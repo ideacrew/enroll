@@ -30,7 +30,7 @@ class BenefitGroupAssignment
 
   scope :renewing,       -> { any_in(aasm_state: RENEWING) }
   scope :active,         -> { where(:is_active => true) }
-  scope :effective_on,   ->(effective_date) { where(:start_on.lte => effective_date, :end_on.gte => effective_date) }
+  scope :effective_on,   ->(effective_date) { where(:start_on => effective_date) }
 
   scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
     where(:start_on.lte => effective_on, :end_on.gte => effective_on, :benefit_package_id => benefit_package.id)

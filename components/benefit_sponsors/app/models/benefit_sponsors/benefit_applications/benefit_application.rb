@@ -472,50 +472,24 @@ module BenefitSponsors
     end
 
     def renew_benefit_package_members
-      if is_renewing?
-        benefit_packages.each do |benefit_package|
-          benefit_package.renew_member_benefits
-        end
-      end
+      return unless is_renewing?
+      benefit_packages.each {|benefit_package| benefit_package.renew_member_benefits }          
     end
 
     def effectuate_benefit_package_members
-      benefit_packages.each do |benefit_package|
-        Family.enrolled_through_benefit_package(benefit_package).each do |family|
-          benefit_package.effectuate_family_coverages(family)
-        end
-      end
+      benefit_packages.each {|benefit_package| benefit_package.effectuate_member_benefits } 
     end
 
     def expire_benefit_package_members
-      benefit_packages.each do |benefit_package|
-        benefit_package.deactivate
-        Family.enrolled_through_benefit_package(benefit_package).each do |family|
-          benefit_package.expire_family_coverages(family)
-        end
-      end
+      benefit_packages.each {|benefit_package| benefit_package.expire_member_benefits } 
     end
 
     def terminate_benefit_package_members
-      benefit_packages.each do |benefit_package|
-        benefit_package.deactivate
-        Family.enrolled_through_benefit_package(benefit_package).each do |family|
-          benefit_package.terminate_family_coverages(family)
-        end
-      end
+      benefit_packages.each {|benefit_package| benefit_package.terminate_member_benefits }
     end
 
     def cancel_benefit_package_members
-      benefit_packages.each do |benefit_package|
-        disable_benefit_package(benefit_package)
-      end
-    end
-
-    def disable_benefit_package(benefit_package)
-      benefit_package.deactivate
-      Family.enrolled_through_benefit_package(benefit_package).each do |family|
-        benefit_package.cancel_family_coverages(family)
-      end
+      benefit_packages.each {|benefit_package| benefit_package.cancel_member_benefits }
     end
 
     def refresh(new_benefit_sponsor_catalog)

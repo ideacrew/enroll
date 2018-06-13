@@ -1,3 +1,4 @@
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
 <div class="profile-content top-pd">
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
@@ -32,7 +33,23 @@
                     <% end %>
                   </div><br>
                   <div class="action-group">
-                    <%= render "benefit_sponsors/shared/office_locations", f: f %>
+                    <%#= render "benefit_sponsors/shared/office_locations", f: f %>
+                    <h2> Office Locations </h2>
+                    <div data-controller="office-locations">
+                      <div data-target="office-locations.officeLocations">
+                        <%= f.fields_for :office_locations, f.object.office_locations.each do |office_fields| %>
+                          <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
+                          <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+
+                          <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
+                            <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
+                            <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f.object.profile_type}  %>
+                          </div>
+                        <% end %>
+                      </div>
+                      <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
+                    </div>
+                    <br/>
                     <div class="row no-buffer">
                       <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
                     </div>
@@ -46,3 +63,7 @@
     </div>
   </div>
 </div>
+
+<script>
+var disableSelectric = true;
+</script>
