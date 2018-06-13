@@ -44,7 +44,7 @@ module BenefitMarkets
       end
     end
 
-    describe "created for a given zip code and county in a state" do
+    describe "created for a given zip code and county in a state", :dbclean => :after_each do
       let(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create!(county_name: "Hampshire", zip: "01001", state: "MA") }
       let(:rating_area) { ::BenefitMarkets::Locations::RatingArea.create!(active_year: TimeKeeper.date_of_record.year, county_zip_ids: [county_zip.id], exchange_provided_code: "MA0") }
 
@@ -77,11 +77,6 @@ module BenefitMarkets
         )
       }
 
-      after(:each) do
-        county_zip.destroy
-        rating_area.destroy
-      end
-
       it "will not be found when given an address not in that county" do
         rating_area
         rating_areas = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_outside_county)
@@ -107,7 +102,7 @@ module BenefitMarkets
       end
     end
 
-    describe "created for a given state" do
+    describe "created for a given state", :dbclean => :after_each do
       let(:rating_area) { ::BenefitMarkets::Locations::RatingArea.create!(active_year: TimeKeeper.date_of_record.year, covered_states: ["MA"], exchange_provided_code: "MA0") }
 
       let(:address_outside_state) {
@@ -124,10 +119,6 @@ module BenefitMarkets
           :state => "MA"
         )
       }
-
-      after(:each) do
-        rating_area.destroy
-      end
 
       it "will not be found when given an address not in that state" do
         rating_area

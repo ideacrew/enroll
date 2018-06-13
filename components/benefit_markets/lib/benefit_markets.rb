@@ -5,6 +5,7 @@ require "virtus"
 require "mongoid"
 require "aasm"
 require 'config'
+require "slim"
 
 module BenefitMarkets
 

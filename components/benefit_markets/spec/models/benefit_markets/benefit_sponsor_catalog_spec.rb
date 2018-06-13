@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitSponsorCatalog, type: :model, db_clean: :after_each do
+  RSpec.describe BenefitSponsorCatalog, type: :model, dbclean: :after_each do
     let(:subject) { described_class.new }
 
     let(:this_year)               { Date.today.year }
@@ -153,7 +153,7 @@ module BenefitMarkets
         end
       end
 
-      context "and the product_packages are different" do
+      context "and the product_packages are different", dbclean: :after_each do
         let(:compare_catalog)     { described_class.new(**params) }
         let(:new_product_package) { FactoryGirl.build(:benefit_markets_products_product_package) }
 
