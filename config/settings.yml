@@ -59,6 +59,7 @@ contact_center:
   alt_phone_number: "1-888-813-9220"
   payment_phone_number: "1-888-813-9220"
   ivl_number: "1-877-623-6765"
+  ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
   non_discrimination_email: "Nondiscrimination@state.ma.us"
@@ -101,6 +102,12 @@ notices:
     city:
     state: "MA"
     zip:
+
+  shop:
+    attachments:
+      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "ma_envelope_without_address.pdf"
+
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
@@ -147,6 +154,9 @@ aca:
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
       end_on: <%= Date.new(2018,02,05) %>
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2018,11,1) %>
+      end_on: <%= Date.new(2019,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'

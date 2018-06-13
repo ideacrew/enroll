@@ -536,27 +536,27 @@ if Settings.aca.state_abbreviation == "MA"
       #         }
       #     ]
       # },
-    {
-      hbx_id: 'SHOP33',
-      title: 'Special Enrollment Period Denial',
-      description: 'EE SEP Requested by Employee outside of allowable time frame',
-      resource_name: 'employee_role',
-      event_name: 'sep_request_denial_notice',
-      notice_triggers: [
-        {
-          name: 'Denial of SEP Requested by EE outside of allowable time frame',
-          notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
-          notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-          mpi_indicator: 'SHOP_M033',
-          notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employee"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
+    # {
+    #   hbx_id: 'SHOP33',
+    #   title: 'Special Enrollment Period Denial',
+    #   description: 'EE SEP Requested by Employee outside of allowable time frame',
+    #   resource_name: 'employee_role',
+    #   event_name: 'sep_request_denial_notice',
+    #   notice_triggers: [
+    #     {
+    #       name: 'Denial of SEP Requested by EE outside of allowable time frame',
+    #       notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
+    #       notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
+    #       mpi_indicator: 'SHOP_M033',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employee"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
     # {
     #   hbx_id: 'SHOP32',
     #   title: 'EE SEP Requested Enrollment Period Approval Notice',
@@ -792,27 +792,27 @@ if Settings.aca.state_abbreviation == "MA"
       #   ]
       # },
 
-      {
-          hbx_id: 'SHOP47',
-          title: 'You have been removed as a Broker',
-          description: "When a broker is fired, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-          resource_name: 'broker_role',
-          event_name: 'broker_agency_fired_confirmation',
-          notice_triggers: [
-             {
-                name: 'Broker Agency Fired',
-                notice_template: 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
-                notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
-                mpi_indicator: 'SHOP_M047',
-                notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["broker"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP47',
+      #     title: 'You have been removed as a Broker',
+      #     description: "When a broker is fired, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+      #     resource_name: 'broker_role',
+      #     event_name: 'broker_agency_fired_confirmation',
+      #     notice_triggers: [
+      #        {
+      #           name: 'Broker Agency Fired',
+      #           notice_template: 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
+      #           notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
+      #           mpi_indicator: 'SHOP_M047',
+      #           notice_trigger_element_group: {
+      #             market_places: ['shop'],
+      #             primary_recipients: ["broker"],
+      #             primary_recipient_delivery_method: ["secure_message"],
+      #             secondary_recipients: []
+      #           }
+      #         }
+      #     ]
+      # },
     # {
     #   hbx_id: 'SHOP27',
     #   title: 'Final Reminder to publish Application',
@@ -1003,27 +1003,27 @@ if Settings.aca.state_abbreviation == "MA"
       #         }
       #     ]
       # },
-      {
-          hbx_id: 'SHOP_M053',
-          title: 'EE Ineligibility Notice – Terminated from Roster',
-          description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
-          resource_name: 'employee_role',
-          event_name: 'employee_termination_notice',
-          notice_triggers: [
-            {
-                  name: 'Employee Termination Notice',
-                  notice_template: 'notices/shop_employee_notices/employee_termination_notice',
-                  notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
-                  mpi_indicator: 'SHOP_M053',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employee"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP_M053',
+      #     title: 'EE Ineligibility Notice – Terminated from Roster',
+      #     description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
+      #     resource_name: 'employee_role',
+      #     event_name: 'employee_termination_notice',
+      #     notice_triggers: [
+      #       {
+      #             name: 'Employee Termination Notice',
+      #             notice_template: 'notices/shop_employee_notices/employee_termination_notice',
+      #             notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
+      #             mpi_indicator: 'SHOP_M053',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employee"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
       # {
       #     hbx_id: 'SHOP_M041',
       #     title: 'Notice Confirmation for Group termination due to ER advance request',
@@ -1064,6 +1064,27 @@ if Settings.aca.state_abbreviation == "MA"
       #               secondary_recipients: []
       #         }
       #       }
+      #     ]
+      # },
+      # {
+      #     hbx_id: 'SHOP_M041',
+      #     title: 'Notice Confirmation for Group termination due to ER advance request',
+      #     description: 'Group termination confirmation for advance request',
+      #     resource_name: 'employer',
+      #     event_name: 'group_advance_termination_confirmation',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Notice to employee after they select a plan Annual Open Enrollment',
+      #             notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
+      #             notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
+      #             mpi_indicator: 'SHOP_M041',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
       #     ]
       # },
     # {
@@ -2547,7 +2568,6 @@ elsif Settings.aca.state_abbreviation == "DC"
         }
       ]
     },
-
     {
       hbx_id: 'IVLR3',
       title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
@@ -2795,4 +2815,3 @@ ivl_notice_triggers.each do |trigger_params|
 end
 
 puts "::: created notice triggers for #{Settings.aca.state_abbreviation} ApplicationEventKinds Successfully :::"
-
