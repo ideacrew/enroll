@@ -13,10 +13,11 @@ FactoryGirl.define do
       is_primary true
       address { FactoryGirl.build(:benefit_sponsors_locations_address,
                     kind: "primary",
-                    city: 'boston',
+                    address_1: '26 Greenough Ave',
+                    city: 'Boston',
                     state: 'MA',
-                    zip: '10010',
-                    county: 'Hampstead',
+                    zip: '02130',
+                    county: 'Suffolk'
                   )
                 }
       phone   { FactoryGirl.build(:benefit_sponsors_locations_phone,

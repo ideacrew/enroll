@@ -31,14 +31,14 @@ module BenefitMarkets
     def self.rating_area_for(address, during: TimeKeeper.date_of_record)
       county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
         :zip => address.zip,
-        :county_name => address.county,
-        :state => address.state
+        :county_name => address.county.titlecase,
+        :state => address.state.upcase
       ).map(&:id)
       area = self.where(
         "active_year" => during.year,
         "$or" => [
           {"county_zip_ids" => { "$in" => county_zip_ids }},
-          {"covered_states" => address.state}
+          {"covered_states" => address.state.upcase}
         ]
       )
       raise "Multiple Rating Areas Returned" if area.size > 1
