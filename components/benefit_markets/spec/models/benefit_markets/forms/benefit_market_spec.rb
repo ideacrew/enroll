@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitMarkets
   module Forms
-    RSpec.describe BenefitMarket, type: :model do
+    RSpec.describe BenefitMarket, type: :model, dbclean: :after_each do
       shared_context "params", :shared_context => :metadata do
         let(:params) do
           {

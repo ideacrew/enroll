@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitMarkets
-  RSpec.describe BenefitSponsorCatalog, type: :model do
+  RSpec.describe BenefitSponsorCatalog, type: :model, db_clean: :after_each do
     let(:subject) { described_class.new }
 
     let(:this_year)               { Date.today.year }
