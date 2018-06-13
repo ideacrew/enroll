@@ -216,7 +216,7 @@ module BenefitSponsors
       end
 
       def renew_member_benefits
-        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
+        census_employees_assigned_on(effective_period.min, false).each { |member| renew_member_benefit(member) }
       end
 
       def renew_member_benefit(census_employee)
@@ -229,7 +229,6 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-
           enrollments = family.enrollments.by_benefit_sponsorship(benefit_sponsorship)
           .by_effective_period(predecessor_benefit_package.effective_period)
           .enrolled_and_waived
@@ -250,38 +249,55 @@ module BenefitSponsors
         sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
       end
 
-      def effectuate_family_coverages(family)
-        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-        sponsored_benefits.map(&:product_kind).each do |product_kind|
-          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
-          hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
-        end
+      def enrolled_families
+        Family.enrolled_through_benefit_package(self)
       end
 
-      def expire_family_coverages(family)
-        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-        sponsored_benefits.map(&:product_kind).each do |product_kind|
-          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
-          hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
-        end
-      end
+      def effectuate_member_benefits
+        enrolled_families.each do |family| 
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
-      def terminate_family_coverages(family)
-        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-        sponsored_benefits.map(&:product_kind).each do |product_kind|
-          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
-          if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.terminate_coverage!
-            hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+            hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
           end
         end
       end
 
-      def cancel_family_coverages(family)
-        enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-        sponsored_benefits.map(&:product_kind).each do |product_kind|
-          hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
-          hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+      def expire_member_benefits
+        enrolled_families.each do |family|
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+            hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
+          end
+        end
+      end
+ 
+      def terminate_member_benefits
+        enrolled_families.each do |family|
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+            
+            if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
+              hbx_enrollment.terminate_coverage!
+              hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+            end
+          end
+        end
+      end
+
+      def cancel_member_benefits(family)
+        enrolled_families.each do |family|
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+            hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+          end
         end
       end
 
@@ -294,8 +310,8 @@ module BenefitSponsors
         sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind.to_s == coverage_kind.to_s }
       end
 
-      def census_employees_assigned_on(effective_date)
-        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_terminated
+      def census_employees_assigned_on(effective_date, is_active = true)
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
       end
 
       def self.find(id)
