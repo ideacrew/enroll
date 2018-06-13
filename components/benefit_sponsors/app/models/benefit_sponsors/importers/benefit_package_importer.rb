@@ -9,6 +9,8 @@ module BenefitSponsors
       #   :plan_option_kind, :reference_plan_hios_id, :relationship_benefits, :dental_reference_plan_hios_id, :dental_relationship_benefits 
       # }
 
+      attr_accessor :benefit_package
+
       def self.call(benefit_application, args)
         self.new(benefit_application, args)
       end
@@ -26,6 +28,7 @@ module BenefitSponsors
         benefit_package.probation_period_kind = probation_period_kind_for(attributes[:effective_on_kind], attributes[:effective_on_offset])
         construct_sponsored_benefit(benefit_package, filtered_attributes_for(attributes, :health))
         construct_sponsored_benefit(benefit_package, filtered_attributes_for(attributes, :dental)) if is_offering_dental?(attributes)
+        @benefit_package = benefit_package
       end
 
       # TODO: Enhance this to handle Dental Sponsored Benefits
