@@ -49,6 +49,10 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
 
     def benefit_sponsorship_for(new_organization, plan_year_start)
+      if new_organization.benefit_sponsorships.size == 1
+        return new_organization.benefit_sponsorships[0] if new_organization.benefit_sponsorships[0].effective_begin_on.blank?
+      end
+
       benefit_sponsorship = new_organization.benefit_sponsorships.desc(:effective_begin_on).effective_begin_on(plan_year_start).first
 
       if benefit_sponsorship && benefit_sponsorship.effective_end_on.present?
@@ -116,12 +120,14 @@ class BenefitApplicationMigration < Mongoid::Migration
         next unless new_organization.present?
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
+          @benefit_package_map = {}
           begin
             benefit_sponsorship = BenefitSponsorshipMigrationService.fetch_sponsorship_for(new_organization, plan_year)
-            benefit_application = contruct_benefit_application(benefit_sponsorship, plan_year)
+            benefit_application = convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year)
 
             if benefit_application.valid?
               benefit_application.save!
+              assign_employee_benefits(benefit_sponsorship)
               csv << [old_org.legal_name, old_org.fein, plan_year.start_on, 'Success']
               success += 1
             else
@@ -140,40 +146,40 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
   end
 
-  def construct_benefit_application(benefit_sponsorship, plan_year)
-    benefit_application = construct_benefit_application(benefit_sponsorship, plan_year)
-
+  # TODO: Verify updated by field on plan year
+  # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
+  def convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year)
     py_attrs = plan_year.attributes.except(:benefit_groups, :workflow_state_transitions)
     application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :enrolled_summary, :waived_summary, :created_at, :updated_at, :terminated_on)
 
     benefit_application = benefit_sponsorship.benefit_applications.new(application_attrs)
-    benefit_application.effective_period = (plan_year.start_on..plan_year.end_on)
+    benefit_application.effective_period       = (plan_year.start_on..plan_year.end_on)
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
-
-    # "aasm_state"=>"active",
-    # "imported_plan_year"=>false,
-    # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
     benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
 
+    # TODO: do unscoped...to pick all the benefit groups
     plan_year.benefit_groups.each do |benefit_group|
-      params = santize_benefit_group_attrs(benefit_group)
-      BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, params)
-    end
-
-    if plan_year.is_conversion
-      aasm_state = :imported
-    else
+      params = sanitize_benefit_group_attrs(benefit_group)
+      importer = BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, params)
+      if importer.benefit_package.blank?
+        raise Standard, "Benefit Package creation failed"
+      end
+      @benefit_package_map[benefit_group] = importer.benefit_package
     end
 
     benefit_application.aasm_state = benefit_application.matching_state_for(plan_year)
-    @benefit_sponsor_catalog =  nil
+
+    if plan_year.is_conversion
+      benefit_application.aasm_state = :imported
+    end
+
     construct_workflow_state_transitions(benefit_application, plan_year)
     benefit_application
   end
 
-  def santize_benefit_group_attrs(benefit_group)
+  def sanitize_benefit_group_attrs(benefit_group)
     attributes = benefit_group.attributes.slice(
       :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind,
       :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
@@ -188,6 +194,23 @@ class BenefitApplicationMigration < Mongoid::Migration
   def construct_workflow_state_transitions(benefit_application, plan_year)
     plan_year.workflow_state_transitions.asc(:transition_at).each do |wst|
       benefit_application.workflow_state_transitions.build(wst.attributes.except(:_id))
+    end
+  end
+
+  def assign_employee_benefits(benefit_sponsorship)
+    @benefit_package_map.each do |benefit_group, benefit_package|
+      benefit_group.census_employees.each do |census_employee|
+        if census_employee.benefit_sponsorship_id.blank?
+          census_employee.benefit_sponsorship = benefit_sponsorship
+        end
+
+        census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+          if benefit_group_assignment.benefit_group_id.to_s == benefit_group.id.to_s
+            benefit_group_assignment.benefit_package_id = benefit_package.id
+          end
+        end
+      end
+      census_employee.save(:validate => false)
     end
   end
 

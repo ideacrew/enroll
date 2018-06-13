@@ -111,18 +111,19 @@
           <% end %>
           </div>
           <h2> Office Locations </h2>
-          <div data-controller="site">
-            <div data-target="site.officeLocations">
+          <div data-controller="office-locations">
+            <div data-target="office-locations.officeLocations">
               <%= f_profile.fields_for :office_locations, f_profile.object.office_locations.each do |office_fields| %>
                 <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
                 <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
 
-                <div data-target="<%= 'site.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
-                  <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields}  %>
+                <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
+                  <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
+                  <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f_profile.object.profile_type}  %>
                 </div>
               <% end %> 
             </div>
-            <a class="btn btn-default pull-left col-12" data-action="click->site#addLocation">Add Office Location</a>
+            <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
           </div>
           <br/>
           <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f_profile %><br>

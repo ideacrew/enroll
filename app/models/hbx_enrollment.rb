@@ -1484,10 +1484,10 @@ class HbxEnrollment
   def new_hire_enrollment_for_shop?
     return false if is_special_enrollment?
     return false unless is_shop?
-    shopping_plan_year = benefit_group.plan_year
+    shopping_plan_year = sponsored_benefit_package.benefit_application
     purchased_at = [submitted_at, created_at].compact.max
-    return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
-    !(shopping_plan_year.start_on == effective_on)
+    return true unless (shopping_plan_year.open_enrollment_period.min..shopping_plan_year.open_enrollment_period.max).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
+    !(shopping_plan_year.effective_period.min== effective_on)
   end
 
   def update_coverage_kind_by_plan

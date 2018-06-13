@@ -41,7 +41,7 @@ module BenefitMarkets
           {"covered_states" => address.state.upcase}
         ]
       )
-      raise "Multiple Rating Areas Returned" if area.size > 1
+      raise "Multiple Rating Areas Returned" if area.count > 1
       return nil if area.nil?
       area.first
     end

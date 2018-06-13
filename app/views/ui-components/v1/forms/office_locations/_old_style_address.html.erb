@@ -32,7 +32,8 @@
             </div>
 
             <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd delete_address">
-              <%= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
+              <%#= link_to image_tag('delete.png'), 'javascript:void(0)', class: 'remove_fields close-2' %>
+              <a class="remove_fields close-2" data-action="click->office-locations#removeLocation"><i class="far fa-trash-alt fa-2x role-trashcan"></i></a>
             </div>
           </div>
 
@@ -54,7 +55,7 @@
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                  <%= f.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP',oninvalid:"checkZip(this);", oninput:"checkZip(this);", data: { 'child-index': "#{f.index.to_s}" } %>
               </div>
-              <% if controller_name == 'registrations' && aca_address_query_county && primary_office_location %>
+              <% if aca_address_query_county && profile_type == "benefit_sponsor" && primary_office_location %>
                 <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
                    <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: f.object.try(:zip)).pluck(:county_name).uniq %>
                    <% @empty_message = f.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
