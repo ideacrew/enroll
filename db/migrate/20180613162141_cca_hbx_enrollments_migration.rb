@@ -31,9 +31,10 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
 
   def self.update_hbx_enrollments(logger)
     ces = CensusEmployee.all
-    issuer_orga = BenefitSponsors::Organizations::Organization.issuer_profiles
-    carrier_orga = Organization.exists(carrier_profile: true)
-    products = BenefitMarkets::Products::Product.all
+    @issuer_orga = BenefitSponsors::Organizations::Organization.issuer_profiles
+    @carrier_orga = Organization.exists(carrier_profile: true)
+    @products = BenefitMarkets::Products::Product.all
+
     begin
       ces.each do |ce|
 
@@ -41,20 +42,24 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
         ce.benefit_group_assignments.each do |bga|
 
           enrollment = bga.hbx_enrollment
-          next unless enrollment.product_id.blank? && enrollment.issuer_profile_id.blank? && enrollment.benefit_sponsorship_id.blank?
+          next unless enrollment.product_id.blank? && enrollment.benefit_sponsorship_id.blank?
 
           #get plan_id - product_id
           next unless enrollment.plan.present?
           hios_id = enrollment.plan.hios_id
           plan_active_year = enrollment.plan.active_year
-          products = products.where(hios_id: hios_id).and(:"application_period.min.year" => plan_active_year)
-          product_id = products.first.id if products.count == 1
+          products = @products.where(hios_id: hios_id)
+          product = products.select {|product| product.application_period.min.year == plan_active_year}
+          product_id = product.first.id if product.count == 1
 
+          issuer_profile_id = nil
           #get carrier_profile_id - issuer_profile_id
-          next unless enrollment.carrier_profile_id.present?
-          carrier_profile_id = enrollment.carrier_profile_id
-          carrier_profile_hbx_id = carrier_orga.where(id: carrier_profile_id).first.hbx_id
-          issuer_profile_id = issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id
+          if enrollment.carrier_profile_id.present?
+            carrier_profile_id = enrollment.carrier_profile_id
+            carrier_profile_hbx_id = @carrier_orga.where(id: carrier_profile_id).first.hbx_id
+            issuer_profile_id = @issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id
+          end
+
 
           #get benefit_sponsorship_id
           benefit_sponsorship_id = ce.benefit_sponsorship.id

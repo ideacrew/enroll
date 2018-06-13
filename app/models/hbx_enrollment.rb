@@ -1538,8 +1538,8 @@ class HbxEnrollment
 
   def composite_rated?
     return false if dental?
-    return false if benefit_group_id.blank?
-    benefit_group.sole_source?
+    return false if sponsored_benefit_package_id.blank?
+    sponsored_benefit.single_plan_type?
   end
 
   def rating_area
