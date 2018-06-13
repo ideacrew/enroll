@@ -91,7 +91,7 @@ module BenefitSponsors
       end
 
       def reference_plan_id=(product_id)
-        self.reference_product = product_package.products.where(id: product_id).first
+        self.reference_product = product_package.products.where(id: product_id).first.create_copy_for_embedding(self, self.relations["reference_product"])
       end
 
       def sponsor_contribution_attributes=(sponsor_contribution_attrs)
