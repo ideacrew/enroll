@@ -3,8 +3,9 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
+        before_action :check_and_download_invoice, only: [:download_invoice]
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -44,17 +45,14 @@ module BenefitSponsors
                 @current_plan_year = @benefit_sponsorship.submitted_benefit_application
               end
 
-
-                 # collect_and_sort_invoices(params[:sort_order])
-                 # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+              collect_and_sort_invoices(params[:sort_order])
+              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
               respond_to do |format|
                 format.html
                 format.js
               end
             end
-
-
           end
         end
 
@@ -101,7 +99,23 @@ module BenefitSponsors
           @sent_box = false
         end
 
+        def download_invoice
+          options={}
+          options[:content_type] = @invoice.type
+          options[:filename] = @invoice.title
+          send_data Aws::S3Storage.find(@invoice.identifier) , options
+        end
+
         private
+
+        def check_and_download_invoice
+          @invoice = @employer_profile.documents.find(params[:invoice_id])
+        end
+
+        def collect_and_sort_invoices(sort_order='ASC')
+          @invoices = @employer_profile.invoices
+          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+        end
 
         def find_employer
           id_params = params.permit(:id, :employer_profile_id)

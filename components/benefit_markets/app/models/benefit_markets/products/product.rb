@@ -236,9 +236,13 @@ module BenefitMarkets
       product_packages.delete(product_package) { "not found" }
     end
 
-    def create_copy_for_embedding
+    def create_copy_for_embedding(parent, relation)
       new_product = self.class.new(self.attributes.except(:premium_tables))
       new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
+      new_product.__metadata = relation
+      new_product.embedded = true
+      new_product._parent = parent
+      new_product.atomic_paths
       new_product
     end
   end

@@ -299,7 +299,6 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-
       # {
       #   hbx_id: 'SHOP3B',
       #   title: 'Plan Offerings Finalized',
@@ -514,28 +513,6 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-
-      {
-          hbx_id: 'SHOP_M020',
-          title: 'Initial Ineligible to Obtain Coverage',
-          description: 'Notice goes to Initial groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
-          resource_name: 'employer',
-          event_name: 'initial_employer_ineligibility_notice',
-          notice_triggers: [
-              {
-                  name: 'Initial Group Ineligible to Obtain Coverage',
-                  notice_template: 'notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice',
-                  notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-                  mpi_indicator: 'SHOP_M020',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
     {
       hbx_id: 'SHOP33',
       title: 'Special Enrollment Period Denial',
@@ -2710,4 +2687,3 @@ ivl_notice_triggers.each do |trigger_params|
 end
 
 puts "::: created notice triggers for #{Settings.aca.state_abbreviation} ApplicationEventKinds Successfully :::"
-
