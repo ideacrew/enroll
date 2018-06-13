@@ -187,10 +187,12 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
           expect(merge_model.plan_year.current_py_end_date).to eq current_py.end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-
-          expect(merge_model.plan_year.enrollment_errors).to include(:non_business_owner_enrollment_count)
+          enrollment_errors = []
+          enrollment_errors << "One non-owner employee enrolled in health coverage"
+          enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+          expect(merge_model.plan_year.enrollment_errors).to include(enrollment_errors.join(' AND/OR '))
           if model_instance.start_on.yday != 1
-            expect(merge_model.plan_year.enrollment_errors).to include(:enrollment_ratio)
+            expect(merge_model.plan_year.enrollment_errors).to include(enrollment_errors.join(' AND/OR '))
           end
 
           TimeKeeper.set_date_of_record_unprotected!(current_date)

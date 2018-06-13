@@ -4,7 +4,7 @@ describe "app/views/events/v2/employers/_elected_plan.xml.haml" do
   let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:carrier_special_plan_id)  { "abcde" }
   let!(:application_period)  { TimeKeeper.date_of_record.beginning_of_month..TimeKeeper.date_of_record.beginning_of_month + 1.year }
-  let!(:elected_plan)  { BenefitMarkets::Products::DentalProducts::DentalProduct.create(application_period: application_period, carrier_special_plan_identifier:carrier_special_plan_id,issuer_profile: issuer_profile) }
+  let!(:elected_plan)  { BenefitMarkets::Products::DentalProducts::DentalProduct.create(application_period: application_period, issuer_assigned_id:carrier_special_plan_id,issuer_profile: issuer_profile) }
 
   before :each do
     allow(elected_plan).to receive(:ehb).and_return(0.0)
