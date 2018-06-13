@@ -238,6 +238,7 @@ $(document).ready(function() {
         $(clonedForm).find('select').selectric();
         //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
     $('#has_job_income_true').click(function(e) {
@@ -496,8 +497,9 @@ $(':input[required]').on('keyup change', function(){
 function validateForm(form) {
   var isValid = true;
   form.find(':input[required]').each(function() {
-    if ( $(this).val() == '' ||  $(this).val()=='0')
+    if ( $(this).val() == '' ||  $(this).val()=='0.00' || $(this).val()=='Choose' ) {
       isValid = false;
+    }
   });
   return isValid;
 }

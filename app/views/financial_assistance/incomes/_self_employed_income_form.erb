@@ -8,7 +8,7 @@
 
       <div class="col-md-3 fa-select select-box">
         <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
-        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), prompt: 'Choose',required: true %>
+        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
       </div>
 
       <div class="col-md-3">
