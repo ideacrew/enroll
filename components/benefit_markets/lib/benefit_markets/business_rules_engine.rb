@@ -18,7 +18,7 @@
 #         rules: [:name_of_first_rule, :name_of_second_rule]
 #
 # Execute the Business Policy:
-#   assert_business_policies(:name_of_first_business_policy)
+#   assert_business_policies([:name_of_first_business_policy])
 #
 module BenefitMarkets
   module BusinessRulesEngine
@@ -29,21 +29,18 @@ module BenefitMarkets
       class_attribute :rules
       self.business_policies = {}
       self.rules = []
+    end
 
-      # TONY: Make this an instance method
-      def assert_business_policies(name)
-        if name
-          # TONY:  iterate through hash and not array
-          business_policies.each do |business_policy, value|
-            business_policies[business_policy].send(:process_rules)
+    module ClassMethods
+      def assert_business_policies(names = [])
+        if names.size == 0
+          business_policies.each do |business_policy|
+            business_policy.send(:process_rules)
           end
         else
           business_policies[name].send(:process_rules) if business_policies.has_key?(name)
         end
       end
-    end
-
-    class_methods do
 
       def register_business_policy(name, business_policy)
         raise Error, "business_policy #{name} already exists" if business_policies.has_key?(name)
@@ -69,6 +66,7 @@ module BenefitMarkets
             list
           end
         end
+
         business_policy = BusinessRulesEngine::BusinessPolicy.new(name, options)
         register_business_policy(name, business_policy)
       end
@@ -121,7 +119,7 @@ module BenefitMarkets
         @fail_results.empty?
       end
 
-      def process_rules(model_instance = nil)
+      def process_rules(model_instance)
         rules.sort_by(&:priority).each do |rule|
           success, result = rule.run(model_instance)
           if success
@@ -133,7 +131,6 @@ module BenefitMarkets
       end
 
       def <<(new_rule)
-        puts "adding rule"
         if new_rule.is_a? BusinessRulesEngine::Rule
           @rules << new_rule
           new_rule

@@ -18,7 +18,6 @@ module BenefitSponsors
       }
     end
 
-
     context "A new model instance" do
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_field(:title).of_type(String).with_default_value_of("")}
@@ -70,7 +69,6 @@ module BenefitSponsors
         end
       end
     end
-
 
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
@@ -145,6 +143,35 @@ module BenefitSponsors
     describe '.renew_employee_benefits' do
       include_context "setup employees with benefits"
 
+    end
+
+    describe 'changing reference product' do
+      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+      let!(:benefit_market) { site.benefit_markets.first }
+      let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+      let!(:benefit_application) {
+        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
+        application.benefit_sponsor_catalog.save!
+        application
+      }
+
+      let(:benefit_package) { create :benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application }
+      let(:sponsored_benefit) { benefit_package.sponsored_benefits.first }
+      let(:product) { sponsored_benefit.product_package.products.first }
+
+      before do
+        sponsored_benefit.reference_plan_id = product.id
+        bp = sponsored_benefit.benefit_package
+        ba = bp.benefit_application
+        ba.save!
+        ba.reload
+      end
+
+      it 'changes to the correct product' do
+        expect(sponsored_benefit.reference_product).to eq(product)
+      end
     end
   end
 end
