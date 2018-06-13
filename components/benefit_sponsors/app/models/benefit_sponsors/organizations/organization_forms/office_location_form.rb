@@ -6,6 +6,7 @@ module BenefitSponsors
 
       attribute :id, String
       attribute :is_primary, Boolean
+      attribute :_destroy, Boolean
       attribute :address, ::BenefitSponsors::Organizations::OrganizationForms::AddressForm
       attribute :phone, ::BenefitSponsors::Organizations::OrganizationForms::PhoneForm
 

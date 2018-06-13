@@ -42,6 +42,9 @@ export default class extends Controller {
 
   removeLocation(event) {
     //remove itself
-    event.target.closest('.js-office-location').remove()
+    event.target.closest('.js-office-location').querySelectorAll('input[id="delete_location"]').forEach(function(input) {
+      input.setAttribute('value', true)
+    })
+    event.target.closest('.js-office-location').hide();
   }
 }

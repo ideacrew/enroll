@@ -97,10 +97,12 @@ module BenefitSponsors
 
       def office_locations_form_to_params(locations)
         locations.each_with_index.inject({}) do |result, (form, index_val)|
-          result[index_val] = sanitize_params(form.attributes.slice(:is_primary, :id)).merge({
+          attributes = sanitize_params(form.attributes.slice(:is_primary, :id, :_destroy))
+          attributes.merge!({
             :phone_attributes =>  phone_form_to_params(form.phone),
             :address_attributes =>  address_form_to_params(form.address)
-          })
+          }) unless (attributes[:_destroy] == "true")
+          result[index_val] = attributes
           result
         end
       end
