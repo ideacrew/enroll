@@ -332,6 +332,10 @@ module BenefitSponsors
       predecessor_application.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
     end
 
+    def is_conversion?
+      IMPORTED_STATES.include?(aasm_state)
+    end
+
     def is_renewal_enrolling?
       predecessor_application.present? && (ENROLLING_STATES).include?(aasm_state)
     end

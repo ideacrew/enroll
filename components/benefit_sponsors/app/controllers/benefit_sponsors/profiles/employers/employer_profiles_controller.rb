@@ -3,8 +3,9 @@ module BenefitSponsors
     module Employers
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :show_pending]
+        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :coverage_reports, :download_invoice]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
+        before_action :check_and_download_invoice, only: [:download_invoice]
         layout "two_column", except: [:new]
 
         #New person registered with existing organization and approval request submitted to employer
@@ -44,17 +45,14 @@ module BenefitSponsors
                 @current_plan_year = @benefit_sponsorship.submitted_benefit_application
               end
 
-
-                 # collect_and_sort_invoices(params[:sort_order])
-                 # @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+              collect_and_sort_invoices(params[:sort_order])
+              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
               respond_to do |format|
                 format.html
                 format.js
               end
             end
-
-
           end
         end
 
@@ -101,12 +99,29 @@ module BenefitSponsors
           @sent_box = false
         end
 
+        def download_invoice
+          options={}
+          options[:content_type] = @invoice.type
+          options[:filename] = @invoice.title
+          send_data Aws::S3Storage.find(@invoice.identifier) , options
+        end
+
         private
+
+        def check_and_download_invoice
+          @invoice = @employer_profile.documents.find(params[:invoice_id])
+        end
+
+        def collect_and_sort_invoices(sort_order='ASC')
+          @invoices = @employer_profile.invoices
+          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+        end
 
         def find_employer
           id_params = params.permit(:id, :employer_profile_id)
           id = id_params[:id] || id_params[:employer_profile_id]
-          @employer_profile = BenefitSponsors::Organizations::Profile.find(id)
+          @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
+          @employer_profile = @organization.employer_profile
           render file: 'public/404.html', status: 404 if @employer_profile.blank?
         end
 
@@ -163,7 +178,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [
+                csv << [  
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,

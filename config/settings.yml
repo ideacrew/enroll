@@ -59,6 +59,7 @@ contact_center:
   alt_phone_number: "1-888-813-9220"
   payment_phone_number: "1-888-813-9220"
   ivl_number: "1-877-623-6765"
+  ivl_phone_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
   non_discrimination_email: "Nondiscrimination@state.ma.us"

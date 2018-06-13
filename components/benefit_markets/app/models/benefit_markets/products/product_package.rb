@@ -116,7 +116,7 @@ module BenefitMarkets
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
     def load_embedded_products(service_areas, effective_date)
-      benefit_market_products_available_for(service_areas, effective_date).collect { |prod| prod.create_copy_for_embedding }
+      benefit_market_products_available_for(service_areas, effective_date).collect { |prod| prod.create_copy_for_embedding(self, self.relations["products"]) }
     end
 
     # Query products from database applicable to this product package

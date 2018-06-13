@@ -1,5 +1,6 @@
 module Notifier
   class Builders::EmployeeProfile
+
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
     include Notifier::Builders::PlanYear
@@ -75,7 +76,11 @@ module Notifier
 
     def enrollment_coverage_end_on
       return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
+      if event_name == "employee_notice_for_employee_terminated_from_roster"
+        merge_model.enrollment.coverage_end_on = format_date(census_employee_record.employment_terminated_on.end_of_month)
+      else
+        merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
+      end
     end
 
     def enrollment_coverage_start_on
@@ -140,17 +145,11 @@ module Notifier
     end
 
     def latest_terminated_health_enrollment
-      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
-        census_employee_record.employment_terminated_on < hbx.terminated_on
-      end
-      enrollment
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" }.first
     end
 
     def latest_terminated_dental_enrollment
-      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("dental").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
-        census_employee_record.employment_terminated_on < hbx.terminated_on
-      end
-      enrollment
+      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" }.first
     end
 
     def census_employee_latest_terminated_health_enrollment_plan_name
@@ -169,6 +168,18 @@ module Notifier
       employee_role.employer_profile
     end
 
+    def dependents_name
+      names = []
+      payload["notice_params"]["dep_hbx_ids"].each do |dep_id|
+        names << Person.where(hbx_id: dep_id).first.full_name
+      end
+      merge_model.dependents_name = names.join(", ")
+    end
+
+    def dependent_termination_date
+      merge_model.dependent_termination_date = format_date(TimeKeeper.date_of_record.end_of_month)
+    end
+    
     def special_enrollment_period
       return @special_enrollment_period if defined? @special_enrollment_period
       if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod

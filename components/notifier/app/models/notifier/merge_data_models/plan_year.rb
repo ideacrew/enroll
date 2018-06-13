@@ -69,10 +69,9 @@ module Notifier
         renewal_binder_due_data: '09/25/2017',
         ivl_open_enrollment_end_on: '01/31/2018',
         ivl_open_enrollment_start_on: '11/01/2017',
-        enrollment_errors: {non_business_owner_enrollment_count: "at least 3 non-owner employee must enroll"},
+        enrollment_errors: "at least 3 non-owner employee must enroll",
         total_enrolled_count: '2',
         eligible_to_enroll_count: '6'
-
       })
     end
   end

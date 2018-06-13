@@ -61,11 +61,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-
-    @organizations= Organization.where(:id.in => params[:ids]).all
-
-    @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
+    @organizations = BenefitSponsors::Organizations::Organization.where(:"_id".in => params[:ids]).all
+    @employer_profiles = @organizations.flat_map(&:employer_profile)
+    @employer_profiles.each do |employer_profile|
+      @employer_invoice = BenefitSponsors::EmployerInvoice.new(employer_profile.organization)
       @employer_invoice.save_and_notify_with_clean_up
     end
 
@@ -83,7 +82,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-    @datatable = Effective::Datatables::EmployerDatatable.new
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
 
     respond_to do |format|
       format.js
