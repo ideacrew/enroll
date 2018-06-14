@@ -2,7 +2,8 @@ module BenefitSponsors
   class BenefitApplications::BenefitApplicationEnrollmentService
     include Config::AcaModelConcern
 
-    attr_reader :benefit_application
+    attr_reader   :benefit_application
+    attr_accessor :business_policy
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
@@ -34,8 +35,10 @@ module BenefitSponsors
         if is_application_eligible? # TODO: change it to is_application_valid?
           benefit_application.approve_application!
 
-          if benefit_application.open_enrollment_period.begin >= TimeKeeper.date_of_record
+          oe_period = benefit_application.open_enrollment_period
+          if today >= oe_period.begin
             benefit_application.begin_open_enrollment!
+            benefit_application.update(open_enrollment_period: (today..oe_period.end))
           end
 
           [true, benefit_application, application_warnings]
@@ -53,7 +56,7 @@ module BenefitSponsors
         if benefit_application.may_approve_application?
           benefit_application.approve_application! 
 
-          if benefit_application.open_enrollment_period.begin >= TimeKeeper.date_of_record
+          if benefit_application.open_enrollment_period.begin >= today
             benefit_application.begin_open_enrollment! 
           end
         end
@@ -63,11 +66,13 @@ module BenefitSponsors
     end
 
     def begin_open_enrollment
-      # benefit_application.validate_sponsor_market_policy
-      # return false unless benefit_application.is_valid?
-      # business_policy.assert(benefit_application)
-
-      # if business_policy.is_satisfied?(benefit_application)
+      open_enrollment_begin = benefit_application.open_enrollment_period.begin
+      
+      if today >= open_enrollment_begin
+        # benefit_application.validate_sponsor_market_policy
+        # return false unless benefit_application.is_valid?
+        # business_policy.assert(benefit_application)
+        # if business_policy.is_satisfied?(benefit_application)
 
         if benefit_application.may_begin_open_enrollment?
           benefit_application.begin_open_enrollment!
@@ -75,6 +80,7 @@ module BenefitSponsors
           benefit_application.errors.add(:base => "State transition failed")
           return false
         end
+      end
       # else
       #   business_policy.errors
       # end
@@ -90,18 +96,24 @@ module BenefitSponsors
     def begin_benefit
       if benefit_application.may_activate_enrollment?
         benefit_application.activate_enrollment!
+      else
+        raise StandardError, "Benefit begin state transition failed"
       end
     end
 
     def cancel
       if benefit_application.may_cancel?
         benefit_application.cancel!
+      else
+        raise StandardError, "Benefit cancel state transition failed"
       end
     end
 
     def end_benefit
       if benefit_application.may_expire?
         benefit_application.expire!
+      else
+        raise StandardError, "Benefit expire state transition failed"
       end
     end
 
@@ -183,6 +195,10 @@ module BenefitSponsors
 
     def application_eligibility_warnings
       {}
+    end
+
+    def today
+      TimeKeeper.date_of_record
     end
 
     private

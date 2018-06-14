@@ -206,7 +206,7 @@ class HbxEnrollment
 
   embeds_many :workflow_state_transitions, as: :transitional
 
-  belongs_to  :benefit_sponsorship,
+  belongs_to :benefit_sponsorship,
               class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
   embeds_many :hbx_enrollment_members
@@ -650,10 +650,6 @@ class HbxEnrollment
   #   is_shop? ? benefit_group : benefit_sponsor.benefit_coverage_period.each {}
   # end
   #
-  def benefit_sponsorship
-    return nil if benefit_sponsorship_id.nil?
-    ::BenefitSponsors::BenefitSponsorships::BenefitSponsor.find(benefit_sponsorship_id)
-  end
 
   def benefit_sponsor
     is_shop? ? employer_profile : HbxProfile.current_hbx.benefit_sponsorship

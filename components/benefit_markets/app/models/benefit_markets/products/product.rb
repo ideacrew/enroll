@@ -30,13 +30,10 @@ module BenefitMarkets
     field :deductible, type: String
     field :family_deductible, type: String
     field :issuer_assigned_id, type: String
+    field :service_area_id, type: BSON::ObjectId
 
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
-
-    belongs_to  :service_area,
-                counter_cache: true,
-                class_name: "BenefitMarkets::Locations::ServiceArea"
 
     embeds_many :premium_tables,
                 class_name: "BenefitMarkets::Products::PremiumTable"
@@ -120,6 +117,29 @@ module BenefitMarkets
           (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
         end
       end
+    end
+
+    def service_area_id=(val)
+      write_attribute(:service_area_id, val)
+      if val.nil?
+        @service_area = nil
+      else
+        @service_area = ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
+      end
+    end
+
+    def service_area=(val)
+      @service_area = val
+      if val.nil?
+        write_attribute(:service_area_id, nil)
+      else
+        write_attribute(:service_area_id, val.id)
+      end
+    end
+
+    def service_area
+      return nil if service_area_id.blank?
+      @service_area ||= ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
     end
 
     def name
@@ -235,16 +255,5 @@ module BenefitMarkets
     def drop_product_package(product_package)
       product_packages.delete(product_package) { "not found" }
     end
-
-    def create_copy_for_embedding(parent, relation)
-      new_product = self.class.new(self.attributes.except(:premium_tables))
-      new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
-      new_product.__metadata = relation
-      new_product.embedded = true
-      new_product._parent = parent
-      new_product.atomic_paths
-      new_product
-    end
   end
-
 end

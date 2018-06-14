@@ -1,8 +1,8 @@
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
   
-  let(:renewal_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-  let(:current_effective_date)  { renewal_effective_date.prev_year }
-  let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
+
+  let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
+  let(:renewal_effective_date)  { current_effective_date.next_year }
 
   let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 

@@ -4,6 +4,9 @@ module BenefitSponsors
       # include Concerns::AcaRatingAreaConfigConcern
       include Config::AcaModelConcern
       include BenefitSponsors::Concerns::EmployerProfileConcern
+      include BenefitSponsors::Concerns::Observable
+
+      after_update :notify_observers
 
       field :sic_code,  type: String
 
@@ -11,6 +14,8 @@ module BenefitSponsors
       validates_presence_of :sic_code
 
       embeds_one  :employer_attestation
+
+      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new
 
       # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
       def is_attestation_eligible?
@@ -39,6 +44,7 @@ module BenefitSponsors
         # welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
         # inbox.messages.new(subject: welcome_subject, body: welcome_body)
       end
+
     end
   end
 end

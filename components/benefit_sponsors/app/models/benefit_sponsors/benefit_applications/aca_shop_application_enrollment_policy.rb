@@ -39,6 +39,21 @@ module BenefitSponsors
             fail:     ->{"begin date must be earlier than end date" }
 
 
+    rule :stubbed_rule_one,
+            validate: -> (model_instance) {
+              true
+            },
+            fail:     -> (model_instance){ "something went wrong!!" },
+            success:  -> (model_instance){ "validated successfully" }
+
+    rule :stubbed_rule_two,
+            validate: -> (model_instance) {
+              true
+            },
+            fail:     -> (model_instance){ "something went wrong!!" },
+            success:  -> (model_instance){ "validated successfully" }
+
+
     business_policy :passes_open_enrollment_period_policy,
             rules: [:period_begin_before_end_rule, :open_enrollment_period_minimum_rule]
 
@@ -47,6 +62,9 @@ module BenefitSponsors
             rules: [:period_begin_before_end_rule]
 
 
+    business_policy :stubbed_policy,
+            rules: [ :stubbed_rule_one, :stubbed_rule_two ]
+
 
     # Standard rules for verifying submitted initial BenefitApplication is compliant and may be approved
     # to proceed to open enrollment. Handles special circumstances for Jan 1 effective dates
@@ -54,13 +72,17 @@ module BenefitSponsors
       unless @benefit_application.effective_date.yday == 1
       else
       end
-
     end
     
     # retrieve business policy
     def business_policies_for(model_instance, event_name)
-      
+      if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+        business_policies[:stubbed_policy]
+      elsif model_instance.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
+        business_policies[:stubbed_policy]
+      end
     end
+
 
     # Standard rules for verifying post-open enrollment initial BenefitApplication is compliant and
     # the BenefitSponsorship and Member Enrollments are eligible for coverage to begin on

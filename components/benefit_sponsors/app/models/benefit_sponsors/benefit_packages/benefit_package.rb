@@ -290,7 +290,7 @@ module BenefitSponsors
         end
       end
 
-      def cancel_member_benefits(family)
+      def cancel_member_benefits
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 

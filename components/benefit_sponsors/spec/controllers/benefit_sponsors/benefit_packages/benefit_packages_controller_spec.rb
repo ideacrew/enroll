@@ -30,6 +30,8 @@ module BenefitSponsors
     let!(:product) { product_package.products.first }
     let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
 
+    let(:issuer_profile)  {FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile)}
+
     let(:benefit_package_params) {
       {
         :benefit_application_id => benefit_application.id.to_s,
@@ -65,7 +67,6 @@ module BenefitSponsors
         "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
       }
     }
-
 
     describe "GET new" do
       it "should initialize the form" do
@@ -151,6 +152,11 @@ module BenefitSponsors
     end
 
     describe "GET edit" do
+
+      before do
+        benefit_package.sponsored_benefits.first.reference_product.update_attributes(:issuer_profile_id => issuer_profile.id)
+        benefit_package.reload
+      end
 
       def sign_in_and_do_edit
         sign_in user

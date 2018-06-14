@@ -408,6 +408,22 @@ module BenefitSponsors
       broker_agency_accounts.detect { |baa| baa.is_active }
     end
 
+    def service_areas_for(date)
+      primary_office = profile.primary_office_location
+      return [] unless primary_office
+      address = primary_office.address
+      return [] unless address
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: date)
+    end
+
+    def rating_area_for(date)
+      primary_office = profile.primary_office_location
+      return nil unless primary_office
+      address = primary_office.address
+      return nil unless address
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: date)
+    end
+
     private
 
     def set_service_and_rating_areas

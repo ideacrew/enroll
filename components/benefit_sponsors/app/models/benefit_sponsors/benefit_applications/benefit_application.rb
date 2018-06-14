@@ -122,6 +122,10 @@ module BenefitSponsors
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
                                                                                          }
+    scope :by_year,                          ->(compare_year = TimeKeeper.date_of_record.year) { where(
+                                                                                                :"effective_period.min".gte => Date.new(compare_year, 1, 1),
+                                                                                                :"effective_period.min".lte => Date.new(compare_year, 12, -1)
+                                                                                              )}
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
     scope :renewing,                        ->{ is_renewing } # Deprecate it in future
@@ -181,8 +185,8 @@ module BenefitSponsors
     def set_values
       if benefit_sponsorship
         recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
-        recorded_rating_area   = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
+        recorded_rating_area   = benefit_sponsorship.rating_area_for(start_on) unless recorded_rating_area.present?
+        recorded_service_areas = benefit_sponsorship.service_areas_for(start_on) unless recorded_service_areas.present?
       end
     end
 
@@ -242,7 +246,7 @@ module BenefitSponsors
 
     def recorded_service_areas
       return @recorded_service_areas if defined? @recorded_service_areas
-      @recorded_rating_area = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
+      @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
     end
 
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)

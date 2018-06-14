@@ -58,7 +58,7 @@ module EnrollmentShopping
 			enrollment
 		end
 
-    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil)
+    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil, family_member_ids: [])
 			enrollment = @household.hbx_enrollments.build
 			enrollment.coverage_household_id = @coverage_household.id
 			enrollment.kind = "employer_sponsored"
@@ -87,10 +87,9 @@ module EnrollmentShopping
 
 			enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
 
-      old_applicant_ids = previous_enrollment.hbx_enrollment_members.map(&:applicant_id)
-      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |hem|
-        old_applicant_ids.include?(hem.applicant_id)
-      end
+			enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
+				family_member_ids.include? member.applicant_id
+			end
 
       copy_member_coverage_dates(previous_enrollment, enrollment)
       enrollment
