@@ -10,7 +10,7 @@ FactoryGirl.define do
     after(:build) do |sponsored_benefit, evaluator|
       if evaluator.product_package
         sponsored_benefit.product_package_kind = evaluator.product_package.package_kind
-        sponsored_benefit.reference_product    = evaluator.product_package.products[0]
+        sponsored_benefit.reference_product_id = evaluator.product_package.products[0].id
         build(:benefit_sponsors_sponsored_benefits_sponsor_contribution, sponsored_benefit: sponsored_benefit, product_package: evaluator.product_package)
       end
     end
