@@ -185,8 +185,8 @@ module BenefitSponsors
     def set_values
       if benefit_sponsorship
         recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
-        recorded_rating_area   = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
+        recorded_rating_area   = benefit_sponsorship.rating_area_for(start_on) unless recorded_rating_area.present?
+        recorded_service_areas = benefit_sponsorship.service_areas_for(start_on) unless recorded_service_areas.present?
       end
     end
 

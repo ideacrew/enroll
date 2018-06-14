@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-shared_examples_for "observable" do
+RSpec.shared_examples_for "observable" do
   let(:model) { create described_class.to_s.underscore.gsub('/', '_').to_sym }
 
   before do

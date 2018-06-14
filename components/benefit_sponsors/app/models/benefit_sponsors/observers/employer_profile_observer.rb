@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Observers
     class EmployerProfileObserver
-      include Acapi::Notifiers
+      include ::Acapi::Notifiers
 
       def update(employer_profile)
         employer_profile.office_locations.each do |office_location|
