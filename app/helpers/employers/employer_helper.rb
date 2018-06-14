@@ -154,7 +154,8 @@ module Employers::EmployerHelper
     return bga.benefit_package_id if bga && bga.benefit_package_id
     application = @employer_profile.current_benefit_application
     return nil if application.blank?
-    application.default_benefit_group || application.benefit_packages[0].id
+    return nil if application.benefit_packages.empty?
+    application.benefit_packages[0].id
   end
 
   def current_option_for_renewal_benefit_package

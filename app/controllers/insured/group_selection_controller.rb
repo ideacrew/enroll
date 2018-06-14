@@ -42,10 +42,10 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
-    @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment, @new_effective_on) do |enrollment, can_waive|
+    @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment, @new_effective_on) do |enrollment|
       @hbx_enrollment = enrollment
-      @waivable = can_waive
     end
+    @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
   def create
@@ -63,8 +63,6 @@ class Insured::GroupSelectionController < ApplicationController
       if sep.present?
         hbx_enrollment.special_enrollment_period_id = sep.id
       end
-
-      hbx_enrollment.product = @hbx_enrollment.product
     end
 
     hbx_enrollment.generate_hbx_signature
@@ -78,8 +76,8 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     if hbx_enrollment.save
-      if @adapter.keep_existing_plan?(params)
-        redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
+      if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
+        redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
         redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
       else
@@ -133,7 +131,7 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group_assignment = nil
 
       if @adapter.previous_hbx_enrollment.present?
-        @adapter.build_shop_change_enrollment(@employee_role, @change_plan)
+        @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
       else
         @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
       end

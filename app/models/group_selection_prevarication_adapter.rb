@@ -82,8 +82,8 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def if_employee_role
-		return nil unless @employee_role.present?
-		yield @employee_role
+		return nil unless possible_employee_role.present?
+		yield possible_employee_role
 	end
 
 	def if_resident_role
@@ -163,13 +163,20 @@ class GroupSelectionPrevaricationAdapter
       
 			prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
       if prev_enrollment
-			  waivable_value = prev_enrollment.can_complete_shopping?
-			  yield prev_enrollment,waivable_value
+			  yield prev_enrollment
       else
         yield nil, nil
       end
 		end
 	end
+
+  def can_waive?(hbx_enrollment, params)
+    if hbx_enrollment.present?
+      hbx_enrollment.is_shop?
+    else
+      (select_market(params) == "shop")
+    end
+  end
 
   def find_previous_enrollment_for(params, new_effective_date)
     @family.households.flat_map(&:hbx_enrollments).detect do |other_enrollment|
@@ -240,10 +247,11 @@ class GroupSelectionPrevaricationAdapter
   # SHOP enrollment creation adapters
   def build_shop_change_enrollment(
     controller_employee_role,
-    controller_change_plan
+    controller_change_plan,
+    family_member_ids
   )
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on)
+    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on, family_member_ids: family_member_ids)
   end
 
   def build_new_shop_enrollment(
@@ -311,7 +319,7 @@ class GroupSelectionPrevaricationAdapter
 		if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
 			benefit_group
 		else
-			select_benefit_group_from_qle_and_employee_role(qle, employee_role)
+			select_benefit_group_from_qle_and_employee_role(qle, possible_employee_role)
 		end
 	end
 
