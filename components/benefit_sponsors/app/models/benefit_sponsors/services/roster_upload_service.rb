@@ -77,7 +77,7 @@ module BenefitSponsors
             plan_year: parse_text(row["plan_year"]),
             newly_designated: parse_boolean(row["newly_designated"]),
             email: Forms::EmailForm.new(email_params(row)),
-            address: Organizations::Forms::AddressForm.new(address_params(row))
+            address: Organizations::OrganizationForms::AddressForm.new(address_params(row))
           )
           result
         end
@@ -124,7 +124,7 @@ module BenefitSponsors
       def persist_census_records(form)
         if @persist_queqe.present?
           employees = @persist_queqe.values.map(&:employee)
-          if employees.map(&:valid?).all? || self.errors.blank?
+          if employees.map(&:valid?).all? && self.errors.blank?
             employees.compact.each(&:save!)
           else
             map_errors_for(self, onto: form)
@@ -145,7 +145,6 @@ module BenefitSponsors
       end
 
       def terminate_census_records
-        # TODO
         if @terminate_queue.present?
           return false if self.errors.present?
           @terminate_queue.each do |row, employee_termination_map|
@@ -178,7 +177,6 @@ module BenefitSponsors
       end
 
       def _insert_primary(form)
-        # TODO
         member = find_employee(form.ssn) || ::CensusEmployee.new
         member = init_census_record(member, form)
         @persist_queqe[@index + 4] = EmployeePersistMap.new(member)
@@ -217,18 +215,43 @@ module BenefitSponsors
       end
 
       def init_census_record(member, form)
-        # TODO
         params = sanitize_params(form).merge!({
           hired_on: form.hired_on,
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
-          benefit_sponsors_employer_profile_id: profile.parent.active_benefit_sponsorship.id,
+          benefit_sponsors_employer_profile_id: profile.id,
+          benefit_sponsorship_id: profile.active_benefit_sponsorship.id,
           address: build_address(form)
         })
         member.assign_attributes(params)
-        # TODO - benefit application
+        assign_benefit_package_assignments(form, member)
         member
+      end
+
+      def assign_benefit_package_assignments(form, member)
+        return unless (form.benefit_group.present? || form.plan_year.present?)
+        application = profile.benefit_applications.by_year(form.plan_year.to_i).first
+        return unless application.blank?
+        benefit_package = application.benefit_packages.where(title: form.benefit_group).first
+        return unless benefit_package.blank?
+
+        assignment = build_benefit_package_assignment(benefit_package)
+
+        employee.benefit_group_assignments.each do |bga|
+          bga.assign_attributes(is_active: false, end_on: [assignment.start_on - 1.day, bga.start_on].max) if bga.is_active?
+        end
+        member.benefit_group_assignments << assignment
+        member
+      end
+
+      def build_benefit_package_assignment(benefit_package)
+        ::BenefitGroupAssignment.new(
+          benefit_package_id: benefit_package.id,
+          start_on: benefit_package.start_on,
+          is_active: true,
+          activated_at: TimeKeeper.datetime_of_record
+        )
       end
 
       def build_address(form)
@@ -237,7 +260,6 @@ module BenefitSponsors
       end
 
       def build_email(form)
-        # TODO
         ::Email.new(sanitize_email_params(form.email)) if form.email
       end
 
@@ -248,15 +270,13 @@ module BenefitSponsors
         false
       end
 
-      def  find_employee(ssn)
-        # TODO
+      def find_employee(ssn)
         profile.census_employees.active.by_ssn(ssn).first
       end
 
       def find_dependent(form)
-        # TODO
         @primary_census_employee.census_dependents.detect do |dependent|
-          (dependent.ssn == form.ssn) && (dependent.dob == form.dob)
+          (dependent.ssn == form.ssn) && form.dob.present? && (dependent.dob == Date.strptime(form.dob, '%m/%d/%Y'))
         end
       end
 
@@ -269,7 +289,9 @@ module BenefitSponsors
       end
 
       def sanitize_params(form)
-        form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :dob, :gender)
+        form.attributes.slice(:employer_assigned_family_id, :employee_relationship, :last_name, :first_name, :middle_name, :name_sfx, :ssn, :gender).merge({
+          dob: Date.strptime(form.dob, "%m/%d/%Y")
+        })
       end
 
       def sanitize_primary_params(form)
