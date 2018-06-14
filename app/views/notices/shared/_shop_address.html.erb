@@ -5,38 +5,41 @@
       <td><br></br></td>
     </tr>
     <tr>
-      <td><%= notice.primary_fullname %></td>
+      <td><%= notice_recipient.full_name %></td>
     </tr>
-    <% if (notice.shop? && !notice.employee_notice? && !notice.general_agency? && !notice.broker?) %>
+
+    <% if (recipient.shop? && !recipient.employee_notice? && !recipient.general_agency? && !recipient.broker_present?) %>
+      <tr class="fssize1">
+        <td><%= recipient.employer_name %></td>
+      </tr>
+    <% end %>
 
     <tr class="fssize1">
-      <td><%= notice.employer_name %></td>
+       <td><%= recipient.primary_address.street_1 %></td>
     </tr>
+
+    <% if recipient.primary_address.street_2.present? %>
+      <tr class="fssize1">
+        <td><%= recipient.primary_address.street_2 %></td>
+      </tr>
     <% end %>
-    <tr class="fssize1">
-       <td><%= notice.primary_address.street_1 %></td>
-    </tr>
-    <% if notice.primary_address.street_2.present? %>
-    <tr class="fssize1">
-      <td><%= notice.primary_address.street_2 %></td>
-    </tr>
-    <% end %>
+
     <tr>
-    <td><%= notice.primary_address.city %>, <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
-    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
-    <% if display_mpi_indicator.nil? %>
-      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
+      <td><%= recipient.primary_address.city %>, <%= recipient.primary_address.state %> <%= recipient.primary_address.zip %></td>
+      <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+      <% if display_mpi_indicator.nil? %>
+        <td style="text-align: right;"><%= notice.notice_number %></td>
+      <% end %>
+    </tr>
+    <% if (recipient.primary_address.street_2.blank? || (recipient.shop? && !recipient.employee_notice? && !recipient.broker_present?) == false) %>
+      <tr>
+        <td><br></td>
+      </tr>
     <% end %>
-    </tr>
-    <% if (notice.primary_address.street_2.blank? || (notice.shop? && !notice.employee_notice? && !notice.broker?) == false) %>
-    <tr>
-      <td><br></td>
-    </tr>
-    <% end %>
-    <% if (notice.shop? && !notice.employee_notice? && !notice.broker?) == false %>
-    <tr>
-      <td><br></td>
-    </tr>
+    <% if (recipient.shop? && !recipient.employee_notice? && !recipient.broker_present?) == false %>
+      <tr>
+        <td><br></td>
+      </tr>
     <% end %>
     <tr>
       <td>

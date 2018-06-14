@@ -36,10 +36,10 @@ module Notifier
     end
 
     def render_envelope(params)
-       Notifier::NoticeKindsController.new.render_to_string({
+      Notifier::NoticeKindsController.new.render_to_string({
         :template => Settings.notices.shop.partials.template, 
         :layout => false,
-        :locals => params.merge(notice_number: self.notice_number)
+        :locals => params.merge(notice_number: self.notice_number, notice: self, notice_recipient: notice_recipient)
       })
     end
 
@@ -86,7 +86,7 @@ module Notifier
         encoding: 'utf8',
         header: {
           content: ApplicationController.new.render_to_string({
-            template: "notifier/notice_kinds/header_with_page_numbers.html.erb",
+            template: Settings.notices.shop.partials.header,
             layout: false,
             locals: {notice: self, recipient: notice_recipient}
             }),
@@ -96,7 +96,7 @@ module Notifier
       if dc_exchange?
         options.merge!({footer: {
           content: ApplicationController.new.render_to_string({
-            partial: "layouts/notifier/footer.html.erb",
+            template: Settings.notices.shop.partials.footer,
             layout: false,
             locals: {notice: self}
           })
@@ -123,6 +123,10 @@ module Notifier
 
     def attach_envelope
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
+    end
+
+    def employee_appeal_rights
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_employee_appeal_rights)]
     end
 
     def join_pdfs(pdfs)
