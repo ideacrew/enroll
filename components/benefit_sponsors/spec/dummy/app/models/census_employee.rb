@@ -6,6 +6,9 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   
   require 'roo'
+  
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
@@ -33,6 +36,17 @@ class CensusEmployee < CensusMember
   belongs_to :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
+
+  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on, is_active) {
+    where(:"benefit_group_assignments" => { :$elemMatch => {
+      :start_on => effective_on,
+      :benefit_package_id => benefit_package.id, :is_active => is_active
+      }})
+  }
+
+  scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
+  scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
+  scope :non_business_owner, ->{ where(is_business_owner: false) }
 
   def initialize(*args)
     super(*args)

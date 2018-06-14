@@ -12,13 +12,8 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.open_enrollment_begin_on(new_date).approved.first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-
-        if benefit_application.is_renewing?
-          service.begin_renewal_open_enrollment
-        else
-          service.begin_initial_open_enrollment
-        end
+        application_enrollment_service = init_application_service(benefit_application, :begin_open_enrollment)
+        application_enrollment_service.begin_open_enrollment
       end
     end
 
@@ -26,8 +21,8 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.open_enrollment_end_on(new_date).enrolling.first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        service.close_open_enrollment
+        application_enrollment_service = init_application_service(benefit_application, :end_open_enrollment)
+        application_enrollment_service.close_open_enrollment
       end
     end
 
@@ -35,8 +30,8 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.effective_date_begin_on(new_date).enrollment_eligible.first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        service.begin_benefit
+        application_enrollment_service = init_application_service(benefit_application, :begin_sponsor_benefit)
+        application_enrollment_service.begin_benefit
       end
     end
 
@@ -44,8 +39,8 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.effective_date_end_on(new_date).coverage_effective.first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        service.end_benefit
+        application_enrollment_service = init_application_service(benefit_application, :end_sponsor_benefit)
+        application_enrollment_service.end_benefit
       end
     end
 
@@ -53,8 +48,8 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.benefit_terminate_on(new_date).first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        service.terminate
+        application_enrollment_service = init_application_service(benefit_application, :terminate_benefit)
+        application_enrollment_service.terminate
       end
     end
 
@@ -62,9 +57,26 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.benefit_applications.effective_date_end_on(new_date).coverage_effective.first
 
       if benefit_application.present?
-        service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        service.renew
+        application_enrollment_service = init_application_service(benefit_application, :renew_benefit)
+        application_enrollment_service.renew
       end
+    end
+
+    private
+
+    def init_application_service(benefit_application, event_name)
+      application_enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+      application_enrollment_service.business_policy = business_policy_for(benefit_application, event_name)
+      application_enrollment_service
+    end
+
+    def business_policy_for(benefit_application, event_name)
+      enrollment_policy.business_policies_for(benefit_application, event_name)
+    end
+
+    def enrollment_policy
+      return @enrollment_policy if defined?(@enrollment_policy)
+      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEnrollmentPolicy.new
     end
   end
 end
