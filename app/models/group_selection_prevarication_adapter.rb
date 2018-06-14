@@ -170,7 +170,7 @@ class GroupSelectionPrevaricationAdapter
 		end
 	end
 
-  def can_waive?(hbx_enrollment)
+  def can_waive?(hbx_enrollment, params)
     if hbx_enrollment.present?
       hbx_enrollment.is_shop?
     else

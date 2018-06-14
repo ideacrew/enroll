@@ -45,7 +45,7 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment, @new_effective_on) do |enrollment|
       @hbx_enrollment = enrollment
     end
-    @waivable = @adapter.can_waive?(@hbx_enrollment)
+    @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
   def create
