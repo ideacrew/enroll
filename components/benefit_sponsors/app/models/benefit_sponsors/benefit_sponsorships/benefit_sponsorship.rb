@@ -401,7 +401,7 @@ module BenefitSponsors
     end
 
     def is_mid_plan_year_conversion?
-      source_kind == :mid_plan_year_conversion
+      source_kind.to_s == "mid_plan_year_conversion"
     end
 
     def active_broker_agency_account
