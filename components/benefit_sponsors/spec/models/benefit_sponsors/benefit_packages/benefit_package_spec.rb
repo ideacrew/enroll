@@ -163,14 +163,15 @@ module BenefitSponsors
 
       before do
         sponsored_benefit.reference_plan_id = product.id
-        bp = sponsored_benefit.benefit_package
-        ba = bp.benefit_application
-        ba.save!
-        ba.reload
+        sponsored_benefit.save!
+        sponsored_benefit.reload
+        @benefit_application_id = sponsored_benefit.benefit_package.benefit_application.id
       end
 
       it 'changes to the correct product' do
+        benefit_application_from_db = ::BenefitSponsors::BenefitApplications::BenefitApplication.find(@benefit_application_id)
         expect(sponsored_benefit.reference_product).to eq(product)
+        expect(benefit_application_from_db.benefit_packages.first.sponsored_benefits.first.reference_product).to eq(product)
       end
     end
   end
