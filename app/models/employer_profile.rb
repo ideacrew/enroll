@@ -166,12 +166,8 @@ class EmployerProfile
     active_broker_agency_account.save!
     trigger_notice_observer(self, active_broker_agency_account, 'broker_fired_confirmation_to_employer')
     notify_broker_terminated
+    trigger_notice_observer(active_broker_agency_account.broker_agency_profile, self, "broker_agency_fired_confirmation")
     trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
-    broker_agency_fired_confirmation
-  end
-
-  def broker_agency_fired_confirmation
-    trigger_notices("broker_agency_fired_confirmation")
   end
 
   def broker_fired_confirmation_to_broker
@@ -1234,16 +1230,6 @@ class EmployerProfile
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def self.notice_to_employee_for_missing_binder_payment(org)
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
-      rescue Exception => e
-        (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
-      end
-    end
   end
 
   # TODO - fix premium amount

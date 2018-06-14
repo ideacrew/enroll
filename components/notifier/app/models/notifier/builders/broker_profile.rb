@@ -33,6 +33,11 @@ module Notifier
       merge_model.notice_date = format_date(TimeKeeper.date_of_record)
     end
 
+    def email
+      merge_model.email = broker_role.email_address
+    end
+
+
     def first_name
       merge_model.first_name = broker_role.person.first_name
     end
@@ -60,7 +65,7 @@ module Notifier
     end
 
     def assignment_date
-      merge_model.assignment_date = employer.active_broker_agency_account.start_on if employer.active_broker_agency_account
+      merge_model.assignment_date = employer.active_broker_agency_account.start_on.strftime('%m/%d/%Y') if employer.active_broker_agency_account
     end
 
     def terminated_broker_agency_account

@@ -6,6 +6,7 @@ module Notifier
     attribute :current_py_oe_end_date, String
     attribute :current_py_start_date, String
     attribute :current_py_end_date, String
+    attribute :current_py_plus_60_days, String
 
     attribute :renewal_py_oe_start_date, String
     attribute :renewal_py_oe_end_date, String
@@ -50,6 +51,7 @@ module Notifier
         next_available_start_date: current_py_start.next_month.strftime('%m/%d/%Y'),
         current_py_end_date: renewal_py_start.prev_day.strftime('%m/%d/%Y'),
         next_application_deadline: current_py_start.strftime('%m/%d/%Y'),
+        current_py_plus_60_days: (renewal_py_start.prev_day + 60.days).strftime('%m/%d/%Y'),
         renewal_py_oe_start_date: renewal_py_start.prev_month.strftime('%m/%d/%Y'),
         renewal_py_oe_end_date: (renewal_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         renewal_py_start_date: renewal_py_start.strftime('%m/%d/%Y'),
@@ -67,10 +69,9 @@ module Notifier
         renewal_binder_due_data: '09/25/2017',
         ivl_open_enrollment_end_on: '01/31/2018',
         ivl_open_enrollment_start_on: '11/01/2017',
-        enrollment_errors: {non_business_owner_enrollment_count: "at least 3 non-owner employee must enroll"},
+        enrollment_errors: "at least 3 non-owner employee must enroll",
         total_enrolled_count: '2',
         eligible_to_enroll_count: '6'
-
       })
     end
   end
