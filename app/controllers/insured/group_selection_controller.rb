@@ -71,6 +71,11 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
+    # case for responsible party with primary and dependent in separate markets
+    if hbx_enrollment.kind != @market_kind
+      hbx_enrollment.kind = @market_kind
+    end
+
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
