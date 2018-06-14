@@ -242,7 +242,7 @@ module BenefitSponsors
 
     def recorded_service_areas
       return @recorded_service_areas if defined? @recorded_service_areas
-      @recorded_rating_area = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
+      @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
     end
 
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)

@@ -649,6 +649,11 @@ class HbxEnrollment
   # def benefit_package
   #   is_shop? ? benefit_group : benefit_sponsor.benefit_coverage_period.each {}
   # end
+  #
+  def benefit_sponsorship
+    return nil if benefit_sponsorship_id.nil?
+    ::BenefitSponsors::BenefitSponsorships::BenefitSponsor.find(benefit_sponsorship_id)
+  end
 
   def benefit_sponsor
     is_shop? ? employer_profile : HbxProfile.current_hbx.benefit_sponsorship
@@ -1440,6 +1445,12 @@ class HbxEnrollment
       if cobra_eligibility_date == effective_on
         return "employer_sponsored_cobra"
       end
+    end
+    if !benefit_sponsorship_id.blank?
+      # TODO: THIS IS A HACK
+      # HACK: I JUST SAID SO, AND IT TOTALLY IS
+      # FIXME: THIS EXISTS ONLY FOR INITIAL MPY - REMOVE THIS AFTER THEY ARE SENT
+      return "open_enrollment" if benefit_sponsorship.is_mid_plan_year_conversion?
     end
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
   end
