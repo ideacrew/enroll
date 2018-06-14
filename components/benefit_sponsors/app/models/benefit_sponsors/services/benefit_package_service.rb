@@ -152,9 +152,18 @@ module BenefitSponsors
             product_option_choice: sponsored_benefit.product_option_choice,
             product_package_kind: sponsored_benefit.product_package_kind,
             reference_plan_id: sponsored_benefit.reference_product.id,
+            reference_product: reference_product_attributes_to_form_params(sponsored_benefit.reference_product),
             sponsor_contribution: sponsored_contribution_attributes_to_form_params(sponsored_benefit)
           })
         end
+      end
+
+      def reference_product_attributes_to_form_params(reference_product)
+        Forms::Product.new({
+          title: reference_product.title,
+          issuer_name: reference_product.issuer_profile.legal_name,
+          plan_kind: reference_product.health_plan_kind
+        })
       end
 
       def sponsored_contribution_attributes_to_form_params(sponsored_benefit)

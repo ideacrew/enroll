@@ -12,6 +12,7 @@ module BenefitSponsors
 
       attribute :products, Array[BenefitProductForm]
       attribute :reference_plan_id, String
+      attribute :reference_product, Product
 
       attribute :sponsor_contribution, SponsorContributionForm
       attribute :pricing_determinations, Array[PricingDeterminationForm]
