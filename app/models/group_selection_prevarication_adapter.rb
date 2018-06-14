@@ -82,8 +82,8 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def if_employee_role
-		return nil unless @employee_role.present?
-		yield @employee_role
+		return nil unless possible_employee_role.present?
+		yield possible_employee_role
 	end
 
 	def if_resident_role
@@ -312,7 +312,7 @@ class GroupSelectionPrevaricationAdapter
 		if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
 			benefit_group
 		else
-			select_benefit_group_from_qle_and_employee_role(qle, employee_role)
+			select_benefit_group_from_qle_and_employee_role(qle, possible_employee_role)
 		end
 	end
 
