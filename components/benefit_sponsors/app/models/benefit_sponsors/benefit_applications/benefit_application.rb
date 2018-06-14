@@ -122,6 +122,10 @@ module BenefitSponsors
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
                                                                                          }
+    scope :by_year,                          ->(compare_year = TimeKeeper.date_of_record.year) { where(
+                                                                                                :"effective_period.min".gte => Date.new(compare_year, 1, 1),
+                                                                                                :"effective_period.min".lte => Date.new(compare_year, 12, -1)
+                                                                                              )}
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
     scope :renewing,                        ->{ is_renewing } # Deprecate it in future
