@@ -1,9 +1,12 @@
 module BenefitSponsors
   module Observers
     class EmployerProfileObserver
-      extend Acapi::Notifiers
+      include Acapi::Notifiers
 
-      def update
+      def update(employer_profile)
+        employer_profile.office_locations.each do |office_location|
+          notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"}) unless office_location.address.changes.empty?
+        end
       end
     end
   end
