@@ -133,7 +133,7 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group_assignment = nil
 
       if @adapter.previous_hbx_enrollment.present?
-        @adapter.build_shop_change_enrollment(@employee_role, @change_plan)
+        @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
       else
         @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)
       end

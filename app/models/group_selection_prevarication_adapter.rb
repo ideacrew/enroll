@@ -240,10 +240,11 @@ class GroupSelectionPrevaricationAdapter
   # SHOP enrollment creation adapters
   def build_shop_change_enrollment(
     controller_employee_role,
-    controller_change_plan
+    controller_change_plan,
+    family_member_ids
   )
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on)
+    e_builder.build_change_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on, family_member_ids: family_member_ids)
   end
 
   def build_new_shop_enrollment(
