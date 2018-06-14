@@ -163,13 +163,20 @@ class GroupSelectionPrevaricationAdapter
       
 			prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
       if prev_enrollment
-			  waivable_value = prev_enrollment.can_complete_shopping?
-			  yield prev_enrollment,waivable_value
+			  yield prev_enrollment
       else
         yield nil, nil
       end
 		end
 	end
+
+  def can_waive?(hbx_enrollment)
+    if hbx_enrollment.present?
+      hbx_enrollment.is_shop?
+    else
+      (select_market(params) == "shop")
+    end
+  end
 
   def find_previous_enrollment_for(params, new_effective_date)
     @family.households.flat_map(&:hbx_enrollments).detect do |other_enrollment|

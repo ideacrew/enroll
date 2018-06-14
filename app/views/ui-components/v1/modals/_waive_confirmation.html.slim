@@ -5,8 +5,7 @@
         = form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :post) do
           .modal-header
             button.close type="button" data-dismiss="modal" aria-label="Close"
-            span aria-hidden="true"
-            | &times;
+              | &times;
             h4.modal-title = l10n("select_waive_reason")
           .modal-body
             = select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason")
@@ -16,8 +15,7 @@
       - else
         .modal-header
           button.close type="button" data-dismiss="modal" aria-label="Close"
-          span aria-hidden="true"
-          | &times;
+            | &times;
           h4.modal-title = l10n("unable_to_waive_coverage")
         .modal-body
           = l10n("insured.plan_shoppings.you_can_not_waive_confirmation_msg")
