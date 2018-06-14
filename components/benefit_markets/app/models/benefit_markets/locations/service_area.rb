@@ -16,9 +16,6 @@ module BenefitMarkets
       # specify which here.
       field :covered_states, type: Array
 
-      has_many  :products,
-                class_name: "BenefitMarkets::Products::Product"
-
       validates_presence_of :active_year, allow_blank: false
       validates_presence_of :issuer_provided_code, allow_nil: false
       validates_presence_of :issuer_profile_id, allow_nil: false
