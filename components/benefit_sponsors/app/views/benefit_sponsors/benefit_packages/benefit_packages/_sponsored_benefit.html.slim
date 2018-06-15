@@ -12,13 +12,15 @@
     .reference_plan_info style='clear: both;'
       h4
       .content
-- unless show_benefit_application_tile == "true"
-  = render "./ui-components/v1/cards/metal_level_select", f: f
+  #planSelection.hidden
+    = render "./ui-components/v1/cards/metal_level_select", f: f
 - if show_benefit_application_tile == "true"
-  = render "./ui-components/v1/cards/sponsor_contributions", f: f
+  #scEdit
+    = render "./ui-components/v1/cards/sponsor_contributions", f: f
   br
   br
-  = render "./ui-components/v1/cards/reference_plan", f: f
+  #referencePlanEdit
+    = render "./ui-components/v1/cards/reference_plan", f: f
   i.fas.fa-info-circle.mr-1 
   | Your final monthly cost is based on final enrollment.
   br
