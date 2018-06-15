@@ -5,21 +5,22 @@ class BenefitApplicationMigration < Mongoid::Migration
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/benefit_application_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w(organization_name organization_fein plan_year_start_on status)
+      field_names = %w(organization_name organization_fein plan_year_id plan_year_start_on status)
 
-      # logger = Logger.new("#{Rails.root}/log/benefit_application_migration.log")
-      # logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
+      logger = Logger.new("#{Rails.root}/log/benefit_application_migration.log")
+      logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
-      # CSV.open(file_name, 'w') do |csv|
-      #   csv << field_names
-      #   status =
-      #   migrate_plan_years_to_benefit_applications
-      #   if status
-      #     puts "Check the report and logs for futher information" unless Rails.env.test?
-      #   else
-      #     puts "Data migration failed" unless Rails.env.test?
-      #   end
-      # end
+      CSV.open(file_name, 'w') do |csv|
+        csv << field_names
+        migrate_plan_years_to_benefit_applications(csv, logger)
+
+        puts "" unless Rails.env.test?
+        puts "Check the report and logs for futher information" unless Rails.env.test?
+
+      end
+      logger.info "End of the script" unless Rails.env.test?
+    else
+      say "Skipping for non-CCA site"
     end
   end
 
@@ -110,22 +111,30 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   private
 
-  def self.migrate_plan_years_to_benefit_applications
-    say_with_time("Time taken to pull all old organizations with plan years") do
-      @old_organizations = Organization.unscoped.exists(:"employer_profile.plan_years" => true)
-    end
+  def self.migrate_plan_years_to_benefit_applications(csv, logger)
+
+    old_organizations = Organization.unscoped.exists(:"employer_profile.plan_years" => true)
 
     success = 0
     failed = 0
+    total_plan_years = 0
     limit = 100
 
     say_with_time("Time take to migrate plan years") do
-      @old_organizations.batch_size(limit).no_timeout.each do |old_org|
-        next unless continuous_coverage?(old_org)
-        new_organization = new_org(old_org) # write to csv
-        next unless new_organization.present?
+      old_organizations.batch_size(limit).no_timeout.each do |old_org|
+        unless continuous_coverage?(old_org)
+          puts old_org.hbx_id
+          next
+        end
+        next unless new_org(old_org).present?
+
+        new_organization = new_org(old_org)
         benefit_sponsorship = new_organization.first.benefit_sponsorships[0]
+
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
+
+          total_plan_years += 1
+
           @benefit_package_map = {}
           begin
             # benefit_sponsorship = BenefitSponsorshipMigrationService.fetch_sponsorship_for(new_organization, plan_year)
@@ -135,22 +144,26 @@ class BenefitApplicationMigration < Mongoid::Migration
 
             if benefit_application.valid?
               benefit_application.save!
-              # assign_employee_benefits(benefit_sponsorship)
-              # csv << [old_org.legal_name, old_org.fein, plan_year.start_on, 'Success']
+              assign_employee_benefits(benefit_sponsorship)
+
+              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, 'Success']
+              print '.' unless Rails.env.test?
               success += 1
             else
               raise StandardError, benefit_application.errors.to_s
             end
           rescue Exception => e
-            # csv << [old_org.legal_name, old_org.fein, plan_year.start_on, 'Failed', e.to_s]
+            csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, 'Failed', e.to_s]
+            print 'F' unless Rails.env.test?
             failed += 1
           end
         end
       end
 
-      # logger.info " Total #{total_organizations} old organizations with plan years" unless Rails.env.test?
-      # logger.info " #{failed} plan years failed to migrate into new DB at this point." unless Rails.env.test?
-      # logger.info " #{success} plan years successfully migrated into new DB at this point." unless Rails.env.test?
+      logger.info " Total #{old_organizations.count} old organizations with plan years" unless Rails.env.test?
+      logger.info " Total #{total_plan_years} plan years" unless Rails.env.test?
+      logger.info " #{failed} plan years failed to migrate into new DB at this point." unless Rails.env.test?
+      logger.info " #{success} plan years successfully migrated into new DB at this point." unless Rails.env.test?
     end
   end
 
@@ -189,11 +202,12 @@ class BenefitApplicationMigration < Mongoid::Migration
   end
 
   def self.is_plan_year_effectuated?(plan_year) # add renewing_draft,renewing_enrolling,renewning enrolled
-    %w(active suspended expired terminated termination_pending, renewing_draft,renewing_enrolling,renewning enrolled).include?(plan_year.aasm_state)
+    %w(active suspended expired terminated termination_pending renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending).include?(plan_year.aasm_state)
   end
 
   def self.continuous_coverage?(old_org)
-    return true if old_org.employer_profile.plan_years.count == 1
+    return true if old_org.employer_profile.plan_years.count < 2
+    return true unless old_org.employer_profile.plan_years.any?{|py| py.expired? || py.terminated? || py.active?}
 
     plan_years = old_org.employer_profile.plan_years.select {|plan_year| is_plan_year_effectuated?(plan_year)}
     plan_year_month = plan_years.sort_by(&:start_on).first.start_on.month
@@ -207,7 +221,7 @@ class BenefitApplicationMigration < Mongoid::Migration
   def self.sanitize_benefit_group_attrs(benefit_group)
     attributes = benefit_group.attributes.slice(
         :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
-        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
+        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits, :composite_tier_contributions
     )
 
     attributes[:is_default] = benefit_group.default
@@ -234,8 +248,8 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
         end
+        census_employee.save(:validate => false)
       end
-      census_employee.save(:validate => false)
     end
   end
 

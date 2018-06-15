@@ -4,7 +4,7 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/enrollment_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( census_emp_id total_benefit_group_assignment_id enrollment_id status product_id issuer_profile_id benefit_sponsorship_id)
+      field_names = %w( employer_name census_emp_id benefit_group_assignment_id enrollment_id status product_id issuer_profile_id benefit_sponsorship_id sponsored_benefit_package_id sponsored_benefit_id)
 
       logger = Logger.new("#{Rails.root}/log/enrollment_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -13,8 +13,9 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
         csv << field_names
 
         # update enrollments to work with new model
-        # update_hbx_enrollments(csv, logger)
+        update_hbx_enrollments(csv, logger)
 
+        puts "" unless Rails.env.test?
         puts "Check enrollment_migration_data logs & enrollment_migration_status csv for additional information." unless Rails.env.test?
 
       end
@@ -41,55 +42,92 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
     total_enrollments = 0
     updated_enrollments = 0
 
-    begin
-      ces.each do |ce|
 
-        next unless ce.benefit_sponsorship.present?
-        ce.benefit_group_assignments.each do |bga|
+    ces.batch_size(1000).no_timeout.all.each do |ce|
+      next unless ce.benefit_sponsorship.present?
+      ce.benefit_group_assignments.no_timeout.all.each do |bga|
 
-          benefit_sponsorship_id = nil
-          product_id = nil
-          issuer_profile_id = nil
+        benefit_sponsorship_id = nil
+        product_id = nil
+        issuer_profile_id = nil
+        sponsored_benefit_package_id = nil
+        sponsored_benefit_id = nil
+
+
+        enrollments = get_hbx_enrollments(bga)
+        next unless enrollments.present?
+
+        enrollments.each do |enrollment|
           total_enrollments = total_enrollments + 1
+          begin
 
-          enrollment = bga.hbx_enrollment
+            #get plan_id - product_id
+            if enrollment.plan.present?
+              hios_id = enrollment.plan.hios_id
+              plan_active_year = enrollment.plan.active_year
+              products = @products.where(hios_id: hios_id)
+              product = products.select {|product| product.application_period.min.year == plan_active_year}
 
-          #get plan_id - product_id
-          if enrollment.plan.present?
-            hios_id = enrollment.plan.hios_id
-            plan_active_year = enrollment.plan.active_year
-            products = @products.where(hios_id: hios_id)
-            product = products.select {|product| product.application_period.min.year == plan_active_year}
-            product_id = product.first.id if product.count == 1
+              product_id = product.first.id if product.count == 1
+            end
 
             #get carrier_profile_id - issuer_profile_id
             if enrollment.carrier_profile_id.present?
               carrier_profile_id = enrollment.carrier_profile_id
-              carrier_profile_hbx_id = @carrier_orga.where(id: carrier_profile_id).first.hbx_id
-              issuer_profile_id = @issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id
+              carrier_profiles =  @carrier_orga.where(id: carrier_profile_id)
+              carrier_profile_hbx_id = carrier_profiles.first.hbx_id if carrier_profiles.present?
+              issuer_profile_id = @issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id if carrier_profile_hbx_id.present?
             end
-
 
             #get benefit_sponsorship_id
             benefit_sponsorship_id = ce.benefit_sponsorship.id
 
-            enrollment.update_attributes(product_id: product_id, issuer_profile_id: issuer_profile_id, benefit_sponsorship_id: benefit_sponsorship_id)
+            #get sponsored_benefit_package_id
+            sponsored_benefit_package_id = bga.benefit_package_id
+
+            #get sponsored_benefit_id
+            if sponsored_benefit_package_id.present?
+              benefit_package = bga.benefit_package
+              sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+              sponsored_benefit_id = sponsored_benefit.id
+            end
+
+            #TODO should fix this to update rating_area_id in HBX enrollment
+            #rating_area_id
+
+            enrollment.update_attributes(product_id: product_id,
+                                         issuer_profile_id: issuer_profile_id,
+                                         benefit_sponsorship_id: benefit_sponsorship_id,
+                                         sponsored_benefit_package_id: sponsored_benefit_package_id,
+                                         sponsored_benefit_id: sponsored_benefit_id
+            )
+
             print '.' unless Rails.env.test?
             updated_enrollments = updated_enrollments + 1
-            csv << [ce.id, bga.id, enrollment.id, "updated", product_id, issuer_profile_id, benefit_sponsorship_id]
-          else
-            csv << [ce.id, bga.id, enrollment.id, "skipped as no plan id present for enrollment", product_id, issuer_profile_id, benefit_sponsorship_id]
+            csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "updated", product_id, issuer_profile_id, benefit_sponsorship_id, sponsored_benefit_package_id, sponsored_benefit_id]
+
+          rescue Exception => e
+            print 'F' unless Rails.env.test?
+            csv << [ce.employer_profile.legal_name ,ce.id, bga.id, enrollment.id, "failed", product_id, issuer_profile_id, benefit_sponsorship_id, sponsored_benefit_package_id, sponsored_benefit_id]
+            logger.error "update failed for HBX Enrollment: #{enrollment.id},
+            #{e.inspect}" unless Rails.env.test?
           end
         end
       end
-    rescue Exception => e
-      print 'F' unless Rails.env.test?
-      csv << [ce.id, bga.id, enrollment.id, "failed", product_id, issuer_profile_id, benefit_sponsorship_id]
-      logger.error "update failed for HBX Enrollment: #{enrollment.id},
-          #{e.inspect}" unless Rails.env.test?
     end
     logger.info " Total #{total_enrollments} enrollments for census employees" unless Rails.env.test?
     logger.info " #{updated_enrollments} enrollments updated at this point." unless Rails.env.test?
     return true
+  end
+
+  def self.get_hbx_enrollments(bga)
+    bga.covered_families.inject([]) do |enrollments, family|
+      family.households.each do |household|
+        enrollments += household.hbx_enrollments.select do |enrollment|
+          enrollment.benefit_group_assignment_id == bga.id
+        end.to_a
+      end
+      enrollments
+    end
   end
 end

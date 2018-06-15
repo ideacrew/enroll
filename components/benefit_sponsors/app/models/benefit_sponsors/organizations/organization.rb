@@ -240,6 +240,24 @@ module BenefitSponsors
         benefit_sponsorships.first
       end
 
+      def latest_benefit_sponsorship
+        bs_without_date = benefit_sponsorships_without_benefit_application
+        bs_having_start_date = benefit_sponsorships_with_benefit_application
+
+        if bs_without_date.count > 0
+          benefit_sponsorship =  bs_without_date.first
+        elsif bs_having_start_date.count > 0
+          benefit_sponsorship = bs_having_start_date.order_by(&:'effective_being_on'.desc).first
+        end
+      end
+
+      def benefit_sponsorships_without_benefit_application
+        benefit_sponsorships.where(:'effective_being_on' => nil )
+      end
+
+      def benefit_sponsorships_with_benefit_application
+        benefit_sponsorships.where(:'effective_being_on' => {'$ne' => nil})
+      end
 
       class << self
 
