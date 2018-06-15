@@ -183,7 +183,7 @@ javascript:
             <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '">\
           </div>\
           <div class="col-xs-9">\
-            <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'">\
+            <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-name="'+contribution.display_name+'">\
           </div>\
         </div>\
       </div>'
@@ -231,6 +231,7 @@ javascript:
   
   function setInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
+    contributionAmounts(element)
   }
   
   function showFormButtons() {
@@ -243,6 +244,48 @@ javascript:
     document.getElementById('addBenefitPackage').classList.add('hidden')
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
+  }
+  
+  function disablePlanYearButton() {
+    var savePlanYearButton = document.getElementById('submitBenefitPackage');
+    savePlanYearButton.classList.add('disabled')
+  }
+  
+  function enablePlanYearButton() {
+    var savePlanYearButton = document.getElementById('submitBenefitPackage');
+    savePlanYearButton.classList.remove('disabled')
+  }
+  
+  var eeContribution = Number;
+  var spouse = Number;
+  var domesticPartner = Number;
+  var childUnder26 = Number;
+  
+  function contributionAmounts(element) {
+    var sliderName = element.dataset.name;
+    var sliderValue = element.value;
+
+    switch (sliderName) {
+      case 'Employee':
+        eeContribution = sliderValue;
+      break;
+      case 'Spouse':
+        spouse = sliderValue;
+      break;
+      case 'Domestic Partner':
+        domesticPartner = sliderValue;
+      break;
+      case 'Child Under 26':
+        childUnder26 = sliderValue;
+      break;
+    }
+    if (eeContribution < 50) {
+      disablePlanYearButton()
+    } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+      disablePlanYearButton()
+    } else {
+      enablePlanYearButton()
+    }
   }
   
   
