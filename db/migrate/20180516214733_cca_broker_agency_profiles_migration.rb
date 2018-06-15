@@ -108,16 +108,10 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
   def self.initialize_new_profile(old_org, old_profile_params)
     new_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(old_profile_params)
 
-    build_inbox_messages(new_profile)
     build_documents(old_org, new_profile)
+    build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
     return new_profile
-  end
-
-  def self.build_inbox_messages(new_profile)
-    @old_profile.inbox.messages.each do |message|
-      new_profile.inbox.messages.new(message.attributes.except("_id"))
-    end
   end
 
   def self.build_documents(old_org, new_profile)
@@ -132,6 +126,26 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
       doc.save!
+    end
+  end
+
+  def self.build_inbox_messages(new_profile)
+    @old_profile.inbox.messages.each do |message|
+      msg = new_profile.inbox.messages.new(message.attributes.except("_id"))
+      msg.body.gsub!("BrokerAgencyProfile", "BenefitSponsorsBrokerAgencyProfile")
+      msg.body.gsub!(@old_profile.id.to_s, new_profile.id.to_s)
+
+      new_profile.documents.where(subject: "notice").each do |doc|
+        old_emp_docs = @old_profile.documents.where(identifier: doc.identifier)
+        old_org_docs = @old_profile.organization.documents.where(identifier: doc.identifier)
+        old_document_id = if old_emp_docs.present?
+                            old_emp_docs.first.id.to_s
+                          elsif old_org_docs.present?
+                            old_org_docs.first.id.to_s
+                          end
+        msg.body.gsub!(old_document_id, doc.id.to_s) if (doc.id.to_s.present? && old_document_id.present?)
+      end
+
     end
   end
 

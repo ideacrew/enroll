@@ -187,6 +187,31 @@ module BenefitSponsors
     scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
     scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
 
+    
+    def application_may_renew_effective_on(new_date)
+      benefit_applications.effective_date_end_on(new_date).coverage_effective.first
+    end
+
+    def application_may_begin_open_enrollment_on(new_date)
+      benefit_applications.open_enrollment_begin_on(new_date).approved.first
+    end
+
+    def application_may_end_open_enrollment_on(new_date)
+      benefit_applications.open_enrollment_end_on(new_date).enrolling.first
+    end
+
+    def application_may_begin_benefit_on(new_date)
+      benefit_applications.effective_date_begin_on(new_date).enrollment_eligible.first
+    end
+
+    def application_may_end_benefit_on(new_date)
+      benefit_applications.effective_date_end_on(new_date).coverage_effective.first
+    end
+
+    def application_may_terminate_on(new_date)
+      benefit_applications.benefit_terminate_on(new_date).first
+    end
+
     def primary_office_service_areas
       primary_office = profile.primary_office_location
       if primary_office.address.present?
@@ -406,6 +431,22 @@ module BenefitSponsors
 
     def active_broker_agency_account
       broker_agency_accounts.detect { |baa| baa.is_active }
+    end
+
+    def service_areas_for(date)
+      primary_office = profile.primary_office_location
+      return [] unless primary_office
+      address = primary_office.address
+      return [] unless address
+      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: date)
+    end
+
+    def rating_area_for(date)
+      primary_office = profile.primary_office_location
+      return nil unless primary_office
+      address = primary_office.address
+      return nil unless address
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: date)
     end
 
     private

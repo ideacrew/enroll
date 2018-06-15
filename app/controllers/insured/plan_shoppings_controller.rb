@@ -49,6 +49,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
     else
+
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"

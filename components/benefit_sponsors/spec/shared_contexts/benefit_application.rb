@@ -1,10 +1,13 @@
 RSpec.shared_context "setup initial benefit application", :shared_context => :metadata do
-  
+
+  let(:aasm_state) { :active }
   let(:package_kind) { :single_issuer }
+  let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
+  let(:open_enrollment_period) { effective_period.min.prev_month..(effective_period.min - 10.days) }
   let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, benefit_market: benefit_market) }
-  let(:initial_application) { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period) }
+  let(:initial_application) { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: aasm_state, open_enrollment_period: open_enrollment_period) }
   let(:product_package) { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:current_benefit_package) { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
+  let!(:current_benefit_package) { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
 
   it 'should create a valid benefit sponsorship' do
     expect(benefit_sponsorship).to be_valid

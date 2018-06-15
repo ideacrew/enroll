@@ -263,7 +263,7 @@ class Family
 
   def enrollments
     return [] if  latest_household.blank?
-    latest_household.hbx_enrollments.show_enrollments
+    latest_household.hbx_enrollments.show_enrollments_sans_canceled
   end
 
   # The {FamilyMember} who is head and 'owner' of this family instance.

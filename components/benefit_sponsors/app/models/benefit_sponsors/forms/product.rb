@@ -8,6 +8,7 @@ module BenefitSponsors
       attribute :title, String
       attribute :issuer_name, String
       attribute :plan_kind, String
+      attribute :metal_level_kind, String
 
     end
   end
