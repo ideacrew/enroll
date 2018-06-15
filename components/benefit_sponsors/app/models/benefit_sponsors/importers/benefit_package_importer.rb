@@ -80,7 +80,7 @@ module BenefitSponsors
         # estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
 
         pricing_model = sponsored_benefit.product_package.pricing_model
-     
+
         price_determination_tiers = pricing_model.pricing_units.inject([]) do |pd_tiers, pricing_unit|
           pd_tiers << BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
             pricing_unit_id: pricing_unit.id
@@ -88,12 +88,13 @@ module BenefitSponsors
         end
         
         sponsored_benefit.pricing_determinations.build(pricing_determination_tiers: price_determination_tiers)
-  
+
         pricing_determination = sponsored_benefit.pricing_determinations.first
         copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
 
         if sponsor_contribution_attrs[0][:final_tier_premium].present?
           new_determination = pricing_determination.dup
+          new_determination.sponsored_benefit = sponsored_benefit
           copy_tier_contributions(new_determination, sponsor_contribution_attrs, :final_tier_premium)
           sponsored_benefit.pricing_determinations << new_determination
         end
@@ -101,7 +102,7 @@ module BenefitSponsors
 
       def copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, attribute_to_copy)
         pricing_determination.pricing_determination_tiers.each do |tier|
-          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| tier_contribution[:relationship] == tier.pricing_unit.name }
+          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| tier_contribution[:relationship] ? tier_contribution[:relationship]: tier_contribution[:composite_rating_tier] == tier.pricing_unit.name }
           tier.price = matched_tier[attribute_to_copy].to_f
         end
       end
