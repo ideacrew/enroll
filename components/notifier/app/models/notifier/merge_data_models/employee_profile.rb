@@ -74,12 +74,24 @@ module Notifier
       census_employee_health_enrollment? && census_employee_dental_enrollment?
     end
 
+    def primary_address
+      mailing_address
+    end
+
     def broker_present?
       self.broker.present?
     end
 
     def employee_notice?
       true
+    end
+
+    def general_agency?
+      false
+    end
+
+    def broker?
+      false
     end
 
     def shop?
