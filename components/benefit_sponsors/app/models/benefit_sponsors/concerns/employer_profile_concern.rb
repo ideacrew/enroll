@@ -265,11 +265,12 @@ module BenefitSponsors
       end
 
       def find_plan_year_by_effective_date(target_date)
-        benefit_application = (benefit_applications.published + benefit_applications.renewing_published_state + benefit_applications.where(aasm_state: "expired")).detect do |py|
+        benefit_application = (benefit_applications.published + benefit_applications.where(aasm_state: "expired")).detect do |py|
           (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
         end
 
-        (benefit_application.present? && benefit_application.external_benefit_application?) ? renewing_published_benefit_application : benefit_application
+        binding.pry
+        (benefit_application.present? && benefit_application.is_conversion?) ? renewing_published_benefit_application : benefit_application
       end
 
       def enrollments_for_billing(billing_date = nil)
