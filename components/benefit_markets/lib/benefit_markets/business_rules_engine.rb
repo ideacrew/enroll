@@ -34,7 +34,7 @@ module BenefitMarkets
     module ClassMethods
       def assert_business_policies(names = [])
         if names.size == 0
-          business_policies.each do |business_policy|
+          business_policies.each do |business_policy_name, business_policy|
             business_policy.send(:process_rules)
           end
         else
@@ -110,11 +110,12 @@ module BenefitMarkets
       def initialize(name, options={})
         @name = name
         @rules = options[:rules] || []
-        @fail_results = []
-        @success_results = []
+        @fail_results = {}
+        @success_results = {}
       end
 
       def is_satisfied?(model_instance)
+        reset_results
         process_rules(model_instance)
         @fail_results.empty?
       end
@@ -123,9 +124,9 @@ module BenefitMarkets
         rules.sort_by(&:priority).each do |rule|
           success, result = rule.run(model_instance)
           if success
-            @success_results << { "#{rule.name}" => result }
+            @success_results[rule.name] => result }
           else
-            @fail_results    << { "#{rule.name}" => result }
+            @fail_results[rule.name] => result }
           end
         end
       end
@@ -170,6 +171,11 @@ module BenefitMarkets
       def reset_rules
         @rules = []
         reset_errors
+      end
+
+      def reset_results
+        @success_results = {}
+        @fail_results = {}
       end
 
       def inspect
