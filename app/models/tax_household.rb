@@ -115,12 +115,18 @@ class TaxHousehold
     aptc_ratio_by_member.each do |member_id, ratio|
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
+    latest_eligibility_id = latest_eligibility_determination.id
+    previous_eligibility = eligibility_determinations.not_in(id: latest_eligibility_id).last
 
     # FIXME should get hbx_enrollments by effective_starting_on
     household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
-        aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
+        if previous_eligibility.present? && current_max_aptc.to_f < previous_eligibility.max_aptc.to_f
+          aptc_available_amount_hash[applicant_id] = (enrollment_member.applied_aptc_amount || 0).try(:to_f) - aptc_available_amount_hash[applicant_id]
+        else
+          aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
+        end
         aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end

@@ -50,14 +50,11 @@ class Admin::Aptc < ApplicationController
           if months.include?(key) || max_aptc_vals_array.count == 1
             max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
           else 
-            
             previous_max_aptc = max_aptc_vals_array.first.to_f
-            if total_aptc_applied_vals_for_household[key].to_f > value.to_f
+            if previous_available_aptc_hash.values.first.to_f < value.to_f && total_aptc_applied_vals_for_household[key].to_f > value.to_f
               remaining_available_aptc = available_aptc_value.to_f - total_aptc_applied_vals_for_household[key].to_f
             else
               remaining_available_aptc = available_aptc_value.to_f
-              # remaining_available_aptc = previous_max_aptc - total_aptc_applied_vals_for_household[key].to_f
-              # remaining_available_aptc = available_aptc_value.to_f + remaining_available_aptc
             end
             remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
             max_aptc_vals[key] = '%.2f' % (remaining_available_aptc) if value.to_f == max_aptc
