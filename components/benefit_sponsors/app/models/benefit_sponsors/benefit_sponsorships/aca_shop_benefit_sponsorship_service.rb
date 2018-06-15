@@ -9,7 +9,7 @@ module BenefitSponsors
     end
 
     def begin_open_enrollment
-      benefit_application = benefit_sponsorship.benefit_applications.open_enrollment_begin_on(new_date).approved.first
+      benefit_application = benefit_sponsorship.application_may_begin_open_enrollment_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :begin_open_enrollment)
@@ -18,7 +18,7 @@ module BenefitSponsors
     end
 
     def end_open_enrollment
-      benefit_application = benefit_sponsorship.benefit_applications.open_enrollment_end_on(new_date).enrolling.first
+      benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :end_open_enrollment)
@@ -27,7 +27,7 @@ module BenefitSponsors
     end
 
     def begin_sponsor_benefit
-      benefit_application = benefit_sponsorship.benefit_applications.effective_date_begin_on(new_date).enrollment_eligible.first
+      benefit_application = benefit_sponsorship.application_may_begin_benefit_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :begin_sponsor_benefit)
@@ -36,7 +36,7 @@ module BenefitSponsors
     end
 
     def end_sponsor_benefit
-      benefit_application = benefit_sponsorship.benefit_applications.effective_date_end_on(new_date).coverage_effective.first
+      benefit_application = benefit_sponsorship.application_may_end_benefit_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :end_sponsor_benefit)
@@ -45,7 +45,7 @@ module BenefitSponsors
     end
 
     def terminate_sponsor_benefit
-      benefit_application = benefit_sponsorship.benefit_applications.benefit_terminate_on(new_date).first
+      benefit_application = benefit_sponsorship.application_may_terminate_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :terminate_benefit)
@@ -54,7 +54,7 @@ module BenefitSponsors
     end
 
     def renew_sponsor_benefit
-      benefit_application = benefit_sponsorship.benefit_applications.effective_date_end_on(new_date).coverage_effective.first
+      benefit_application = benefit_sponsorship.application_may_renew_effective_on(new_date)
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :renew_benefit)
