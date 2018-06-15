@@ -11,7 +11,11 @@ module BenefitSponsors
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
-          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
+          if params[:add_new_benefit_package] == "true"
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application)
+          else
+            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
+          end
         else
           flash[:error] = error_messages(@benefit_package_form)
           render :new
