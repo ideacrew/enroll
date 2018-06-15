@@ -23,9 +23,11 @@ class DocumentsController < ApplicationController
       relation = params[:relation]
       relation_id = params[:relation_id]
 
-      #Fix for new model inbox-messages notice download
+      #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
+      elsif model == "BenefitSponsorsBrokerAgencyProfile"
+        model = "BenefitSponsors::Organizations::BrokerAgencyProfile"
       end
 
       model_object = Object.const_get(model).find(model_id)
