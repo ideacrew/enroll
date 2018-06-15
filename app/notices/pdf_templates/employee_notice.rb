@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
+    attribute :census_employee, PdfTemplates::CensusEmployee
     attribute :enrollment, PdfTemplates::Enrollment
     attribute :email, String
     attribute :plan_year, PdfTemplates::PlanYear
