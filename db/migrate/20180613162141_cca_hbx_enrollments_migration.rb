@@ -74,7 +74,8 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
             #get carrier_profile_id - issuer_profile_id
             if enrollment.carrier_profile_id.present?
               carrier_profile_id = enrollment.carrier_profile_id
-              carrier_profile_hbx_id = @carrier_orga.where(id: carrier_profile_id).first.hbx_id if @carrier_orga.where(id: carrier_profile_id).present?
+              carrier_profiles =  @carrier_orga.where(id: carrier_profile_id)
+              carrier_profile_hbx_id = carrier_profiles.first.hbx_id if carrier_profiles.present?
               issuer_profile_id = @issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id if carrier_profile_hbx_id.present?
             end
 
