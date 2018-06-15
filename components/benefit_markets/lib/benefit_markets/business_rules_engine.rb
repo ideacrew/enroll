@@ -124,9 +124,9 @@ module BenefitMarkets
         rules.sort_by(&:priority).each do |rule|
           success, result = rule.run(model_instance)
           if success
-            @success_results[rule.name] => result }
+            { @success_results[rule.name] => result }
           else
-            @fail_results[rule.name] => result }
+            { @fail_results[rule.name] => result }
           end
         end
       end
@@ -199,7 +199,7 @@ module BenefitMarkets
       # if invalid
       attr_accessor :fail
 
-      NO_OP = lambda {|o| true }
+      NO_OP = lambda { |o| true }
 
       def initialize(name = nil, options={})
         self.name(name) if name.present?
