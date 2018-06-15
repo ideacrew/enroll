@@ -8,9 +8,15 @@ class AddCoverageHouseholdMember < MongoidMigrationTask
       raise "Invalid Hbx Id"
     end
     family_member = person.first.primary_family.family_members.where(id: family_member_id).first
+    puts "family memeber with id found"
     ch = person.first.primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
+    puts "coverage household member found "
     chm = ch.add_coverage_household_member(family_member)
+    puts "adding family member"
     chm.save if chm.present?
+    puts "chm saved"
+    puts chm.valid?
+    puts ch.valid?
     ch.save
     puts "Family member added to coverage household successfully" unless Rails.env.test?
   end
