@@ -37,10 +37,10 @@ module BenefitSponsors
     #                                 following time period gap in benefit coverage
     #   :restored                 =>  sponsor, previously active on HBX, was involuntarily terminated
     #                                 and sponsorship resumed according to HBX policy
-    SOURCE_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored]
+    SOURCE_KINDS              = [:self_serve, :conversion, :mid_plan_year_conversion, :reapplied, :restored].freeze
 
-    TERMINATION_KINDS         = [:voluntary, :involuntary]
-    TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud]
+    TERMINATION_KINDS         = [:voluntary, :involuntary].freeze
+    TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud].freeze
 
 
     field :hbx_id,              type: String
@@ -290,19 +290,29 @@ module BenefitSponsors
     # Workflow for self service
     aasm do
       state :applicant, initial: true
+      state :initial_application_under_review # Sponsor's first application is submitted invalid and under HBX review
+      state :initial_application_denied       # Sponsor's first application is rejected
       state :initial_application_approved     # Sponsor's first application is submitted and approved
-      state :initial_enrollment_open          # Sponsor members are in open enrollment period
-      state :initial_enrollment_closed        # Sponsor members have successfully completed open enrollment
-      state :initial_enrollment_ineligible
-      state :initial_enrollment_eligible,   after_enter: :publish_binder_paid  # Sponsor has paid first premium in-full and authorized to offer benefits
-      state :binder_reversed,               after_enter: :publish_binder_reversed
+      state :initial_enrollment_open          # Sponsor members are under first open enrollment period
+      state :initial_enrollment_closed        # Sponsor members' have successfully completed first open enrollment
+      state :initial_enrollment_ineligible    # Sponsor members' first open enrollment has failed to meet eligibility policies
+      state :initial_enrollment_eligible,   after_enter: :publish_binder_event   # Sponsor has paid first premium in-full and authorized to offer benefits
+      state :binder_reversed,               after_enter: :publish_binder_event   # Spnosor's initial payment is returned
       state :active                           # Sponsor's members are actively enrolled in coverage
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
 
       event :approve_initial_application do
-        transitions from: :applicant, to: :initial_application_approved
+        transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
+      end
+
+      event :review_initial_application do
+        transitions from: :applicant, to: :initial_application_under_review
+      end
+
+      event :deny_initial_application do
+        transitions from: :initial_application_under_review, to: :initial_application_denied
       end
 
       event :open_initial_enrollment do
@@ -336,7 +346,10 @@ module BenefitSponsors
       end
 
       event :revert_to_applicant do
-        transitions from: [:applicant, :initial_application_approved, :initial_enrollment_closed, :initial_enrollment_eligible, :initial_enrollment_ineligible], to: :new
+        transitions from: [:applicant, :initial_application_approved,
+                          :initial_application_under_review, :initial_application_denied,
+                          :initial_enrollment_closed, :initial_enrollment_eligible,
+                          :initial_enrollment_ineligible], to: :applicant
       end
 
       event :terminate do
@@ -368,7 +381,8 @@ module BenefitSponsors
       end
     end
 
-    def publish_binder_paid
+    # Notify BenefitApplication that
+    def publish_binder_event
       benefit_applications.each do |benefit_application|
         benefit_application.benefit_sponsorship_event_subscriber(aasm)
       end
@@ -385,6 +399,10 @@ module BenefitSponsors
       case aasm.to_state
       when :approved
         approve_initial_application! if may_approve_initial_application?
+      when :pending
+        review_initial_application! if may_review_initial_application?
+      when :denied
+        deny_initial_application! if may_deny_initial_application?
       when :enrollment_open
         open_initial_enrollment! if may_open_initial_enrollment?
       when :enrollment_closed

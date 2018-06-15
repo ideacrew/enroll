@@ -139,7 +139,6 @@ module BenefitSponsors
           expect{benefit_sponsorship.benefit_sponsor_catalog_for(future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
         end
       end
-
     end
 
     context "Working with subclassed parent Profiles" do
@@ -208,80 +207,142 @@ module BenefitSponsors
       # end
     end
 
-    describe "Transitioning a BenefitSponsorship through workflow states" do
+    describe "Transitioning a BenefitSponsorship through Initial Applicaiton Workflow States" do
       let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
       let(:this_year)                           { Date.today.year }
       let(:benefit_application)                 { build(:benefit_sponsors_benefit_application,
-                                                          benefit_sponsorship: benefit_sponsorship,
-                                                          recorded_service_areas: benefit_sponsorship.service_areas) }
+                                                        benefit_sponsorship: benefit_sponsorship,
+                                                        recorded_service_areas: benefit_sponsorship.service_areas) }
 
-      context "Initial application happy path workflow" do
+      context "and system date is set to today" do
         before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
-        it "should initialize in state: :applicant" do
+        it "benefit_sponsorship should initialize in state: :applicant" do
           expect(benefit_sponsorship.aasm_state).to eq :applicant
         end
 
-        context "and a valid benefit application is submitted" do
-          before { benefit_application.approve_application! }
+        it "benefit_application should initialize in state: :draft" do
+          expect(benefit_application.aasm_state).to eq :draft
+        end
 
-          it "benefit_sponsorship should transition to state: :initial_application_approved" do
-            expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
-          end
+        context "and a benefit application is submitted" do
+          context "and benefit application is valid" do
+            before { benefit_application.approve_application! }
 
-          context "and open enrollment period begins" do
-            before {
+            it "benefit_sponsorship should transition to state: :initial_application_approved" do
+              expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
+            end
+
+            context "and open enrollment period begins" do
+              before {
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
                 benefit_application.begin_open_enrollment!
               }
 
-            it "should transition to state: :initial_enrollment_open" do
-              expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
-            end
+              it "should transition to state: :initial_enrollment_open" do
+                expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+              end
 
-            context "and open enrollment period ends" do
-              before {
+              context "and open enrollment period ends" do
+                before {
                   TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.max)
                   benefit_application.end_open_enrollment!
                 }
 
-              it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
-                expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
-              end
-
-              context "and binder payment is made" do
-                before { benefit_sponsorship.credit_binder! }
-
-                it "benefit_sponsorship should transition to state: :initial_enrollment_eligible" do
-                  expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_eligible
+                it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
+                  expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
                 end
 
-                it "benefit_application should transition to state: :enrollment_eligible" do
-                  expect(benefit_application.aasm_state).to eq :enrollment_eligible
-                end
+                context "and binder payment is credited" do
+                  before { benefit_sponsorship.credit_binder! }
 
-                context "and effective period begins" do
-                  before {
+                  it "benefit_sponsorship should transition to state: :initial_enrollment_eligible" do
+                    expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_eligible
+                  end
+
+                  it "benefit_application should transition to state: :enrollment_eligible" do
+                    expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                  end
+
+                  context "and effective period begins" do
+                    before {
                       TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
-                      benefit_application.activate_enrollment!
+                      benefit_sponsorship.activate_enrollment!
                     }
 
-                  it "benefit_sponsorship should transition to state: :active" do
-                    expect(benefit_sponsorship.aasm_state).to eq :active
+                    it "benefit_sponsorship should transition to state: :active" do
+                      expect(benefit_sponsorship.aasm_state).to eq :active
+                    end
+
+                    it "benefit_application should transition to state: :active" do
+                      expect(benefit_application.aasm_state).to eq :active
+                    end
                   end
 
-                  it "benefit_application should transition to state: :active" do
-                    expect(benefit_application.aasm_state).to eq :active
+                  context "and binder payment is reversed" do
+                    before { benefit_sponsorship.reverse_binder! }
+
+                    it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
+                      expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
+                    end
+
+                    it "benefit_application should transition to state: enrollment_closed" do
+                      expect(benefit_application.aasm_state).to eq :enrollment_closed
+                    end
+
+                    context "and effective period begins" do
+                      before {
+                        TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
+                        benefit_application.activate_enrollment!
+                      }
+
+                      it "benefit_sponsorship should transition to state: :applicant" do
+                        expect(benefit_sponsorship.aasm_state).to eq :applicant
+                      end
+
+                      it "benefit_application should transition to state: :expired" do
+                        expect(benefit_application.aasm_state).to eq :expired
+                      end
+                    end
                   end
                 end
+              end
+            end
+          end
+
+          context "and benefit application is invalid" do
+            before { benefit_application.review_application! }
+
+            it "benefit_sponsorship should transition to state: :initial_application_under_review" do
+              expect(benefit_sponsorship.aasm_state).to eq :initial_application_under_review
+            end
+
+            context "and it's denied by HBX" do
+              before { benefit_application.deny_application! }
+
+              it "benefit_sponsorship should transition to state: :initial_application_denied" do
+                expect(benefit_sponsorship.aasm_state).to eq :initial_application_denied
+              end
+            end
+
+            context "and it's approved by HBX" do
+              before { benefit_application.approve_application! }
+
+              it "benefit_sponsorship should transition to state: :initial_application_approved" do
+                expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
+              end
+            end
+
+            context "and it's reverted by HBX" do
+              before { benefit_application.revert_application }
+
+              it "benefit_sponsorship should transition to state: :applicant" do
+                expect(benefit_sponsorship.aasm_state).to eq :applicant
               end
             end
           end
         end
       end
-
     end
-
-
   end
 end
