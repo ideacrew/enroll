@@ -196,7 +196,7 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      deadline = if payload['notice_params'][:qle_reporting_deadline] ||= TimeKeeper.date_of_record + 15.days
+      deadline = if payload['notice_params'][:qle_reporting_deadline]
       merge_model.special_enrollment_period.reporting_deadline = format_date(deadline) 
     end
 
