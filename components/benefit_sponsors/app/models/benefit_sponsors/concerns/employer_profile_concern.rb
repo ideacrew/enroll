@@ -269,7 +269,6 @@ module BenefitSponsors
           (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
         end
 
-        binding.pry
         (benefit_application.present? && benefit_application.is_conversion?) ? renewing_published_benefit_application : benefit_application
       end
 

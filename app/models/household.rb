@@ -323,7 +323,7 @@ class Household
       benefit_group: benefit_group,
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
-      benefit_package: benefit_package,
+      sponsored_benefit_package_id: employee_role.benefit_group.id,
       qle: qle,
       submitted_at: Time.now,
       external_enrollment: external_enrollment,
