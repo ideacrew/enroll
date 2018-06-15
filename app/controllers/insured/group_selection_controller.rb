@@ -72,7 +72,11 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     # case for responsible party with primary and dependent in separate markets
-    if hbx_enrollment.kind != @market_kind
+    # it assumes the primary and dependent are in either IVL or coverall
+    # TODO will need to account for shop market as well with coverall phase 3 when
+    # people will be able to receive a transition from shop to coverall, etc.
+    
+    if ((hbx_enrollment.kind != @market_kind) && (@market_kind != "shop"))
       hbx_enrollment.kind = @market_kind
     end
 
