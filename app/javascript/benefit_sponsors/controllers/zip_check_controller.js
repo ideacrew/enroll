@@ -3,12 +3,13 @@ import axios from 'axios'
 
 export default class extends Controller {
   static targets = ['countySelect']
-  
+
   initialize() {
     document.getElementById('kindSelect').value = "primary";
   }
 
   zipChange(event) {
+    return true; // Temp Disable ZipCode Check
     axios({
       method: 'POST',
       url: 'counties_for_zip_code',
