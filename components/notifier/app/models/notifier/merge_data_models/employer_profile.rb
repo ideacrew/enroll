@@ -51,18 +51,10 @@ module Notifier
       %w{broker_present?}
     end
 
-    def primary_address
-      addresses.first
-    end
-
     def broker_present?
       self.broker.present?
     end
 
-    def general_agency?
-      false
-    end
-    
     def shop?
       true
     end
