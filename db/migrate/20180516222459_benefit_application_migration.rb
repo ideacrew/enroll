@@ -123,7 +123,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     say_with_time("Time take to migrate plan years") do
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
         unless continuous_coverage?(old_org)
-          csv << [old_org.legal_name, old_org.fein, '', '', 'Failed due to org has no contionus coverage', e.to_s]
+          csv << [old_org.legal_name, old_org.fein, '', '', 'Failed due to org has no contionus coverage']
           next
         end
         next unless new_org(old_org).present?
@@ -143,7 +143,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_application.recorded_service_areas = benefit_sponsorship.service_areas
 
             unless check_benefit_app_product_matched(benefit_application,plan_year)
-              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old benefit application", e.to_s]
+              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old benefit application"]
               next
             end
 
