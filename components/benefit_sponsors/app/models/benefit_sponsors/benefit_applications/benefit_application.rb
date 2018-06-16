@@ -295,6 +295,10 @@ module BenefitSponsors
       open_enrollment_period.max unless open_enrollment_period.blank?
     end
 
+    def open_enrollment_length
+      (open_enrollment_period.end - open_enrollment_period.begin).to_i
+    end
+
     # Reschedule the end date of open enrollment for this application.  The application must be in
     # open enrollment state already, or in an enrolling state that can transition to open enrollment.
     # Also, the new end date must be later than the existing end date, may not occur in the past, and
@@ -460,10 +464,10 @@ module BenefitSponsors
 
     def non_business_owner_enrolled
       total_enrolled   = families_enrolled_under_application
-      
+
       owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
       filter_enrolled_employees(owner_employees, total_enrolled)
-      
+
       waived_employees = active_census_employees.select{|ce| ce.waived?}
       filter_enrolled_employees(waived_employees, total_enrolled)
 
@@ -481,15 +485,15 @@ module BenefitSponsors
 
     def renew_benefit_package_members
       return unless is_renewing?
-      benefit_packages.each {|benefit_package| benefit_package.renew_member_benefits }          
+      benefit_packages.each {|benefit_package| benefit_package.renew_member_benefits }
     end
 
     def effectuate_benefit_package_members
-      benefit_packages.each {|benefit_package| benefit_package.effectuate_member_benefits } 
+      benefit_packages.each {|benefit_package| benefit_package.effectuate_member_benefits }
     end
 
     def expire_benefit_package_members
-      benefit_packages.each {|benefit_package| benefit_package.expire_member_benefits } 
+      benefit_packages.each {|benefit_package| benefit_package.expire_member_benefits }
     end
 
     def terminate_benefit_package_members
@@ -518,7 +522,7 @@ module BenefitSponsors
       def find(id)
         return nil if id.blank?
         sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find(id).first
-        
+
         if sponsorship.present?
           sponsorship.benefit_applications_by(id)
         end
@@ -546,7 +550,7 @@ module BenefitSponsors
       state :enrollment_closed
       state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible   # open enrollment did not meet eligibility criteria
-      
+
       state :active,     :after_enter => :effectuate_benefit_package_members    # Application benefit coverage is in-force
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
       state :terminated, :after_enter => :terminate_benefit_package_members # Coverage under this application is terminated
@@ -586,7 +590,7 @@ module BenefitSponsors
       event :deny_application do
         transitions from: APPLICATION_EXCEPTION_STATES, to: :denied
       end
-      
+
       event :begin_open_enrollment do
         transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
           to:     :enrollment_open
@@ -618,8 +622,8 @@ module BenefitSponsors
           :enrollment_open, :enrollment_closed,
           :enrollment_eligible, :enrollment_ineligible,
           :active
-        ] + APPLICATION_EXCEPTION_STATES, 
-          to:     :draft, 
+        ] + APPLICATION_EXCEPTION_STATES,
+          to:     :draft,
           after:  :cancel_benefit_package_members
       end
 
