@@ -142,7 +142,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_application.recorded_rating_area = benefit_sponsorship.rating_area
             benefit_application.recorded_service_areas = benefit_sponsorship.service_areas
 
-            unless check_benefit_app_product_matched(benefit_application,plan_year)
+            unless self.check_benefit_app_product_matched(benefit_application,plan_year)
               csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old benefit application"]
               next
             end
@@ -223,22 +223,22 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
   end
 
-  def check_benefit_app_product_matched(benefit_application, plan_year)
+  def self.check_benefit_app_product_matched(benefit_application, plan_year)
 
     benefit_application.benefit_packages.each do |benefit_package|
-      new_bene_app_product_hios_ids = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
-      new_bene_app_product_hios_ids << benefit_package.health_sponsored_benefit.reference_product.hios_id
-      new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id) if benefit_package.dental_sponsored_benefit.present?
-      new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.reference_product.hios_id if benefit_package.dental_sponsored_benefit.present?
+      @new_bene_app_product_hios_ids = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
+      @new_bene_app_product_hios_ids << benefit_package.health_sponsored_benefit.reference_product.hios_id
+      @new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id) if benefit_package.dental_sponsored_benefit.present?
+      @new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.reference_product.hios_id if benefit_package.dental_sponsored_benefit.present?
     end
     plan_year.benefit_groups.each do |benefit_group|
-      old_bene_app_product_hios_ids = benefit_group.elected_plans.map(&:hios_id)
-      old_bene_app_product_hios_ids << benefit_group.reference_plan.hios_id
-      old_bene_app_product_hios_ids << benefit_group.elected_dental_plans.map(&:hios_id) if benefit_group.is_offering_dental?
-      old_bene_app_product_hios_ids << benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+      @old_bene_app_product_hios_ids = benefit_group.elected_plans.map(&:hios_id)
+      @old_bene_app_product_hios_ids << benefit_group.reference_plan.hios_id
+      @old_bene_app_product_hios_ids << benefit_group.elected_dental_plans.map(&:hios_id) if benefit_group.is_offering_dental?
+      @old_bene_app_product_hios_ids << benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
     end
 
-    new_bene_app_product_hios_ids == old_bene_app_product_hios_ids
+    @new_bene_app_product_hios_ids == @old_bene_app_product_hios_ids
   end
 
   def self.sanitize_benefit_group_attrs(benefit_group)
