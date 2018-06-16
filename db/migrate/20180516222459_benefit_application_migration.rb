@@ -178,6 +178,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
+    @benefit_sponsor_catalog.benefit_application = benefit_application
     @benefit_sponsor_catalog.save
     benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
 
@@ -197,6 +198,7 @@ class BenefitApplicationMigration < Mongoid::Migration
       benefit_application.aasm_state = :imported
     end
 
+    construct_workflow_state_transitions(benefit_application, plan_year)
     # construct_workflow_state_transitions(benefit_application, plan_year)
     benefit_application
   end
