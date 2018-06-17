@@ -2,6 +2,8 @@ module BenefitSponsors
   module BenefitSponsorships
     class AcaShopScheduledEvent
 
+      include ::Acapi::Notifiers
+
       attr_reader :new_date
 
       def self.advance_day(new_date)
@@ -12,7 +14,7 @@ module BenefitSponsors
         @new_date = new_date
         shop_daily_events
         auto_submit_renewal_applications
-        generate_employer_group_files
+        auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
       end
 
@@ -75,11 +77,16 @@ module BenefitSponsors
 
       def auto_submit_renewal_applications
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
-          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
+          effective_on = new_date.next_month.beginning_of_month
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_auto_submit_application?(effective_on)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :auto_submit_application)
+          end
         end
       end
 
-      def generate_employer_group_files
+      def auto_transmit_monthly_benefit_sponsors
         if aca_shop_market_transmit_scheduled_employers
           if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_benefit_sponsors(new_date)
@@ -90,7 +97,6 @@ module BenefitSponsors
       def close_enrollment_quiet_period
         if new_date.prev_day.mday == Settings.aca.shop_market.initial_application.quiet_period.mday
           effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
-
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
       end
@@ -101,13 +107,12 @@ module BenefitSponsors
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
 
         benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
-          employer_profile = org.employer_profile
-          employer_profile.transmit_renewal_eligible_event     if employer_profile.is_renewal_transmission_eligible?
-          employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
+          benefit_sponsorship.transmit_renewal_eligible_event     if benefit_sponsorship.is_renewal_transmission_eligible?
+          benefit_sponsorship.transmit_renewal_carrier_drop_event if benefit_sponsorship.is_renewal_carrier_drop?
         end
 
         benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          org.employer_profile.transmit_initial_eligible_event
+          benefit_sponsorship.transmit_initial_eligible_event
         end
       end
 

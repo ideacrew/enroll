@@ -8,6 +8,13 @@ module BenefitSponsors
       @new_date = new_date
     end
 
+    def execute(benefit_sponsorship, event_name, business_policy)
+      self.benefit_sponsorship = benefit_sponsorship
+      if business_policy.is_satisfied?(benefit_sponsorship)
+        eval(event_name.to_s)
+      end
+    end
+
     def begin_open_enrollment
       benefit_application = benefit_sponsorship.application_may_begin_open_enrollment_on(new_date)
 
@@ -59,6 +66,16 @@ module BenefitSponsors
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :renew_benefit)
         application_enrollment_service.renew_application
+      end
+    end
+
+    def auto_submit_application
+      effective_on = new_date.next_month.beginning_of_month
+      benefit_application = benefit_sponsorship.application_may_auto_submit(effective_on)
+
+      if benefit_application.present?
+        application_enrollment_service = init_application_service(benefit_application, :auto_submit)
+        application_enrollment_service.auto_submit_application
       end
     end
 
