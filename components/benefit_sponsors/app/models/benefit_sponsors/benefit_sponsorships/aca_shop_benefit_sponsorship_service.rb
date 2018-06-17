@@ -75,7 +75,7 @@ module BenefitSponsors
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :auto_submit)
-        application_enrollment_service.auto_submit_application
+        application_enrollment_service.force_submit_application
       end
     end
 
