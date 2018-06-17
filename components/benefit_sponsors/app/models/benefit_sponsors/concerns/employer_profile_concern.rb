@@ -26,7 +26,7 @@ module BenefitSponsors
         scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
         scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
-        delegate :legal_name, :end_on, to: :organization
+        delegate :legal_name, :end_on, :entity_kind, to: :organization
         delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
       end
 
