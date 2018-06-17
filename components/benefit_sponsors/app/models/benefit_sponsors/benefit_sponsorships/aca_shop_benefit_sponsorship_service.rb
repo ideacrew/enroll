@@ -58,7 +58,7 @@ module BenefitSponsors
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :renew_benefit)
-        application_enrollment_service.renew
+        application_enrollment_service.renew_application
       end
     end
 

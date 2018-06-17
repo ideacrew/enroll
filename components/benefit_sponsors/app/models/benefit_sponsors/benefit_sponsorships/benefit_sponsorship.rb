@@ -151,6 +151,14 @@ module BenefitSponsors
       )
     }
 
+    scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(
+        :"benefit_applications.effective_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :enrollment_eligible,
+        :"aasm_state" => :initial_enrollment_eligible
+      )
+    }
+
     scope :benefit_application_find,     ->(ids) {
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
@@ -447,6 +455,11 @@ module BenefitSponsors
       address = primary_office.address
       return nil unless address
       ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: date)
+    end
+
+    def self.find_by_feins(feins)
+      organizations = BenefitSponsors::Organizations::Organization.where(fein: {:$in => feins})
+      where(:organization_id => {:$in => organizations.pluck(:_id)})
     end
 
     private
