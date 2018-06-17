@@ -542,10 +542,13 @@ module BenefitSponsors
     def employer_profile_to_benefit_sponsor_states_map
       {
         :applicant            => :applicant,
-        :registered           => :initial_applicant,
-        :conversion_expired   => :applicant,
+        :registered           => :initial_application_approved,
+        :eligible             => :initial_enrollment_closed,
+        :binder_paid          => :initial_enrollment_eligible,
+        :enrolled             => :active,
+        :suspended            => :suspended,
+        :ineligible           => :ineligible
       }
     end
-
   end
 end
