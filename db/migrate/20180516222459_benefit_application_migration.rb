@@ -131,6 +131,11 @@ class BenefitApplicationMigration < Mongoid::Migration
         new_organization = new_org(old_org)
         benefit_sponsorship = new_organization.first.benefit_sponsorships[0]
 
+        if benefit_sponsorship.service_areas.blank? ||  benefit_sponsorship.rating_area.blank?
+          csv << [old_org.legal_name, old_org.fein, '', '', 'service area (or) rating areas missing for benefit sponsorship']
+          next
+        end
+
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
 
           total_plan_years += 1
@@ -238,7 +243,8 @@ class BenefitApplicationMigration < Mongoid::Migration
       @old_bene_app_product_hios_ids << benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
     end
 
-    @new_bene_app_product_hios_ids == @old_bene_app_product_hios_ids
+    return false unless (@new_bene_app_product_hios_ids.size == @old_bene_app_product_hios_ids.size)
+    (@new_bene_app_product_hios_ids & @old_bene_app_product_hios_ids).uniq.size == @new_bene_app_product_hios_ids.uniq.size
   end
 
   def self.sanitize_benefit_group_attrs(benefit_group)
