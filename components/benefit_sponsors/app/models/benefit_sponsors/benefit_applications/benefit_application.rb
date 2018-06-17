@@ -128,7 +128,7 @@ module BenefitSponsors
                                                                                               )}
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
-    scope :renewing,                        ->{ is_renewing } # Deprecate it in future
+    # scope :renewing,                        ->{ is_renewing } # Deprecate it in future
 
     # scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
     # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
@@ -155,6 +155,10 @@ module BenefitSponsors
           {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
         ]
       )
+    }
+
+    scope :renewing, -> {
+      where("$exists" => {:predecessor_application_id => true} )
     }
 
     # scope :published_and_expired_plan_years_by_date, ->(date) {
@@ -350,6 +354,12 @@ module BenefitSponsors
 
     def open_enrollment_contains?(date)
       open_enrollment_period.cover?(date)
+    end
+
+    def issuers_offered_for(product_kind)
+      benefit_packages.inject([]) do |issuers, benefit_package|
+        issuers += benefit_package.issuers_offered_for(product_kind)
+      end
     end
 
     # Build a new [BenefitApplication] instance along with all associated child model instances, for the
