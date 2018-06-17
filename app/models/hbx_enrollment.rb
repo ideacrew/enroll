@@ -42,13 +42,13 @@ class HbxEnrollment
 
 
   WAIVER_REASONS = [
-    "I have coverage through spouse’s employer health plan",
-    "I have coverage through parent’s employer health plan",
-    "I have coverage through any other employer health plan",
-    "I have coverage through an individual market health plan",
-    "I have coverage through Medicare",
-    "I have coverage through Tricare",
-    "I have coverage through Medicaid"
+      "I have coverage through spouse’s employer health plan",
+      "I have coverage through parent’s employer health plan",
+      "I have coverage through any other employer health plan",
+      "I have coverage through an individual market health plan",
+      "I have coverage through Medicare",
+      "I have coverage through Tricare",
+      "I have coverage through Medicaid"
   ]
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
 
@@ -1060,12 +1060,12 @@ class HbxEnrollment
 
   def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
-      employee_role: employee_role,
-      coverage_household: coverage_household,
-      benefit_group: benefit_group,
-      benefit_group_assignment: benefit_group_assignment,
-      consumer_role: consumer_role,
-      benefit_package: benefit_package
+        employee_role: employee_role,
+        coverage_household: coverage_household,
+        benefit_group: benefit_group,
+        benefit_group_assignment: benefit_group_assignment,
+        consumer_role: consumer_role,
+        benefit_package: benefit_package
     )
     enrollment.save
     enrollment
@@ -1525,6 +1525,13 @@ class HbxEnrollment
   #     end
   #   end
   # end
+
+  def any_dependent_members_age_above_26?
+    hbx_enrollment_members.where(is_subscriber: false).map(&:family_member).map(&:person).each do |person|
+      return true if person.age_on(TimeKeeper.date_of_record) >= 26
+    end
+    return false
+  end
 
  def is_active_renewal_purchase?
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil

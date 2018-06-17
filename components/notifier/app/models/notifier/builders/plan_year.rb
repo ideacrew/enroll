@@ -16,7 +16,7 @@ module Notifier
 
     def plan_year_renewal_py_start_date
       if renewal_plan_year.present?
-        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on) 
+        merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on)
       end
     end
 
@@ -44,6 +44,12 @@ module Notifier
       if current_plan_year.present?
         payment = current_plan_year.benefit_groups.map(&:monthly_employer_contribution_amount)
         merge_model.plan_year.monthly_employer_contribution_amount = number_to_currency(payment.inject(0){ |sum,a| sum+a })
+      end
+    end
+
+    def plan_year_current_py_plus_60_days
+      if current_plan_year.present?
+        merge_model.plan_year.current_py_plus_60_days = format_date(current_plan_year.end_on + 60.days)
       end
     end
 
@@ -136,10 +142,18 @@ module Notifier
     end
 
     def plan_year_enrollment_errors
-      if renewal_plan_year.present?
-        merge_model.plan_year.enrollment_errors = renewal_plan_year.enrollment_errors
-      elsif current_plan_year.present?
-        merge_model.plan_year.enrollment_errors = current_plan_year.enrollment_errors
+      enrollment_errors = []
+      plan_year = (renewal_plan_year || current_plan_year)
+      if plan_year.present?
+        plan_year.enrollment_errors.each do |k, _|
+          case k.to_s
+          when "enrollment_ratio"
+            enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+          when "non_business_owner_enrollment_count"
+            enrollment_errors << "One non-owner employee enrolled in health coverage"
+          end
+        end
+        merge_model.plan_year.enrollment_errors = enrollment_errors.join(' AND/OR ')
       end
     end
 

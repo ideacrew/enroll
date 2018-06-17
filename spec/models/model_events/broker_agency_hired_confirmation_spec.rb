@@ -74,7 +74,7 @@ describe 'ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
     end
 
     it "should return broker assignment date" do
-      expect(merge_model.assignment_date).to eq broker_agency_account.start_on
+      expect(merge_model.assignment_date).to eq broker_agency_account.start_on.strftime('%m/%d/%Y')
     end
 
     it "should return employer poc name" do

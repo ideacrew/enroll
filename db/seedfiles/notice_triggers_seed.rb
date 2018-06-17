@@ -299,7 +299,6 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-
       # {
       #   hbx_id: 'SHOP3B',
       #   title: 'Plan Offerings Finalized',
@@ -471,28 +470,6 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-
-      {
-          hbx_id: 'SHOP_M020',
-          title: 'Initial Ineligible to Obtain Coverage',
-          description: 'Notice goes to Initial groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
-          resource_name: 'employer',
-          event_name: 'initial_employer_ineligibility_notice',
-          notice_triggers: [
-              {
-                  name: 'Initial Group Ineligible to Obtain Coverage',
-                  notice_template: 'notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice',
-                  notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-                  mpi_indicator: 'SHOP_M020',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
     {
       hbx_id: 'SHOP33',
       title: 'Special Enrollment Period Denial',
@@ -726,7 +703,6 @@ if Settings.aca.state_abbreviation == "MA"
     #     }
     #   ]
     # },
-
       {
           hbx_id: 'SHOP45',
           title: 'You have been Hired as a Broker',
@@ -1000,27 +976,6 @@ if Settings.aca.state_abbreviation == "MA"
                       secondary_recipients: []
                   }
               }
-          ]
-      },
-      {
-          hbx_id: 'SHOP59',
-          title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
-          description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
-          resource_name: 'employee_role',
-          event_name: 'ee_ers_plan_year_will_not_be_written_notice',
-          notice_triggers: [
-            {
-              name: " Notice to EEs that ER’s plan year will not be written",
-              notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
-              notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
-              mpi_indicator: 'SHOP_M059',
-              notice_trigger_element_group: {
-                    market_places: ['shop'],
-                    primary_recipients: ["employee"],
-                    primary_recipient_delivery_method: ["secure_message"],
-                    secondary_recipients: []
-              }
-            }
           ]
       },
     # {
@@ -1503,6 +1458,27 @@ elsif Settings.aca.state_abbreviation == "DC"
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
+            primary_recipient_delivery_method: ["secure_message"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
+      hbx_id: 'DAG058',
+      title: 'Ineligible for SHOP Coverage Offered through DC Health Link',
+      description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
+      resource_name: 'employee_role',
+      event_name: 'employee_termination_notice',
+      notice_triggers: [
+        {
+          name: 'Employee Termination Notice',
+          notice_template: 'notices/shop_employee_notices/employee_termination_notice',
+          notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
+          mpi_indicator: 'SHOP_D058',
+          notice_trigger_element_group: {
+            market_places: ['shop'],
+            primary_recipients: ["employee"],
             primary_recipient_delivery_method: ["secure_message"],
             secondary_recipients: []
           }
@@ -2441,7 +2417,6 @@ elsif Settings.aca.state_abbreviation == "DC"
         }
       ]
     },
-
     {
       hbx_id: 'IVLR3',
       title: '2017 Health Insurance Coverage and Preliminary Renewal Information',

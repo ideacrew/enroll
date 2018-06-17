@@ -128,6 +128,41 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
+
+
+    context "#init_qle" do
+      before :each do
+        @controller = Insured::FamiliesController.new
+        @qle = FactoryGirl.create(:qualifying_life_event_kind)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        allow(person).to receive(:user).and_return(user)
+        allow(user).to receive(:identity_verified?).and_return(false)
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
+        allow(person).to receive(:active_employee_roles).and_return([])
+        allow(person).to receive(:employee_roles).and_return([])
+        allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
+        allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(family).to receive(:active_family_members).and_return(family_members)
+        sign_in user
+      end
+      after do
+        QualifyingLifeEventKind.destroy_all
+      end
+
+      it "should return qles" do
+        allow(@controller).to receive(:params).and_return({})
+        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([@qle])
+      end
+
+
+      it "should return qles" do
+        allow(@controller).to receive(:params).and_return({market: "individual_market_events"})
+        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([])
+      end
+    end
+
     context "for SHOP market" do
 
       let(:employee_roles) { double }

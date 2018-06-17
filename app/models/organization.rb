@@ -475,7 +475,7 @@ class Organization
   # Returns date
   # added to decouple functionality from similar method with invoice flow
   def self.commission_statement_date(file_path)
-    date_string = File.basename(file_path).split("_")[1]
+    date_string = File.basename(file_path).split("_")[2]
     Date.strptime(date_string, "%m%d%Y")
   end
 

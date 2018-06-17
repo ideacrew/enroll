@@ -783,7 +783,7 @@ class CensusEmployee < CensusMember
     }).any_in("benefit_group_assignments.benefit_group_id" => [bg_id])
   end
 
-  def self.to_csv
+def self.to_csv
 
     columns = [
       "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
@@ -826,23 +826,38 @@ class CensusEmployee < CensusMember
             census_member.ssn,
             census_member.dob.strftime("%m/%d/%Y"),
             census_member.gender
-          ]
+          ] 
 
-          if census_member.is_a?(CensusEmployee)
-            values += [
-              census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
-              census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
-              census_member.is_business_owner ? "yes" : "no"
+        data = [
+            "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
+            census_employee.dob,
+            census_employee.hired_on,
+            census_employee.aasm_state.humanize.downcase,
+            census_employee.renewal_benefit_group_assignment.try(:benefit_group).try(:title)
+        ]
+
+          if active_assignment = census_employee.active_benefit_group_assignment
+            data += [
+                active_assignment.benefit_group.title,
+                "dental: #{ d = active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'dental'}.try(:aasm_state).try(:humanize).try(:downcase)} health: #{ active_assignment.try(:hbx_enrollments).detect{|enrollment| enrollment.coverage_kind == 'health'}.try(:aasm_state).try(:humanize).try(:downcase)}"
             ]
-          else
-            values += ["", "", "no"]
-          end
 
-          values += 2.times.collect{ "" }
-          if census_member.address.present?
-            values += census_member.address.to_a
-          else
-            values += 6.times.collect{ "" }
+            if census_member.is_a?(CensusEmployee)
+              values += [
+                census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
+                census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
+                census_member.is_business_owner ? "yes" : "no"
+              ]
+            else
+              values += ["", "", "no"]
+            end
+
+            values += 2.times.collect{ "" }
+            if census_member.address.present?
+              values += census_member.address.to_a
+            else
+              values += 6.times.collect{ "" }
+            end
           end
 
           csv << values
