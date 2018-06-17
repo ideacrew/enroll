@@ -17,9 +17,15 @@ describe "CcaBrokerAgencyProfilesMigration" do
       FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
 
       organization = FactoryGirl.create(:broker)
-      FactoryGirl.create(:message1, inbox: organization.broker_agency_profile.inbox)
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: organization.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123456")
-      FactoryGirl.create(:broker_role, broker_agency_profile_id: organization.broker_agency_profile.id)
+      document3 = FactoryGirl.build(:document)
+      document4 = FactoryGirl.build(:document)
+      broker_agency_profile = organization.broker_agency_profile
+
+      FactoryGirl.create(:message1, inbox: broker_agency_profile.inbox)
+      broker_agency_profile.inbox.messages.first.update_attributes(body: "<br>Your notice is now available in your employer profile under the Billing tab. For more information, please download your <a href=/document/authorized_download/BrokerAgencyProfile/#{broker_agency_profile.id}/documents/#{document3.id}?content_type=application/pdf&filename=MonthlyInvoiceAvailableNotice.pdf&disposition=inline target='_blank'>MonthlyInvoiceAvailableNotice</a>")
+
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123456")
+      FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id)
 
       organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")
       FactoryGirl.create(:carrier_profile, organization: organization1)

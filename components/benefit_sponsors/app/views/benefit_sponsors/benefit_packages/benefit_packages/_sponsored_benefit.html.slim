@@ -12,7 +12,7 @@
     .reference_plan_info style='clear: both;'
       h4
       .content
-  #planSelection.hidden
+  #planSelection
     = render "./ui-components/v1/cards/metal_level_select", f: f
 - if show_benefit_application_tile == "true"
   #scEdit
@@ -26,21 +26,21 @@
   br
   br
 
-  javascript:
-    window.onload = function() {
-      showFormButtons()
-    }
+javascript:
+  window.onload = function() {
+    showFormButtons()
+  }
+
+  function showFormButtons() {
+    document.getElementById('addBenefitPackage').classList.remove('hidden')
+    document.getElementById('submitBenefitPackage').classList.remove('hidden')
+    document.getElementById('cancelBenefitPackage').classList.remove('hidden')
+  }
   
-    function showFormButtons() {
-      document.getElementById('addBenefitPackage').classList.remove('hidden')
-      document.getElementById('submitBenefitPackage').classList.remove('hidden')
-      document.getElementById('cancelBenefitPackage').classList.remove('hidden')
-    }
-    
-    function displayReferencePlanDetails() {
-    // f.object.product_package_kind
-    // f.object.reference_plan_id
-    }
+  function displayReferencePlanDetails() {
+  // f.object.product_package_kind
+  // f.object.reference_plan_id
+  }
   
 
 

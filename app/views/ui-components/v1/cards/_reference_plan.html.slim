@@ -1,3 +1,5 @@
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false  
+
 .panel
   .panel-body
     .row
@@ -34,59 +36,60 @@
         br
         | $0.00
 
-javascript:
+- if show_benefit_application_tile == "true"
+  javascript:
 
-  function setInputValue(element) {
-    document.getElementById(element.dataset.id).value = element.value;
-    contributionAmounts(element)
-  }
+    function setInputValue(element) {
+      document.getElementById(element.dataset.id).value = element.value;
+      contributionAmounts(element)
+    }
   
-  function showPlanSelection() {
-    document.getElementById('planSelection').classList.remove('hidden');
-    document.getElementById('referencePlanEdit').classList.add('hidden');
-    document.getElementById('scEdit').classList.add('hidden');
-  }
+    function showPlanSelection() {
+      document.getElementById('planSelection').classList.remove('hidden');
+      document.getElementById('referencePlanEdit').classList.add('hidden');
+      document.getElementById('scEdit').classList.add('hidden');
+    }
   
-  function disablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.add('disabled')
-  }
+    function disablePlanYearButton() {
+      var savePlanYearButton = document.getElementById('submitBenefitPackage');
+      savePlanYearButton.classList.add('disabled')
+    }
   
-  function enablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.remove('disabled')
-  }
+    function enablePlanYearButton() {
+      var savePlanYearButton = document.getElementById('submitBenefitPackage');
+      savePlanYearButton.classList.remove('disabled')
+    }
   
-  var eeContribution = Number;
-  var spouse = Number;
-  var domesticPartner = Number;
-  var childUnder26 = Number;
+    var eeContribution = Number;
+    var spouse = Number;
+    var domesticPartner = Number;
+    var childUnder26 = Number;
   
-  function contributionAmounts(element) {
-    var sliderName = element.dataset.name;
-    var sliderValue = element.value;
+    function contributionAmounts(element) {
+      var sliderName = element.dataset.name;
+      var sliderValue = element.value;
 
-    switch (sliderName) {
-      case 'Employee':
-        eeContribution = sliderValue;
-      break;
-      case 'Spouse':
-        spouse = sliderValue;
-      break;
-      case 'Domestic Partner':
-        domesticPartner = sliderValue;
-      break;
-      case 'Child Under 26':
-        childUnder26 = sliderValue;
-      break;
+      switch (sliderName) {
+        case 'Employee':
+          eeContribution = sliderValue;
+        break;
+        case 'Spouse':
+          spouse = sliderValue;
+        break;
+        case 'Domestic Partner':
+          domesticPartner = sliderValue;
+        break;
+        case 'Child Under 26':
+          childUnder26 = sliderValue;
+        break;
+      }
+      if (eeContribution < 50) {
+        disablePlanYearButton()
+      } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+        disablePlanYearButton()
+      } else {
+        enablePlanYearButton()
+      }
     }
-    if (eeContribution < 50) {
-      disablePlanYearButton()
-    } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
-      disablePlanYearButton()
-    } else {
-      enablePlanYearButton()
-    }
-  }
 
     
