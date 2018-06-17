@@ -305,9 +305,14 @@ module BenefitSponsors
         self.update_attributes(is_active: false)
       end
 
+      def issuers_offered_for(product_kind)
+        sponsored_benefit = sponsored_benefit_for(product_kind)
+        return [] unless sponsored_benefit
+        sponsored_benefit.issuers_offered
+      end
+
       def sponsored_benefit_for(coverage_kind)
-        # I know it's a symbol - but we should behave like indifferent access here
-        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind.to_s == coverage_kind.to_s }
+        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind.to_sym }
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)
