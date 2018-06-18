@@ -6,8 +6,6 @@ module BenefitSponsors
       include BenefitSponsors::Concerns::EmployerProfileConcern
       include BenefitSponsors::Concerns::Observable
 
-      after_update :notify_observers
-
       field :sic_code,  type: String
 
       # TODO use SIC code validation
