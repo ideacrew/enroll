@@ -257,27 +257,27 @@ if Settings.aca.state_abbreviation == "MA"
     #     }
     #   ]
     # },
-      {
-          hbx_id: 'SHOP_M003',
-          title: 'Employer Denial Notice',
-          description: 'Application to Offer Group Health Coverage in Health Connector',
-          resource_name: 'employer',
-          event_name: 'initial_employer_denial',
-          notice_triggers: [
-              {
-                  name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
-                  notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
-                  notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-                  mpi_indicator: 'SHOP_M003',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP_M003',
+      #     title: 'Employer Denial Notice',
+      #     description: 'Application to Offer Group Health Coverage in Health Connector',
+      #     resource_name: 'employer',
+      #     event_name: 'initial_employer_denial',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
+      #             notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
+      #             notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
+      #             mpi_indicator: 'SHOP_M003',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
       # {
       #   hbx_id: 'SHOP3A',
       #   title: 'Plan Offerings Finalized',
@@ -299,6 +299,7 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
+
       # {
       #   hbx_id: 'SHOP3B',
       #   title: 'Plan Offerings Finalized',
@@ -513,71 +514,93 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-    {
-      hbx_id: 'SHOP33',
-      title: 'Special Enrollment Period Denial',
-      description: 'EE SEP Requested by Employee outside of allowable time frame',
-      resource_name: 'employee_role',
-      event_name: 'sep_request_denial_notice',
-      notice_triggers: [
-        {
-          name: 'Denial of SEP Requested by EE outside of allowable time frame',
-          notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
-          notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-          mpi_indicator: 'SHOP_M033',
-          notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employee"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
-    {
-      hbx_id: 'SHOP32',
-      title: 'EE SEP Requested Enrollment Period Approval Notice',
-      description: 'Notification to Employee Regarding SEP Request Enrollment Approval',
-      resource_name: 'employee_role',
-      event_name: 'notify_employee_of_special_enrollment_period',
-      notice_triggers: [
-          {
-              name: 'Notification to employee regarding their Special enrollment period',
-              notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_sep',
-              notice_builder: 'ShopEmployeeNotices::EmployeeSepQleAcceptNotice',
-              mpi_indicator: 'SHOP_M032',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employee"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
 
-              }
-          }
-      ]
-    },
+      # {
+      #     hbx_id: 'SHOP_M020',
+      #     title: 'Initial Ineligible to Obtain Coverage',
+      #     description: 'Notice goes to Initial groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
+      #     resource_name: 'employer',
+      #     event_name: 'initial_employer_ineligibility_notice',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Initial Group Ineligible to Obtain Coverage',
+      #             notice_template: 'notices/shop_employer_notices/20_a_initial_employer_ineligibility_notice',
+      #             notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
+      #             mpi_indicator: 'SHOP_M020',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
+    # {
+    #   hbx_id: 'SHOP33',
+    #   title: 'Special Enrollment Period Denial',
+    #   description: 'EE SEP Requested by Employee outside of allowable time frame',
+    #   resource_name: 'employee_role',
+    #   event_name: 'sep_request_denial_notice',
+    #   notice_triggers: [
+    #     {
+    #       name: 'Denial of SEP Requested by EE outside of allowable time frame',
+    #       notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
+    #       notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
+    #       mpi_indicator: 'SHOP_M033',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employee"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
+    # {
+    #   hbx_id: 'SHOP32',
+    #   title: 'EE SEP Requested Enrollment Period Approval Notice',
+    #   description: 'Notification to Employee Regarding SEP Request Enrollment Approval',
+    #   resource_name: 'employee_role',
+    #   event_name: 'notify_employee_of_special_enrollment_period',
+    #   notice_triggers: [
+    #       {
+    #           name: 'Notification to employee regarding their Special enrollment period',
+    #           notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_sep',
+    #           notice_builder: 'ShopEmployeeNotices::EmployeeSepQleAcceptNotice',
+    #           mpi_indicator: 'SHOP_M032',
+    #           notice_trigger_element_group: {
+    #               market_places: ['shop'],
+    #               primary_recipients: ["employee"],
+    #               primary_recipient_delivery_method: ["secure_message"],
+    #               secondary_recipients: []
 
-    {
-        hbx_id: 'SHOP42',
-        title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
-        description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
-        resource_name: 'employee_role',
-        event_name: 'notify_employee_when_employer_requests_advance_termination',
-        notice_triggers: [
-          {
-            name: " Notice to EEs that active ER is terminated from SHOP",
-            notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
-            notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
-            mpi_indicator: 'SHOP_M042',
-            notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employee"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                }
-            }
-        ]
-    },
+    #           }
+    #       }
+    #   ]
+    # },
+
+    # {
+    #     hbx_id: 'SHOP42',
+    #     title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
+    #     description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
+    #     resource_name: 'employee_role',
+    #     event_name: 'notify_employee_when_employer_requests_advance_termination',
+    #     notice_triggers: [
+    #       {
+    #         name: " Notice to EEs that active ER is terminated from SHOP",
+    #         notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
+    #         notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
+    #         mpi_indicator: 'SHOP_M042',
+    #         notice_trigger_element_group: {
+    #               market_places: ['shop'],
+    #               primary_recipients: ["employee"],
+    #               primary_recipient_delivery_method: ["secure_message"],
+    #               secondary_recipients: []
+    #             }
+    #         }
+    #     ]
+    # },
     # {
     #   hbx_id: 'SHOP_D018',
     #   title: 'Group Open Enrollment Successfully Completed',
@@ -620,27 +643,27 @@ if Settings.aca.state_abbreviation == "MA"
     #     }
     #   ]
     # },
-    {
-      hbx_id: 'SHOP19',
-      title: 'Group Ineligible to Obtain Coverage',
-      description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
-      resource_name: 'employer',
-      event_name: 'renewal_employer_ineligibility_notice',
-      notice_triggers: [
-        {
-          name: 'Renewal Group Ineligible to Obtain Coverage',
-          notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
-          notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
-          mpi_indicator: 'MPI_SHOP19',
-          notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employer"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
+    # {
+    #   hbx_id: 'SHOP19',
+    #   title: 'Group Ineligible to Obtain Coverage',
+    #   description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
+    #   resource_name: 'employer',
+    #   event_name: 'renewal_employer_ineligibility_notice',
+    #   notice_triggers: [
+    #     {
+    #       name: 'Renewal Group Ineligible to Obtain Coverage',
+    #       notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
+    #       notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
+    #       mpi_indicator: 'MPI_SHOP19',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employer"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
     {
       hbx_id: 'SHOP20',
       title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
@@ -747,49 +770,48 @@ if Settings.aca.state_abbreviation == "MA"
     #   ]
     # },
 
-      {
-          hbx_id: 'SHOP45',
-          title: 'You have been Hired as a Broker',
-          description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-          resource_name: 'broker_role',
-          event_name: 'broker_hired',
-          notice_triggers: [
-             {
-                name: 'Broker Hired',
-                notice_template: 'notices/shop_broker_notices/broker_hired_notice.html.erb',
-                notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
-                mpi_indicator: 'SHOP_M045',
-                notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
-      },
-
-      {
-          hbx_id: 'SHOP47',
-          title: 'You have been removed as a Broker',
-          description: "When a broker is fired, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-          resource_name: 'broker_role',
-          event_name: 'broker_agency_fired_confirmation',
-          notice_triggers: [
-             {
-                name: 'Broker Agency Fired',
-                notice_template: 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
-                notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
-                mpi_indicator: 'SHOP_M047',
-                notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["broker"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-                }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP45',
+      #     title: 'You have been Hired as a Broker',
+      #     description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+      #     resource_name: 'broker_role',
+      #     event_name: 'broker_hired',
+      #     notice_triggers: [
+      #        {
+      #           name: 'Broker Hired',
+      #           notice_template: 'notices/shop_broker_notices/broker_hired_notice.html.erb',
+      #           notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
+      #           mpi_indicator: 'SHOP_M045',
+      #           notice_trigger_element_group: {
+      #           market_places: ['shop'],
+      #           primary_recipients: ["broker"],
+      #           primary_recipient_delivery_method: ["secure_message"],
+      #           secondary_recipients: []
+      #         }
+      #       }
+      #   ]
+      # },
+      # {
+      #     hbx_id: 'SHOP47',
+      #     title: 'You have been removed as a Broker',
+      #     description: "When a broker is fired, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+      #     resource_name: 'broker_role',
+      #     event_name: 'broker_agency_fired_confirmation',
+      #     notice_triggers: [
+      #        {
+      #           name: 'Broker Agency Fired',
+      #           notice_template: 'notices/shop_broker_agency_notices/broker_agency_fired_notice',
+      #           notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyFiredNotice',
+      #           mpi_indicator: 'SHOP_M047',
+      #           notice_trigger_element_group: {
+      #             market_places: ['shop'],
+      #             primary_recipients: ["broker"],
+      #             primary_recipient_delivery_method: ["secure_message"],
+      #             secondary_recipients: []
+      #           }
+      #         }
+      #     ]
+      # },
     # {
     #   hbx_id: 'SHOP27',
     #   title: 'Final Reminder to publish Application',
@@ -959,69 +981,111 @@ if Settings.aca.state_abbreviation == "MA"
     #       ]
     #   },
 
-      {
-          hbx_id: 'SHOP_M068',
-          title: 'Employee Plan Selection Confirmation',
-          description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
-          resource_name: 'employee_role',
-          event_name: 'select_plan_year_during_oe',
-          notice_triggers: [
-              {
-                  name: 'Notice to employee after they select a plan during Annual Open Enrollment',
-                  notice_template: 'notices/shop_employee_notices/15_employee_select_plan_during_annual_open_enrollment',
-                  notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
-                  mpi_indicator: 'SHOP_M068',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employee"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
-      {
-          hbx_id: 'SHOP_M053',
-          title: 'EE Ineligibility Notice – Terminated from Roster',
-          description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
-          resource_name: 'employee_role',
-          event_name: 'employee_termination_notice',
-          notice_triggers: [
-            {
-                  name: 'Employee Termination Notice',
-                  notice_template: 'notices/shop_employee_notices/employee_termination_notice',
-                  notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
-                  mpi_indicator: 'SHOP_M053',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employee"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
-      {
-          hbx_id: 'SHOP_M041',
-          title: 'Notice Confirmation for Group termination due to ER advance request',
-          description: 'Group termination confirmation for advance request',
-          resource_name: 'employer',
-          event_name: 'group_advance_termination_confirmation',
-          notice_triggers: [
-              {
-                  name: 'Notice to employee after they select a plan Annual Open Enrollment',
-                  notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
-                  notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
-                  mpi_indicator: 'SHOP_M041',
-                  notice_trigger_element_group: {
-                      market_places: ['shop'],
-                      primary_recipients: ["employer"],
-                      primary_recipient_delivery_method: ["secure_message"],
-                      secondary_recipients: []
-                  }
-              }
-          ]
-      },
+      # {
+      #     hbx_id: 'SHOP_M068',
+      #     title: 'Employee Plan Selection Confirmation',
+      #     description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
+      #     resource_name: 'employee_role',
+      #     event_name: 'select_plan_year_during_oe',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Notice to employee after they select a plan during Annual Open Enrollment',
+      #             notice_template: 'notices/shop_employee_notices/15_employee_select_plan_during_annual_open_enrollment',
+      #             notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
+      #             mpi_indicator: 'SHOP_M068',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employee"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
+      # {
+      #     hbx_id: 'SHOP_M053',
+      #     title: 'EE Ineligibility Notice – Terminated from Roster',
+      #     description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
+      #     resource_name: 'employee_role',
+      #     event_name: 'employee_termination_notice',
+      #     notice_triggers: [
+      #       {
+      #             name: 'Employee Termination Notice',
+      #             notice_template: 'notices/shop_employee_notices/employee_termination_notice',
+      #             notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
+      #             mpi_indicator: 'SHOP_M053',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employee"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
+      # {
+      #     hbx_id: 'SHOP_M041',
+      #     title: 'Notice Confirmation for Group termination due to ER advance request',
+      #     description: 'Group termination confirmation for advance request',
+      #     resource_name: 'employer',
+      #     event_name: 'group_advance_termination_confirmation',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Notice to employee after they select a plan Annual Open Enrollment',
+      #             notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
+      #             notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
+      #             mpi_indicator: 'SHOP_M041',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
+      # {
+      #     hbx_id: 'SHOP59',
+      #     title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
+      #     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
+      #     resource_name: 'employee_role',
+      #     event_name: 'ee_ers_plan_year_will_not_be_written_notice',
+      #     notice_triggers: [
+      #       {
+      #         name: " Notice to EEs that ER’s plan year will not be written",
+      #         notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
+      #         notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
+      #         mpi_indicator: 'SHOP_M059',
+      #         notice_trigger_element_group: {
+      #               market_places: ['shop'],
+      #               primary_recipients: ["employee"],
+      #               primary_recipient_delivery_method: ["secure_message"],
+      #               secondary_recipients: []
+      #         }
+      #       }
+      #     ]
+      # },
+      # {
+      #     hbx_id: 'SHOP_M041',
+      #     title: 'Notice Confirmation for Group termination due to ER advance request',
+      #     description: 'Group termination confirmation for advance request',
+      #     resource_name: 'employer',
+      #     event_name: 'group_advance_termination_confirmation',
+      #     notice_triggers: [
+      #         {
+      #             name: 'Notice to employee after they select a plan Annual Open Enrollment',
+      #             notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
+      #             notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
+      #             mpi_indicator: 'SHOP_M041',
+      #             notice_trigger_element_group: {
+      #                 market_places: ['shop'],
+      #                 primary_recipients: ["employer"],
+      #                 primary_recipient_delivery_method: ["secure_message"],
+      #                 secondary_recipients: []
+      #             }
+      #         }
+      #     ]
+      # },
     # {
     #   hbx_id: 'SHOP_D092',
     #   title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
@@ -1174,7 +1238,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Employer Approval Notice',
       description: 'Application to Offer Group Health Coverage in DC Health Link',
       resource_name: 'employer',
-      event_name: 'initial_employer_approval',
+      event_name: 'initial_application_submitted',
       notice_triggers: [
         {
           name: 'Initial Employer SHOP Approval Notice',
@@ -1191,17 +1255,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP2B',
+      hbx_id: 'SHOP_M003',
       title: 'Employer Denial Notice',
       description: 'Application to Offer Group Health Coverage in DC Health Link',
       resource_name: 'employer',
-      event_name: 'initial_employer_denial',
+      event_name: 'employer_initial_eligibility_denial_notice',
       notice_triggers: [
         {
           name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
           notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
           notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-          mpi_indicator: 'MPI_SHOP2B',
+          mpi_indicator: 'SHOP_M003',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -1212,17 +1276,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'DRG006',
+      hbx_id: 'SHOP_D006',
       title: 'Plan Offerings Finalized',
       description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
       resource_name: 'employer',
-      event_name: 'planyear_renewal_3a',
+      event_name: 'renewal_application_published',
       notice_triggers: [
         {
           name: 'PlanYear Renewal',
           notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-          mpi_indicator: 'MPI_DRG006',
+          mpi_indicator: 'SHOP_D006',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -1233,17 +1297,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'DRG007',
+      hbx_id: 'SHOP_D007',
       title: 'Plan Offerings Finalized',
       description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
       resource_name: 'employer',
-      event_name: 'planyear_renewal_3b',
+      event_name: 'plan_year_auto_published',
       notice_triggers: [
         {
           name: 'PlanYear Renewal Auto-Published',
           notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-          mpi_indicator: 'MPI_DRG007',
+          mpi_indicator: 'SHOP_D007',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -1277,17 +1341,17 @@ elsif Settings.aca.state_abbreviation == "DC"
     },
 
     {
-      hbx_id: 'SHOP5',
+      hbx_id: 'SHOP_D004',
       title: 'Group Renewal Available',
       description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
       resource_name: 'employer',
-      event_name: 'group_renewal_5',
+      event_name: 'renewal_application_created',
       notice_triggers: [
         {
           name: 'Group Renewal Notice',
           notice_template: 'notices/shop_employer_notices/5_employer_renewal_notice',
           notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-          mpi_indicator: 'MPI_SHOP5',
+          mpi_indicator: 'SHOP_D004',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -1320,7 +1384,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP6',
+      hbx_id: 'SHOP_D008',
       title: 'Action Needed – Add all Eligible Employees to your Roster',
       description: 'This notice goes to all the employers with zero employees on roster when published',
       resource_name: 'employer',
@@ -1330,7 +1394,7 @@ elsif Settings.aca.state_abbreviation == "DC"
           name: 'Zero Employees on Rotser',
           notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
           notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-          mpi_indicator: 'MPI_SHOP6',
+          mpi_indicator: 'SHOP_D008',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -1341,17 +1405,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8A',
+      hbx_id: 'SHOP_D010',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_auto_renewal',
+      event_name: 'employee_coverage_passively_renewed',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
-          mpi_indicator: 'MPI_SHOP8A',
+          mpi_indicator: 'SHOP_D010',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -1362,17 +1426,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8B',
+      hbx_id: 'SHOP_D011',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All employees that enrolled the previous year and do not have an auto-renewal plan option available.',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_no_auto_renewal',
+      event_name: 'employee_coverage_passive_renewal_failed',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal',
-          mpi_indicator: 'MPI_SHOP8B',
+          mpi_indicator: 'SHOP_D011',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -1383,17 +1447,17 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8C',
+      hbx_id: 'SHOP_D012',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All employees that are not currently enrolled in a plan',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_unenrolled',
+      event_name: 'employee_coverage_passively_waived',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled',
-          mpi_indicator: 'MPI_SHOP8C',
+          mpi_indicator: 'SHOP_D012',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -1471,7 +1535,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Eligible to Apply for Employer-sponsored Health Insurance',
       description: 'This notices goes to all the employees who have successfully matched their employer.',
       resource_name: 'employee_role',
-      event_name: 'employee_eligibility_notice',
+      event_name: 'employee_matches_employer_rooster',
       notice_triggers: [
         {
           name: 'Employee Eligibility Notice',
@@ -1502,6 +1566,27 @@ elsif Settings.aca.state_abbreviation == "DC"
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
+            primary_recipient_delivery_method: ["secure_message"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
+      hbx_id: 'DAG058',
+      title: 'Ineligible for SHOP Coverage Offered through DC Health Link',
+      description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
+      resource_name: 'employee_role',
+      event_name: 'employee_termination_notice',
+      notice_triggers: [
+        {
+          name: 'Employee Termination Notice',
+          notice_template: 'notices/shop_employee_notices/employee_termination_notice',
+          notice_builder: 'ShopEmployeeNotices::EmployeeTerminationNotice',
+          mpi_indicator: 'SHOP_D058',
+          notice_trigger_element_group: {
+            market_places: ['shop'],
+            primary_recipients: ["employee"],
             primary_recipient_delivery_method: ["secure_message"],
             secondary_recipients: []
           }
@@ -1681,7 +1766,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Employee Terminating coverage',
       description: 'Employee Terminating coverage after QLE',
       resource_name: 'employer',
-      event_name: 'notify_employer_when_employee_terminate_coverage',
+      event_name: 'employer_notice_for_employee_coverage_termination',
       notice_triggers: [
         {
           name: 'Notice to employer when employee terminates coverage',
@@ -1744,7 +1829,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Group Ineligible to Obtain Coverage',
       description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
       resource_name: 'employer',
-      event_name: 'initial_employer_ineligibility_notice',
+      event_name: 'initial_employer_application_denied',
       notice_triggers: [
         {
           name: 'Initial Employer ineligible to obtain coverage.',
@@ -1807,7 +1892,7 @@ elsif Settings.aca.state_abbreviation == "DC"
         title: 'Confirmation - Broker Fired',
         description: 'Broker gets terminated after employer selects change broker',
         resource_name: 'employer',
-        event_name: 'employer_broker_fired',
+        event_name: 'broker_fired_confirmation_to_employer',
         notice_triggers: [
             {
                 name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
@@ -1891,7 +1976,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Confirmation - Broker Hired',
       description: 'Confirmation of Broker Hired Sent to Employer',
       resource_name: 'employer',
-      event_name: 'broker_hired_confirmation_notice',
+      event_name: 'broker_hired_confirmation_to_employer',
       notice_triggers: [
         {
           name: 'Boker Hired Confirmation',
@@ -1933,7 +2018,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Employee has made a change to their employer-sponsored coverage selection',
       description: 'Employee mid year plan change when an eligiblity determination is reached',
       resource_name: 'employer',
-      event_name: 'ee_mid_year_plan_change_non_congressional_notice',
+      event_name: 'employee_mid_year_plan_change_notice_to_employer',
       notice_triggers: [
         {
           name: 'Employee Mid-Year Plan change Non-Congressional',
@@ -1954,7 +2039,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Welcome to DC Health Link',
       description: 'ER creates an account in DC Health',
       resource_name: 'employer',
-      event_name: 'employer_account_creation_notice',
+      event_name: 'welcome_notice_to_employer',
       notice_triggers: [
         {
           name: 'Welcome Notice sent to Employer',
@@ -1996,7 +2081,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'You have been hired as a broker',
       description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
       resource_name: 'broker_role',
-      event_name: 'broker_hired',
+      event_name: 'broker_hired_notice_to_broker',
       notice_triggers: [
         {
           name: 'Broker Hired',
@@ -2059,13 +2144,76 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Special Enrollment Period Approval',
       description: 'SEP request by Employee accepted when an eligiblity determination is reached',
       resource_name: 'employee_role',
-      event_name: 'ee_sep_request_accepted_notice',
+      event_name: 'employee_sep_request_accepted',
       notice_triggers: [
         {
           name: 'EE SEP Requested Accepted',
           notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
           notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
           mpi_indicator: 'SHOP_D034',
+          notice_trigger_element_group: {
+            market_places: ['shop'],
+            primary_recipients: ["employee"],
+            primary_recipient_delivery_method: ["secure_message"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
+    hbx_id: 'SHOP_D064',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
+    resource_name: 'employee_role',
+    event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written',
+    notice_triggers: [
+      {
+        name: "Notice to EEs that ER’s plan year will not be written",
+        notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
+        notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
+        mpi_indicator: 'SHOP_D064',
+        notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employee"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+            }
+        }
+    ]
+  },
+  {
+      hbx_id: 'SHOP_D075',
+      title: 'Employee Enrollment Confirmation',
+      description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
+      resource_name: 'employee_role',
+      event_name: 'initial_employee_plan_selection_confirmation',
+      notice_triggers: [
+        {
+          name: 'Notice to employee after they select a plan Annual Open Enrollment',
+          notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
+          notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
+          mpi_indicator: 'SHOP_D075',
+          notice_trigger_element_group: {
+            market_places: ['shop'],
+            primary_recipients: ["employee"],
+            primary_recipient_delivery_method: ["secure_message"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
+      hbx_id: 'SHOP_M040',
+      title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+      description: 'Notification to employees regarding their Employer’s ineligibility.',
+      resource_name: 'employee_role',
+      event_name: 'group_ineligibility_notice_to_employee',
+      notice_triggers: [
+        {
+          name: 'Notification to employees regarding their Employer’s ineligibility.',
+          notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
+          notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
+          mpi_indicator: 'SHOP_M040',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -2164,7 +2312,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Confirmation of Election To Terminate Coverage',
       description: 'Employee Terminating coverage after QLE',
       resource_name: 'employee_role',
-      event_name: 'notify_employee_confirming_coverage_termination',
+      event_name: 'employee_notice_for_employee_coverage_termination',
       notice_triggers: [
         {
           name: 'Notice to employee when employee terminates coverage',

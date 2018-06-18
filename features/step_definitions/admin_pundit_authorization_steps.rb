@@ -16,11 +16,11 @@ Then(/^the Add SEP option should be disabled$/) do
 end
 
 Then(/^the Cancel Enrollment option should be enabled$/) do
-  find_link('Cancel Enrollment')['data-remote'].should == nil
+  find_link('Cancel Enrollment')['data-remote'].should == 'true'
 end
 
 Then(/^the Terminate Enrollment option should be enabled$/) do
-  find_link('Terminate Enrollment')['data-remote'].should == nil
+  find_link('Terminate Enrollment')['data-remote'].should == 'true'
 end
 
 Then(/^the Cancel Enrollment option should be disabled$/) do
