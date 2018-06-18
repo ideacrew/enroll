@@ -5,11 +5,10 @@ module BenefitSponsors
     included do
       after_update :notify_observers
 
-      def notify_observers(*arg)
+      def notify_observers(args={})
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, v|
-            puts k.inspect
-            k.send v, *arg
+            k.send v, self, args
           end
         end
       end
