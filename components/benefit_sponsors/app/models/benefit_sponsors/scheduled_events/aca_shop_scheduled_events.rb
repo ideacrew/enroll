@@ -2,6 +2,8 @@ module BenefitSponsors
   module BenefitSponsorships
     class AcaShopScheduledEvent
 
+      include ::Acapi::Notifiers
+
       attr_reader :new_date
 
       def self.advance_day(new_date)
@@ -11,30 +13,9 @@ module BenefitSponsors
       def initialize(new_date)
         @new_date = new_date
         shop_daily_events
-        trigger_force_submit_applications
-        generate_employer_group_files
-        end_enrollment_quiet_period
-      end
-
-      # def is_event_date_valid?(new_date) commented out as jenkins build was failing
-      def is_event_date_valid?
-        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
-          return true
-        end
-      end
-
-      def trigger_force_submit_applications
-        # if is_event_date_valid?(:force_submit) commented this line as jenkins build was failing
-        if is_event_date_valid?
-
-          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
-        end
-      end
-
-      def generate_employer_group_files
-      end
-
-      def end_enrollment_quiet_period
+        auto_submit_renewal_applications
+        auto_transmit_monthly_benefit_sponsors
+        close_enrollment_quiet_period
       end
 
       def shop_daily_events
@@ -46,27 +27,11 @@ module BenefitSponsors
         process_events_for { benefit_renewal }
       end
 
-      def business_policy_for(event)
-
-      end
-
-      def event_service_for(benefit_sponsorship)
-        if benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
-          sponsorship_service
-        end
-      end
-
-      def process_event(benefit_sponsorship, event)
-        business_policy = business_policy_for(event)
-        event_service   = event_service_for(benefit_sponsorship)
-        event_service.execute(benefit_sponsorship, event, business_policy)
-      end
-
       def open_enrollment_begin
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_open_enrollment?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          process_application(benefit_sponsorship, :begin_open_enrollment)
+          execute_sponsor_event(benefit_sponsorship, :begin_open_enrollment)
         end
       end
 
@@ -74,7 +39,7 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_open_enrollment?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          process_application(benefit_sponsorship, :close_open_enrollment)        
+          execute_sponsor_event(benefit_sponsorship, :close_open_enrollment)
         end
       end
 
@@ -82,10 +47,7 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_begin_benefit_coverage?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          process_application(benefit_sponsorship, :close_open_enrollment)        
-
-          # sponsorship_service.benefit_sponsorship = benefit_sponsorship
-          # sponsorship_service.begin_sponsor_benefit
+          execute_sponsor_event(benefit_sponsorship, :begin_sponsor_benefit)   
         end
       end
 
@@ -93,8 +55,7 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_benefit_coverage?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          sponsorship_service.benefit_sponsorship = benefit_sponsorship
-          sponsorship_service.end_sponsor_benefit
+          execute_sponsor_event(benefit_sponsorship, :end_sponsor_benefit)
         end
       end
 
@@ -102,8 +63,7 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_benefit_coverage?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          sponsorship_service.benefit_sponsorship = benefit_sponsorship
-          sponsorship_service.terminate_sponsor_benefit
+          execute_sponsor_event(benefit_sponsorship, :terminate_sponsor_benefit)
         end
       end
 
@@ -111,8 +71,66 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_renew_application?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          sponsorship_service.benefit_sponsorship = benefit_sponsorship
-          sponsorship_service.renew_sponsor_benefit
+          execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
+        end
+      end
+
+      def auto_submit_renewal_applications
+        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
+          effective_on = new_date.next_month.beginning_of_month
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_auto_submit_application?(effective_on)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :auto_submit_application)
+          end
+        end
+      end
+
+      def auto_transmit_monthly_benefit_sponsors
+        if aca_shop_market_transmit_scheduled_employers
+          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
+            transmit_scheduled_benefit_sponsors(new_date)
+          end
+        end
+      end
+
+      def close_enrollment_quiet_period
+        if new_date.prev_day.mday == Settings.aca.shop_market.initial_application.quiet_period.mday
+          effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
+          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
+        end
+      end
+
+      def transmit_scheduled_benefit_sponsors(new_date, feins=[])
+        start_on = new_date.next_month.beginning_of_month
+        benefit_sponsors = BenefitSponsors::BenefitSponsors::BenefitSponsorship
+        benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
+
+        benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
+          benefit_sponsorship.transmit_renewal_eligible_event     if benefit_sponsorship.is_renewal_transmission_eligible?
+          benefit_sponsorship.transmit_renewal_carrier_drop_event if benefit_sponsorship.is_renewal_carrier_drop?
+        end
+
+        benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
+          benefit_sponsorship.transmit_initial_eligible_event
+        end
+      end
+
+      private
+
+      def execute_sponsor_event(benefit_sponsorship, event)
+        business_policy = business_policy_for(benefit_sponsorship, event)
+        event_service   = sponsor_service_for(benefit_sponsorship)
+        event_service.execute(benefit_sponsorship, event, business_policy)
+      end
+
+      def business_policy_for(benefit_sponsorship, event_name)
+        sponsor_policy.business_policies_for(benefit_sponsorship, event_name)
+      end
+
+      def sponsor_service_for(benefit_sponsorship)
+        if benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
+          sponsorship_service
         end
       end
 
@@ -121,7 +139,10 @@ module BenefitSponsors
         @sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(new_date: new_date)
       end
 
-      private
+      def sponsor_policy
+        return @sponsor_policy if defined?(@sponsor_policy)
+        @sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
+      end
 
       def process_events_for(&block)
         begin
