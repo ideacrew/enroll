@@ -288,7 +288,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
         end
-        census_employee.save
+        census_employee.save(:validate => false)
       end
     end
   end
