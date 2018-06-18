@@ -261,7 +261,6 @@ class BenefitApplicationMigration < Mongoid::Migration
       attributes = wst.attributes.except(:_id)
       attributes[:from_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.from_state.to_sym]
       attributes[:to_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.to_state.to_sym]
-      binding.pry
       benefit_application.workflow_state_transitions.build(attributes)
     end
   end
