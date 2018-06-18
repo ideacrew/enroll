@@ -54,6 +54,8 @@ aca:
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
       end_on: <%= Date.new(2018,02,05) %>
+    dc_resident_application: true
+    transition_family_members_link: true
 
   shop_market:
     small_market_employee_count_maximum: 50

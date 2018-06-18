@@ -1,3 +1,4 @@
+@disable_resident_application
 Feature: Consumer requests enrollment in CoverAll
   As a person who is aware in advance that he is not qualified for QHP through the
   exchange, and has not initialized an application through EA, he can request to

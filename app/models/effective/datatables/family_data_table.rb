@@ -76,9 +76,6 @@ module Effective
         (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
       end
 
-      def transition_family_members_link_type(row, allow)
-        allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
-      end
 
       def create_eligibility_family_member_link_type(row, allow)
         allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
