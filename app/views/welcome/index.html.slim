@@ -16,7 +16,7 @@
       = link_to l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-default"
     = link_to l10n(".returning_user"), family_account_path, class: "btn btn-default"
     = link_to l10n(".employer_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: "btn btn-default"
-    = link_to l10n(".broker_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-default"
+    = link_to l10n(".broker_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency, portal: true), class: "btn btn-default"
     = link_to l10n(".general_agency_portal"), general_agencies_root_path, class: "btn btn-default" if general_agency_enabled?
     = link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default"
 

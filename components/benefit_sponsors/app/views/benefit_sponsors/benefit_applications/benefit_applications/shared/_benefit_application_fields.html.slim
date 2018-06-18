@@ -87,15 +87,23 @@ javascript:
     setDueDates('binder_payment_deadline_month', monthName[deadlineMonth-1]);
   }
   
+  var employeeCounts = {
+    fte: Number,
+    pte: Number,
+    msp: Number
+  }
+  
   function checkEmployeeCount(element) {
-    var employeeCounts = {
-      fte: Number
-    }
-    
     if (element.id == "fteEmployee") {
       employeeCounts.fte = element.value
     }
-    if (employeeCounts.fte >= 1) {
+    if (element.id == "pteEmployee") {
+      employeeCounts.pte = element.value
+    }
+    if (element.id == "medSecPayers") {
+      employeeCounts.msp = element.value
+    }
+    if (employeeCounts.fte >= 1 || employeeCounts.pte >= 1 || employeeCounts.msp >= 1) {
       document.getElementById('benefitContinueBtn').classList.remove('disabled')
     } else {
       document.getElementById('benefitContinueBtn').classList.add('disabled')
