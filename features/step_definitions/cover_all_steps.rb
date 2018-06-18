@@ -111,12 +111,12 @@ When(/^Hbx Admin clicks on Transition family members link$/) do
   click_link('Transition Family Members')
 end
 
-Then(/^Hbx Admin should see the form being rendered to transition each family memebers seperately$/) do
+Then(/^Hbx Admin should see the form being rendered to transition each family members seperately$/) do
   expect(page).to have_content(/Transition Family Members/i)
   expect(page).to have_content(/Transition User?/i)
 end
 
-When(/^Hbx Admin enter\/update information of each memeber individually$/) do
+When(/^Hbx Admin enter\/update information of each member individually$/) do
   find(:xpath, "(//input[@type='checkbox'])[1]").trigger('click')
   find('input.date-picker').click
   find(:xpath, '/html/body/div[4]/table/tbody/tr[3]/td[4]/a').click
