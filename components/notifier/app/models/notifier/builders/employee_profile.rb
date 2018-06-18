@@ -194,11 +194,12 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      merge_model.special_enrollment_period.event_on =  format_date(payload['notice_params'][:qle_event_on] || special_enrollment_period.event_on )
+      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : special_enrollment_period.event_on
+      merge_model.special_enrollment_period.event_on = format_date(event_on)
     end
 
     def special_enrollment_period_title
-      merge_model.special_enrollment_period.title = special_enrollment_period.blank? ? payload['notice_params'][:qle_title] : special_enrollment_period.title
+      merge_model.special_enrollment_period.title = special_enrollment_period.nil? ? payload['notice_params']['qle_title'] : special_enrollment_period.title
     end
 
     def special_enrollment_period_qle_reported_on
@@ -220,7 +221,7 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      deadline = payload['notice_params'][:qle_reporting_deadline]
+      deadline = payload['notice_params']['qle_reporting_deadline']
       merge_model.special_enrollment_period.reporting_deadline = format_date(deadline) 
     end
 

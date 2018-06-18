@@ -14,9 +14,9 @@ describe 'ModelEvents::SepRequestDenialNotice', :dbclean => :after_each  do
   let(:qle_event_on) { qle_reporting_deadline.next_day}
   let(:notice_params) {
     {
-      qle_title: qle.title,
-      qle_reporting_deadline: qle_reporting_deadline,
-      qle_event_on: qle_event_on
+      "qle_title" => qle.title,
+      "qle_reporting_deadline" => qle_reporting_deadline,
+      "qle_event_on" => qle_event_on
     }
   }
 
