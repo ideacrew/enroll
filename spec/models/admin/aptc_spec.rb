@@ -56,24 +56,47 @@ RSpec.describe Admin::Aptc, :type => :model do
     end
 
     # BUILD AVAILABLE APTC VALUES
-    context 'build avalaible_aptc values' do
-      let!(:max_aptc__hash) do
-        {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-         "Jul"=>"400.00", "Aug"=>"400.00", "Sep"=>"400.00", "Oct"=>"400.00", "Nov"=>"400.00", "Dec"=>"400.00"}
-      end
-      let(:expected_available_hash) do
-        {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-         "Jul"=>"750.00", "Aug"=>"750.00", "Sep"=>"750.00", "Oct"=>"750.00", "Nov"=>"750.00", "Dec"=>"750.00"}
-      end
-      before do
-        allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc__hash
+    describe 'build avalaible_aptc values' do
+      context 'when current aptc 1000' do
+        let!(:max_aptc__hash) do
+          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
+           "Jul"=>"1000.00", "Aug"=>"1000.00", "Sep"=>"1000.00", "Oct"=>"1000.00", "Nov"=>"1000.00", "Dec"=>"1000.00"}
+        end
+        let(:expected_available_hash) do
+          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
+           "Jul"=>"1950.00", "Aug"=>"1950.00", "Sep"=>"1950.00", "Oct"=>"1950.00", "Nov"=>"1950.00", "Dec"=>"1950.00"}
+        end
+        before do
+          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc__hash
+        end
+
+        it "should return a hash that reflects max_aptc change on a monthly basis based on the new formula" do
+          available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, [], nil, 1000)
+          expect(available_aptc_hash).to eq expected_available_hash
+        end
       end
 
-      it "should return a hash that reflects max_aptc change on a monthly basis based on the new formula" do
-        available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, [], nil, 400)
-        expect(available_aptc_hash).to eq expected_available_hash
+      context 'when current apt' do
+        let!(:max_aptc__hash) do
+          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
+           "Jul"=>".00", "Aug"=>"0.00", "Sep"=>"0.00", "Oct"=>"0.00", "Nov"=>"0.00", "Dec"=>"0.00"}
+        end
+        let(:expected_available_hash) do
+          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
+           "Jul"=>"0.00", "Aug"=>"0.00", "Sep"=>"0.00", "Oct"=>"0.00", "Nov"=>"0.00", "Dec"=>"0.00"}
+        end
+        before do
+          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc__hash
+        end
+
+        it "should return a hash that reflects max_aptc change on a monthly basis based on the new formula" do
+          available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, [], nil, 0)
+          expect(available_aptc_hash).to eq expected_available_hash
+        end
       end
     end
+
+
 
     # CSR PERCENT AS INTEGER
     context "build csr_percentage values" do

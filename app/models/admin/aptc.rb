@@ -28,13 +28,11 @@ class Admin::Aptc < ApplicationController
       current_available_aptc_hash = {}
       months = []
       date = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date
-      offset_month = TimeKeeper.datetime_of_record.day <= 15 ? 1 : 2
       month_value = date.month - 1
       (1..month_value).to_a.each do |month|
       months << Date.new(date.year, month, 1).strftime('%b')
       end
       max_aptc_vals_array = (max_aptc_vals.values - ["0.00"]).uniq
-      previous_max_aptc = 0
       if max_aptc.present?  
         max_aptc_vals.each do |key, value|
           if value.to_f == max_aptc
@@ -49,8 +47,7 @@ class Admin::Aptc < ApplicationController
         max_aptc_vals.each do |key, value|
           if months.include?(key) || max_aptc_vals_array.count == 1
             max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
-          else 
-            previous_max_aptc = max_aptc_vals_array.first.to_f
+          else
             if previous_available_aptc_hash.values.first.to_f < value.to_f && total_aptc_applied_vals_for_household[key].to_f > value.to_f
               remaining_available_aptc = available_aptc_value.to_f - total_aptc_applied_vals_for_household[key].to_f
             else
