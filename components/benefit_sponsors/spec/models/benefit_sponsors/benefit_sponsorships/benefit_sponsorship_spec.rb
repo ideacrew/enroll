@@ -244,6 +244,106 @@ module BenefitSponsors
 
     end
 
+    describe "Scopes", :dbclean => :after_each do
+      let(:this_year)                       { TimeKeeper.date_of_record.year }
+      
+      let(:march_effective_date)            { Date.new(this_year,3,1) }
+      let(:march_open_enrollment_begin_on)  { march_effective_date - 1.month }
+      let(:march_open_enrollment_end_on)    { march_open_enrollment_begin_on + 9.days }
+      
+      let(:april_effective_date)            { Date.new(this_year,4,1) }
+      let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
+      let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
+      let(:initial_application_state)       { :active }
+      let(:renewal_application_state)       { :enrollment_open }
+
+      let!(:march_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 3, :with_organization_cca_profile, 
+        :with_initial_benefit_application, initial_application_state: initial_application_state, 
+        default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)))
+      }
+
+      let!(:april_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, 
+        :with_initial_benefit_application, initial_application_state: initial_application_state, 
+        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+      }
+
+      let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile, 
+        :with_renewal_benefit_application, initial_application_state: initial_application_state,
+        renewal_application_state: renewal_application_state,
+        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+      }
+
+      before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
+      subject { BenefitSponsors::BenefitSponsorships::BenefitSponsorship }
+
+      context '.may_begin_open_enrollment?' do
+        let(:initial_application_state) { :approved }
+
+        it "should find sponsorships with application in approved state and matching open enrollment begin date" do
+          expect(subject.may_begin_open_enrollment?(april_open_enrollment_begin_on).size).to eq (april_sponsors.size)
+          expect(subject.may_begin_open_enrollment?(april_open_enrollment_begin_on).to_a).to eq (april_sponsors)
+        end
+      end
+
+      context '.may_end_open_enrollment?' do
+        let(:initial_application_state) { :enrollment_open }
+        let(:renewal_application_state) { :enrollment_open }
+
+        it "should find sponsorships with application in enrollment_open state and matching open enrollment end date" do
+          expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on).size).to eq (april_sponsors.size + april_renewal_sponsors.size)
+          expect(subject.may_end_open_enrollment?(april_open_enrollment_end_on).to_a).to eq (april_sponsors + april_renewal_sponsors)
+        end
+      end
+
+      context '.may_begin_benefit_coverage?' do 
+        let(:initial_application_state) { :enrollment_eligible }
+        let(:renewal_application_state) { :enrollment_eligible }
+
+        it "should find sponsorships with application in enrollment_eligible state and matching effective period begin date" do
+          expect(subject.may_begin_benefit_coverage?(march_effective_date).size).to eq (march_sponsors.size)
+          expect(subject.may_begin_benefit_coverage?(march_effective_date).to_a).to eq (march_sponsors)
+
+          expect(subject.may_begin_benefit_coverage?(april_effective_date).size).to eq (april_sponsors.size + april_renewal_sponsors.size)
+          expect(subject.may_begin_benefit_coverage?(april_effective_date).to_a).to eq (april_sponsors + april_renewal_sponsors)
+        end
+      end
+
+      context '.may_end_benefit_coverage?' do
+        let(:initial_application_state) { :active }
+        let(:renewal_application_state) { :approved }
+
+        it "should find sponsorships with application in active state and matching effective period end date" do
+          expect(subject.may_end_benefit_coverage?(march_effective_date.next_year.prev_day).size).to eq (march_sponsors.size)
+          expect(subject.may_end_benefit_coverage?(march_effective_date.next_year.prev_day).to_a).to eq (march_sponsors)
+
+          expect(subject.may_end_benefit_coverage?(april_effective_date.next_year.prev_day).size).to eq (april_sponsors.size)
+          expect(subject.may_end_benefit_coverage?(april_effective_date.next_year.prev_day).to_a).to eq (april_sponsors)
+        end
+      end
+
+      context '.may_renew_application?' do
+        let(:initial_application_state) { :active }
+
+        it "should find sponsorships with application in active state and matching effective period begin date" do
+          expect(subject.may_renew_application?(april_effective_date.prev_year).size).to eq (april_renewal_sponsors.size)
+          expect(subject.may_renew_application?(april_effective_date.prev_year).to_a).to eq (april_renewal_sponsors)
+        end
+      end
+
+      context '.may_terminate_benefit_coverage?' do
+
+        it "should find sponsorships with application in termination_pending state and matching terminated_on date" do
+        end
+      end
+
+      context '.may_transmit_initial_enrollment?' do 
+
+      end
+
+      context '.may_auto_submit_application?' do 
+      end
+    end
   end
 end

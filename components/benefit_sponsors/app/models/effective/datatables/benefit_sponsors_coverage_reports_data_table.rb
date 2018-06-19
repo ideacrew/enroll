@@ -7,17 +7,17 @@ module Effective
           :proc => Proc.new { |row|
             @sponsored_benefit = row.primary_member.sponsored_benefit
             primary_member = row.primary_member
-            name_adapter = primary_member.name
+            member_info = primary_member.member_info
             content_tag(:span) do
             format_name(
-              first_name: name_adapter.first_name,
-              last_name: name_adapter.last_name,
-              middle_name: name_adapter.middle_name,
-              name_sfx: name_adapter.suffix
+              first_name: member_info.first_name,
+              last_name: member_info.last_name,
+              middle_name: member_info.middle_name,
+              name_sfx: member_info.suffix
             )
           end +
           content_tag(:span, content_tag(:p, "DOB: #{format_date primary_member.dob}")) +
-          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn primary_member.employee_role.ssn}")) +
+          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn member_info.ssn}")) +
           content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.hired_on}")
           }, :filter => false, :sortable => false
         

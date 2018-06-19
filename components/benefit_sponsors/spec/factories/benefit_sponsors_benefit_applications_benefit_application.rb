@@ -14,19 +14,33 @@ FactoryGirl.define do
 
     # design using defining module spec helpers
     effective_period do
-      start_on  = TimeKeeper.date_of_record.end_of_month + 1.day + 1.month
-      end_on    = start_on + 1.year - 1.day
-      start_on..end_on
+      if default_effective_period.present?
+        default_effective_period
+      else
+        start_on  = TimeKeeper.date_of_record.end_of_month + 1.day + 1.month
+        end_on    = start_on + 1.year - 1.day
+        start_on..end_on
+      end
     end
 
     open_enrollment_period do
-      start_on = effective_period.min.prev_month
-      end_on   = start_on + 9.days
-      start_on..end_on
+      if default_open_enrollment_period.present?
+        default_open_enrollment_period
+      else
+        start_on = effective_period.min.prev_month
+        end_on   = start_on + 9.days
+        start_on..end_on
+      end
     end
 
     recorded_service_areas   { [create(:benefit_markets_locations_service_area)] }
     recorded_rating_area     { create(:benefit_markets_locations_rating_area) }
+
+    transient do
+      predecessor_application_state :active
+      default_effective_period nil
+      default_open_enrollment_period nil
+    end
 
     trait :with_benefit_sponsor_catalog do
       after(:build) do |benefit_application, evaluator|
@@ -53,10 +67,10 @@ FactoryGirl.define do
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
           successor_applications: [benefit_application],
-          aasm_state: :active
+          aasm_state: evaluator.predecessor_application_state
         )
         benefit_application.predecessor_application = predecessor_application
-       benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
+        benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
       end
     end
 

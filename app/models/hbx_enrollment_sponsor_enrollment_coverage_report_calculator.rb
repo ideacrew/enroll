@@ -1,9 +1,14 @@
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 	EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
   
-  MemberNameAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix)
+  MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn) do
+    def ssn
+      return nil if encrypted_ssn.blank?
+      Person.decrypt_ssn(encrypted_ssn)
+    end
+  end
 
-	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name, :sponsored_benefit) do
+	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :member_info, :sponsored_benefit) do
 		def is_disabled?
 			is_disabled
 		end
@@ -68,18 +73,19 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 					{"$project" => {
 						"hbx_enrollment" => 1,
 						"family_members" => 1,
-						"people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_name_fields))
+						"people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
 					}}
 			])
 		end
 
-    def person_name_fields
+    def person_info_fields
       {
         "first_name" => 1,
         "last_name" => 1,
         "middle_name" => 1,
         "name_pfx" => 1,
-        "name_sfx" => 1
+        "name_sfx" => 1,
+        "encrypted_ssn" => 1
       }
     end
 
@@ -101,12 +107,13 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 				family_people_ids[fm["_id"]] = fm["person_id"]
 				family_dobs[fm["_id"]] = person_id_map[fm["person_id"]]["dob"]
 				family_disables[fm["_id"]] = person_id_map[fm["person_id"]]["is_disabled"]
-        family_names[fm["_id"]] = MemberNameAdapter.new(
+        family_names[fm["_id"]] = MemberInfoAdapter.new(
           person_id_map[fm["person_id"]]["name_pfx"],
           person_id_map[fm["person_id"]]["first_name"],
           person_id_map[fm["person_id"]]["middle_name"],
           person_id_map[fm["person_id"]]["last_name"],
-          person_id_map[fm["person_id"]]["name_sfx"]
+          person_id_map[fm["person_id"]]["name_sfx"],
+          person_id_map[fm["person_id"]]["encrypted_ssn"]
         )
         if fm["_id"] == sub_member["applicant_id"]
           sub_person = person_id_map[fm["person_id"]]
@@ -131,12 +138,13 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
         true,
         sub_person["is_disabled"],
         employee_role,
-        MemberNameAdapter.new(
+        MemberInfoAdapter.new(
           sub_person["name_pfx"],
           sub_person["first_name"],
           sub_person["middle_name"],
           sub_person["last_name"],
-          sub_person["name_sfx"]
+          sub_person["name_sfx"],
+          sub_person["encrypted_ssn"]
         ),
         @sponsored_benefit
       )

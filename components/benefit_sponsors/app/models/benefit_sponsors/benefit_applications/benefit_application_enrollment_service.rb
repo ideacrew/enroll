@@ -206,7 +206,6 @@ module BenefitSponsors
       if employer_attestation_is_enabled?
         unless employer_profile.is_attestation_eligible?
           employer_attestation = employer_profile.employer_attestation
-          binding.pry
           if employer_attestation.blank? || employer_attestation.unsubmitted?
             warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
           elsif employer_attestation.denied?
