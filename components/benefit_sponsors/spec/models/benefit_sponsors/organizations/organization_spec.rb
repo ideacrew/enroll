@@ -12,7 +12,7 @@ module BenefitSponsors
       let(:it_division)             { BenefitSponsors::Organizations::ExemptOrganization.new(legal_name: it_division_name) }
 
       before do
-        agency.divisions.build(legal_name: business_division_name) 
+        agency.divisions.build(legal_name: business_division_name)
         agency.divisions << it_division
         it_division.divisions.build(legal_name: it_devops_division_name)
       end
@@ -57,7 +57,7 @@ module BenefitSponsors
       end
 
       context "and the broker creates a plan_design_organization for the employer" do
-        let(:customer)                  { broker_organization.plan_design_subjects.first } 
+        let(:customer)                  { broker_organization.plan_design_subjects.first }
         let!(:plan_design_organization) { broker_organization.plan_design_organizations.build(subject_organization: customer) }
 
         it "the broker should have a new plan_design_organization instance" do
@@ -73,49 +73,20 @@ module BenefitSponsors
 
     context "a health exchange sets up a site offering ACA individual and shop benefit markets" do
       let(:shop_kind)           { :aca_shop }
-      let(:individual_kind)     { :aca_individual }
+      # let(:individual_kind)     { :aca_individual }
       let(:hbx_name)            { "Health Exchange Unlimited, LTD" }
       let(:entity_kind)         { :s_corporation }
 
-
-      let(:hbx_site)            { FactoryGirl.build(:benefit_sponsors_site, 
-                                                        owner_organization: hbx_organization, 
-                                                        benefit_markets: [shop_benefit_market, ivl_benefit_market]
-                                                      ) 
-                                                    }
-      let(:hbx_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile) }
-      let(:hbx_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, 
-                                                        entity_kind: entity_kind, 
-                                                        legal_name: hbx_name, 
-                                                        profiles: [hbx_profile]
-                                                      )
-                                                    }
-      let(:shop_benefit_market)  { FactoryGirl.build(:benefit_markets_benefit_market, 
-                                                        # :with_benefit_catalog, #TODO enable when benefit_catalog class is added
-                                                        kind: shop_kind
-                                                      ) 
-                                                    }
-
-      let(:ivl_benefit_market)    { FactoryGirl.build(:benefit_markets_benefit_market, 
-                                                        # :with_benefit_catalog, #TODO enable when benefit_catalog class is added
-                                                        kind: individual_kind
-                                                      ) 
-                                                    }
+      let(:hbx_site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:shop_benefit_market)  { hbx_site.benefit_markets.first }
 
       it "a site should exist with an individual and shop market" do
-        # binding.pry
-        expect(hbx_site.benefit_markets.size).to eq 2
+        expect(hbx_site.benefit_markets.size).to eq 1
       end
 
       context "and an employer sponsors benefits" do
-        let(:employer_name)            { "Spacely Sprockets, Inc." }
-        let(:employer_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, 
-                                                              legal_name: employer_name, 
-                                                              profiles: [employer_profile],
-                                                              site: hbx_site
-                                                            )
-                                                          }
-        let(:employer_profile)      { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_dc_employer_profile) }
+        let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: hbx_site) }
+        let(:employer_profile)        { employer_organization.employer_profile }
 
         before { employer_organization.sponsor_benefits_for(employer_profile) }
 

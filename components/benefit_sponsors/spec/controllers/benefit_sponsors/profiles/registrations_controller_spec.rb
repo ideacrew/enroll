@@ -7,7 +7,8 @@ module BenefitSponsors
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
+    # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:person) { FactoryGirl.create(:person) }
     let(:edit_user) { FactoryGirl.create(:user, :person => person)}
     let(:user) { FactoryGirl.create(:user) }
@@ -15,16 +16,16 @@ module BenefitSponsors
     let(:benefit_sponsor_user) { user }
     let(:broker_agency_user) { nil }
 
-    let(:phone_attributes) { 
+    let(:phone_attributes) {
       {
         :kind => "phone main",
         :number => "8768776",
         :area_code => "876",
         :extension => "extension"
-      } 
+      }
     }
 
-    let(:address_attributes) { 
+    let(:address_attributes) {
       {
         :kind => "primary",
         :address_1 => "address 1",
@@ -32,7 +33,7 @@ module BenefitSponsors
         :city => "city",
         :state => "MD",
         :zip => "22222"
-      } 
+      }
     }
 
     let(:office_locations_attributes) {
@@ -165,7 +166,7 @@ module BenefitSponsors
           end
 
           it "should redirect to sign_up page if current user doesn't exist" do
-            expect(response.location.include?("users/sign_up")).to eq true
+            expect(response.location.include?("users/sign_in")).to eq true
           end
 
           it "should set the value of portal on form instance to true" do
@@ -282,14 +283,14 @@ module BenefitSponsors
         # it_behaves_like "fail store profile for create if params invalid", "general_agency"
         # it_behaves_like "fail store profile for create if params invalid", "contact_center"
         # it_behaves_like "fail store profile for create if params invalid", "fedhb"
-        
+
       end
     end
 
     describe "GET edit", dbclean: :after_each do
 
-      let(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
-      let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+      let(:benefit_sponsor) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:broker_agency)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
       shared_examples_for "initialize profile for edit" do |profile_type|
 
@@ -340,8 +341,9 @@ module BenefitSponsors
       context "updating profile" do
 
         let(:person) { FactoryGirl.create :person}
-        let(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
-        let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+
+        let(:benefit_sponsor) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+        let(:broker_agency)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
         let(:benefit_sponsor_params) {
           {
@@ -411,7 +413,7 @@ module BenefitSponsors
             sign_in update_user
             sanitize_attributes(profile_type)
             address_attributes.merge!({
-              kind: nil  
+              kind: nil
             })
             put :update, :agency => self.send("#{profile_type}_params"), :id => self.send("#{profile_type}_params")[:id]
           end

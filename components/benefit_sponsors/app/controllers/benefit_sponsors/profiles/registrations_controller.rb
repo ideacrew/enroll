@@ -115,7 +115,7 @@ module BenefitSponsors
           if current_user
             redirect_to self.send(:agency_home_url, exception.record.profile_id)
           else
-            session[:custom_url] = main_app.new_user_registration_path
+            session[:custom_url] = main_app.new_user_session_path
             super
           end
         when :new?

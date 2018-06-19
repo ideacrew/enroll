@@ -1,6 +1,7 @@
 module BenefitSponsors
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
+    before_action :set_last_portal_visited
     include Pundit
 
     helper BenefitSponsors::Engine.helpers
@@ -84,6 +85,13 @@ module BenefitSponsors
 
     def stashed_user_password
       session["stashed_password"]
+    end
+
+    def set_last_portal_visited
+      if controller_name == "broker_agency_profiles" && action_name == "show"
+        return if (current_user.blank? || (current_user.person.present? && !current_user.person.broker_role.present?) ||current_user.last_portal_visited == request.referrer)
+        current_user.update_attributes(last_portal_visited: request.referrer)
+      end
     end
 
     private

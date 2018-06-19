@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :benefit_markets_benefit_market, class: 'BenefitMarkets::BenefitMarket' do
     site_urn 'acme'
+    site  { build(:benefit_sponsors_site) }
     kind :aca_shop
     title "DC Health Link SHOP Market"
     description "Health Insurance Marketplace for District Employers and Employees"
@@ -21,14 +22,14 @@ FactoryGirl.define do
 
     trait :with_benefit_catalog do
       after :build do |benefit_market, evaluator|
-        benefit_market.benefit_catalogs << build(:benefit_markets_benefit_catalog)
+        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_catalog))
       end
     end
 
     trait :with_benefit_catalog_and_product_packages do
 
       after :build do |benefit_market, evaluator|
-        benefit_market.benefit_catalogs << build(:benefit_markets_benefit_catalog, :with_product_packages)
+        benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_catalog, :with_product_packages))
       end
     end
 
