@@ -195,7 +195,7 @@ module Notifier
 
     def special_enrollment_period_event_on
       event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : special_enrollment_period.event_on
-      merge_model.special_enrollment_period.event_on = format_date(event_on)
+      merge_model.special_enrollment_period.event_on = event_on
     end
 
     def special_enrollment_period_title
@@ -222,7 +222,7 @@ module Notifier
 
     def special_enrollment_period_reporting_deadline
       deadline = payload['notice_params']['qle_reporting_deadline']
-      merge_model.special_enrollment_period.reporting_deadline = format_date(deadline) 
+      merge_model.special_enrollment_period.reporting_deadline = deadline
     end
 
     def format_date(date)
