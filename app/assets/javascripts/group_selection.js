@@ -151,6 +151,15 @@ function errorsForChangeInCoverageKind(employer_id){
       disableIvlIneligible();
     }
   });
+
+  if ($("#waiver_reasons_selection_modal_form").length) {
+    $("#waiver_reasons_selection_modal_form").on( "submit", function( event ) {
+      event.preventDefault();
+      $("#is_waiving_hidden_value_field").val("true");
+      $("#waiver_reason_hidden_value_field").val($("#waiver_reason_selection_dropdown").val());
+      $("#group-selection-form").trigger("submit");
+    });
+  }
 }
 
 function disableIvlIneligible() {
@@ -188,12 +197,20 @@ function setDentalBenefits(dental_benefits){
   }
 }
 
+$(document).on('change', '#waiver_reason_selection_dropdown', function() {
+	if($(this).val() == undefined || $(this).val() == ""){
+		$('#waiver_reason_submit').attr("disabled",true);
+	}else{
+		$('#waiver_reason_submit').attr("disabled",false);
+	}
+});
+
 $(function(){
-  if ( $("#find_sep_link").length ) {
-    $("#find_sep_link").click(function() {
-      $(this).closest('form').attr('action', '/insured/families/find_sep');
-      $(this).closest('form').attr('method', 'get');
-      $(this).closest('form').submit();
-    });
-  }
+	if ( $("#find_sep_link").length ) {
+		$("#find_sep_link").click(function() {
+			$(this).closest('form').attr('action', '/insured/families/find_sep');
+			$(this).closest('form').attr('method', 'get');
+			$(this).closest('form').submit();
+		});
+	}
 })

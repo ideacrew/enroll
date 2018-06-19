@@ -105,6 +105,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
   end
 
+  # Waives against an existing enrollment
   def waive
     person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))

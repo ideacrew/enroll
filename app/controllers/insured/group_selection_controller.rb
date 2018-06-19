@@ -52,11 +52,21 @@ class Insured::GroupSelectionController < ApplicationController
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
-    raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-    family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
-      BSON::ObjectId.from_string(family_member_id)
+    unless @adapter.is_waiving?(params)
+      raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
+      family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
+        BSON::ObjectId.from_string(family_member_id)
+      end
     end
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
+    if @adapter.is_waiving?(params)
+      if hbx_enrollment.save
+        raise "REDIRECT TO WAIVING"
+      else
+        raise "WAIVING FAILED"
+      end
+    end
+
     if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
 
@@ -130,7 +140,13 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group = nil
       benefit_group_assignment = nil
 
-      if @adapter.previous_hbx_enrollment.present?
+      if @adapter.is_waiving?(params)
+        if @adapter.previous_hbx_enrollment.present?
+          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, params)
+        else
+          @adapter.build_new_shop_waiver_enrollment(@employee_role)
+        end
+      elsif @adapter.previous_hbx_enrollment.present?
         @adapter.build_shop_change_enrollment(@employee_role, @change_plan, family_member_ids)
       else
         @adapter.build_new_shop_enrollment(@employee_role, family_member_ids)

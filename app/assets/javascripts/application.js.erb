@@ -683,14 +683,6 @@ $(document).on('click', '.btn-danger', function() {
   $('.message-unread').html(unread);
 });
 
-$(document).on('change', '#waive_confirm select#waiver_reason', function() {
-  if($(this).val() == undefined || $(this).val() == ""){
-    $('#waiver_reason_submit').attr("disabled",true);
-  }else{
-    $('#waiver_reason_submit').attr("disabled",false);
-  }
-});
-
 $(document).on('click', '#terms_check_thank_you', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();

@@ -13,6 +13,8 @@
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
+	  <%= hidden_field_tag(:waiver_reason, nil, id: "waiver_reason_hidden_value_field") %>
+	  <%= hidden_field_tag(:is_waiving, nil, id: "is_waiving_hidden_value_field") %>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
