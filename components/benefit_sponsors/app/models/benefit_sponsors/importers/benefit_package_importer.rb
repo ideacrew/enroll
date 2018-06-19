@@ -102,7 +102,8 @@ module BenefitSponsors
 
       def copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, attribute_to_copy)
         pricing_determination.pricing_determination_tiers.each do |tier|
-          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| tier_contribution[:relationship] ? tier_contribution[:relationship]: tier_contribution[:composite_rating_tier] == tier.pricing_unit.name }
+          # During Migration, we are checking for composite_rating_tier field value
+          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| (tier_contribution[:relationship] ? tier_contribution[:relationship]: tier_contribution[:composite_rating_tier]) == tier.pricing_unit.name }
           tier.price = matched_tier[attribute_to_copy].to_f
         end
       end

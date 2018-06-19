@@ -6,6 +6,7 @@ module BenefitSponsors
 
       attribute :current_user_id, String
       attribute :profile_type, String
+      attribute :portal, Boolean
       attribute :profile_id, String
       attribute :staff_roles, Array[OrganizationForms::StaffRoleForm]
       attribute :organization, OrganizationForms::OrganizationForm
@@ -33,10 +34,12 @@ module BenefitSponsors
         false
       end
 
-      def self.for_new(profile_type)
-        service = resolve_service(profile_type)
-        form_params = service.build(profile_type)
-        new(form_params)
+      def self.for_new(attrs)
+        service = resolve_service(profile_type: attrs[:profile_type])
+        form_params = service.build(profile_type: attrs[:profile_type])
+        new(form_params.merge!({
+          portal: attrs[:portal]
+        }))
       end
 
       def self.for_create(attrs)

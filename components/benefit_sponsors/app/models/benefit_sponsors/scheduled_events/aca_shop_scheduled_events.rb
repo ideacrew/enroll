@@ -94,6 +94,21 @@ module BenefitSponsors
         end
       end
 
+      def transmit_scheduled_benefit_sponsors(new_date, feins=[])
+        start_on = new_date.next_month.beginning_of_month
+        benefit_sponsors = BenefitSponsors::BenefitSponsors::BenefitSponsorship
+        benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
+
+        benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
+          transmit_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
+          transmit_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+        end
+
+        benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
+          transmit_event(benefit_sponsorship, :transmit_initial_eligible_event)
+        end
+      end
+
       def close_enrollment_quiet_period
         if new_date.prev_day.mday == Settings.aca.shop_market.initial_application.quiet_period.mday
           effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
@@ -101,27 +116,20 @@ module BenefitSponsors
         end
       end
 
-      def transmit_scheduled_benefit_sponsors(new_date, feins=[])
-        start_on = new_date.next_month.beginning_of_month
-        benefit_sponsors = BenefitSponsors::BenefitSponsors::BenefitSponsorship
-        benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
-
-        benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
-          benefit_sponsorship.transmit_renewal_eligible_event     if benefit_sponsorship.is_renewal_transmission_eligible?
-          benefit_sponsorship.transmit_renewal_carrier_drop_event if benefit_sponsorship.is_renewal_carrier_drop?
-        end
-
-        benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          benefit_sponsorship.transmit_initial_eligible_event
-        end
-      end
-
       private
 
       def execute_sponsor_event(benefit_sponsorship, event)
-        business_policy = business_policy_for(benefit_sponsorship, event)
-        event_service   = sponsor_service_for(benefit_sponsorship)
-        event_service.execute(benefit_sponsorship, event, business_policy)
+        begin
+          business_policy = business_policy_for(benefit_sponsorship, event)
+          event_service   = sponsor_service_for(benefit_sponsorship)
+          event_service.execute(benefit_sponsorship, event, business_policy)
+        rescue Exception => e 
+        end
+      end
+
+      def transmit_event(benefit_sponsorship, event)
+        sponsorship_service.benefit_sponsorship = benefit_sponsorship
+        sponsorship_service.send(event)
       end
 
       def business_policy_for(benefit_sponsorship, event_name)
@@ -145,13 +153,6 @@ module BenefitSponsors
       end
 
       def process_events_for(&block)
-        begin
-          block.call
-        rescue Exception => e
-        end
-      end
-
-      def process_event(&block)
         begin
           block.call
         rescue Exception => e

@@ -23,7 +23,7 @@ module BenefitSponsors
 
     rule  :open_enrollment_period_minimum,
             validate: -> (benefit_application){
-              benefit_application.open_enrollment_length > OPEN_ENROLLMENT_DAYS_MIN
+              benefit_application.open_enrollment_length >= OPEN_ENROLLMENT_DAYS_MIN
               },
             success:  -> (benfit_application) { "validated successfully" },
             fail:     -> (benefit_application) {

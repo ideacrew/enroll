@@ -200,7 +200,7 @@ module BenefitSponsors
       end
 
       # definitions for pundit policy
-      
+
       def is_benefit_sponsor_already_registered?(user, form)
         if user.person.present? && user.person.has_active_employer_staff_role?
           form.profile_id = user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id.to_s
@@ -210,9 +210,13 @@ module BenefitSponsors
       end
 
       def is_broker_agency_registered?(user, form)
-        if user.present? && (user.has_broker_agency_staff_role? || user.has_broker_role?)
-          form.profile_id = (user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id || user.person.broker_role.benefit_sponsors_broker_agency_profile_id.to_s)
-          return false
+        if user.present? && user.person.present?
+          broker_agency_staff_role = user.person.broker_agency_staff_roles.first
+          broker_role = user.person.broker_role
+          if broker_agency_staff_role || broker_role
+            form.profile_id = broker_agency_staff_role.present? ? broker_agency_staff_role.benefit_sponsors_broker_agency_profile_id : broker_role.benefit_sponsors_broker_agency_profile_id.to_s
+            return false
+          end
         end
         true
       end

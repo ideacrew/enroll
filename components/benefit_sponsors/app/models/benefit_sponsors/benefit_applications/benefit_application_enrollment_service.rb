@@ -199,7 +199,24 @@ module BenefitSponsors
     end
 
     def application_eligibility_warnings
-      {}
+      #fixed only attestation related bug #25241
+      warnings = {}
+      employer_profile = benefit_sponsorship.profile
+
+      if employer_attestation_is_enabled?
+        unless employer_profile.is_attestation_eligible?
+          employer_attestation = employer_profile.employer_attestation
+          if employer_attestation.blank? || employer_attestation.unsubmitted?
+            warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+          elsif employer_attestation.denied?
+            warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+          else
+            warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_attestation.aasm_state.humanize}. Please contact customer service."})
+          end
+        end
+      end
+
+      warnings
     end
 
     def today

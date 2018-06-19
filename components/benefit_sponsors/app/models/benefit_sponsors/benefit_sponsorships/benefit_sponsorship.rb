@@ -18,18 +18,10 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include BenefitSponsors::Concerns::EmployerDatatableConcern
-    include ::Acapi::Notifiers
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
     include AASM
-
-    INITIAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_initial_application_eligible"
-    RENEWAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
-    RENEWAL_EMPLOYER_CARRIER_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
-    INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_initial_application_eligible"
-    RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_renewal_application_eligible"
-    RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped"
 
 
     # Origination of this BenefitSponsorship instance in association
@@ -122,60 +114,52 @@ module BenefitSponsors
     scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
 
     scope :may_begin_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.open_enrollment_period.min" => compare_date,
-        :"benefit_applications.aasm_state" => :approved
+      where(:benefit_applications => {
+        :$elemMatch => {:"open_enrollment_period.min" => compare_date, :aasm_state => :approved }}
       )
     }
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.open_enrollment_period.max" => compare_date,
-        :"benefit_applications.aasm_state" => :enrollment_open
+      where(:benefit_applications => {
+        :$elemMatch => {:"open_enrollment_period.max" => compare_date, :aasm_state => :enrollment_open }}
       )
     }
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.effective_period.min" => compare_date,
-        :"benefit_applications.aasm_state" => :enrollment_eligible
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }}
       )
     }
 
     scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.effective_period.max" => compare_date,
-        :"benefit_applications.aasm_state" => :active
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
       )
     }
 
     scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.effective_period.min" => compare_date,
-        :"benefit_applications.aasm_state" => :active
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :active }}
       )
     }
 
+    # Fix Me: verify the state check...probably need to use termination_pending
     scope :may_terminate_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.terminated_on" => compare_date,
-        :"benefit_applications.aasm_state".in => [:active, :suspended]
+      where(:benefit_applications => {
+        :$elemMatch => {:"terminated_on" => compare_date, :aasm_state.in => [:active, :suspended] }}
       )
     }
 
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.effective_period.min" => compare_date,
-        :"benefit_applications.aasm_state" => :enrollment_eligible,
-        :"aasm_state" => :initial_enrollment_eligible
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+        :aasm_state => :initial_enrollment_eligible  
       )
     }
 
     scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(
-        :"benefit_applications.predecessor_application_id" => { :$exists => true },
-        :"benefit_applications.effective_period.min" => compare_date,
-        :"benefit_applications.aasm_state" => :draft
+      where(:benefit_applications => {
+        :$elemMatch => {:predecessor_application_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
       )
     }
 
@@ -354,18 +338,6 @@ module BenefitSponsors
 
     def carriers_dropped_for(product_kind)
       active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
-    end
-
-    def transmit_initial_eligible_event
-      notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
-    end
-
-    def transmit_renewal_eligible_event
-      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
-    end
-
-    def transmit_renewal_carrier_drop_event
-      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
     end
 
     def renew_benefit_application
