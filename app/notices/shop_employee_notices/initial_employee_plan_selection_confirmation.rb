@@ -15,17 +15,32 @@ class ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation < ShopEmploy
     notice.plan_year = PdfTemplates::PlanYear.new({
       :start_on => plan_year.start_on
       })
+    health_enrs, dental_enrs = census_employee.active_benefit_group_assignment.hbx_enrollments.partition{|enr| enr.coverage_kind == "health"}
 
-    enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
-    notice.enrollment = PdfTemplates::Enrollment.new({ 
-      responsible_amount: enrollment.total_employer_contribution,
-      employee_cost: enrollment.total_employee_cost,
+    enrollment = health_enrs.first
+    
+    if enrollment.present?
+      notice.enrollment = PdfTemplates::Enrollment.new({ 
+        responsible_amount: enrollment.total_employer_contribution,
+        employee_cost: enrollment.total_employee_cost,
+        })
+      plan = enrollment.plan
+      notice.plan = PdfTemplates::Plan.new({
+        :plan_name => plan.name
       })
+    end
 
-    plan = enrollment.plan
-    notice.plan = PdfTemplates::Plan.new({
-      :plan_name => plan.name
-    })
-
+    dental_enrollment = dental_enrs.first
+    
+    if dental_enrollment.present?
+      notice.dental_enrollment = PdfTemplates::Enrollment.new({ 
+        responsible_amount: dental_enrollment.total_employer_contribution,
+        employee_cost: dental_enrollment.total_employee_cost,
+        })
+      dental_plan = dental_enrollment.plan
+      notice.dental_plan = PdfTemplates::Plan.new({
+        :plan_name => dental_plan.name
+      })
+    end
   end
 end

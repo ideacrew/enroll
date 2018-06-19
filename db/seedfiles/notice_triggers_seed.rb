@@ -995,28 +995,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP43',
-    title: 'Employee Enrollment Confirmation',
-    description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
-    resource_name: 'employee_role',
-    event_name: 'initial_employee_plan_selection_confirmation',
-    notice_triggers: [
-      {
-        name: 'Notice to employee after they select a plan Annual Open Enrollment',
-        notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
-        notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
-        mpi_indicator: 'MPI_SHOPDIE075',
-        notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employee"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-        }
-      }
-    ]
-  },
-
-  {
     hbx_id: 'SHOP_D034',
     title: 'Special Enrollment Period Approval',
     description: 'SEP request by Employee accepted when an eligiblity determination is reached',
