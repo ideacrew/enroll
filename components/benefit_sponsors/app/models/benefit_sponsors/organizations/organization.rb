@@ -96,8 +96,7 @@ module BenefitSponsors
       accepts_nested_attributes_for :profiles
 
       validates_presence_of :legal_name, :site_id, :profiles
-
-      validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
+      # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
 
       before_save :generate_hbx_id
 
@@ -108,6 +107,7 @@ module BenefitSponsors
       index({ :"profiles._type" => 1 })
       index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
+      scope :profile,                 ->(id){ find_by(:"profiles._id" => id) }
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
       scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
       scope :broker_agency_profiles,  ->{ where(:"profiles._type" => /.*BrokerAgencyProfile$/) }
@@ -159,10 +159,6 @@ module BenefitSponsors
       scope :'employer_profiles_enrolling',   -> {}
       scope :'employer_profiles_enrolled',    -> {}
 
-
-
-
-
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
       # Strip non-numeric characters
@@ -171,6 +167,19 @@ module BenefitSponsors
         write_attribute(:fein, numeric_fein)
         @fein = numeric_fein
       end
+
+      # def self.bind_benefit_sponsorship_to_profile(benefit_sponsorship, profile_id)
+      #   profile_organization = self.profile(profile_id)
+      #   profile = profile_organization.profiles.detect { |profile| profile._id == profile_id }
+
+      #   if profile.present? && profile.is_benefit_sponsorship_eligible?
+      #     profile_organization.benefit_sponsorships << benefit_sponsorship
+      #     profile_organization.save!
+      #   else
+      #     raise "Profile not found or ineligible for benefit sponsorship: #{profile || nil}" if area.count > 1
+      #   end
+      #   profile
+      # end
 
       def sponsor_benefits_for(profile)
         if profile.is_benefit_sponsorship_eligible?
@@ -182,15 +191,8 @@ module BenefitSponsors
           # end
 
           benefit_market = site.benefit_market_for(:aca_shop)
-
-          if profile.primary_office_location.address.present?
-            rating_area   = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
-            service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address)
-          else
-            rating_area   = nil
-            service_areas = nil
-          end
-          new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market, rating_area: rating_area, service_areas: service_areas)
+          new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
+          new_sponsorship.refresh_rating_area
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
@@ -339,7 +341,7 @@ module BenefitSponsors
       end
 
       def is_benefit_sponsor?
-        employer_profile.present?
+        profiles.any? { |profile| profile.is_benefit_sponsorship_eligible? }
       end
     end
   end

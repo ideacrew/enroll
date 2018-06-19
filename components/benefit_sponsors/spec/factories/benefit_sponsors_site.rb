@@ -11,25 +11,22 @@ FactoryGirl.define do
       site_owner_organization_legal_name "Site Owner"
     end
 
-    trait :with_owner_general_organization do
-      after :build do |site, evaluator|
-        site.owner_organization = build(:benefit_sponsors_organizations_general_organization, site: site)
-      end
-    end
+    # trait :with_owner_general_organization do
+    #   after :build do |site, evaluator|
+    #     site.owner_organization = build(:benefit_sponsors_organizations_general_organization, site: site)
+    #   end
+    # end
 
-    trait :with_owner_exempt_organization do
-      after :build do |site, evaluator|
-        site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, site: site)
-      end
-    end
+    # trait :with_owner_exempt_organization do
+    #   after :build do |site, evaluator|
+    #     site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, site: site)
+    #     owner_organization.profile = build(:benefit_sponsors_organizations_hbx_profile, organization: organization)
+    #   end
+    # end
 
-    trait :with_hbx_profile do
+    trait :as_hbx_profile do
       after :build do |site, evaluator|
-        if site.benefit_markets.blank?
-          site.benefit_markets << create(:benefit_markets_benefit_market, site: site)
-        end
-
-        profile = build(:benefit_sponsors_organizations_hbx_profile, organization: site.owner_organization)
+        site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
 

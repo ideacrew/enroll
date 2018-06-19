@@ -12,9 +12,9 @@ module BenefitSponsors
         if is_benefit_sponsorship_eligible.blank?
           write_attribute(:is_benefit_sponsorship_eligible, true)
           @is_benefit_sponsorship_eligible = true
-
-          add_benefit_sponsorship
         end
+
+        add_benefit_sponsorship
 
         self
       end

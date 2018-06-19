@@ -3,71 +3,30 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
 
-    let(:site)            { create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
-    let(:organization)    { build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let(:profile)         { build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: organization) }
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:benefit_market)  { site.benefit_markets.first }
-    let(:service_areas)   { ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address) }
 
-    let(:params) do
-      {
-        benefit_market: benefit_market,
-        organization: organization,
-        profile: profile,
-        service_areas: service_areas
-      }
-    end
+    let(:employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)        { employer_organization.employer_profile }
 
     context "A new model instance" do
+      subject { employer_profile.add_benefit_sponsorship }
+
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_fields(:hbx_id, :profile_id)}
       it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
       it { is_expected.to embed_many(:broker_agency_accounts)}
       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponsorships)}
 
-      context "with no arguments" do
-        subject { described_class.new }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-        end
-      end
-
-      context "with no organization" do
-        subject { described_class.new(params.except(:organization)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-        end
-      end
-
-      context "with no benefit market" do
-        subject { described_class.new(params.except(:benefit_market)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-        end
-      end
-
-      context "with no profile" do
-        subject { described_class.new(params.except(:profile)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-        end
-      end
-
       context "with all required arguments" do
-        subject { described_class.new(params) }
-
 
         context "and all arguments are valid" do
           it "should reference the correct profile_id" do
-            expect(subject.profile_id).to eq profile.id
+            expect(subject.profile_id).to eq employer_profile.id
+          end
+
+          it "should reference a rating_area" do
+            expect(subject.rating_area).to be_an_instance_of(::BenefitMarkets::Locations::RatingArea)
           end
 
           it "should be valid" do
@@ -85,19 +44,23 @@ module BenefitSponsors
 
     describe "Working around validating model factory" do
       context "when benefit sponsor has profile and organization" do
-        let(:benefit_sponsorships)              { FactoryGirl.build_stubbed(:benefit_sponsors_benefit_sponsorship)}
-        let(:valid_build_benefit_sponsorships)  { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
-        let(:valid_create_benefit_sponsorships) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
+        let(:valid_build_benefit_sponsorship)  { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
+        let(:valid_create_benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
 
-        it "should be valid", :aggregate_failures do
-          expect(benefit_sponsorships.valid?).to eq true
-          expect(valid_build_benefit_sponsorships.valid?).to be_truthy
-          expect(valid_create_benefit_sponsorships.valid?).to be_truthy
+        it "with_full_package build should be valid" do
+          # binding.pry
+          expect(valid_build_benefit_sponsorship.valid?).to be_truthy
+        end
+
+        it "with_market_profile create should be valid" do
+          binding.pry
+          expect(valid_create_benefit_sponsorship.valid?).to be_truthy
         end
       end
 
       context "when benefit sponsorship is CCA SHOP employer" do
-        let(:benefit_sponsorship)   { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+        let(:cca_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site)  }
+        let(:benefit_sponsorship) { cca_profile.add_benefit_sponsorship }
 
         it "should be valid" do
           expect(benefit_sponsorship.valid?).to be true
@@ -106,13 +69,11 @@ module BenefitSponsors
       end
     end
 
-
     describe "Finding a BenefitSponsorCatalog" do
-      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
+      let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:next_year)                           { Date.today.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
       let!(:benefit_market_catalog_next_year)   { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period_next_year) }
-      # let(:benefit_market_catalog_future_year)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, benefit_market: nil, application_period: application_period) }
 
       before { benefit_market.add_benefit_market_catalog(benefit_market_catalog_next_year) }
 
@@ -143,32 +104,31 @@ module BenefitSponsors
 
     context "Working with subclassed parent Profiles" do
       context "using sic_code helper method" do
-        let(:sic_code)                  { "1110" }
-        let(:profile_with_sic_code)     { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new(sic_code: sic_code ) }
-        let(:profile_with_nil_sic_code) { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new }
-        let(:profile_without_sic_code)  { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }
+        let(:cca_employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+        let(:cca_employer_profile)        { cca_employer_organization.employer_profile }
+        let(:sic_code)                    { "1110" }
 
-        context "on profile without attribute defined" do
-          subject { described_class.new(profile: profile_without_sic_code) }
+        context "on cca_employer_profile with attribute defined but not set" do
+          before { cca_employer_profile.sic_code = nil; cca_employer_profile.add_benefit_sponsorship }
 
-          it "should not return value" do
-            expect(subject.sic_code).to be_nil
+          it "cca_employer_profile should have exactly one benefit_sponsorship" do
+            expect(cca_employer_profile.benefit_sponsorships.size).to eq 1
+          end
+
+          it "empployer_profile sic_code should be set" do
+            expect(cca_employer_profile.sic_code).to eq nil
+          end
+
+          it "should return correct value" do
+            expect(cca_employer_profile.benefit_sponsorships[0].sic_code).to be_nil
           end
         end
 
-        context "on profile with attribute defined but not set" do
-          subject { described_class.new(profile: profile_with_nil_sic_code) }
+        context "on cca_employer_profile with attribute defined" do
+          before { cca_employer_profile.sic_code = sic_code; cca_employer_profile.add_benefit_sponsorship }
 
           it "should return correct value" do
-            expect(subject.sic_code).to be_nil
-          end
-        end
-
-        context "on profile with attribute defined" do
-          subject { described_class.new(profile: profile_with_sic_code) }
-
-          it "should return correct value" do
-            expect(subject.sic_code).to eq sic_code
+            expect(cca_employer_profile.benefit_sponsorships[0].sic_code).to eq sic_code
           end
         end
       end
@@ -207,8 +167,8 @@ module BenefitSponsors
       # end
     end
 
-    describe "Transitioning a BenefitSponsorship through Initial Applicaiton Workflow States" do
-      let(:benefit_sponsorship)                 { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, profile: profile, benefit_market: benefit_market) }
+    describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
+      let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:this_year)                           { Date.today.year }
       let(:benefit_application)                 { build(:benefit_sponsors_benefit_application,
                                                         benefit_sponsorship: benefit_sponsorship,
@@ -267,7 +227,7 @@ module BenefitSponsors
                   context "and effective period begins" do
                     before {
                       TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
-                      benefit_sponsorship.activate_enrollment!
+                      benefit_application.activate_enrollment!
                     }
 
                     it "benefit_sponsorship should transition to state: :active" do
@@ -283,7 +243,7 @@ module BenefitSponsors
                     before { benefit_sponsorship.reverse_binder! }
 
                     it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
-                      expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
+                      expect(benefit_sponsorship.aasm_state).to eq :binder_reversed
                     end
 
                     it "benefit_application should transition to state: enrollment_closed" do
@@ -313,12 +273,20 @@ module BenefitSponsors
           context "and benefit application is invalid" do
             before { benefit_application.review_application! }
 
+            it "benefit_application should transition to state: :pending" do
+              expect(benefit_application.aasm_state).to eq :pending
+            end
+
             it "benefit_sponsorship should transition to state: :initial_application_under_review" do
               expect(benefit_sponsorship.aasm_state).to eq :initial_application_under_review
             end
 
             context "and it's denied by HBX" do
               before { benefit_application.deny_application! }
+
+              it "benefit_application should transition to state: :denied" do
+                expect(benefit_application.aasm_state).to eq :denied
+              end
 
               it "benefit_sponsorship should transition to state: :initial_application_denied" do
                 expect(benefit_sponsorship.aasm_state).to eq :initial_application_denied
@@ -328,6 +296,10 @@ module BenefitSponsors
             context "and it's approved by HBX" do
               before { benefit_application.approve_application! }
 
+              it "benefit_application should transition to state: :approved" do
+                expect(benefit_application.aasm_state).to eq :approved
+              end
+
               it "benefit_sponsorship should transition to state: :initial_application_approved" do
                 expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
               end
@@ -335,6 +307,10 @@ module BenefitSponsors
 
             context "and it's reverted by HBX" do
               before { benefit_application.revert_application }
+
+              it "benefit_application should transition to state: :draft" do
+                expect(benefit_application.aasm_state).to eq :draft
+              end
 
               it "benefit_sponsorship should transition to state: :applicant" do
                 expect(benefit_sponsorship.aasm_state).to eq :applicant

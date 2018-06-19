@@ -1,9 +1,8 @@
 FactoryGirl.define do
   factory :benefit_sponsors_organizations_general_organization, class: 'BenefitSponsors::Organizations::GeneralOrganization' do
     legal_name  "ACME Widgets, Inc."
-    dba         "ACME Widgets Co."
+    dba         "ACME Co."
     entity_kind :c_corporation
-    site        { create(:benefit_sponsors_site, :with_owner_exempt_organization) }
 
     fein do
       Forgery('basic').text(:allow_lower   => false,
@@ -13,8 +12,8 @@ FactoryGirl.define do
     end
 
     trait :with_site do
-      before :create do |organization, evaluator|
-        organization.site = create(:benefit_sponsors_site, :with_owner_exempt_organization)
+      before :build do |organization, evaluator|
+        organization.site = create(:benefit_sponsors_site, :as_hbx_profile)
       end
     end
 
