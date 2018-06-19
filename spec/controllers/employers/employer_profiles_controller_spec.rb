@@ -316,7 +316,7 @@ RSpec.describe Employers::EmployerProfilesController do
         census_employee.update(aasm_state: 'employment_terminated')
         employee_role.census_employee_id = census_employee.id
         employee_role.save
-        employer_profile.plan_years = [plan_year]
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
         sign_in(user)
       end
 
@@ -336,7 +336,7 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(user).to receive(:last_portal_visited=).and_return("true")
         employee_role.census_employee_id = census_employee.id
         employee_role.save
-        employer_profile.plan_years = [plan_year]
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
         sign_in(user)
       end
 
