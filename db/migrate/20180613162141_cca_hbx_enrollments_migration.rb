@@ -31,14 +31,13 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
   private
 
   def self.update_hbx_enrollments(csv, logger)
-    ces = CensusEmployee.all
+    ces = CensusEmployee.all.exists(benefit_group_assignments: true)
+
     @issuer_orga = BenefitSponsors::Organizations::Organization.issuer_profiles
     @carrier_orga = Organization.exists(carrier_profile: true)
     @products = BenefitMarkets::Products::Product.all
 
     #counters
-    total_ces = ces.count
-    total_benefit_group_assignments = 0
     total_enrollments = 0
     updated_enrollments = 0
 
@@ -52,7 +51,12 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
         issuer_profile_id = nil
         sponsored_benefit_package_id = nil
         sponsored_benefit_id = nil
+        rating_area_id = nil
 
+        unless bga.benefit_package_id.present?
+          csv << [ce.employer_profile.legal_name, ce.id, bga.id, "no benefit package id", "skipped in current migrartion as there is no benefit package id", product_id, issuer_profile_id, benefit_sponsorship_id, sponsored_benefit_package_id, sponsored_benefit_id]
+          next
+        end
 
         enrollments = get_hbx_enrollments(bga)
         next unless enrollments.present?
@@ -74,7 +78,7 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
             #get carrier_profile_id - issuer_profile_id
             if enrollment.carrier_profile_id.present?
               carrier_profile_id = enrollment.carrier_profile_id
-              carrier_profiles =  @carrier_orga.where(id: carrier_profile_id)
+              carrier_profiles = @carrier_orga.where(id: carrier_profile_id)
               carrier_profile_hbx_id = carrier_profiles.first.hbx_id if carrier_profiles.present?
               issuer_profile_id = @issuer_orga.where(hbx_id: carrier_profile_hbx_id).first.id if carrier_profile_hbx_id.present?
             end
@@ -90,25 +94,25 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
               benefit_package = bga.benefit_package
               sponsored_benefit = benefit_package.sponsored_benefit_for('health')
               sponsored_benefit_id = sponsored_benefit.id
+              rating_area_id = benefit_package.benefit_application.recorded_rating_area_id
             end
 
-            #TODO should fix this to update rating_area_id in HBX enrollment
-            #rating_area_id
 
             enrollment.update_attributes(product_id: product_id,
                                          issuer_profile_id: issuer_profile_id,
                                          benefit_sponsorship_id: benefit_sponsorship_id,
                                          sponsored_benefit_package_id: sponsored_benefit_package_id,
-                                         sponsored_benefit_id: sponsored_benefit_id
+                                         sponsored_benefit_id: sponsored_benefit_id,
+                                         rating_area_id: rating_area_id
             )
 
             print '.' unless Rails.env.test?
             updated_enrollments = updated_enrollments + 1
-            csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "updated", product_id, issuer_profile_id, benefit_sponsorship_id, sponsored_benefit_package_id, sponsored_benefit_id]
+            csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "updated", enrollment.product_id, enrollment.issuer_profile_id, enrollment.benefit_sponsorship_id, enrollment.sponsored_benefit_package_id, enrollment.sponsored_benefit_id]
 
           rescue Exception => e
             print 'F' unless Rails.env.test?
-            csv << [ce.employer_profile.legal_name ,ce.id, bga.id, enrollment.id, "failed", product_id, issuer_profile_id, benefit_sponsorship_id, sponsored_benefit_package_id, sponsored_benefit_id]
+            csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "failed", enrollment.product_id, enrollment.issuer_profile_id, enrollment.benefit_sponsorship_id, enrollment.sponsored_benefit_package_id, enrollment.sponsored_benefit_id]
             logger.error "update failed for HBX Enrollment: #{enrollment.id},
             #{e.inspect}" unless Rails.env.test?
           end
