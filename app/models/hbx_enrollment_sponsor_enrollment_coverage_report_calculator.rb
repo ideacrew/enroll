@@ -108,7 +108,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           person_id_map[fm["person_id"]]["middle_name"],
           person_id_map[fm["person_id"]]["last_name"],
           person_id_map[fm["person_id"]]["name_sfx"],
-          person_id_map[fm["person_id"]]["name_sfx"]
+          person_id_map[fm["person_id"]]["encrypted_ssn"]
         )
         if fm["_id"] == sub_member["applicant_id"]
           sub_person = person_id_map[fm["person_id"]]
