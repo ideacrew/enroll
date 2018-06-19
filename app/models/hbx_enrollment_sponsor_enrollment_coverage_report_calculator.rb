@@ -1,9 +1,14 @@
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 	EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
   
-  MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn)
+  MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn) do
+    def ssn
+      return nil if encrypted_ssn.blank?
+      Person.decrypt_ssn(encrypted_ssn)
+    end
+  end
 
-	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :name, :sponsored_benefit) do
+	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :member_info, :sponsored_benefit) do
 		def is_disabled?
 			is_disabled
 		end
