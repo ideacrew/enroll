@@ -17,12 +17,11 @@ FactoryGirl.define do
     #   end
     # end
 
-    # trait :with_owner_exempt_organization do
-    #   after :build do |site, evaluator|
-    #     site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, site: site)
-    #     owner_organization.profile = build(:benefit_sponsors_organizations_hbx_profile, organization: organization)
-    #   end
-    # end
+    trait :with_owner_exempt_organization do
+      after :build do |site, evaluator|
+        site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
+      end
+    end
 
     trait :as_hbx_profile do
       after :build do |site, evaluator|

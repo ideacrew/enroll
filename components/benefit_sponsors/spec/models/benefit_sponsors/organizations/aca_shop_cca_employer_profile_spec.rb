@@ -15,7 +15,10 @@ module BenefitSponsors
     let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site_urn: "site_urn", description: "description") }
     let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new }
 
-    let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_hbx_profile)}
+
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+
+    # let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_hbx_profile)}
 
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site,

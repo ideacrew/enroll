@@ -4,7 +4,11 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:package_kind) { :single_issuer }
   let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
   let(:open_enrollment_period) { effective_period.min.prev_month..(effective_period.min - 10.days) }
-  let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, benefit_market: benefit_market) }
+
+  let(:abc_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:abc_profile)         { abc_organization.employer_profile }
+  let(:benefit_sponsorship) { abc_profile.add_benefit_sponsorship }
+
   let(:initial_application) { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: aasm_state, open_enrollment_period: open_enrollment_period) }
   let(:product_package) { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
   let!(:current_benefit_package) { create(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
@@ -13,7 +17,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     expect(benefit_sponsorship).to be_valid
   end
 
-  it 'should create a valid benefit application' do 
+  it 'should create a valid benefit application' do
     expect(initial_application).to be_valid
   end
 

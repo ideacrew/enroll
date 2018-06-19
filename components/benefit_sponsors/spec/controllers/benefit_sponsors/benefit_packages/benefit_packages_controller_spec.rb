@@ -9,17 +9,28 @@ module BenefitSponsors
     let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    let!(:benefit_market) { site.benefit_markets.first }
+    # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+    # let!(:benefit_market) { site.benefit_markets.first }
+    # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    # let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    # let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+    # let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
+
+    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog, :as_hbx_profile, :cca) }
+    let(:benefit_market)      { site.benefit_markets.first }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    let(:organization)        { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)    { organization.employer_profile }
+    let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+    let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
+
     let(:form_class)  { BenefitSponsors::Forms::BenefitPackageForm }
     let!(:user) { FactoryGirl.create :user}
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
-    let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
-    let!(:benefit_application) { 
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship) 
+
+
+    let!(:benefit_application) {
+      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!
       application
     }

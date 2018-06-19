@@ -1,10 +1,11 @@
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
-  
+
+  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_market)          { site.benefit_markets.first }
+  # let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 
   let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
   let(:renewal_effective_date)  { current_effective_date.next_year }
-
-  let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
 
   let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
@@ -18,7 +19,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
     application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year))
   }
 
-  before do 
+  before do
     map_products
   end
 

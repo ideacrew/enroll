@@ -59,8 +59,8 @@ module BenefitMarkets
     def products_sorted_by_cost
       return @products_sorted_by_cost if defined? @products_sorted_by_cost
 
-      @products_sorted_by_cost = load_base_products.sort_by{|product| 
-        product.cost_for_application_period(application_period) 
+      @products_sorted_by_cost = load_base_products.sort_by{|product|
+        product.cost_for_application_period(application_period)
       }
     end
 
@@ -128,7 +128,7 @@ module BenefitMarkets
 
     # Intersection of BenefitMarket::Products that match both service area and effective date
     def benefit_market_products_available_for(service_areas, effective_date)
-      benefit_market_products_available_on(effective_date) & benefit_market_products_available_where(service_areas)
+      benefit_market_products_available_on(effective_date) #& benefit_market_products_available_where(service_areas)
     end
 
     # BenefitMarket::Products available for purchase on effective date
