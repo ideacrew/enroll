@@ -6,8 +6,10 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile)}
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
+    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let(:employer_profile) { organization.employer_profile }
+    # let(:employer_profile_id) { organization.employer_profile.id }
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }

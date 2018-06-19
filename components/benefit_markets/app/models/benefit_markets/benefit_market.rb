@@ -15,7 +15,7 @@ module BenefitMarkets
 
     belongs_to  :site, class_name: "::BenefitSponsors::Site"
     # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-    has_many    :benefit_market_catalogs,      
+    has_many    :benefit_market_catalogs,
                 class_name: "BenefitMarkets::BenefitMarketCatalog"
 
     embeds_one :configuration, class_name: "BenefitMarkets::Configurations::Configuration"
@@ -35,7 +35,7 @@ module BenefitMarkets
 
     # BenefitMarketCatalogs may not overlap application_periods
     def add_benefit_market_catalog(new_benefit_market_catalog)
-      application_period_is_covered = benefit_market_catalogs.detect do | catalog | 
+      application_period_is_covered = benefit_market_catalogs.detect do | catalog |
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.min) ||
         catalog.application_period.cover?(new_benefit_market_catalog.application_period.max)
       end
@@ -47,7 +47,11 @@ module BenefitMarkets
 
     # Catalogs with benefit products currently available for purchase
     def benefit_market_catalog_effective_on(date = ::TimeKeeper.date_of_record)
-      benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
+      benefit_market_catalog = benefit_market_catalogs.detect { |catalog| catalog.application_period_cover?(date)}
+      if benefit_market_catalog.blank?
+        raise InvalidEffectiveDateError, "benefit_market_catalog not found for effective date: #{date}"
+      end
+      benefit_market_catalog
     end
 
     def benefit_sponsor_catalog_for(service_areas, effective_date = ::TimeKeeper.date_of_record)
