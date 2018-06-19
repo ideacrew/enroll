@@ -166,7 +166,7 @@ module BenefitSponsors
           end
 
           it "should redirect to sign_up page if current user doesn't exist" do
-            expect(response.location.include?("users/sign_up")).to eq true
+            expect(response.location.include?("users/sign_in")).to eq true
           end
 
           it "should set the value of portal on form instance to true" do
