@@ -107,7 +107,7 @@ module BenefitSponsors
       index({ :"profiles._type" => 1 })
       index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
-      scope :profile,                 ->(id){ find_by(:"profiles._id" => id) }
+      # scope :profile,                 ->(id){ find_by(:"profiles._id" => id) }
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
       scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
       scope :broker_agency_profiles,  ->{ where(:"profiles._type" => /.*BrokerAgencyProfile$/) }

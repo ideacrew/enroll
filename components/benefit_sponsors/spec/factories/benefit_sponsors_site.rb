@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :benefit_sponsors_site, class: 'BenefitSponsors::Site' do
-    site_key    :acme
+    site_key    :cca
     byline      "ACME Healthcare"
     long_name   "ACME Widget's Benefit Website"
     short_name  "Benefit Website"
