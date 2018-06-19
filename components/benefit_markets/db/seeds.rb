@@ -3,12 +3,15 @@
 ##  1) In spec/dummy/db folder, create seed.rb file with following: BenefitMarkets::Engine.load_seed
 ##  2) In terminal, chdir to spec/dummy, run rake db:seed
 
+require 'mongoid_rails_migrations'
+
 puts "\n"*3
 puts "Start of Engine BenefitMarkets seed"
 puts "*"*80
 
 collection_names = %w(
     benefit_markets_benefit_markets
+    benefit_markets_benefit_market_catalogs
     benefit_markets_pricing_models_pricing_models
     benefit_markets_locations_service_areas
     benefit_markets_locations_rating_areas
