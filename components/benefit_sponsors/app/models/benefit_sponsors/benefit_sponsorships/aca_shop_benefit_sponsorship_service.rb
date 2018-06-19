@@ -1,5 +1,13 @@
 module BenefitSponsors
   class BenefitSponsorships::AcaShopBenefitSponsorshipService
+    include ::Acapi::Notifiers
+
+    INITIAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+    RENEWAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
+    RENEWAL_EMPLOYER_CARRIER_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+    INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_initial_application_eligible"
+    RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_renewal_application_eligible"
+    RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped"
 
     attr_accessor :benefit_sponsorship, :new_date
 
@@ -11,7 +19,7 @@ module BenefitSponsors
     def execute(benefit_sponsorship, event_name, business_policy)
       self.benefit_sponsorship = benefit_sponsorship
       if business_policy.is_satisfied?(benefit_sponsorship)
-        eval(event_name.to_s)
+        process_event { eval(event_name.to_s) }
       end
     end
 
@@ -79,6 +87,18 @@ module BenefitSponsors
       end
     end
 
+    def transmit_initial_eligible_event
+      notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+    end
+
+    def transmit_renewal_eligible_event
+      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+    end
+
+    def transmit_renewal_carrier_drop_event
+      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
+    end
+
     private
 
     def init_application_service(benefit_application, event_name)
@@ -94,6 +114,13 @@ module BenefitSponsors
     def enrollment_policy
       return @enrollment_policy if defined?(@enrollment_policy)
       @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEnrollmentPolicy.new
+    end
+
+    def process_event(&block)
+      begin
+        block.call
+      rescue Exception => e
+      end
     end
   end
 end

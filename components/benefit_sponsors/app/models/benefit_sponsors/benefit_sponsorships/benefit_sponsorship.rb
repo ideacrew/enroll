@@ -18,18 +18,10 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include BenefitSponsors::Concerns::EmployerDatatableConcern
-    include ::Acapi::Notifiers
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
     include AASM
-
-    INITIAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_initial_application_eligible"
-    RENEWAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
-    RENEWAL_EMPLOYER_CARRIER_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
-    INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_initial_application_eligible"
-    RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_renewal_application_eligible"
-    RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped"
 
 
     # Origination of this BenefitSponsorship instance in association
@@ -355,18 +347,6 @@ module BenefitSponsors
 
     def carriers_dropped_for(product_kind)
       active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
-    end
-
-    def transmit_initial_eligible_event
-      notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
-    end
-
-    def transmit_renewal_eligible_event
-      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
-    end
-
-    def transmit_renewal_carrier_drop_event
-      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
     end
 
     def renew_benefit_application
