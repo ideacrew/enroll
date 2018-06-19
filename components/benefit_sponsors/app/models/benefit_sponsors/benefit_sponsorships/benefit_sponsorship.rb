@@ -197,6 +197,10 @@ module BenefitSponsors
       self.rating_area = primary_office_rating_area
     end
 
+    def refresh_service_area
+      self.service_area = primary_office_service_areas
+    end
+
     def application_may_renew_effective_on(new_date)
       benefit_applications.effective_date_end_on(new_date).coverage_effective.first
     end
