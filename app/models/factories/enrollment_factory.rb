@@ -334,7 +334,7 @@ module Factories
 
     def self.find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
       roles = person.employee_roles.where(
-          "employer_profile_id" => employer_profile.id.to_s,
+          "benefit_sponsors_employer_profile_id" => employer_profile.id.to_s,
           "hired_on" => census_employee.hired_on
         )
 
