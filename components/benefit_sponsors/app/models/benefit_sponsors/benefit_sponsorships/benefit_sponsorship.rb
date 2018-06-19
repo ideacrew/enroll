@@ -198,7 +198,7 @@ module BenefitSponsors
     end
 
     def refresh_service_area
-      self.service_area = primary_office_service_areas
+      self.service_areas = primary_office_service_areas
     end
 
     def application_may_renew_effective_on(new_date)
