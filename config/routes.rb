@@ -180,7 +180,7 @@ Rails.application.routes.draw do
         get 'print_waiver'
         post 'checkout'
         get 'thankyou'
-        post 'waive'
+        get 'waive'
         post 'terminate'
         post 'set_elected_aptc'
       end
