@@ -11,7 +11,7 @@ module BenefitSponsors
       layout 'two_column', :only => :edit
 
       def new
-        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type)
+        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
         authorize @agency
         authorize @agency, :redirect_home?
         respond_to do |format|
@@ -112,7 +112,12 @@ module BenefitSponsors
 
         case action
         when :redirect_home?
-          redirect_to self.send(:agency_home_url, exception.record.profile_id)
+          if current_user
+            redirect_to self.send(:agency_home_url, exception.record.profile_id)
+          else
+            session[:custom_url] = main_app.new_user_registration_path
+            super
+          end
         when :new?
           session[:portal] = url_for(params)
           redirect_to self.send(:sign_up_url)

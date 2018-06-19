@@ -122,14 +122,24 @@ class BenefitApplicationMigration < Mongoid::Migration
 
     say_with_time("Time take to migrate plan years") do
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
+
         unless continuous_coverage?(old_org)
           csv << [old_org.legal_name, old_org.fein, '', '', 'Failed due to org has no contionus coverage']
           next
         end
-        next unless new_org(old_org).present?
+
+        unless new_org(old_org).present?
+          csv << [old_org.legal_name, old_org.fein, '', '', "New organization not found for fein: #{old_org.fein}"]
+          next
+        end
 
         new_organization = new_org(old_org)
-        benefit_sponsorship = new_organization.first.benefit_sponsorships[0]
+        benefit_sponsorship = new_organization.first.active_benefit_sponsorship
+
+        if benefit_sponsorship.service_areas.blank? ||  benefit_sponsorship.rating_area.blank?
+          csv << [old_org.legal_name, old_org.fein, '', '', 'service area (or) rating areas missing for benefit sponsorship']
+          next
+        end
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
 
@@ -152,7 +162,6 @@ class BenefitApplicationMigration < Mongoid::Migration
               assign_employee_benefits(benefit_sponsorship)
 
               csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, 'Success']
-              print '.' unless Rails.env.test?
               success += 1
             else
               raise StandardError, benefit_application.errors.to_s
@@ -181,6 +190,12 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.effective_period = (plan_year.start_on..plan_year.end_on)
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
 
+    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
+    benefit_application.predecessor_application_id = predecessor_application.first.id if predecessor_application.present?
+
+    # successor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => benefit_application.effective_period.max.next_day, :aasm_state.in=> [:draft, :approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :terminated, :expired])
+    # benefit_application.successor_application_ids = successor_application.map(&:id) if successor_application.present?
+
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
     @benefit_sponsor_catalog.benefit_application = benefit_application
     @benefit_sponsor_catalog.save
@@ -206,17 +221,15 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application
   end
 
-  def self.is_plan_year_effectuated?(plan_year) # add renewing_draft,renewing_enrolling,renewning enrolled
-    %w(active suspended expired terminated termination_pending renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending).include?(plan_year.aasm_state)
+  def self.is_plan_year_effectuated?(plan_year)
+    %w(published enrolling enrolled active suspended expired terminated termination_pending renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending).include?(plan_year.aasm_state)
   end
 
   def self.continuous_coverage?(old_org)
     return true if old_org.employer_profile.plan_years.count < 2
     return true unless old_org.employer_profile.plan_years.any?{|py| py.expired? || py.terminated? || py.active?}
-
-    plan_years = old_org.employer_profile.plan_years.select {|plan_year| is_plan_year_effectuated?(plan_year)}
-    plan_year_month = plan_years.sort_by(&:start_on).first.start_on.month
-    if plan_years.any? {|py| py.start_on.month != plan_year_month}
+    plan_years = old_org.employer_profile.plan_years.select {|plan_year| is_plan_year_effectuated?(plan_year)}.sort_by(&:start_on)
+    if plan_years.each_cons(2).any? {|plan_year| plan_year[0].end_on.next_day !=  plan_year[1].start_on }
       return false
     else
       return true
@@ -238,7 +251,8 @@ class BenefitApplicationMigration < Mongoid::Migration
       @old_bene_app_product_hios_ids << benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
     end
 
-    @new_bene_app_product_hios_ids == @old_bene_app_product_hios_ids
+    return false unless (@new_bene_app_product_hios_ids.size == @old_bene_app_product_hios_ids.size)
+    (@new_bene_app_product_hios_ids & @old_bene_app_product_hios_ids).uniq.size == @new_bene_app_product_hios_ids.uniq.size
   end
 
   def self.sanitize_benefit_group_attrs(benefit_group)
@@ -255,7 +269,10 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   def self.construct_workflow_state_transitions(benefit_application, plan_year)
     plan_year.workflow_state_transitions.asc(:transition_at).each do |wst|
-      benefit_application.workflow_state_transitions.build(wst.attributes.except(:_id))
+      attributes = wst.attributes.except(:_id)
+      attributes[:from_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.from_state.to_sym]
+      attributes[:to_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.to_state.to_sym]
+      benefit_application.workflow_state_transitions.build(attributes)
     end
   end
 
@@ -271,7 +288,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
         end
-        census_employee.save
+        census_employee.save(:validate => false)
       end
     end
   end

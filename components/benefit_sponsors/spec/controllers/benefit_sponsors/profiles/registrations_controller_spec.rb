@@ -156,6 +156,44 @@ module BenefitSponsors
       # it_behaves_like "initialize profile for new", :new, { profile_type: "general_agency" }
       # it_behaves_like "initialize profile for new", :new, { profile_type:  "contact_center" }
       # it_behaves_like "initialize profile for new", :new, { profile_type: "fedhb" }
+
+      describe "for new on broker_agency_portal" do
+        context "for new on broker_agency_portal click without user" do
+
+          before :each do
+            get :new, profile_type: "broker_agency", portal: true
+          end
+
+          it "should redirect to sign_up page if current user doesn't exist" do
+            expect(response.location.include?("users/sign_up")).to eq true
+          end
+
+          it "should set the value of portal on form instance to true" do
+            expect(assigns(:agency).portal).to eq true
+          end
+        end
+
+        context "for new on broker_agency_portal click without user" do
+          let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
+          let(:broker_user) { FactoryGirl.create(:user, person: broker_person) }
+          let(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+          let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
+
+          before :each do
+            broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+            sign_in broker_user
+            get :new, profile_type: "broker_agency", portal: true
+          end
+
+          it "should redirect to show page if current user exists and passes the pundit" do
+            expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency_id))
+          end
+
+          it "should set the value of portal on form instance to true" do
+            expect(assigns(:agency).portal).to eq true
+          end
+        end
+      end
     end
 
     describe "POST create", dbclean: :after_each do

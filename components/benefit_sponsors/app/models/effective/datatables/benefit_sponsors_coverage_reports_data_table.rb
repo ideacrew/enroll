@@ -17,7 +17,7 @@ module Effective
             )
           end +
           content_tag(:span, content_tag(:p, "DOB: #{format_date primary_member.dob}")) +
-          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn primary_member.employee_role.ssn}")) +
+          content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn primary_member.employee_role.census_employee.ssn}")) +
           content_tag(:span, "HIRED:  #{format_date primary_member.employee_role.hired_on}")
           }, :filter => false, :sortable => false
         

@@ -78,6 +78,7 @@ module BenefitSponsors
         end
 
         def redirect_home?
+          return false if record.portal && user.blank?
           if is_employer_profile?
             return service.is_benefit_sponsor_already_registered?(user, record)
           end
