@@ -61,9 +61,10 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
-        raise "REDIRECT TO WAIVING"
+        redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id)
+        return
       else
-        raise "WAIVING FAILED"
+        raise "Waive Coverage Failed"
       end
     end
 
