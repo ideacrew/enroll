@@ -48,12 +48,10 @@ module BenefitSponsors
         let(:valid_create_benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
 
         it "with_full_package build should be valid" do
-          # binding.pry
           expect(valid_build_benefit_sponsorship.valid?).to be_truthy
         end
 
         it "with_market_profile create should be valid" do
-          binding.pry
           expect(valid_create_benefit_sponsorship.valid?).to be_truthy
         end
       end
@@ -65,7 +63,6 @@ module BenefitSponsors
         it "should be valid" do
           expect(benefit_sponsorship.valid?).to be true
         end
-
       end
     end
 
