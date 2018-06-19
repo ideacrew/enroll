@@ -65,6 +65,11 @@ module BenefitSponsors
         @product_package = benefit_sponsor_catalog.product_package_for(self)
       end
 
+      def issuers_offered
+        return [] if product_package.blank?
+        product_package.products.pluck(:issuer_profile_id).uniq
+      end
+
       def latest_pricing_determination
         pricing_determinations.sort_by(&:created_at).last
       end

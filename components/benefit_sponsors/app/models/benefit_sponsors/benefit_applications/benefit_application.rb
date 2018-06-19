@@ -134,7 +134,7 @@ module BenefitSponsors
                                                                                               )}
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
-    scope :renewing,                        ->{ is_renewing } # Deprecate it in future
+    # scope :renewing,                        ->{ is_renewing } # Deprecate it in future
 
     # scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
     # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
@@ -161,6 +161,10 @@ module BenefitSponsors
           {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
         ]
       )
+    }
+
+    scope :renewing, -> {
+      where("$exists" => {:predecessor_application_id => true} )
     }
 
     # scope :published_and_expired_plan_years_by_date, ->(date) {
@@ -301,6 +305,10 @@ module BenefitSponsors
       open_enrollment_period.max unless open_enrollment_period.blank?
     end
 
+    def open_enrollment_length
+      (open_enrollment_period.end - open_enrollment_period.begin).to_i
+    end
+
     # Reschedule the end date of open enrollment for this application.  The application must be in
     # open enrollment state already, or in an enrolling state that can transition to open enrollment.
     # Also, the new end date must be later than the existing end date, may not occur in the past, and
@@ -352,6 +360,12 @@ module BenefitSponsors
 
     def open_enrollment_contains?(date)
       open_enrollment_period.cover?(date)
+    end
+
+    def issuers_offered_for(product_kind)
+      benefit_packages.inject([]) do |issuers, benefit_package|
+        issuers += benefit_package.issuers_offered_for(product_kind)
+      end
     end
 
     # Build a new [BenefitApplication] instance along with all associated child model instances, for the
@@ -485,20 +499,16 @@ module BenefitSponsors
       Family.enrolled_under_benefit_application(self)
     end
 
+    def renew_benefit_package_members
+      benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
+    end
+
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
       return unless transition_kind.present?
 
-      if transition_kind == :renew
-        if is_renewing?
-          benefit_packages.each {|benefit_package| benefit_package.renew_member_benefits }
-        else
-          raise StandardError, "unable to renew benefit_application_members on non-renewing benefit_application: #{self}"
-        end
-      else
-        # :effectuate, :expire, :terminate, :cancel
-        benefit_package.send("#{transition_kind}_member_benefits".to_sym)
-      end
+      # :effectuate, :expire, :terminate, :cancel
+      benefit_packages.each { |benefit_package| benefit_package.send("#{transition_kind}_member_benefits".to_sym) }
     end
 
     def refresh(new_benefit_sponsor_catalog)
@@ -557,6 +567,7 @@ module BenefitSponsors
       state :terminated, :after_enter => :transition_benefit_package_members  # Coverage under this application is terminated
       state :expired,    :after_enter => :transition_benefit_package_members  # Non-published plans are expired following their end on date
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
+
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
       after_all_transitions :publish_state_transition
@@ -613,7 +624,7 @@ module BenefitSponsors
           to:     :enrollment_ineligible
       end
 
-      event :reverse_enrollment_eligiblity do
+      event :reverse_enrollment_eligibility do
         transitions from:   :enrollment_eligible,
           to:     :enrollment_closed
       end
@@ -625,8 +636,7 @@ module BenefitSponsors
           :enrollment_eligible, :enrollment_ineligible,
           :active
         ] + APPLICATION_EXCEPTION_STATES,
-          to:     :draft,
-          after:  :cancel_benefit_package_members
+          to:     :draft
       end
 
       event :activate_enrollment do
@@ -674,8 +684,8 @@ module BenefitSponsors
         approve_enrollment_eligiblity!
       end
 
-      if aasm.to_state == :binder_reversed && may_reverse_enrollment_eligibility?
-        reverse_enrollment_eligiblity!
+      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
+        reverse_enrollment_eligibility!
       end
     end
 

@@ -9,15 +9,20 @@ module BenefitSponsors
       @benefit_application = benefit_application
     end
 
-    def renew
-      effective_period_end = benefit_application.effective_period.end
-      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end + 1.day)
+    def renew_application
+      if business_policy.is_satisfied?(benefit_application)
+        effective_period_end = benefit_application.effective_period.end
+        benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(effective_period_end + 1.day)
 
-      if benefit_sponsor_catalog
-        new_benefit_application = benefit_application.renew(benefit_sponsor_catalog)
-        if new_benefit_application.save
-          benefit_sponsor_catalog.save
+        if benefit_sponsor_catalog
+          new_benefit_application = benefit_application.renew(benefit_sponsor_catalog)
+          if new_benefit_application.save
+            benefit_sponsor_catalog.save
+          end
         end
+        add_success_messages
+      else
+        add_error_messages
       end
     end
 

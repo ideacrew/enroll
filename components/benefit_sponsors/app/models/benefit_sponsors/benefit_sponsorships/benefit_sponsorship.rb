@@ -18,10 +18,19 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include BenefitSponsors::Concerns::EmployerDatatableConcern
+    include ::Acapi::Notifiers
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
     include AASM
+
+    INITIAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+    RENEWAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
+    RENEWAL_EMPLOYER_CARRIER_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+    INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_initial_application_eligible"
+    RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG     = "benefit_coverage_renewal_application_eligible"
+    RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped"
+
 
     # Origination of this BenefitSponsorship instance in association
     # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
@@ -151,6 +160,22 @@ module BenefitSponsors
       )
     }
 
+    scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(
+        :"benefit_applications.effective_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :enrollment_eligible,
+        :"aasm_state" => :initial_enrollment_eligible
+      )
+    }
+
+    scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(
+        :"benefit_applications.predecessor_application_id" => { :$exists => true },
+        :"benefit_applications.effective_period.min" => compare_date,
+        :"benefit_applications.aasm_state" => :draft
+      )
+    }
+
     scope :benefit_application_find,     ->(ids) {
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
@@ -208,8 +233,12 @@ module BenefitSponsors
       benefit_applications.effective_date_end_on(new_date).coverage_effective.first
     end
 
-    def application_may_terminate_on(new_date)
-      benefit_applications.benefit_terminate_on(new_date).first
+    def application_may_terminate_on(terminated_on)
+      benefit_applications.benefit_terminate_on(terminated_on).first
+    end
+
+    def application_may_auto_submit(effective_date)
+      benefit_applications.effective_date_begin_on(effective_date).renewing.draft.first
     end
 
     def primary_office_service_areas
@@ -284,6 +313,10 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
     end
 
+    def active_benefit_application
+      benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
+    end
+
     def renewing_published_benefit_application # TODO -recheck
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
     end
@@ -308,6 +341,33 @@ module BenefitSponsors
     #   end
     # end
 
+    def is_renewal_transmission_eligible?
+      renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?
+    end
+
+    def is_renewal_carrier_drop?
+      if is_renewal_transmission_eligible?
+        carriers_dropped_for(:health).any? || carriers_dropped_for(:dental).any?
+      else
+        true
+      end
+    end
+
+    def carriers_dropped_for(product_kind)
+      active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+    end
+
+    def transmit_initial_eligible_event
+      notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+    end
+
+    def transmit_renewal_eligible_event
+      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+    end
+
+    def transmit_renewal_carrier_drop_event
+      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
+    end
 
     def renew_benefit_application
     end
@@ -467,6 +527,11 @@ module BenefitSponsors
       ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: date)
     end
 
+    def self.find_by_feins(feins)
+      organizations = BenefitSponsors::Organizations::Organization.where(fein: {:$in => feins})
+      where(:organization_id => {:$in => organizations.pluck(:_id)})
+    end
+
     private
 
     def set_service_and_rating_areas
@@ -495,10 +560,13 @@ module BenefitSponsors
     def employer_profile_to_benefit_sponsor_states_map
       {
         :applicant            => :applicant,
-        :registered           => :initial_applicant,
-        :conversion_expired   => :applicant,
+        :registered           => :initial_application_approved,
+        :eligible             => :initial_enrollment_closed,
+        :binder_paid          => :initial_enrollment_eligible,
+        :enrolled             => :active,
+        :suspended            => :suspended,
+        :ineligible           => :ineligible
       }
     end
-
   end
 end
