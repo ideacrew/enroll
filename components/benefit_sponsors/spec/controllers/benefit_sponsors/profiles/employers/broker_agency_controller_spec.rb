@@ -10,12 +10,12 @@ module BenefitSponsors
     let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)  { organization.employer_profile }
 
-    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'MA legal Name1', site: site) }
+    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
     let!(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
 
-    let!(:broker_agency_organization2) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'MA legal Name2', site: site) }
+    let!(:broker_agency_organization2) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'Second Legal Name', site: site) }
     let!(:broker_agency_profile2) { broker_agency_organization2.broker_agency_profile }
     let!(:person2) { FactoryGirl.create(:person) }
     let!(:broker_role2) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id, person: person2) }
