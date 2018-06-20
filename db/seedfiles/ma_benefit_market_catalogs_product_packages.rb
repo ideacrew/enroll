@@ -23,7 +23,7 @@ Mongoid::Migration.say_with_time("Load MA Benefit Market Catalogs") do
 
     def products_for(product_package, calender_year)
       puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
-      BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).to_a
+      BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
     end
 
     puts "Creating Product Packages..."

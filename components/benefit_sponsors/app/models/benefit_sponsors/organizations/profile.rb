@@ -68,8 +68,7 @@ module BenefitSponsors
       end
 
       def add_benefit_sponsorship
-        return unless is_benefit_sponsorship_eligible?
-        organization.sponsor_benefits_for(self)
+        organization.sponsor_benefits_for(self) if is_benefit_sponsorship_eligible? && organization.present?
       end
 
       def benefit_sponsorships
@@ -80,12 +79,18 @@ module BenefitSponsors
         organization.latest_benefit_sponsorship_for(self)
       end
 
-      def contact_methods
-        ::BenefitMarkets::CONTACT_METHODS_HASH
+      def rating_area
+        return nil if primary_office_location.blank?
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address)
       end
 
-      def active_broker
-        # TODO
+      def service_areas
+        return nil if primary_office_location.blank?
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address)
+      end
+
+      def contact_methods
+        ::BenefitMarkets::CONTACT_METHODS_HASH
       end
 
       def staff_roles #managing profile staff
@@ -96,8 +101,7 @@ module BenefitSponsors
         def find(id)
           return nil if id.blank?
           organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
-          return unless organization
-          organization.profiles.detect { |profile| profile.id.to_s == id.to_s }
+          organization.profiles.detect { |profile| profile.id.to_s == id.to_s } if organization.present?
         end
       end
 
@@ -107,10 +111,11 @@ module BenefitSponsors
 
       private
 
-      # Subclasses are expected to override this method
+      # Subclasses may extend this method
       def initialize_profile
       end
 
+      # Subclasses may extend this method
       def build_nested_models
       end
     end

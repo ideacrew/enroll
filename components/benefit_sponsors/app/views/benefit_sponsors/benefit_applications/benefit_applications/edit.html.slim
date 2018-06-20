@@ -7,22 +7,41 @@
 
 - @benefit_application_form.benefit_packages.each do |benefit_package_form|
 
-  .col-xs-11
-    = link_to 'Edit Benefit Package', edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, benefit_package_form.service.benefit_application, benefit_package_form.service.benefit_package, :show_benefit_application_tile => false), method: :get, class: 'btn btn pull-right'
-    h3.heading-text
-      = benefit_package_form.title
-    - if benefit_package_form.description.present?
-      h5
-        = benefit_package_form.description
-
-    table.col-xs-8
-      thead
-        tr scope="col"
-          th Coverage Year
-          th Eligibility
-      tbody
-        tr
-          td
-            = @benefit_application_form.start_on
-          td
-            = benefit_package_form.probation_period_display_name
+  .col-xs-12
+    = link_to 'Edit Benefit Package', edit_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, benefit_package_form.service.benefit_application, benefit_package_form.service.benefit_package, :show_benefit_application_tile => false), method: :get, class: 'btn btn-default pull-right mb-1'
+    
+    .panel.benefitgroup.col-xs-12.referenceplan#uicReferencePlan
+      .col-xs-1
+        i.fas.fa-star.fa-3x.mt-3 style="color:#eaeaea"
+      .col-xs-11.health        
+        .row
+          .col-xs-6
+            h3.title.heading-text #{benefit_package_form.service.benefit_package.title}
+            h6 #{benefit_package_form.service.benefit_package.description}
+            
+        table.table
+          tr
+            td
+              header
+                | Coverage Year
+            td #{benefit_package_form.catalog.effective_period}
+          tr
+            td
+              header
+                | ELIGIBILITY
+            td #{benefit_package_form.probation_period_display_name}
+                
+        table.table
+          tr
+            th colspan="2" Reference Plans
+            th colspan="2" Carrier
+            th colspan="2" Type
+            th colspan="2" Metal Level
+            th colspan="2" Plans By
+          tr
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.title}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.issuer_name}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.plan_kind}
+            td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.metal_level_kind}
+            td colspan="2" N/A
+          

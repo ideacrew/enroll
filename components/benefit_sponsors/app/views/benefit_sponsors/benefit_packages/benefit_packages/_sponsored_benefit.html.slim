@@ -36,11 +36,12 @@ javascript:
     document.getElementById('submitBenefitPackage').classList.remove('hidden')
     document.getElementById('cancelBenefitPackage').classList.remove('hidden')
   }
-  
-  function displayReferencePlanDetails() {
-  // f.object.product_package_kind
-  // f.object.reference_plan_id
-  }
-  
+
+- if show_benefit_application_tile == "true"
+  javascript:
+    window.onload = function() {
+      document.getElementById('planSelection').classList.add('hidden')
+      document.getElementById('scEdit').classList.add('hidden')
+    }
 
 

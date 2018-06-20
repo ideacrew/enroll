@@ -13,6 +13,8 @@
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
+	  <%= hidden_field_tag(:waiver_reason, nil, id: "waiver_reason_hidden_value_field") %>
+	  <%= hidden_field_tag(:is_waiving, nil, id: "is_waiving_hidden_value_field") %>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
@@ -115,9 +117,8 @@
             <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+	      <%= link_to l10n('select_plan_to_terminate'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-primary btn-lg' %>
 
-              <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
-              class: ('btn btn-primary' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->

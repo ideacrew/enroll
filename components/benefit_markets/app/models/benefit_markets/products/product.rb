@@ -255,5 +255,11 @@ module BenefitMarkets
     def drop_product_package(product_package)
       product_packages.delete(product_package) { "not found" }
     end
+
+    def create_copy_for_embedding
+      new_product = self.class.new(self.attributes.except(:premium_tables))
+      new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
+      new_product
+    end
   end
 end

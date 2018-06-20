@@ -263,6 +263,28 @@ class GroupSelectionPrevaricationAdapter
       family_member_ids)
   end
 
+  def build_new_shop_waiver_enrollent(controller_employee_role, params)
+    e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
+    e_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
+  end
+
+  def build_change_shop_waiver_enrollment(
+    controller_employee_role,
+    controller_change_plan,
+    params
+  )
+    e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
+    e_builder.build_change_waiver_enrollment(previous_enrollment: previous_hbx_enrollment, is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
+  end
+
+  def is_waiving?(params)
+    !params[:is_waiving].blank?
+  end
+
+  def get_waiver_reason(params)
+    params[:waiver_reason]
+  end
+
   def can_shop_shop?(person)
     person.present? && person.has_employer_benefits?
   end
