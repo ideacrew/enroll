@@ -14,7 +14,18 @@ module BenefitSponsors
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: site.benefit_markets[0], employer_attestation: employer_attestation) }
+    let(:benefit_sponsorship) do
+      FactoryGirl.create(
+        :benefit_sponsors_benefit_sponsorship,
+        :with_rating_area,
+        :with_service_areas,
+        supplied_rating_area: rating_area,
+        service_area_list: [service_area],
+        organization: organization,
+        profile_id: organization.profiles.first.id,
+        benefit_market: site.benefit_markets[0],
+        employer_attestation: employer_attestation) 
+    end
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }

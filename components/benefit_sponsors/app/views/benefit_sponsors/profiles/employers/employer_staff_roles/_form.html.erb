@@ -9,7 +9,7 @@
           <%= f.text_field :last_name, class: "floatlabel form-control", required: true, placeholder: 'LAST NAME *' %>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-          <%= f.date_field :dob, {:class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yyyy', required: true, readonly: defined?(readonly)} %>
+          <%= f.text_field :dob, :class => "floatlabel form-control interaction-field-control-person-dob", :placeholder => "DATE OF BIRTH *", required: true, readonly: defined?(readonly), onmouseover:"showDatepicker(this)" %>
         </div>
       </div>
     </div>
@@ -19,7 +19,7 @@
 <% end %>
 
 <script type="text/javascript">
-    $(function() {
-        applyJQDatePickers();
-    });
+    function showDatepicker(element) {
+      initDatepicker(element.id,new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month-16.years %>'))
+    }
 </script>

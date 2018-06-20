@@ -5,10 +5,14 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
 
-    let!(:site)             { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:employer_profile)  { organization.employer_profile }
+
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)    { organization.employer_profile }
+    let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
     let!(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
@@ -24,7 +28,13 @@ module BenefitSponsors
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
+    after :all do
+      DatabaseCleaner.clean
+    end
+
     before :each do
+      organization.benefit_sponsorships << benefit_sponsorship
+      organization.save!
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
       broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role2.id)
