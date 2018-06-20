@@ -126,7 +126,7 @@ module Notifier
     end
 
     def employee_appeal_rights
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_employee_appeal_rights)]
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', employee_appeal_rights)]
     end
 
     def join_pdfs(pdfs)

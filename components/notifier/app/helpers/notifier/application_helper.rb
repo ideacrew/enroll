@@ -58,7 +58,7 @@ module Notifier
       Settings.notices.shop.attachments.envelope_without_address
     end
 
-    def shop_employee_appeal_rights
+    def employee_appeal_rights
       Settings.notices.shop.attachments.employee_appeal_rights
     end
   end

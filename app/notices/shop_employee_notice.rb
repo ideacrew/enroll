@@ -1,4 +1,5 @@
 class ShopEmployeeNotice < Notice
+  include ::Notifier::ApplicationHelper
 
   Required= Notice::Required + []
 
@@ -44,7 +45,7 @@ class ShopEmployeeNotice < Notice
   end
 
   def non_discrimination_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_non_discrimination_attachment)]
   end
 
   def attach_envelope
@@ -52,7 +53,7 @@ class ShopEmployeeNotice < Notice
   end
 
   def employee_appeal_rights_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employee_appeal_rights.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', employee_appeal_rights)]
   end
 
   def append_hbe

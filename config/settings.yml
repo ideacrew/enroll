@@ -105,9 +105,9 @@ notices:
 
   shop:
     attachments:
-      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
       envelope_without_address: "ma_envelope_without_address.pdf"
-
+      non_discrimination_attachment: "ma_shop_non_discrimination_attachment.pdf"
+      employee_appeal_rights: "ma_employee_appeal_rights.pdf"
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
