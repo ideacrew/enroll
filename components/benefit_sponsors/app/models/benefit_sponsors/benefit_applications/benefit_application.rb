@@ -170,6 +170,9 @@ module BenefitSponsors
     before_create :set_rating_area
     before_update :update_rating_area
 
+    before_create :set_service_areas
+    before_update :update_service_areas
+
     def set_rating_area
       if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
         self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
@@ -179,6 +182,18 @@ module BenefitSponsors
     def update_rating_area
       if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
         self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+      end
+    end
+
+    def set_service_areas
+      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        self.recorded_service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(benefit_sponsorship.primary_office_address, during: start_on)
+      end
+    end
+
+    def update_service_areas
+      if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        self.recorded_service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(benefit_sponsorship.primary_office_address, during: start_on)
       end
     end
     # scope :published_and_expired_plan_years_by_date, ->(date) {

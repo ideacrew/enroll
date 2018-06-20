@@ -31,7 +31,7 @@ module BenefitSponsors
       has_many :documents, as: :documentable,
                class_name: "BenefitSponsors::Documents::Document"
 
-      validates_presence_of :organization, :office_locations, :contact_method
+      validates_presence_of :office_locations, :contact_method
       accepts_nested_attributes_for :office_locations, allow_destroy: true
 
       # @abstract profile subclass is expected to implement #initialize_profile

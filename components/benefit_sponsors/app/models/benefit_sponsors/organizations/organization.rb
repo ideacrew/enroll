@@ -182,6 +182,7 @@ module BenefitSponsors
       # end
 
       def sponsor_benefits_for(profile)
+        new_sponsorship = nil
         if profile.is_benefit_sponsorship_eligible?
 
           # if profile._type == "BenefitSponsors::Organizations::HbxProfile"
