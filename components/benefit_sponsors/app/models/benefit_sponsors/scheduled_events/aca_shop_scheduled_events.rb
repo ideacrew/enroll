@@ -3,6 +3,7 @@ module BenefitSponsors
     class AcaShopScheduledEvents
 
       include ::Acapi::Notifiers
+      include Config::AcaModelConcern
 
       attr_reader :new_date
 

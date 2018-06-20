@@ -10,12 +10,12 @@ module BenefitSponsors
     let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)  { organization.employer_profile }
 
-    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'MA legal Name1', site: site) }
+    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
     let!(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
 
-    let!(:broker_agency_organization2) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'MA legal Name2', site: site) }
+    let!(:broker_agency_organization2) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'Second Legal Name', site: site) }
     let!(:broker_agency_profile2) { broker_agency_organization2.broker_agency_profile }
     let!(:person2) { FactoryGirl.create(:person) }
     let!(:broker_role2) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id, person: person2) }
@@ -86,7 +86,6 @@ module BenefitSponsors
 
         it 'should assign broker_agency_profiles variable' do
           expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile1)
-          expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile2)
         end
 
         it 'should assign page_alphabets variable' do
@@ -96,6 +95,18 @@ module BenefitSponsors
         it 'should assign employer_profile variable' do
           expect(assigns(:employer_profile)).to eq employer_profile
         end
+      end
+
+      context 'with filter criteria' do
+        before(:each) do
+          sign_in(user_with_hbx_staff_role)
+          xhr :get, :index, employer_profile_id: employer_profile.id, q: broker_agency_profile2.legal_name[0], format: :js
+        end
+
+        it 'should assign broker_agency_profiles variable' do
+          expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile2)
+        end
+
       end
 
       context 'with out filter criteria with page label' do
@@ -193,7 +204,7 @@ module BenefitSponsors
         end
 
         it 'should assign broker_agency_profiles variable with the filter' do
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile1, broker_agency_profile2]
+          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile1]
         end
 
         it 'should assign employer_profile variable' do
@@ -207,6 +218,7 @@ module BenefitSponsors
 
         before(:each) do
           sign_in(user_with_hbx_staff_role)
+          @request.env['HTTP_REFERER'] = ""
           post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id
         end
 
