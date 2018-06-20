@@ -1,5 +1,5 @@
 module Notifier
-  class MergeDataModels::PlanYear
+  class MergeDataModels::BenefitApplication
     include Virtus.model
 
     attribute :current_py_oe_start_date, String
@@ -44,7 +44,7 @@ module Notifier
       current_py_start = reference_date.prev_year
       renewal_py_start = reference_date
 
-      Notifier::MergeDataModels::PlanYear.new({
+      Notifier::MergeDataModels::BenefitApplication.new({
         current_py_oe_start_date: (current_py_start.prev_month).strftime('%m/%d/%Y'),
         current_py_oe_end_date: (current_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         current_py_start_date: current_py_start.strftime('%m/%d/%Y'),
