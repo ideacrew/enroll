@@ -4,7 +4,13 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationFactory, type: :model, :dbclean => :after_each do
 
     describe "constructor" do
-      let!(:benefit_sponsorship) {FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
+
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)    { organization.employer_profile }
+    let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+
+      # let!(:benefit_sponsorship) {FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_market_profile)}
       let!(:dc_benefit_application) {BenefitApplications::BenefitApplication.new}
       let!(:cca_benefit_application) {BenefitApplications::BenefitApplication.new}
       let!(:dc_args) {{"fte_count" => "5"}}
