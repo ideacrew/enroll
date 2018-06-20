@@ -185,5 +185,26 @@ module BenefitSponsors
 
     end
 
+    context "for active_broker" do
+      let!(:organization100) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_initial_application, site: site) }
+      let(:employer_profile100) { organization100.employer_profile }
+      let(:benefit_sponsorship100) { organization100.benefit_sponsorships.first }
+      let!(:broker_agency_account) { FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account) }
+
+      before :each do
+        benefit_sponsorship100.broker_agency_accounts << broker_agency_account
+        benefit_sponsorship100.save!
+      end
+
+      it "should return person record" do
+        expect(employer_profile100.active_broker).to eq broker_agency_account.writing_agent.person
+      end
+
+      it "should return nothing if broker is not assigned to employer_profile" do
+        benefit_sponsorship100.broker_agency_accounts = []
+        benefit_sponsorship100.save
+        expect(employer_profile100.active_broker.present?).to be_falsey
+      end
+    end
   end
 end
