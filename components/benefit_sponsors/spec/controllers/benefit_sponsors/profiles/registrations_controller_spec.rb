@@ -8,7 +8,7 @@ module BenefitSponsors
 
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
     # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
     let(:person) { FactoryGirl.create(:person) }
     let(:edit_user) { FactoryGirl.create(:user, :person => person)}
     let(:user) { FactoryGirl.create(:user) }
