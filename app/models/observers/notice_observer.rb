@@ -32,7 +32,7 @@ module Observers
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
           trigger_zero_employees_on_roster_notice(plan_year)
         end
-        
+
         if new_model_event.event_key == :zero_employees_on_roster
           trigger_zero_employees_on_roster_notice(plan_year)
         end
@@ -129,10 +129,6 @@ module Observers
               end
             end
           end
-        end
-
-        if new_model_event.event_key == :initial_employer_invoice_available
-          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
         end
       end
 
