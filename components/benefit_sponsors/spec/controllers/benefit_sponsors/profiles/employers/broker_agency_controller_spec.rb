@@ -86,7 +86,6 @@ module BenefitSponsors
 
         it 'should assign broker_agency_profiles variable' do
           expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile1)
-          expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile2)
         end
 
         it 'should assign page_alphabets variable' do
@@ -96,6 +95,18 @@ module BenefitSponsors
         it 'should assign employer_profile variable' do
           expect(assigns(:employer_profile)).to eq employer_profile
         end
+      end
+
+      context 'with filter criteria' do
+        before(:each) do
+          sign_in(user_with_hbx_staff_role)
+          xhr :get, :index, employer_profile_id: employer_profile.id, q: broker_agency_profile2.legal_name[0], format: :js
+        end
+
+        it 'should assign broker_agency_profiles variable' do
+          expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile2)
+        end
+
       end
 
       context 'with out filter criteria with page label' do
