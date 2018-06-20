@@ -109,7 +109,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def waive
     person = @person
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    hbx_enrollment.waive_coverage_by_benefit_group_assignment
+    hbx_enrollment.waive_coverage_by_benefit_group_assignment(params.require(:waiver_reason))
 
     redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
   rescue => e

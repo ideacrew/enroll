@@ -535,7 +535,7 @@ class HbxEnrollment
     end
   end
 
-  def waive_coverage_by_benefit_group_assignment
+  def waive_coverage_by_benefit_group_assignment(waiver_reason)
     update_current(waiver_reason: waiver_reason)
     waive_coverage!
   end

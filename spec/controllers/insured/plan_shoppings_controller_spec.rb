@@ -288,15 +288,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     it "should get success flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_return(true)
-      get :waive, id: "hbx_id"
+      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_return(true)
+      get :waive, id: "hbx_id", waiver_reason: "Because"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
-      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).and_raise(StandardError.new("WAIVE FAILED"))
-      get :waive, id: "hbx_id"
+      allow(hbx_enrollment).to receive(:waive_coverage_by_benefit_group_assignment).with("Because").and_raise(StandardError.new("WAIVE FAILED"))
+      get :waive, id: "hbx_id", waiver_reason: "Because"
       expect(flash[:alert]).to eq "Waive Coverage Failed"
       expect(response).to be_redirect
     end
