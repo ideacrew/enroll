@@ -5,11 +5,14 @@
 
 require 'mongoid_rails_migrations'
 
+force_collection_drop = false
+
 puts "\n"*3
 puts "Start of Engine BenefitMarkets seed"
 puts "*"*80
 
-collection_names = %w(
+## Move these constants into <engine_name>/config folder
+DB_COLLECTION_NAMES = %w(
     benefit_markets_benefit_markets
     benefit_markets_benefit_market_catalogs
     benefit_markets_pricing_models_pricing_models
@@ -21,16 +24,34 @@ collection_names = %w(
     benefit_markets_products_actuarial_factors_actuarial_factors
   )
 
+DB_COLLECTION_PRESERVE_NAMES = []
+# DB_COLLECTION_PRESERVE_NAMES = %w(
+#     benefit_markets_locations_service_areas
+#     benefit_markets_locations_rating_areas
+#     benefit_markets_locations_county_zips
+#   )
+
+## Add following to rspec/rails_helper.rb
+## DatabaseCleaner.strategy = :truncation, {:except => DB_COLLECTION_PRESERVE_NAMES}
+
+
 puts "Dropping engine-specific collections"
 Mongoid.default_client.collections.each do |collection|
-  if collection_names.include?(collection.name)
-    puts "  dropping collection: #{collection.name}"
-    collection.drop
+  if DB_COLLECTION_NAMES.include?(collection.name)
+    if DB_COLLECTION_PRESERVE_NAMES.include?(collection.name) && !force_collection_drop
+      puts "  preserving collection: #{collection.name}"
+    else
+      puts "  dropping collection: #{collection.name}"
+      collection.drop
+    end
   end
 end
+
 puts "*"*80
 puts "*"*80
 
+## Use DB_COLLECTION_PRESERVE_NAMES && force_collection_drop setting above to determine which
+## seedfiles are run
 require File.join(File.dirname(__FILE__),'seedfiles', 'cca_seed')
 
 puts "End of Engine BenefitMarkets seed"
