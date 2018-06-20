@@ -126,7 +126,7 @@ module BenefitSponsors
       end
     end
 
-    describe "GET new" do
+    describe "GET new", dbclean: :after_each do
 
       shared_examples_for "initialize profile for new" do |profile_type|
 
@@ -159,7 +159,7 @@ module BenefitSponsors
       # it_behaves_like "initialize profile for new", :new, { profile_type:  "contact_center" }
       # it_behaves_like "initialize profile for new", :new, { profile_type: "fedhb" }
 
-      describe "for new on broker_agency_portal" do
+      describe "for new on broker_agency_portal", dbclean: :after_each do
         context "for new on broker_agency_portal click without user" do
 
           before :each do

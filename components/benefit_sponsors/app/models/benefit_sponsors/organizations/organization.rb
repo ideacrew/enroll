@@ -5,6 +5,7 @@ module BenefitSponsors
     class Organization
       include Mongoid::Document
       include Mongoid::Timestamps
+      include BenefitSponsors::Concerns::Observable
 
       ENTITY_KINDS =[
         :tax_exempt_organization,
@@ -21,6 +22,8 @@ module BenefitSponsors
         :foreign_embassy_or_consulate,
         :health_insurance_exchange,
       ]
+
+      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
       field :hbx_id, type: String
 
@@ -94,6 +97,7 @@ module BenefitSponsors
 
 
       accepts_nested_attributes_for :profiles
+      add_observer BenefitSponsors::Observers::OrganizationObserver.new
 
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
