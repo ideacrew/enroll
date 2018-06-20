@@ -204,7 +204,7 @@ module BenefitSponsors
         end
 
         it 'should assign broker_agency_profiles variable with the filter' do
-          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile1, broker_agency_profile2]
+          expect(assigns(:broker_agency_profiles)).to eq [broker_agency_profile1]
         end
 
         it 'should assign employer_profile variable' do
@@ -218,6 +218,7 @@ module BenefitSponsors
 
         before(:each) do
           sign_in(user_with_hbx_staff_role)
+          @request.env['HTTP_REFERER'] = ""
           post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id
         end
 
