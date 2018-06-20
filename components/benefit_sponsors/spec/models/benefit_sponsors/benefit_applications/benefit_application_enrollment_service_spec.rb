@@ -13,6 +13,10 @@ module BenefitSponsors
       let(:current_effective_date) { Date.new(market_inception, 8, 1) }
     end
 
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     describe '.renew' do
       include_context "setup initial benefit application" do
         let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
@@ -28,7 +32,7 @@ module BenefitSponsors
       context "when initial employer eligible for renewal" do
 
         it "should generate renewal application" do
-          subject.renew
+          subject.renew_application
           benefit_sponsorship.reload
           renewal_application = benefit_sponsorship.benefit_applications.detect{|application| application.is_renewing?}
           expect(renewal_application).not_to be_nil
