@@ -323,8 +323,8 @@ javascript:
               SBC LINK WILL GO HERE\
             </div>\
             <div class="col-md-5 col-sm-5 col-xs-5 pl-0 pr-0">\
-              <a class="btn btn-default btn-right plan-select select" data-url="/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/thankyou?change_plan=&coverage_kind='+enrollment.product.kind+'&enrollment_kind=&market_kind='+enrollment.product.benefit_market_kind.replace('aca_','')+'&plan_id='+enrollment.product._id+'">Select Plan</a>\
-              <a class="btn btn-default ml-1" href="/products/plans/summary?active_year='+enrollment.coverage_start_on.split('-')[0]+'&coverage_kind='+enrollment.product.kind+'&enrollment_kind=&hbx_enrollment_id=#{@hbx_enrollment.id.to_s}&market_kind='+enrollment.product.benefit_market_kind.replace('aca_','')+'&standard_component_id='+enrollment.product.hios_id+'">See Details</a>\
+              <a class="btn btn-default btn-right plan-select select" href="/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/thankyou?change_plan=&coverage_kind='+enrollment.product.kind+'&enrollment_kind=&market_kind='+enrollment.product.benefit_market_kind.replace('aca_','')+'&plan_id='+enrollment.product._id+'">Select Plan</a>\
+              <a class="btn btn-default ml-1" data-remote="true" href="/products/plans/summary?active_year='+enrollment.coverage_start_on.split('-')[0]+'&coverage_kind='+enrollment.product.kind+'&enrollment_kind=&hbx_enrollment_id=#{@hbx_enrollment.id.to_s}&market_kind='+enrollment.product.benefit_market_kind.replace('aca_','')+'&standard_component_id='+enrollment.product.hios_id+'">See Details</a>\
             </div>\
           </div>\
         </div>\
@@ -339,4 +339,3 @@ javascript:
       return  index === c.indexOf(item.product_cost_total)
     })
   }
-  
