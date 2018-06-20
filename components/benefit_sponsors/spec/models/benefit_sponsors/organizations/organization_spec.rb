@@ -1,7 +1,9 @@
 require 'rails_helper'
+require_relative '../../../concerns/observable_spec.rb'
 
 module BenefitSponsors
   RSpec.describe Organizations::Organization, type: :model, dbclean: :after_each do
+    it_behaves_like 'observable', :benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile
 
     context "an Organization is hierarchical with a top level agency and child divisions" do
       let(:agency_name)             { "Multinational Conglomerate, Ltd" }

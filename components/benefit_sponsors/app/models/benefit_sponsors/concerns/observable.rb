@@ -28,7 +28,7 @@ module BenefitSponsors
       end
 
       def observer_peers
-        @observer_peers
+        @observer_peers || ancestors[1..-1].map { |a| a.observer_peers if a.respond_to?(:observer_peers) }.compact.first
       end
     end
   end

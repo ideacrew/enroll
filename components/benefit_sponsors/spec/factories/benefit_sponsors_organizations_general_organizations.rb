@@ -12,7 +12,7 @@ FactoryGirl.define do
     end
 
     trait :with_site do
-      before :build do |organization, evaluator|
+      after :build do |organization, evaluator|
         organization.site = create(:benefit_sponsors_site, :as_hbx_profile)
       end
     end
