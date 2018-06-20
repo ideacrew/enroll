@@ -102,6 +102,10 @@ module BenefitSponsors
       }
     end
 
+    before do
+      issuer_profile.organization.update_attributes!(site_id: site.id)
+    end
+
     describe "validate form" do
       context "valid params" do
         include_context "valid params"
@@ -178,7 +182,12 @@ module BenefitSponsors
         }
       }
 
-      subject { BenefitSponsors::Forms::BenefitPackageForm.for_edit params_for_edit }
+      before do
+        benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
+        benefit_package.reload
+      end
+
+      subject { BenefitSponsors::Forms::BenefitPackageForm.for_edit(params_for_edit, false) }
 
       it 'loads the existing Site in to the Site Form' do
         expect(subject.title).to eql(benefit_package.title)
