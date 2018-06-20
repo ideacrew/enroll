@@ -41,7 +41,7 @@
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
-        url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
+        url: "#{main_app.check_time_until_logout_path(format: :js)}",
         method: 'GET',
         dataType: 'script',
         success: function(response){
