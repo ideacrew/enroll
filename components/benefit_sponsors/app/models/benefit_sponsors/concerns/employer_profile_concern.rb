@@ -142,7 +142,7 @@ module BenefitSponsors
           # fire_general_agency!(terminate_on)
         end
 
-        organization.active_benefit_sponsorship.broker_agency_accounts.create(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on).save!
+        organization.employer_profile.active_benefit_sponsorship.broker_agency_accounts.create(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on).save!
         @broker_agency_profile = new_broker_agency
       end
 
