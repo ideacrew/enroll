@@ -9,6 +9,16 @@ FactoryGirl.define do
     zip '02130'
     county 'Suffolk' # Suffolk County zips: 02101 -> 02137
 
+    # This address is in rating area RMA03 and has good issuer service area coverage
+    trait :cca_shop_baseline do
+      kind      'work'
+      address_1 '27 Reo Road'
+      city      'Maynard'
+      state     'MD'
+      zip       '01754'
+      county    'Middlesex'
+    end
+
     trait :work_kind do
       kind 'work'
     end
