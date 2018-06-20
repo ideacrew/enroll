@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model do
+  RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
 
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:benefit_market)  { site.benefit_markets.first }
