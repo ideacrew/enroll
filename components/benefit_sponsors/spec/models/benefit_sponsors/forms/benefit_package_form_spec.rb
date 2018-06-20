@@ -4,7 +4,7 @@ module BenefitSponsors
   RSpec.describe Forms::BenefitPackageForm, type: :model, dbclean: :after_each do
 
     let(:form_class)              { BenefitSponsors::Forms::BenefitPackageForm }
-    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog, :as_hbx_profile, :cca) }
+    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :as_hbx_profile, :cca) }
     let(:benefit_market)          { site.benefit_markets.first }
     let(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
 

@@ -13,6 +13,10 @@ module BenefitSponsors
       let(:current_effective_date) { Date.new(market_inception, 8, 1) }
     end
 
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     describe '.renew' do
       include_context "setup initial benefit application" do
         let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }

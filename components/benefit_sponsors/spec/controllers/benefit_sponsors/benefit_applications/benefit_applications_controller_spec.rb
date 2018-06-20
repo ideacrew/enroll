@@ -56,6 +56,7 @@ module BenefitSponsors
     end
 
     before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
       benefit_sponsorship.benefit_market.site_urn = site.site_key
       benefit_sponsorship.save
     end
