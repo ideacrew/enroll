@@ -64,7 +64,7 @@
       .modal-footer
         button.btn.btn-default type="button" data-dismiss="modal"
 
-= render :partial => "ui-components/v1/modals/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.try(:employee_role).present?
+= render :partial => "ui-components/v1/modals/waive_confirmation_during_shopping", :locals => {:enrollment => @hbx_enrollment } if @hbx_enrollment.is_shop?
 
 = render :partial => "ui-components/v1/modals/help_with_plan", :locals => {:enrollment => @hbx_enrollment }
 

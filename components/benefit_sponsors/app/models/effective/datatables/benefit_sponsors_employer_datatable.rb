@@ -3,7 +3,7 @@ module Effective
     class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
 
-      SOURCE_KINDS = BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS.unshift(:all).freeze
+      SOURCE_KINDS = ([:all]+ BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
 
       datatable do
 
