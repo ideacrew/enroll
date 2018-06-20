@@ -236,8 +236,14 @@ module BenefitSponsors
     end
 
     def primary_office_service_areas
+      service_areas_for(::TimeKeeper.date_of_record)
+    end
+
+    def service_areas_for(a_date)
       if primary_office_location.present? && primary_office_location.address.present?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: ::TimeKeeper.date_of_record)
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date)
+      else
+        []
       end
     end
 
@@ -277,9 +283,9 @@ module BenefitSponsors
       ["ineligible", "terminated"].exclude?(aasm_state)
     end
 
-    def benefit_sponsor_catalog_for(effective_date)
+    def benefit_sponsor_catalog_for(recorded_service_areas, effective_date)
       benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
-      benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
+      benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: recorded_service_areas, effective_date: effective_date)
     end
 
     def published_benefit_application

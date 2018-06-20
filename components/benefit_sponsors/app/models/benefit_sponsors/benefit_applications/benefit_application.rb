@@ -175,25 +175,41 @@ module BenefitSponsors
 
     def set_rating_area
       if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+        self.recorded_rating_area = resolve_rating_area
       end
     end
 
     def update_rating_area
       if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+        self.recorded_rating_area = resolve_rating_area
       end
     end
 
     def set_service_areas
       if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(benefit_sponsorship.primary_office_address, during: start_on)
+        self.recorded_service_areas = resolve_service_areas
       end
     end
 
     def update_service_areas
       if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(benefit_sponsorship.primary_office_address, during: start_on)
+        self.recorded_service_areas = resolve_service_areas
+      end
+    end
+
+    def resolve_rating_area
+      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+      else
+        nil
+      end
+    end
+
+    def resolve_service_areas
+      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        benefit_sponsorship.service_areas_for(start_on)
+      else
+        []
       end
     end
     # scope :published_and_expired_plan_years_by_date, ->(date) {

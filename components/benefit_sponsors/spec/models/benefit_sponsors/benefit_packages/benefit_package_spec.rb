@@ -5,6 +5,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
 
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
@@ -72,7 +74,7 @@ module BenefitSponsors
 
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
-        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
+        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_for(renewal_effective_date), renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
         let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
@@ -149,8 +151,8 @@ module BenefitSponsors
       let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
       let!(:benefit_market) { site.benefit_markets.first }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_rating_area, supplied_rating_area: rating_area, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
       let!(:benefit_application) {
         application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
         application.benefit_sponsor_catalog.save!
