@@ -1,6 +1,6 @@
 module Notifier
   class Builders::BrokerProfile
-    include Notifier::Builders::PlanYear
+    # include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
 
     attr_accessor :payload, :broker_role, :merge_model
