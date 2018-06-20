@@ -569,7 +569,6 @@ module BenefitSponsors
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
 
       state :termination_pending
-      state :active,     :after_enter => :effectuate_benefit_package_members    # Application benefit coverage is in-force
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
       after_all_transitions :publish_state_transition
