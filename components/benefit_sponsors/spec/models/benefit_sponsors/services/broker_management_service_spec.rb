@@ -5,13 +5,12 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_market)  { site.benefit_markets.first }
-
-    let!(:organization)               { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let!(:employer_profile)           { organization.employer_profile }
-    let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }
-    let!(:active_benefit_sponsorship) { benefit_sponsorship.save! }
+    let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)              { organization.employer_profile }
+    let(:active_benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     let!(:broker_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
@@ -31,6 +30,7 @@ module BenefitSponsors
                                             }
 
     before :each do
+      active_benefit_sponsorship.save!
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
       organization.reload
@@ -46,6 +46,7 @@ module BenefitSponsors
       end
 
       it 'should succesfully assigns broker agency to the employer_profile' do
+        active_benefit_sponsorship.reload
         expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
       end
 
@@ -66,6 +67,7 @@ module BenefitSponsors
       end
 
       it 'should succesfully assigns broker agency to the employer_profile' do
+        active_benefit_sponsorship.reload
         expect(active_benefit_sponsorship.broker_agency_accounts).not_to eq []
         subject.terminate_agencies(broker_management_form_terminate)
         active_benefit_sponsorship.reload
