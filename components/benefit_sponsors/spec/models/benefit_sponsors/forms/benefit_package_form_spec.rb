@@ -3,25 +3,24 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Forms::BenefitPackageForm, type: :model, dbclean: :after_each do
 
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let(:form_class)     { BenefitSponsors::Forms::BenefitPackageForm }
+    let(:form_class)              { BenefitSponsors::Forms::BenefitPackageForm }
+    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog, :as_hbx_profile, :cca) }
+    let(:benefit_market)          { site.benefit_markets.first }
+    let(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    let!(:benefit_market) { site.benefit_markets.first }
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-    let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
-    let!(:benefit_application) { 
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship) 
+    let(:organization)          { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    let(:employer_profile)      { organization.employer_profile }
+    let(:employer_attestation)  { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+    let(:benefit_sponsorship)   { employer_profile.add_benefit_sponsorship }
+    let(:benefit_application)   {
+      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!
       application
     }
-    let!(:product_package_kind) { :single_issuer }
-    let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
-    let!(:product) { product_package.products.first }
-    let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile }
-    let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    let!(:product_package_kind)     { :single_issuer }
+    let!(:product_package)          { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
+    let!(:product)                  { product_package.products.first }
+    let!(:issuer_profile)           { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile }
 
     after :all do
       DatabaseCleaner.clean

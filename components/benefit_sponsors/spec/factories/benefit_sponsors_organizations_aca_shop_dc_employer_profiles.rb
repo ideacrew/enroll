@@ -8,9 +8,16 @@ FactoryGirl.define do
       office_locations_count 1
     end
 
-    after(:build) do |profile, evaluator|
-      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :primary)
-      profile.parent.benefit_sponsorships << build(:benefit_sponsors_benefit_sponsorship, :with_benefit_market, organization: profile.parent)
+    before(:build) do |profile, evaluator|
+      if profile.organization.site.benefit_markets.blank?
+        profile.organization.site.benefit_markets << create(:benefit_markets_benefit_market, site: profile.organization.site)
+      end
     end
+
+    after(:build) do |profile, evaluator|
+      profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :with_massachusetts_address)
+      profile.add_benefit_sponsorship if profile.benefit_sponsorships.blank?
+    end
+
   end
 end
