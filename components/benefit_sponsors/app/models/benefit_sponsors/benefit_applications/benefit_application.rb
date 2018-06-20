@@ -561,6 +561,7 @@ module BenefitSponsors
       state :enrollment_eligible  # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible   # open enrollment did not meet eligibility criteria
 
+      state :termination_pending
       state :active,     :after_enter => :effectuate_benefit_package_members    # Application benefit coverage is in-force
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
       state :terminated, :after_enter => :terminate_benefit_package_members # Coverage under this application is terminated
@@ -757,6 +758,7 @@ module BenefitSponsors
         :conversion_expired       => :expired,    # Conversion employers who did not establish eligibility in a timely manner
         :canceled                 => :canceled,
         :renewing_canceled        => :canceled,
+        :termination_pending      => :termination_pending
       }
     end
 
