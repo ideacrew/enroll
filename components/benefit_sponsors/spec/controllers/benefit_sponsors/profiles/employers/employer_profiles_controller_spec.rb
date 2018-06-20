@@ -9,9 +9,9 @@ module BenefitSponsors
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, :person => person)}
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
-    let!(:benefit_sponsor) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
-    let(:employer_profile) { benefit_sponsor.profiles.first }
+    let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_sponsor)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)      { benefit_sponsor.employer_profile }
 
     describe "GET show_pending" do
       before do
@@ -31,7 +31,7 @@ module BenefitSponsors
     describe "GET show" do
       let(:benefit_sponsorship) { benefit_sponsor.profiles.first.parent.active_benefit_sponsorship }
       let!(:employees) {
-        FactoryGirl.create_list(:benefit_sponsors_census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
       }
       render_views
 
