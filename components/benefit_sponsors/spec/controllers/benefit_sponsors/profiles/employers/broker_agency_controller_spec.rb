@@ -33,8 +33,7 @@ module BenefitSponsors
     end
 
     before :each do
-      organization.benefit_sponsorships << benefit_sponsorship
-      organization.save!
+      benefit_sponsorship.save!
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
       broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role2.id)
