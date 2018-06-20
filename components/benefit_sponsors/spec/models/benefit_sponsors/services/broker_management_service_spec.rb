@@ -5,10 +5,13 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
-    let(:employer_profile)        { organization.employer_profile }
-    let!(:benefit_sponsorship)    { employer_profile.benefit_sponsorships.first }
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_market)  { site.benefit_markets.first }
+
+    let!(:organization)               { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:employer_profile)           { organization.employer_profile }
+    let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }
+    let!(:active_benefit_sponsorship) { benefit_sponsorship.save! }
 
     let!(:broker_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
     let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
@@ -43,7 +46,7 @@ module BenefitSponsors
       end
 
       it 'should succesfully assigns broker agency to the employer_profile' do
-        expect(employer_profile.active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
+        expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
       end
 
       it 'should send a message to the broker' do
@@ -63,10 +66,10 @@ module BenefitSponsors
       end
 
       it 'should succesfully assigns broker agency to the employer_profile' do
-        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).not_to eq []
+        expect(active_benefit_sponsorship.broker_agency_accounts).not_to eq []
         subject.terminate_agencies(broker_management_form_terminate)
-        employer_profile.active_benefit_sponsorship.reload
-        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).to eq []
+        active_benefit_sponsorship.reload
+        expect(active_benefit_sponsorship.broker_agency_accounts).to eq []
       end
     end
   end

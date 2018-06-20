@@ -6,14 +6,20 @@ module BenefitSponsors
 
     subject { broker_management_form_class.new }
 
+    let!(:site)                       { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:organization)               { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)            { organization.employer_profile }
+    let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }
+    let!(:active_benefit_sponsorship) { benefit_sponsorship.save! }
+
+    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'Legal Name', site: site) }
+    let!(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
+
+
     let(:model_attributes) { [:employer_profile_id, :broker_agency_profile_id, :broker_role_id, :termination_date, :direct_terminate] }
-    let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryGirl.create(:person) }
     let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
-    let(:employer_profile) { organization.employer_profile }
 
     let(:create_params) {
       {
@@ -74,7 +80,7 @@ module BenefitSponsors
       end
 
       it 'should assign broker agency to the employer_profile' do
-        expect(employer_profile.active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
+        expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
       end
     end
 
@@ -104,10 +110,10 @@ module BenefitSponsors
       end
 
       it 'should termiante active broker agency of the employer_profile' do
-        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).not_to eq []
+        expect(active_benefit_sponsorship.broker_agency_accounts).not_to eq []
         broker_management_form_terminate.terminate
-        employer_profile.active_benefit_sponsorship.reload
-        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).to eq []
+        active_benefit_sponsorship.reload
+        expect(active_benefit_sponsorship.broker_agency_accounts).to eq []
       end
     end
   end
