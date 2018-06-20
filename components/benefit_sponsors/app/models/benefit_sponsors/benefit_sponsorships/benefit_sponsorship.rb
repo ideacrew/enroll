@@ -249,10 +249,17 @@ module BenefitSponsors
     end
 
     def profile=(profile)
+      if profile.nil?
+        write_attribute(:profile_id, nil)
+        @profile = nil
+        self.organization = nil
+        refresh_rating_area
+        return
+      end
       write_attribute(:profile_id, profile._id)
       @profile = profile
+      self.organization = profile.organization
       refresh_rating_area
-      @profile
     end
 
     def roster_size

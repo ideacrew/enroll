@@ -3,24 +3,37 @@ FactoryGirl.define do
 
     source_kind   :self_serve
 
-    initialize_with   {
-        site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
-        organization  = build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
-        profile = organization.employer_profile
-        sponsorship = profile.add_benefit_sponsorship
-        sponsorship.rating_area = create(:benefit_markets_locations_rating_area)
-        sponsorship
-    }
-
     transient do
       initial_application_state :active
       renewal_application_state :enrollment_open
       default_effective_period nil
       default_open_enrollment_period nil
+      service_area_list []
+      supplied_rating_area nil
     end
 
     trait :with_benefit_market do
       benefit_market { FactoryGirl.build :benefit_markets_benefit_market}
+    end
+
+    trait :with_rating_area do
+      after :build do |benefit_sponsorship, evaluator|
+        if evaluator.supplied_rating_area
+          benefit_sponsorship.rating_area = evaluator.supplied_rating_area
+        else
+          benefit_sponsorship.rating_area = create(:benefit_markets_locations_rating_area)
+        end
+      end
+    end
+
+    trait :with_service_areas do
+      after :build do |benefit_sponsorship, evaluator|
+        if evaluator.service_area_list.any?
+          benefit_sponsorship.service_areas = evaluator.service_area_list
+        else
+          benefit_sponsorship.service_areas = [create(:benefit_markets_locations_service_area)]
+        end
+      end
     end
 
     trait :with_organization_dc_profile do
@@ -32,7 +45,10 @@ FactoryGirl.define do
 
     trait :with_organization_cca_profile do
       after :build do |benefit_sponsorship, evaluator|
-        profile = build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, organization: benefit_sponsorship.organization)
+        site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        organization  = create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
+        benefit_sponsorship.benefit_market = site.benefit_markets.first
+        profile = organization.employer_profile
         benefit_sponsorship.profile = profile
       end
     end

@@ -2,9 +2,11 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
-    let(:subject) { BenefitApplications::BenefitApplication.new }
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
+#    let(:subject) { BenefitApplications::BenefitApplication.new }
 
-    let(:benefit_sponsorship)       { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile) }
+    let!(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_rating_area, :with_service_areas, service_area_list: [service_area], supplied_rating_area: rating_area) }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -15,7 +17,7 @@ module BenefitSponsors
 
     let(:recorded_service_areas)     { benefit_sponsorship.service_areas }
     let(:recorded_rating_area)      { benefit_sponsorship.rating_area }
-    let(:benefit_sponsor_catalog)   { FactoryGirl.build(:benefit_markets_benefit_sponsor_catalog, service_areas: recorded_service_areas) }
+    let(:benefit_sponsor_catalog)   { FactoryGirl.create(:benefit_markets_benefit_sponsor_catalog, service_areas: recorded_service_areas) }
 
     let(:params) do
       {
