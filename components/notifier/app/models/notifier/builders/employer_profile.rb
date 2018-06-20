@@ -2,7 +2,7 @@ module Notifier
   class Builders::EmployerProfile
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
-    include Notifier::Builders::PlanYear
+    # include Notifier::Builders::PlanYear
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
 

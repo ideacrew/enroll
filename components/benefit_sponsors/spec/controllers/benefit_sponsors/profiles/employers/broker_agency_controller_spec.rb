@@ -5,8 +5,8 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:rating_area)   { FactoryGirl.create :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryGirl.create :benefit_markets_locations_service_area }
 
 
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }

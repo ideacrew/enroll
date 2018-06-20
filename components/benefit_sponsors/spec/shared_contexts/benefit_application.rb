@@ -1,5 +1,4 @@
 RSpec.shared_context "setup initial benefit application", :shared_context => :metadata do
-
   let(:aasm_state) { :active }
   let(:package_kind) { :single_issuer }
   let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }

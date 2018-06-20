@@ -87,7 +87,7 @@ module BenefitSponsors
 
         # before { benefit_market.benefit_market_catalogs = benefit_market_catalogs }
         it "should find a benefit_market_catalog" do
-          expect(benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
+          expect(benefit_sponsorship.benefit_sponsor_catalog_for([], effective_date)).to be_an_instance_of(BenefitMarkets::BenefitSponsorCatalog)
         end
       end
 
@@ -95,7 +95,7 @@ module BenefitSponsors
         let(:future_effective_date)  { Date.new((next_year + 2),1,1) }
 
         it "should not find a benefit_market_catalog" do
-          expect{benefit_sponsorship.benefit_sponsor_catalog_for(future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
+          expect{benefit_sponsorship.benefit_sponsor_catalog_for([], future_effective_date)}.to raise_error(/benefit_market_catalog not found for effective date: #{future_effective_date}/)
         end
       end
     end

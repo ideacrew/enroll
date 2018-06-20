@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe Organizations::OrganizationForms::BrokerManagementForm, type: :model, dbclean: :after_each do
+    let!(:rating_area) { create(:benefit_markets_locations_rating_area) }
     let(:broker_management_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
     subject { broker_management_form_class.new }
