@@ -13,7 +13,7 @@ module BenefitSponsors
     let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-    let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role) }
+    let(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role],broker_role:broker_role) }
     let(:user) { FactoryGirl.create(:user, :person => person)}
 
     shared_examples_for "should return profile type" do |profile_type|
