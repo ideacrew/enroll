@@ -11,6 +11,8 @@ class EmployerStaffRole
   field :aasm_state, type: String, default: 'is_active'
   field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId
 
+  delegate :hbx_id, to: :profile, allow_nil: false
+
   validates_presence_of :benefit_sponsor_employer_profile_id
 
   aasm do
@@ -24,5 +26,9 @@ class EmployerStaffRole
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
     end
+  end
+
+  def profile
+    BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
   end
 end

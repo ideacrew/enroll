@@ -9,17 +9,35 @@ module BenefitSponsors
     let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    let!(:benefit_market) { site.benefit_markets.first }
-    let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+    # let!(:benefit_market) { site.benefit_markets.first }
+    # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    # let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    # let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+    # let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
+    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+
+    let(:benefit_market)      { site.benefit_markets.first }
+    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+                                            benefit_market: benefit_market,
+                                            title: "SHOP Benefits for #{current_effective_date.year}",
+                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+                                          }
+
+    # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
+    let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)    { organization.employer_profile }
+    let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+    let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
+
     let(:form_class)  { BenefitSponsors::Forms::BenefitPackageForm }
     let!(:user) { FactoryGirl.create :user}
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
-    let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
-    let!(:benefit_application) { 
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship) 
+
+
+    let!(:benefit_application) {
+      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!
       application
     }
@@ -29,8 +47,6 @@ module BenefitSponsors
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
     let!(:product) { product_package.products.first }
     let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
-
-    let(:issuer_profile)  {FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile)}
 
     let(:benefit_package_params) {
       {
@@ -67,6 +83,10 @@ module BenefitSponsors
         "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
       }
     }
+
+    before do
+      issuer_profile.organization.update_attributes!(site_id: site.id)
+    end
 
     describe "GET new" do
       it "should initialize the form" do
@@ -154,7 +174,7 @@ module BenefitSponsors
     describe "GET edit" do
 
       before do
-        benefit_package.sponsored_benefits.first.reference_product.update_attributes(:issuer_profile_id => issuer_profile.id)
+        benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
         benefit_package.reload
       end
 

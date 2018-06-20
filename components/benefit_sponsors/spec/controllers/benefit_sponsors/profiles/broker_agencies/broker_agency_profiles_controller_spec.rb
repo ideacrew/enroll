@@ -10,8 +10,11 @@ module BenefitSponsors
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
     let!(:person01) { FactoryGirl.create(:person, :with_broker_role) }
     let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person01 ) }
-    let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile) }
-    let!(:organization_with_hbx_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_hbx_profile) }
+
+    let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+    let!(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
     let(:bap_id) { organization.broker_agency_profile.id }
 
     before :each do

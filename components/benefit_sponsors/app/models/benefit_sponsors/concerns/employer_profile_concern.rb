@@ -47,6 +47,12 @@ module BenefitSponsors
         active_benefit_sponsorship.census_employees
       end
 
+      def active_broker
+        if active_broker_agency_account && active_broker_agency_account.writing_agent_id
+          Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
+        end
+      end
+
       def active_benefit_application
         benefit_applications.where(:aasm_state => :active).first
       end

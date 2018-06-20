@@ -67,7 +67,7 @@ module BenefitSponsors
       end
 
       describe '##for_edit' do
-        let(:site) { create :benefit_sponsors_site, :with_owner_exempt_organization }
+        let(:site) { create :benefit_sponsors_site, :as_hbx_profile }
         subject { BenefitSponsors::Forms::Site.for_edit site.id.to_s }
 
         it 'loads the existing Site in to the Site Form' do
@@ -82,7 +82,7 @@ module BenefitSponsors
       describe '##for_update' do
         include_context 'params'
 
-        let(:site) { create :benefit_sponsors_site, :with_owner_exempt_organization }
+        let(:site) { create :benefit_sponsors_site, :as_hbx_profile }
 
         subject { BenefitSponsors::Forms::Site.for_update site.id.to_s }
 

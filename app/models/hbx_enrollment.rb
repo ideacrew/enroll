@@ -517,7 +517,7 @@ class HbxEnrollment
     return false unless is_shop? # there is no concept of waiver in ivl case
 
     if parent_enrollment.present?
-      parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
+      update_existing_shop_coverage
     end
 
     if coverage_kind == 'health' && census_employee.benefit_group_assignments.present?
@@ -535,7 +535,7 @@ class HbxEnrollment
     end
   end
 
-  def waive_coverage_by_benefit_group_assignment(waiver_reason)
+  def waive_coverage_by_benefit_group_assignment
     update_current(waiver_reason: waiver_reason)
     waive_coverage!
   end
@@ -865,6 +865,7 @@ class HbxEnrollment
   end
 
   def update_current(updates)
+
     household && household.hbx_enrollments.where(id: id).update_all(updates)
   end
 

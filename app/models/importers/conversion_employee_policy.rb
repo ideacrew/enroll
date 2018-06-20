@@ -227,8 +227,8 @@ module Importers
         end
 
         en_attributes = {
-            aasm_state: "coverage_selected",
-            coverage_kind: 'health'
+          aasm_state: en.effective_on > TimeKeeper.date_of_record ? "coverage_selected" : "coverage_enrolled",
+          coverage_kind: 'health'
         }
 
         unless employer.is_a?(EmployerProfile)

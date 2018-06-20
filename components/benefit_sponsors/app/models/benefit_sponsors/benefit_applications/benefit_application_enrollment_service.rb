@@ -20,9 +20,9 @@ module BenefitSponsors
             benefit_sponsor_catalog.save
           end
         end
-        add_success_messages
+        # add_success_messages
       else
-        add_error_messages
+        # add_error_messages
       end
     end
 

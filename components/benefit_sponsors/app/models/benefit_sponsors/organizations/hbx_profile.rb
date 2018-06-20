@@ -9,10 +9,13 @@ module BenefitSponsors
       private
 
       def initialize_profile
-        return unless is_benefit_sponsorship_eligible.blank?
+        if is_benefit_sponsorship_eligible.blank?
+          write_attribute(:is_benefit_sponsorship_eligible, true)
+          @is_benefit_sponsorship_eligible = true
+        end
 
-        write_attribute(:is_benefit_sponsorship_eligible, true)
-        @is_benefit_sponsorship_eligible = true
+        add_benefit_sponsorship
+
         self
       end
 

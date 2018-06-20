@@ -5,31 +5,27 @@ module BenefitSponsors
   RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model do
     it_behaves_like 'observable'
 
-    let(:hbx_id)            { "56789" }
-    let(:legal_name)        { "Tyrell Corporation" }
-    let(:dba)               { "Offworld Enterprises" }
-    let(:fein)              { "100001001" }
-    let(:entity_kind)       { :s_corporation }
+    let(:hbx_id)              { "56789" }
+    let(:legal_name)          { "Tyrell Corporation" }
+    let(:dba)                 { "Offworld Enterprises" }
+    let(:fein)                { "100001001" }
+    let(:entity_kind)         { :s_corporation }
 
-    let(:configuration) { BenefitMarkets::Configurations::Configuration.new }
+    let(:configuration)       { BenefitMarkets::Configurations::Configuration.new }
     let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site_urn: "site_urn", description: "description") }
     let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new }
 
-    let(:site)              { BenefitSponsors::Site.new(site_key: :cca) }
-    let(:owner_organization) { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile,
+
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+
+    # let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_hbx_profile)}
+
+    let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site,
                                   hbx_id: hbx_id,
                                   legal_name: legal_name,
                                   dba: dba,
-                                  entity_kind: entity_kind
-                                )
-                              }
-    let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                  site: site, 
-                                  hbx_id: hbx_id, 
-                                  legal_name: legal_name,
-                                  dba: dba, 
-                                  fein: fein, 
+                                  fein: fein,
                                   entity_kind: entity_kind
                                 )}
 
@@ -42,7 +38,7 @@ module BenefitSponsors
     let(:rating_area)       { ::BenefitMarkets::Locations::RatingArea.new }
 
 
-    let(:params) do 
+    let(:params) do
       {
         organization: organization,
         office_locations: office_locations,
@@ -73,24 +69,7 @@ module BenefitSponsors
       context "with all required arguments" do
         subject { described_class.new(params) }
 
-        context "and all arguments are valid", dbclean: :after_each do
-
-          before {
-            benefit_market.configuration = configuration
-            benefit_sponsorship.profile_id = subject.id
-            benefit_sponsorship.benefit_market = benefit_market
-            benefit_sponsorship.organization = organization
-            organization.benefit_sponsorships << benefit_sponsorship
-            site.byline = 'test'
-            site.long_name = 'test'
-            site.short_name = 'test'
-            site.domain_name = 'test'
-            site.owner_organization = owner_organization
-            site.site_organizations << organization
-            organization.profiles << subject
-            organization.active_benefit_sponsorship.save!
-          }
-
+        context "and all arguments are valid" do
           it "should be valid" do
             subject.validate
             expect(subject).to be_valid
@@ -104,11 +83,8 @@ module BenefitSponsors
           end
 
           it "should save and be findable" do
-            expect(site.save!).to eq true
-            expect(organization.save!).to eq true
-
-            expect(subject.save!).to eq true
-            expect(BenefitSponsors::Organizations::Profile.find(subject.id)).to eq subject
+            subject.save!
+            expect(described_class.find(subject.id)).to eq subject
           end
         end
       end
@@ -120,11 +96,11 @@ module BenefitSponsors
       let(:legal_name)          { "MA Health Connector" }
       let(:organization)        { BenefitSponsors::Organizations::GeneralOrganization.new(
                                       site: site,
-                                      hbx_id: hbx_id, 
-                                      legal_name: legal_name, 
-                                      dba: dba, 
-                                      entity_kind: entity_kind, 
-                                      fein: "525285898", 
+                                      hbx_id: hbx_id,
+                                      legal_name: legal_name,
+                                      dba: dba,
+                                      entity_kind: entity_kind,
+                                      fein: "525285898",
                                     )}
       let(:profile)             { BenefitSponsors::Organizations::HbxProfile.new(organization: organization, office_locations: office_locations) }
 
@@ -142,17 +118,17 @@ module BenefitSponsors
 
 
       let(:tyrell_organization)           { BenefitSponsors::Organizations::GeneralOrganization.create(
-                                                site:         site, 
-                                                legal_name:   tyrell_legal_name, 
-                                                fein:         tyrell_fein, 
+                                                site:         site,
+                                                legal_name:   tyrell_legal_name,
+                                                fein:         tyrell_fein,
                                                 entity_kind:  entity_kind,
                                                 profiles:     [tyrell_profile],
                                               )}
 
       let(:wallace_organization)          { BenefitSponsors::Organizations::GeneralOrganization.create(
-                                                site:         site, 
-                                                legal_name:   wallace_legal_name, 
-                                                fein:         wallace_fein, 
+                                                site:         site,
+                                                legal_name:   wallace_legal_name,
+                                                fein:         wallace_fein,
                                                 entity_kind:  entity_kind,
                                                 profiles:     [wallace_profile],
                                               )}
@@ -167,7 +143,7 @@ module BenefitSponsors
                                                 sic_code: sic_code,
                                             )}
 
-      before { 
+      before {
           site.owner_organization = organization
           site.site_organizations << organization
           organization.profiles << profile
@@ -209,5 +185,26 @@ module BenefitSponsors
 
     end
 
+    context "for active_broker" do
+      let!(:organization100) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_initial_application, site: site) }
+      let(:employer_profile100) { organization100.employer_profile }
+      let(:benefit_sponsorship100) { organization100.benefit_sponsorships.first }
+      let!(:broker_agency_account) { FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account) }
+
+      before :each do
+        benefit_sponsorship100.broker_agency_accounts << broker_agency_account
+        benefit_sponsorship100.save!
+      end
+
+      it "should return person record" do
+        expect(employer_profile100.active_broker).to eq broker_agency_account.writing_agent.person
+      end
+
+      it "should return nothing if broker is not assigned to employer_profile" do
+        benefit_sponsorship100.broker_agency_accounts = []
+        benefit_sponsorship100.save
+        expect(employer_profile100.active_broker.present?).to be_falsey
+      end
+    end
   end
 end

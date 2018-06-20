@@ -45,6 +45,15 @@ module BenefitSponsors
             success:  -> (benfit_application) { "validated successfully" },
             fail:     -> (benefit_application) { "application benefit packages must have reference plans" }
 
+    rule :all_employees_are_assigned_benefit_package,
+            validate: -> (benefit_application){
+              benefit_application.benefit_sponsorship.census_employees.map{|e| ba.benefit_packages.map(&:id).include?(e.active_benefit_group_assignment.benefit_package_id)}
+            },
+            success:  -> (benfit_application) { "validated successfully" },
+            fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
+
+
+
     rule :employer_profile_eligible,
           validate: -> (benefit_application) {
             benefit_application.employer_profile.is_benefit_sponsorship_eligible
@@ -57,6 +66,7 @@ module BenefitSponsors
             rules: [:open_enrollment_period_minimum,
                     :benefit_application_contains_benefit_packages,
                     :benefit_packages_contains_reference_plans,
+                    :all_employees_are_assigned_benefit_package,
                     :employer_profile_eligible]
 
   end

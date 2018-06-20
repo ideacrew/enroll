@@ -48,7 +48,7 @@ FactoryGirl.define do
           benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
         end
         benefit_application.benefit_sponsor_catalog = (benefit_sponsor_catalog || ::BenefitMarkets::BenefitSponsorCatalog.new)
-        benefit_application.benefit_sponsor_catalog.service_areas = benefit_sponsorship.service_areas
+        benefit_application.benefit_sponsor_catalog.service_areas = benefit_application.recorded_service_areas
       end
     end
 

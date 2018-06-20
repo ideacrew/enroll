@@ -59,8 +59,8 @@ module BenefitMarkets
     def products_sorted_by_cost
       return @products_sorted_by_cost if defined? @products_sorted_by_cost
 
-      @products_sorted_by_cost = load_base_products.sort_by{|product| 
-        product.cost_for_application_period(application_period) 
+      @products_sorted_by_cost = load_base_products.sort_by{|product|
+        product.cost_for_application_period(application_period)
       }
     end
 

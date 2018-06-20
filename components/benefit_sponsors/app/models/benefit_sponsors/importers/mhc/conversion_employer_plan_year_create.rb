@@ -2,8 +2,7 @@ module BenefitSponsors
 module Importers::Mhc
   class ConversionEmployerPlanYearCreate < ConversionEmployerPlanYear
 
-    def map_plan_year
-      employer_profile = find_employer
+    def map_plan_year(employer_profile)
       issuer_profile   = find_carrier
 
       benefit_sponsorship = employer_profile.organization.benefit_sponsorships.first
@@ -107,7 +106,7 @@ module Importers::Mhc
       return false if service_areas_missing?(sponsorship)
       return false if plan_year_exists?(sponsorship)
 
-      record = map_plan_year
+      record = map_plan_year(employer_profile)
       if save_result = record.save
         catalog = record.benefit_sponsor_catalog
         catalog.benefit_application = record

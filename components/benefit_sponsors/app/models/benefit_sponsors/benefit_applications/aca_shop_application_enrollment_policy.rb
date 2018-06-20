@@ -78,8 +78,6 @@ module BenefitSponsors
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
         business_policies[:stubbed_policy]
-      elsif model_instance.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
-        business_policies[:stubbed_policy]
       end
     end
 

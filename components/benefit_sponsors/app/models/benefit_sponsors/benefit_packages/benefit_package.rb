@@ -44,9 +44,11 @@ module BenefitSponsors
       def new_hire_effective_on(roster)
       end
 
-      def eligible_on(date_of_hire)
-        # TODO
-        Date.today
+      def eligible_on(date_of_hire) # date_of_hire probation type is deprecated
+        return (date_of_hire.end_of_month + 1.day) if effective_on_offset == 1
+        return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
+
+        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
       end
 
       def effective_on_for(date_of_hire)
@@ -57,6 +59,10 @@ module BenefitSponsors
         else
           ::TimeKeeper.date_of_record
         end
+      end
+
+      def effective_on_for_cobra(date_of_hire)
+        [start_on, eligible_on(date_of_hire)].max
       end
 
       def open_enrollment_contains?(date)
