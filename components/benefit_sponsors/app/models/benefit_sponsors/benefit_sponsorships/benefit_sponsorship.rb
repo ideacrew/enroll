@@ -229,6 +229,12 @@ module BenefitSponsors
       benefit_applications.effective_date_begin_on(effective_date).renewing.draft.first
     end
 
+    def primary_office_address
+      if primary_office_location.present? && primary_office_location.address.present?
+        primary_office_location.address
+      end
+    end
+
     def primary_office_service_areas
       if primary_office_location.present? && primary_office_location.address.present?
         ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: ::TimeKeeper.date_of_record)

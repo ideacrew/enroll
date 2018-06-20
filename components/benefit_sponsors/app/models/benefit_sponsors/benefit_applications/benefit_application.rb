@@ -167,6 +167,20 @@ module BenefitSponsors
       where("$exists" => {:predecessor_application_id => true} )
     }
 
+    before_create :set_rating_area
+    before_update :update_rating_area
+
+    def set_rating_area
+      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+      end
+    end
+
+    def update_rating_area
+      if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
+        self.recorded_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
+      end
+    end
     # scope :published_and_expired_plan_years_by_date, ->(date) {
     #   where(
     #     "$and" => [
@@ -237,6 +251,11 @@ module BenefitSponsors
     end
 
     def recorded_rating_area=(new_recorded_rating_area)
+      if new_recorded_rating_area.nil?
+        @recorded_rating_area = nil
+        self.recorded_rating_area_id = nil
+        return
+      end
       raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
       self.recorded_rating_area_id = new_recorded_rating_area._id
       @recorded_rating_area = new_recorded_rating_area
