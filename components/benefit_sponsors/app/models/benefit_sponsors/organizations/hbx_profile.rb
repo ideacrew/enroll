@@ -14,8 +14,6 @@ module BenefitSponsors
           @is_benefit_sponsorship_eligible = true
         end
 
-        add_benefit_sponsorship
-
         self
       end
 
