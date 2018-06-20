@@ -1,6 +1,6 @@
 module BenefitSponsors
-  module BenefitSponsorships
-    class AcaShopScheduledEvent
+  module ScheduledEvents
+    class AcaShopScheduledEvents
 
       include ::Acapi::Notifiers
 
