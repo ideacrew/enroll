@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   module Observers
-    RSpec.describe EmployerProfileObserver, type: :model do
+    RSpec.describe EmployerProfileObserver, type: :model, dbclean: :after_each do
       subject { EmployerProfileObserver.new }
 
       let(:employer_profile) { create :benefit_sponsors_organizations_aca_shop_cca_employer_profile }
