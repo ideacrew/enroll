@@ -18,6 +18,7 @@ module Notifier
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
+      data_object.offered_products = Notifier::MergeDataModels::OfferedProduct.new
       @merge_model = data_object
     end
 

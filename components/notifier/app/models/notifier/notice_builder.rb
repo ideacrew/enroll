@@ -2,6 +2,7 @@ module Notifier
   module NoticeBuilder
     include Config::SiteConcern
     include ApplicationHelper
+    include Notifier::ApplicationHelper
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
