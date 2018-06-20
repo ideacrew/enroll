@@ -137,7 +137,7 @@ class User
 
   def is_benefit_sponsor_active_broker?(profile_id)
     profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(profile_id)).first
-    person == profile_organization.employer_profile.active_broker if (profile_organization && profile_organization.employer_profile && employer_profile.active_broker)
+    person == profile_organization.employer_profile.active_broker if (profile_organization && profile_organization.employer_profile && profile_organization.employer_profile.active_broker)
   end
 
   def handle_headless_records

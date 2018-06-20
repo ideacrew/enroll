@@ -84,6 +84,10 @@ module BenefitSponsors
       }
     }
 
+    before do
+      issuer_profile.organization.update_attributes!(site_id: site.id)
+    end
+
     describe "GET new" do
       it "should initialize the form" do
         sign_in_and_do_new
@@ -170,7 +174,7 @@ module BenefitSponsors
     describe "GET edit" do
 
       before do
-        benefit_package.sponsored_benefits.first.reference_product.update_attributes(:issuer_profile_id => issuer_profile.id)
+        benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
         benefit_package.reload
       end
 
