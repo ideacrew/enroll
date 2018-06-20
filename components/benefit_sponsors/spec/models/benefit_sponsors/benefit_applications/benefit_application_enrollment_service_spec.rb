@@ -28,7 +28,7 @@ module BenefitSponsors
       context "when initial employer eligible for renewal" do
 
         it "should generate renewal application" do
-          subject.renew
+          subject.renew_application
           benefit_sponsorship.reload
           renewal_application = benefit_sponsorship.benefit_applications.detect{|application| application.is_renewing?}
           expect(renewal_application).not_to be_nil
