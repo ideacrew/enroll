@@ -4,6 +4,11 @@ module BenefitSponsors
 
   RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
+    let!(:benefit_market)  { benefit_market = site.benefit_markets.first
+                              benefit_market.save }
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+
     subject { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
 
     describe '#for_new' do
@@ -69,7 +74,7 @@ module BenefitSponsors
                    "accept_new_clients"=>"1",
                    "office_locations_attributes"=>
                        {"0"=>
-                            {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA", "zip"=>"01001", "county"=>"Hampden"},
+                            {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA","zip"=>"01026", "county"=>"Berkshire"},
                              "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"222", "number"=>"2221111", "extension"=>""}}},
                   "contact_method"=>"paper_and_electronic"}},
          "profile_id"=>nil,

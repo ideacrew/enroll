@@ -4,6 +4,8 @@ FactoryGirl.define do
 
     market_kind :shop
     corporate_npn "0989898981"
+    ach_routing_number '123456789'
+    ach_account_number '9999999999999999'
     transient do
       office_locations_count 1
     end
