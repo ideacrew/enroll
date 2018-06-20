@@ -43,19 +43,19 @@ module BenefitSponsors
         end
 
         def create
-          @broker_managenement_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_create(params)
-          @broker_managenement_form.save
+          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_create(params)
+          @broker_management_form.save
           flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
           redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: 'brokers')
         rescue => e
-          error_msgs = @broker_managenement_form.errors.map(&:full_messages) if @broker_managenement_form.errors
+          error_msgs = @broker_management_form.errors.map(&:full_messages) if @broker_management_form.errors
           redirect_to(:back, :flash => {error: error_msgs})
         end
 
         def terminate
-          @broker_managenement_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_terminate(params)
+          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_terminate(params)
 
-          if @broker_managenement_form.terminate && @broker_managenement_form.direct_terminate
+          if @broker_management_form.terminate && @broker_management_form.direct_terminate
             flash[:notice] = "Broker terminated successfully."
             redirect_to profiles_employers_employer_profile_path(@employer_profile, tab: "brokers")
           else

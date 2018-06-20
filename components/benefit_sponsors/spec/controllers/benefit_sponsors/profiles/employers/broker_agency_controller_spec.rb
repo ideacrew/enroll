@@ -223,7 +223,7 @@ module BenefitSponsors
         end
 
         it 'should initialize broker management form' do
-          expect(assigns(:broker_managenement_form).class).to eq broker_managenement_form_class
+          expect(assigns(:broker_management_form).class).to eq broker_managenement_form_class
         end
 
         it 'should redirect to show page' do
@@ -235,7 +235,7 @@ module BenefitSponsors
         end
 
         it 'should add a new broker_agency_account to the benefit_sponsorship accociated to the employer profile' do
-          expect(employer_profile.active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
+          expect(assigns[:broker_management_form].broker_agency_profile_id).to eq broker_agency_profile1.id.to_s
         end
 
         it 'should assign employer_profile variable' do
@@ -257,7 +257,7 @@ module BenefitSponsors
 
       context 'for terminating an exisiting broker' do
         it 'should initialize broker management form' do
-          expect(assigns(:broker_managenement_form).class).to eq broker_managenement_form_class
+          expect(assigns(:broker_management_form).class).to eq broker_managenement_form_class
         end
 
         it 'should redirect to show page' do
