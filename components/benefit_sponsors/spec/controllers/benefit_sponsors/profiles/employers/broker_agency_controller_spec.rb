@@ -218,7 +218,7 @@ module BenefitSponsors
 
         before(:each) do
           sign_in(user_with_hbx_staff_role)
-          @request.env['HTTP_REFERER'] = ""
+          @request.env['HTTP_REFERER'] = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id.to_s}?tab=brokers"
           post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id
         end
 
