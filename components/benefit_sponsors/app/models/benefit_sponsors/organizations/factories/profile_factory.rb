@@ -111,6 +111,10 @@ module BenefitSponsors
 
         def persist_agency!
           if organization.valid?
+            # benefitsponsorships are being saved and had to save manually.
+            organization.benefit_sponsorships.each do |benefit_sponsorship|
+              benefit_sponsorship.save! if benefit_sponsorship.new_record?
+            end
             organization.save!
             persist_representative!
           else
