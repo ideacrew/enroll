@@ -12,12 +12,6 @@ module BenefitSponsors
         # Fix this
       end
 
-      def active_broker
-        # if active_broker_agency_account && active_broker_agency_account.writing_agent_id
-        #   Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
-        # end
-      end
-
       # def census_employees
       #   CensusEmployee.find_by_employer_profile(self)
       # end
