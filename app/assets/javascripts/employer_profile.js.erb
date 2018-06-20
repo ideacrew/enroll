@@ -723,7 +723,7 @@ $(document).on('click', "a.interaction-click-control-terminate", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
-$(document).on('click', '.cobra_confirm', function(){
+$(document).on('click', '.cobra_confirm', function(event){
   event.preventDefault();
   var datepicker = $(this).prev();
   var cobra_date = datepicker.val();
