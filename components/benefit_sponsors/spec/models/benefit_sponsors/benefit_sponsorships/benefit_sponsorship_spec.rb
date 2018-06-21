@@ -2,7 +2,10 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
+    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
+    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
 
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:benefit_market)  { site.benefit_markets.first }
@@ -59,7 +62,7 @@ module BenefitSponsors
       end
 
       context "when benefit sponsorship is CCA SHOP employer" do
-        let(:cca_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site)  }
+        let(:cca_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, site: site)  }
         let(:benefit_sponsorship) { cca_profile.add_benefit_sponsorship }
 
         it "should be valid" do
@@ -351,18 +354,18 @@ module BenefitSponsors
 
       let!(:march_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 3, :with_organization_cca_profile,
                                                           :with_initial_benefit_application, initial_application_state: initial_application_state,
-                                                          default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)))
+                                                          default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)), site: site)
       }
 
       let!(:april_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
                                                           :with_initial_benefit_application, initial_application_state: initial_application_state,
-                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site)
       }
 
       let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
                                                           :with_renewal_benefit_application, initial_application_state: initial_application_state,
                                                           renewal_application_state: renewal_application_state,
-                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site)
       }
 
       before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }

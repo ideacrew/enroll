@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   module Observers
-    RSpec.describe BrokerAgencyAccountObserver, type: :model do
+    RSpec.describe BrokerAgencyAccountObserver, type: :model, dbclean: :after_each do
       subject { BrokerAgencyAccountObserver.new }
 
       before do

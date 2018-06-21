@@ -5,6 +5,7 @@ FactoryGirl.define do
     sic_code              "001"
 
     transient do
+      site nil
       secondary_office_locations_count 1
     end
 
@@ -20,7 +21,12 @@ FactoryGirl.define do
 
     trait :with_organization_and_site do
       after(:build) do |profile, evaluator|
-        site = create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market)
+        site = nil
+        if evaluator.site
+          site = evaluator.site
+        else
+          site = create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market)
+        end
         profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site)
       end
     end
