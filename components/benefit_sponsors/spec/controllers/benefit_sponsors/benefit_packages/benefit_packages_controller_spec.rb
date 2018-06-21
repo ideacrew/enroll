@@ -32,7 +32,8 @@ module BenefitSponsors
     let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitPackageForm }
-    let!(:user) { FactoryGirl.create :user}
+    let(:person) { FactoryGirl.create(:person) }
+    let!(:user) { FactoryGirl.create :user, person: person}
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
 

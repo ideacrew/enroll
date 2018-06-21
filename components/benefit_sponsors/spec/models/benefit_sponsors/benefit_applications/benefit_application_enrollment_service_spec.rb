@@ -26,6 +26,10 @@ module BenefitSponsors
         TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
       end
 
+      after(:all) do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+
       subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
       context "when initial employer eligible for renewal" do
@@ -63,6 +67,10 @@ module BenefitSponsors
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
         end
 
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         context "open enrollment start date in the past" do
@@ -87,7 +95,7 @@ module BenefitSponsors
       end
 
       context "when renewing employer present with renewal application" do
-  
+
       end
     end
 
@@ -100,13 +108,17 @@ module BenefitSponsors
         let(:open_enrollment_begin) { TimeKeeper.date_of_record - 5.days }
 
         include_context "setup initial benefit application" do
-        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-        let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
-        let(:aasm_state) { :approved }
+          let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
+          let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+          let(:aasm_state) { :approved }
         end
 
         before(:all) do 
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
+        end
+
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -150,6 +162,10 @@ module BenefitSponsors
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         context "open enrollment close date passed" do
@@ -173,7 +189,7 @@ module BenefitSponsors
       end
 
       context "when renewing employer present with renewal application" do
-        
+
       end
     end
 
@@ -184,12 +200,16 @@ module BenefitSponsors
         let(:applcation_state) { :enrollment_closed }
 
         include_context "setup initial benefit application" do
-        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-        let(:aasm_state) {  applcation_state }
+          let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
+          let(:aasm_state) {  applcation_state }
         end
 
         before(:all) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
+        end
+
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
@@ -217,7 +237,7 @@ module BenefitSponsors
       end
 
       context "when renewing employer present with renewal application" do
-        
+
       end
     end
 
@@ -228,12 +248,16 @@ module BenefitSponsors
 
 
         include_context "setup initial benefit application" do
-        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year - 1, 8, 1) }
-        let(:aasm_state) { :active }
+          let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year - 1, 8, 1) }
+          let(:aasm_state) { :active }
         end
 
         before(:all) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 8, 1))
+        end
+
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }

@@ -198,6 +198,10 @@ module BenefitSponsors
                 benefit_application.begin_open_enrollment!
               }
 
+              after {
+                TimeKeeper.set_date_of_record_unprotected!(Date.today) 
+              }
+
               it "should transition to state: :initial_enrollment_open" do
                 expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
               end
@@ -206,6 +210,10 @@ module BenefitSponsors
                 before {
                   TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.max)
                   benefit_application.end_open_enrollment!
+                }
+
+                after {
+                  TimeKeeper.set_date_of_record_unprotected!(Date.today) 
                 }
 
                 it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
@@ -227,6 +235,10 @@ module BenefitSponsors
                     before {
                       TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
                       benefit_application.activate_enrollment!
+                    }
+
+                    after {
+                      TimeKeeper.set_date_of_record_unprotected!(Date.today) 
                     }
 
                     it "benefit_sponsorship should transition to state: :active" do
@@ -253,6 +265,9 @@ module BenefitSponsors
                       before {
                         TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
                         benefit_application.activate_enrollment!
+                      }
+                      after {
+                        TimeKeeper.set_date_of_record_unprotected!(Date.today) 
                       }
 
                       it "benefit_sponsorship should transition to state: :applicant" do
@@ -335,19 +350,19 @@ module BenefitSponsors
       let(:renewal_application_state)       { :enrollment_open }
 
       let!(:march_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 3, :with_organization_cca_profile,
-        :with_initial_benefit_application, initial_application_state: initial_application_state,
-        default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)))
+                                                          :with_initial_benefit_application, initial_application_state: initial_application_state,
+                                                          default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)))
       }
 
       let!(:april_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
-        :with_initial_benefit_application, initial_application_state: initial_application_state,
-        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+                                                          :with_initial_benefit_application, initial_application_state: initial_application_state,
+                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
       }
 
       let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
-        :with_renewal_benefit_application, initial_application_state: initial_application_state,
-        renewal_application_state: renewal_application_state,
-        default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+                                                          :with_renewal_benefit_application, initial_application_state: initial_application_state,
+                                                          renewal_application_state: renewal_application_state,
+                                                          default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
       }
 
       before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }

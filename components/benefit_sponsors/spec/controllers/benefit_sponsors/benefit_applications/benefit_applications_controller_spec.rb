@@ -10,7 +10,9 @@ module BenefitSponsors
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
-    let!(:user) { FactoryGirl.create_default :user}
+    let(:person) { FactoryGirl.create(:person) }
+    let!(:user) { FactoryGirl.create_default :user, person: person}
+
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
@@ -263,7 +265,7 @@ module BenefitSponsors
       end
 
       context "benefit application is not submitted" do
-        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :pending) }
+        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :denied) }
 
         it "should redirect with errors" do
           sign_in user
