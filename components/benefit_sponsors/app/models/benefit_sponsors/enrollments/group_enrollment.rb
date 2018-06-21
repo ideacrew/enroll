@@ -6,7 +6,7 @@ module BenefitSponsors
                   :product_cost_total, :benefit_sponsor,
                   :sponsor_contribution_total, :member_enrollments, :group_id,
                   :rating_area,
-                  :rate_schedule_date
+                  :rate_schedule_date, :sponsor_contribution_prohibited
 
     def initialize(opts = {})
       @group_id                   = nil
