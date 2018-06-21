@@ -1,10 +1,20 @@
 require "rails_helper"
+require "fileutils"
 
 RSpec.describe "an MA ACA Employer" do
 
   def reload_db_fixtures
-    load_location = File.expand_path(File.join(File.dirname(__FILE__), "..", "fixture_dbs"))
-    `cd #{load_location} && mongorestore --drop`
+    db_name = Mongoid::Config.clients[:default][:database]
+    db_location = File.expand_path(File.join(File.dirname(__FILE__), "..", "fixture_dbs", "dump"))
+    tmp_dir = Dir.mktmpdir
+    dest_dir = File.join(tmp_dir, "dump")
+    db_dump_src_dir = File.join(dest_dir, "fixture_source")
+    db_dump_dest_dir = File.join(dest_dir, db_name)
+    FileUtils.mkdir(dest_dir)
+    FileUtils.cp_r(db_location, tmp_dir)
+    FileUtils.mv(db_dump_src_dir, db_dump_dest_dir)
+    `cd #{tmp_dir} && mongorestore --drop`
+    FileUtils.rm_r(tmp_dir)
   end
 
   def primary_address_attributes
