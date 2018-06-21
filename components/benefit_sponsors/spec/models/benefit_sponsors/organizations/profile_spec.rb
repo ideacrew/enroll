@@ -40,7 +40,7 @@ module BenefitSponsors
 
         it "should not be valid" do
           subject.validate
-          expect(subject).to_not be_valid
+          expect{subject.save!}.to raise_error(Mongoid::Errors::NoParent)
         end
       end
 
