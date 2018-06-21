@@ -54,7 +54,6 @@ module BenefitSponsors
     describe "#terminate" do
       let!(:benefit_sponsorship_with_account) {FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_broker_agency_account, profile: employer_profile, broker_agency_profile: broker_agency_profile, benefit_market: site.benefit_markets.first)}
       let!(:broker_agency_account) {benefit_sponsorship_with_account.broker_agency_accounts.first}
-#      let!(:broker_agency_profile) {broker_agency_account.broker_agency_profile}
       let!(:writing_agent) {broker_agency_account.writing_agent}
 
 
