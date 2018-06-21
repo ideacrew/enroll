@@ -89,27 +89,33 @@ module Effective
 
       def collection
         return @employer_collection if defined? @employer_collection
-        employers = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
-        if attributes[:employers].present? && !['all'].include?(attributes[:employers])
-          employers = employers.send(attributes[:employers]) if ['benefit_sponsorship_applicant','benefit_application_enrolling','benefit_application_enrolled', 'employer_attestations'].include?(attributes[:employers])
-          employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
+
+        @benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
+
+        @employer_collection = @benefit_sponsorships unless employer_kinds.include?(attributes[:employers])
+
+          if employer_attestation_kinds.include?(attributes[:attestations])
+            benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
+          elsif enrolling_kinds.include?(attributes[:enrolling])
+            #TODO for employer enrolling kinds
+          elsif enrolled_kinds.include?(attributes[:enrolled])
+            #TODO for employer enrolled kinds
+          else
+            benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
+          end
+
+          # employers = @employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
           # employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
           # employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
-          #
+
           # employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          # employers = employers.send(attributes[:attestations]) if attributes[:attestations].present?
-          #
+
           # if attributes[:upcoming_dates].present?
           #     if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
           #       employers = employers.employer_profile_plan_year_start_on(date)
           #     end
           # end
-
-        end
-
-
-        @employer_collection = employers
-
+          @employer_collection = benefit_sponsorships
       end
 
       def global_search?
@@ -120,10 +126,25 @@ module Effective
         :datatable_search
       end
 
+      def employer_kinds
+        ['benefit_sponsorship_applicant','benefit_application_enrolling','benefit_application_enrolled', 'employer_attestations']
+      end
+
+      def employer_attestation_kinds
+        kinds ||= EmployerAttestation::ATTESTATION_KINDS
+      end
+
+      def enrolling_kinds
+        []
+      end
+
+      def enrolled_kinds
+        []
+      end
+
       def search_column(collection, table_column, search_term, sql_column)
         if table_column[:name] == 'source_kind' || table_column[:name] == 'mid_plan_year_conversion'
           if search_term != "all"
-            #binding.pry
             collection.datatable_search_for_source_kind(search_term.to_sym)
           else
             super
@@ -174,10 +195,10 @@ module Effective
          attestations:
           [
             {scope: 'employer_attestations', label: 'All'},
-            # {scope: 'employer_attestations_submitted', label: 'Submitted'},
-            # {scope: 'employer_attestations_pending', label: 'Pending'},
-            # {scope: 'employer_attestations_approved', label: 'Approved'},
-            # {scope: 'employer_attestations_denied', label: 'Denied'},
+            {scope: 'submitted', label: 'Submitted'},
+            {scope: 'pending', label: 'Pending'},
+            {scope: 'approved', label: 'Approved'},
+            {scope: 'denied', label: 'Denied'},
           ],
         employers:
          [
