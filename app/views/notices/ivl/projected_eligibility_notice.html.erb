@@ -38,7 +38,7 @@
 <% if notice.notification_type == "projected_eligibility_notice_1" %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
 <% end %>
 
@@ -46,7 +46,7 @@
   <% if notice.irs_consent_needed %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
     listings: ["Review your household information, and make sure it’s correct",
-               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
+               "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
   <% else %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
