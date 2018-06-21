@@ -1,1 +1,0 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"enroll_development.ach_records"},{"v":2,"unique":true,"key":{"routing_number":1},"name":"routing_number_1","ns":"enroll_development.ach_records"}],"uuid":"aeae8b20b39f4190b092aa6d2d7684ea"}
