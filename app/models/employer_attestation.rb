@@ -4,6 +4,8 @@ class EmployerAttestation
   include Mongoid::Timestamps
   include AASM
 
+  ATTESTATION_KINDS = ['submitted', 'pending', 'approved', 'denied'].freeze
+
   field :aasm_state, type: String, default: "unsubmitted"
 
   embedded_in :employer_profile

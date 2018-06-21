@@ -18,6 +18,14 @@ module BenefitSponsors
                                                                                    :"created_at".lte => compare_date )
                                                                                  }
 
+        scope :attestations_by_kind, ->(attestation_kind) {
+          orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state" => attestation_kind)
+          self.where(:"organization".in => orgs.collect{|org| org.id.to_s})}
+
+        scope :employer_attestations, -> {
+          orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state".in => EmployerAttestation::ATTESTATION_KINDS)
+          self.where(:"organization".in => orgs.collect{|org| org.id.to_s}) }
+
          scope :benefit_sponsorship_applicant, -> () {
            where(:"aasm_state" => :applicant)
          }
