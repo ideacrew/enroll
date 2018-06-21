@@ -8,9 +8,9 @@ module BenefitSponsors
         before_action :check_and_download_invoice, only: [:download_invoice]
         layout "two_column", except: [:new]
 
-        #New person registered with existing organization and approval request submitted to employer
+        #New profile registration with existing organization and approval request submitted to employer
         def show_pending
-          authorize @employer_profile
+          authorize BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new
           respond_to do |format|
             format.html
             format.js
