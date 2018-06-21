@@ -5,7 +5,7 @@ module BenefitSponsors
         attr :total_contribution
         attr :member_contributions
 
-        def initialize(c_model, level_map, t_price, elig_dates, c_start, r_coverage)
+        def initialize(c_model, level_map, t_price, elig_dates, c_start, r_coverage, contribution_banhammered)
           @contribution_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
           @eligibility_dates = elig_dates
           @coverage_start = c_start
@@ -20,6 +20,7 @@ module BenefitSponsors
           @product = r_coverage.product
           @previous_product = r_coverage.previous_product
           @primary_member_id = nil
+          @is_contribution_prohibited = contribution_banhammered
         end
 
         def add(member)
@@ -36,21 +37,28 @@ module BenefitSponsors
         end
 
         def finalize_results
-          contribution_unit = @contribution_model.contribution_units.detect do |cu|
-            cu.match?(@relationship_totals)
+          if !@is_contribution_prohibited
+            contribution_unit = @contribution_model.contribution_units.detect do |cu|
+              cu.match?(@relationship_totals)
+            end
+            cu = @level_map[contribution_unit.id]
+            c_factor = cu.contribution_factor
+            max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
+            @total_contribution = [max_contribution, @total_price].min
+            members_total_price = 0.00
+            @member_ids.each do |m_id|
+              member_price = BigDecimal.new((@total_contribution / @member_total).to_s).floor(2)
+              members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
+              @member_contributions[m_id] = member_price
+            end
+            member_discrepency = BigDecimal.new((@total_contribution - members_total_price).to_s).round(2)
+            @member_contributions[@primary_member_id] = BigDecimal.new((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2) 
+          else
+            @member_ids.each do |m_id|
+              @member_contributions[m_id] = 0.00
+              @total_contribution = 0.00
+            end
           end
-          cu = @level_map[contribution_unit.id]
-          c_factor = cu.contribution_factor
-          max_contribution = BigDecimal.new((@total_price * c_factor).to_s).round(2)
-          @total_contribution = [max_contribution, @total_price].min
-          members_total_price = 0.00
-          @member_ids.each do |m_id|
-            member_price = BigDecimal.new((@total_contribution / @member_total).to_s).floor(2)
-            members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
-            @member_contributions[m_id] = member_price
-          end
-          member_discrepency = BigDecimal.new((@total_contribution - members_total_price).to_s).round(2)
-          @member_contributions[@primary_member_id] = BigDecimal.new((@member_contributions[@primary_member_id] + member_discrepency).to_s).round(2) 
           self
         end
       end
@@ -75,7 +83,7 @@ module BenefitSponsors
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
         level_map = level_map_for(sponsor_contribution)
-        state = CalculatorState.new(contribution_model, level_map, roster_coverage.product_cost_total, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage)
+        state = CalculatorState.new(contribution_model, level_map, roster_coverage.product_cost_total, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage,roster_coverage.sponsor_contribution_prohibited)
         priced_roster_entry.members.each do |member|
           state.add(member)
         end
