@@ -13,7 +13,7 @@ RSpec.describe "an MA ACA Employer" do
     FileUtils.mkdir(dest_dir)
     FileUtils.cp_r(db_location, tmp_dir)
     FileUtils.mv(db_dump_src_dir, db_dump_dest_dir)
-    `cd #{tmp_dir} && mongorestore --drop`
+    `cd #{tmp_dir} && mongorestore --drop --quiet`
     FileUtils.rm_r(tmp_dir)
   end
 
