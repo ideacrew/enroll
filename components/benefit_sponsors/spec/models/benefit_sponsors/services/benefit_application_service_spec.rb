@@ -43,8 +43,20 @@ module BenefitSponsors
 
       let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
       let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+      let(:benefit_sponsorship) do
+        FactoryGirl.create(
+          :benefit_sponsors_benefit_sponsorship,
+          :with_rating_area,
+          :with_service_areas,
+          supplied_rating_area: rating_area,
+          service_area_list: [service_area],
+          organization: organization,
+          profile_id: organization.profiles.first.id,
+          benefit_market: site.benefit_markets[0],
+          employer_attestation: employer_attestation)
+      end
       let(:benefit_application)       { benefit_sponsorship.benefit_applications.new(params) }
+
       let!(:benefit_market) { site.benefit_markets.first }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
@@ -56,7 +68,6 @@ module BenefitSponsors
 
       context "has received valid attributes" do
         it "should save updated benefit application" do
-          allow(benefit_application).to receive(:benefit_sponsorship).and_return(benefit_sponsorship)
           allow(benefit_market).to receive(:benefit_sponsor_catalog_for).with([],benefit_application.effective_period.begin).and_return(nil)
           service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
           expect(service_obj.store(benefit_application_form, benefit_application)).to eq [true, benefit_application]
@@ -89,9 +100,23 @@ module BenefitSponsors
     describe ".load_form_params_from_resource" do
       let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
       let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
-      let!(:benefit_market) { site.benefit_markets.first }
+      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+      let!(:benefit_market) { site.benefit_markets.first }
+
+      let(:benefit_sponsorship) do
+        FactoryGirl.create(
+          :benefit_sponsors_benefit_sponsorship,
+          :with_rating_area,
+          :with_service_areas,
+          supplied_rating_area: rating_area,
+          service_area_list: [service_area],
+          organization: organization,
+          profile_id: organization.profiles.first.id,
+          benefit_market: benefit_market,
+          employer_attestation: employer_attestation)
+      end
 
       let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
