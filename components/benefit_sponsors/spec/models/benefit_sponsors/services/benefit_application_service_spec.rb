@@ -41,11 +41,14 @@ module BenefitSponsors
       let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
 
-      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-      let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
+
+      let!(:site)               { create(:benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :as_hbx_profile, :cca) }
+      let!(:benefit_market)     { site.benefit_markets.first }
+      let!(:organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)    { organization.employer_profile }
+      let!(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+
       let(:benefit_application)       { benefit_sponsorship.benefit_applications.new(params) }
-      let!(:benefit_market) { site.benefit_markets.first }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
       let!(:benefit_application_factory) { BenefitSponsors::BenefitApplications::BenefitApplicationFactory }
