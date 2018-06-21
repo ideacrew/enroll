@@ -156,6 +156,8 @@ module BenefitSponsors
             benefit_application.extend_open_enrollment_period(past_date)
           end
 
+          after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
           it "should be able to transition into open enrollment" do
             expect(benefit_application.may_begin_open_enrollment?).to eq true
           end
