@@ -2,7 +2,7 @@ module Notifier
   class Builders::EmployerProfile
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
-    # include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
 
@@ -11,7 +11,7 @@ module Notifier
     def initialize
       data_object = Notifier::MergeDataModels::EmployerProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
-      data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.benefit_application = Notifier::MergeDataModels::BenefitApplication.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       @merge_model = data_object
@@ -28,7 +28,7 @@ module Notifier
     end
 
     def addresses
-      office_address = employer_profile.organization.primary_office_location.address
+      office_address = employer_profile.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: office_address.address_1,
