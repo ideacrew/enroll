@@ -28,7 +28,7 @@ module BenefitSponsors
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
-    after :all do
+    after :each do
       DatabaseCleaner.clean
     end
 

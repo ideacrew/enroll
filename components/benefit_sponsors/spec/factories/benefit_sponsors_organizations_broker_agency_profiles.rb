@@ -16,10 +16,12 @@ FactoryGirl.define do
     end
 
     after(:build) do |profile, evaluator|
-      if evaluator.assigned_site
-        profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
-      else
-        profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site)
+      if profile.organization.blank?
+        if evaluator.assigned_site
+          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
+        else
+          profile.organization = FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site)
+        end
       end
     end
   end
