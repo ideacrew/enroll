@@ -62,8 +62,9 @@ module BenefitSponsors
       end
 
       context "when benefit sponsorship is CCA SHOP employer" do
-        let(:cca_profile)         { FactoryGirl.build(:benefit_sponsors_organizations_aca_shop_cca_employer_profile, site: site)  }
-        let(:benefit_sponsorship) { cca_profile.add_benefit_sponsorship }
+        let(:cca_employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+        let(:cca_profile)                 { cca_employer_organization.employer_profile  }
+        let(:benefit_sponsorship)         { cca_profile.add_benefit_sponsorship }
 
         it "should be valid" do
           expect(benefit_sponsorship.valid?).to be true
@@ -202,7 +203,7 @@ module BenefitSponsors
               }
 
               after {
-                TimeKeeper.set_date_of_record_unprotected!(Date.today) 
+                TimeKeeper.set_date_of_record_unprotected!(Date.today)
               }
 
               it "should transition to state: :initial_enrollment_open" do
@@ -216,7 +217,7 @@ module BenefitSponsors
                 }
 
                 after {
-                  TimeKeeper.set_date_of_record_unprotected!(Date.today) 
+                  TimeKeeper.set_date_of_record_unprotected!(Date.today)
                 }
 
                 it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
@@ -241,7 +242,7 @@ module BenefitSponsors
                     }
 
                     after {
-                      TimeKeeper.set_date_of_record_unprotected!(Date.today) 
+                      TimeKeeper.set_date_of_record_unprotected!(Date.today)
                     }
 
                     it "benefit_sponsorship should transition to state: :active" do
@@ -270,7 +271,7 @@ module BenefitSponsors
                         benefit_application.activate_enrollment!
                       }
                       after {
-                        TimeKeeper.set_date_of_record_unprotected!(Date.today) 
+                        TimeKeeper.set_date_of_record_unprotected!(Date.today)
                       }
 
                       it "benefit_sponsorship should transition to state: :applicant" do

@@ -60,12 +60,14 @@ FactoryGirl.define do
     end
 
     trait :with_full_package do
+      with_organization_cca_profile
       after :build do |benefit_sponsorship, evaluator|
 
       end
     end
 
     trait :with_market_profile do
+      with_organization_cca_profile
       # we have to update the factory create instead of build
       before(:create) do |benefit_sponsorship, evaluator|
 
@@ -118,7 +120,7 @@ FactoryGirl.define do
     end
 
     trait :with_broker_agency_account do
-      transient do 
+      transient do
         broker_agency_profile nil
       end
 
