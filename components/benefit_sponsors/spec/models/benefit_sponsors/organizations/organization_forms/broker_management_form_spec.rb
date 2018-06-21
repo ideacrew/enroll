@@ -81,7 +81,7 @@ module BenefitSponsors
       end
 
       it 'should assign broker agency to the employer_profile' do
-        expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
+        expect(employer_profile.active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
       end
     end
 
@@ -111,10 +111,10 @@ module BenefitSponsors
       end
 
       it 'should termiante active broker agency of the employer_profile' do
-        expect(active_benefit_sponsorship.broker_agency_accounts).not_to eq []
+        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).not_to eq []
         broker_management_form_terminate.terminate
-        active_benefit_sponsorship.reload
-        expect(active_benefit_sponsorship.broker_agency_accounts).to eq []
+        employer_profile.active_benefit_sponsorship.reload
+        expect(employer_profile.active_benefit_sponsorship.broker_agency_accounts).to eq []
       end
     end
   end
