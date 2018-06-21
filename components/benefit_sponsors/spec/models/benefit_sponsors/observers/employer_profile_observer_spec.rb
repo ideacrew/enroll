@@ -5,7 +5,7 @@ module BenefitSponsors
     RSpec.describe EmployerProfileObserver, type: :model, dbclean: :after_each do
       subject { EmployerProfileObserver.new }
 
-      let(:employer_profile) { create :benefit_sponsors_organizations_aca_shop_cca_employer_profile }
+      let(:employer_profile) { create :benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site }
 
       before do
         allow(subject).to receive(:notify)
