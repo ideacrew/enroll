@@ -1,6 +1,7 @@
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
+    include Notifier::ApplicationHelper
     include ApplicationHelper
 
     def to_html(options = {})

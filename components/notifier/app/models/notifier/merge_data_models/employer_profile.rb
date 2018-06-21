@@ -20,7 +20,7 @@ module Notifier
     # attribute :to, String
     # attribute :plan, MergeDataModels::Plan
     attribute :enrollment, MergeDataModels::Enrollment
-    attribute :plan_year, MergeDataModels::BenefitApplication
+    attribute :benefit_application, MergeDataModels::BenefitApplication
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Enrollment
 
@@ -36,7 +36,7 @@ module Notifier
       })
 
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
-      notice.plan_year = Notifier::MergeDataModels::BenefitApplication.stubbed_object
+      notice.benefit_application = Notifier::MergeDataModels::BenefitApplication.stubbed_object
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
       notice.enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object
       notice.addresses = [ notice.mailing_address ]

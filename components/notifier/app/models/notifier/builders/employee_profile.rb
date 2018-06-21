@@ -3,7 +3,7 @@ module Notifier
 
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
-    # include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
 
@@ -14,7 +14,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
-      data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.benefit_application = Notifier::MergeDataModels::BenefitApplication.new
       data_object.census_employee = Notifier::MergeDataModels::CensusEmployee.new
       data_object.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
       @merge_model = data_object

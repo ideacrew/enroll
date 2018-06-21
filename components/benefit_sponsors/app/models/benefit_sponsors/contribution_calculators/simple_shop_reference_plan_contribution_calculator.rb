@@ -5,7 +5,7 @@ module BenefitSponsors
         attr_reader :total_contribution
         attr_reader :member_contributions
 
-        def initialize(c_model, m_prices, r_coverage, r_product, l_map, c_eligibility_dates)
+        def initialize(c_model, m_prices, r_coverage, r_product, l_map, c_eligibility_dates, contribution_banhammered)
           @rate_schedule_date = r_coverage.rate_schedule_date
           @contribution_model = c_model
           @contribution_calculator = ::BenefitSponsors::CoverageAgeCalculator.new
@@ -19,13 +19,18 @@ module BenefitSponsors
           @level_map = l_map
           @product = r_coverage.product
           @previous_product = r_coverage.previous_product
+          @is_contribution_prohibited = contribution_banhammered
         end
 
         def add(member)
-          c_factor = contribution_factor_for(member)
-          c_amount = calc_contribution_amount_for(member, c_factor)
-          @member_contributions[member.member_id] = c_amount 
-          @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+          if !@is_contribution_prohibited
+            c_factor = contribution_factor_for(member)
+            c_amount = calc_contribution_amount_for(member, c_factor)
+            @member_contributions[member.member_id] = c_amount 
+            @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+          else
+            @member_contributions[member.member_id] = 0.00
+          end
           self
         end
 
@@ -99,7 +104,8 @@ module BenefitSponsors
           roster_coverage,
           reference_product,
           level_map,
-          coverage_eligibility_dates
+          coverage_eligibility_dates,
+          roster_coverage.sponsor_contribution_prohibited
         )
         priced_roster_entry.members.each do |member|
           state.add(member)

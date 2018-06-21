@@ -20,6 +20,7 @@ class GroupSelectionEligibilityChecker
     coverage_age = @age_calculator.calc_coverage_age_for(MemberAgeSlug.new(dob, family_member.id), nil, coverage_date, {}, nil)
     # If the relationship doesn't even map, they aren't allowed
     mapped_relationship = @contribution_model.map_relationship_for(rel, coverage_age, disability)
+    return false if mapped_relationship.blank?
     matching_contribution_units = @contribution_model.contribution_units.select do |cu|
       cu.at_least_one_matches?({mapped_relationship.to_s => 1})
     end
