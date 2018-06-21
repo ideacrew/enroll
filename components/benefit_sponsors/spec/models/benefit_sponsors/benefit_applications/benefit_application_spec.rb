@@ -151,6 +151,10 @@ module BenefitSponsors
             benefit_application.extend_open_enrollment_period(past_date)
           end
 
+          after do
+            TimeKeeper.set_date_of_record_unprotected!(Date.current)
+          end
+
           it "should be able to transition into open enrollment" do
             expect(benefit_application.may_begin_open_enrollment?).to eq true
           end
@@ -294,6 +298,10 @@ module BenefitSponsors
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
                 benefit_application.begin_open_enrollment
               }
+
+            after do
+              TimeKeeper.set_date_of_record_unprotected!(Date.current)
+            end
 
             it "should transition to state: :approved" do
               expect(benefit_application.aasm_state).to eq :enrollment_open
