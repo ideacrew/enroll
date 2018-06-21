@@ -112,9 +112,18 @@ FactoryGirl.define do
     end
 
     trait :with_broker_agency_account do
+      transient do 
+        broker_agency_profile nil
+      end
+
       after :build do |benefit_sponsorship, evaluator|
-        broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account
-        benefit_sponsorship.broker_agency_accounts= [broker_agency_account]
+        if evaluator.broker_agency_profile
+          broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: evaluator.broker_agency_profile, benefit_sponsorship: benefit_sponsorship
+          benefit_sponsorship.broker_agency_accounts = [broker_agency_account]
+        else
+          broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship
+          benefit_sponsorship.broker_agency_accounts = [broker_agency_account]
+        end
       end
     end
 
