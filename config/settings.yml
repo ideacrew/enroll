@@ -23,7 +23,7 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "dc_logo.png"
   tab_icon: 'dc_favicon.ico'
-  mailer_logo_file_name: "dc_invoice_logo.png"
+  mailer_logo_file_name: "dchealthlink.jpg"
   make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "dchbx"
@@ -108,6 +108,11 @@ notices:
     attachments:
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
       envelope_without_address: "taglines.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
+    partials:
+      template: "notifier/notice_kinds/template.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb"
 
 invoices:
   addendum: ""

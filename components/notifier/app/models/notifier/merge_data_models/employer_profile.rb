@@ -51,6 +51,10 @@ module Notifier
       %w{broker_present?}
     end
 
+    def primary_address
+      mailing_address
+    end
+
     def broker_present?
       self.broker.present?
     end
@@ -60,6 +64,14 @@ module Notifier
     end
 
     def employee_notice?
+      false
+    end
+
+    def general_agency?
+      false
+    end
+
+    def broker?
       false
     end
   end
