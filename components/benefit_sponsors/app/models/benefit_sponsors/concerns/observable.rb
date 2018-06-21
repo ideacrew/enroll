@@ -7,8 +7,10 @@ module BenefitSponsors
 
       def notify_observers(args={})
         if self.class.observer_peers.any?
-          self.class.observer_peers.each do |k, v|
-            k.send v, self, args
+          self.class.observer_peers.each do |k, events|
+            events.each do |event|
+              k.send event, self, args
+            end
           end
         end
       end
@@ -17,7 +19,8 @@ module BenefitSponsors
     class_methods do
       def add_observer(observer, func=:update)
         @observer_peers ||= {}
-        unless observer.respond_to? func
+        func = Array.wrap(func)
+        unless func.all? {|event| observer.respond_to? event}
           raise NoMethodError, "observer does not respond to '#{func.to_s}'"
         end
 

@@ -5,7 +5,11 @@ module BenefitSponsors
       include SetCurrentUser
       include Mongoid::Timestamps
 
-      embedded_in :benefit_sponsorship
+      include ::BenefitSponsors::Concerns::Observable
+
+      embedded_in :benefit_sponsorship,
+                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+
       embedded_in :family
 
       # Begin date of relationship
@@ -25,6 +29,10 @@ module BenefitSponsors
       validates_presence_of :start_on, :benefit_sponsors_broker_agency_profile_id, :is_active
 
       default_scope -> {where(:is_active => true)}
+
+      before_create :notify_observers
+
+      add_observer ::BenefitSponsors::Observers::BrokerAgencyAccountObserver.new, [:broker_fired?, :broker_hired?]
 
 
       # belongs_to broker_agency_profile
