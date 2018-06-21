@@ -109,6 +109,12 @@ module BenefitSponsors
         organization.legal_name
       end
 
+      def self.by_hbx_id(an_hbx_id)
+        organization = BenefitSponsors::Organizations::Organization.where(hbx_id: an_hbx_id, profiles: {"$exists" => true})
+        return nil unless organization.any?
+        organization.first.employer_profile
+      end
+
       private
 
       # Subclasses may extend this method
