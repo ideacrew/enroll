@@ -19,5 +19,11 @@ FactoryGirl.define do
       profile.add_benefit_sponsorship if profile.benefit_sponsorships.blank?
     end
 
+    trait :with_benefit_sponsorship do
+      after :build do |profile, evaluator|
+        profile.add_benefit_sponsorship
+      end
+    end
+
   end
 end
