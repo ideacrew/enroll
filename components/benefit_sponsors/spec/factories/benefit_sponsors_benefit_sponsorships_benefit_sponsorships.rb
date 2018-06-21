@@ -10,6 +10,7 @@ FactoryGirl.define do
       default_open_enrollment_period nil
       service_area_list []
       supplied_rating_area nil
+      site nil
     end
 
     trait :with_benefit_market do
@@ -45,7 +46,12 @@ FactoryGirl.define do
 
     trait :with_organization_cca_profile do
       after :build do |benefit_sponsorship, evaluator|
-        site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        site = nil
+        if evaluator.site
+          site = evaluator.site
+        else
+          site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+        end
         organization  = create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
         benefit_sponsorship.benefit_market = site.benefit_markets.first
         profile = organization.employer_profile
@@ -54,12 +60,14 @@ FactoryGirl.define do
     end
 
     trait :with_full_package do
+      with_organization_cca_profile
       after :build do |benefit_sponsorship, evaluator|
 
       end
     end
 
     trait :with_market_profile do
+      with_organization_cca_profile
       # we have to update the factory create instead of build
       before(:create) do |benefit_sponsorship, evaluator|
 
@@ -112,7 +120,7 @@ FactoryGirl.define do
     end
 
     trait :with_broker_agency_account do
-      transient do 
+      transient do
         broker_agency_profile nil
       end
 

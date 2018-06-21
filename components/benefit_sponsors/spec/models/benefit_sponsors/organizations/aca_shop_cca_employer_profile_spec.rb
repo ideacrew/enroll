@@ -2,7 +2,7 @@ require 'rails_helper'
 require_relative '../../../concerns/observable_spec.rb'
 
 module BenefitSponsors
-  RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model do
+  RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model, dbclean: :after_each do
     it_behaves_like 'observable', nil, :with_organization_and_site
 
     let(:hbx_id)              { "56789" }
@@ -189,11 +189,8 @@ module BenefitSponsors
       let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:employer_profile100)    { benefit_sponsor.employer_profile }
       let(:benefit_sponsorship100)    { employer_profile100.add_benefit_sponsorship }
-      let!(:broker_agency_account) { FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account) }
-
-      before :each do
-        benefit_sponsorship100.broker_agency_accounts << broker_agency_account
-      end
+      let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, assigned_site: site) }
+      let!(:broker_agency_account) { FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship100, broker_agency_profile: broker_agency_profile) }
 
       it "should return person record" do
         expect(employer_profile100.active_broker).to eq broker_agency_account.writing_agent.person

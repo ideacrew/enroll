@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Inboxes::MessagesController, type: :controller, dbclean: :after_all do
+  RSpec.describe Inboxes::MessagesController, type: :controller, dbclean: :after_each do
 
     routes {BenefitSponsors::Engine.routes}
     let!(:security_question)  { FactoryGirl.create_default :security_question }
