@@ -9,6 +9,8 @@ module BenefitSponsors
     let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
     let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let(:employer_profile) { organization.employer_profile }
+    let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }
+    let!(:active_benefit_sponsorship) { benefit_sponsorship.save! }
     let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
 
