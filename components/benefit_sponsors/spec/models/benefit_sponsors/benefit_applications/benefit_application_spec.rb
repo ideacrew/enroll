@@ -6,6 +6,11 @@ module BenefitSponsors
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
 #    let(:subject) { BenefitApplications::BenefitApplication.new }
 
+    # let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    # let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    # let(:employer_profile)    { organization.employer_profile }
+    # let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+
     let!(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_rating_area, :with_service_areas, service_area_list: [service_area], supplied_rating_area: rating_area) }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -151,6 +156,10 @@ module BenefitSponsors
             benefit_application.extend_open_enrollment_period(past_date)
           end
 
+          after do
+            TimeKeeper.set_date_of_record_unprotected!(Date.current)
+          end
+
           it "should be able to transition into open enrollment" do
             expect(benefit_application.may_begin_open_enrollment?).to eq true
           end
@@ -167,8 +176,8 @@ module BenefitSponsors
         context "and the new end date is valid" do
           let(:valid_date)  { effective_period_start_on - 1.day }
 
-          before { 
-            benefit_application.extend_open_enrollment_period(valid_date) 
+          before {
+            benefit_application.extend_open_enrollment_period(valid_date)
           }
 
           it "should change the open_enrollment_period end date and transition into open_enrollment" do
@@ -294,6 +303,11 @@ module BenefitSponsors
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
                 benefit_application.begin_open_enrollment
               }
+            after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
+            after do
+              TimeKeeper.set_date_of_record_unprotected!(Date.current)
+            end
 
             it "should transition to state: :approved" do
               expect(benefit_application.aasm_state).to eq :enrollment_open
