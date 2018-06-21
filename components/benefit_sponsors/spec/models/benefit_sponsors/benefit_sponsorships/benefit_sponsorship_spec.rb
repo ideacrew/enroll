@@ -20,6 +20,7 @@ module BenefitSponsors
       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponsorships)}
 
       context "with all required arguments" do
+        before { subject.rating_area = rating_area }
 
         context "and all arguments are valid" do
           it "should reference the correct profile_id" do

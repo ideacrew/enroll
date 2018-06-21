@@ -1,14 +1,19 @@
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
+
+      include Pundit
+
       layout "two_column"
 
       def new
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
+        authorize @benefit_package_form, :updateable?
       end
 
       def create
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_create(benefit_package_params)
+        authorize @benefit_package_form, :updateable?
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
           if params[:add_new_benefit_package] == "true"
@@ -24,10 +29,12 @@ module BenefitSponsors
 
       def edit
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id), true)
+        authorize @benefit_package_form, :updateable?
       end
 
       def update
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        authorize @benefit_package_form, :updateable?
 
         if @benefit_package_form.update
           flash[:notice] = "Benefit Package successfully updated."
@@ -49,6 +56,7 @@ module BenefitSponsors
 
       def destroy
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.fetch(params.permit(:id, :benefit_application_id))
+        authorize @benefit_package_form, :updateable?
         if @benefit_package_form.destroy
           flash[:notice] = "Benefit Package successfully deleted."
           benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
