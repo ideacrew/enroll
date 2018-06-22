@@ -122,6 +122,7 @@ aca:
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
   general_agency_enabled: false
+  broker_carrier_appointments_enabled: true
   dental_market_enabled: false
   calendar_enabled: true
   dental_plan_years_available: [""]
