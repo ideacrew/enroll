@@ -40,7 +40,7 @@ module BenefitSponsors
         benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_end_open_enrollment?(new_date)
 
         benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :close_open_enrollment)
+          execute_sponsor_event(benefit_sponsorship, :end_open_enrollment)
         end
       end
 

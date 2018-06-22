@@ -151,7 +151,7 @@ module BenefitSponsors
       end
     end
 
-    describe '.close_open_enrollment' do 
+    describe '.end_open_enrollment' do 
       context "when initial employer successfully completed enrollment period" do
 
         let(:open_enrollment_close) { TimeKeeper.date_of_record.prev_day }
@@ -176,7 +176,7 @@ module BenefitSponsors
         context "open enrollment close date passed" do
 
           it "should close open enrollment" do
-            subject.close_open_enrollment
+            subject.end_open_enrollment
             initial_application.reload
             expect(initial_application.aasm_state).to eq :enrollment_closed
           end

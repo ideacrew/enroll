@@ -91,7 +91,7 @@ module BenefitSponsors
       # end
     end
 
-    def close_open_enrollment
+    def end_open_enrollment
       if benefit_application.may_end_open_enrollment?
         benefit_application.end_open_enrollment!
         benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?

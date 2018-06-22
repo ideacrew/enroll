@@ -35,6 +35,7 @@ export default class extends Controller {
     newLocation.querySelectorAll('select').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`)
       input.setAttribute('name', name)
+      input.value = ''
     })
 
     this.officeLocationsTarget.appendChild(newLocation)
