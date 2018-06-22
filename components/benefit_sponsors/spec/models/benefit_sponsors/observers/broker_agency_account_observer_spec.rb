@@ -39,7 +39,7 @@ module BenefitSponsors
 
       context 'when employer fired a broker' do
 
-        let(:account) { build :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
+        let(:account) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
 
         before do
           account.assign_attributes({
