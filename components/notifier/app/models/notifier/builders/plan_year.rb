@@ -173,19 +173,19 @@ module Notifier
     end
 
     def load_plan_year
-      plan_year = nil
+      return @plan_year if defined? @plan_year
 
       if payload['event_object_kind'].constantize == PlanYear
-        plan_year = employer_profile.plan_years.find(payload['event_object_id'])
+        @plan_year = employer_profile.plan_years.find(payload['event_object_id'])
       end
 
-      if plan_year.blank? && enrollment.present?
+      if @plan_year.blank? && enrollment.present?
         if enrollment.benefit_group
-          plan_year = enrollment.benefit_group.plan_year
+          @plan_year = enrollment.benefit_group.plan_year
         end
       end
 
-      plan_year
+      @plan_year
     end
 
     def current_plan_year
