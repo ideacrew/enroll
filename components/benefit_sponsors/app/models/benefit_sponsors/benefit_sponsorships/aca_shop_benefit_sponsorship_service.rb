@@ -37,7 +37,7 @@ module BenefitSponsors
 
       if benefit_application.present?
         application_enrollment_service = init_application_service(benefit_application, :end_open_enrollment)
-        application_enrollment_service.close_open_enrollment
+        application_enrollment_service.end_open_enrollment
       end
     end
 
