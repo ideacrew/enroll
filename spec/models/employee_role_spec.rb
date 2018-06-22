@@ -65,7 +65,11 @@ describe ".coverage_effective_on" do
       :with_site,
       :with_aca_shop_dc_employer_profile_renewal_application
     )}
-    let(:employer_profile) { organization.employer_profile }
+
+    let(:employer_profile)        { organization.employer_profile }
+    let!(:rating_area)            { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)           { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
 
 
@@ -111,6 +115,9 @@ describe EmployeeRole, dbclean: :after_each do
   let(:dob) { 36.years.ago.to_date }
   let(:gender) {"female"}
   let(:hired_on) { 10.days.ago.to_date }
+  let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
   describe "built" do
     let(:address) {FactoryGirl.build(:address)}
@@ -138,6 +145,10 @@ describe EmployeeRole, dbclean: :after_each do
         employer_profile: employer_profile,
         hired_on: hired_on,
       }
+    end
+
+    before do
+      benefit_sponsorship
     end
 
     context "with valid parameters" do
@@ -290,6 +301,9 @@ describe EmployeeRole, dbclean: :after_each do
   let(:dob) { 45.years.ago.to_date }
   let(:hired_on) { 2.years.ago.to_date }
   let(:gender) { "male" }
+  let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
   context "when created" do
     # let(:employer_profile) { FactoryGirl.create(:employer_profile) }
@@ -321,6 +335,10 @@ describe EmployeeRole, dbclean: :after_each do
         }
       )
     }
+
+    before do
+      benefit_sponsorship
+    end
 
     it "parent created_at should be right" do
       expect(person.created_at).to eq person_created_at
@@ -468,6 +486,8 @@ describe EmployeeRole, dbclean: :after_each do
 
     let(:match_employer_profile) { organization1.employer_profile }
 
+    let(:match_benefit_sponsorship) { match_employer_profile.add_benefit_sponsorship }
+
 
     let(:organization2) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
       :with_site,
@@ -475,11 +495,18 @@ describe EmployeeRole, dbclean: :after_each do
     )}
     let(:non_match_employer_profile) { organization2.employer_profile }
 
+    let(:non_match_benefit_sponsorship) { non_match_employer_profile.add_benefit_sponsorship }
+
     let!(:match_employee_roles)       { FactoryGirl.create_list(:employee_role, 5, employer_profile: match_employer_profile) }
     let!(:non_match_employee_roles)   { FactoryGirl.create_list(:employee_role, 3, employer_profile: non_match_employer_profile) }
     let(:first_match_employee_role)   { match_employee_roles.first }
     let(:first_non_match_employee_role)   { non_match_employee_roles.first }
     let(:ee_ids)   { [first_match_employee_role.id, first_non_match_employee_role.id] }
+
+    before do
+      match_benefit_sponsorship
+      non_match_benefit_sponsorship
+    end
 
     it "should find employee roles using a list of ids" do
       expect(EmployeeRole.ids_in(ee_ids).size).to eq ee_ids.size
@@ -517,6 +544,10 @@ describe EmployeeRole, dbclean: :after_each do
   let(:employer_profile) { organization.employer_profile }
   let(:benefit_application) { organization.active_benefit_sponsorship.current_benefit_application }
   let(:benefit_package) { benefit_application.benefit_packages.first }
+
+  let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
   let(:benefit_group_assignment) {
     BenefitGroupAssignment.create({
@@ -705,7 +736,7 @@ describe EmployeeRole, dbclean: :after_each do
 end
 
 describe "#benefit_group", dbclean: :after_each do
-  subject { EmployeeRole.new(:person => person, :employer_profile => organization.employer_profile, :census_employee => census_employee) }
+  subject { EmployeeRole.new(:person => person, :employer_profile => employer_profile, :census_employee => census_employee) }
   let(:person) { FactoryGirl.create(:person, :with_ssn) }
   # let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
 
@@ -713,6 +744,12 @@ describe "#benefit_group", dbclean: :after_each do
     :with_site,
     :with_aca_shop_dc_employer_profile_renewal_application
   )}
+
+  let(:employer_profile) { organization.employer_profile  }
+
+  let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
@@ -730,11 +767,12 @@ describe "#benefit_group", dbclean: :after_each do
     last_name: person.last_name,
     dob: person.dob,
     ssn: person.ssn,
-    employer_profile: organization.employer_profile,
+    employer_profile: employer_profile,
     benefit_sponsorship: organization.active_benefit_sponsorship
   )}
 
   before do
+    benefit_sponsorship
     allow(family).to receive(:current_sep).and_return sep
   end
 
@@ -766,12 +804,15 @@ describe "#benefit_group", dbclean: :after_each do
       :with_aca_shop_cca_employer_profile_expired_application
     )}
 
+    let(:employer_profile) { organization.employer_profile  }
+
     # let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
 
     before do
       # census_employee.benefit_group_assignments.each do |bga|
       #   bga.delete 
       # end
+      benefit_sponsorship
       census_employee.benefit_group_assignments.delete_all
       # active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
       # expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first

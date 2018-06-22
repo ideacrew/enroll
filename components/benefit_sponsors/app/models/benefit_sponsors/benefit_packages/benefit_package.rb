@@ -35,6 +35,7 @@ module BenefitSponsors
       delegate :benefit_sponsorship, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
+      delegate :is_conversion?, to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
@@ -52,13 +53,7 @@ module BenefitSponsors
       end
 
       def effective_on_for(date_of_hire)
-        # TODO
-        shopping_date = ::TimeKeeper.date_of_record
-        if open_enrollment_period.include?(shopping_date)
-          start_on
-        else
-          ::TimeKeeper.date_of_record
-        end
+        [start_on, eligible_on(date_of_hire)].max
       end
 
       def effective_on_for_cobra(date_of_hire)
@@ -82,17 +77,25 @@ module BenefitSponsors
       end
 
       def successor
-        nil
+        successor_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
+          :"benefit_applications.benefit_packages.predecessor_id" => predecessor_id
+        ).first
+
+        return nil if successor_application.blank?
+
+        successor_application.benefit_packages.where(
+          :"predecessor_id" => predecessor_id
+        ).first
       end
 
       def package_for_date(coverage_start_date)
         if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
-          return self
+          return self unless self.is_conversion?
         elsif (coverage_start_date < start_on)
-          return nil unless predecessor.present?
+          return nil if (predecessor.blank? || predecessor.is_conversion?)
           predecessor.package_for_date(coverage_start_date)
         else
-          return nil unless successor.present?
+          return nil if (successor.blank? && successor.is_conversion?)
           successor.package_for_date(coverage_start_date)
         end
       end

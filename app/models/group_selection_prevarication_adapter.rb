@@ -192,7 +192,7 @@ class GroupSelectionPrevaricationAdapter
 
 	def select_benefit_group(params)
 		if (select_market(params) == "shop") && possible_employee_role.present?
-			possible_employee_role.benefit_group(qle: is_qle?)
+			possible_employee_role.benefit_package(qle: is_qle?)
 		else
 			nil
 		end
@@ -346,7 +346,7 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def select_benefit_group_from_qle_and_employee_role(qle, employee_role)
-	  employee_role.benefit_group(qle: qle) 
+	  employee_role.benefit_package(qle: qle)
 	end
 
 	protected
