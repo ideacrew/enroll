@@ -101,7 +101,12 @@ module BenefitSponsors
         price = 0.00
         contribution = 0.00
         if employees_enrolling.count < 1
-          return [sponsor_contribution, price, contribution]
+          if p_determination_builder
+            create_fake_pricing_determination(sponsored_benefit, sponsor_contribution, pricing_model, contribution_model, p_determination_builder)
+            return [sponsor_contribution, price, contribution]
+          else
+            return [sponsor_contribution, price, contribution]
+          end
         end
         if p_determination_builder
           precalculate_costs(
@@ -137,6 +142,11 @@ module BenefitSponsors
         sponsor_contribution = cm_builder.build_sponsor_contribution(product_package)
         sponsor_contribution.sponsored_benefit = sponsored_benefit
         sponsor_contribution
+      end
+
+      def create_fake_pricing_determination(sponsored_benefit, sponsor_contribution, pricing_model, contribution_model, p_determination_builder_klass)
+        p_determination_builder = p_determination_builder_klass.new
+        p_determination_builder.create_fake_pricing_determinations(sponsored_benefit, pricing_model)
       end
 
       def precalculate_costs(
