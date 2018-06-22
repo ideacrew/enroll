@@ -20,6 +20,7 @@ module BenefitSponsors
     describe '.renew' do
       let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
       let(:aasm_state) { :active }
+      let(:business_policy) { instance_double("some_policy")}
       include_context "setup initial benefit application"
 
       before(:all) do 
@@ -35,6 +36,8 @@ module BenefitSponsors
       context "when initial employer eligible for renewal" do
 
         it "should generate renewal application" do
+          allow(subject).to receive(:business_policy).and_return(business_policy)
+          allow(business_policy).to receive(:is_satisfied?).with(initial_application).and_return(true)
           subject.renew_application
           benefit_sponsorship.reload
           renewal_application = benefit_sponsorship.benefit_applications.detect{|application| application.is_renewing?}
@@ -156,7 +159,9 @@ module BenefitSponsors
         let(:aasm_state) { :enrollment_open }
         let(:open_enrollment_period) { effective_period.min.prev_month..open_enrollment_close }
 
-        include_context "setup initial benefit application"
+        include_context "setup initial benefit application" do
+          let(:aasm_state) { :enrollment_open }
+        end
 
         before(:all) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
@@ -218,7 +223,7 @@ module BenefitSponsors
           let(:applcation_state) { :enrollment_eligible }
 
           before do 
-            allow(initial_application).to receive(:effectuate_benefit_package_members).and_return(true)
+            allow(initial_application).to receive(:transition_benefit_package_members).and_return(true)
           end
 
           it "should begin benefit" do
@@ -265,7 +270,7 @@ module BenefitSponsors
         context "when end date is in past" do
 
           before do 
-            allow(initial_application).to receive(:expire_benefit_package_members).and_return(true)
+            allow(initial_application).to receive(:transition_benefit_package_members).and_return(true)
           end
 
           it "should close benefit" do

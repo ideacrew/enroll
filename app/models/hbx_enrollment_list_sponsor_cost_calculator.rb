@@ -43,7 +43,8 @@ class HbxEnrollmentListSponsorCostCalculator
 							"effective_on" => "$households.hbx_enrollments.effective_on",
 							"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
 							"_id" => "$households.hbx_enrollments._id",
-							"product_id" => "$households.hbx_enrollments.product_id"
+							"product_id" => "$households.hbx_enrollments.product_id",
+              "kind" => "$households.hbx_enrollments.kind"
 						},
 						"family_members" => 1,
 						"people_ids" => {
@@ -122,6 +123,7 @@ class HbxEnrollmentListSponsorCostCalculator
                 coverage_eligibility_on: dep_member["coverage_start_on"]
         })
 			end
+      contribution_prohibited = (enrollment_record["hbx_enrollment"]["kind"].to_s == "employer_sponsored_cobra")
 			group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
 				{
 					product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
@@ -129,7 +131,8 @@ class HbxEnrollmentListSponsorCostCalculator
 					rate_schedule_date: @sponsored_benefit.rate_schedule_date,
 					coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
 					member_enrollments: member_enrollments, 
-					rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code
+					rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
+          sponsor_contribution_prohibited: contribution_prohibited
 				})
 			::BenefitSponsors::Members::MemberGroup.new(
 				member_entries,

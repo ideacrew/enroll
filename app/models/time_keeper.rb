@@ -91,7 +91,7 @@ class TimeKeeper
 
   def push_date_of_record
     BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
-    # BenefitSponsorship.advance_day(self.date_of_record)
+    BenefitSponsorship.advance_day(self.date_of_record)
     # EmployerProfile.advance_day(self.date_of_record)
     Family.advance_day(self.date_of_record) if individual_market_is_enabled?
     HbxEnrollment.advance_day(self.date_of_record)

@@ -5,7 +5,7 @@ module BenefitSponsors
     RSpec.describe EmployerProfileObserver, type: :model, dbclean: :after_each do
       subject { EmployerProfileObserver.new }
 
-      let(:employer_profile) { create :benefit_sponsors_organizations_aca_shop_cca_employer_profile }
+      let(:employer_profile) { create :benefit_sponsors_organizations_aca_shop_cca_employer_profile, :with_organization_and_site }
 
       before do
         allow(subject).to receive(:notify)
@@ -27,7 +27,7 @@ module BenefitSponsors
         end
 
         it 'sends a notification' do
-          expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id=>nil, :event_name=>"address_changed"})
+          expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id=> employer_profile.hbx_id, :event_name=>"address_changed"})
         end
       end
     end

@@ -4,12 +4,6 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
-#    let(:subject) { BenefitApplications::BenefitApplication.new }
-
-    # let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    # let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    # let(:employer_profile)    { organization.employer_profile }
-    # let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
 
     let!(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_rating_area, :with_service_areas, service_area_list: [service_area], supplied_rating_area: rating_area) }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
@@ -406,7 +400,7 @@ module BenefitSponsors
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
 
-        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period) }
+        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship) }
         let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
 
         it "should generate renewal application" do
