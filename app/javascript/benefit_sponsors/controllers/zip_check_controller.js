@@ -42,6 +42,7 @@ export default class extends Controller {
         newOption.value = "Zipcode outside of MA";
         this.countySelectTarget.add(newOption)
         event.target.parentElement.classList.add('was-validated')
+        event.target.setCustomValidity()
       }
     })
   }
