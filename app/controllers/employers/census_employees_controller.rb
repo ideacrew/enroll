@@ -1,7 +1,7 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
-  before_action :updateable?, except: [:edit, :show, :benefit_group]
+  before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
   layout "two_column"
   def new
     @census_employee = build_census_employee
@@ -35,7 +35,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-    authorize EmployerProfile, :updateable?
+    authorize @employer_profile, :updateable?
     @status = params[:status]
 
     # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)

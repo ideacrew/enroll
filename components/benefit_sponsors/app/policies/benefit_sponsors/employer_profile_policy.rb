@@ -38,8 +38,13 @@ module BenefitSponsors
     end
 
     def updateable?
-      return true unless role = user.person && user.person.hbx_staff_role
-      role.permission.modify_employer
+      if role = user.person.hbx_staff_role
+        role.permission.modify_employer
+      else
+        user.person.employer_staff_roles.any? do |employer_staff_role|
+          employer_staff_role.benefit_sponsor_employer_profile_id == record.id
+        end
+      end
     end
 
     def list_enrollments?
