@@ -235,6 +235,8 @@ module BenefitSponsors
 
         context "binder not paid" do
 
+          let(:aasm_state) {  :canceled } # benefit application will be moved to canceled state when binder payment is missed.
+
           it "should raise an exception" do
             expect{subject.begin_benefit}.to raise_error(StandardError)
           end
