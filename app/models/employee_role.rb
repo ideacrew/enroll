@@ -103,35 +103,53 @@ class EmployeeRole
     end
   end
 
-  def benefit_group(qle: false)
-    if qle && active_coverage_benefit_group
-      active_coverage_benefit_group
-    elsif qle && renewal_coverage
-      census_employee.renewal_published_benefit_group
+  def qle_benefit_package
+    effective_on = person.primary_family.current_sep.effective_on
+    census_employee.benefit_package_for_date(effective_on)
+  end
+
+  def benefit_package(qle: false)
+    if qle.present?
+      qle_benefit_package
     else
       census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
     end
   end
 
-  def active_coverage_benefit_group
-    expired_plan_year = self.employer_profile.plan_years.where(aasm_state: "expired").order_by(:'start_on'.desc).first
-    if expired_plan_year.present?
-      bg_list = expired_plan_year.benefit_groups.map(&:id)
-      # bg = self.census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_group)
-      bg = self.census_employee.benefit_group_assignments.where(:benefit_package_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_package)
-      effective_on = person.primary_family.current_sep.effective_on
-      return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on >= effective_on
-    end
-    bg = census_employee.active_benefit_group
-    effective_on = person.primary_family.current_sep.effective_on
-    return bg if bg.start_on <= effective_on &&  bg.end_on >= effective_on
+  def benefit_group(qle: false)
+    warn "[Deprecated] Instead use benefit_package(qle: true/false(default))"
+    benefit_package(qle: qle)
   end
 
-  def renewal_coverage
-    bg = census_employee.renewal_published_benefit_group
-    effective_on = person.primary_family.current_sep.effective_on
-    bg.start_on <= effective_on &&  bg.end_on >= effective_on if bg.present?
-  end
+  # def benefit_group(qle: false)
+  #   if qle && active_coverage_benefit_group
+  #     active_coverage_benefit_group
+  #   elsif qle && renewal_coverage
+  #     census_employee.renewal_published_benefit_group
+  #   else
+  #     census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+  #   end
+  # end
+
+  # def active_coverage_benefit_group
+  #   expired_plan_year = self.employer_profile.plan_years.where(aasm_state: "expired").order_by(:'start_on'.desc).first
+  #   if expired_plan_year.present?
+  #     bg_list = expired_plan_year.benefit_groups.map(&:id)
+  #     # bg = self.census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_group)
+  #     bg = self.census_employee.benefit_group_assignments.where(:benefit_package_id.in => bg_list).order_by(:'created_at'.desc).first.try(:benefit_package)
+  #     effective_on = person.primary_family.current_sep.effective_on
+  #     return bg if bg.present? && bg.start_on <= effective_on &&  bg.end_on >= effective_on
+  #   end
+  #   bg = census_employee.active_benefit_group
+  #   effective_on = person.primary_family.current_sep.effective_on
+  #   return bg if bg.start_on <= effective_on &&  bg.end_on >= effective_on
+  # end
+
+  # def renewal_coverage
+  #   bg = census_employee.renewal_published_benefit_group
+  #   effective_on = person.primary_family.current_sep.effective_on
+  #   bg.start_on <= effective_on &&  bg.end_on >= effective_on if bg.present?
+  # end
 
   def is_under_open_enrollment?
     return employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record) if is_case_old?
@@ -165,8 +183,8 @@ class EmployeeRole
   end
 
   def coverage_effective_on(current_benefit_group: nil, qle: false)
-    if qle && benefit_group(qle: qle).present?
-      current_benefit_group = benefit_group(qle: qle)
+    if qle && benefit_package(qle: qle).present?
+      current_benefit_group = benefit_package(qle: qle)
     end
 
     census_employee.coverage_effective_on(current_benefit_group)

@@ -29,4 +29,4 @@ nav
     | &nbsp;
     .panel-body
       span
-        = link_to "My Employees: #{total_active_census_employees(profile)}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees')
+        = link_to "My Employees: #{total_active_census_employees(profile.id)}", benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'employees')
