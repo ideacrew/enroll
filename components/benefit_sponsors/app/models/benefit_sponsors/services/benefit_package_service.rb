@@ -113,8 +113,8 @@ module BenefitSponsors
         end
         benefit_package.sponsored_benefits.each do |sb|
           cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-          sb, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-          sb.save!
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+          sbenefit.save!
         end
         [true, benefit_package]
       end

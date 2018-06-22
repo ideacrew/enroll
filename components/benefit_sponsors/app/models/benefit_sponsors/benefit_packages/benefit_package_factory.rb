@@ -50,10 +50,13 @@ module BenefitSponsors
       end
 
       def new_sponsored_benefit_for(kind)
-        if kind == "health"
+        case kind
+        when "health", :health
           BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
-        elsif kind == "dental"
+        when "dental", :dental
           BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
+        else
+          raise "Invalid benefit kind specified: #{kind.inspect}"
         end
       end
 
