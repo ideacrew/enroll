@@ -3,7 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Site, type: :model, dbclean: :after_each do
 
-    let(:site_key)            { :usa }
+    let(:site_key)            { :cca }
     let(:long_name)           { "ACME Widget's Benefit Website" }
     let(:short_name)          { "Benefit Website" }
     let(:domain_name)         { "hbxshop.org" }
@@ -19,6 +19,7 @@ module BenefitSponsors
     let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
 
     let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
+    let(:site)      { owner_organization.site }
 
 
     let(:params) do
@@ -194,36 +195,20 @@ module BenefitSponsors
         context "benefit_market should be findable by kind" do
           let(:shop_kind)             { :aca_shop }
           let(:individual_kind)       { :aca_individual }
-          let(:legal_name_1)          { "3M, Corp" }
-          let(:legal_name_2)          { "M&M, Corp" }
-          let(:legal_name_3)          { "R&D, Corp" }
 
           let(:shop_benefit_market_1) { FactoryGirl.build(:benefit_markets_benefit_market, kind: shop_kind) }
-          let(:shop_benefit_market_2) { FactoryGirl.build(:benefit_markets_benefit_market, kind: shop_kind) }
           let(:ivl_benefit_market_1)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) }
-          let(:ivl_benefit_market_2)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) }
 
-          let!(:shop_only_site)       { create(:benefit_sponsors_site, :as_hbx_profile, :cca, benefit_markets: [shop_benefit_market_1]) }
-          let!(:ivl_only_site)        { create(:benefit_sponsors_site, :as_hbx_profile, :cca, benefit_markets: [ivl_benefit_market_1]) }
-          let!(:shop_and_ivl_site)    { create(:benefit_sponsors_site, :as_hbx_profile, :cca, benefit_markets: [ivl_benefit_market_2, shop_benefit_market_2]) }
-
-          let(:owner_organization_1)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, legal_name: legal_name_1, profiles: [hbx_profile], site: shop_only_site) }
-          let(:owner_organization_2)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: legal_name_2, site: ivl_only_site) }
-          let(:owner_organization_3)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, legal_name: legal_name_3, site: shop_and_ivl_site) }
+          before do
+            site.benefit_markets = [shop_benefit_market_1,ivl_benefit_market_1]
+            site.save
+          end
 
           it "should find the right benefit_markets using benefit_market_for" do
-            expect(shop_only_site.benefit_market_for(shop_kind)).to eq shop_benefit_market_1
-            expect(shop_only_site.benefit_market_for(individual_kind)).to be_nil
-
-            expect(ivl_only_site.benefit_market_for(shop_kind)).to be_nil
-            expect(shop_and_ivl_site.benefit_market_for(shop_kind)).to eq shop_benefit_market_2
-
-            expect(ivl_only_site.benefit_market_for(individual_kind)).to eq ivl_benefit_market_1
-            expect(shop_and_ivl_site.benefit_market_for(individual_kind)).to eq ivl_benefit_market_2
+            expect(site.benefit_market_for(shop_kind)).to eq shop_benefit_market_1
+            expect(site.benefit_market_for(individual_kind)).to eq ivl_benefit_market_1
           end
         end
-
-
       end
 
     end

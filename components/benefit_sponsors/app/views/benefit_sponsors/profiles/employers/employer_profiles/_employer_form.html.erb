@@ -102,11 +102,14 @@
           <%= f_profile.hidden_field :id, value: f_profile.object.id %>
           <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
           <% if display_sic_field_for_employer? %>
-            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-20px">
+            <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-20px">
               <%= f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} ) %>
             </div>
             <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top:-8px">
-              <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
+              <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question ml-2" aria-hidden="true"></span></a>
+            </div>
+            <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+              <%= render "sic_help" , sicFieldId: 'organization_sic_code' %>
             </div>
           <% end %>
           </div>
