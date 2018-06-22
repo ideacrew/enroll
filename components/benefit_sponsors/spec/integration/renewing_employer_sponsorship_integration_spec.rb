@@ -274,4 +274,79 @@ RSpec.describe "an MA ACA Employer" do
       end
     end
   end
+
+  describe "given:
+              - a 2017 benefit sponsorship
+              - with NO employee
+              - an initial 2017 benefit application, with a sole source selection made", dbclean: :after_all do
+    before :all do
+      reload_db_fixtures
+      employer_profile = create_employer_profile
+      benefit_sponsorship = employer_profile.add_benefit_sponsorship
+      benefit_sponsorship.save!
+      benefit_application = ::BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
+        benefit_sponsorship,
+        effective_period: (Date.new(2017,12,1)..Date.new(2018,11,30)),
+        open_enrollment_period: (Date.new(2017,1,1)..Date.new(2017,11,15)),
+        fte_count: 5,
+        pte_count: 0,
+        msp_count: 0
+      )
+      benefit_application.save!
+      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
+      benefit_application.save!
+      benefit_application.benefit_sponsor_catalog.save!
+      @benefit_application = benefit_application
+      create_sole_source_benefit_package(benefit_application)
+      @benefit_application.reload
+    end
+
+    after :all do
+      DatabaseCleaner.clean
+    end
+
+    it "has a benefit_package" do
+      expect(@benefit_application.benefit_packages).not_to be_empty
+    end
+
+    it "has a sole source health sponsored benefit" do
+      sponsored_benefits = @benefit_application.benefit_packages.flat_map(&:sponsored_benefits)
+      expect(sponsored_benefits).not_to be_empty
+    end
+
+    describe "with the sole source health sponsored benefit" do
+      before :each do
+        sponsored_benefits = @benefit_application.benefit_packages.flat_map(&:sponsored_benefits)
+        @sponsored_benefit = sponsored_benefits.first
+      end
+
+      it "has a default sponsor contribution" do
+        expect(@sponsored_benefit.sponsor_contribution).not_to eq(nil)
+      end
+
+      it "has a pricing determination" do
+        expect(@sponsored_benefit.latest_pricing_determination).not_to be(nil)
+      end
+
+      describe "with the default contribution" do
+        before :each do
+          @sponsor_contribution = @sponsored_benefit.sponsor_contribution
+        end
+
+        it "has the correct number of contribution levels" do
+          expect(@sponsor_contribution.contribution_levels.count).to eq(2)
+        end
+      end
+
+      describe "with the resulting pricing determination" do
+        before :each do
+          @pricing_determination = @sponsored_benefit.latest_pricing_determination
+        end
+
+        it "has the correct number of tiers" do
+          expect(@pricing_determination.pricing_determination_tiers.count).to eq(4)
+        end
+      end
+    end
+  end
 end
