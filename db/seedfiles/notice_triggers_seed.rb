@@ -449,49 +449,6 @@ if Settings.aca.state_abbreviation == "MA"
       #     }
       #   ]
       # },
-      # {
-      #   hbx_id: 'SHOP16_B',
-      #   title: 'Initial Eligible Employee Open Enrollment Period begins',
-      #   description: 'When Employer application meets minimum participation and non-owner requirements',
-      #   resource_name: 'employee_role',
-      #   event_name: 'initial_employee_open_enrollment_begins',
-      #   notice_triggers: [
-      #     {
-      #       name: 'Initial Eligible Employee open enrollment begins',
-      #       notice_template: 'notices/shop_employee_notices/16b_initial_employee_open_enrollment_begins',
-      #       notice_builder: 'ShopEmployeeNotices::InitialEmployeeOpenEnrollmentBegin',
-      #       mpi_indicator: 'MPI_SHOP16_B',
-      #       notice_trigger_element_group: {
-      #         market_places: ['shop'],
-      #         primary_recipients: ["employee"],
-      #         primary_recipient_delivery_method: ["secure_message"],
-      #         secondary_recipients: []
-      #       }
-      #     }
-      #   ]
-      # },
-
-      # {
-      #     hbx_id: 'SHOP_M017',
-      #     title: 'Open Enrollment Completed',
-      #     description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
-      #     resource_name: 'employer',
-      #     event_name: 'initial_employer_open_enrollment_completed',
-      #     notice_triggers: [
-      #         {
-      #             name: 'Initial Employee Open Enrollment Successfully Completed',
-      #             notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
-      #             notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-      #             mpi_indicator: 'SHOP_M017',
-      #             notice_trigger_element_group: {
-      #                 market_places: ['shop'],
-      #                 primary_recipients: ["employer"],
-      #                 primary_recipient_delivery_method: ["secure_message"],
-      #                 secondary_recipients: []
-      #             }
-      #         }
-      #     ]
-      # },
 
       # {
       #   hbx_id: 'SHOP13',
@@ -664,27 +621,27 @@ if Settings.aca.state_abbreviation == "MA"
     #     }
     #   ]
     # },
-    {
-      hbx_id: 'SHOP20',
-      title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
-      description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
-      resource_name: 'employer',
-      event_name: 'initial_employer_invoice_available',
-      notice_triggers: [
-        {
-          name: 'Initial Employer first invoice available in the account',
-          notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-          notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-          mpi_indicator: 'MPI_SHOP20',
-          notice_trigger_element_group: {
-            market_places: ['shop'],
-            primary_recipients: ["employer"],
-            primary_recipient_delivery_method: ["secure_message"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
+    # {
+    #   hbx_id: 'SHOP20',
+    #   title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
+    #   description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
+    #   resource_name: 'employer',
+    #   event_name: 'initial_employer_invoice_available',
+    #   notice_triggers: [
+    #     {
+    #       name: 'Initial Employer first invoice available in the account',
+    #       notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
+    #       notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+    #       mpi_indicator: 'MPI_SHOP20',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employer"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
     # {
     #   hbx_id: 'SHOP21',
     #   title: 'Monthly Invoice Available Notice',

@@ -9,4 +9,4 @@ module PdfTemplates
      attribute :reporting_deadline, Date
      attribute :qle_reported_on, Date
    end  
-end 
+end

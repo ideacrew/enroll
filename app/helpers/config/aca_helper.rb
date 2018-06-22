@@ -43,6 +43,10 @@ module Config::AcaHelper
     Settings.aca.general_agency_enabled
   end
 
+  def broker_carrier_appointments_enabled?
+    Settings.aca.broker_carrier_appointments_enabled
+  end
+
   def dental_market_enabled?
     Settings.aca.dental_market_enabled
   end

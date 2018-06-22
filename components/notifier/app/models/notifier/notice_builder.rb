@@ -2,10 +2,11 @@ module Notifier
   module NoticeBuilder
     include Config::SiteConcern
     include ApplicationHelper
+    include Notifier::ApplicationHelper
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
-      render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object}) 
+      render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object})
     end
 
     def notice_recipient
@@ -36,15 +37,20 @@ module Notifier
     end
 
     def render_envelope(params)
-      Notifier::NoticeKindsController.new.render_to_string({
-        :template => Settings.notices.shop.partials.template, 
+      template_location = if self.event_name == 'generate_initial_employer_invoice'
+                            'notifier/notice_kinds/initial_invoice/invoice_template.html.erb'
+                          else
+                            Settings.notices.shop.partials.template
+                          end
+       Notifier::NoticeKindsController.new.render_to_string({
+        :template => template_location,
         :layout => false,
         :locals => params.merge(notice_number: self.notice_number, notice: self, notice_recipient: notice_recipient)
       })
     end
 
     def render_notice_body(params)
-      Notifier::NoticeKindsController.new.render_to_string({ 
+      Notifier::NoticeKindsController.new.render_to_string({
         :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
         :layout => 'notifier/pdf_layout',
         :locals => params
@@ -55,13 +61,14 @@ module Notifier
       File.open(Rails.root.join("tmp", "notice.html"), 'wb') do |file|
         file << self.to_html({kind: 'pdf'})
       end
-    end 
-  
+    end
+
     def to_pdf
       WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options)
     end
 
     def generate_pdf_notice
+      save_html
       File.open(notice_path, 'wb') do |file|
         file << self.to_pdf
       end
@@ -77,7 +84,7 @@ module Notifier
           top: 15,
           bottom: 28,
           left: 22,
-          right: 22 
+          right: 22
         },
         disable_smart_shrinking: true,
         dpi: 96,
@@ -142,16 +149,31 @@ module Notifier
     end
 
     def upload_to_amazonS3
-      Aws::S3Storage.save(notice_path, 'notices')
+      if self.event_name == 'generate_initial_employer_invoice'
+        Aws::S3Storage.save(notice_path, 'invoices', file_name)
+      else
+        Aws::S3Storage.save(notice_path, 'notices')
+      end
     rescue => e
       raise "unable to upload to amazon #{e}"
+    end
+
+    def file_name
+      if self.event_name == 'generate_initial_employer_invoice'
+        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
+      end
+    end
+
+    def invoice_date
+      date_string = file_name.split("_")[1]
+      Date.strptime(date_string, "%m%d%Y")
     end
 
     def recipient_name
       if resource.is_a?(EmployerProfile)
         return resource.staff_roles.first.full_name.titleize
       end
-      
+
       if resource.is_a?(EmployeeRole)
         return resource.person.full_name.titleize
       end
@@ -199,13 +221,17 @@ module Notifier
     def create_recipient_document(doc_uri)
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
-      notice = receiver.documents.build({
-        title: notice_filename, 
+
+      doc_params = {
+        title: notice_filename,
         creator: "hbx_staff",
-        subject: "notice",
+        subject: document_subject,
         identifier: doc_uri,
         format: "application/pdf"
-        })
+      }
+
+      doc_params[:date] = invoice_date if self.event_name == 'generate_initial_employer_invoice'
+      notice = receiver.documents.build(doc_params)
 
       if notice.save
         notice
@@ -214,12 +240,25 @@ module Notifier
       end
     end
 
+    def document_subject
+      if self.event_name == 'generate_initial_employer_invoice'
+        'initial_invoice'
+      else
+        'notice'
+      end
+    end
+
     def create_secure_inbox_message(notice)
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
-      body = "<br>You can download the notice by clicking this link " +
-             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, 
-      receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+
+      if self.event_name == 'generate_initial_employer_invoice'
+        body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
+      else
+        body = "<br>You can download the notice by clicking this link " +
+               "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s,
+        receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+      end
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end

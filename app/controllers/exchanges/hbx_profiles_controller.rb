@@ -3,6 +3,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesSearch
   include Pundit
   include SepAll
+  include Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -62,11 +63,15 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def generate_invoice
 
-    @organizations= Organization.where(:id.in => params[:ids]).all
+    @organizations = Organization.where(:id.in => params[:ids]).all
 
     @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+      if aca_state_abbreviation == "MA"
+        org.employer_profile.trigger_model_event(:generate_initial_employer_invoice)
+      else
+        @employer_invoice = EmployerInvoice.new(org)
+        @employer_invoice.save_and_notify_with_clean_up
+      end
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."

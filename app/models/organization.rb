@@ -193,11 +193,15 @@ class Organization
   end
 
   def invoices
-    documents.select{ |document| document.subject == 'invoice' }
+    employer_profile.documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
+  end
+
+  def initial_invoices
+    employer_profile.documents.select{ |document| ["initial_invoice"].include? document.subject }
   end
 
   def current_month_invoice
-    documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+    invoices.select{ |document| document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
   end
 
   # Strip non-numeric characters
@@ -397,7 +401,7 @@ class Organization
         document.format = 'application/pdf'
         document.subject = 'invoice'
         document.title = File.basename(file_path)
-        org.documents << document
+        org.employer_profile.documents << document
         logger.debug "associated file #{file_path} with the Organization"
         return document
       else
@@ -460,7 +464,7 @@ class Organization
   end
 
   def self.invoice_exist?(invoice_date,org)
-    docs =org.documents.where("date" => invoice_date)
+    docs =org.invoices.select{|doc| doc.date == invoice_date }
     matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
     return true if matching_documents.count > 0
   end
