@@ -23,7 +23,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     if params[:ids]
       begin
-        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.update_status_to_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
       rescue => e
