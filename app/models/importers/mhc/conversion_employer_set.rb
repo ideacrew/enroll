@@ -53,7 +53,8 @@ module Importers::Mhc
           "Family Rating Tier Contribution",
           "Family Rating Tier Premium",
           "Import Status",
-          "Import Details"
+          "Import Details",
+          "Organization assigned hbx_id"
       ]
     end
 
