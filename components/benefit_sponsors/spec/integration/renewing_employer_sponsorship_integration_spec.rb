@@ -4,6 +4,7 @@ require "fileutils"
 RSpec.describe "an MA ACA Employer" do
 
   def reload_db_fixtures
+    warn "USING DB DUMP AS FIXTURES - REPLACE WITH CORRECTED FACTORY HARNESS"
     db_name = Mongoid::Config.clients[:default][:database]
     db_location = File.expand_path(File.join(File.dirname(__FILE__), "..", "fixture_dbs", "dump"))
     tmp_dir = Dir.mktmpdir
@@ -75,7 +76,7 @@ RSpec.describe "an MA ACA Employer" do
     end
   end
 
-  describe "with an initial 2017 benefit application", dbclean: :after_all do
+  describe "with an initial 2017 benefit application, and an employee", dbclean: :after_all do
     before :all do
       reload_db_fixtures
       employer_profile = create_employer_organization
@@ -92,6 +93,7 @@ RSpec.describe "an MA ACA Employer" do
       benefit_application.save!
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
       benefit_application.save!
+      benefit_application.benefit_sponsor_catalog.save!
       @benefit_application = benefit_application
 		end
 
@@ -117,11 +119,44 @@ RSpec.describe "an MA ACA Employer" do
         @benefit_sponsor_catalog = @benefit_application.benefit_sponsor_catalog
       end
 
-			it "should have the correct service areas" do
+			it "has the correct service areas" do
         service_area_ids = @benefit_application.recorded_service_area_ids.sort
         catalog_service_area_ids = @benefit_sponsor_catalog.service_area_ids.sort
         expect(service_area_ids).to eq(catalog_service_area_ids)
       end
-		end
-	end
+
+      it "has the correct effective dates" do
+        ba_effective_period = @benefit_application.effective_period
+        catalog_effective_period = @benefit_sponsor_catalog.effective_period
+        expect(ba_effective_period).to eq catalog_effective_period
+      end
+
+      describe "and it's product packages" do
+        before :each do
+          @product_packages = @benefit_sponsor_catalog.product_packages
+        end
+
+        it "has the correct benefit packages for 2017" do
+          package_types = @product_packages.map(&:package_kind)
+          expect(@product_packages.count).to eq(3)
+          expect(package_types).to include(:metal_level)
+          expect(package_types).to include(:single_issuer)
+          expect(package_types).to include(:single_product)
+        end
+
+        it "does NOT contain ALL of the single source products" do
+          single_source_package = @product_packages.detect { |p_package| p_package.package_kind == :single_product }
+          benefit_market_catalog = @benefit_application.benefit_sponsorship.benefit_market.benefit_market_catalog_effective_on(@benefit_application.start_on)
+          benefit_market_single_source_package = benefit_market_catalog.product_packages.detect { |p_package| p_package.package_kind == :single_product }
+          expect(single_source_package.products.count).not_to eq(benefit_market_single_source_package.products.count)
+        end
+
+        it "does NOT contain any products from service areas it does not occupy" do
+          product_service_area_ids = @product_packages.flat_map(&:products).map(&:service_area_id).uniq.sort
+          service_area_ids = @benefit_application.recorded_service_area_ids.sort
+          expect(service_area_ids).to include(*product_service_area_ids)
+        end
+      end
+    end
+  end
 end

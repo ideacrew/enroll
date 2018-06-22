@@ -128,7 +128,10 @@ module BenefitMarkets
 
     # Intersection of BenefitMarket::Products that match both service area and effective date
     def benefit_market_products_available_for(service_areas, effective_date)
-      benefit_market_products_available_on(effective_date) # & benefit_market_products_available_where(service_areas)
+      service_area_ids = service_areas.map(&:id)
+      benefit_market_products_available_on(effective_date).select do |product|
+        service_area_ids.include?(product.service_area_id)
+      end # & benefit_market_products_available_where(service_areas)
     end
 
     # BenefitMarket::Products available for purchase on effective date
