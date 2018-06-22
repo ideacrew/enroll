@@ -9,7 +9,7 @@ module Importers::Mhc
       benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(benefit_sponsorship, fetch_application_params)
       
       catalog_date = mid_year_conversion ? orginal_plan_year_begin_date : default_plan_year_start
-      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(catalog_date)
+      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas, catalog_date)
       
       BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
       benefit_application
