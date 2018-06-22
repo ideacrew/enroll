@@ -400,7 +400,7 @@ module BenefitSponsors
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
 
-        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period) }
+        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship) }
         let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
 
         it "should generate renewal application" do
