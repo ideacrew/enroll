@@ -33,6 +33,10 @@ module Notifier
     end
 
     def addresses
+      merge_model.addresses = primary_address
+    end
+
+    def primary_address
       office_address = employer_profile.organization.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
