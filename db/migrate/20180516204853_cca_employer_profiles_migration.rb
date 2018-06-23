@@ -6,7 +6,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/employer_profiles_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( organization_id benefit_sponsor_organization_id status)
+      field_names = %w( organization_hbx_id legal_name benefit_sponsor_organization_id status)
 
       logger = Logger.new("#{Rails.root}/log/employer_profiles_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -68,6 +68,8 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
 
             @benefit_sponsorship = @new_profile.add_benefit_sponsorship
             @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+
+            raise Exception unless @benefit_sponsorship.valid?
             @benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
@@ -86,20 +88,21 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
             link_existing_census_employees_to_new_profile(census_employees_with_old_id)
 
             print '.' unless Rails.env.test?
-            csv << [old_org.id, new_organization.id, "Migration Success"]
+            csv << [old_org.hbx_id, old_org.legal_name, new_organization.id, "Migration Success"]
             success = success + 1
           else
             existing_organization = existing_organization + 1
-            csv << [old_org.id, existing_new_organizations.first.id, "Already Migrated to new model, no action taken"]
+            csv << [old_org.hbx_id, old_org.legal_name, existing_new_organizations.first.id, "Already Migrated to new model, no action taken"]
           end
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
-          csv << [old_org.id, "0", "Migration Failed"]
+          csv << [old_org.hbx_id, old_org.legal_name, "0", "Migration Failed"]
           logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
           validation_errors:
           organization - #{new_organization.errors.messages}
           profile - #{@new_profile.errors.messages},
+          benefit_sponsorship - #{@benefit_sponsorship.errors.messages},
           #{e.inspect}" unless Rails.env.test?
         end
       end
