@@ -110,7 +110,7 @@ class EmployeeRole
 
   def benefit_package(qle: false)
     if qle.present?
-      qle_benefit_package
+      qle_benefit_package unless qle_benefit_package.is_conversion?
     else
       census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
     end

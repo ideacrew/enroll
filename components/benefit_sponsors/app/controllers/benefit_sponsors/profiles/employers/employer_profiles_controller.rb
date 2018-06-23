@@ -28,10 +28,10 @@ module BenefitSponsors
               @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
               @benefit_applications = @employer_profile.benefit_applications
             when 'documents'
-              @datatable = Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
+              @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
               load_documents
             when 'employees'
-              @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+              @datatable = ::Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'inbox'
@@ -59,7 +59,7 @@ module BenefitSponsors
         def coverage_reports
           authorize @employer_profile
           @billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
-          @datatable = Effective::Datatables::BenefitSponsorsCoverageReportsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
+          @datatable = ::Effective::Datatables::BenefitSponsorsCoverageReportsDataTable.new({ id: params.require(:employer_profile_id), billing_date: @billing_date})
 
           respond_to do |format|
             format.html
