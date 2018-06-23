@@ -515,13 +515,6 @@ module BenefitSponsors
       where(:organization_id => {:$in => organizations.pluck(:_id)})
     end
 
-    def self.update_status_to_binder_paid(organization_ids)
-      organizations = ::BenefitSponsors::Organizations::Organization.where(:"_id".in => organization_ids).all
-      organizations.each do |organization|
-        organization.active_benefit_sponsorship.credit_binder!
-      end
-    end
-
     private
 
     def populate_associations
