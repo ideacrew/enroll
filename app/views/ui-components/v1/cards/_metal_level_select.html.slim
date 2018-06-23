@@ -73,6 +73,9 @@
 
           h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
           #yourPlans
+            .float-right.mb-2
+              #yourPlanTotals
+              br
           
           #yourSponsorContributions
           
@@ -115,6 +118,12 @@ javascript:
     var selectedRadio = element.value;
     var selectedName = element.dataset.name;
     filteredProducts = planOptions[productOptionKind][selectedName];
+    // Sort by plan title
+    filteredProducts.sort(function(a,b) {
+      if (a.title < b.title) return -1;
+      if (a.title > b.title) return 1;
+      return 0;
+    })
     populateReferencePlans(filteredProducts)
   }
   
@@ -137,20 +146,25 @@ javascript:
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
       var div = document.createElement('div')
+      document.getElementById('yourPlanTotals').innerHTML = `<span class="pull-right mr-3">Displaying: <b>${filteredProducts.length} plans</b></span>`
       div.setAttribute('id', 'yourAvailablePlans')
-      div.innerHTML = '<div class="col-xs-4 reference-plans">\
-          <div class="col-xs-12 p0 mb-1">\
-            <div class="col-xs-3 p0">\
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="'+plan.id+'" onclick="displayReferencePlanDetails(this)" value="'+plan.id+'" data-plan-title="'+plan.title+'" data-plan-carrier="'+plan.carrier_name+'" data-plan-id="'+plan.id+'" data-plan-metal-level="'+plan.metal_level_kind+'" data-plan-type="'+plan.health_plan_kind+'">\
-            </div>\
-            <div class="col-xs-9 p0 rp-info mb-1">\
-              <p class="heading-text reference-plan-title mb-1">'+plan.title+'</p>\
-              <span class="plan-label">Type:</span>' +plan.health_plan_kind+'<br>\
-              <span class="plan-label">Carrier:</span>' +plan.carrier_name+'<br>\
-              <span class="plan-label">Level:</span>' +plan.metal_level_kind+'<br>\
-            </div>\
-          </div>\
-        </div>'
+        div.innerHTML =
+        `<div class="col-xs-4 reference-plans">
+          <div class="col-xs-12 p0 mb-1">
+            <div class="col-xs-3 p0">
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
+            </div>
+            <div class="col-xs-9 p0 rp-info mb-1">
+              <p class="heading-text reference-plan-title mb-1"> ${plan.title}</p>
+              <span class="plan-label">Type:</span> <span class="rp-plan-info">${plan.health_plan_kind}</span><br>
+              <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
+              <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
+              <span class="plan-label">Network:</span><br>
+              <span class="plan-label mt-1 rp-view-summary">View Summary</span><br>
+            </div>
+          </div>
+        </div>
+        `
 
         document.getElementById('yourPlans').append(div);
     }
