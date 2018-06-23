@@ -58,6 +58,22 @@ module BenefitSponsors
         end
       end
 
+      def create_fake_pricing_determinations(sponsored_benefit, pricing_model)
+        price_determination_tiers = []
+        pricing_model.pricing_units.each do |pu|
+          price_determination_tiers << ::BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
+            pricing_unit_id: pu.id,
+            price: 0.00
+          )
+        end 
+        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(
+          pricing_determination_tiers: price_determination_tiers,
+          group_size: 1,
+          participation_rate: 0.01
+        )
+        sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations + [price_determination]
+      end
+
       def create_pricing_determinations(sponsored_benefit, product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
         rate_hash = calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
         price_determination_tiers = []

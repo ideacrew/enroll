@@ -7,10 +7,10 @@ module Effective
 
       datatable do
 
-        # bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
-        #    bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
-        #    bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
-        # end
+        bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
+          bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
+          bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+        end
 
         table_column :legal_name, :proc => Proc.new { |row|
           @employer_profile = row.organization.employer_profile

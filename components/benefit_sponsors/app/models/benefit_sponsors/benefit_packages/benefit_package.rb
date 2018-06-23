@@ -90,12 +90,12 @@ module BenefitSponsors
 
       def package_for_date(coverage_start_date)
         if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
-          return self unless self.is_conversion?
+          return self
         elsif (coverage_start_date < start_on)
-          return nil if (predecessor.blank? || predecessor.is_conversion?)
+          return nil unless predecessor.present?
           predecessor.package_for_date(coverage_start_date)
         else
-          return nil if (successor.blank? && successor.is_conversion?)
+          return nil unless successor.present?
           successor.package_for_date(coverage_start_date)
         end
       end

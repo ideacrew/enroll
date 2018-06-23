@@ -10,6 +10,7 @@ module BenefitSponsors
 
 
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization_with_hbx_profile)  { site.owner_organization }
     let(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { organization.employer_profile }
     let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
@@ -33,6 +34,9 @@ module BenefitSponsors
     end
 
     before :each do
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
+
       benefit_sponsorship.save!
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
@@ -226,6 +230,7 @@ module BenefitSponsors
       context 'for assigning a new broker' do
 
         before(:each) do
+          allow_any_instance_of(HbxStaffRole).to receive(:permission).and_return(double(modify_employer: true))
           sign_in(user_with_hbx_staff_role)
           @request.env['HTTP_REFERER'] = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id.to_s}?tab=brokers"
           post :create, employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id
@@ -244,7 +249,7 @@ module BenefitSponsors
         end
 
         it 'should add a new broker_agency_account to the benefit_sponsorship accociated to the employer profile' do
-          expect(assigns[:broker_management_form].broker_agency_profile_id).to eq broker_agency_profile1.id.to_s
+          expect(assigns(:broker_management_form).broker_agency_profile_id).to eq broker_agency_profile1.id.to_s
         end
 
         it 'should assign employer_profile variable' do
@@ -259,6 +264,7 @@ module BenefitSponsors
 
     describe 'for terminate' do
       before :each do
+        allow_any_instance_of(HbxStaffRole).to receive(:permission).and_return(double(modify_employer: true))
         employer_profile.hire_broker_agency(broker_agency_profile1)
         sign_in(user_with_hbx_staff_role)
         get :terminate, employer_profile_id: employer_profile.id, direct_terminate: 'true', broker_agency_id: broker_agency_profile1.id, termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')

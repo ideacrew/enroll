@@ -348,7 +348,7 @@ module BenefitSponsors
               Rails.logger.warn("Unable to upload PDF to AWS S3")
             end
           else
-            logger.warn("Unable to associate invoice #{file_path}")
+            Rails.logger.warn("Unable to associate invoice #{file_path}")
           end
         end
 
@@ -369,7 +369,7 @@ module BenefitSponsors
               return document
             end
           else
-            logger.warn("Unable to associate commission statement #{file_path}")
+            Rails.logger.warn("Unable to associate commission statement #{file_path}")
           end
         end
 

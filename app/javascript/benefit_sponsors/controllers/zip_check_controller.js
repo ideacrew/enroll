@@ -17,21 +17,32 @@ export default class extends Controller {
         'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
       }
     }).then((response) => {
+
       if (response.data.length >= 1) {
+        this.countySelectTarget.removeAttribute('disabled')
+        this.countySelectTarget.options.length = 0;
         event.target.parentElement.classList.remove('was-validated')
         event.target.setCustomValidity("")
-        this.countySelectTarget.childNodes.forEach((option) => {
-          if (option.value == "") return // skip blank
-          if (response.data.includes(option.value))
-            option.disabled = false
-          else
-            option.disabled = true
-        })
-        if (response.data.length == 1) // if there's only 1 county select it
-          this.countySelectTarget.querySelector(`option[value=${response.data[0]}]`).selected = true
+        let optionValues = JSON.parse(this.countySelectTarget.dataset.options);
+        
+        for (let option of optionValues) {
+          if (response.data.includes(option)) {
+            let newOption = document.createElement("option")
+            newOption.text = option;
+            newOption.value = option;
+            this.countySelectTarget.add(newOption)
+          }
+        }
+        
       } else {
+        this.countySelectTarget.setAttribute('disabled', true);
+        this.countySelectTarget.options.length = 0;
+        let newOption = document.createElement("option")
+        newOption.text = "Zipcode outside of MA";
+        newOption.value = "Zipcode outside of MA";
+        this.countySelectTarget.add(newOption)
         event.target.parentElement.classList.add('was-validated')
-        event.target.setCustomValidity("Not an MA zip.")
+        event.target.setCustomValidity("Zipcode outside of MA")
       }
     })
   }

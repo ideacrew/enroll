@@ -80,7 +80,6 @@ class BenefitGroupAssignment
 
   def benefit_group=(new_benefit_group)
     warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
-    # raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
     if new_benefit_group.is_a?(BenefitGroup)
       self.benefit_group_id = new_benefit_group._id
       return @benefit_group = new_benefit_group
@@ -91,8 +90,6 @@ class BenefitGroupAssignment
   def benefit_group
     return @benefit_group if defined? @benefit_group
     warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
-    # return @benefit_group if defined? @benefit_group
-    # return nil if benefit_group_id.blank?
     if is_case_old?
       return @benefit_group = BenefitGroup.find(self.benefit_group_id)
     end
@@ -133,6 +130,7 @@ class BenefitGroupAssignment
     end
   end
 
+  # Deprecated
   def latest_hbx_enrollments_for_cobra
     families = Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
@@ -178,7 +176,7 @@ class BenefitGroupAssignment
     end
   end
 
-  def hbx_enrollment
+  def hbx_enrollment # Do we still need this?
     return @hbx_enrollment if defined? @hbx_enrollment
 
     if hbx_enrollment_id.blank?
@@ -299,6 +297,7 @@ class BenefitGroupAssignment
     end
 
     if hbx_enrollment.present?
+      # Enrollment will not have benefit group assignment id anymore, # Do we still need this?
       self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
       # TODO: Re-enable this after enrollment propagation issues resolved.
       #       Right now this is causing issues when linking census employee under Enrollment Factory.

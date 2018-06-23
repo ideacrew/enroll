@@ -163,22 +163,30 @@ module BenefitSponsors
           let(:aasm_state) { :enrollment_open }
         end
 
-        before(:all) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
+        before(:each) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         context "open enrollment close date passed" do
+          before :each do
+            allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
+          end
 
           it "should close open enrollment" do
             subject.end_open_enrollment
             initial_application.reload
             expect(initial_application.aasm_state).to eq :enrollment_closed
+          end
+
+          it "invokes pricing determination calculation" do
+            expect(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
+            subject.end_open_enrollment
           end
         end
 
@@ -234,6 +242,8 @@ module BenefitSponsors
         end
 
         context "binder not paid" do
+
+          let(:aasm_state) {  :canceled } # benefit application will be moved to canceled state when binder payment is missed.
 
           it "should raise an exception" do
             expect{subject.begin_benefit}.to raise_error(StandardError)

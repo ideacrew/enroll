@@ -40,7 +40,7 @@ module BenefitSponsors
 
     rule  :benefit_packages_contains_reference_plans,
             validate: -> (benefit_application){
-              benefit_application.benefit_packages.any?{|bp| bp.reference_plan.blank? }
+              benefit_application.benefit_packages.any?{|bp| bp.reference_plan.present? }
               },
             success:  -> (benfit_application) { "validated successfully" },
             fail:     -> (benefit_application) { "application benefit packages must have reference plans" }
@@ -53,7 +53,6 @@ module BenefitSponsors
             fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
 
 
-
     rule :employer_profile_eligible,
           validate: -> (benefit_application) {
             benefit_application.employer_profile.is_benefit_sponsorship_eligible
@@ -61,6 +60,19 @@ module BenefitSponsors
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "This employer is ineligible to enroll for coverage at this time" }
 
+    rule  :stubbed_rule_one,
+            validate: -> (model_instance) {
+              true
+            },
+            fail:     -> (model_instance){ "something went wrong!!" },
+            success:  -> (model_instance){ "validated successfully" }
+
+    rule  :stubbed_rule_two,
+            validate: -> (model_instance) {
+              true
+            },
+            fail:     -> (model_instance){ "something went wrong!!" },
+            success:  -> (model_instance){ "validated successfully" }
 
     business_policy :passes_open_enrollment_period_policy,
             rules: [:open_enrollment_period_minimum,
@@ -69,6 +81,21 @@ module BenefitSponsors
                     :all_employees_are_assigned_benefit_package,
                     :employer_profile_eligible]
 
+    business_policy  :stubbed_policy,
+            rules: [:stubbed_rule_one, :stubbed_rule_two ]
+
+
+    def business_policies_for(model_instance, event_name)
+      if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+
+        case event_name
+        when :submit_benefit_application
+          business_policies[:passes_open_enrollment_period_policy]
+        else
+          business_policies[:stubbed_policy]
+        end
+      end
+    end
   end
 end
 

@@ -656,15 +656,13 @@ class CensusEmployee < CensusMember
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
 
-    cobra_assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
-    hbxs = cobra_assignments.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
-
-    hbxs.compact.each do |hbx|
-      enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
-      enrollment_cobra_factory.family = family
-      enrollment_cobra_factory.census_employee = self
-      enrollment_cobra_factory.enrollment = hbx
-      enrollment_cobra_factory.clone_for_cobra
+    cobra_eligible_enrollments.each do |enrollment|
+      factory = Factories::FamilyEnrollmentCloneFactory.new(
+        family: family,
+        census_employee: self,
+        enrollment: enrollment
+      )
+      factory.clone_for_cobra
     end
   rescue => e
     logger.error(e)
@@ -1173,6 +1171,26 @@ def self.to_csv
       :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
       :"employee_role_id" => self.employee_role_id
     )
+  end
+
+  # Enrollments eligible for Cobra
+
+  # Picking latest health & dental enrollments
+  def active_benefit_group_cobra_eligible_enrollments
+    return [] if active_benefit_group_enrollments.blank?
+    eligible_enrollments = active_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
+  end
+
+  # Picking latest health & dental enrollments
+  def renewal_benefit_group_cobra_eligible_enrollments
+    return [] if renewal_benefit_group_enrollments.blank?
+    eligible_enrollments = renewal_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
+  end
+
+  def cobra_eligible_enrollments
+    (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
   end
 
   def benefit_package_for_open_enrollment(shopping_date)
