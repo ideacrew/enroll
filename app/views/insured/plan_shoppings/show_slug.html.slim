@@ -261,10 +261,11 @@ javascript:
       // Used to show deductible for plan
       if (result.member_enrollments.length > 1) {
         var deductible = result.product.family_deductible;
+        var deductibeType = "FAMILY DEDUCTIBLE"
       } else {
         var deductible = result.product.deductible;
+        var deductibeType = "DEDUCTIBLE"
       }
-      console.log(result)
       var div = document.createElement('div')
       div.setAttribute('class', 'myfilteredPlans')
       div.innerHTML =
@@ -301,14 +302,14 @@ javascript:
                           <th scope="col">TYPE</th>
                           <th scope="col">LEVEL</th>
                           <th scope="col">NETWORK</th>
-                          <th scope="col">FAMILY DEDUCTIBLE</th>
+                          <th scope="col">${deductibeType}</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td>${result.product.kind.toUpperCase()}</td>
+                          <td>${result.product.health_plan_kind.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
-                          <td>N/A</td>
+                          <td>Nationwide</td>
                           <td>${deductible}</td>
                         </tr>
                       </tbody>
