@@ -109,7 +109,9 @@ module BenefitSponsors
       index({ fein: 1 },  { unique: true, sparse: true })
       index({ :"profiles._id" => 1 })
       index({ :"profiles._type" => 1 })
-      index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
+
+      index({ :"benefit_sponsorships._id" => 1 }, { sparse: true })
+      # index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
       # scope :profile,                 ->(id){ find_by(:"profiles._id" => id) }
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
@@ -197,8 +199,8 @@ module BenefitSponsors
 
           benefit_market = site.benefit_market_for(:aca_shop)
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
-          new_sponsorship.refresh_rating_area
-          new_sponsorship.refresh_service_area
+          # new_sponsorship.refresh_rating_area
+          # new_sponsorship.refresh_service_areas
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
@@ -217,6 +219,10 @@ module BenefitSponsors
 
       def latest_benefit_sponsorship_for(profile)
         benefit_sponsorships.by_profile(profile).desc(:created_at).first
+      end
+
+      def find_benefit_sponsorships(ids)
+        benefit_sponsorships.find(ids)
       end
 
       def entity_kinds

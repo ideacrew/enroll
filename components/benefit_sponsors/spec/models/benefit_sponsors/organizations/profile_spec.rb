@@ -12,13 +12,13 @@ module BenefitSponsors
 
     let!(:site)             { BenefitSponsors::Site.new(site_key: :dc) }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                  site: site,
-                                  hbx_id: hbx_id,
-                                  legal_name: legal_name,
-                                  dba: dba,
-                                  entity_kind: entity_kind,
-                                  fein: fein,
-                                )}
+                                site: site,
+                                hbx_id: hbx_id,
+                                legal_name: legal_name,
+                                dba: dba,
+                                entity_kind: entity_kind,
+                                fein: fein,
+    )}
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
     let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
@@ -92,14 +92,14 @@ module BenefitSponsors
 
         context "and all arguments are valid" do
           before {
-              site.byline = 'test'
-              site.long_name = 'test'
-              site.short_name = 'test'
-              site.domain_name = 'test'
-              site.owner_organization = organization
-              site.site_organizations << organization
-              organization.profiles << subject
-            }
+            site.byline = 'test'
+            site.long_name = 'test'
+            site.short_name = 'test'
+            site.domain_name = 'test'
+            site.owner_organization = organization
+            site.site_organizations << organization
+            organization.profiles << subject
+          }
 
           it "should be valid" do
             subject.validate
@@ -142,6 +142,62 @@ module BenefitSponsors
           expect(subject.organization.dba).to eq changed_dba
           expect(subject.organization.fein).to eq changed_fein
         end
+      end
+    end
+
+
+    context "Adding an initial BenefitSponsorship" do
+
+      context "and an initial BenefitSponsorship is added" do
+
+        it "" do
+        end
+
+        context "and it is saved" do
+        end
+
+      end
+
+    end
+
+    context "Adding a second or greater BenefitSponsorship" do
+
+      context "and the prior BenefitSponsorship was canceled without effectuating enrollment" do
+
+        context "and the benefit_application effective date is one date after the cancelation date" do
+          it "should be valid"
+        end
+
+        context "and the benefit_application effective date is later than one day after the cancelation date" do
+          it "should be valid"
+        end
+
+        context "and the benefit_application effective date is earlier than the most recent benefit_application cancelation" do
+          it "should be valid"
+        end
+      end
+
+      context "and the prior BenefitSponsorship was terminated after effectuating enrollment" do
+
+        context "and the benefit_application effective date is one date after the termination date" do
+        end
+
+        context "and the benefit_application effective date is later than one day after the termination date" do
+        end
+
+        context "and the benefit_application effective date is earlier than the most recent benefit_application termination" do
+          it "should be invalid"
+        end
+      end
+
+
+      it "should become the new active benefit_sponsorship"
+
+      it "the former benefit_sponsorship end date should be set and state transitioned"
+
+      it "benefit with sponsored benefit has date gap sponsored_benefits then we need a new benefit_sponsorship"
+
+      context "and BenefitSponsorship is canceled " do
       end
     end
 

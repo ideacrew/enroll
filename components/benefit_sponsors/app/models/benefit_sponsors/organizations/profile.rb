@@ -79,14 +79,8 @@ module BenefitSponsors
         organization.latest_benefit_sponsorship_for(self)
       end
 
-      def rating_area
-        return nil if primary_office_location.blank?
-        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address)
-      end
-
-      def service_areas
-        return nil if primary_office_location.blank?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address)
+      def benefit_sponsorship_successors_for(benefit_sponsorship)
+        organization.benefit_sponsorships.select { |organization_sponsorship| organization_sponsorship.predecessor_sponsorship_id == benefit_sponsorship._id }
       end
 
       def contact_methods

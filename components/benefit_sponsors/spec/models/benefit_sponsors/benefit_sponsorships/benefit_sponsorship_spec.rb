@@ -13,19 +13,18 @@ module BenefitSponsors
     let(:employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
-    context "A new model instance" do
-      subject { employer_profile.add_benefit_sponsorship }
-
+    describe "A new model instance" do
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_fields(:hbx_id, :profile_id)}
       it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
       it { is_expected.to embed_many(:broker_agency_accounts)}
       it { is_expected.to belong_to(:organization).as_inverse_of(:benefit_sponsorships)}
 
-      context "with all required arguments" do
-        before { subject.rating_area = rating_area }
+      context "built from a Profile" do
+        subject { employer_profile.add_benefit_sponsorship }
 
-        context "and all arguments are valid" do
+        context "with all required arguments" do
+
           it "should reference the correct profile_id" do
             expect(subject.profile_id).to eq employer_profile.id
           end
@@ -43,6 +42,119 @@ module BenefitSponsors
             subject.save!
             expect(described_class.find(subject.id)).to eq subject
           end
+        end
+      end
+    end
+
+    describe "A new model instance intantiated using .new" do
+      let(:today)               { Date.today }
+      let(:effective_begin_on)  { today.next_month.beginning_of_month }
+
+      let(:params) do
+        {
+          profile: employer_profile,
+          organization: employer_profile.organization,
+        }
+      end
+
+      context "with no profile" do
+        subject { described_class.new(params.except(:profile)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:profile_id].first).to match(/can't be blank/)
+        end
+      end
+
+      context "a profile with no organization and no params" do
+        subject { described_class.new }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:organization].first).to match(/can't be blank/)
+          expect(subject.errors[:rating_area].first).to match(/can't be blank/)
+          expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
+        end
+      end
+
+      context "with an invalid organization" do
+        let(:invalid_organization)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+
+        subject { described_class.new(params.except(:organization)) }
+
+        before { subject.organization = invalid_organization }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:organization].first).to match(/must be profile's organization/)
+        end
+      end
+
+      context "a profile without a primary office location" do
+        let(:profile_without_primary_office_location)   { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new() }
+        subject { described_class.new(profile: profile_without_primary_office_location) }
+
+        it "should not be valid", :agreggate_errors do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:organization].first).to match(/can't be blank/)
+          expect(subject.errors[:rating_area].first).to match(/can't be blank/)
+          expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
+        end
+      end
+
+      context "and all arguments are valid" do
+        subject { described_class.new(params) }
+
+        it "should be valid" do
+          subject.validate
+          expect(subject).to be_valid
+        end
+
+        it "should be findable" do
+          subject.save!
+          expect(described_class.find(subject.id)).to eq subject
+        end
+
+      end
+    end
+
+    describe "Navigating BenefitSponsorship linked list" do
+      let(:org_a)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:profile_a)   { employer_organization.employer_profile }
+      let(:org_a1)      { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:profile_a1)  { employer_organization.employer_profile }
+      let(:org_a1a)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:profile_a1a) { employer_organization.employer_profile }
+      let(:org_b1)      { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:profile_b1)  { employer_organization.employer_profile }
+
+      let(:node_a)      { described_class.new(profile: profile_a) }
+      let(:node_a1)     { described_class.new(profile: profile_a1, predecessor_sponsorship: node_a) }
+      let(:node_a1a)    { described_class.new(profile: profile_a1a, predecessor_sponsorship: node_a1) }
+      let(:node_b1)     { described_class.new(profile: profile_b1, predecessor_sponsorship: node_a) }
+
+      it "should manage predecessors", :aggregate_failures do
+        expect(node_a1a.predecessor_sponsorship).to eq node_a1
+        expect(node_a1.predecessor_sponsorship).to eq node_a
+        expect(node_b1.predecessor_sponsorship).to eq node_a
+        expect(node_a.predecessor_sponsorship).to eq nil
+      end
+
+      context "and the BenefitSponsorships are persisted" do
+        before do
+          node_a.save!
+          node_a1.save!
+          node_a1a.save!
+          node_b1.save!
+        end
+
+        it "should maintain linked lists for successor_sponsorships", :aggregate_failures do
+          expect(node_a.successor_sponsorships).to eq [node_a1, node_b1]
+          expect(node_a1.successor_sponsorships).to eq [node_a1a]
         end
       end
     end
@@ -356,18 +468,18 @@ module BenefitSponsors
       let!(:march_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 3, :with_organization_cca_profile,
                                                           :with_initial_benefit_application, initial_application_state: initial_application_state,
                                                           default_effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)), site: site)
-      }
+                                              }
 
       let!(:april_sponsors)                 { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
                                                           :with_initial_benefit_application, initial_application_state: initial_application_state,
                                                           default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site)
-      }
+                                              }
 
       let!(:april_renewal_sponsors)         { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
                                                           :with_renewal_benefit_application, initial_application_state: initial_application_state,
                                                           renewal_application_state: renewal_application_state,
                                                           default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site)
-      }
+                                              }
 
       before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
