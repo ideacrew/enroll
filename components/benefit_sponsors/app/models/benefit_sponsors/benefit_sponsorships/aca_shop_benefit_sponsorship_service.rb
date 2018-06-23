@@ -16,10 +16,12 @@ module BenefitSponsors
       @new_date = new_date
     end
 
-    def execute(benefit_sponsorship, event_name, business_policy)
+    def execute(benefit_sponsorship, event_name, business_policy = nil)
       self.benefit_sponsorship = benefit_sponsorship
-      if business_policy.is_satisfied?(benefit_sponsorship)
+      if business_policy.blank? || business_policy.is_satisfied?(benefit_sponsorship)
         process_event { eval(event_name.to_s) }
+      else
+        # log()
       end
     end
 
@@ -27,8 +29,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_begin_open_enrollment_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :begin_open_enrollment)
-        application_enrollment_service.begin_open_enrollment
+        application_service_for(benefit_application).begin_open_enrollment
       end
     end
 
@@ -36,8 +37,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :end_open_enrollment)
-        application_enrollment_service.end_open_enrollment
+        application_service_for(benefit_application).end_open_enrollment
       end
     end
 
@@ -45,8 +45,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_begin_benefit_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :begin_sponsor_benefit)
-        application_enrollment_service.begin_benefit
+        application_service_for(benefit_application).begin_benefit
       end
     end
 
@@ -54,8 +53,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_end_benefit_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :end_sponsor_benefit)
-        application_enrollment_service.end_benefit
+        application_service_for(benefit_application).end_benefit
       end
     end
 
@@ -63,8 +61,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_terminate_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :terminate_benefit)
-        application_enrollment_service.terminate
+        application_service_for(benefit_application).terminate
       end
     end
 
@@ -72,8 +69,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_renew_effective_on(new_date)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :renew_benefit)
-        application_enrollment_service.renew_application
+        application_service_for(benefit_application).renew_application
       end
     end
 
@@ -82,8 +78,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_auto_submit(effective_on)
 
       if benefit_application.present?
-        application_enrollment_service = init_application_service(benefit_application, :auto_submit)
-        application_enrollment_service.force_submit_application
+        application_service_for(benefit_application).force_submit_application
       end
     end
 
@@ -101,19 +96,12 @@ module BenefitSponsors
 
     private
 
-    def init_application_service(benefit_application, event_name)
-      application_enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-      application_enrollment_service.business_policy = business_policy_for(benefit_application, event_name)
-      application_enrollment_service
-    end
-
     def business_policy_for(benefit_application, event_name)
       enrollment_policy.business_policies_for(benefit_application, event_name)
     end
 
-    def enrollment_policy
-      return @enrollment_policy if defined?(@enrollment_policy)
-      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEnrollmentPolicy.new
+    def application_service_for(benefit_application)
+      BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
     end
 
     def process_event(&block)

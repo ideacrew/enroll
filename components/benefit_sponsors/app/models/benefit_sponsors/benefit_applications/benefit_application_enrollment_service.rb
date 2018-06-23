@@ -6,11 +6,12 @@ module BenefitSponsors
     attr_accessor :business_policy
 
     def initialize(benefit_application)
-      @benefit_application = benefit_application
+      @benefit_application   = benefit_application
     end
 
     def renew_application
-      if business_policy.is_satisfied?(benefit_application)
+      if is_business_policy_satisfied?(:renew_benefit_application)
+      # if business_policy.is_satisfied?(benefit_application)
         effective_period_end = benefit_application.effective_period.end
         benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, effective_period_end + 1.day)
 
@@ -36,8 +37,8 @@ module BenefitSponsors
     end
 
     def submit_application
-      if benefit_application.may_approve_application?
-        if is_application_eligible? # TODO: change it to is_application_valid?
+      if benefit_application.may_approve_application? # eligible_warnings_policy
+        if is_application_eligible? # TODO: change it to is_application_valid? # application_valid_policy
           benefit_application.approve_application!
 
           oe_period = benefit_application.open_enrollment_period
@@ -224,6 +225,25 @@ module BenefitSponsors
     end
 
     private
+
+    def is_business_policy_satisfied?(event_name)
+      business_policy_name = policy_name(event_name)
+      business_policy = business_policy_for(business_policy_name)
+      business_policy.is_satisfied?
+    end
+
+    def enrollment_policy
+      return @enrollment_policy if defined?(@enrollment_policy)
+      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEnrollmentPolicy.new
+    end
+
+    def business_policy_for(business_policy_name)
+      enrollment_policy.business_policies_for(benefit_application, business_policy_name)
+    end
+
+    def policy_name(event_name)
+      event_name
+    end
 
     def log_message(errors)
       msg = yield.first
