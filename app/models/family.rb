@@ -96,6 +96,16 @@ class Family
          },
          {name: "kind_and_state_and_coverage_kind_effective_date"})
 
+  index({
+    "households.hbx_enrollments.sponsored_benefit_package_id" => 1,
+    "households.hbx_enrollments.sponsored_benefit_id" => 1,
+    "households.hbx_enrollments.effective_on" => 1,
+    "households.hbx_enrollments.submitted_at" => 1,
+    "households.hbx_enrollments.employee_role_id" => 1,
+    "households.hbx_enrollments.aasm_state" => 1,
+    "households.hbx_enrollments.kind" => 1
+  }, {name: "hbx_enrollment_sb_package_lookup"})
+
   index({"households.hbx_enrollments.plan_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.writing_agent_id" => 1}, { sparse: true })
   index({"households.hbx_enrollments.hbx_id" => 1})
