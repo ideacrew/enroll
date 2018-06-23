@@ -152,7 +152,7 @@ module BenefitSponsors
 
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, "aasm_state" => :enrollment_eligible},
+        :$elemMatch => {:"effective_period.min" => compare_date, "aasm_state" => :enrollment_eligible}},
         :aasm_state => :enrollment_eligible
       )
     }
