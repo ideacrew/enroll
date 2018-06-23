@@ -255,7 +255,7 @@ module BenefitSponsors
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)
-      @profile = organization.by_employer_profile(self.profile_id).employer_profile unless profile_id.blank?
+      @profile = BenefitSponsors::Organizations::Organization.by_employer_profile(self.profile_id).first.employer_profile unless profile_id.blank?
     end
 
     def profile=(new_profile)

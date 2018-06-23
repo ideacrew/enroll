@@ -122,7 +122,8 @@ module BenefitSponsors
 
       scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
-      scope :by_employer_profile,             ->( profile_id ){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
+
+      scope :by_employer_profile,             ->( profile_id ){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
       scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
 
       scope :employer_profiles_applicants,   ->{
