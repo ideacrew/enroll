@@ -8,8 +8,10 @@
     .row
       - if plan.try(:is_standard_plan)
         .col-md-12
-          i.fa.fa-bookmark data-toggle="tooltip" data-placement="top" data-container="body" title="#{l10n('insured.plan_shoppings.standard_plan_title_info')}" = l10n("standard_plan").to_s.upcase
-    .row
+          span style="color:green"
+            i.fas.fa-bookmark.mr-1 data-toggle="tooltip" data-placement="top" data-container="body" title="#{l10n('insured.plan_shoppings.standard_plan_title_info')}"
+            = l10n("standard_plan").to_s.upcase
+    .row.mt-1
       - if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)
         h5.col-md-12.current.bg-title
           i.fa.fa-star.fa-lg.enrolling = l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase
