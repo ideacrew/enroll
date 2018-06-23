@@ -4,6 +4,7 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include AASM
+    include Acapi::Notifiers
 
     embedded_in :benefit_sponsorship,
                 class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
@@ -670,6 +671,14 @@ module BenefitSponsors
       end
 
       event :approve_enrollment_eligiblity do
+        after do
+          if is_renewing?
+            notify("benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.hbx_id, event_name: "benefit_coverage_renewal_application_eligible"})
+          else
+            notify("benefit_coverage_initial_application_eligible", {employer_id: benefit_sponsorship.hbx_id, event_name: "benefit_coverage_initial_application_eligible"})
+          end
+        end
+
         transitions from:   ENROLLING_STATES,
           to:     :enrollment_eligible
       end

@@ -309,10 +309,21 @@ module BenefitSponsors
               end
 
               context "and binder payment is made" do
-                before { benefit_application.approve_enrollment_eligiblity }
+                before do
+                  allow(benefit_application).to receive(:notify)
+                  benefit_application.approve_enrollment_eligiblity
+                end
 
                 it "should transition to state: :enrollment_eligible" do
                   expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                end
+
+                it "notifies that initial appication is eligible" do
+                  expect(benefit_application).to have_received(:notify).with(
+                    "benefit_coverage_initial_application_eligible",
+                    {:employer_id=>benefit_application.benefit_sponsorship.hbx_id,
+                     :event_name=>"benefit_coverage_renewal_application_eligible"}
+                  )
                 end
 
                 context "and effective period begins" do
