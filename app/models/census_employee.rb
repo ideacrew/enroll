@@ -1193,6 +1193,10 @@ def self.to_csv
     (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
   end
 
+  def benefit_group_assignment_by_package(package_id)
+    benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
+  end
+
   def benefit_package_for_open_enrollment(shopping_date)
     active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
   end

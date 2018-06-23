@@ -61,6 +61,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
+        @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
         redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id, :waiver_reason => hbx_enrollment.waiver_reason)
         return
       else
@@ -87,6 +88,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     if hbx_enrollment.save
+      @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
       if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
