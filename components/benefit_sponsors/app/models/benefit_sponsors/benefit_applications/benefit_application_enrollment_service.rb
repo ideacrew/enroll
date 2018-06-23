@@ -100,6 +100,7 @@ module BenefitSponsors
       if benefit_application.may_end_open_enrollment?
         benefit_application.end_open_enrollment!
         benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
+        calculate_pricing_determinations(benefit_application)
       end
     end
 
@@ -229,6 +230,10 @@ module BenefitSponsors
     end
 
     private
+
+    def calculate_pricing_determinations(b_application)
+      ::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(b_application, today)
+    end
 
     def log_message(errors)
       msg = yield.first
