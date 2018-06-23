@@ -162,7 +162,10 @@ class HbxEnrollment
   scope :by_year,             ->(year) { where(effective_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :by_hbx_id,            ->(hbx_id) { where(hbx_id: hbx_id) }
   scope :by_coverage_kind,    ->(kind) { where(coverage_kind: kind)}
+  scope :by_health,           ->{where(coverage_kind: "health").order(effective_on: :desc)}
+  scope :by_dental,           ->{where(coverage_kind: "dental").order(effective_on: :desc)}
   scope :by_kind,             ->(kind) { where(kind: kind)}
+  scope :non_cobra,           ->{where(:"kind".ne => "employer_sponsored_cobra")}
   scope :with_aptc,           ->{ gt("applied_aptc_amount.cents": 0) }
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
