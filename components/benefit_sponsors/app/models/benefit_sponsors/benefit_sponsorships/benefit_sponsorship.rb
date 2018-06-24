@@ -469,7 +469,7 @@ module BenefitSponsors
         transitions from: :active, to: :suspended
       end
 
-      event :unsuspend do
+      event :reverse_suspension do
         transitions from: :suspended, to: :active
       end
 
