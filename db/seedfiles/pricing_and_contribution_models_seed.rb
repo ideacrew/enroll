@@ -81,7 +81,7 @@ employer_contribution_units = [
     name: "employee",
     display_name: "Employee",
     order: 0,
-    default_contribution_factor: 0.75,
+    default_contribution_factor: 0.0,
     member_relationship_maps: [
       BenefitMarkets::ContributionModels::MemberRelationshipMap.new({
         relationship_name: "employee",
@@ -94,7 +94,7 @@ employer_contribution_units = [
     name: "spouse",
     display_name: "Spouse",
     order: 1,
-    default_contribution_factor: 0.50,
+    default_contribution_factor: 0.00,
     member_relationship_maps: [
       BenefitMarkets::ContributionModels::MemberRelationshipMap.new({
         relationship_name: "spouse",
@@ -107,7 +107,7 @@ employer_contribution_units = [
     name: "dependent",
     display_name: "Dependent",
     order: 2,
-    default_contribution_factor: 0.25,
+    default_contribution_factor: 0.00,
     member_relationship_maps: [
       BenefitMarkets::ContributionModels::MemberRelationshipMap.new({
         relationship_name: "dependent",

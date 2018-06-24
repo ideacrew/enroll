@@ -121,7 +121,8 @@ module BenefitSponsors
 
       def execute_sponsor_event(benefit_sponsorship, event)
         begin
-          business_policy = business_policy_for(benefit_sponsorship, event)
+          business_policy_name = policy_name(event)
+          business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
           event_service   = sponsor_service_for(benefit_sponsorship)
           event_service.execute(benefit_sponsorship, event, business_policy)
         rescue Exception => e 
@@ -133,8 +134,17 @@ module BenefitSponsors
         sponsorship_service.send(event)
       end
 
-      def business_policy_for(benefit_sponsorship, event_name)
-        sponsor_policy.business_policies_for(benefit_sponsorship, event_name)
+      def sponsor_policy
+        return @sponsor_policy if defined?(@sponsor_policy)
+        @sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
+      end
+
+      def business_policy_for(benefit_sponsorship, business_policy_name)
+        sponsor_policy.business_policies_for(benefit_sponsorship, business_policy_name)
+      end
+
+      def policy_name(event_name)
+        event_name
       end
 
       def sponsor_service_for(benefit_sponsorship)
@@ -146,11 +156,6 @@ module BenefitSponsors
       def sponsorship_service
         return @sponsorship_service if defined? @sponsorship_service
         @sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(new_date: new_date)
-      end
-
-      def sponsor_policy
-        return @sponsor_policy if defined?(@sponsor_policy)
-        @sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
       end
 
       def process_events_for(&block)

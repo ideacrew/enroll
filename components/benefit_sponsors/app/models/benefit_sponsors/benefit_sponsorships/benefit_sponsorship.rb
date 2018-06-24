@@ -153,7 +153,7 @@ module BenefitSponsors
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"effective_period.min" => compare_date, "aasm_state" => :enrollment_eligible}},
-        :aasm_state => :enrollment_eligible
+        :aasm_state => :initial_enrollment_eligible
       )
     }
 
@@ -304,7 +304,7 @@ module BenefitSponsors
     def benefit_package_by(id)
       benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
       if benefit_application
-        benefit_application.benefit_packages.find(id)
+        benefit_application.benefit_packages.unscoped.find(id)
       end
     end
 
