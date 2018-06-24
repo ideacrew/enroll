@@ -12,14 +12,15 @@ class ShopEmployerNotice < Notice
     args[:to] = employer_profile.staff_roles.first.work_email_or_best
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
+    self.header = "notices/shared/shop_header.html.erb" 
     self.key = args[:key]
-    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
   def deliver
     build
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -56,7 +57,7 @@ class ShopEmployerNotice < Notice
   end
 
   def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
   end
 
   def shop_dchl_rights_attachment
@@ -79,12 +80,12 @@ class ShopEmployerNotice < Notice
 
   def send_generic_notice_alert_to_broker_and_ga
     if employer_profile.broker_agency_profile.present?
-      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name.titleize
       broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
       UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
     end
     if employer_profile.general_agency_profile.present?
-      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
+      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name.titleize
       ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
       UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
     end
@@ -98,11 +99,14 @@ class ShopEmployerNotice < Notice
     return if person.blank? || location.blank?
 
     notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: person.full_name,
+      primary_fullname: person.full_name.titleize,
       organization: broker.legal_name,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      assignment_date: employer_profile.active_broker_agency_account.present? ? employer_profile.active_broker_agency_account.start_on : "",
       address: PdfTemplates::NoticeAddress.new({
         street_1: location.address.address_1,
         street_2: location.address.address_2,

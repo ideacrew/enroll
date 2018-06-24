@@ -3,10 +3,11 @@ require 'rails_helper'
 RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
   let!(:employer_profile){ create :employer_profile}
   let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:start_on) { Date.new(calender_year, 5, 1)}
-  let(:end_on) { Date.new(calender_year+1, 4, 30) }
-  let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
-  let(:open_enrollment_end_on) { Date.new(calender_year, 4, 10) }
+  let(:calender_month) { (TimeKeeper.date_of_record + 2.months).month}
+  let(:start_on) { Date.new(calender_year, calender_month, 1)}
+  let(:end_on) { start_on.next_year.prev_day }
+  let(:open_enrollment_start_on) { start_on.prev_month }
+  let(:open_enrollment_end_on) { open_enrollment_start_on + 10.days}
   let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: "renewing_enrolling", start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{

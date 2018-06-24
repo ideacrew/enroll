@@ -43,6 +43,10 @@ describe ConsumerRole, dbclean: :after_each do
     context "with all valid arguments" do
       let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
 
+      it "should have a default value of native validation as na" do
+        expect(consumer_role.native_validation).to eq "na"
+      end
+
       it "should save" do
         expect(consumer_role.save).to be_truthy
       end
@@ -904,6 +908,20 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_outstanding
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :fully_verified
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
+end
+
+describe "#add_type_history_element" do
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:attr) { {verification_type: "verification_type",
+                action: "action",
+                modifier: "actor",
+                update_reason: "reason"} }
+
+  it "creates verification history record" do
+    person.consumer_role.verification_type_history_elements.delete_all
+    person.consumer_role.add_type_history_element(attr)
+    expect(person.consumer_role.verification_type_history_elements.size).to be > 0
+  end
 end
 
 describe "Verification Tracker" do
