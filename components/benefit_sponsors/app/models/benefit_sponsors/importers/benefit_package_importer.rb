@@ -124,7 +124,7 @@ module BenefitSponsors
       def product_package_choice_for(sponsored_benefit)
         case sponsored_benefit.product_package_kind
         when :single_product, :single_issuer
-          sponsored_benefit.reference_product.issuer_profile.legal_name
+          sponsored_benefit.reference_product.issuer_profile.id
         when :metal_level
           sponsored_benefit.reference_product.metal_level_kind
         end
