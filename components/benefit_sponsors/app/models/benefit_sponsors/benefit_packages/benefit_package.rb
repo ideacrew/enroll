@@ -39,6 +39,8 @@ module BenefitSponsors
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
+      default_scope ->{ where(is_active: true) }
+
       # calculate effective on date based on probation period kind
       # Logic to deal with hired_on and created_at
       # returns a roster
@@ -300,12 +302,30 @@ module BenefitSponsors
       end
 
       def cancel_member_benefits
+        deactivate_benefit_group_assignments
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+          end
+        end
+        deactivate
+      end
+
+      def deactivate_benefit_group_assignments
+        self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+          benefit_group_assignments.each do |benefit_group_assignment|
+            benefit_group_assignment.update(is_active: false) unless self.benefit_application.is_renewing?
+          end
+
+          other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
+          if self.benefit_application.is_renewing?
+            ce.add_renew_benefit_group_assignment([other_benefit_package])
+          else
+            ce.find_or_create_benefit_group_assignment([other_benefit_package])
           end
         end
       end
