@@ -97,7 +97,7 @@ module BenefitSponsors
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
         start_on = new_date.next_month.beginning_of_month
-        benefit_sponsors = BenefitSponsors::BenefitSponsors::BenefitSponsorship
+        benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
 
         benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
