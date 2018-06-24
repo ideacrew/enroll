@@ -670,12 +670,12 @@ module BenefitSponsors
       end
 
       event :approve_enrollment_eligiblity do
-        transitions from:   ENROLLING_STATES,
+        transitions from:   :enrollment_closed,
           to:     :enrollment_eligible
       end
 
       event :deny_enrollment_eligiblity do
-        transitions from:   ENROLLING_STATES,
+        transitions from:   :enrollment_closed,
           to:     :enrollment_ineligible
       end
 
