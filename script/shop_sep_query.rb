@@ -76,8 +76,8 @@ term_ids = Family.collection.aggregate([
   {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
 
-def is_valid_plan_year?(plan_year)
-  %w(enrolled renewing_enrolled canceled expired renewing_canceled active terminated termination_pending).include?(plan_year.aasm_state)
+def is_valid_benefit_application?(benefit_application)
+ ["enrollment_eligible", "active", "terminated","expired"].include?(benefit_application.aasm_state)
 end
 
 def term_states
@@ -85,9 +85,9 @@ def term_states
 end
 
 def can_publish_enrollment?(enrollment, transition_at)
-  plan_year = enrollment.benefit_group.plan_year
-  if enrollment.employer_profile.aasm_state == "enrolled" || is_valid_plan_year?(plan_year)
-    return false if transition_at.in_time_zone("UTC") <= plan_year.enrollment_quiet_period.max # don't transmit enrollments until quiet period ended
+  quiet_period = benefit_application.quiet_period
+  if is_valid_benefit_application?(benefit_application)
+    return false if transition_at.in_time_zone("UTC") <= quiet_period.max # don't transmit enrollments until quiet period ended
     return true  if term_states.include?(enrollment.aasm_state) # new hire enrollment check not needed for terminated enrollments
     return false if enrollment.new_hire_enrollment_for_shop? && (enrollment.effective_on <= (Time.now - 2.months))
     return true

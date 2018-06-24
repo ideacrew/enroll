@@ -81,6 +81,24 @@
           
           #yourReferencePlanDetails
 
+// Shows view summary modal    
+.modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="close" x
+        h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
+      .modal-body
+        | Summary Data Here
+      .modal-footer
+        .pull-left 
+          a href="/"
+            i.far.fa-file-pdf.fa-2x.mr-1
+            | Summary of Benefits and Coverage
+        .pull-right
+          button.btn.btn-default.btn-sm.btn-more-details More Details
+          button.btn.btn-default.btn-sm data-dismiss="modal" style="margin-top:-1px" Close
+
 javascript:
   var productOptionKind = String;
   var selectedRadio = String;
@@ -160,7 +178,7 @@ javascript:
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
               <span class="plan-label">Network:</span><br>
-              <span class="plan-label mt-1 rp-view-summary">View Summary</span><br>
+              <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}">View Summary</span><br>
             </div>
           </div>
         </div>
@@ -300,6 +318,13 @@ javascript:
     } else {
       enablePlanYearButton()
     }
+  }
+  
+  function viewSummary(element) {
+    var title = element.dataset.planTitle;
+    document.getElementById('viewSummaryTitle').innerHTML = title;
+    $('#viewSummaryModal').modal('show');
+    $('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent')
   }
   
   
