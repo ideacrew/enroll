@@ -31,7 +31,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
                                                    } )
     end
 
-    if person.all_types_verified?
+    if person.all_types_verified? && !person.consumer_role.fully_verified?
       begin
         person.consumer_role.verify_ivl_by_admin
         puts "Person state verified person: #{person.id}" unless Rails.env.test?
@@ -81,7 +81,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     Person.where({'$or' => [
         {"consumer_role.aasm_state"=>"verification_outstanding"},
         {'$and' => [
-            {"consumer_role.aasm_state"=>"fully_verified"},
+            {"consumer_role.aasm_state"=>{'$in' => ["fully_verified", "sci_verified"]}},
             { '$or' => [
                 {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
                 {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}
@@ -106,4 +106,3 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
     person.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last.try(:body)
   end
 end
-

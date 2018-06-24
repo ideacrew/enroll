@@ -24,6 +24,8 @@ module PdfTemplates
     attribute :residency_verified, Boolean, :default => false
     attribute :indian_conflict, Boolean, :default => false
     attribute :incarcerated, Boolean, :default => false
+    attribute :mec_type_1, String
+    attribute :mec_type_2, String
 
     attribute :magi_medicaid_monthly_income_limit, Integer
     attribute :magi_as_percentage_of_fpl, Integer

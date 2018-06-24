@@ -8,7 +8,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>PAYMENT DEADLINE: <%= notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y") %> - <%= notice.enrollment_notice_subject.upcase %></h3></td>
+      <td><h3>PAYMENT DEADLINE: <%= notice.latest_current_year_enrollment.effective_on.strftime("%B %d, %Y") %> - <%= notice.enrollment_notice_subject.upcase %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -30,7 +30,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
+ contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.latest_current_year_enrollment.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
    heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -55,12 +55,12 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["On #{TimeKeeper.date_of_record.strftime("%B %d, %Y")}, you enrolled the people listed in the plan(s) shown below:"],
+ contents: ["On #{notice.enrollments.first.created_at.strftime("%B %d, %Y")}, you enrolled the people listed in the plan(s) shown below:"],
    heading: 'Your Plan', sub_heading: ''} %>
 
 <% notice.enrollments.each do |enrollment| %>
   <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                               rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+                               rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", number_to_currency(enrollment.responsible_amount, precision: 2), "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
       col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 
@@ -99,11 +99,11 @@
         </td>
       </tr>
     </table>
+
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+      content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
   <% end %>
 <% end %>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
- content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment."],
@@ -113,7 +113,7 @@
   previous: "",
   listings: ["You should receive a bill from your insurance company 7-10 days from now. Your bill tells you how to make your monthly payments.",
              "If you haven’t received a bill in 7-10 days, call your insurance company right away so you don’t miss your payment deadline.",
-             "You must pay your first monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start your plan. Your premium payments for the rest of the year are also due by the first of the month.",
+             "You must pay your first monthly premium by #{notice.latest_current_year_enrollment.effective_on.strftime("%B %d, %Y")} to start your plan. Your premium payments for the rest of the year are also due by the first of the month.",
              "Do NOT send your premium payments to #{Settings.site.short_name}."]} %>
 
 <%= render partial: 'notices/shared/custom_listing', locals: {
@@ -168,8 +168,11 @@ content: "Call your insurance company if you have questions about services the p
 content: "To report life changes, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You can end your insurance for any reason, but you must tell us at least 2 weeks before you want your plan to end. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
+ contents: ["You can end your insurance for any reason. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
    heading: 'Ending Your Insurance', sub_heading: '', top_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+content: "If you want to end your insurance, you must tell us no later than the day you want your plan to end.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
@@ -177,17 +180,26 @@ content: "If you end your health plan, and don’t replace it, you may have to p
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
 
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+   heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Please call #{Settings.site.short_name} at #{notice.hbe.phone} if you have any questions about this letter, or if you think we made a mistake."],
    heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
+listing: "<strong>Remember, you must pay your monthly premium by #{notice.latest_current_year_enrollment.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
 
-<% if notice.documents_needed == true %>
+<% if (notice.documents_needed == true && !notice.cover_all?) %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
   listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
+
+<br>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
@@ -200,5 +212,6 @@ content: "If you have questions or concerns, we’re here to help.<br></br>The #
   "Annual open enrollment period: 45 CFR §155.410(e)",
   "Special enrollment periods: 45 CFR §155.420",
   "Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
-  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)]"]} %>
+  "Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)]",
+  "Eligibility appeals:  45 C.F.R. §155.500 et. seq."]} %>
 <% end %>

@@ -46,7 +46,6 @@ module Eligibility
       end
 
       bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
-      bga.renew_coverage
       benefit_group_assignments << bga
     end
 

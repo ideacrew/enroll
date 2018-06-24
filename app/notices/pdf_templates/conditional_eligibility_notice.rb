@@ -17,31 +17,44 @@ module PdfTemplates
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
-    attribute :individuals, Array[PdfTemplates::Individual]
+    attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
+    attribute :immigration_unverified , Array[PdfTemplates::Individual]
     attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
+    attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
     attribute :indian_inconsistency, Array[PdfTemplates::Individual]
     attribute :mec_conflict, Array[PdfTemplates::Individual]
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
-    attribute :last_name, String
+    attribute :notice_subject, String
     attribute :due_date, Date
+    attribute :application_date, Date
+    attribute :last_name, String
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
     attribute :current_year, String
 
+
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
+    end
+
+    def general_agency?
+      false
     end
 
     def shop?
       false
     end
 
+    def broker?
+      return false
+    end
+     
     def employee_notice?
       false
     end
@@ -74,8 +87,12 @@ module PdfTemplates
       individuals.select{|individual| individual.incarcerated}
     end
 
+    def cover_all?
+      enrollments.select{|enrollment| enrollment.kind == "coverall"}.present?
+    end
+
     def current_health_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def assisted_enrollments
@@ -86,8 +103,16 @@ module PdfTemplates
       current_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
     end
 
+    def renewal_csr_enrollments
+      renewal_health_enrollments.select{|enrollment| enrollment.plan.is_csr ==  true}
+    end
+
+    def latest_current_year_enrollment
+      enrollments.sort_by(&:effective_on).last
+    end
+
     def current_dental_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def renewal_health_enrollments
@@ -142,7 +167,7 @@ module PdfTemplates
         else
           subject = "Your Health Plan and Cost Savings"
         end
-      elsif current_health_enrollments.present? && assisted_enrollments.nil?
+      elsif current_health_enrollments.present? && assisted_enrollments.empty?
         if current_dental_enrollments.present?
           subject = "Your Health and Dental Plan"
         else
