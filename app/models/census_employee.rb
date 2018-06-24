@@ -439,17 +439,20 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employee_enrollments
-    [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
-      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
-      enrollments.each do |e|
-        if e.effective_on > self.coverage_terminated_on
-          e.cancel_coverage!(self.employment_terminated_on) if e.may_cancel_coverage?
+
+    term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
+    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
+
+    enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
+
+    enrollments.each do |enrollment|
+      if enrollment.effective_on > self.coverage_terminated_on
+        enrollment.cancel_coverage!(self.coverage_terminated_on) if enrollment.may_cancel_coverage?
+      else
+        if self.coverage_terminated_on < TimeKeeper.date_of_record
+          enrollment.terminate_coverage!(self.coverage_terminated_on) if enrollment.may_terminate_coverage?
         else
-          if self.coverage_terminated_on < TimeKeeper.date_of_record
-            e.terminate_coverage!(self.coverage_terminated_on) if e.may_terminate_coverage?
-          else
-            e.schedule_coverage_termination!(self.coverage_terminated_on) if e.may_schedule_coverage_termination?
-          end
+          enrollment.schedule_coverage_termination!(self.coverage_terminated_on) if enrollment.may_schedule_coverage_termination?
         end
       end
     end

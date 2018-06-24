@@ -211,7 +211,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
 
     # TODO: do unscoped...to pick all the benefit groups
-    plan_year.benefit_groups.each do |benefit_group|
+    plan_year.benefit_groups.unscoped.each do |benefit_group|
       params = sanitize_benefit_group_attrs(benefit_group)
       importer = BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, params)
       if importer.benefit_package.blank?
@@ -277,7 +277,7 @@ class BenefitApplicationMigration < Mongoid::Migration
   end
 
   def self.construct_workflow_state_transitions(benefit_application, plan_year)
-    plan_year.workflow_state_transitions.asc(:transition_at).each do |wst|
+    plan_year.workflow_state_transitions.unscoped.asc(:transition_at).each do |wst|
       attributes = wst.attributes.except(:_id)
       attributes[:from_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.from_state.to_sym]
       attributes[:to_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.to_state.to_sym]
@@ -286,7 +286,7 @@ class BenefitApplicationMigration < Mongoid::Migration
   end
 
   def self.construct_workflow_state_for_benefit_sponsorship(benefit_sponsorship, old_org)
-    old_org.employer_profile.workflow_state_transitions.asc(:transition_at).each do |wst|
+    old_org.employer_profile.workflow_state_transitions.unscoped.asc(:transition_at).each do |wst|
       attributes = wst.attributes.except(:_id)
       attributes[:from_state] = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[wst.from_state.to_sym]
       attributes[:to_state] = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[wst.to_state.to_sym]
@@ -296,12 +296,12 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   def self.assign_employee_benefits(benefit_sponsorship)
     @benefit_package_map.each do |benefit_group, benefit_package|
-      benefit_group.census_employees.each do |census_employee|
+      benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 
-        census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+        census_employee.benefit_group_assignments.unscoped.each do |benefit_group_assignment|
           if benefit_group_assignment.benefit_group_id.to_s == benefit_group.id.to_s
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
