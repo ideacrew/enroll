@@ -15,6 +15,10 @@ module Config::SiteHelper
   def site_website_name
     Settings.site.website_name
   end
+
+  def site_privacy_policy
+    Settings.site.privacy_policy
+  end
   
   def site_website_link
     link_to site_website_name, site_website_name
