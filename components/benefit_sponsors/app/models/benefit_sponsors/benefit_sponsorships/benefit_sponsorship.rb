@@ -1,8 +1,10 @@
 # BenefitSponsorship
-# Manage benfit enrollment activity for a sponsoring Organization's Profile (e.g. EmployerProfile, HbxProfile, etc.)
-# Behavior is goverened by settings obtained from the BenefitMarkets::BenefitCatelog.  Typically assumes a once annual enrollment period and effective date.  For scenarios where there's a once-yearly
-# open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
-# cycles.  Scenarios where enollments are conducted on a rolling monthly basis are also supported.
+# Manage benfit enrollment activity for a sponsoring Organization's Profile (e.g. EmployerProfile,
+# HbxProfile, etc.) Behavior is goverened by settings obtained from the BenefitMarkets::BenefitCatelog.
+# Typically assumes a once annual enrollment period and effective date.  For scenarios where there's a
+# once-yearly open enrollment, new sponsors may join mid-year for initial enrollment, subsequently
+# renewing on-schedule in following cycles. Scenarios where enollments are conducted on a rolling monthly
+# basis are also supported.
 
 # Organzations may embed many BenefitSponsorships.  Significant changes result in new BenefitSponsorship,
 # such as the following supported scenarios:
