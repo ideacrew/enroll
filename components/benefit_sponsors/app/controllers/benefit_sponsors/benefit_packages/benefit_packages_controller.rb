@@ -66,6 +66,11 @@ module BenefitSponsors
         end
       end
 
+      def reference_product_summary
+        @product_summary = BenefitSponsors::Forms::BenefitPackageForm.for_reference_product_summary(reference_product_params, params[:details])
+        render json: @product_summary
+      end
+
       private
 
       def error_messages(object)
@@ -81,6 +86,10 @@ module BenefitSponsors
             ]
           ]
         )
+      end
+
+      def reference_product_params
+        params.permit(:benefit_application_id).merge({:sponsored_benefits_attributes => {"0" => {:reference_plan_id => params[:reference_plan_id]} }})
       end
 
       def sponsored_benefit_params

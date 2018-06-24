@@ -66,6 +66,27 @@ module BenefitSponsors
         [sponsored_benefit_with_lowest_cost_product, sponsored_benefit_with_reference_product, sponsored_benefit_with_highest_cost_product]
       end
 
+      def reference_product_details(form, details)
+        product = find_product(form)
+        benefit_application = find_benefit_application(form)
+        hios_id = [] << product.hios_id
+        year = benefit_application.start_on.year
+        coverage_kind = product.kind.to_s
+        qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)
+        if details.nil?
+          visit_types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+        else
+          visit_types = qhps.first.qhp_service_visits.map(&:visit_type)
+        end
+
+        [qhps, visit_types]
+      end
+
+      def find_product(form)
+        product_id = form.sponsored_benefits[0].reference_plan_id
+        BenefitMarkets::Products::Product.find product_id
+      end
+
       def decorated_sponsored_benefit(product, package)
         dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
         dummy_sponsored_benefit.reference_product = product
