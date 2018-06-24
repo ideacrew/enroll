@@ -78,7 +78,7 @@ module BenefitSponsors
     def begin_open_enrollment
       open_enrollment_begin = benefit_application.open_enrollment_period.begin
       
-      if business_policy_satisfied_for(:begin_open_enrollment)
+      if business_policy_satisfied_for?(:begin_open_enrollment)
         if today >= open_enrollment_begin
           # benefit_application.validate_sponsor_market_policy
           # return false unless benefit_application.is_valid?
@@ -98,7 +98,7 @@ module BenefitSponsors
     end
 
     def end_open_enrollment
-      if business_policy_satisfied_for(:end_open_enrollment)
+      if business_policy_satisfied_for?(:end_open_enrollment)
         if benefit_application.may_end_open_enrollment?
           benefit_application.end_open_enrollment!
           benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
@@ -110,7 +110,7 @@ module BenefitSponsors
     end
 
     def begin_benefit
-      if business_policy_satisfied_for(:begin_benefit)
+      if business_policy_satisfied_for?(:begin_benefit)
         if benefit_application.may_activate_enrollment?
           benefit_application.activate_enrollment!
         else
@@ -122,7 +122,7 @@ module BenefitSponsors
     end
 
     def cancel
-      if business_policy_satisfied_for(:cancel_benefit)
+      if business_policy_satisfied_for?(:cancel_benefit)
         if benefit_application.may_cancel?
           benefit_application.cancel!
         else
@@ -134,7 +134,7 @@ module BenefitSponsors
     end
 
     def end_benefit
-      if business_policy_satisfied_for(:end_benefit)
+      if business_policy_satisfied_for?(:end_benefit)
         if benefit_application.may_expire?
           benefit_application.expire!
         else
@@ -146,7 +146,7 @@ module BenefitSponsors
     end
 
     def terminate(end_on, termination_date)
-      if business_policy_satisfied_for(:terminate_benefit)
+      if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_terminate_enrollment?
           benefit_application.terminate_enrollment!
           if benefit_application.terminated?
