@@ -29,7 +29,91 @@ module BenefitSponsors
             expect(subject.profile_id).to eq employer_profile.id
           end
 
-          it "should reference a rating_area" do
+          it "should pull attributes from the profile and it's backing organization instance" do
+            expect(subject.benefit_market).to eq site.benefit_markets.first
+            expect(subject.rating_area).to be_an_instance_of(::BenefitMarkets::Locations::RatingArea)
+          end
+
+          it "should be valid" do
+            subject.validate
+            expect(subject).to be_valid
+          end
+
+          it "should be findable" do
+            subject.save!
+            expect(described_class.find(subject.id)).to eq subject
+          end
+        end
+      end
+
+      context "instantiated using .new" do
+        let(:today)               { Date.today }
+        let(:effective_begin_on)  { today.next_month.beginning_of_month }
+
+        let(:params) do
+          {
+            profile: employer_profile,
+            organization: employer_profile.organization,
+          }
+        end
+
+        context "with no params" do
+          subject { described_class.new }
+
+          it "should not be valid", :agreggate_errors do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:profile_id].first).to match(/can't be blank/)
+            expect(subject.errors[:organization].first).to match(/can't be blank/)
+            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
+            expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
+          end
+        end
+
+        context "with no profile" do
+          subject { described_class.new(params.except(:profile)) }
+
+          it "should not be valid", :agreggate_errors do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.benefit_market).to eq site.benefit_markets.first
+            expect(subject.errors[:profile_id].first).to match(/can't be blank/)
+            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
+          end
+        end
+
+        context "with an organization different than profile's organization" do
+          let(:invalid_organization)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+
+          subject { described_class.new(params.except(:organization)) }
+
+          before { subject.organization = invalid_organization }
+
+          it "should not be valid" do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:organization].first).to match(/must be profile's organization/)
+          end
+        end
+
+        context "no params and a profile without organization or primary office location" do
+          let(:profile_without_primary_office_location)   { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new() }
+          subject { described_class.new(profile: profile_without_primary_office_location) }
+
+          it "should not be valid", :agreggate_errors do
+            subject.validate
+            expect(subject).to_not be_valid
+            expect(subject.errors[:organization].first).to match(/can't be blank/)
+            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
+            expect(subject.benefit_market).to be_nil
+          end
+        end
+
+        context "and all arguments are valid" do
+          subject { described_class.new(params) }
+
+          it "should pull attributes from the profile and it's backing organization instance" do
+            expect(subject.benefit_market).to eq site.benefit_markets.first
             expect(subject.rating_area).to be_an_instance_of(::BenefitMarkets::Locations::RatingArea)
           end
 
@@ -46,83 +130,7 @@ module BenefitSponsors
       end
     end
 
-    describe "A new model instance intantiated using .new" do
-      let(:today)               { Date.today }
-      let(:effective_begin_on)  { today.next_month.beginning_of_month }
-
-      let(:params) do
-        {
-          profile: employer_profile,
-          organization: employer_profile.organization,
-        }
-      end
-
-      context "with no profile" do
-        subject { described_class.new(params.except(:profile)) }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:profile_id].first).to match(/can't be blank/)
-        end
-      end
-
-      context "a profile with no organization and no params" do
-        subject { described_class.new }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:organization].first).to match(/can't be blank/)
-          expect(subject.errors[:rating_area].first).to match(/can't be blank/)
-          expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
-        end
-      end
-
-      context "with an invalid organization" do
-        let(:invalid_organization)  { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-
-        subject { described_class.new(params.except(:organization)) }
-
-        before { subject.organization = invalid_organization }
-
-        it "should not be valid" do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:organization].first).to match(/must be profile's organization/)
-        end
-      end
-
-      context "a profile without a primary office location" do
-        let(:profile_without_primary_office_location)   { BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new() }
-        subject { described_class.new(profile: profile_without_primary_office_location) }
-
-        it "should not be valid", :agreggate_errors do
-          subject.validate
-          expect(subject).to_not be_valid
-          expect(subject.errors[:organization].first).to match(/can't be blank/)
-          expect(subject.errors[:rating_area].first).to match(/can't be blank/)
-          expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
-        end
-      end
-
-      context "and all arguments are valid" do
-        subject { described_class.new(params) }
-
-        it "should be valid" do
-          subject.validate
-          expect(subject).to be_valid
-        end
-
-        it "should be findable" do
-          subject.save!
-          expect(described_class.find(subject.id)).to eq subject
-        end
-
-      end
-    end
-
-    describe "Navigating BenefitSponsorship linked list" do
+    describe "Navigating BenefitSponsorship Predecessor/Successor linked list" do
       let(:org_a)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:profile_a)   { employer_organization.employer_profile }
       let(:org_a1)      { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -217,7 +225,7 @@ module BenefitSponsors
       end
     end
 
-    context "Working with subclassed parent Profiles" do
+    describe "Working with subclassed parent Profiles" do
       context "using sic_code helper method" do
         let(:cca_employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
         let(:cca_employer_profile)        { cca_employer_organization.employer_profile }
@@ -552,5 +560,42 @@ module BenefitSponsors
       context '.may_auto_submit_application?' do
       end
     end
+
+    describe "Finding BenefitApplications" do
+
+      context "and one benefit_application is unsubmitted" do
+        it "most_recent_benefit_application should find the benefit_application"
+        it "current_benefit_application should find the benefit_application"
+        it "should not find a renewal_benefit_application"
+        it "should not find an active_benefit_application"
+        it "should not find a renewing_submitted_application"
+
+        context "and the benefit_application is effectuated" do
+          it "active_benefit_application should the benefit_application"
+
+          context "and a renewal_benefit_application is instantiated" do
+            it "should find a renewal_benefit_application"
+            it "most_recent_benefit_application should find the renewal_benefit_application"
+            it "active_benefit_application should find the effectuated benefit_application"
+            it "current_benefit_application should find the effectuated benefit_application"
+            it "should not find a renewing_submitted_application"
+
+            context "and the renewal_benefit_application is submitted" do
+              it "renewing_submitted_application should find the renewal_benefit_application"
+
+            end
+
+            context "and the renewal_benefit_application is effectuated" do
+              it "should not find a renewal_benefit_application"
+              it "active_benefit_application should find the effectuated renewal_benefit_application"
+              it "current_benefit_application should find the effectuated renewal_benefit_application"
+            end
+          end
+        end
+
+      end
+    end
+
+
   end
 end

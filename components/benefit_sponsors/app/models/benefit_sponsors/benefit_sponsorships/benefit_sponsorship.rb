@@ -285,15 +285,6 @@ module BenefitSponsors
       end
     end
 
-    def pull_organization_attributes
-      self.benefit_market = organization.site.benefit_market_for(:aca_shop) unless organization.blank?
-    end
-
-    def pull_profile_attributes
-      refresh_rating_area
-      refresh_service_areas
-    end
-
     def predecessor_sponsorship=(benefit_sponsorship)
       raise ArgumentError.new("expected BenefitSponsorship") unless benefit_sponsorship.is_a? BenefitSponsors::BenefitSponsorships::BenefitSponsorship
       self.predecessor_sponsorship_id = benefit_sponsorship._id
@@ -351,18 +342,11 @@ module BenefitSponsors
       employer_attestation.present? && employer_attestation.is_eligible?
     end
 
-    def most_recent_benefit_application
-      benefit_applications.order_by(:"created_at".desc).first
-    end
-
-    alias_method :latest_benefit_application, :most_recent_benefit_application
-
-
     # If there is a gap, it will fall under a new benefit sponsorship
     # Renewal_benefit_application's predecessor_sponsorship is always current benefit application
-    # Latest benefit_application will always be their current benefit_application if no renewal
+    # most_recent_benefit_application will always be their current benefit_application if no renewal
     def current_benefit_application
-      renewal_benefit_application.present? ? renewal_benefit_application.predecessor_sponsorship : latest_benefit_application
+      renewal_benefit_application.present? ? renewal_benefit_application.predecessor_sponsorship : most_recent_benefit_application
     end
 
     def renewal_benefit_application
@@ -373,9 +357,16 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
     end
 
-    def renewing_published_benefit_application # TODO -recheck
+    def most_recent_benefit_application
+      benefit_applications.order_by(:"created_at".desc).first
+    end
+
+    def renewing_submitted_benefit_application # TODO -recheck
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
     end
+
+    alias_method :renewing_published_benefit_application, :renewing_submitted_benefit_application
+    alias_method :latest_benefit_application, :most_recent_benefit_application
 
     # TODO: pass in termination reason and kind
     def terminate_enrollment(benefit_end_date)
@@ -385,6 +376,8 @@ module BenefitSponsors
       end
     end
 
+
+    #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?
       renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?
     end
@@ -400,9 +393,8 @@ module BenefitSponsors
     def carriers_dropped_for(product_kind)
       active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
+    ####
 
-    def renew_benefit_sponsorship
-    end
 
     # Workflow for self service
     aasm do
@@ -563,6 +555,15 @@ module BenefitSponsors
           return errors.add(:organization, "must be profile's organization")
         end
       end
+    end
+
+    def pull_organization_attributes
+      self.benefit_market = organization.site.benefit_market_for(:aca_shop) unless organization.blank?
+    end
+
+    def pull_profile_attributes
+      refresh_rating_area
+      refresh_service_areas
     end
 
     def refresh_rating_area
