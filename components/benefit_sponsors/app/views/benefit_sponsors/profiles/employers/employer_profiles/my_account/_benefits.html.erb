@@ -153,8 +153,8 @@
           </div>
             <%= pundit_span EmployerProfile, :updateable? %>
                 <div class="below clear">
-                  <%= link_to "Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id}" }, class: 'btn btn-default' if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
-                  <%= render partial: "employers/benefit_applications/delete_benefit_package_modal", locals: { benefit_application: benefit_application, package: package } if benefit_application.aasm_state == "draft" || benefit_application.aasm_state == "renewing_draft" %>
+                  <%= link_to "Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id.to_s}" }, class: 'btn btn-default' if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
+                  <%= render partial: "benefit_sponsors/profiles/employers/benefit_packages/delete_benefit_package_modal", locals: { benefit_application: benefit_application, package: package } if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
                 </div>
             </span>
           <% end %>

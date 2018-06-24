@@ -176,28 +176,33 @@ class BenefitGroupAssignment
     end
   end
 
-  def hbx_enrollment # Do we still need this?
+  # def hbx_enrollment # Deprecated
+  #   return @hbx_enrollment if defined? @hbx_enrollment
+
+  #   if hbx_enrollment_id.blank?
+  #     families = Family.where({
+  #       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+  #       })
+
+  #     families.each do |family|
+  #       family.households.each do |household|
+  #         household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
+  #           if enrollment.benefit_group_assignment_id == self.id
+  #             @hbx_enrollment = enrollment
+  #           end
+  #         end
+  #       end
+  #     end
+
+  #     return @hbx_enrollment
+  #   else
+  #     @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
+  #   end
+  # end
+
+  def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
-
-    if hbx_enrollment_id.blank?
-      families = Family.where({
-        "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
-        })
-
-      families.each do |family|
-        family.households.each do |household|
-          household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
-            if enrollment.benefit_group_assignment_id == self.id
-              @hbx_enrollment = enrollment
-            end
-          end
-        end
-      end
-
-      return @hbx_enrollment
-    else
-      @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id)
-    end
+    @hbx_enrollment = HbxEnrollment.find(self.hbx_enrollment_id) if hbx_enrollment_id.present?
   end
 
   def end_benefit(end_on)
@@ -297,8 +302,7 @@ class BenefitGroupAssignment
     end
 
     if hbx_enrollment.present?
-      # Enrollment will not have benefit group assignment id anymore, # Do we still need this?
-      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.benefit_group_id == benefit_group_id
+      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.sponsored_benefit_package_id == benefit_package_id
       # TODO: Re-enable this after enrollment propagation issues resolved.
       #       Right now this is causing issues when linking census employee under Enrollment Factory.
       # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?

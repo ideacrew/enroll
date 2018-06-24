@@ -332,7 +332,7 @@ class CensusEmployee < CensusMember
 
   def published_benefit_group_assignment
     benefit_group_assignments.detect do |benefit_group_assignment|
-      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
     end
   end
 
@@ -1191,6 +1191,10 @@ def self.to_csv
 
   def cobra_eligible_enrollments
     (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
+  end
+
+  def benefit_group_assignment_by_package(package_id)
+    benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
   end
 
   def benefit_package_for_open_enrollment(shopping_date)

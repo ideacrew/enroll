@@ -12,6 +12,7 @@ module Factories
 
     def save_clone_enrollment(clone_enrollment)
       if clone_enrollment.save
+        assign_enrollment_to_benefit_package_assignment(clone_enrollment)
         clone_enrollment
       else
         message = "Enrollment: #{enrollment.id}, \n" \
@@ -71,6 +72,11 @@ module Factories
           is_subscriber: hbx_enrollment_member.is_subscriber
         })
       end
+    end
+
+    def assign_enrollment_to_benefit_package_assignment(enrollment)
+      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      assignment.update_attributes(hbx_enrollment_id: enrollment.id)
     end
   end
 
