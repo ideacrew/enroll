@@ -277,7 +277,7 @@ module BenefitSponsors
 
     def eligibility_policy
       return @eligibility_policy if defined?(@eligibility_policy)
-      @eligibility_policy = BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+      @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
     end
 
     def due_date_for_publish
