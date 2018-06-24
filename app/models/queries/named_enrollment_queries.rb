@@ -1,10 +1,26 @@
 module Queries
   class NamedEnrollmentQueries
 
+    class InitialEnrollmentFilter
+      include Enumerable
+
+      def initialize(enum_from_aggregation)
+        @source_enum = enum_from_aggregation 
+      end
+
+      def each
+        @source_enum.each do |rec|
+          unless ["renewing_waived", "inactive", "void"].include?(rec["aasm_state"].to_s)
+            yield rec["hbx_enrollment_id"]
+          end
+        end
+      end
+    end
+
     def self.shop_initial_enrollments(organization, effective_on)
       benefit_package_ids = find_ie_benefit_package_ids(organization, effective_on)
 
-      Family.collection.aggregate([
+      aggregation = Family.collection.aggregate([
         {
           "$match" => {
             "households.hbx_enrollments.sponsored_benefit_package_id" => {"$in" => benefit_package_ids}
@@ -16,7 +32,11 @@ module Queries
           "households.hbx_enrollments.sponsored_benefit_package_id" => {"$in" => benefit_package_ids},
           "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
           "households.hbx_enrollments.effective_on" => effective_on,
-          "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]}
+          "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
+          "$or" => [
+            {"households.hbx_enrollments.terminated_on" => nil},
+            {"households.hbx_enrollments.terminated_on" => {"$gt" => effective_on}}
+          ]
         }},
         {"$sort" => {"households.hbx_enrollments.submitted_at" => 1}},
         {
@@ -26,12 +46,13 @@ module Queries
                "sponsored_benefit_id" => "$households.sponsored_benefit_id"
              },
             "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
+            "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
             "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"}
            }
         }
-      ]).lazy.map do |rec|
-        rec["hbx_enrollment_id"]
-      end
+      ])
+
+      InitialEnrollmentFilter.new(aggregation) 
     end
 
     def self.find_ie_benefit_package_ids(organization, effective_on)

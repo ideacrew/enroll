@@ -774,6 +774,26 @@ module BenefitSponsors
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
     end
 
+    def enrollment_quiet_period
+      if open_enrollment_end_on.blank?
+        prev_month = start_on.prev_month
+        quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+      else
+        quiet_period_start = open_enrollment_end_on + 1.day
+      end
+
+      quiet_period_end = predecessor_application_id.present? ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
+      TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+    end
+
+    def initial_quiet_period_end(start_on)
+      start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+    end
+
+    def renewal_quiet_period_end(start_on)
+      start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
+    end
+
     private
 
     def log_message(errors)
