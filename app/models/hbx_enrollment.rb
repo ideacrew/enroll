@@ -977,9 +977,11 @@ class HbxEnrollment
 
     case market_kind
       when 'shop'
-        if qle && family.is_under_special_enrollment_period?
+        if qle && family.is_under_special_enrollment_period? && benefit_group.present?
           family.current_sep.effective_on
         else
+          # we always have benefit group unless QLE gives an effective date before plan year start on
+          return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           benefit_group.effective_on_for(employee_role.hired_on)
         end
       when 'individual'

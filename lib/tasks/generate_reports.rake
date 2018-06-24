@@ -21,31 +21,55 @@ namespace :generate_reports do
     BenefitSponsors::Organizations::Organization.employer_profiles.includes(:benefit_sponsorships).select {|org| org.benefit_sponsorships.first.source_kind == :mid_plan_year_conversion}
   end
 
-  # def find_census_employees(organization)
-  #   benefit_sponsorship = organization.benefit_sponsorships.first
-  #   CensusEmployee.where(benefit_sponsors_employer_profile_id: organization.employer_profile.id, benefit_sponsorship_id: benefit_sponsorship.id)
-  # end
-  #
-  # def find_enrollment_policy_id(census_employee)
-  #   person = census_employee.employee_role.person
-  #   hbx_id = person.hbx_id
-  #   family = person.primary_family
-  #   policy_id = family.active_household.hbx_enrollments.first.hbx_id
-  #   dependents_hbx_ids = find_dependents_hbx_ids(family)
-  #   [hbx_id, policy_id] + dependents_hbx_ids
-  # end
-  #
-  # def find_dependents_hbx_ids(family)
-  #
-  #
-  # end
-  #
-  # desc "export conversion census employee details"
-  # task conversion_employees: :environment do
-  #   file_name = File.expand_path("#{Rails.root}/public/results_conversion_employees.csv")
-  #
-  #
-  #
-  # end
+  def find_census_employees(organization)
+    benefit_sponsorship = organization.benefit_sponsorships.first
+    CensusEmployee.where(benefit_sponsors_employer_profile_id: organization.employer_profile.id, benefit_sponsorship_id: benefit_sponsorship.id)
+  end
 
+  def find_enrollment_policy_id(census_employee)
+    person = census_employee.employee_role.person
+    hbx_id = person.hbx_id
+    family = person.primary_family
+    policy_id = family.active_household.hbx_enrollments.first.hbx_id
+    dependents_info = find_dependents_hbx_ids(family)
+    [person.first_name, person.last_name, hbx_id, policy_id] + dependents_info
+  end
+
+  def find_dependents_hbx_ids(family)
+    dependent_info = Array.new
+    family_dependents = family.family_members.find_all {|family_member| !family_member.is_primary_applicant?}
+
+    family_dependents.each do |family_member|
+      dependent_info.push family_member.person.first_name
+      dependent_info.push family_member.person.last_name
+      dependent_info.push family_member.person.hbx_id
+    end
+    dependent_info
+  end
+
+  desc "export conversion census employee details"
+  task conversion_employees: :environment do
+    attributes = %w(fein legal_name census_employee_first_name census_employee_last_name census_employee_hbx_id census_employee_policy_id)
+    (1..6).each do |i|
+      ["first name", "last name", "hbx_id"].each do |h|
+        attributes.push "Dep_#{i}_#{h}"
+      end
+    end
+
+    file_name = File.expand_path("#{Rails.root}/public/results_conversion_employees.csv")
+
+    organizations = find_organizations
+    puts "Started exporting values to CSV"
+    CSV.open(file_name, "w", force_quotes: true) do |csv|
+      csv << attributes
+      organizations.each do |organization|
+        census_employees = find_census_employees(organization)
+        census_employees.each do |census_employee|
+          census_info = find_enrollment_policy_id(census_employee)
+          csv << [organization.fein, organization.legal_name] + census_info
+        end
+      end
+    end
+    puts "Successfully generated report placed the CSV under public directory"
+  end
 end

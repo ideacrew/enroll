@@ -101,6 +101,7 @@ class Family
     "households.hbx_enrollments.sponsored_benefit_id" => 1,
     "households.hbx_enrollments.effective_on" => 1,
     "households.hbx_enrollments.submitted_at" => 1,
+    "households.hbx_enrollments.terminated_on" => 1,
     "households.hbx_enrollments.employee_role_id" => 1,
     "households.hbx_enrollments.aasm_state" => 1,
     "households.hbx_enrollments.kind" => 1
