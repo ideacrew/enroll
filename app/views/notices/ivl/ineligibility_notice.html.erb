@@ -1,5 +1,4 @@
 <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
-
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <br>
@@ -55,7 +54,7 @@
    heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + Settings.aca.individual_market.verification_due.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>

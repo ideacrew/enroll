@@ -32,7 +32,7 @@ module Factories
 
       if active_renewals.blank?
         if is_coverage_active? && renewal_plan_offered_by_er?(enrollment)
-          generate_passive_renewal
+          generate_passive_renewal(aasm_event: 'force_select_coverage')
         else
           @enrollment = current_enrollments.where(:aasm_state => 'inactive').first
           renew_waived_enrollment
