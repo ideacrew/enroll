@@ -16,22 +16,22 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
+    humanize_enrollment_states(census_employee, census_employee.active_benefit_group_enrollments).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
+    humanize_enrollment_states(census_employee, census_employee.renewal_benefit_group_enrollments).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
-  def humanize_enrollment_states(benefit_group_assignment)
+  def humanize_enrollment_states(census_employee, enrollments)
     enrollment_states = []
 
-    if benefit_group_assignment
-      enrollments = benefit_group_assignment.hbx_enrollments
+    if enrollments
+      enrollments = enrollments.show_enrollments_sans_canceled
 
       %W(health dental).each do |coverage_kind|
         if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-          enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
+          enrollment_states << "#{employee_benefit_group_assignment_status(census_employee, coverage.aasm_state)} (#{coverage_kind})"
         end
       end
       enrollment_states << '' if enrollment_states.compact.empty?

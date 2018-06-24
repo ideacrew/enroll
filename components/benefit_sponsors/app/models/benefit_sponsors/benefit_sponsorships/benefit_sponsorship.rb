@@ -304,7 +304,7 @@ module BenefitSponsors
     def benefit_package_by(id)
       benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
       if benefit_application
-        benefit_application.benefit_packages.find(id)
+        benefit_application.benefit_packages.unscoped.find(id)
       end
     end
 
