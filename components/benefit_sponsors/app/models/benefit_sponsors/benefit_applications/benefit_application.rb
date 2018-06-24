@@ -61,22 +61,24 @@ module BenefitSponsors
     # application
     field :recorded_sic_code,       type: String
 
-    field :predecessor_application_id,  type: BSON::ObjectId
-    field :successor_application_ids,   type: Array, default: []
+    field :predecessor_id,          type: BSON::ObjectId
 
     field :recorded_rating_area_id,     type: BSON::ObjectId
     field :recorded_service_area_ids,   type: Array, default: []
 
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId
 
+    delegate :benefit_market, to: :benefit_sponsorship
+
     embeds_many :benefit_packages,
       class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area
 
-    index({ "aasm_state" => 1 })
-    index({ "effective_period.min" => 1, "effective_period.max" => 1 }, { name: "effective_period" })
-    index({ "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1 }, { name: "open_enrollment_period" })
+    before_validation :pull_benefit_sponsorship_attributes
+    before_create :validate_benefit_sponsorship_shared_attributes
+    after_create :renew_benefit_package_assignments
+
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -96,7 +98,7 @@ module BenefitSponsors
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-    # scope :is_renewing,                     ->{ where(:predecessor_application => {:$exists => true},
+    # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
     #                                             }
 
@@ -164,114 +166,39 @@ module BenefitSponsors
     }
 
     scope :renewing, -> {
-      where("$exists" => {:predecessor_application_id => true} )
+      where("$exists" => {:predecessor_id => true} )
     }
 
-    before_create :set_rating_area
-    before_update :update_rating_area
+    def benefit_sponsorship=(new_benefit_sponsorship)
+      write_attribute(:recorded_rating_area_id, nil)
+      write_attribute(:recorded_service_area_ids, [])
+      write_attribute(:recorded_sic_code, nil)
+      write_attribute(:benefit_sponsorship, new_benefit_sponsorship)
 
-    before_create :set_service_areas
-    before_update :update_service_areas
-
-    def set_rating_area
-      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_rating_area = resolve_rating_area
-      end
+      pull_benefit_sponsorship_attributes
     end
 
-    def update_rating_area
-      if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_rating_area = resolve_rating_area
-      end
+    def predecessor=(benefit_application)
+      raise ArgumentError.new("expected BenefitApplication") unless benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
+      write_attribute(:predecessor_id, benefit_application._id)
+      @predecessor = benefit_application
     end
 
-    def set_service_areas
-      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_service_areas = resolve_service_areas
-      end
+    def predecessor
+      return nil if predecessor_id.blank?
+      return @predecessor if defined? @predecessor
+      @predecessor = benefit_sponsorship.find_benefit_applications(predecessor_id)
     end
 
-    def update_service_areas
-      if self.effective_period_changed? && start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        self.recorded_service_areas = resolve_service_areas
-      end
-    end
-
-    def resolve_rating_area
-      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        ::BenefitMarkets::Locations::RatingArea.rating_area_for(benefit_sponsorship.primary_office_address, during: start_on)
-      else
-        nil
-      end
-    end
-
-    def resolve_service_areas
-      if start_on.present? && benefit_sponsorship.present? && benefit_sponsorship.primary_office_address.present?
-        benefit_sponsorship.service_areas_for(start_on)
-      else
-        []
-      end
-    end
-    # scope :published_and_expired_plan_years_by_date, ->(date) {
-    #   where(
-    #     "$and" => [
-    #       {:aasm_state.in => APPROVED_STATES + ['expired'] },
-    #       {:"effective_period.min".lte => date, :"effective_period.max".gte => date}
-    #     ]
-    #     )
-    # }
-
-
-    # def benefit_sponsor_catalog_for(effective_date)
-    #   benefit_market_catalog = benefit_sponsorship.benefit_market.benefit_market_catalog_effective_on(effective_date)
-    #   if benefit_market_catalog.present?
-    #     self.benefit_sponsor_catalog = benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
-    #   else
-    #     nil
-    #   end
-    #   # benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: benefit_sponsorship.service_areas, effective_date: effective_date)
-    # end
-
-    delegate :benefit_market, to: :benefit_sponsorship
-
-    after_initialize :set_values
-    after_create :renew_benefit_package_assignments
-
-    def set_values
-      if benefit_sponsorship
-        recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
-        recorded_rating_area   = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
-      end
-    end
-
-    def predecessor_application=(new_benefit_application)
-      raise ArgumentError.new("expected BenefitApplication") unless new_benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
-      self.predecessor_application_id = new_benefit_application._id
-      @predecessor_application = new_benefit_application
-    end
-
-    def predecessor_application
-      return nil if predecessor_application_id.blank?
-      return @predecessor_application if @benefit_application
-      @predecessor_application = benefit_sponsorship.benefit_applications_by(predecessor_application_id)
-    end
-
-    def successor_applications=(applications)
-      raise ArgumentError.new("expected BenefitApplication") if applications.any?{|application| !application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication}
-      self.successor_application_ids = applications.map(&:_id)
-      @successor_applications = applications
-    end
-
-    def successor_applications
-      return nil if successor_application_ids.blank?
-      return if defined? @successor_applications
-      @successor_applications = benefit_sponsorship.benefit_applications_by(successor_application_ids)
+    def successors
+      return [] if benefit_sponsorship.blank?
+      return @successors if defined? @successors
+      @successors = benefit_sponsorship.benefit_application_successors_for(self)
     end
 
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
-      self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
+      write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
     end
 
@@ -283,13 +210,14 @@ module BenefitSponsors
 
     def recorded_rating_area=(new_recorded_rating_area)
       if new_recorded_rating_area.nil?
+        write_attribute(:recorded_rating_area_id, nil)
         @recorded_rating_area = nil
-        self.recorded_rating_area_id = nil
-        return
+      else
+        raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
+        write_attribute(:recorded_rating_area_id, new_recorded_rating_area._id)
+        @recorded_rating_area = new_recorded_rating_area
       end
-      raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
-      self.recorded_rating_area_id = new_recorded_rating_area._id
-      @recorded_rating_area = new_recorded_rating_area
+      @recorded_rating_area
     end
 
     def recorded_rating_area
@@ -298,20 +226,20 @@ module BenefitSponsors
       @recorded_rating_area = BenefitMarkets::Locations::RatingArea.find(recorded_rating_area_id)
     end
 
+    def recorded_service_areas
+      return @recorded_service_areas if defined? @recorded_service_areas
+      @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
+    end
+
     def recorded_service_areas=(new_recorded_service_areas)
       raise ArgumentError.new("expected ServiceArea") if new_recorded_service_areas.any?{|service_area| !service_area.is_a? BenefitMarkets::Locations::ServiceArea}
       self.recorded_service_area_ids = new_recorded_service_areas.map(&:_id)
       @recorded_service_areas = new_recorded_service_areas
     end
 
-    def recorded_service_areas
-      return @recorded_service_areas if defined? @recorded_service_areas
-      @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
-    end
-
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
-      self.benefit_sponsor_catalog_id = new_benefit_sponsor_catalog._id
+      write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
     end
 
@@ -332,7 +260,7 @@ module BenefitSponsors
     end
 
     def rate_schedule_date
-      if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor_application.blank?
+      if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor.blank?
         end_on.prev_year + 1.day
       else
         start_on
@@ -397,7 +325,7 @@ module BenefitSponsors
     end
 
     def is_renewing?
-      predecessor_application.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      predecessor.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
     end
 
     def is_conversion?
@@ -405,7 +333,7 @@ module BenefitSponsors
     end
 
     def is_renewal_enrolling?
-      predecessor_application.present? && (ENROLLING_STATES).include?(aasm_state)
+      predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
     end
 
     def open_enrollment_contains?(date)
@@ -438,7 +366,7 @@ module BenefitSponsors
         pte_count:                pte_count,
         msp_count:                msp_count,
         benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
-        predecessor_application:  self,
+        predecessor:  self,
         recorded_service_areas:   benefit_sponsorship.service_areas,
         recorded_rating_area:     benefit_sponsorship.rating_area,
         effective_period:         new_benefit_sponsor_catalog.effective_period,
@@ -728,12 +656,13 @@ module BenefitSponsors
       end
     end
 
-
+    # Notify BenefitSponsorship upon state change
     def publish_state_transition
       return unless benefit_sponsorship.present?
       benefit_sponsorship.application_event_subscriber(aasm)
     end
 
+    # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
       if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
         approve_enrollment_eligiblity!
@@ -744,57 +673,94 @@ module BenefitSponsors
       end
     end
 
-    def is_published?
+    def is_published? # Deprecate in future
+      warn "[Deprecated] Instead use is_submitted?" # unless Rails.env.test?
+      is_submitted?
+    end
+
+    def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
     end
 
     def benefit_groups # Deprecate in future
-      warn "[Deprecated] Instead use benefit_packages" unless Rails.env.test?
+      warn "[Deprecated] Instead use benefit_packages" ##  unless Rails.env.test?
       benefit_packages
     end
 
     def employees_are_matchable? # Deprecate in future
-      warn "[Deprecated] Instead use is_published?" unless Rails.env.test?
-      is_published?
+      warn "[Deprecated] Instead use is_submitted?" # unless Rails.env.test?
+      is_submitted?
     end
 
     def employer_profile
       benefit_sponsorship.profile
     end
 
-    def eligible_for_export?
-      return false if self.aasm_state.blank?
-      return false if self.imported?
-      return false if self.effective_period.blank?
-      return true if self.enrollment_eligible? || self.active?
-      self.terminated? || self.expired?
-    end
-
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
     end
 
-    def enrollment_quiet_period
-      if open_enrollment_end_on.blank?
-        prev_month = start_on.prev_month
-        quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
-      else
-        quiet_period_start = open_enrollment_end_on + 1.day
-      end
 
-      quiet_period_end = predecessor_application_id.present? ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
-      TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
-    end
+    ### TODO FIX Move these methods to domain logic
+            def eligible_for_export?
+              return false if self.aasm_state.blank?
+              return false if self.imported?
+              return false if self.effective_period.blank?
+              return true if self.enrollment_eligible? || self.active?
+              self.terminated? || self.expired?
+            end
 
-    def initial_quiet_period_end(start_on)
-      start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
-    end
+            def enrollment_quiet_period
+              if open_enrollment_end_on.blank?
+                prev_month = start_on.prev_month
+                quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+              else
+                quiet_period_start = open_enrollment_end_on + 1.day
+              end
 
-    def renewal_quiet_period_end(start_on)
-      start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
-    end
+              quiet_period_end = predecessor_id.present? ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
+              TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
+            end
+
+            def initial_quiet_period_end(start_on)
+              start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+            end
+
+            def renewal_quiet_period_end(start_on)
+              start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
+            end
+    ###
 
     private
+
+    def pull_benefit_sponsorship_attributes
+      return unless benefit_sponsorship.present? && effective_period.present?
+      if recorded_rating_area.blank? && benefit_sponsorship.rating_area.present?
+        self.recorded_rating_area_id = benefit_sponsorship.rating_area._id
+      end
+
+      if recorded_service_areas.blank? && benefit_sponsorship.service_areas.present?
+        self.recorded_service_area_ids = benefit_sponsorship.service_areas_for(effective_period.min).map(&:_id)
+      end
+
+      if recorded_sic_code.blank? && benefit_sponsorship.sic_code.present?
+        self.recorded_sic_code = benefit_sponsorship.sic_code
+      end
+    end
+
+    def validate_benefit_sponsorship_shared_attributes
+      if benefit_sponsorship.present?
+        if rating_area == benefit_sponsorship.rating_area
+          if service_areas = benefit_sponsorship.benefit_sponsorship.service_areas_for(effective_period.min)
+            return true
+          else
+            return errors.add(:services_areas, "must match benefit_sponsorship service areas")
+          end
+        else
+          return errors.add(:rating_area, "must match benefit_sponsorship rating area")
+        end
+      end
+    end
 
     def log_message(errors)
       msg = yield.first

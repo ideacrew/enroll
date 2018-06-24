@@ -29,21 +29,14 @@ module BenefitSponsors
       }
     end
 
-    context "A new model instance" do
+    describe "A new model instance" do
      it { is_expected.to be_mongoid_document }
      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
      it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
-
      it { is_expected.to embed_many(:benefit_packages)}
-     # it { is_expected.to belong_to(:successor_applications).as_inverse_of(:predecessor_application)}
-
-      # before do
-      #   site.owner_organization = owner_organization
-      #   benefit_market.save!
-      # end
 
       context "with no arguments" do
         subject { described_class.new }
@@ -114,7 +107,7 @@ module BenefitSponsors
       end
     end
 
-    describe "Extending a BenefitApplication's open_enrollment_period", :dbclean => :after_each do
+    describe "Extending an open_enrollment_period", :dbclean => :after_each do
       let(:benefit_application)   { described_class.new(**params) }
 
       context "and the application can transition to open enrollment state" do
@@ -273,7 +266,6 @@ module BenefitSponsors
       # end
     end
 
-
     describe "Transitioning a BenefitApplication through Plan Design states" do
       let(:benefit_application)   { described_class.new(**params) }
 
@@ -327,7 +319,6 @@ module BenefitSponsors
           end
         end
       end
-
     end
 
 
@@ -371,7 +362,6 @@ module BenefitSponsors
 
     describe ".renew" do
 
-
       context "when renewal benefit sponsor catalog available" do
 
         # Create site
@@ -412,7 +402,7 @@ module BenefitSponsors
       end
     end
 
-    context "a BenefitApplication class" do
+    describe "Date period behaviors" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
       let(:begin_day)           { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
@@ -547,7 +537,51 @@ module BenefitSponsors
                             )).to be_valid
         end
       end
-
     end
+
+    describe "Navigating BenefitSponsorship Predecessor/Successor linked list", :dbclean => :after_each do
+      let(:node_a)    { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                              ) }
+      let(:node_a1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                predecessor: node_a,
+                                              ) }
+      let(:node_a1a)  { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                predecessor: node_a1,
+                                              ) }
+      let(:node_b1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                predecessor: node_a,
+                                              ) }
+
+      it "should manage predecessors", :aggregate_failures do
+        expect(node_a1a.predecessor).to eq node_a1
+        expect(node_a1.predecessor).to eq node_a
+        expect(node_b1.predecessor).to eq node_a
+        expect(node_a.predecessor).to eq nil
+      end
+
+      context "and the BenefitApplications are persisted" do
+        before do
+          node_a.save!
+          node_a1.save!
+          node_a1a.save!
+          node_b1.save!
+        end
+
+        it "should maintain linked lists for successors", :aggregate_failures do
+          expect(node_a.successors).to contain_exactly(node_a1, node_b1)
+          expect(node_a1.successors).to eq [node_a1a]
+        end
+      end
+    end
+
+
   end
 end
