@@ -5,6 +5,16 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
+    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+                                            benefit_market: benefit_market,
+                                            title: "SHOP Benefits for #{current_effective_date.year}",
+                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+                                          }
+    let(:benefit_market)      { site.benefit_markets.first }
+    let!(:product_package) { benefit_market_catalog.product_packages.first }
+
     let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
@@ -12,8 +22,6 @@ module BenefitSponsors
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
     let(:person) { FactoryGirl.create(:person) }
     let!(:user) { FactoryGirl.create_default :user, person: person}
-
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
@@ -216,18 +224,23 @@ module BenefitSponsors
     end
 
     describe "POST publish" do
+
       include_context 'shared_stuff'
 
+      let!(:benefit_application) {
+        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
+        application.benefit_sponsor_catalog.save!
+        application
+      }
+      let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+
       before do
-        benefit_sponsorship.benefit_applications = [ben_app]
-        ben_app.benefit_packages.build
-        ben_app.save
         benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
       end
 
       def sign_in_and_submit_application
         sign_in user
-        post :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+        post :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "benefit application published sucessfully" do
@@ -245,7 +258,7 @@ module BenefitSponsors
 
         it "should redirect with success message" do
           sign_in user
-          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           expect(flash[:notice]).to eq "Benefit Application successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
@@ -259,7 +272,7 @@ module BenefitSponsors
 
         it "should display warnings" do
           sign_in user
-          xhr :post, :submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
           have_http_status(:success)
         end
       end

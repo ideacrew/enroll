@@ -37,17 +37,22 @@ module BenefitSponsors
     end
 
     def submit_application
-      if benefit_application.may_approve_application? # eligible_warnings_policy
-        if is_application_eligible? # TODO: change it to is_application_valid? # application_valid_policy
-          benefit_application.approve_application!
+      if benefit_application.may_approve_application?
+        if is_application_eligible? # TODO: change it to is_application_valid?
+          ben_app_policy = business_policy_for(:submit_benefit_application)
+          if ben_app_policy.is_satisfied?(benefit_application)
+            benefit_application.approve_application!
 
-          oe_period = benefit_application.open_enrollment_period
-          if today >= oe_period.begin
-            benefit_application.begin_open_enrollment!
-            benefit_application.update(open_enrollment_period: (today..oe_period.end))
+            oe_period = benefit_application.open_enrollment_period
+            if today >= oe_period.begin
+              benefit_application.begin_open_enrollment!
+              benefit_application.update(open_enrollment_period: (today..oe_period.end))
+            end
+
+            [true, benefit_application, application_warnings]
+          else
+            [false, benefit_application, ben_app_policy.fail_results]
           end
-
-          [true, benefit_application, application_warnings]
         else
           [false, benefit_application, application_eligibility_warnings]
         end
@@ -96,6 +101,7 @@ module BenefitSponsors
       if benefit_application.may_end_open_enrollment?
         benefit_application.end_open_enrollment!
         benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
+        calculate_pricing_determinations(benefit_application)
       end
     end
 
@@ -232,22 +238,26 @@ module BenefitSponsors
       business_policy.is_satisfied?
     end
 
-    def enrollment_policy
-      return @enrollment_policy if defined?(@enrollment_policy)
-      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEnrollmentPolicy.new
-    end
-
-    def business_policy_for(business_policy_name)
-      enrollment_policy.business_policies_for(benefit_application, business_policy_name)
-    end
-
     def policy_name(event_name)
       event_name
+    end
+
+    def calculate_pricing_determinations(b_application)
+      ::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(b_application, today)
     end
 
     def log_message(errors)
       msg = yield.first
       (errors[msg[0]] ||= []) << msg[1]
+    end
+
+    def eligibility_policy
+      return @eligibility_policy if defined?(@eligibility_policy)
+      @eligibility_policy = BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    end
+
+    def business_policy_for(business_policy_name)
+      eligibility_policy.business_policies_for(benefit_application, business_policy_name)
     end
 
     def due_date_for_publish

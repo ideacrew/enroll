@@ -32,10 +32,15 @@ module BenefitSponsors
       def disable_benefit_package(form)
         benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
-        if benefit_application.disable_benefit_package(benefit_package)
-          return [true, benefit_package]
+        if benefit_application.benefit_packages.size > 1
+          if benefit_package.cancel_member_benefits
+            return [true, benefit_package]
+          else
+            map_errors_for(benefit_package, onto: form)
+            return [false, nil]
+          end
         else
-          map_errors_for(benefit_package, onto: form)
+          form.errors.add(:base, "Benefit package can not be deleted because it is the only benefit package remaining in the plan year.")
           return [false, nil]
         end
       end

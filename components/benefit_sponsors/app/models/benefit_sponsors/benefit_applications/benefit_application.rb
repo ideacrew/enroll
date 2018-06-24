@@ -528,6 +528,10 @@ module BenefitSponsors
       end
     end
 
+    def assigned_census_employees_without_owner
+      benefit_sponsorship.census_employees.active.non_business_owner
+    end
+
     def non_business_owner_enrolled
       total_enrolled   = families_enrolled_under_application
 

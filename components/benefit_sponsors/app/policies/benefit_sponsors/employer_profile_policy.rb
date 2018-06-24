@@ -4,7 +4,7 @@ module BenefitSponsors
     def show?
       return false unless user.present?
       return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      true
+      is_staff_role_for_employer?(record)
     end
 
     def show_pending?
@@ -15,7 +15,7 @@ module BenefitSponsors
     def coverage_reports?
       return false unless user.present?
       return true if (user.has_hbx_staff_role? && can_list_enrollments?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      true
+      is_staff_role_for_employer?(record)
     end
 
     def export_census_employees?
@@ -24,6 +24,11 @@ module BenefitSponsors
 
     def inbox?
       show?
+    end
+
+    def is_staff_role_for_employer?(profile)
+      staff_roles = user.person.employer_staff_roles
+      staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == record.id }
     end
 
     def is_broker_for_employer?(profile)
@@ -38,8 +43,9 @@ module BenefitSponsors
     end
 
     def updateable?
-      return true unless role = user.person && user.person.hbx_staff_role
-      role.permission.modify_employer
+      return false if (user.blank? || user.person.blank?)
+      return true if  (user.has_hbx_staff_role? && can_modify_employer?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      is_staff_role_for_employer?(record)
     end
 
     def list_enrollments?
@@ -48,6 +54,10 @@ module BenefitSponsors
 
     def can_list_enrollments?
       user.person.hbx_staff_role.permission.list_enrollments
+    end
+
+    def can_modify_employer?
+      user.person.hbx_staff_role.permission.modify_employer
     end
   end
 end

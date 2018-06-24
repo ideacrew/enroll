@@ -59,10 +59,10 @@ module BenefitSponsors
         authorize @benefit_package_form, :updateable?
         if @benefit_package_form.destroy
           flash[:notice] = "Benefit Package successfully deleted."
-          benefit_sponsorship_benefit_applications_path(@benefit_package_form.service.benefit_application.benefit_sponsorship)
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
         else
-          falsh[:error] = error_messages(@benefit_package_form)
-          # render :
+          flash[:error] = error_messages(@benefit_package_form)
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
         end
       end
 

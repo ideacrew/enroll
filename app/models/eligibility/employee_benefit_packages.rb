@@ -118,6 +118,14 @@ module Eligibility
       end
     end
 
+    def possible_benefit_package
+      if active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+        active_benefit_group_assignment.benefit_package
+      elsif renewal_benefit_group_assignment.present?
+        renewal_benefit_group_assignment.benefit_package
+      end
+    end
+
     def reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
         benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max

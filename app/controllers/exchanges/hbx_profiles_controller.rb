@@ -23,7 +23,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     if params[:ids]
       begin
-        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
       rescue => e
@@ -61,7 +61,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-    @organizations = BenefitSponsors::Organizations::Organization.where(:"_id".in => params[:ids]).all
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @organizations = @benfit_sponsorships.map(&:organization)
     @employer_profiles = @organizations.flat_map(&:employer_profile)
     @employer_profiles.each do |employer_profile|
       @employer_invoice = BenefitSponsors::EmployerInvoice.new(employer_profile.organization)

@@ -122,6 +122,7 @@ module BenefitSponsors
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
       scope :by_employer_profile,             ->( profile_id ){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
       scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
+      scope :employer_by_fein,                ->( fein ){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
 
       scope :employer_profiles_applicants,   ->{
         where(

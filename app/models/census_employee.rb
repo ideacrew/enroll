@@ -332,7 +332,7 @@ class CensusEmployee < CensusMember
 
   def published_benefit_group_assignment
     benefit_group_assignments.detect do |benefit_group_assignment|
-      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      benefit_group_assignment.benefit_group.is_active && benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
     end
   end
 
@@ -439,17 +439,20 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employee_enrollments
-    [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
-      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
-      enrollments.each do |e|
-        if e.effective_on > self.coverage_terminated_on
-          e.cancel_coverage!(self.employment_terminated_on) if e.may_cancel_coverage?
+
+    term_eligible_active_enrollments = active_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if active_benefit_group_enrollments.present?
+    term_eligible_renewal_enrollments = renewal_benefit_group_enrollments.show_enrollments_sans_canceled.non_terminated if renewal_benefit_group_enrollments.present?
+
+    enrollments = (Array.wrap(term_eligible_active_enrollments) + Array.wrap(term_eligible_renewal_enrollments)).compact
+
+    enrollments.each do |enrollment|
+      if enrollment.effective_on > self.coverage_terminated_on
+        enrollment.cancel_coverage!(self.coverage_terminated_on) if enrollment.may_cancel_coverage?
+      else
+        if self.coverage_terminated_on < TimeKeeper.date_of_record
+          enrollment.terminate_coverage!(self.coverage_terminated_on) if enrollment.may_terminate_coverage?
         else
-          if self.coverage_terminated_on < TimeKeeper.date_of_record
-            e.terminate_coverage!(self.coverage_terminated_on) if e.may_terminate_coverage?
-          else
-            e.schedule_coverage_termination!(self.coverage_terminated_on) if e.may_schedule_coverage_termination?
-          end
+          enrollment.schedule_coverage_termination!(self.coverage_terminated_on) if enrollment.may_schedule_coverage_termination?
         end
       end
     end
@@ -656,15 +659,13 @@ class CensusEmployee < CensusMember
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
 
-    cobra_assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
-    hbxs = cobra_assignments.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
-
-    hbxs.compact.each do |hbx|
-      enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
-      enrollment_cobra_factory.family = family
-      enrollment_cobra_factory.census_employee = self
-      enrollment_cobra_factory.enrollment = hbx
-      enrollment_cobra_factory.clone_for_cobra
+    cobra_eligible_enrollments.each do |enrollment|
+      factory = Factories::FamilyEnrollmentCloneFactory.new(
+        family: family,
+        census_employee: self,
+        enrollment: enrollment
+      )
+      factory.clone_for_cobra
     end
   rescue => e
     logger.error(e)
@@ -1173,6 +1174,30 @@ def self.to_csv
       :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
       :"employee_role_id" => self.employee_role_id
     )
+  end
+
+  # Enrollments eligible for Cobra
+
+  # Picking latest health & dental enrollments
+  def active_benefit_group_cobra_eligible_enrollments
+    return [] if active_benefit_group_enrollments.blank?
+    eligible_enrollments = active_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
+  end
+
+  # Picking latest health & dental enrollments
+  def renewal_benefit_group_cobra_eligible_enrollments
+    return [] if renewal_benefit_group_enrollments.blank?
+    eligible_enrollments = renewal_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
+  end
+
+  def cobra_eligible_enrollments
+    (active_benefit_group_cobra_eligible_enrollments + renewal_benefit_group_cobra_eligible_enrollments).flatten
+  end
+
+  def benefit_group_assignment_by_package(package_id)
+    benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
   end
 
   def benefit_package_for_open_enrollment(shopping_date)

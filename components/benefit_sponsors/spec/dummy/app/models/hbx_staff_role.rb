@@ -20,4 +20,7 @@ class HbxStaffRole
   #subrole is for documentation. should be redundant with permission_id
   field :subrole, type: String, default: ""
   field :permission_id, type: BSON::ObjectId
+
+  def permission
+  end
 end
