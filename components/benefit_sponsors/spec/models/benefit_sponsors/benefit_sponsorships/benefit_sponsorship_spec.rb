@@ -131,19 +131,13 @@ module BenefitSponsors
     end
 
     describe "Navigating BenefitSponsorship Predecessor/Successor linked list" do
-      let(:org_a)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let(:profile_a)   { employer_organization.employer_profile }
-      let(:org_a1)      { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let(:profile_a1)  { employer_organization.employer_profile }
-      let(:org_a1a)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let(:profile_a1a) { employer_organization.employer_profile }
-      let(:org_b1)      { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let(:profile_b1)  { employer_organization.employer_profile }
+      let(:linked_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:linked_profile)      { linked_organization.employer_profile }
 
-      let(:node_a)      { described_class.new(profile: profile_a) }
-      let(:node_a1)     { described_class.new(profile: profile_a1, predecessor_sponsorship: node_a) }
-      let(:node_a1a)    { described_class.new(profile: profile_a1a, predecessor_sponsorship: node_a1) }
-      let(:node_b1)     { described_class.new(profile: profile_b1, predecessor_sponsorship: node_a) }
+      let(:node_a)      { described_class.new(profile: linked_profile) }
+      let(:node_a1)     { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a) }
+      let(:node_a1a)    { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a1) }
+      let(:node_b1)     { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a) }
 
       it "should manage predecessors", :aggregate_failures do
         expect(node_a1a.predecessor_sponsorship).to eq node_a1
