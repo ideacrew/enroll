@@ -142,7 +142,11 @@ module BenefitSponsors
 
         def messages
           @sent_box = true
-          @provider = current_user.person
+          # don't use current_user
+          # messages are different for current_user is admin and broker account login
+          @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+          @broker_provider = @broker_agency_profile.primary_broker_role.person
+
           respond_to do |format|
             format.js {}
           end
