@@ -36,7 +36,7 @@ attributes: !ruby/hash:BSON::Document
   family_deductible: "$3300 per person | $6600 per group"
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-06-12 17:27:19.424000000 Z
+  updated_at: 2018-06-23 22:31:10.988000000 Z
   created_at: 2018-06-10 20:37:10.174000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId

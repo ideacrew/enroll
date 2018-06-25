@@ -305,12 +305,20 @@ class BenefitApplicationMigration < Mongoid::Migration
   def self.sanitize_benefit_group_attrs(benefit_group)
     attributes = benefit_group.attributes.slice(
         :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
-        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits, :composite_tier_contributions
+        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
     )
 
     attributes[:is_default] = benefit_group.default
     attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
     attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+    attributes[:composite_tier_contributions] = benefit_group.composite_tier_contributions.inject([]) do |contributions, tier|
+      contributions << {
+          relationship: tier.composite_rating_tier,
+          offered: tier.offered,
+          premium_pct: tier.employer_contribution_percent,
+          estimated_tier_premium: tier.estimated_tier_premium
+      }
+    end
     attributes
   end
 
