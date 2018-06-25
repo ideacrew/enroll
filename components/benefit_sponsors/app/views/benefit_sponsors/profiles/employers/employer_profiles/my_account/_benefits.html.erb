@@ -78,6 +78,85 @@
           <% end %>
           <span></span>
         </div>
+
+        <% if benefit_application.draft? && benefit_application.benefit_packages.empty? %>
+          <div class="benefit-group">
+            <div class="panel benefitgroup col-xs-12">
+              <div class="col-xs-11">
+                <table>
+                  <tr>
+                    <td>
+                      <header>Coverage Year</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.start_on.to_date.to_formatted_s :long_ordinal %> - <%= benefit_application.end_on.to_date.to_formatted_s :long_ordinal %>
+                      </p>
+                    </td>
+
+                    <% if benefit_application.terminated_on %>
+                      <td>
+                          <header>Terminated On</header>
+                      </td>
+                      <td>
+                         <p>
+                            <%= benefit_application.terminated_on.to_date.to_formatted_s :long_ordinal %>
+                         </p>
+                      </td>
+                    <%end%>
+
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>Open Enrollment Dates</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.open_enrollment_start_on.to_date.to_formatted_s :long_ordinal %> - <%= benefit_application.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>FTE Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.fte_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>PTE Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.pte_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <header>MSP Count</header>
+                    </td>
+                    <td>
+                      <p>
+                        <%= benefit_application.msp_count %>
+                      </p>
+                    </td>
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
         <% benefit_application.benefit_packages.each do |package| %>
         <div class="benefit-group">
           <% # next if package.reference_plan_id.blank? %>
