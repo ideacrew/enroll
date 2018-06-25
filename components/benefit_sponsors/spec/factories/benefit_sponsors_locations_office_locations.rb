@@ -13,14 +13,14 @@ FactoryGirl.define do
       after(:build) do |office_location, evaluator|
         office_location.is_primary = true
         office_location.address { FactoryGirl.build(:benefit_sponsors_locations_address,
-                      kind: "primary",
-                      address_1: '26 Greenough Ave',
-                      city: 'Boston',
-                      state: 'MA',
-                      zip: '02130',
-                      county: 'Suffolk'
-                    )
+                      kind:       "work",
+                      address_1: '27 Reo Road',
+                      city:      'Maynard',
+                      state:     'MD',
+                      zip:       '01754',
+                      county:    'Middlesex'                    )
                   }
+
         office_location.phone   { FactoryGirl.build(:benefit_sponsors_locations_phone,
                       kind: "work",
                       area_code: 617,
