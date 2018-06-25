@@ -25,7 +25,6 @@ module BenefitSponsors
     # include Concerns::Observable
     include AASM
 
-
     # Origination of this BenefitSponsorship instance in association
     # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
     #   :self_serve               =>  sponsor independently joined HBX with initial effective date
@@ -184,14 +183,10 @@ module BenefitSponsors
     index({ profile_id: 1 })
 
     index({"benefit_application._id" => 1})
-    index({ "benefit_application.aasm_state" => 1,
-            "effective_period.min" => 1,
-            "effective_period.max" => 1},
+    index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
             { name: "effective_period" })
 
-    index({ "benefit_application.aasm_state" => 1,
-            "open_enrollment_period.min" => 1,
-            "open_enrollment_period.max" => 1},
+    index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
 
 
@@ -269,6 +264,7 @@ module BenefitSponsors
         write_attribute(:profile_id, new_profile._id)
         @profile = new_profile
         self.organization = new_profile.organization
+
         pull_profile_attributes
         pull_organization_attributes
       end
@@ -328,6 +324,10 @@ module BenefitSponsors
 
     def benefit_applications_by(ids)
       benefit_applications.find(ids)
+    end
+
+    def benefit_application_successors_for(benefit_application)
+      benefit_applications.select { |sponsorship_benefit_application| sponsorship_benefit_application.predecessor_id == benefit_application._id}
     end
 
     def benefit_package_by(id)
@@ -506,6 +506,8 @@ module BenefitSponsors
     # active                 -> active
     def application_event_subscriber(aasm)
       case aasm.to_state
+      when :imported
+        revert_to_applicant! if may_revert_to_applicant?
       when :approved
         approve_initial_application! if may_approve_initial_application?
       when :pending
@@ -525,6 +527,7 @@ module BenefitSponsors
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       end
+
     end
 
     def is_conversion?
