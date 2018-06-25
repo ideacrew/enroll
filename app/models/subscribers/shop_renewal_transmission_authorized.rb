@@ -25,9 +25,9 @@ module Subscribers
           return
         end
         employer = if employer_id.blank?
-                     Organization.where(:fein => employer_fein).first
+                     BenefitSponsors::Organizations::Organization.where(:fein => employer_fein).first
                    else
-                     Organization.employer_by_hbx_id(employer_id).first
+                     BenefitSponsors::Organizations::Organization.employer_by_hbx_id(employer_id).first
                    end
         if employer.nil?
           notify("acapi.error.events.employer.renewal_transmission_authorized.employer_not_found", {
