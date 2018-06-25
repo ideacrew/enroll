@@ -85,6 +85,8 @@ def term_states
 end
 
 def can_publish_enrollment?(enrollment, transition_at)
+  sb = enrollment.sponsored_benefit
+  benefit_application = sb.benefit_package.benefit_application
   quiet_period = benefit_application.quiet_period
   if is_valid_benefit_application?(benefit_application)
     return false if transition_at.in_time_zone("UTC") <= quiet_period.max # don't transmit enrollments until quiet period ended

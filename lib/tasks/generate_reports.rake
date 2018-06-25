@@ -32,7 +32,7 @@ namespace :generate_reports do
     family = person.primary_family
     policy_id = family.active_household.hbx_enrollments.first.hbx_id
     dependents_info = find_dependents_hbx_ids(family)
-    [person.first_name, person.last_name, hbx_id, policy_id] + dependents_info
+    [person.first_name, person.last_name, person.ssn, person.dob.to_s, hbx_id, policy_id] + dependents_info
   end
 
   def find_dependents_hbx_ids(family)
@@ -40,18 +40,21 @@ namespace :generate_reports do
     family_dependents = family.family_members.find_all {|family_member| !family_member.is_primary_applicant?}
 
     family_dependents.each do |family_member|
-      dependent_info.push family_member.person.first_name
-      dependent_info.push family_member.person.last_name
-      dependent_info.push family_member.person.hbx_id
+      person = family_member.person
+      dependent_info.push person.first_name
+      dependent_info.push person.last_name
+      dependent_info.push person.ssn
+      dependent_info.push person.dob.to_s
+      dependent_info.push person.hbx_id
     end
     dependent_info
   end
 
   desc "export conversion census employee details"
   task conversion_employees: :environment do
-    attributes = %w(fein legal_name census_employee_first_name census_employee_last_name census_employee_hbx_id census_employee_policy_id)
+    attributes = %w(fein legal_name census_employee_first_name census_employee_last_name census_employee_ssn census_employee_dob census_employee_hbx_id census_employee_policy_id)
     (1..6).each do |i|
-      ["first name", "last name", "hbx_id"].each do |h|
+      ["first name", "last name", "ssn", "dob", "hbx_id"].each do |h|
         attributes.push "Dep_#{i}_#{h}"
       end
     end
