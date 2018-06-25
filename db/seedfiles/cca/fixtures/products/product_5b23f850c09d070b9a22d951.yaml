@@ -1,5 +1,5 @@
 --- !ruby/object:BenefitMarkets::Products::HealthProducts::HealthProduct
-__selected_fields:
+__selected_fields: 
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -17,10 +17,10 @@ attributes: !ruby/hash:BSON::Document
   health_plan_kind: :hmo
   metal_level_kind: :bronze
   is_standard_plan: false
-  rx_formulary_url:
+  rx_formulary_url: 
   hsa_eligibility: false
   benefit_market_kind: :aca_shop
-  hbx_id:
+  hbx_id: 
   title: Select Care Bronze Deductible 3000
   issuer_profile_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -34,16 +34,16 @@ attributes: !ruby/hash:BSON::Document
   service_area_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WxWP9Z+ICzHOaiuJ
-  provider_directory_url:
+  provider_directory_url: 
   deductible: "$3,000"
   family_deductible: "$3000 per person | $6000 per group"
   is_reference_plan_eligible: true
-  issuer_assigned_id:
+  issuer_assigned_id: 
   renewal_product_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       Wx2L9+bro5CtEzsC
   kind: :health
-  updated_at: 2018-06-15 17:33:04.235000000 Z
+  updated_at: 2018-06-23 22:30:34.846000000 Z
   created_at: 2018-06-15 17:33:04.235000000 Z
   premium_tables:
   - !ruby/hash:BSON::Document
