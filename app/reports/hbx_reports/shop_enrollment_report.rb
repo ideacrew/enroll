@@ -31,7 +31,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
     enrollment_ids.each{|id| (enrollment_ids_final << id)}
 
     field_names = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State', 'Enrollment Group ID', 
-               'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name', 'Subscriber SSN', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Sep Reason', 'In Glue']
+               'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name', 'Subscriber SSN', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason', 'In Glue']
 
     file_name = "#{Rails.root}/hbx_report/shop_enrollment_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -40,7 +40,12 @@ class ShopEnrollmentReport < MongoidMigrationTask
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
         begin
           employer_profile = hbx_enrollment.employer_profile
-          sep_reason = hbx_enrollment.enrollment_kind == "special_enrollment" ? hbx_enrollment.special_enrollment_period.qualifying_life_event_kind.reason : ''
+          case hbx_enrollment.enrollment_kind
+          when "special_enrollment" 
+            enrollment_reason = hbx_enrollment.special_enrollment_period.qualifying_life_event_kind.reason
+          when "open_enrollment"
+            enrollment_reason = hbx_enrollment.eligibility_event_kind
+          end
           employer_id = employer_profile.hbx_id
           fein = employer_profile.fein
           legal_name = employer_profile.legal_name
@@ -62,7 +67,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
             subscriber_ssn = subscriber.person.ssn
           end
           in_glue = glue_list.include?(id) if glue_list.present?
-          csv << [employer_id,fein,legal_name,plan_year_start,plan_year_state,employer_profile_aasm,eg_id,purchase_time,coverage_start,enrollment_state,subscriber_hbx_id,first_name,last_name,subscriber_ssn,plan_hios_id,covered_lives,sep_reason,in_glue]
+          csv << [employer_id,fein,legal_name,plan_year_start,plan_year_state,employer_profile_aasm,eg_id,purchase_time,coverage_start,enrollment_state,subscriber_hbx_id,first_name,last_name,subscriber_ssn,plan_hios_id,covered_lives,enrollment_reason,in_glue]
         rescue Exception => e
           puts "Couldnot add the hbx_enrollment's information on to the CSV, because #{e.inspect}" unless Rails.env.test?
         end
