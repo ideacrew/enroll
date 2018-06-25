@@ -81,6 +81,7 @@ BenefitSponsors::Engine.routes.draw do
       resources :benefit_packages, controller: "benefit_packages/benefit_packages" do
         get :calculate_employer_contributions, on: :collection
         get :calculate_employer_contributions, on: :member
+        get :reference_product_summary, on: :collection
         resources :sponsored_benefits, only: :new
       end
     end

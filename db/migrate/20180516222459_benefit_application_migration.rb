@@ -156,12 +156,16 @@ class BenefitApplicationMigration < Mongoid::Migration
           @benefit_package_map = {}
           begin
             # benefit_sponsorship = BenefitSponsorshipMigrationService.fetch_sponsorship_for(new_organization, plan_year)
-            benefit_application = convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year)
+            benefit_application = convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year,csv)
+            next unless benefit_application
             benefit_application.recorded_rating_area = benefit_sponsorship.rating_area
             benefit_application.recorded_service_areas = benefit_sponsorship.service_areas
 
-            unless self.check_benefit_app_product_matched(benefit_application,plan_year)
-              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old benefit application"]
+            plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
+            benfit_application_product_hios_ids = self.get_plan_hios_ids_of_benefit_application(benefit_application)
+
+            unless self.new_benfit_application_product_valid(plan_year_plan_hios_ids, benfit_application_product_hios_ids)
+              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old model plan year products"]
               next
             end
 
@@ -191,7 +195,7 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   # TODO: Verify updated by field on plan year
   # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
-  def self.convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year)
+  def self.convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year, csv)
     py_attrs = plan_year.attributes.except(:benefit_groups, :workflow_state_transitions)
     application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :enrolled_summary, :waived_summary, :created_at, :updated_at, :terminated_on)
 
@@ -206,6 +210,16 @@ class BenefitApplicationMigration < Mongoid::Migration
     # benefit_application.successor_application_ids = successor_application.map(&:id) if successor_application.present?
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
+
+    catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
+    plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
+
+    unless self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
+      print 'F' unless Rails.env.test?
+      csv << [plan_year.employer_profile.legal_name, plan_year.employer_profile.fein, plan_year.id, plan_year.start_on, "benefit sponsor catalog products mismatch with old model plan year products"]
+      return false
+    end
+
     @benefit_sponsor_catalog.benefit_application = benefit_application
     @benefit_sponsor_catalog.save
     benefit_application.benefit_sponsor_catalog = @benefit_sponsor_catalog
@@ -245,34 +259,66 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
   end
 
-  def self.check_benefit_app_product_matched(benefit_application, plan_year)
-
-    benefit_application.benefit_packages.each do |benefit_package|
-      @new_bene_app_product_hios_ids = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
-      @new_bene_app_product_hios_ids << benefit_package.health_sponsored_benefit.reference_product.hios_id
-      @new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id) if benefit_package.dental_sponsored_benefit.present?
-      @new_bene_app_product_hios_ids << benefit_package.dental_sponsored_benefit.reference_product.hios_id if benefit_package.dental_sponsored_benefit.present?
+  def self.get_plan_hios_ids_of_plan_year(plan_year)
+    plan_year.benefit_groups.inject([]) do |plan_hios_ids, benefit_group|
+      plan_hios_ids += benefit_group.elected_plans.map(&:hios_id)
+      plan_hios_ids += [benefit_group.reference_plan.hios_id]
+      plan_hios_ids.uniq
     end
-    plan_year.benefit_groups.each do |benefit_group|
-      @old_bene_app_product_hios_ids = benefit_group.elected_plans.map(&:hios_id)
-      @old_bene_app_product_hios_ids << benefit_group.reference_plan.hios_id
-      @old_bene_app_product_hios_ids << benefit_group.elected_dental_plans.map(&:hios_id) if benefit_group.is_offering_dental?
-      @old_bene_app_product_hios_ids << benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
-    end
+  end
 
-    return false unless (@new_bene_app_product_hios_ids.size == @old_bene_app_product_hios_ids.size)
-    (@new_bene_app_product_hios_ids & @old_bene_app_product_hios_ids).uniq.size == @new_bene_app_product_hios_ids.uniq.size
+  def self.get_plan_hios_ids_of_benefit_application(benefit_application)
+    benefit_application.benefit_packages.inject([]) do |product_hios_ids, benefit_package|
+      product_hios_ids += benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
+      product_hios_ids += [benefit_package.health_sponsored_benefit.reference_product.hios_id]
+      product_hios_ids.uniq
+    end
+  end
+
+  def self.new_benfit_application_product_valid(plan_year_plan_hios_ids, benfit_application_product_hios_ids)
+    return false unless (benfit_application_product_hios_ids.size == plan_year_plan_hios_ids.size)
+    (benfit_application_product_hios_ids & plan_year_plan_hios_ids).size == benfit_application_product_hios_ids.size
+  end
+
+  def self.benefit_sponsor_catalog_products(benefit_sponsor_catalog, plan_year)
+    @package_kind = plan_year.benefit_groups.map{|benfit_group| self.map_product_package_kind(benfit_group.plan_option_kind)}
+    benefit_sponsor_catalog.product_packages.select{|product_package| @package_kind.include?(product_package.package_kind)}.inject([]) do |catalog_product, product_package|
+      catalog_product += product_package.products.map(&:hios_id)
+    end
+  end
+
+  def self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
+    plan_year_plan_hios_ids.all? {|hios_id| catalog_product_hios_id.include?(hios_id)}
+  end
+
+  def self.map_product_package_kind(plan_option_kind)
+    package_kind_mapping = {
+        sole_source: :single_product,
+        single_plan: :single_product,
+        single_carrier: :single_issuer,
+        metal_level: :metal_level
+    }
+
+    package_kind_mapping[plan_option_kind.to_sym]
   end
 
   def self.sanitize_benefit_group_attrs(benefit_group)
     attributes = benefit_group.attributes.slice(
         :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
-        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits, :composite_tier_contributions
+        :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
     )
 
     attributes[:is_default] = benefit_group.default
     attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
     attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+    attributes[:composite_tier_contributions] = benefit_group.composite_tier_contributions.inject([]) do |contributions, tier|
+      contributions << {
+          relationship: tier.composite_rating_tier,
+          offered: tier.offered,
+          premium_pct: tier.employer_contribution_percent,
+          estimated_tier_premium: tier.estimated_tier_premium
+      }
+    end
     attributes
   end
 

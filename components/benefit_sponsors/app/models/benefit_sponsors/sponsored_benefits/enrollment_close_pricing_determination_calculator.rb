@@ -2,7 +2,7 @@ module BenefitSponsors
   module SponsoredBenefits
     class EnrollmentClosePricingDeterminationCalculator
       def self.call(benefit_application, calc_date)
-        calculator = ::BenefitSponsors::SponsoredBenefits::HbxEnrollmentPricingDeterminationCalculator.new(benefit_application.benefit_sponsorship, calc_date)
+        calculator = ::BenefitSponsors::SponsoredBenefits::HbxEnrollmentPricingDeterminationCalculator.new(benefit_application.benefit_sponsorship, benefit_application.open_enrollment_end_on)
         benefit_application.benefit_packages.each do |bp|
           bp.sponsored_benefits.each do |sb|
             enrollment_count, waiver_count = enrollment_and_waiver_count_for(sb, benefit_application.start_on)
