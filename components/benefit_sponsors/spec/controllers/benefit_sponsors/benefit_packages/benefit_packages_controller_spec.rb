@@ -200,6 +200,24 @@ module BenefitSponsors
       end
     end
 
+    describe "GET reference_product_summary details" do
+
+      def sign_in_and_get_ref_prod
+        sign_in user
+        get :reference_product_summary, :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id
+      end
+
+      it "should be a success" do
+        sign_in_and_get_ref_prod
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should initialize form" do
+        sign_in_and_get_ref_prod
+        expect(form_class).to respond_to(:for_reference_product_summary)
+      end
+    end
+
     describe "POST update" do
 
       let(:contribution_levels) { benefit_package.sponsored_benefits[0].sponsor_contribution.contribution_levels }
