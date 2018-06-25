@@ -25,8 +25,19 @@ module EnrollmentShopping
 				if optional_effective_on.present?
 					enrollment.effective_on = optional_effective_on
 				else
-				  enrollment.effective_on = enrollment.family.current_sep.effective_on
-				end
+          possible_benefit_package = benefit_package_for_date(@employee_role, enrollment.family.current_sep.effective_on)
+          if possible_benefit_package
+            # They are in a sep and there is an applicable benefit package
+            benefit_package = possible_benefit_package
+            enrollment.effective_on = enrollment.family.current_sep.effective_on
+          else
+            # They are in a sep, but there is NO benefit package available then
+            # Maybe they weren't hired yet
+            effective_date = earliest_eligible_date_for_shop(@employee_role)
+            enrollment.effective_on = effective_date
+            benefit_package = benefit_package_for_date(@employee_role, effective_date)
+          end
+        end
 				enrollment.enrollment_kind = "special_enrollment"
         # TODO: Assign sep
 			else
@@ -165,8 +176,19 @@ module EnrollmentShopping
 				if optional_effective_on.present?
 					enrollment.effective_on = optional_effective_on
 				else
-				  enrollment.effective_on = enrollment.family.current_sep.effective_on
-				end
+          possible_benefit_package = benefit_package_for_date(@employee_role, enrollment.family.current_sep.effective_on)
+          if possible_benefit_package
+            # They are in a sep and there is an applicable benefit package
+            benefit_package = possible_benefit_package
+            enrollment.effective_on = enrollment.family.current_sep.effective_on
+          else
+            # They are in a sep, but there is NO benefit package available then
+            # Maybe they weren't hired yet
+            effective_date = earliest_eligible_date_for_shop(@employee_role)
+            enrollment.effective_on = effective_date
+            benefit_package = benefit_package_for_date(@employee_role, effective_date)
+          end
+        end
 				enrollment.enrollment_kind = "special_enrollment"
         # TODO: Assign sep
 			else
