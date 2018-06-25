@@ -201,7 +201,18 @@ module BenefitSponsors
       end
     end
 
+    context "Sponsor moves primary office" do
+      let(:profile)             { described_class.new(params) }
+      let(:benefit_sponsorship) { profile.add_benefit_sponsorship }
 
+      it "notifies benefit_sponsorships with :primary_office_location_change event" do
+        profile.is_benefit_sponsorship_eligible = true
+        expect(benefit_sponsorship).to receive(:profile_event_subscriber).with(:primary_office_location_change)
+        profile.primary_office_location.address.address_1 = "SOME OTHER STREET"
+        profile.primary_office_location.save!
+      end
+
+    end
 
     # let(:is_benefit_sponsorship_eligible) { true }
     # let(:sponsorship_profile)             { BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new }

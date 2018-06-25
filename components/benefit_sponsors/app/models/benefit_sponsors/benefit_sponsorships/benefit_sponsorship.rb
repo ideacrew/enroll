@@ -44,7 +44,6 @@ module BenefitSponsors
     TERMINATION_KINDS         = [:voluntary, :involuntary].freeze
     TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud].freeze
 
-
     field :hbx_id,              type: String
     field :profile_id,          type: BSON::ObjectId
 
@@ -269,6 +268,13 @@ module BenefitSponsors
         pull_organization_attributes
       end
       @profile
+    end
+
+    # Watch for changes in Profile
+    def profile_event_subscriber(event)
+      if event == :primary_office_location_change && ![:terminated, :ineligible].include?(aasm_state)
+        pull_profile_attributes
+      end
     end
 
     def reset_organization=(new_organization)
