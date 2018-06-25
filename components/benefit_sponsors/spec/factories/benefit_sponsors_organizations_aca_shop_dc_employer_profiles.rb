@@ -3,7 +3,6 @@ FactoryGirl.define do
     organization { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_site) }
 
     is_benefit_sponsorship_eligible true
-    sic_code  "012"
 
     transient do
       office_locations_count 1
