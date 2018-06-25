@@ -9,7 +9,7 @@
         <p class="twenty">Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</p>
         <div style="font-size :24px">
         <%if @effective_on_date.present? || @new_effective_on%>
-          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= @effective_on_date || @new_effective_on %></span>
+          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= format_date(@effective_on_date || @new_effective_on) %></span>
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
