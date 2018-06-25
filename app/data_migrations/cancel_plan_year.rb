@@ -10,8 +10,8 @@ class CancelPlanYear < MongoidMigrationTask
       if organizations.size > 1
         raise 'more than 1 employer found with given fein'
       end
-
-      plan_year = organizations.first.employer_profile.plan_years.where(aasm_state: ENV['plan_year_state'].to_s).first
+      plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
+      plan_year = organizations.first.employer_profile.plan_years.where(:start_on => plan_year_start_on, :aasm_state => ENV['plan_year_state'].to_s).first
       next puts "Present fein: #{fein} is found but it has different plan year assm state" if plan_year.nil?
       enrollments = all_enrollments(plan_year.benefit_groups)
       if enrollments.present?
