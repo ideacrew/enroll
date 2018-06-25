@@ -63,7 +63,6 @@ describe HbxEnrollment do
       expect(employer_profile.census_employees.size).to eq fte_count
     end
 
-
     context "and employees create employee roles and families" do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
@@ -534,8 +533,9 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          enrollment.update_attributes(effective_on: sep.effective_on - 1.month)
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).and_return(bcp)
+          allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).with(enrollment.effective_on).and_return(bcp)
           allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
@@ -714,30 +714,39 @@ describe HbxProfile, "class methods", type: :model do
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
     end
 
-    it "when qle is false" do
-      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)
-      expect(enrollment.enrollment_kind).to eq "open_enrollment"
+    shared_examples_for "new enrollment from" do |qle, sep, enrollment_period, error|
+      context "#{enrollment_period} period" do
+        let(:enrollment) { HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: qle) }
+        before do
+          allow(family).to receive(:is_under_special_enrollment_period?).and_return sep
+          allow(family).to receive(:is_under_ivl_open_enrollment?).and_return enrollment_period == "open_enrollment"
+        end
+
+        unless error
+          it "assigns #{enrollment_period} as enrollment_kind when qle is #{qle}" do
+            expect(enrollment.enrollment_kind).to eq enrollment_period
+          end
+          it "should have submitted at as current date and time" do
+            enrollment.save
+            expect(enrollment.submitted_at).not_to be_nil
+          end
+          it "creates hbx_enrollment members " do
+            expect(enrollment.hbx_enrollment_members).not_to be_empty
+          end
+          it "creates members with coverage_start_on as enrollment effective_on" do
+            expect(enrollment.hbx_enrollment_members.first.coverage_start_on).to eq enrollment.effective_on
+          end
+        else
+          it "raises an error" do
+            expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error(RuntimeError)
+          end
+        end
+      end
     end
 
-    it "when qle is true" do
-      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: true)
-      expect(enrollment.enrollment_kind).to eq "special_enrollment"
-    end
-
-    it "when qle is false and is not uder opent enrollment period" do
-      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return false
-      expect{HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false)}.to raise_error(RuntimeError)
-    end
-
-    it "should have submitted at as current date and time" do
-      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-
-      enrollment = HbxEnrollment.new_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package, qle: false, submitted_at: nil)
-      enrollment.save
-      expect(enrollment.submitted_at).not_to be_nil
-    end
+    it_behaves_like "new enrollment from", false, true, "open_enrollment", false
+    it_behaves_like "new enrollment from", true, true, "special_enrollment", false
+    it_behaves_like "new enrollment from", false, false, "not_open_enrollment", "raise_an_error"
   end
 
   context "is reporting a qle before the employer plan start_date and having a expired plan year" do
@@ -784,6 +793,10 @@ describe HbxProfile, "class methods", type: :model do
     let(:benefit_group){ BenefitGroup.new(plan_year: plan_year) }
     let(:plan){ Plan.new(active_year: date.year) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
+
+    before do
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+    end
 
     it "should return plan year start on year when shop" do
       expect(hbx_enrollment.coverage_year).to eq date.year
@@ -858,11 +871,11 @@ describe HbxProfile, "class methods", type: :model do
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
 
     before do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1
+      TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
+       TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
     it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
@@ -949,6 +962,39 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment.terminated_on).to eq nil
     end
   end
+
+   context "cancel_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "inactive")}
+
+    it "should cancel the enrollment" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should not populate the terminated on" do
+      hbx_enrollment.cancel_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq nil
+    end
+  end
+
+
+   context "terminate_for_non_payment!", dbclean: :after_each do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected")}
+
+    it "should terminate enrollment" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+    end
+
+    it "should  populate terminate on" do
+      hbx_enrollment.terminate_for_non_payment!
+      expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
+    end
+  end
+
+
 end
 
 describe HbxEnrollment, dbclean: :after_each do
@@ -1330,7 +1376,7 @@ context "Benefits are terminated" do
                                                  submitted_at: effective_on_date - 10.days
                                                  )
                               }
-    let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
+    let(:ivl_termination_date)  { TimeKeeper.date_of_record}
 
     it "should be open enrollment" do
       expect(ivl_enrollment.is_open_enrollment?).to be_truthy
@@ -1722,12 +1768,16 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end
-                                                 })
+
+      benefit_group =  BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
     it "should have an eligibility event date" do
       expect(subject.eligibility_event_has_date?).to eq true
@@ -1762,13 +1812,17 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end,
-                                                                              :start_on => coverage_start
-                                                 })
+
+      benefit_group = BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end,
+        :start_on => coverage_start
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
 
     describe "when coverage start is the same as the plan year" do
@@ -1955,7 +2009,7 @@ context "for cobra", :dbclean => :after_each do
     end
 
     it "should return true" do
-      enrollment.kind = 'employer_sponsored_cobra' 
+      enrollment.kind = 'employer_sponsored_cobra'
       expect(enrollment.is_cobra_status?).to be_truthy
     end
   end
@@ -1997,7 +2051,7 @@ context "for cobra", :dbclean => :after_each do
   end
 
   it "can_select_coverage?" do
-    enrollment.kind = 'employer_sponsored_cobra' 
+    enrollment.kind = 'employer_sponsored_cobra'
     expect(enrollment.can_select_coverage?).to be_truthy
   end
 
@@ -2295,35 +2349,70 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
         let(:sep){
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
- 
-        it 'should cancel passive renewal and create new passive' do 
-          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
-          expect(passive_renewal).not_to be_nil
 
-          new_enrollment.select_coverage!
-          family.reload
-          passive_renewal.reload
+        context 'when employee already has passive renewal coverage' do
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
-          new_passive = family.enrollments.where(:aasm_state => 'auto_renewing').first
-          expect(new_passive.plan).to eq new_renewal_plan
+          it 'should cancel passive renewal and create new enrollment with coverage selected' do
+            passive_renewals = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on)
+            expect(passive_renewals.size).to eq 1
+            passive_renewal = passive_renewals.first
+            expect(passive_renewal.auto_renewing?).to be_truthy
+
+            new_enrollment.select_coverage!
+            family.reload
+            passive_renewal.reload
+
+            expect(passive_renewal.coverage_canceled?).to be_truthy
+            new_passives = family.enrollments.by_coverage_kind('health').where(:effective_on => renewing_plan_year.start_on, :id.ne => passive_renewal.id)
+            expect(new_passives.size).to eq 1
+            expect(new_passives.first.coverage_selected?).to be_truthy
+          end
+        end
+
+        context 'when employee actively renewed coverage' do
+
+          it 'should not cancel active renewal and should not generate passive' do
+            renewal_coverage = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            renewal_coverage.update(aasm_state: 'coverage_selected')
+
+            new_enrollment.select_coverage!
+            family.reload
+            renewal_coverage.reload
+
+            expect(renewal_coverage.coverage_canceled?).to be_falsey
+            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(new_passive.blank?).to be_truthy
+          end
         end
       end
 
-      context 'when EE terminates current coverage' do 
+      context 'when EE terminates current coverage' do
 
-        it 'should cancel passive renewal and generate a waiver' do 
+        it 'should cancel passive renewal and generate a waiver' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
           enrollment.terminate_coverage!
           enrollment.update_renewal_coverage
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
+          expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
           expect(passive_waiver.present?).to be_truthy
         end
       end
+    end
+  end
+
+  context '#is_applicable_for_renewal' do
+    let(:benefit_group) { double("BenefitGroup", :plan_year => double("PlanYear", :is_published? => true))}
+    let(:enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment)}
+    it "should return false if benefit group is nil for shop enrollment" do
+      expect(enrollment.is_applicable_for_renewal?).to eq false
+    end
+
+    it "should return true if benefit group & published plan year present for shop enrollment" do
+      allow(enrollment).to receive(:benefit_group).and_return benefit_group
+      expect(enrollment.is_applicable_for_renewal?).to eq true
     end
   end
 
@@ -2390,6 +2479,42 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
   end
 end
 
+describe HbxEnrollment, 'Renewal Purchase', type: :model, dbclean: :after_all do
+  let(:family)          { FactoryGirl.build(:individual_market_family) }
+  let(:hbx_enrollment)  { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, kind: 'individual') }
+
+  context "open enrollment" do
+    before do
+      hbx_enrollment.update(enrollment_kind: 'open_enrollment')
+    end
+
+    it "should return true when auto_renewing" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'auto_renewing')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return true when renewing_coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'renewing_coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_truthy
+    end
+
+    it "should return false when coverage_selected" do
+      FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: 'coverage_selected')
+      expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+    end
+  end
+
+  it "should return false when it is not open_enrollment" do
+    hbx_enrollment.update(enrollment_kind: 'special_enrollment')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+
+  it "should return false when it is individual" do
+    hbx_enrollment.update(kind: 'employer_sponsored')
+    expect(hbx_enrollment.is_active_renewal_purchase?).to be_falsey
+  end
+end
+
 describe HbxEnrollment, 'state machine' do
   let(:family) { FactoryGirl.build(:individual_market_family) }
   subject { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
@@ -2433,7 +2558,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
-    
+
     before do
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
@@ -2459,7 +2584,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     context 'When employee not elgibile for cobra' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
-      it 'should raise error' do 
+      it 'should raise error' do
         expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
@@ -2505,23 +2630,23 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
        plan_id: plan.id
        )
     }
-    
+
     context 'for congression employer' do
       before do
         allow(enrollment).to receive_message_chain("benefit_group.is_congress") { true }
       end
-   
+
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecoratorCongress)
       end
     end
 
-    context 'for non congression employer' do 
+    context 'for non congression employer' do
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecorator)
-      end 
+      end
     end
   end
 
@@ -2597,6 +2722,60 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
       @enrollment2.cancel_previous(TimeKeeper.date_of_record.year)
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
+    end
+  end
+
+  describe "#trigger ee_plan_selection_confirmation_sep_new_hire" do
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+
+    before :each do
+      @household = mikes_family.households.first
+    end
+
+    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+
+      hbx_enrollment.ee_plan_selection_confirmation_sep_new_hire
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('ee_plan_selection_confirmation_sep_new_hire')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+  end
+
+  describe "#trigger notify_employee_confirming_coverage_termination" do
+    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+
+    before :each do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+    end
+
+    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      hbx_enrollment.notify_employee_confirming_coverage_termination
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('notify_employee_confirming_coverage_termination')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
 end

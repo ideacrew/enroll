@@ -112,6 +112,10 @@ class BrokerRole
     self.broker_agency_profile_id.present?
   end
 
+  def can_update_carrier_appointments?
+   active?
+  end
+
   def address=(new_address)
     parent.addresses << new_address
   end
@@ -125,7 +129,7 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone rescue ""
+    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
   end
 
   def email=(new_email)
@@ -246,7 +250,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :broker_agency_declined
     end
 
-    event :broker_agency_terminate, :after => :record_transition do
+    event :broker_agency_terminate, :after => [:record_transition, :remove_broker_assignments] do
       transitions from: :active, to: :broker_agency_terminated
     end
 
@@ -255,7 +259,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :denied
     end
 
-    event :decertify, :after => :record_transition  do
+    event :decertify, :after => [:record_transition, :remove_broker_assignments]  do
       transitions from: :active, to: :decertified
     end
 
@@ -298,7 +302,8 @@ class BrokerRole
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 
@@ -341,5 +346,24 @@ class BrokerRole
 
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
+  end
+  
+  def remove_broker_assignments
+    @orgs = Organization.by_broker_role(id)
+    @employers = @orgs.map(&:employer_profile)
+    # Remove broker from employers
+    @employers.each do |e|
+      e.fire_broker_agency
+      # Remove General Agency
+      e.fire_general_agency!(TimeKeeper.datetime_of_record)
+    end
+    # Remove broker from families
+    if has_broker_agency_profile?
+      families = self.broker_agency_profile.families
+      families.each do |f|
+        f.terminate_broker_agency
+      end
+    end
+    
   end
 end

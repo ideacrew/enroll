@@ -6,17 +6,21 @@ module Employers::EmployerHelper
   def employee_state_format(employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
+    elsif employee_state == 'employee_role_linked'
+      return 'Account Linked'
+    elsif employee_state == 'eligible'
+      return 'No Account Linked'
     else
       return employee_state.humanize
     end
   end
-
+  
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
   def humanize_enrollment_states(benefit_group_assignment)
@@ -139,11 +143,14 @@ module Employers::EmployerHelper
     end.html_safe
   end
 
-  def cobra_button(census_employee)
-    disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    if census_employee.employer_profile.present?
-      disabled = true if census_employee.is_disabled_cobra_action?
+  def cobra_button(census_employee)    
+    disabled = true
+    if census_employee.is_cobra_coverage_eligible?
+      if current_user.has_hbx_staff_role? || !census_employee.cobra_eligibility_expired?
+        disabled = false
+      end
     end
+
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
     if census_employee.cobra_terminated?
@@ -186,8 +193,6 @@ module Employers::EmployerHelper
       user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_active_broker?(@employer_profile)
     end
   end
-
-
 
   def display_employee_status_transitions(census_employee)
     content = "<input type='text' class='form-control date-picker date-field'/>" || nil if CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include? census_employee.aasm_state

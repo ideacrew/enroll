@@ -41,7 +41,6 @@ class BenefitGroup
   field :lowest_cost_plan_id, type: BSON::ObjectId
   field :highest_cost_plan_id, type: BSON::ObjectId
 
-
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
@@ -55,6 +54,9 @@ class BenefitGroup
   field :is_congress, type: Boolean, default: false
   field :_type, type: String, default: self.name
 
+  field :is_active, type: Boolean, default: true
+
+  default_scope ->{ where(is_active: true) }
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
@@ -103,7 +105,6 @@ class BenefitGroup
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
-  before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -321,16 +322,17 @@ class BenefitGroup
 
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
-      organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
-      organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
-        bg.id == id
-      end.first
+      if organization = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id }).first
+        plan_year = organization.employer_profile.plan_years.where({"benefit_groups._id" => id }).first
+        plan_year.benefit_groups.unscoped.detect{|bg| bg.id == id }
+      else
+        nil
+      end
     end
   end
 
-
   def monthly_employer_contribution_amount(plan = reference_plan)
-    return 0 if targeted_census_employees.count > 100
+    return 0 if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
       if plan.coverage_kind == 'dental'
         pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
@@ -342,7 +344,7 @@ class BenefitGroup
   end
 
   def monthly_min_employee_cost(coverage_kind = nil)
-    return 0 if targeted_census_employees.count > 100
+    return 0 if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
       if coverage_kind == 'dental'
         pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
@@ -354,7 +356,7 @@ class BenefitGroup
   end
 
   def monthly_max_employee_cost(coverage_kind = nil)
-    return 0 if targeted_census_employees.count > 100
+    return 0 if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
       if coverage_kind == 'dental'
         pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
@@ -381,6 +383,26 @@ class BenefitGroup
 
   def is_default?
     default
+  end
+
+  def carriers_offered
+    case plan_option_kind
+    when "single_plan"
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
+    when "single_carrier"
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
+    when "metal_level"
+      Plan.where(:id => {"$in" => elected_plan_ids}).pluck(:carrier_profile_id).uniq
+    end
+  end
+
+  def dental_carriers_offered
+    return [] unless is_offering_dental?
+    if dental_plan_option_kind == 'single_plan'
+      Plan.where(:id => {"$in" => elected_dental_plan_ids}).pluck(:carrier_profile_id).uniq
+    else
+      Plan.where(id: dental_reference_plan_id).pluck(:carrier_profile_id)
+    end
   end
 
   def elected_plans_by_option_kind
@@ -418,19 +440,51 @@ class BenefitGroup
     end
   end
 
-  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+  def disable_benefits
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
 
       if benefit_group_assignments.present?
         benefit_group_assignments.each do |bga|
-          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-          bga.destroy
+          bga.hbx_enrollments.each do |enrollment|
+            enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+          end
+          bga.update(is_active: false) unless self.plan_year.is_renewing?
         end
 
-        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
-        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+        other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
+
+        if self.plan_year.is_renewing?
+          ce.add_renew_benefit_group_assignment(other_benefit_group)
+        else
+          ce.find_or_create_benefit_group_assignment([other_benefit_group])
+        end
       end
+    end
+
+    self.is_active = false
+  end
+
+  def renewal_elected_plan_ids
+    start_on_year = (start_on.next_year).year
+    if plan_option_kind == "single_carrier"
+      Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).pluck(:_id)
+    else
+      if plan_option_kind == "metal_level"
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).pluck(:_id)
+      else
+        Plan.where(:id.in => elected_plan_ids).pluck(:renewal_plan_id).compact
+      end
+    end
+  end
+
+  def renewal_elected_dental_plan_ids
+    return [] unless is_offering_dental?
+    start_on_year = (start_on.next_year).year
+    if plan_option_kind == "single_carrier"
+      Plan.by_active_year(start_on_year).shop_market.dental_coverage.by_carrier_profile(dental_reference_plan.carrier_profile).pluck(:_id)
+    else
+      Plan.where(:id.in => elected_dental_plan_ids).pluck(:renewal_plan_id).compact
     end
   end
 
@@ -441,11 +495,11 @@ class BenefitGroup
     self.plan_option_kind = "metal_level"
     self.default = true
 
-    # 2017 contribution schedule
+    # 2018 contribution schedule
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 480.29 if employee_max_amt == 0
-    self.first_dependent_max_amt = 1030.88 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 496.71 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1063.83 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1130.09 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)

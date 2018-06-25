@@ -1,8 +1,8 @@
 class Notice
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
 
-  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:recipient_document_store]
+  Required=[:subject,:mpi_indicator,:event_name,:template,:recipient,:notice,:market_kind,:recipient_document_store]
 
   def initialize(params = {})
     validate_params(params)
@@ -10,6 +10,7 @@ class Notice
     self.mpi_indicator = params[:mpi_indicator]
     self.template = params[:template]
     self.notice= params[:notice]
+    self.event_name= params[:event_name]
     self.market_kind= params[:market_kind]
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
@@ -18,8 +19,8 @@ class Notice
   end
 
   def html(options = {})
-    ApplicationController.new.render_to_string({ 
-      :template => template,
+    ApplicationController.new.render_to_string({
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -34,11 +35,15 @@ class Notice
   end
 
   def layout
-    'pdf_notice'
+    if market_kind == 'individual'
+      'ivl_pdf_notice'
+    else
+      'pdf_notice'
+    end
   end
 
   def notice_filename
-    "#{subject.titleize.gsub(/\s*/, '')}"
+    "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
   end
 
   def notice_path
@@ -52,10 +57,10 @@ class Notice
   def pdf_options
     options = {
       margin:  {
-        top: 15,
-        bottom: 28,
+        top: 10,
+        bottom: 20,
         left: 22,
-        right: 22 
+        right: 22
       },
       disable_smart_shrinking: true,
       dpi: 96,
@@ -66,18 +71,20 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
+          locals: { recipient: recipient, notice: notice}
           }),
         }
     }
-    if market_kind == 'individual'
-      options.merge!({footer: { 
-        content: ApplicationController.new.render_to_string({ 
-          template: "notices/shared/footer.html.erb", 
-          layout: false 
-        })
-      }})
-    end
-    
+    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
+
+    options.merge!({footer: {
+      content: ApplicationController.new.render_to_string({
+        template: footer,
+        layout: false,
+        locals: {notice: notice}
+      })
+    }})
+
     options
   end
 
@@ -92,9 +99,14 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
+    begin
+      File.open(notice_path, 'wb') do |file|
+        file << self.pdf
+      end
+    rescue Exception => e
+      puts "#{e} #{e.backtrace}"
     end
+    # notice_path
     # clear_tmp
   end
 
@@ -109,7 +121,7 @@ class Notice
     notice  = create_recipient_document(doc_uri)
     create_secure_inbox_message(notice)
   end
-  
+
   def upload_to_amazonS3
     Aws::S3Storage.save(notice_path, 'notices')
   rescue => e
@@ -139,13 +151,12 @@ class Notice
 
   def create_recipient_document(doc_uri)
     notice = recipient_document_store.documents.build({
-      title: notice_filename, 
+      title: notice_filename,
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
       format: "application/pdf"
     })
-
     if notice.save
       notice
     else
@@ -155,7 +166,7 @@ class Notice
 
   def create_secure_inbox_message(notice)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!

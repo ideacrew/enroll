@@ -2,18 +2,20 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
     authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_admin_sep = @family.active_admin_seps.last
+    @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -75,7 +77,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -89,7 +90,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
@@ -136,25 +137,32 @@ class Insured::FamiliesController < FamiliesController
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
+      @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
 
+    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+      sep_request_denial_notice
+    elsif is_ee_sep_request_accepted?
+      ee_sep_request_accepted_notice
+    end
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase
@@ -232,6 +240,29 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def sep_request_denial_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
+  end
+
+  def is_ee_sep_request_accepted?
+    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
+  end
+
+  def ee_sep_request_accepted_notice
+    employee_role = @person.active_employee_roles.first
+    if employee_role.present? && employee_role.census_employee.present?
+      begin
+        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
+      rescue Exception => e
+        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
+      end
+    end
+  end
+
   private
 
   def updateable?
@@ -278,21 +309,17 @@ class Insured::FamiliesController < FamiliesController
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+        if @manually_picked_role == "individual_market_events"
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        end
       end
     else
       if @person.active_employee_roles.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-        end
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
       else @person.consumer_role.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-        end
+      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
       end
     end
   end

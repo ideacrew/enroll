@@ -204,6 +204,68 @@ class Household
     tax_households.tax_household_with_year(year).try(:last)
   end
 
+  def end_multiple_thh(options = {})
+    all_active_thh = tax_households.active_tax_household
+    all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
+      sorted_ath = active_thh_with_year(k).order_by(:'created_at'.asc)
+      c = sorted_ath.count
+      #for update eligibility manually
+      sorted_ath.limit(c-1).update_all(effective_ending_on: Date.new(k, 12, 31)) if sorted_ath
+    end
+  end
+
+  def latest_active_thh
+    return tax_households.first if tax_households.length == 1
+    tax_households.active_tax_household.order_by(:'created_at'.desc).first
+  end
+
+  def latest_active_thh_with_year(year)
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:'created_at'.desc).first
+  end
+
+  def active_thh_with_year(year)
+    tax_households.tax_household_with_year(year).active_tax_household
+  end
+
+  def build_thh_and_eligibility(max_aptc, csr, date, slcsp)
+    th = tax_households.build(
+        allocated_aptc: 0.0,
+        effective_starting_on: Date.new(date.year, date.month, date.day),
+        is_eligibility_determined: true,
+        submitted_at: Date.today
+    )
+
+    th.tax_household_members.build(
+        family_member: family.primary_family_member,
+        is_subscriber: true,
+        is_ia_eligible: true,
+    )
+
+    deter = th.eligibility_determinations.build(
+        source: "Admin_Script",
+        benchmark_plan_id: slcsp,
+        max_aptc: max_aptc.to_f,
+        csr_percent_as_integer: csr.to_i,
+        determined_on: Date.today
+    )
+
+    deter.save!
+
+    end_multiple_thh
+
+    th.save!
+
+    family.active_dependents.each do |fm|
+      ath = latest_active_thh
+      ath.tax_household_members.build(
+          family_member: fm,
+          is_subscriber: false,
+          is_ia_eligible: true
+      )
+      ath.save!
+    end
+  end
+
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -252,7 +314,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil,enrollment_kind:nil,external_enrollment: false)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind:nil, external_enrollment: false, opt_effective_on: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -265,7 +327,8 @@ class Household
       qle: qle,
       submitted_at: Time.now,
       external_enrollment: external_enrollment,
-      coverage_start: coverage_start
+      coverage_start: coverage_start,
+      opt_effective_on: opt_effective_on
     )
   end
 

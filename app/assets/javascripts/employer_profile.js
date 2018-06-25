@@ -25,7 +25,7 @@ var EmployerProfile = ( function( window, undefined ) {
       });
       $(this).closest('.injected-edit-status').find('.btn-primary:contains("Terminate")').on('click', function() {
         var url = $(this).closest('.census-employee').data('terminate-url');
-        var termination_date = $(this).val();
+        var termination_date = $('input[placeholder*="Termination Date"][title]').val();
         $.ajax({
           url: url,
           data: {

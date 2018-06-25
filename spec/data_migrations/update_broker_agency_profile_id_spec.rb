@@ -1,8 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_broker_agency_profile_id")
 
-describe UpdateBrokerAgencyProfileId do
-
+describe UpdateBrokerAgencyProfileId, dbclean: :after_each do
 
   let(:given_task_name) { "update_broker_agency_profile_id" }
   subject { UpdateBrokerAgencyProfileId.new(given_task_name, double(:current_scope => nil)) }
@@ -24,7 +23,7 @@ describe UpdateBrokerAgencyProfileId do
       broker_agency.broker_agency_profile.update_attributes(primary_broker_role: broker_role)
       broker_role.update_attributes(broker_agency_profile: broker_agency.broker_agency_profile)
       broker_agency.broker_agency_profile.approve!
-      @broker_agency_staff_role = FactoryGirl.create(:broker_agency_staff_role, person: person)    
+      @broker_agency_staff_role = FactoryGirl.create(:broker_agency_staff_role, person: person)
       allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:broker_role).and_return(broker_role)

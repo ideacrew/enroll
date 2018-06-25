@@ -2,7 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_renewing_plan_year_aasm_state")
 
 
-describe ChangeRenewingPlanYearAasmState do
+describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
   let(:given_task_name) { "change_renewing_plan_year_aasm_state" }
   subject { ChangeRenewingPlanYearAasmState.new(given_task_name, double(:current_scope => nil)) }
@@ -29,7 +29,7 @@ describe ChangeRenewingPlanYearAasmState do
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('')
     end
-    
+
     it "should update aasm_state of plan year" do
       subject.migrate
       plan_year.reload
@@ -52,12 +52,35 @@ describe ChangeRenewingPlanYearAasmState do
       end
     end
 
-    it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] present" do
+    it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] is set to newing_enrolled" do
+      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
       census_employee.reload
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_enrolled"
+    end
+
+    it "should update aasm_state of plan year to renewing_enrolled in exception case" do
+      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(false)  # exception case
+      allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrolled"
+    end
+
+
+    it "should update aasm_state of plan year to renewing_draft when ENV['py_state_to'] is set to renewing_draft" do
+      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
+      allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_draft')
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_draft"
     end
   end
 end

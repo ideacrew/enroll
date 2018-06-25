@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_ee_dependent_ssn")
 
-describe UpdateEeDependentSSN do
+describe UpdateEeDependentSSN, dbclean: :after_each do
 
   let(:given_task_name) { "update_ee_dependent_ssn" }
   subject { UpdateEeDependentSSN.new(given_task_name, double(:current_scope => nil)) }
@@ -15,7 +15,7 @@ describe UpdateEeDependentSSN do
   describe "update census dependent ssn" do
     let(:census_employee)  { FactoryGirl.create(:census_employee)}
     let(:census_dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
-    
+
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)
       allow(ENV).to receive(:[]).with("dep_id").and_return(census_dependent.id)

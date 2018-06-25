@@ -10,9 +10,9 @@ class ShopEmployeeNotice < Notice
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployeeNotice.new
     args[:to] = census_employee.employee_role.person.work_email_or_best
-    args[:name] = "Employee Notice"
+    args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
@@ -25,14 +25,30 @@ class ShopEmployeeNotice < Notice
   end
 
   def build
-    notice.primary_fullname = census_employee.employee_role.person.full_name
-    notice.employer_name = census_employee.employer_profile.legal_name
+    notice.mpi_indicator = self.mpi_indicator
+    notice.notification_type = self.event_name
+    notice.primary_fullname = census_employee.employee_role.person.full_name.titleize
+    notice.employer_name = census_employee.employer_profile.legal_name.titleize
+    notice.primary_email = census_employee.employee_role.person.work_email_or_best
     append_hbe
+    append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
   def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+  end
+
+  def non_discrimination_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
   end
 
   def append_hbe
@@ -51,6 +67,16 @@ class ShopEmployeeNotice < Notice
     })
   end
 
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: primary_address.address_1.titleize,
+      street_2: primary_address.address_2.titleize,
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
+  end
+
   def append_broker(broker)
     return if broker.blank?
     location = broker.organization.primary_office_location
@@ -59,8 +85,8 @@ class ShopEmployeeNotice < Notice
     return if person.blank? || location.blank?
 
     notice.broker = PdfTemplates::Broker.new({
-      primary_fullname: person.full_name,
-      organization: broker.legal_name,
+      primary_fullname: person.full_name.titleize,
+      organization: broker.legal_name.titleize,
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,

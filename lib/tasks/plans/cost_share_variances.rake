@@ -5,7 +5,7 @@ namespace :serff do
     puts "*"*80
     puts "updating cost_share_variances"
 
-    Plan.where(:active_year.in => [2015, 2016, 2017], market: "individual").each do |plan|
+    Plan.where(:active_year.in => [2015, 2016, 2017, 2018], market: "individual").each do |plan|
       qhp = Products::Qhp.where(active_year: plan.active_year, standard_component_id: plan.hios_base_id).first
       hios_id = plan.coverage_kind == "dental" ? (plan.hios_id + "-01") : plan.hios_id
       if hios_id.split("-").last != "01"

@@ -9,7 +9,7 @@ def check_duplicated
   not_found = []
   stranges = []
 
-  CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
+  CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
@@ -56,7 +56,7 @@ def check_and_run
   not_run = []
   running = []
 
-  CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
+  CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
@@ -73,8 +73,8 @@ def check_and_run
         puts "Person with ssn: #{ssn} has no family."
         next
       end
-      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2017).try(:latest_eligibility_determination)
-      if deter && deter.e_pdc_id =~ /MANUALLY_9_2_2016LOADING/
+      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2018).try(:latest_eligibility_determination)
+      if deter && deter.e_pdc_id =~ /MANUALLY_10_06_2017LOADING/
         deter.update_attributes(max_aptc: aptc)
         deter.csr_percent_as_integer = csr
         deter.save
@@ -104,12 +104,12 @@ def update_aptc(row)
 
   if @household.tax_households.present?
     active_tax_households = @household.tax_households.active_tax_household
-    active_tax_households.update_all(effective_ending_on: Date.new(2016,12,31)) if active_tax_households
+    active_tax_households.update_all(effective_ending_on: Date.new(2017,12,31)) if active_tax_households
   end
 
   th = @household.tax_households.build(
     allocated_aptc: 0.0,
-    effective_starting_on: Date.new(2017,1,1),
+    effective_starting_on: Date.new(2018,1,1),
     is_eligibility_determined: true,
     submitted_at: Date.today
   )
@@ -123,7 +123,7 @@ def update_aptc(row)
   @pdc+=1
 
   deter = th.eligibility_determinations.build(
-    e_pdc_id: "MANUALLY_9_2_2016LOADING" + @pdc.to_s,
+    e_pdc_id: "MANUALLY_10_06_2017LOADING" + @pdc.to_s,
     benchmark_plan_id: @slcsp,
     max_aptc: row[1],
     csr_percent_as_integer: row[2],

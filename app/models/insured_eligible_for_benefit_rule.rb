@@ -13,7 +13,7 @@ class InsuredEligibleForBenefitRule
 
   def initialize(role, benefit_package, options = {})
     @role = role
-    @family = options[:family]
+    @family = options[:family] || @role.person.families.first
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
@@ -57,7 +57,7 @@ class InsuredEligibleForBenefitRule
 
   def set_status_and_error_if_not_applying_coverage
     status = false
-    @errors << ["Did not apply for coverage."]
+    @errors = ["Did not apply for coverage."]
     return status
   end
 
@@ -76,7 +76,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year)
+    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
     return true if tax_household.blank?
 
     cost_sharing = @benefit_package.cost_sharing
@@ -112,7 +112,9 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
-    @role.citizen_status == "not_lawfully_present_in_us" ? false : true
+    return true if @role.is_a?(ResidentRole)
+    return false if @role.citizen_status.blank?
+    !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
 
   def is_ethnicity_satisfied?
@@ -143,7 +145,6 @@ class InsuredEligibleForBenefitRule
 
   def is_age_range_satisfied?
     return true if @benefit_package.age_range == (0..0)
-
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)
   end
