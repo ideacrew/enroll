@@ -106,7 +106,7 @@ module BenefitSponsors
       inverse_of: :benefit_sponsorship_docs,
       class_name: "BenefitSponsors::Documents::Document"
 
-    validates_presence_of :organization, :profile_id, :benefit_market, :source_kind, :rating_area
+    validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
     validates :source_kind,
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
@@ -224,7 +224,7 @@ module BenefitSponsors
       primary_office_location.address if has_primary_office_address?
     end
 
-    def service_areas_for(a_date = ::TimeKeeper.date_of_record)
+    def service_areas_on(a_date = ::TimeKeeper.date_of_record)
       if has_primary_office_address?
         ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date)
       else
@@ -232,7 +232,7 @@ module BenefitSponsors
       end
     end
 
-    def primary_office_rating_area(a_date = ::TimeKeeper.date_of_record)
+    def rating_area_on(a_date = ::TimeKeeper.date_of_record)
       if has_primary_office_address?
         ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address, during: a_date)
       else
@@ -240,8 +240,12 @@ module BenefitSponsors
       end
     end
 
+    def primary_office_rating_area
+      rating_area_on(::TimeKeeper.date_of_record)
+    end
+
     def primary_office_service_areas
-      service_areas_for(::TimeKeeper.date_of_record)
+      service_areas_on(::TimeKeeper.date_of_record)
     end
 
     def has_primary_office_address?
@@ -263,7 +267,6 @@ module BenefitSponsors
         write_attribute(:profile_id, new_profile._id)
         @profile = new_profile
         self.organization = new_profile.organization
-
         pull_profile_attributes
         pull_organization_attributes
       end
@@ -274,6 +277,7 @@ module BenefitSponsors
     def profile_event_subscriber(event)
       if event == :primary_office_location_change && ![:terminated, :ineligible].include?(aasm_state)
         pull_profile_attributes
+        self.save!
       end
     end
 
@@ -571,8 +575,6 @@ module BenefitSponsors
     end
 
     def pull_profile_attributes
-      refresh_rating_area
-      refresh_service_areas
     end
 
     def refresh_rating_area

@@ -31,7 +31,6 @@ module BenefitSponsors
 
           it "should pull attributes from the profile and it's backing organization instance" do
             expect(subject.benefit_market).to eq site.benefit_markets.first
-            expect(subject.rating_area).to be_an_instance_of(::BenefitMarkets::Locations::RatingArea)
           end
 
           it "should be valid" do
@@ -65,7 +64,6 @@ module BenefitSponsors
             expect(subject).to_not be_valid
             expect(subject.errors[:profile_id].first).to match(/can't be blank/)
             expect(subject.errors[:organization].first).to match(/can't be blank/)
-            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
             expect(subject.errors[:benefit_market].first).to match(/can't be blank/)
           end
         end
@@ -78,7 +76,6 @@ module BenefitSponsors
             expect(subject).to_not be_valid
             expect(subject.benefit_market).to eq site.benefit_markets.first
             expect(subject.errors[:profile_id].first).to match(/can't be blank/)
-            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
           end
         end
 
@@ -104,7 +101,6 @@ module BenefitSponsors
             subject.validate
             expect(subject).to_not be_valid
             expect(subject.errors[:organization].first).to match(/can't be blank/)
-            expect(subject.errors[:rating_area].first).to match(/can't be blank/)
             expect(subject.benefit_market).to be_nil
           end
         end
@@ -114,7 +110,6 @@ module BenefitSponsors
 
           it "should pull attributes from the profile and it's backing organization instance" do
             expect(subject.benefit_market).to eq site.benefit_markets.first
-            expect(subject.rating_area).to be_an_instance_of(::BenefitMarkets::Locations::RatingArea)
           end
 
           it "should be valid" do
@@ -454,6 +449,8 @@ module BenefitSponsors
     end
 
     describe "Scopes", :dbclean => :after_each do
+      let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
+      let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
       let(:this_year)                       { TimeKeeper.date_of_record.year }
 
       let(:march_effective_date)            { Date.new(this_year,3,1) }

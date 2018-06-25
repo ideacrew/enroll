@@ -81,8 +81,7 @@ module BenefitSponsors
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
     before_validation :pull_benefit_sponsorship_attributes
-    before_create :validate_benefit_sponsorship_shared_attributes
-    after_create :renew_benefit_package_assignments
+    after_create      :renew_benefit_package_assignments
 
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
@@ -187,15 +186,6 @@ module BenefitSponsors
       end
     end
 
-    # def benefit_sponsorship=(new_benefit_sponsorship)
-    #   write_attribute(:recorded_rating_area_id, nil)
-    #   write_attribute(:recorded_service_area_ids, [])
-    #   write_attribute(:recorded_sic_code, nil)
-    #   write_attribute(:benefit_sponsorship, new_benefit_sponsorship)
-
-    #   pull_benefit_sponsorship_attributes
-    # end
-
     def sponsor_profile
       benefit_sponsorship.profile
     end
@@ -249,7 +239,7 @@ module BenefitSponsors
       return nil if recorded_rating_area_id.blank?
       return @recorded_rating_area if defined? @recorded_rating_area
 
-      @recorded_rating_area = refresh_recorded_rating_area
+      @recorded_rating_area = BenefitMarkets::Locations::RatingArea.find(recorded_rating_area_id)
     end
 
     def recorded_service_areas=(new_recorded_service_areas)
@@ -266,8 +256,9 @@ module BenefitSponsors
     end
 
     def recorded_service_areas
+      return [] if recorded_service_area_ids.blank?
       return @recorded_service_areas if defined? @recorded_service_areas
-      @recorded_service_areas = refresh_recorded_service_areas
+      @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
     end
 
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
@@ -508,6 +499,14 @@ module BenefitSponsors
           end
         end
       end
+    end
+
+    def resolve_service_areas
+      recorded_service_areas
+    end
+
+    def resolve_rating_area
+      recorded_rating_area
     end
 
     def renew_benefit_package_members
@@ -811,34 +810,23 @@ module BenefitSponsors
 
     private
 
-    def benefit_sponsor_has_rating_area?
-      benefit_sponsorship.present? && benefit_sponsorship.rating_area.present?
-    end
-
-    def benefit_sponsor_has_service_areas?
-      benefit_sponsorship.present? && benefit_sponsorship.service_areas.present?
-    end
-
-    def benefit_sponsor_has_sic_code?
-      benefit_sponsorship.present? && benefit_sponsorship.sic_code.present?
-    end
-
     def refresh_recorded_rating_area
-      self.recorded_rating_area = benefit_sponsorship.rating_area if benefit_sponsor_has_rating_area?
+      self.recorded_rating_area = benefit_sponsorship.rating_area_on(self.start_on)
     end
 
     def refresh_recorded_service_areas
-      self.recorded_service_areas = benefit_sponsorship.service_areas if benefit_sponsor_has_service_areas?
+      self.recorded_service_areas = benefit_sponsorship.service_areas_on(self.start_on)
     end
 
     def refresh_recorded_sic_code
-      self.recorded_sic_code = benefit_sponsorship.sic_code if benefit_sponsor_has_sic_code?
+      self.recorded_sic_code = benefit_sponsorship.sic_code
     end
 
     # Assign local attributes derived from benefit_sponsorship parent instance
     def pull_benefit_sponsorship_attributes
+      return unless benefit_sponsorship.present?
       refresh_recorded_rating_area   unless recorded_rating_area.present?
-      refresh_recorded_service_areas unless benefit_sponsor_has_service_areas? && recorded_service_areas.size > 0
+      refresh_recorded_service_areas unless recorded_service_areas.size > 0
       refresh_recorded_sic_code      unless recorded_sic_code.present?
     end
 

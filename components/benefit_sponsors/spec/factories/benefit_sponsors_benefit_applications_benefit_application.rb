@@ -34,6 +34,7 @@ FactoryGirl.define do
 
     recorded_service_areas   { [create(:benefit_markets_locations_service_area)] }
     recorded_rating_area     { create(:benefit_markets_locations_rating_area) }
+    recorded_sic_code         "011"
 
     transient do
       predecessor_application_state :active
