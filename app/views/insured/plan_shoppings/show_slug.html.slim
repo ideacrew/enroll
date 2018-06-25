@@ -13,9 +13,9 @@
             b = l10n("insured.plan_shoppings.final_cost_change")
           .row.no-buffer
             = render "shared/plan_shoppings/more_plan_details"
-            p.pull-right
-              a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
-                = l10n("compare_plans").to_s.upcase
+          p.pull-right
+            a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}"
+              = l10n("compare_plans").to_s.upcase
             #plan-summary
             #all-plans.all-filters-row
               = render partial: './ui-components/v1/filters/plan_filters'
@@ -31,10 +31,10 @@
                 #plans
                  = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
                 #filteredPlans data-enrollments="#{@member_groups.map {|mg| mg.group_enrollment.to_json}}" data-carriers="#{@member_groups.map {|mg| ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, mg.group_enrollment.product.issuer_profile_id).to_json { mg.group_enrollment.product.issuer_profile }}}"
-                
+
       .no-buffer
-        p.pull-right
-          a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}" = l10n("compare_plans").to_s.upcase
+      p.pull-right
+        a.btn.btn-default.compare-selected-plans-link href="javascript:void(0);" style="display: none;" data-uri="#{comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind)}" = l10n("compare_plans").to_s.upcase
       .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-1.col-sm-offset-1.right-section
         - if @change_plan.blank? && @market_kind == "individual"
           - if @enrollment_kind.blank? && is_under_open_enrollment?
@@ -80,19 +80,19 @@ javascript:
   var carriers = document.getElementById('filteredPlans').dataset.carriers;
   var filterType = String;
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
-     
+
   // Grabs available products as JSON for filtering onload
   (function() {
     document.getElementById('filteredPlans').classList.add('hidden');
     getEnrollments()
   })();
-  
+
   var coverageKind = "#{@hbx_enrollment.coverage_kind}";
 
   if (coverageKind == "dental") {
     $(".plan-metal-level-selection-filter").attr("disabled", true);
   }
-  
+
   function clearSelections() {
     Array.from(selectedPlans).forEach(function(plan) {
       if (plan) {
@@ -101,7 +101,7 @@ javascript:
     })
     document.getElementById('plans').classList.remove('hidden')
   }
-  
+
   function filterBy(element) {
     filterType = element.dataset.sortBy;
     clearSelections()
@@ -109,11 +109,11 @@ javascript:
     applyFilter()
     filteredPlans(filterType)
   }
-  
+
   function getEnrollments() {
     enrollments = JSON.parse(enrollments)
     carriers = JSON.parse(carriers)
-    
+
     // Formats enrollment to proper JSON format for filters
     for(enrollment of enrollments) {
       enrollment = JSON.parse(enrollment)
@@ -125,16 +125,16 @@ javascript:
       availableCarriers.push(carrier)
     }
   }
-  
+
   function applyFilter() {
     // Apply's filtered plans to view
     document.getElementById('plans').classList.add('hidden')
     document.getElementById('filteredPlans').classList.remove('hidden')
   }
-  
+
   function filteredPlans(type) {
     filteredArray = [];
-    
+
     if (type == "plan-name") {
       // Filters by Title
       availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
@@ -148,7 +148,7 @@ javascript:
         return 0 //default return value (no sorting)
       })
     }
-    
+
     if (type == "plan-metal-premium") {
       // Filter by premium
       availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
@@ -162,7 +162,7 @@ javascript:
         return 0 //default return value (no sorting)
       })
     }
-    
+
     if (type == "plan-metal-deductible") {
       // Filter by deductible
       availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
@@ -176,14 +176,14 @@ javascript:
         return 0 //default return value (no sorting)
       })
     }
-    
+
     if (type == "plan-carrier") {
       // Filters by Carrier
     }
-    
+
     showFilteredResults()
   }
-  
+
   function filterResultsSelections(selections) {
     var resultsArray = [];
     // Filters based on Metal Level
@@ -211,7 +211,7 @@ javascript:
     // Filters based on Premium Amount
     premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
     premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
-    
+
     availableEnrollments.filter(function(enrollment) {
       premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
       if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
@@ -221,14 +221,14 @@ javascript:
     // Filters based on Deductible Amount
     deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
     deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
-    
+
     availableEnrollments.filter(function(enrollment) {
       deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
       if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
         resultsArray.push(enrollment);
       }
     })
-    
+
     if (selections.selectedHSA) {
       var hsa = Boolean;
       if (selections.selectedHSA == "Yes") {
@@ -236,25 +236,26 @@ javascript:
       } else {
         hsa = false;
       }
-      
+
       availableEnrollments.filter(function(enrollment) {
         if (enrollment.product.hsa_eligibility == hsa) {
           resultsArray.push(enrollment);
         }
       })
-      
+
     }
-    
-    
-    
+
+
+
     // Removes duplicates from results array
     filteredArray = removeDuplicates(resultsArray)
     // Shows results in the view
+    $("#plans-count").text(filteredArray.length);
     clearSelections();
     applyFilter();
     showFilteredResults()
   }
-  
+
   function showFilteredResults() {
     var element = document.getElementById('filteredPlans');
     filteredArray.forEach(function(result) {
@@ -309,7 +310,13 @@ javascript:
                         <tr>
                           <td>${result.product.health_plan_kind.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
-                          <td>Nationwide</td>
+                          <td>
+                            </a>
+                            NETWORK NOTES
+                            <a data-container="body" href="#" data-toggle="tooltip" data-placement="right" title='${result.product.network_information}'>
+                              <i aria-hidden="true" class="fas fa-question-circle fa-lg pl-1"></i>
+                            </a>
+                          </td>
                           <td>${deductible}</td>
                         </tr>
                       </tbody>
@@ -341,7 +348,7 @@ javascript:
       element.append(div)
     });
   }
-  
+
   function removeDuplicates(data) {
     return data.filter((item, index,arr)=>{
       var c = arr.map(item=> item.product_cost_total);

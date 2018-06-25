@@ -26,7 +26,7 @@ module Employers::EmployerHelper
   def humanize_enrollment_states(census_employee, enrollments)
     enrollment_states = []
 
-    if enrollments
+    if enrollments.present?
       enrollments = enrollments.show_enrollments_sans_canceled
 
       %W(health dental).each do |coverage_kind|

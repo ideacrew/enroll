@@ -37,7 +37,7 @@ attributes: !ruby/hash:BSON::Document
   family_deductible: per person not applicable | per group not applicable
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-06-12 17:27:12.266000000 Z
+  updated_at: 2018-06-23 22:31:04.825000000 Z
   created_at: 2018-06-10 20:37:01.924000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
