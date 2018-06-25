@@ -43,7 +43,7 @@ module BenefitSponsors
 
       def single_issuer_options
         carrier_name_and_id_hash = {}
-        plan_options[:single_issuer].each do |k, v|
+        Hash[plan_options[:single_issuer].sort_by { |k, v| k }].each do |k, v|
           carrier_name_and_id_hash[k] = v.first["issuer_id"].to_s
         end
         carrier_name_and_id_hash
@@ -55,7 +55,7 @@ module BenefitSponsors
 
       def single_product_options
         single_product_options_hash = {}
-        plan_options[:single_product].each do |k, v|
+        Hash[plan_options[:single_product].sort_by { |k, v| k }].each do |k, v|
           single_product_options_hash[k] = v.first["issuer_id"].to_s
         end
         single_product_options_hash
