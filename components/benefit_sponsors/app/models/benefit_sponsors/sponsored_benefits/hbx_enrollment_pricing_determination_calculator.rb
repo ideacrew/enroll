@@ -1,7 +1,7 @@
 module BenefitSponsors
 	module SponsoredBenefits
 		class HbxEnrollmentPricingDeterminationCalculator
-			EnrollmentProductAdapter = Struct.new(:id)
+			EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
 
 			EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
 				def is_disabled?
@@ -19,6 +19,12 @@ module BenefitSponsors
 				def initialize(he_id_list, s_benefit)
 					@hbx_enrollment_id_list = he_id_list
 					@sponsored_benefit = s_benefit
+          @issuer_profile_id_map = {}
+          @active_year_map = {}
+          ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+            @issuer_profile_id_map[rec.first] = rec[1]
+            @active_year_map[rec.first] = rec.last["min"].year
+          end
 				end
 
 				def each
@@ -33,19 +39,19 @@ module BenefitSponsors
 					Family.collection.aggregate([
 						{"$match" => {
 							"households.hbx_enrollments" => { "$elemMatch" => {
-								"_id" => {"$in" => enrollment_ids}
+								"hbx_id" => {"$in" => enrollment_ids}
 							}}}},
 							{"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
 							{"$unwind" => "$households"},
 							{"$unwind" => "$households.hbx_enrollments"},
 							{"$match" => {
-								"households.hbx_enrollments._id" => {"$in" => enrollment_ids}
+								"households.hbx_enrollments.hbx_id" => {"$in" => enrollment_ids}
 							}},
 							{"$project" => {
 								"hbx_enrollment" => {
 									"effective_on" => "$households.hbx_enrollments.effective_on",
 									"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
-									"_id" => "$households.hbx_enrollments._id",
+									"_id" => "$households.hbx_enrollments.hbx_id",
 									"product_id" => "$households.hbx_enrollments.product_id"
 								},
 								"family_members" => 1,
@@ -126,10 +132,15 @@ module BenefitSponsors
 							coverage_eligibility_on: dep_member["effective_on"]
 						})
 					end
+          product = EnrollmentProductAdapter.new(
+            enrollment_record["hbx_enrollment"]["product_id"],
+            @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
+          )
 					group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
 						{
-							product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
-							previous_product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
+							product: product,
+							previous_product: product,
 							rate_schedule_date: @sponsored_benefit.rate_schedule_date,
 							coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
 							member_enrollments: member_enrollments,
@@ -223,12 +234,15 @@ module BenefitSponsors
 			end
 
 			def eligible_employee_count
-				@eligible_employee_count ||= eligible_employee_criteria.count
+				@eligible_employee_count ||= begin
+                                       employee_count = eligible_employee_criteria.count
+                                       (employee_count < 1) ? 1 : employee_count
+                                     end
 			end
 
 			def calculate_participation_percent(group_size, waiver_count)
 				enrolling_count = group_size + waiver_count
-				return 1.0 if enrolling_count < 1
+				return 1 if enrolling_count < 1
 				(enrolling_count.to_f / eligible_employee_count) * 100.0
 			end
 		end
