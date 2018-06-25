@@ -168,9 +168,10 @@ class Insured::PlanShoppingsController < ApplicationController
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
     @member_groups = sponsored_cost_calculator.groups_for_products(products)
     @enrolled_hbx_enrollment_plan_ids = []
-    @metal_levels = %w[platinum gold silver bronze catastrophic]
-    @plan_types = %w[HMO PPO POS]
-    @networks = %w[nationwide]
+    @products = @member_groups.map(&:group_enrollment).map(&:product)
+    @metal_levels = @products.map(&:metal_level).uniq
+    @plan_types = @products.map(&:health_plan_kind).uniq
+    # @networks = []
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
     @waivable = @hbx_enrollment.can_waive_enrollment?
