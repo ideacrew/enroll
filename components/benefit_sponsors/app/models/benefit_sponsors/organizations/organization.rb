@@ -176,19 +176,6 @@ module BenefitSponsors
         @fein = numeric_fein
       end
 
-      # def self.bind_benefit_sponsorship_to_profile(benefit_sponsorship, profile_id)
-      #   profile_organization = self.profile(profile_id)
-      #   profile = profile_organization.profiles.detect { |profile| profile._id == profile_id }
-
-      #   if profile.present? && profile.is_benefit_sponsorship_eligible?
-      #     profile_organization.benefit_sponsorships << benefit_sponsorship
-      #     profile_organization.save!
-      #   else
-      #     raise "Profile not found or ineligible for benefit sponsorship: #{profile || nil}" if area.count > 1
-      #   end
-      #   profile
-      # end
-
       def sponsor_benefits_for(profile)
         new_sponsorship = nil
         if profile.is_benefit_sponsorship_eligible?
@@ -219,9 +206,16 @@ module BenefitSponsors
         active_benefit_sponsorship
       end
 
-      def latest_benefit_sponsorship_for(profile)
-        benefit_sponsorships.by_profile(profile).desc(:created_at).first
+      def benefit_sponsorships_for(profile)
+        benefit_sponsorships.by_profile(profile).desc(:created_at)
       end
+
+      def most_recent_benefit_sponsorship_for(profile)
+        benefit_sponsorships_for(profile).first
+      end
+
+      # Deprecate latest_benefit_sponsorship_for
+      alias_method :latest_benefit_sponsorship_for, :most_recent_benefit_sponsorship_for
 
       def find_benefit_sponsorships(ids)
         benefit_sponsorships.find(ids)

@@ -80,7 +80,7 @@ module BenefitSponsors
       end
 
       def benefit_sponsorship_successors_for(benefit_sponsorship)
-        organization.benefit_sponsorships.select { |organization_sponsorship| organization_sponsorship.predecessor_sponsorship_id == benefit_sponsorship._id }
+        organization.benefit_sponsorships.select { |organization_sponsorship| organization_sponsorship.predecessor_id == benefit_sponsorship._id }
       end
 
       def contact_methods

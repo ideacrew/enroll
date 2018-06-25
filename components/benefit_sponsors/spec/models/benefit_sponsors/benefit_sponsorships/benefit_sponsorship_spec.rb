@@ -135,15 +135,15 @@ module BenefitSponsors
       let(:linked_profile)      { linked_organization.employer_profile }
 
       let(:node_a)      { described_class.new(profile: linked_profile) }
-      let(:node_a1)     { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a) }
-      let(:node_a1a)    { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a1) }
-      let(:node_b1)     { described_class.new(profile: linked_profile, predecessor_sponsorship: node_a) }
+      let(:node_a1)     { described_class.new(profile: linked_profile, predecessor: node_a) }
+      let(:node_a1a)    { described_class.new(profile: linked_profile, predecessor: node_a1) }
+      let(:node_b1)     { described_class.new(profile: linked_profile, predecessor: node_a) }
 
       it "should manage predecessors", :aggregate_failures do
-        expect(node_a1a.predecessor_sponsorship).to eq node_a1
-        expect(node_a1.predecessor_sponsorship).to eq node_a
-        expect(node_b1.predecessor_sponsorship).to eq node_a
-        expect(node_a.predecessor_sponsorship).to eq nil
+        expect(node_a1a.predecessor).to eq node_a1
+        expect(node_a1.predecessor).to eq node_a
+        expect(node_b1.predecessor).to eq node_a
+        expect(node_a.predecessor).to eq nil
       end
 
       context "and the BenefitSponsorships are persisted" do
@@ -154,9 +154,9 @@ module BenefitSponsors
           node_b1.save!
         end
 
-        it "should maintain linked lists for successor_sponsorships", :aggregate_failures do
-          expect(node_a.successor_sponsorships).to eq [node_a1, node_b1]
-          expect(node_a1.successor_sponsorships).to eq [node_a1a]
+        it "should maintain linked lists for successors", :aggregate_failures do
+          expect(node_a.successors).to eq [node_a1, node_b1]
+          expect(node_a1.successors).to eq [node_a1a]
         end
       end
     end

@@ -57,7 +57,7 @@ module BenefitSponsors
     field :termination_kind,    type: Symbol
     field :termination_reason,  type: Symbol
 
-    field :predecessor_sponsorship_id,  type: BSON::ObjectId
+    field :predecessor_id,  type: BSON::ObjectId
 
     # Immutable value indicating origination of this BenefitSponsorship
     field :source_kind,         type: Symbol, default: :self_serve
@@ -162,7 +162,7 @@ module BenefitSponsors
 
     scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_sponsorship_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
       )
     }
 
@@ -281,22 +281,22 @@ module BenefitSponsors
       end
     end
 
-    def predecessor_sponsorship=(benefit_sponsorship)
+    def predecessor=(benefit_sponsorship)
       raise ArgumentError.new("expected BenefitSponsorship") unless benefit_sponsorship.is_a? BenefitSponsors::BenefitSponsorships::BenefitSponsorship
-      self.predecessor_sponsorship_id = benefit_sponsorship._id
-      @predecessor_sponsorship = benefit_sponsorship
+      self.predecessor_id = benefit_sponsorship._id
+      @predecessor = benefit_sponsorship
     end
 
-    def predecessor_sponsorship
-      return nil if predecessor_sponsorship_id.blank?
-      return @predecessor_sponsorship if defined? @predecessor_sponsorship
-      @predecessor_sponsorship = profile.find_benefit_sponsorships(predecessor_sponsorship_id)
+    def predecessor
+      return nil if predecessor_id.blank?
+      return @predecessor if defined? @predecessor
+      @predecessor = profile.find_benefit_sponsorships(predecessor_id)
     end
 
-    def successor_sponsorships
+    def successors
       return [] if profile.blank?
-      return @successor_sponsorships if defined? @successor_sponsorships
-      @successor_sponsorships = profile.benefit_sponsorship_successors_for(self)
+      return @successors if defined? @successors
+      @successors = profile.benefit_sponsorship_successors_for(self)
     end
 
     def roster_size
@@ -343,10 +343,10 @@ module BenefitSponsors
     end
 
     # If there is a gap, it will fall under a new benefit sponsorship
-    # Renewal_benefit_application's predecessor_sponsorship is always current benefit application
+    # Renewal_benefit_application's predecessor is always current benefit application
     # most_recent_benefit_application will always be their current benefit_application if no renewal
     def current_benefit_application
-      renewal_benefit_application.present? ? renewal_benefit_application.predecessor_sponsorship : most_recent_benefit_application
+      renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
     end
 
     def renewal_benefit_application
