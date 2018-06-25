@@ -18,8 +18,8 @@ module BenefitMarkets
         end
         BenefitMarkets::Products::Product.each do |product|
           $product_rate_age_bounding_cache[product.id] = {
-            maximum: product.premium_ages.min, 
-            minimum: product.premium_ages.max
+            minimum: product.premium_ages.min, 
+            maximum: product.premium_ages.max
           }
           product.premium_tables.each do |pt|
             r_area_tag = rating_area_cache[pt.rating_area_id]
@@ -41,7 +41,7 @@ module BenefitMarkets
         plan_age = $product_rate_age_bounding_cache[plan_id]
         return plan_age[:minimum] if coverage_age < plan_age[:minimum]
         return plan_age[:maximum] if coverage_age > plan_age[:maximum]
-        given_age
+        coverage_age
       end
 
       # Return the base rate value from the product cache.
