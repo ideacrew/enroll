@@ -77,6 +77,7 @@ module Factories
     def assign_enrollment_to_benefit_package_assignment(enrollment)
       assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
       assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+      enrollment.update_attributes(benefit_group_assignment_id: assignment.id)
     end
   end
 
