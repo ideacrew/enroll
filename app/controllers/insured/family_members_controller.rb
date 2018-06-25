@@ -119,7 +119,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+    if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }

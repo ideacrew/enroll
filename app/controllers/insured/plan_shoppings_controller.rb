@@ -247,7 +247,7 @@ class Insured::PlanShoppingsController < ApplicationController
       elsif @hbx_enrollment.is_coverall?
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
 
       build_same_plan_premiums

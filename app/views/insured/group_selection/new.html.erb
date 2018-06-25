@@ -29,32 +29,59 @@
             </div>
           <% end %>
 
-          <% if can_shop_both_markets?(@person) %>
+          <% if can_shop_both_markets?(@person) || can_shop_individual?(@person) || can_shop_resident?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
                 <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
               <span class="clear" style="display: il"></span>
 
               <div class="n-radio-group">
-                <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
+                <% view_market_places(@person).each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind), disabled: is_market_kind_disabled?(kind) %>
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind) %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
-                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
-                      <% else %>
-                        <%= l10n("insured.group_selection.new.individual_benifits") %>
+                        <%= l10n("insured.group_selection.new.employee_sponsored_benefits") %>
+                      <% elsif kind=="individual"  %>
+                        <%= l10n("insured.group_selection.new.individual_benefits") %>
+                      <% elsif kind=="coverall"  %>
+                        <%= l10n("insured.group_selection.new.coverall_benefits") %>
                       <% end %>
                     </label>
+                  </div>
+                  <div class="modal fade" id="WarningOnCoverAllSelection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="myModalLabel">Some people are eligible for DC Health Link</h4>
+                        </div>
+                        <div class="modal-body">
+                          This group includes people who are eligible to enroll in a plan through DC Health Link. If you choose to enroll these people in a plan through Cover All DC, they will:
+                          <ul>
+                            <li>
+                              not get a Form 1095-A at tax time.
+                            </li>
+                            <li>
+                              not qualify for cost savings like the advance premium tax credit.
+                            </li>
+                          </ul>
+                          <strong>You can enroll these people in the same plan through DC Health Link separately.</strong>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">close</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 <% end %>
               </div>
             </div>
           <% elsif can_shop_shop?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'shop' %>
-	        <% elsif can_shop_individual?(@person) && !can_shop_resident?(@person) %>
-	           <%= hidden_field_tag 'market_kind', 'individual' %>
+             <%= hidden_field_tag 'market_kind', 'shop' %>
+          <% elsif can_shop_individual?(@person) && !can_shop_resident?(@person) %>
+             <%= hidden_field_tag 'market_kind', 'individual' %>
           <% elsif can_shop_resident?(@person) %>
              <%= hidden_field_tag 'market_kind', 'coverall' %>
           <% else %>
