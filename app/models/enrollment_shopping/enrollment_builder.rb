@@ -13,12 +13,6 @@ module EnrollmentShopping
 			enrollment.kind = "employer_sponsored"
 			enrollment.employee_role = @employee_role
       enrollment.predecessor_enrollment_id = previous_enrollment.id
-      enrollment.sponsored_benefit_package_id = previous_enrollment.sponsored_benefit_package_id
-      benefit_package = previous_enrollment.sponsored_benefit_package
-      sponsored_benefit = previous_enrollment.sponsored_benefit
-			enrollment.sponsored_benefit_id = previous_enrollment.sponsored_benefit_id
-			enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-			enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
       enrollment.waiver_reason = waiver_reason
 
 			if is_qle && enrollment.family.is_under_special_enrollment_period?
@@ -39,6 +33,7 @@ module EnrollmentShopping
           end
         end
 				enrollment.enrollment_kind = "special_enrollment"
+        enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
         # TODO: Assign sep
 			else
 				effective_date = earliest_eligible_date_for_shop(@employee_role)
@@ -51,6 +46,14 @@ module EnrollmentShopping
 			enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
 				member.is_subscriber?
 			end
+
+      benefit_package ||= previous_enrollment.sponsored_benefit_package
+      sponsored_benefit = previous_enrollment.sponsored_benefit
+      enrollment.sponsored_benefit_package_id = benefit_package.id
+      sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
+      enrollment.sponsored_benefit_id = sponsored_benefit.id
+      enrollment.rating_area_id = benefit_package.recorded_rating_area.id
+      enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
 
       copy_member_coverage_dates(previous_enrollment, enrollment)
       enrollment
@@ -83,6 +86,7 @@ module EnrollmentShopping
 					end
 				end
 				enrollment.enrollment_kind = "special_enrollment"
+        enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
 				# TODO: Assign sep
 			else
 				effective_date = earliest_eligible_date_for_shop(@employee_role)
@@ -134,6 +138,7 @@ module EnrollmentShopping
 					end
 				end
 				enrollment.enrollment_kind = "special_enrollment"
+        enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
 				# TODO: Assign sep
 			else
 				effective_date = earliest_eligible_date_for_shop(@employee_role)
@@ -165,12 +170,6 @@ module EnrollmentShopping
 			enrollment.kind = "employer_sponsored"
 			enrollment.employee_role = @employee_role
       enrollment.predecessor_enrollment_id = previous_enrollment.id
-      enrollment.sponsored_benefit_package_id = previous_enrollment.sponsored_benefit_package_id
-      benefit_package = previous_enrollment.sponsored_benefit_package
-      sponsored_benefit = previous_enrollment.sponsored_benefit
-			enrollment.sponsored_benefit_id = previous_enrollment.sponsored_benefit_id
-			enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-			enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
 
 			if is_qle && enrollment.family.is_under_special_enrollment_period?
 				if optional_effective_on.present?
@@ -190,6 +189,7 @@ module EnrollmentShopping
           end
         end
 				enrollment.enrollment_kind = "special_enrollment"
+        enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
         # TODO: Assign sep
 			else
 				effective_date = earliest_eligible_date_for_shop(@employee_role)
@@ -202,6 +202,14 @@ module EnrollmentShopping
 			enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
 				family_member_ids.include? member.applicant_id
 			end
+
+      benefit_package ||= previous_enrollment.sponsored_benefit_package
+      sponsored_benefit = previous_enrollment.sponsored_benefit
+      enrollment.sponsored_benefit_package_id = benefit_package.id
+      sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
+      enrollment.sponsored_benefit_id = sponsored_benefit.id
+      enrollment.rating_area_id = benefit_package.recorded_rating_area.id
+      enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
 
       copy_member_coverage_dates(previous_enrollment, enrollment)
       enrollment
