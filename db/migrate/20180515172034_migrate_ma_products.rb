@@ -96,6 +96,7 @@ class MigrateMaProducts < Mongoid::Migration
                 is_standard_plan: plan.is_standard_plan,
                 rx_formulary_url: plan.rx_formulary_url,
                 hsa_eligibility: plan.hsa_eligibility,
+                network_information: plan.network_information,
               }.merge(shared_attributes))
             else
               BenefitMarkets::Products::DentalProducts::DentalProduct.create!({

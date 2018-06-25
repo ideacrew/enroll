@@ -352,7 +352,8 @@ class GroupSelectionPrevaricationAdapter
   # Assignment will never be nil unless you're setting incorrect sponsored_benefit_package on enrollment
   def assign_enrollment_to_benefit_package_assignment(employee_role, enrollment)
     assignment = employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
-    assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+    assignment.update(hbx_enrollment_id: enrollment.id)
+    enrollment.update(benefit_group_assignment_id: assignment.id)
   end
 
 	protected

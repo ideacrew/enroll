@@ -97,16 +97,16 @@ module BenefitSponsors
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
         start_on = new_date.next_month.beginning_of_month
-        benefit_sponsors = BenefitSponsors::BenefitSponsors::BenefitSponsorship
+        benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
 
         benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
-          transmit_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
-          transmit_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
+          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
         end
 
         benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          transmit_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
         end
       end
 
@@ -120,42 +120,7 @@ module BenefitSponsors
       private
 
       def execute_sponsor_event(benefit_sponsorship, event)
-        begin
-          business_policy_name = policy_name(event)
-          business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
-          event_service   = sponsor_service_for(benefit_sponsorship)
-          event_service.execute(benefit_sponsorship, event, business_policy)
-        rescue Exception => e 
-        end
-      end
-
-      def transmit_event(benefit_sponsorship, event)
-        sponsorship_service.benefit_sponsorship = benefit_sponsorship
-        sponsorship_service.send(event)
-      end
-
-      def sponsor_policy
-        return @sponsor_policy if defined?(@sponsor_policy)
-        @sponsor_policy = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipPolicy.new
-      end
-
-      def business_policy_for(benefit_sponsorship, business_policy_name)
-        sponsor_policy.business_policies_for(benefit_sponsorship, business_policy_name)
-      end
-
-      def policy_name(event_name)
-        event_name
-      end
-
-      def sponsor_service_for(benefit_sponsorship)
-        if benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
-          sponsorship_service
-        end
-      end
-
-      def sponsorship_service
-        return @sponsorship_service if defined? @sponsorship_service
-        @sponsorship_service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(new_date: new_date)
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorship, event)
       end
 
       def process_events_for(&block)

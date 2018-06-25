@@ -255,7 +255,7 @@ module BenefitSponsors
     def business_policy_satisfied_for?(event_name)
       business_policy_name = policy_name(event_name)
       @business_policy = business_policy_for(business_policy_name)
-      @business_policy.blank? || @business_policy.is_satisfied?
+      @business_policy.blank? || @business_policy.is_satisfied?(benefit_application)
     end
 
     def business_policy_for(business_policy_name)
