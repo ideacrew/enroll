@@ -39,7 +39,7 @@ attributes: !ruby/hash:BSON::Document
   family_deductible: "$2500 per person | $5000 per group"
   is_reference_plan_eligible: true
   kind: :health
-  updated_at: 2018-06-12 17:27:23.281000000 Z
+  updated_at: 2018-06-25 15:27:01.054000000 Z
   created_at: 2018-06-10 20:36:55.714000000 Z
   sbc_document: !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -6716,3 +6716,7 @@ attributes: !ruby/hash:BSON::Document
           Wx2L5+bro5CtEujz
       age: 64
       cost: 429.84
+  network_information: |-
+    This plan is provided on the "Direct" network which is a smaller network compared to the insurance carrier's "Standard Network" with access to fewer health care providers. Please confirm your PCPs and any other providers are covered in the network before selecting this plan.
+
+    The carrier describes this network as "a focused-network alternative to the Tufts Health Plan - Standard Network that is comparable to the provider networks of other lower-cost health plans offered on the Health Connector." The health plan offering this product was previously known as Tufts Health Plan - Network Health.
