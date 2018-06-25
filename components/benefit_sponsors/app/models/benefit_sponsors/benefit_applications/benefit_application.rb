@@ -234,14 +234,12 @@ module BenefitSponsors
 
     delegate :benefit_market, to: :benefit_sponsorship
 
-    after_initialize :set_values
+    before_validation :set_values
     after_create :renew_benefit_package_assignments
 
     def set_values
       if benefit_sponsorship
-        recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
-        recorded_rating_area   = benefit_sponsorship.rating_area unless recorded_rating_area.present?
-        recorded_service_areas = benefit_sponsorship.service_areas unless recorded_service_areas.present?
+        self.recorded_sic_code      = benefit_sponsorship.sic_code unless recorded_sic_code.present?
       end
     end
 
@@ -627,7 +625,7 @@ module BenefitSponsors
 
       after_all_transitions :publish_state_transition
 
-      event :import do
+      event :import_application do
         transitions from: :draft, to: :imported
       end
 
@@ -647,7 +645,7 @@ module BenefitSponsors
 
       # Upon review, application ineligible status overturned and deemed eligible
       event :approve_application do
-        transitions from: [:draft] + APPLICATION_EXCEPTION_STATES,  to: :approved
+        transitions from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES,  to: :approved
       end
 
       event :submit_for_review do

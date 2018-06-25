@@ -328,6 +328,30 @@ module BenefitSponsors
         end
       end
 
+      context "Conversion workflow" do
+        let(:benefit_application)   { described_class.new(**params) }
+
+        it "should initialize in state: :draft" do
+          expect(benefit_application.aasm_state).to eq :draft
+        end
+
+        context "and its a conversion application" do
+          before { benefit_application.import_application! }
+
+          it "should transition to state :imported" do
+            expect(benefit_application.aasm_state).to eq :imported
+          end
+
+          context "and the application is submitted" do
+            before { benefit_application.approve_application! }
+
+            it "should transition to state: :approved" do
+              expect(benefit_application.aasm_state).to eq :approved
+            end
+          end
+        end
+      end  
+
     end
 
 

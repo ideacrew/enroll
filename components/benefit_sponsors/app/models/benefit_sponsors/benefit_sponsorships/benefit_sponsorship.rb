@@ -476,6 +476,8 @@ module BenefitSponsors
     # active                 -> active
     def application_event_subscriber(aasm)
       case aasm.to_state
+      when :imported
+        revert_to_applicant! if may_revert_to_applicant?
       when :approved
         approve_initial_application! if may_approve_initial_application?
       when :pending
