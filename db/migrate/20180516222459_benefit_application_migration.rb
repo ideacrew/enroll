@@ -345,6 +345,7 @@ class BenefitApplicationMigration < Mongoid::Migration
           end
         end
         CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
+        CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
         census_employee.save(:validate => false)
       end
     end

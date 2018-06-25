@@ -69,6 +69,11 @@ module BenefitSponsors
         form.service.calculate_premiums(form)
       end
 
+      def self.for_reference_product_summary(params, details)
+        form = self.new(params)
+        form.service.reference_product_details(form, details)
+      end
+
       def self.fetch(params)
         form = self.new(params)
         form.service.load_form_metadata(form)
