@@ -82,6 +82,10 @@ module Config::AcaModelConcern
       @@genearl_agency_enabled ||= Settings.aca.general_agency_enabled
     end
 
+    def broker_carrier_appointments_enabled?
+      @@broker_carrier_appointments_enabled ||= Settings.aca.broker_carrier_appointments_enabled
+    end
+
     def use_simple_employer_calculation_model?
       @@use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
     end

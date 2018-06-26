@@ -7,6 +7,8 @@ module Notifier
      attribute :start_on, String
      attribute :end_on, String
      attribute :submitted_at, String
+     attribute :reporting_deadline, String
+     attribute :event_on, String
 
      def self.stubbed_object
        Notifier::MergeDataModels::SpecialEnrollmentPeriod.new({
@@ -14,7 +16,9 @@ module Notifier
          qle_reported_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
          start_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
          end_on: (TimeKeeper.date_of_record + 20.days).strftime('%m/%d/%Y'),
-         submitted_at: (TimeKeeper.datetime_of_record).strftime('%m/%d/%Y')
+         submitted_at: (TimeKeeper.datetime_of_record).strftime('%m/%d/%Y'),
+         reporting_deadline: (TimeKeeper.datetime_of_record + 15.days).strftime('%m/%d/%Y'),
+         event_on: (TimeKeeper.datetime_of_record).strftime('%m/%d/%Y')
          })
      end
    end
