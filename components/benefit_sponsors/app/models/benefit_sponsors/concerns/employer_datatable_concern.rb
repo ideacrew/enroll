@@ -34,17 +34,33 @@ module BenefitSponsors
           where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES)
         }
 
+        scope :benefit_application_imported, -> () {
+          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES)
+        }
+
         scope :benefit_application_enrolled, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES)
+          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_APPROVED_STATES)
         }
 
         scope :benefit_application_published, -> () {
           where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES)
         }
 
+        scope :benefit_application_suspended, -> () {
+          where(:"benefit_applications.aasm_state".in => [:suspended])
+        }
+
         scope :benefit_application_draft, -> () {
           where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES)
         }
+
+        scope :benefit_application_draft, -> () {
+          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES)
+        }
+
+        scope :effective_date_begin_on, -> (compare_date) {
+          where(:"benefit_applications.effective_period.min" => compare_date )
+         }
 
         scope :benefit_application_renewing, -> () {
           where(:"benefit_applications.predecessor_application" => {:$exists => true},

@@ -92,19 +92,34 @@ module Effective
       def collection
         return @employer_collection if defined? @employer_collection
 
-        @benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
+        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
 
-        @employer_collection = @benefit_sponsorships unless employer_kinds.include?(attributes[:employers])
+        if attributes[:employers].present? && !['all'].include?(attributes[:employers])
 
-          if employer_attestation_kinds.include?(attributes[:attestations])
-            benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
-          elsif enrolling_kinds.include?(attributes[:enrolling])
-            #TODO for employer enrolling kinds
-          elsif enrolled_kinds.include?(attributes[:enrolled])
-            #TODO for employer enrolled kinds
-          else
-            benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling].present?
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolled]) if attributes[:enrolled].present?
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:attestations]) if attributes[:attestations].present?
+
+          if attributes[:upcoming_dates].present?
+              if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
+                benefit_sponsorships = benefit_sponsorships.effective_date_begin_on(date)
+              end
           end
+
+        end
+
+          # if employer_attestation_kinds.include?(attributes[:attestations])
+          #   benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
+          # elsif enrolling_kinds.include?(attributes[:enrolling])
+          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:enrolling])
+          # elsif enrolled_kinds.include?(attributes[:enrolled])
+          #   #TODO for employer enrolled kinds
+          # else
+          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
+          # end
 
           # employers = @employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
           # employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
@@ -112,11 +127,7 @@ module Effective
 
           # employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
 
-          # if attributes[:upcoming_dates].present?
-          #     if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
-          #       employers = employers.employer_profile_plan_year_start_on(date)
-          #     end
-          # end
+
           @employer_collection = benefit_sponsorships
       end
 
@@ -176,8 +187,8 @@ module Effective
         #   ],
         enrolled:
           [
-            {scope:'employer_profiles_enrolled', label: 'All' },
-            {scope:'employer_profiles_suspended', label: 'Suspended' },
+            {scope:'benefit_application_enrolled', label: 'All' },
+            {scope:'benefit_application_suspended', label: 'Suspended' },
           ],
         upcoming_dates:
           [
@@ -193,6 +204,8 @@ module Effective
             # {scope: 'employer_profiles_initial_eligible', label: 'Initial', subfilter: :enrolling_initial},
             # {scope: 'employer_profiles_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
             # {scope: 'employer_profiles_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
+            {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
+            {scope: 'benefit_application_imported', label: 'Converting'}
           ],
          attestations:
           [
@@ -207,11 +220,11 @@ module Effective
            {scope:'all', label: 'All'},
            {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
 
-           #{scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
-           {scope:'benefit_application_enrolling', label: 'Enrolling'},
+           {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
+           #{scope:'benefit_application_enrolling', label: 'Enrolling'},
 
-           #{scope:'employer_profiles_enrolled', label: 'Enrolled', subfilter: :enrolled},
-           {scope:'benefit_application_enrolled', label: 'Enrolled'},
+           {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled},
+           #{scope:'benefit_application_enrolled', label: 'Enrolled'},
          ],
         top_scope: :employers
         }
