@@ -23,7 +23,7 @@ attributes: !ruby/hash:BSON::Document
     name: employee
     display_name: Employee
     order: 0
-    default_contribution_factor: 0.0
+    default_contribution_factor: 0.75
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -41,7 +41,7 @@ attributes: !ruby/hash:BSON::Document
     name: spouse
     display_name: Spouse
     order: 1
-    default_contribution_factor: 0.0
+    default_contribution_factor: 0.5
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -59,7 +59,7 @@ attributes: !ruby/hash:BSON::Document
     name: domestic_partner
     display_name: Domestic Partner
     order: 2
-    default_contribution_factor: 0.0
+    default_contribution_factor: 0.25
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -77,7 +77,7 @@ attributes: !ruby/hash:BSON::Document
     name: dependent
     display_name: Child Under 26
     order: 3
-    default_contribution_factor: 0.0
+    default_contribution_factor: 0.25
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId

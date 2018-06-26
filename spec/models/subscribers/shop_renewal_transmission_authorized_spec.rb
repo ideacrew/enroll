@@ -32,7 +32,7 @@ describe Subscribers::ShopRenewalTransmissionAuthorized, "given an employer hbx 
 
   before :each do
     allow(Date).to receive(:strptime).with(effective_on, "%Y-%m-%d").and_return(effective_date)
-    allow(Organization).to receive(:employer_by_hbx_id).with(employer_id).and_return(found_organizations)
+    allow(BenefitSponsors::Organizations::Organization).to receive(:employer_by_hbx_id).with(employer_id).and_return(found_organizations)
   end
 
   describe "which doesn't exist" do
@@ -55,7 +55,7 @@ describe Subscribers::ShopRenewalTransmissionAuthorized, "given an employer hbx 
     let(:enrollment_ids) { [enrollment_id] }
     let(:terminated_enrollment_ids) { [terminated_enrollment_id] }
     let(:employer_fein) { double }
-    let(:employer_org) { instance_double(Organization, :fein => employer_fein) }
+    let(:employer_org) { instance_double(BenefitSponsors::Organizations::Organization, :fein => employer_fein) }
     let(:found_organizations) { [employer_org] }
     let(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
@@ -102,7 +102,7 @@ describe Subscribers::ShopRenewalTransmissionAuthorized, "given an employer fein
 
   before :each do
     allow(Date).to receive(:strptime).with(effective_on, "%Y-%m-%d").and_return(effective_date)
-    allow(Organization).to receive(:where).with({:fein => employer_fein}).and_return(found_organizations)
+    allow(BenefitSponsors::Organizations::Organization).to receive(:where).with({:fein => employer_fein}).and_return(found_organizations)
   end
 
   describe "which doesn't exist" do
@@ -125,7 +125,7 @@ describe Subscribers::ShopRenewalTransmissionAuthorized, "given an employer fein
     let(:enrollment_ids) { [enrollment_id] }
     let(:terminated_enrollment_id) { double }
     let(:terminated_enrollment_ids) { [terminated_enrollment_id] }
-    let(:employer_org) { instance_double(Organization, :fein => employer_fein) }
+    let(:employer_org) { instance_double(BenefitSponsors::Organizations::Organization, :fein => employer_fein) }
     let(:found_organizations) { [employer_org] }
     let(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 

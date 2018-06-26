@@ -45,6 +45,11 @@ fieldset.mt-2
           .invalid-feedback
             |
               Please provide a SIC code.
+        .col-md-1.pl-0
+          a#sicHelperToggle
+            i.fas.fa-question.mt-3.fa-lg style="padding-top:5px"
+      #sicHelperWrapper.hidden.row.row-form-wrapper.no-buffer style="margin-top:90px"
+        = render "sic_help" , sicFieldId: 'organization_sic_code'
         
       br
       br
