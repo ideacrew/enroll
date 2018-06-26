@@ -555,9 +555,9 @@ module ApplicationHelper
     end
   end
 
-  def trigger_notice_observer(recipient, event_object, notice_event, notice_params = nil)
+  def trigger_notice_observer(recipient, event_object, notice_event)
     observer = Observers::NoticeObserver.new
-    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
+    observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event)
   end
 
   def disable_purchase?(disabled, hbx_enrollment, options = {})
@@ -693,15 +693,15 @@ module ApplicationHelper
   end
 
   def benefit_application_summarized_state(benefit_application)
-    return unless benefit_application
-
+    return if benefit_application.nil?
     aasm_map = {
       :draft => :draft,
       :enrollment_open => :enrolling,
       :enrollment_eligible => :enrolled,
       :approved => :published
     }
-    renewing = ""
+
+    renewing = benefit_application.is_renewing? ? "Renewing" : ""
     summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
     summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
     return summary_text.strip
