@@ -158,8 +158,6 @@ class BenefitApplicationMigration < Mongoid::Migration
             # benefit_sponsorship = BenefitSponsorshipMigrationService.fetch_sponsorship_for(new_organization, plan_year)
             benefit_application = convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year,csv)
             next unless benefit_application
-            benefit_application.recorded_rating_area = benefit_sponsorship.rating_area
-            benefit_application.recorded_service_areas = benefit_sponsorship.service_areas
 
             plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
             benfit_application_product_hios_ids = self.get_plan_hios_ids_of_benefit_application(benefit_application)
@@ -204,6 +202,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
+    benefit_application.pull_benefit_sponsorship_attributes
 
     predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
     benefit_application.predecessor_application_id = predecessor_application.first.id if predecessor_application.present?
