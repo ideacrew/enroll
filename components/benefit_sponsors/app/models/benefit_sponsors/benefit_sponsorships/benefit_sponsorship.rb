@@ -226,7 +226,7 @@ module BenefitSponsors
 
     def service_areas_on(a_date = ::TimeKeeper.date_of_record)
       if has_primary_office_address?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date)
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date).to_a
       else
         []
       end
@@ -570,19 +570,19 @@ module BenefitSponsors
       end
     end
 
-    def pull_organization_attributes
-      self.benefit_market = organization.site.benefit_market_for(:aca_shop) unless organization.blank?
-    end
-
-    def pull_profile_attributes
-    end
-
     def refresh_rating_area
       self.rating_area = primary_office_rating_area if has_primary_office_address?
     end
 
     def refresh_service_areas
       self.service_areas = primary_office_service_areas
+    end
+
+    def pull_organization_attributes
+      self.benefit_market = organization.site.benefit_market_for(:aca_shop) unless organization.blank?
+    end
+
+    def pull_profile_attributes
     end
 
     def generate_hbx_id

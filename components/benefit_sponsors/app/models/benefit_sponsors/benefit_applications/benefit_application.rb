@@ -202,7 +202,7 @@ module BenefitSponsors
     def predecessor
       return nil if predecessor_id.blank?
       return @predecessor if defined? @predecessor
-      @predecessor = benefit_sponsorship.find_benefit_applications(predecessor_id)
+      @predecessor = benefit_sponsorship.benefit_applications_by(predecessor_id)
     end
 
     def successors
@@ -472,11 +472,11 @@ module BenefitSponsors
         msp_count:                msp_count,
         benefit_sponsor_catalog:  new_benefit_sponsor_catalog,
         predecessor:              self,
-        recorded_service_areas:   benefit_sponsorship.service_areas,
-        recorded_rating_area:     benefit_sponsorship.rating_area,
         effective_period:         new_benefit_sponsor_catalog.effective_period,
         open_enrollment_period:   new_benefit_sponsor_catalog.open_enrollment_period
       )
+
+      renewal_application.pull_benefit_sponsorship_attributes
 
       benefit_packages.each do |benefit_package|
         new_benefit_package = renewal_application.benefit_packages.build
@@ -807,6 +807,13 @@ module BenefitSponsors
       enrolled_families
     end
 
+    # Assign local attributes derived from benefit_sponsorship parent instance
+    def pull_benefit_sponsorship_attributes
+      return unless benefit_sponsorship.present?
+      refresh_recorded_rating_area   unless recorded_rating_area.present?
+      refresh_recorded_service_areas unless recorded_service_areas.size > 0
+      refresh_recorded_sic_code      unless recorded_sic_code.present?
+    end
 
     private
 
@@ -820,14 +827,6 @@ module BenefitSponsors
 
     def refresh_recorded_sic_code
       self.recorded_sic_code = benefit_sponsorship.sic_code
-    end
-
-    # Assign local attributes derived from benefit_sponsorship parent instance
-    def pull_benefit_sponsorship_attributes
-      return unless benefit_sponsorship.present?
-      refresh_recorded_rating_area   unless recorded_rating_area.present?
-      refresh_recorded_service_areas unless recorded_service_areas.size > 0
-      refresh_recorded_sic_code      unless recorded_sic_code.present?
     end
 
     def validate_benefit_sponsorship_shared_attributes

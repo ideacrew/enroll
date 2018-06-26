@@ -187,8 +187,9 @@ module BenefitSponsors
           #   benefit_market = site.benefit_market_for(:aca_shop)
           # end
 
-          benefit_market = site.benefit_market_for(:aca_shop)
+          benefit_market  = site.benefit_market_for(:aca_shop)
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
+          
           # new_sponsorship.refresh_rating_area
           # new_sponsorship.refresh_service_areas
         else

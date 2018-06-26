@@ -130,7 +130,7 @@ module BenefitMarkets
     def benefit_market_products_available_for(service_areas, effective_date)
       service_area_ids = service_areas.map(&:id)
       benefit_market_products_available_on(effective_date).select do |product|
-        service_area_ids.empty? || service_area_ids.include?(product.service_area_id)
+        service_area_ids.include?(product.service_area_id)
       end # & benefit_market_products_available_where(service_areas)
     end
 
