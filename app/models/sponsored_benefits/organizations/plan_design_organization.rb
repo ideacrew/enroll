@@ -29,6 +29,12 @@ module SponsoredBenefits
       field :sponsor_profile_id,         type: BSON::ObjectId
       field :sponsor_profile_class_name, type: String, default: "::BenefitSponsors::Organizations::Profile"
 
+      #temporary fields to store old model profile data as history while migrating
+      field :history_owner_profile_id,type: BSON::ObjectId
+      field :history_owner_profile_class_name,type: String
+      field :history_sponsor_profile_id,type: BSON::ObjectId
+      field :history_sponsor_profile_class_name,type: String
+
       field :has_active_broker_relationship, type: Boolean, default: false
 
       embeds_many :plan_design_proposals, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal", cascade_callbacks: true
