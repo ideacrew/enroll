@@ -1417,7 +1417,7 @@ class HbxEnrollment
         coverage_effective_date = employee_role.coverage_effective_on(current_benefit_group: sponsored_benefit_package, qle: qle)
       elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
         coverage_effective_date = special_enrollment_period.effective_on
-      elsif sponsored_benefit_package.benefit_application.open_enrollment_effective_on_cover?(TimeKeeper.date_of_record)
+      elsif sponsored_benefit_package.benefit_application.open_enrollment_contains?(TimeKeeper.date_of_record)
         open_enrollment_effective_date = sponsored_benefit_package.benefit_application.start_on
         return false if open_enrollment_effective_date < employee_role.coverage_effective_on(current_benefit_group: sponsored_benefit_package)
         coverage_effective_date = open_enrollment_effective_date
