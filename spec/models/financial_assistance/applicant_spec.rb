@@ -84,7 +84,7 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       end
 
       it "should return the dob of the person associated to the applicant" do
-        expect(applicant2.age_on_effective_date).to eq 45
+        expect(applicant2.age_on_effective_date).to eq Date.today.year - person2.dob.year
         expect(applicant2.age_on_effective_date).not_to eq 25
       end
 
