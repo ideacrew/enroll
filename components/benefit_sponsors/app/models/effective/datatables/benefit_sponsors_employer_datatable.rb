@@ -44,7 +44,9 @@ module Effective
             row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
 
-        # # table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
+        table_column :invoiced?, :proc => Proc.new { |row|
+          boolean_to_glyph(@employer_profile.current_month_invoice.present?)}, :filter => false
+
         # table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
 
         if employer_attestation_is_enabled?
