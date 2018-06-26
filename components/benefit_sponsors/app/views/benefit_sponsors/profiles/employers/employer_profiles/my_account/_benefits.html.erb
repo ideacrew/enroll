@@ -1,4 +1,4 @@
-<%# TODO %> 
+<%# TODO %>
 <div class="benefits-tab">
   <div class="row">
     <div class="col-xs-8">
@@ -55,7 +55,7 @@
                 <% end %>
               </span>
               <%= benefit_application.start_on.to_date.year%>
-              Plan Year (<%= benefit_application.aasm_state.to_s.humanize.titleize %>)
+              Plan Year (<%= benefit_application_summarized_state(benefit_application) %>)
             </div>
           </h3>
         </div>
@@ -226,7 +226,7 @@
             <% package.sponsored_benefits.each do |sponsored_benefit| %>
               <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit %>
             <% end %>
-            
+
 
             <br class="clear"/>
           </div>

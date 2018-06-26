@@ -691,4 +691,18 @@ module ApplicationHelper
     site_key = Settings.site.key
       "icons/#{site_key}-#{icon}"
   end
+
+  def benefit_application_summarized_state(benefit_application)
+    aasm_map = {
+      :draft => :draft,
+      :enrollment_open => :enrolling,
+      :enrollment_eligible => :enrolled,
+      :approved => :published
+    }
+    renewing = benefit_application.predecessor_application_id.blank? ? "" : "Renewing"
+    summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
+    summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
+    return summary_text.strip
+  end
+
 end

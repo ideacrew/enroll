@@ -37,7 +37,7 @@ module Effective
 
         table_column :plan_year_state, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
-            row.latest_benefit_application.aasm_state
+            benefit_application_summarized_state(row.latest_benefit_application)
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
           if row.latest_benefit_application.present?
