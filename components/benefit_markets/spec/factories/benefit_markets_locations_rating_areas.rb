@@ -5,5 +5,6 @@ FactoryGirl.define do
     exchange_provided_code "#{Settings.aca.state_abbreviation}"
     # These should never occur at the same time
     covered_states ["MA"]
+    county_zip_ids { [create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id] }
   end
 end

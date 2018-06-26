@@ -7,6 +7,10 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
   let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
   let(:renewal_effective_date)  { current_effective_date.next_year }
 
+  let!(:prior_rating_area)   { create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year - 1) }
+  let!(:current_rating_area) { create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
+  let!(:renewal_rating_area) { create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year) }
+
   let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     title: "SHOP Benefits for #{current_effective_date.year}",

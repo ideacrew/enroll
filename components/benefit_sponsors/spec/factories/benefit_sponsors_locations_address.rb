@@ -14,7 +14,7 @@ FactoryGirl.define do
       kind      'work'
       address_1 '27 Reo Road'
       city      'Maynard'
-      state     'MD'
+      state     'MA'
       zip       '01754'
       county    'Middlesex'
     end

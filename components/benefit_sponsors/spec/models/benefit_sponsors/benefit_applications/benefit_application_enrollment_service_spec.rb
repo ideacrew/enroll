@@ -20,7 +20,7 @@ module BenefitSponsors
     describe '.renew' do
       let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
       let(:aasm_state) { :active }
-      let(:business_policy) { instance_double("some_policy")}
+      let(:business_policy) { instance_double("some_policy", success_results: "validated successfully")}
       include_context "setup initial benefit application"
 
       before(:all) do 
@@ -40,8 +40,10 @@ module BenefitSponsors
           allow(business_policy).to receive(:is_satisfied?).with(initial_application).and_return(true)
           subject.renew_application
           benefit_sponsorship.reload
+          
           renewal_application = benefit_sponsorship.benefit_applications.detect{|application| application.is_renewing?}
           expect(renewal_application).not_to be_nil
+
           expect(renewal_application.start_on.to_date).to eq current_effective_date.next_year
           expect(renewal_application.benefit_sponsor_catalog).not_to be_nil
           expect(renewal_application.benefit_packages.count).to eq 1
