@@ -7,11 +7,20 @@ module Importers::Mhc
 
       benefit_sponsorship = employer_profile.organization.benefit_sponsorships.first
       benefit_application = BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(benefit_sponsorship, fetch_application_params)
+
+      # return false if service_areas_missing?(benefit_application)
+      # return false if rating_area_missing?(benefit_application)
+      # benefit_sponsorship.service_areas = benefit_application.recorded_service_areas
+      # benefit_sponsorship.rating_area = benefit_application.recorded_rating_area
       
       catalog_date = mid_year_conversion ? orginal_plan_year_begin_date : default_plan_year_start
-      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas, catalog_date)
-      
-      BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
+      benefit_application.recorded_service_areas = benefit_sponsorship.service_areas_on(catalog_date)
+      benefit_application.recorded_rating_area = benefit_sponsorship.rating_area_on(catalog_date)
+
+      benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, catalog_date)
+
+     BenefitSponsors::Importers::BenefitPackageImporter.call(benefit_application, benefit_package_attributes)
+
       benefit_application
     end
 
@@ -102,8 +111,6 @@ module Importers::Mhc
       return false unless valid?
       employer_profile = find_employer
       sponsorship = employer_profile.organization.benefit_sponsorships[0]
-      return false if rating_area_missing?(sponsorship)
-      return false if service_areas_missing?(sponsorship)
       return false if plan_year_exists?(sponsorship)
 
       record = map_plan_year(employer_profile)
