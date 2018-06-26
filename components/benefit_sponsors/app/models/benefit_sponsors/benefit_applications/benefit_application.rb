@@ -810,6 +810,7 @@ module BenefitSponsors
     # Assign local attributes derived from benefit_sponsorship parent instance
     def pull_benefit_sponsorship_attributes
       return unless benefit_sponsorship.present?
+      return if self.start_on.blank?
       refresh_recorded_rating_area   unless recorded_rating_area.present?
       refresh_recorded_service_areas unless recorded_service_areas.size > 0
       refresh_recorded_sic_code      unless recorded_sic_code.present?
