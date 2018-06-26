@@ -549,6 +549,10 @@ Given /^the employer is logged in$/ do
   login_as owner, scope: :user
 end
 
+Then /^employer should see Bulk Actions$/ do
+  expect(page).to have_content "Bulk Actions"
+end
+
 And /^clicks on terminate employee$/ do
   expect(page).to have_content 'Employee Roster'
   employees.first
