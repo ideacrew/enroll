@@ -465,8 +465,8 @@ class Organization
   end
 
   def self.invoice_exist?(invoice_date,org)
-    docs =org.invoices.select{|doc| doc.date == invoice_date }
-    matching_documents = docs.select {|d| d.title.match(Regexp.new("^#{org.hbx_id}"))}
+    docs = org.invoices.select{|doc| doc.date == invoice_date }
+    matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
     return true if matching_documents.count > 0
   end
 
