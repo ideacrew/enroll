@@ -847,7 +847,7 @@ class ConsumerRole
   end
 
   def residency_denied?
-    (!is_state_resident.nil?) && (!is_state_resident)
+    (!is_state_resident.nil?) && (!is_state_resident) && local_residency_validation == "outstanding"
   end
 
   def residency_verified?

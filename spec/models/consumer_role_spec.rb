@@ -320,11 +320,12 @@ context "Verification process and notices" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
-    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, residency_status, from_state, to_state, event|
       before do
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
+        consumer.local_residency_validation = residency_status
       end
       it "moves from #{from_state} to #{to_state} on #{event}" do
         expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
@@ -333,13 +334,13 @@ context "Verification process and notices" do
 
     context "import" do
       all_states.each do |state|
-        it_behaves_like "IVL state machine transitions and workflow", nil, nil, nil, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "any", true, state, :fully_verified, "import!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "any", false, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, nil, nil, "pending", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, "valid", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, "valid", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, "valid", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, "outstanding", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "any", true, "valid", state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "any", false, "outstanding", state, :fully_verified, "import!"
         it "updates all verification types with callback" do
           consumer.import!
           expect(consumer.all_types_verified?).to eq true
@@ -349,16 +350,16 @@ context "Verification process and notices" do
 
     context "coverage_purchased" do
       describe "citizen with ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, "outstanding", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, "valid", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, "outstanding", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, "valid", :unverified, :ssa_pending, "coverage_purchased!"
       end
       describe "citizen with NO ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", true, :unverified, :dhs_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", false, :unverified, :dhs_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, "outstanding", :unverified, :verification_outstanding, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true,  "valid", :unverified, :verification_outstanding, "coverage_purchased!"
         it "update ssn with callback fail_ssa_for_no_ssn" do
           allow(person).to receive(:ssn).and_return nil
           allow(consumer).to receive(:citizen_status).and_return "us_citizen"
@@ -367,16 +368,16 @@ context "Verification process and notices" do
         end
       end
       describe "immigrant with ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, :unverified, :ssa_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, "valid", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, "outstanding", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, "outstanding", :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :unverified, :ssa_pending, "coverage_purchased!"
       end
       describe "immigrant with NO ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", true, :unverified, :dhs_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, :unverified, :dhs_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, :unverified, :dhs_pending, "coverage_purchased!"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", true,  "valid", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
+      it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
       end
 
       describe "pending verification type updates" do
@@ -388,10 +389,10 @@ context "Verification process and notices" do
     end
 
     context "ssn_invalid" do
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
       it "fails ssn with callback" do
         consumer.aasm_state = "ssa_pending"
         consumer.ssn_invalid! verification_attr
@@ -406,15 +407,15 @@ context "Verification process and notices" do
 
     context "ssn_valid_citizenship_invalid" do
       describe "citizen" do
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, "valid", :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, "outstanding", :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
       end
       describe "immigrant" do
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, "valid", :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, "valid", :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, "outstanding", :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, "outstanding", :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
       end
 
       it "updates ssn validation with callback" do
@@ -445,15 +446,18 @@ context "Verification process and notices" do
       end
       [false, nil, true].each do |residency|
         if residency
+          residency_status = "valid"
           to_state = :fully_verified
         elsif residency.nil?
+          residency_status = "pending"
           to_state = :sci_verified
         else
+          residency_status = "outstanding"
           to_state = :verification_outstanding
         end
         describe "residency #{residency} #{'pending' if residency.nil?}" do
           [:unverified, :ssa_pending, :verification_outstanding].each do |from_state|
-            it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", residency, from_state, to_state, "ssn_valid_citizenship_valid!"
+            it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", residency, residency_status, from_state, to_state, "ssn_valid_citizenship_valid!"
             it "updates ssn citizenship with callback and doesn't change consumer citizen input" do
               consumer.ssn_valid_citizenship_valid! verification_attr
               expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("verified")
@@ -466,9 +470,9 @@ context "Verification process and notices" do
     end
 
     context "fail_dhs" do
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :dhs_pending, :verification_outstanding, "fail_dhs!"
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :dhs_pending, :verification_outstanding, "fail_dhs!"
-      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :dhs_pending, :verification_outstanding, "fail_dhs!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :dhs_pending, :verification_outstanding, "fail_dhs!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, "outstanding", :dhs_pending, :verification_outstanding, "fail_dhs!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true,"valid", :dhs_pending, :verification_outstanding, "fail_dhs!"
 
       it "fails lawful presence with callback" do
         consumer.aasm_state = "dhs_pending"
@@ -492,16 +496,19 @@ context "Verification process and notices" do
       end
       [false, nil, true].each do |residency|
         if residency
+          residency_status = "valid"
           to_state = :fully_verified
         elsif residency.nil?
+          residency_status = "pending"
           to_state = :sci_verified
         else
+          residency_status = "outstanding"
           to_state = :verification_outstanding
         end
         describe "residency #{residency} #{'pending' if residency.nil?}" do
           [:unverified, :dhs_pending, :verification_outstanding].each do |from_state|
-            it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", residency, from_state, to_state, "pass_dhs!"
-            it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", residency, from_state, to_state, "pass_dhs!"
+            it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", residency, residency_status, from_state, to_state, "pass_dhs!"
+            it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", residency,residency_status, from_state, to_state, "pass_dhs!"
             it "updates citizenship with callback and doesn't change consumer citizen input" do
               consumer.pass_dhs! verification_attr
               expect(consumer.lawful_presence_determination.verification_successful?).to eq true
@@ -514,12 +521,12 @@ context "Verification process and notices" do
 
     context "pass_residency" do
       [nil, "111111111"].each do |ssn|
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, "valid", :unverified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, "valid", :ssa_pending, :ssa_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, "valid",  :dhs_pending, :dhs_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, "outstanding", :sci_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :verification_outstanding, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :fully_verified, :verification_outstanding, "fail_residency!"
         it "updates residency status with callback" do
           consumer.is_state_resident = true
           consumer.fail_residency!
@@ -530,12 +537,12 @@ context "Verification process and notices" do
 
     context "fail_residency" do
       [nil, "111111111"].each do |ssn|
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "fail_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, "valid", :unverified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, "valid", :ssa_pending, :ssa_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, "valid", :dhs_pending, :dhs_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, "outstanding", :sci_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :verification_outstanding, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :fully_verified, :verification_outstanding, "fail_residency!"
         it "updates residency status with callback" do
           consumer.is_state_resident = true
           consumer.fail_residency! verification_attr
@@ -546,11 +553,11 @@ context "Verification process and notices" do
 
     context "trigger_residency" do
       [nil, "111111111"].each do |ssn|
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "trigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "trigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "trigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "trigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :sci_verified, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, "valid", :ssa_pending, :ssa_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, "valid", :dhs_pending, :dhs_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, "outstanding", :sci_verified, :sci_verified, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :verification_outstanding, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, "outstanding", :fully_verified, :sci_verified, "trigger_residency!"
         it "updates residency status with callback" do
           if consumer.may_trigger_residency?
             consumer.is_state_resident = true
@@ -567,7 +574,7 @@ context "Verification process and notices" do
       end
 
       all_states.each do |state|
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, state, :unverified, "revert!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, "valid", state, :unverified, "revert!"
         it "updates ssn" do
           consumer.revert!
           expect(consumer.ssn_validation).to eq "pending"
@@ -585,10 +592,10 @@ context "Verification process and notices" do
     end
 
     context 'coverage_purchased_no_residency' do
-      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
-      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
-      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', true, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
-      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', false, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', false, "outstanding", :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', false, "outstanding", :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', true, "valid", :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', false, "outstanding", :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
     end
   end
 
