@@ -701,7 +701,7 @@ module ApplicationHelper
       :enrollment_eligible => :enrolled,
       :approved => :published
     }
-    renewing = benefit_application.predecessor_application_id.blank? ? "" : "Renewing"
+    renewing = ""
     summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
     summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
     return summary_text.strip
