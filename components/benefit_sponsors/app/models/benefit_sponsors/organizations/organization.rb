@@ -109,7 +109,9 @@ module BenefitSponsors
       index({ fein: 1 },  { unique: true, sparse: true })
       index({ :"profiles._id" => 1 })
       index({ :"profiles._type" => 1 })
-      index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
+
+      index({ :"benefit_sponsorships._id" => 1 }, { sparse: true })
+      # index({ :"profiles._benefit_sponsorship_id" => 1 }, { sparse: true })
 
       # scope :profile,                 ->(id){ find_by(:"profiles._id" => id) }
       scope :hbx_profiles,            ->{ where(:"profiles._type" => /.*HbxProfile$/) }
@@ -120,7 +122,8 @@ module BenefitSponsors
 
       scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
-      scope :by_employer_profile,             ->( profile_id ){ self.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
+
+      scope :by_employer_profile,             ->( profile_id ){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
       scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
       scope :broker_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
       scope :employer_by_fein,                ->( fein ){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
@@ -174,19 +177,6 @@ module BenefitSponsors
         @fein = numeric_fein
       end
 
-      # def self.bind_benefit_sponsorship_to_profile(benefit_sponsorship, profile_id)
-      #   profile_organization = self.profile(profile_id)
-      #   profile = profile_organization.profiles.detect { |profile| profile._id == profile_id }
-
-      #   if profile.present? && profile.is_benefit_sponsorship_eligible?
-      #     profile_organization.benefit_sponsorships << benefit_sponsorship
-      #     profile_organization.save!
-      #   else
-      #     raise "Profile not found or ineligible for benefit sponsorship: #{profile || nil}" if area.count > 1
-      #   end
-      #   profile
-      # end
-
       def sponsor_benefits_for(profile)
         new_sponsorship = nil
         if profile.is_benefit_sponsorship_eligible?
@@ -197,10 +187,11 @@ module BenefitSponsors
           #   benefit_market = site.benefit_market_for(:aca_shop)
           # end
 
-          benefit_market = site.benefit_market_for(:aca_shop)
+          benefit_market  = site.benefit_market_for(:aca_shop)
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
-          new_sponsorship.refresh_rating_area
-          new_sponsorship.refresh_service_area
+          
+          # new_sponsorship.refresh_rating_area
+          # new_sponsorship.refresh_service_areas
         else
           raise BenefitSponsors::Errors::BenefitSponsorShipIneligibleError, "profile #{profile} isn't eligible to sponsor benefits"
         end
@@ -217,8 +208,19 @@ module BenefitSponsors
         active_benefit_sponsorship
       end
 
-      def latest_benefit_sponsorship_for(profile)
-        benefit_sponsorships.by_profile(profile).desc(:created_at).first
+      def benefit_sponsorships_for(profile)
+        benefit_sponsorships.by_profile(profile).desc(:created_at)
+      end
+
+      def most_recent_benefit_sponsorship_for(profile)
+        benefit_sponsorships_for(profile).first
+      end
+
+      # Deprecate latest_benefit_sponsorship_for
+      alias_method :latest_benefit_sponsorship_for, :most_recent_benefit_sponsorship_for
+
+      def find_benefit_sponsorships(ids)
+        benefit_sponsorships.find(ids)
       end
 
       def entity_kinds

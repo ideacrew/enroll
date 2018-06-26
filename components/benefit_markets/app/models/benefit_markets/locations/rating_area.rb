@@ -34,17 +34,17 @@ module BenefitMarkets
         :county_name => address.county.titlecase,
         :state => address.state.upcase
       ).map(&:id)
-      area = self.where(
+      
+      # TODO FIX
+      # raise "Multiple Rating Areas Returned" if area.count > 1
+      
+      self.where(
         "active_year" => during.year,
         "$or" => [
           {"county_zip_ids" => { "$in" => county_zip_ids }},
           {"covered_states" => address.state.upcase}
         ]
-      )
-      # TODO FIX
-      # raise "Multiple Rating Areas Returned" if area.count > 1
-      return nil if area.nil?
-      area.first
+      ).first
     end
   end
 end

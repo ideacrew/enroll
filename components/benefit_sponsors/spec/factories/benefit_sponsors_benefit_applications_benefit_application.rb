@@ -6,7 +6,6 @@ FactoryGirl.define do
   end
 
   factory :benefit_sponsors_benefit_application, class: 'BenefitSponsors::BenefitApplications::BenefitApplication' do
-    benefit_sponsorship { create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
 
     fte_count   FactoryGirl.generate(:random_count)
     pte_count   FactoryGirl.generate(:random_count)
@@ -35,6 +34,7 @@ FactoryGirl.define do
 
     recorded_service_areas   { [create(:benefit_markets_locations_service_area)] }
     recorded_rating_area     { create(:benefit_markets_locations_rating_area) }
+    recorded_sic_code         "011"
 
     transient do
       predecessor_application_state :active
@@ -52,6 +52,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_benefit_sponsorship do
+      after(:build) do |benefit_application, evaluator|
+        benefit_sponsorship { create(:benefit_sponsors_benefit_sponsorship, :with_full_package)} unless benefit_sponsorship.present?
+      end
+    end
+
     trait :with_benefit_package do
       association :benefit_sponsor_catalog, factory: :benefit_markets_benefit_sponsor_catalog
       after(:build) do |benefit_application, evaluator|
@@ -66,10 +72,9 @@ FactoryGirl.define do
           benefit_sponsorship: benefit_application.benefit_sponsorship,
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
-          successor_applications: [benefit_application],
           aasm_state: evaluator.predecessor_application_state
         )
-        benefit_application.predecessor_application = predecessor_application
+        benefit_application.predecessor = predecessor_application
         benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
       end
     end

@@ -8,20 +8,23 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:abc_profile)             { abc_organization.employer_profile }
   let!(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
 
-  let(:service_areas)           { [create(:benefit_markets_locations_service_area)] }
-  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas, effective_period.min) }
+  let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
+
+  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
+  
   let(:initial_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
                                       # benefit_sponsorship: benefit_sponsorship,
                                       benefit_sponsor_catalog: benefit_sponsor_catalog,
                                       effective_period: effective_period,
                                       aasm_state: aasm_state,
                                       open_enrollment_period: open_enrollment_period,
-                                      recorded_rating_area_id: benefit_sponsorship.rating_area_id,
+                                      recorded_rating_area: rating_area,
                                       recorded_service_areas: service_areas,
                                       fte_count: 5,
                                       pte_count: 0,
                                       msp_count: 0,
                                   ) }
+  
   # let!(:initial_application)  { build(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
   #                                     benefit_sponsorship: benefit_sponsorship,
   #                                     effective_period: effective_period,
@@ -33,7 +36,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   # let(:recorded_service_areas)         { benefit_sponsorship.service_areas_for(effective_period.min) }
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:current_benefit_package)  { build(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
+  let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
 
   # before { binding.pry; benefit_sponsorship.save!; initial_application.save! }
 

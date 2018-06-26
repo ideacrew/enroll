@@ -10,24 +10,14 @@ FactoryGirl.define do
     end
 
     trait :with_massachusetts_address do
-      after(:build) do |office_location, evaluator|
-        office_location.is_primary = true
-        office_location.address { FactoryGirl.build(:benefit_sponsors_locations_address,
-                      kind: "primary",
-                      address_1: '26 Greenough Ave',
-                      city: 'Boston',
-                      state: 'MA',
-                      zip: '02130',
-                      county: 'Suffolk'
-                    )
-                  }
-        office_location.phone   { FactoryGirl.build(:benefit_sponsors_locations_phone,
-                      kind: "work",
-                      area_code: 617,
-                      number: 5551212,
-                    )
-                  }
-      end
+      is_primary true
+      address { FactoryGirl.build(:benefit_sponsors_locations_address, :cca_shop_baseline) }
+      phone   { FactoryGirl.build(:benefit_sponsors_locations_phone,
+        kind: "work",
+        area_code: 617,
+        number: 5551212,
+        )
+      }
     end
   end
 end

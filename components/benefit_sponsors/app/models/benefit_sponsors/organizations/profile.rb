@@ -41,23 +41,19 @@ module BenefitSponsors
 
       alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
 
-      # # TODO make benefit sponsorships a has_many collection
-      # # Inverse of BenefitSponsoship#organization_profile
-      # def benefit_sponsorship
-      #   raise Errors::SponsorshipIneligibleError unless is_benefit_sponsorship_eligible?
-      #   return @benefit_sponsorship if defined?(@benefit_sponsorship)
-      #   @benefit_sponsorship = organization.benefit_sponsorships.detect { |benefit_sponsorship| benefit_sponsorship._id == self.benefit_sponsorship_id }
-      # end
+      validates :contact_method,
+        inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
+        allow_blank: false
 
-      # def benefit_sponsorship=(benefit_sponsorship)
-      #   return unless is_benefit_sponsorship_eligible?
-      #   write_attribute(:benefit_sponsorship_id, benefit_sponsorship._id)
-      #   @benefit_sponsorship = benefit_sponsorship
-      # end
+      after_save :publish_profile_event
 
-       validates :contact_method,
-         inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
-         allow_blank: false
+      def publish_profile_event
+        if primary_office_location && primary_office_location.changed?
+          benefit_sponsorships.each do |benefit_sponsorship|
+            benefit_sponsorship.profile_event_subscriber(:primary_office_location_change)
+          end
+        end
+      end
 
       def primary_office_location
         office_locations.detect(&:is_primary?)
@@ -75,18 +71,16 @@ module BenefitSponsors
         organization.benefit_sponsorships.select { |benefit_sponsorship| benefit_sponsorship.profile_id.to_s == _id.to_s }
       end
 
-      def latest_benefit_sponsorship
+      def most_recent_benefit_sponsorship
         organization.latest_benefit_sponsorship_for(self)
       end
 
-      def rating_area
-        return nil if primary_office_location.blank?
-        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address)
+      def latest_benefit_sponsorship
+        most_recent_benefit_sponsorship
       end
 
-      def service_areas
-        return nil if primary_office_location.blank?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address)
+      def benefit_sponsorship_successors_for(benefit_sponsorship)
+        organization.benefit_sponsorships.select { |organization_sponsorship| organization_sponsorship.predecessor_id == benefit_sponsorship._id }
       end
 
       def contact_methods

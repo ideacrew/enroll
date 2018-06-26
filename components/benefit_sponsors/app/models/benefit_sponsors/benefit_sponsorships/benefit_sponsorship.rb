@@ -1,8 +1,10 @@
 # BenefitSponsorship
-# Manage benfit enrollment activity for a sponsoring Organization's Profile (e.g. EmployerProfile, HbxProfile, etc.)
-# Behavior is goverened by settings obtained from the BenefitMarkets::BenefitCatelog.  Typically assumes a once annual enrollment period and effective date.  For scenarios where there's a once-yearly
-# open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
-# cycles.  Scenarios where enollments are conducted on a rolling monthly basis are also supported.
+# Manage benfit enrollment activity for a sponsoring Organization's Profile (e.g. EmployerProfile,
+# HbxProfile, etc.) Behavior is goverened by settings obtained from the BenefitMarkets::BenefitCatelog.
+# Typically assumes a once annual enrollment period and effective date.  For scenarios where there's a
+# once-yearly open enrollment, new sponsors may join mid-year for initial enrollment, subsequently
+# renewing on-schedule in following cycles. Scenarios where enollments are conducted on a rolling monthly
+# basis are also supported.
 
 # Organzations may embed many BenefitSponsorships.  Significant changes result in new BenefitSponsorship,
 # such as the following supported scenarios:
@@ -23,7 +25,6 @@ module BenefitSponsors
     # include Concerns::Observable
     include AASM
 
-
     # Origination of this BenefitSponsorship instance in association
     # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
     #   :self_serve               =>  sponsor independently joined HBX with initial effective date
@@ -43,7 +44,6 @@ module BenefitSponsors
     TERMINATION_KINDS         = [:voluntary, :involuntary].freeze
     TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud].freeze
 
-
     field :hbx_id,              type: String
     field :profile_id,          type: BSON::ObjectId
 
@@ -55,6 +55,8 @@ module BenefitSponsors
     field :effective_end_on,    type: Date
     field :termination_kind,    type: Symbol
     field :termination_reason,  type: Symbol
+
+    field :predecessor_id,  type: BSON::ObjectId
 
     # Immutable value indicating origination of this BenefitSponsorship
     field :source_kind,         type: Symbol, default: :self_serve
@@ -104,7 +106,7 @@ module BenefitSponsors
       inverse_of: :benefit_sponsorship_docs,
       class_name: "BenefitSponsors::Documents::Document"
 
-    validates_presence_of :organization, :profile_id, :benefit_market, :source_kind, :rating_area
+    validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
     validates :source_kind,
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
@@ -159,7 +161,7 @@ module BenefitSponsors
 
     scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_application_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
       )
     }
 
@@ -180,26 +182,15 @@ module BenefitSponsors
     index({ profile_id: 1 })
 
     index({"benefit_application._id" => 1})
-    index({ "benefit_application.aasm_state" => 1,
-            "effective_period.min" => 1,
-            "effective_period.max" => 1},
+    index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
             { name: "effective_period" })
 
-    index({ "benefit_application.aasm_state" => 1,
-            "open_enrollment_period.min" => 1,
-            "open_enrollment_period.max" => 1},
+    index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
 
 
     before_create :generate_hbx_id
-
-    def refresh_rating_area
-      self.rating_area = primary_office_rating_area
-    end
-
-    def refresh_service_area
-      self.service_areas = primary_office_service_areas
-    end
+    before_validation :pull_profile_attributes, :pull_organization_attributes, :validate_profile_organization
 
     def application_may_renew_effective_on(new_date)
       benefit_applications.effective_date_end_on(new_date).coverage_effective.first
@@ -230,48 +221,92 @@ module BenefitSponsors
     end
 
     def primary_office_address
-      if primary_office_location.present? && primary_office_location.address.present?
-        primary_office_location.address
-      end
+      primary_office_location.address if has_primary_office_address?
     end
 
-    def primary_office_service_areas
-      service_areas_for(::TimeKeeper.date_of_record)
-    end
-
-    def service_areas_for(a_date)
-      if primary_office_location.present? && primary_office_location.address.present?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date)
+    def service_areas_on(a_date = ::TimeKeeper.date_of_record)
+      if has_primary_office_address?
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date).to_a
       else
         []
       end
     end
 
-    def primary_office_rating_area
-      if primary_office_location.present? && primary_office_location.address.present?
-        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address, during: ::TimeKeeper.date_of_record)
+    def rating_area_on(a_date = ::TimeKeeper.date_of_record)
+      if has_primary_office_address?
+        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address, during: a_date)
+      else
+        nil
       end
+    end
+
+    def primary_office_rating_area
+      rating_area_on(::TimeKeeper.date_of_record)
+    end
+
+    def primary_office_service_areas
+      service_areas_on(::TimeKeeper.date_of_record)
+    end
+
+    def has_primary_office_address?
+      primary_office_location.present? && primary_office_location.address.present?
     end
 
     # Inverse of Profile#benefit_sponsorship
     def profile
-      return unless organization.present?
       return @profile if defined?(@profile)
-      @profile = organization.profiles.detect { |profile| profile._id == self.profile_id }
+      @profile = BenefitSponsors::Organizations::Organization.by_employer_profile(self.profile_id).first.employer_profile unless profile_id.blank?
     end
 
-    def profile=(profile)
-      if profile.nil?
+    def profile=(new_profile)
+      if new_profile.nil?
         write_attribute(:profile_id, nil)
         @profile = nil
         self.organization = nil
-        refresh_rating_area
-        return
+      else
+        write_attribute(:profile_id, new_profile._id)
+        @profile = new_profile
+        self.organization = new_profile.organization
+        pull_profile_attributes
+        pull_organization_attributes
       end
-      write_attribute(:profile_id, profile._id)
-      @profile = profile
-      self.organization = profile.organization
-      refresh_rating_area
+      @profile
+    end
+
+    # Watch for changes in Profile
+    def profile_event_subscriber(event)
+      if event == :primary_office_location_change && ![:terminated, :ineligible].include?(aasm_state)
+        pull_profile_attributes
+        self.save!
+      end
+    end
+
+    def reset_organization=(new_organization)
+      if new_organization.nil?
+        self.organization = nil
+        self.benefit_market = nil
+      else
+        self.organization = new_organization
+        pull_organization_attributes
+      end
+    end
+
+    def predecessor=(benefit_sponsorship)
+      raise ArgumentError.new("expected BenefitSponsorship") unless benefit_sponsorship.is_a? BenefitSponsors::BenefitSponsorships::BenefitSponsorship
+      self.predecessor_id = benefit_sponsorship._id
+      @predecessor = benefit_sponsorship
+    end
+
+    def predecessor
+      return nil if predecessor_id.blank?
+      return @predecessor if defined? @predecessor
+      @predecessor = profile.find_benefit_sponsorships(predecessor_id)
+    end
+
+    def successors
+      return [] if profile.blank?
+      return @successors if defined? @successors
+      @successors = profile.benefit_sponsorship_successors_for(self)
     end
 
     def roster_size
@@ -301,6 +336,10 @@ module BenefitSponsors
       benefit_applications.find(ids)
     end
 
+    def benefit_application_successors_for(benefit_application)
+      benefit_applications.select { |sponsorship_benefit_application| sponsorship_benefit_application.predecessor_id == benefit_application._id}
+    end
+
     def benefit_package_by(id)
       benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
       if benefit_application
@@ -313,18 +352,11 @@ module BenefitSponsors
       employer_attestation.present? && employer_attestation.is_eligible?
     end
 
-    def most_recent_benefit_application
-      benefit_applications.order_by(:"created_at".desc).first
-    end
-
-    alias_method :latest_benefit_application, :most_recent_benefit_application
-
-
     # If there is a gap, it will fall under a new benefit sponsorship
-    # Renewal_benefit_application's predecessor_application is always current benefit application
-    # Latest benefit_application will always be their current benefit_application if no renewal
+    # Renewal_benefit_application's predecessor is always current benefit application
+    # most_recent_benefit_application will always be their current benefit_application if no renewal
     def current_benefit_application
-      renewal_benefit_application.present? ? renewal_benefit_application.predecessor_application : latest_benefit_application
+      renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
     end
 
     def renewal_benefit_application
@@ -335,9 +367,16 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
     end
 
-    def renewing_published_benefit_application # TODO -recheck
+    def most_recent_benefit_application
+      benefit_applications.order_by(:"created_at".desc).first
+    end
+
+    def renewing_submitted_benefit_application # TODO -recheck
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
     end
+
+    alias_method :renewing_published_benefit_application, :renewing_submitted_benefit_application
+    alias_method :latest_benefit_application, :most_recent_benefit_application
 
     # TODO: pass in termination reason and kind
     def terminate_enrollment(benefit_end_date)
@@ -347,6 +386,8 @@ module BenefitSponsors
       end
     end
 
+
+    #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?
       renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?
     end
@@ -362,9 +403,8 @@ module BenefitSponsors
     def carriers_dropped_for(product_kind)
       active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
+    ####
 
-    def renew_benefit_application
-    end
 
     # Workflow for self service
     aasm do
@@ -439,7 +479,7 @@ module BenefitSponsors
         transitions from: :active, to: :suspended
       end
 
-      event :unsuspend do
+      event :reverse_suspension do
         transitions from: :suspended, to: :active
       end
 
@@ -497,6 +537,7 @@ module BenefitSponsors
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       end
+
     end
 
     def is_conversion?
@@ -519,10 +560,29 @@ module BenefitSponsors
 
     private
 
-    def populate_associations
-      return unless profile.present?
-      self.rating_area     = primary_office_rating_area
-      self.benefit_market  = profile.organization.site.benefit_market_for(:aca_shop)
+    def validate_profile_organization
+      if organization.present? && profile.present?
+        if organization == profile.organization
+          return true
+        else
+          return errors.add(:organization, "must be profile's organization")
+        end
+      end
+    end
+
+    def refresh_rating_area
+      self.rating_area = primary_office_rating_area if has_primary_office_address?
+    end
+
+    def refresh_service_areas
+      self.service_areas = primary_office_service_areas
+    end
+
+    def pull_organization_attributes
+      self.benefit_market = organization.site.benefit_market_for(:aca_shop) unless organization.blank?
+    end
+
+    def pull_profile_attributes
     end
 
     def generate_hbx_id

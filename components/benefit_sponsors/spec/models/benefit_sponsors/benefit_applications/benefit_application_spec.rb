@@ -2,10 +2,16 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
-    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
-    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
+    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:benefit_market)          { site.benefit_markets.first }
+    let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+    let(:benefit_sponsor_catalog) { FactoryGirl.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
 
-    let!(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_rating_area, :with_service_areas, service_area_list: [service_area], supplied_rating_area: rating_area) }
+    let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
+    let(:service_area) { create_default(:benefit_markets_locations_service_area) }
+    let(:sic_code)      { "001" }
+
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
@@ -14,36 +20,22 @@ module BenefitSponsors
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
-    let(:recorded_service_areas)     { benefit_sponsorship.service_areas }
-    let(:recorded_rating_area)      { benefit_sponsorship.rating_area }
-    let(:benefit_sponsor_catalog)   { FactoryGirl.create(:benefit_markets_benefit_sponsor_catalog, service_areas: recorded_service_areas) }
-
     let(:params) do
       {
-        benefit_sponsorship:      benefit_sponsorship,
         effective_period:         effective_period,
         open_enrollment_period:   open_enrollment_period,
-        recorded_service_areas:   recorded_service_areas,
-        recorded_rating_area:     recorded_rating_area,
         benefit_sponsor_catalog:  benefit_sponsor_catalog,
       }
     end
 
-    context "A new model instance" do
+    describe "A new model instance" do
      it { is_expected.to be_mongoid_document }
      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
      it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:msp_count).of_type(Integer).with_default_value_of(0)}
-
      it { is_expected.to embed_many(:benefit_packages)}
-     # it { is_expected.to belong_to(:successor_applications).as_inverse_of(:predecessor_application)}
-
-      # before do
-      #   site.owner_organization = owner_organization
-      #   benefit_market.save!
-      # end
 
       context "with no arguments" do
         subject { described_class.new }
@@ -60,6 +52,7 @@ module BenefitSponsors
         it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
+          expect(subject.errors[:effective_period].first).to match(/can't be blank/)
         end
       end
 
@@ -69,6 +62,7 @@ module BenefitSponsors
         it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
+          expect(subject.errors[:open_enrollment_period].first).to match(/can't be blank/)
         end
       end
 
@@ -78,6 +72,7 @@ module BenefitSponsors
         it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
+          expect(subject.errors[:recorded_service_areas].first).to match(/can't be blank/)
         end
       end
 
@@ -87,11 +82,27 @@ module BenefitSponsors
         it "should not be valid" do
           subject.validate
           expect(subject).to_not be_valid
+          expect(subject.errors[:recorded_rating_area].first).to match(/can't be blank/)
+        end
+      end
+
+      context "with no recorded_sic_code" do
+        subject { described_class.new(params.except(:recorded_sic_code)) }
+
+        it "should not be valid" do
+          subject.validate
+          expect(subject).to_not be_valid
+          expect(subject.errors[:recorded_sic_code].first).to match(/can't be blank/)
         end
       end
 
       context "with all required arguments" do
         subject {described_class.new(params) }
+
+        before do
+          subject.benefit_sponsorship = benefit_sponsorship
+          benefit_sponsorship.save!
+        end
 
         it "should be valid" do
           subject.validate
@@ -114,8 +125,15 @@ module BenefitSponsors
       end
     end
 
-    describe "Extending a BenefitApplication's open_enrollment_period", :dbclean => :after_each do
-      let(:benefit_application)   { described_class.new(**params) }
+    describe "Extending an open_enrollment_period", :dbclean => :after_each do
+      let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+      let(:benefit_application)     { described_class.new(params) }
+
+      before do
+        benefit_application.benefit_sponsorship = benefit_sponsorship
+        benefit_application.save!
+      end
 
       context "and the application can transition to open enrollment state" do
         let(:valid_open_enrollment_transition_state)    { :approved }
@@ -273,9 +291,16 @@ module BenefitSponsors
       # end
     end
 
-
     describe "Transitioning a BenefitApplication through Plan Design states" do
-      let(:benefit_application)   { described_class.new(**params) }
+      let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+      let(:benefit_application)     { described_class.new(params) }
+
+
+      before do
+        benefit_application.benefit_sponsorship = benefit_sponsorship
+        benefit_application.save!
+      end
 
       context "Happy path workflow" do
 
@@ -284,7 +309,7 @@ module BenefitSponsors
         end
 
         context "and the application is submitted outside open enrollment period" do
-          before { benefit_application.approve_application }
+          before { benefit_application.approve_application! }
 
           it "should transition to state: :approved" do
             expect(benefit_application.aasm_state).to eq :approved
@@ -293,30 +318,30 @@ module BenefitSponsors
           context "and open enrollment period begins" do
             before {
                 TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
-                benefit_application.begin_open_enrollment
+                benefit_application.begin_open_enrollment!
               }
             after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
-            it "should transition to state: :approved" do
+            it "should transition to state: :enrollment_open" do
               expect(benefit_application.aasm_state).to eq :enrollment_open
             end
 
             context "and open enrollment period ends" do
-              before { benefit_application.end_open_enrollment }
+              before { benefit_application.end_open_enrollment! }
 
-              it "should transition to state: :approved" do
+              it "should transition to state: :enrollment_closed" do
                 expect(benefit_application.aasm_state).to eq :enrollment_closed
               end
 
               context "and binder payment is made" do
-                before { benefit_application.approve_enrollment_eligiblity }
+                before { benefit_application.approve_enrollment_eligiblity! }
 
                 it "should transition to state: :enrollment_eligible" do
                   expect(benefit_application.aasm_state).to eq :enrollment_eligible
                 end
 
                 context "and effective period begins" do
-                  before { benefit_application.activate_enrollment }
+                  before { benefit_application.activate_enrollment! }
 
                   it "should transition to state: :approved" do
                     expect(benefit_application.aasm_state).to eq :active
@@ -329,7 +354,6 @@ module BenefitSponsors
       end
 
       context "Conversion workflow" do
-        let(:benefit_application)   { described_class.new(**params) }
 
         it "should initialize in state: :draft" do
           expect(benefit_application.aasm_state).to eq :draft
@@ -350,9 +374,10 @@ module BenefitSponsors
             end
           end
         end
-      end  
+      end
 
     end
+
 
 
     ## TODO: Refactor for BenefitApplication
@@ -395,7 +420,6 @@ module BenefitSponsors
 
     describe ".renew" do
 
-
       context "when renewal benefit sponsor catalog available" do
 
         # Create site
@@ -429,14 +453,14 @@ module BenefitSponsors
 
         it "should generate renewal application" do
           renewal_application = initial_application.renew(benefit_sponsor_catalog)
-          expect(renewal_application.predecessor_application).to eq initial_application
+          expect(renewal_application.predecessor).to eq initial_application
           expect(renewal_application.effective_period.begin).to eq renewal_effective_date
           expect(renewal_application.benefit_sponsor_catalog).to eq benefit_sponsor_catalog
         end
       end
     end
 
-    context "a BenefitApplication class" do
+    describe "Date period behaviors" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
       let(:begin_day)           { Settings.aca.shop_market.open_enrollment.monthly_end_on -
                                   Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
@@ -563,15 +587,73 @@ module BenefitSponsors
 
         it "timetable date values should be valid" do
           timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
                               open_enrollment_period: timetable[:open_enrollment_period],
-                              recorded_service_areas:  recorded_service_areas,
-                              recorded_rating_area:   recorded_rating_area,
+                              recorded_service_areas:  [service_area],
+                              recorded_rating_area:    rating_area,
+                              recorded_sic_code:       sic_code,
                             )).to be_valid
         end
       end
-
     end
+
+    describe "Navigating BenefitSponsorship Predecessor/Successor linked list", :dbclean => :after_each do
+      let(:node_a)    { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                recorded_sic_code: sic_code,
+                                                recorded_rating_area: rating_area,
+                                                recorded_service_areas: [service_area],
+                                              ) }
+      let(:node_a1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                recorded_sic_code: sic_code,
+                                                recorded_rating_area: rating_area,
+                                                recorded_service_areas: [service_area],
+                                                predecessor: node_a,
+                                              ) }
+      let(:node_a1a)  { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                recorded_sic_code: sic_code,
+                                                recorded_rating_area: rating_area,
+                                                recorded_service_areas: [service_area],
+                                                predecessor: node_a1,
+                                              ) }
+      let(:node_b1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
+                                                effective_period: effective_period,
+                                                open_enrollment_period: open_enrollment_period,
+                                                recorded_sic_code: sic_code,
+                                                recorded_rating_area: rating_area,
+                                                recorded_service_areas: [service_area],
+                                                predecessor: node_a,
+                                              ) }
+
+      it "should manage predecessors", :aggregate_failures do
+        expect(node_a1a.predecessor).to eq node_a1
+        expect(node_a1.predecessor).to eq node_a
+        expect(node_b1.predecessor).to eq node_a
+        expect(node_a.predecessor).to eq nil
+      end
+
+      context "and the BenefitApplications are persisted" do
+        before do
+          node_a.save!
+          node_a1.save!
+          node_a1a.save!
+          node_b1.save!
+        end
+
+        it "should maintain linked lists for successors", :aggregate_failures do
+          expect(node_a.successors).to contain_exactly(node_a1, node_b1)
+          expect(node_a1.successors).to eq [node_a1a]
+        end
+      end
+    end
+
+
   end
 end

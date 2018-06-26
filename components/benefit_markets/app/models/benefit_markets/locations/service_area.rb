@@ -36,7 +36,7 @@ module BenefitMarkets
           :county_name => address.county,
           :zip => address.zip,
           :state => address.state
-        ).map(&:id)
+        ).map(&:id).uniq
 
         service_areas = self.where(
           "active_year" => during.year,
