@@ -93,11 +93,11 @@ module BenefitSponsors
       end
 
       def sponsored_benefit_params
-        {:sponsored_benefits_attributes => {"0" => {:product_package_kind => params[:product_package_kind], :reference_plan_id => params[:reference_plan_id]}}}
+        {:sponsored_benefits_attributes => {"0" => {:id => params[:sponsored_benefit_id], :product_package_kind => params[:product_package_kind], :reference_plan_id => params[:reference_plan_id]}}}
       end
 
       def employer_contribution_params
-        params.permit(:benefit_application_id).merge(sponsored_benefit_params)
+        params.permit(:benefit_application_id, :id).merge(sponsored_benefit_params)
       end
     end
   end

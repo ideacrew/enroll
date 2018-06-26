@@ -80,7 +80,7 @@ module BenefitSponsors
           reference_product.renewal_product= product
           reference_product.save!
         }
-        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_for(renewal_effective_date), renewal_effective_date) }
+        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
         let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
@@ -154,31 +154,25 @@ module BenefitSponsors
     end
 
     describe 'changing reference product' do
-      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-      let!(:benefit_market) { site.benefit_markets.first }
-      let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let!(:benefit_application) {
-        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
-        application.benefit_sponsor_catalog.save!
-        application
-      }
+      context 'changing reference product' do
+        include_context "setup benefit market with market catalogs and product packages"
+        include_context "setup initial benefit application"
 
-      let(:benefit_package) { create :benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application }
-      let(:sponsored_benefit) { benefit_package.sponsored_benefits.first }
-      let(:product) { sponsored_benefit.product_package.products.first }
+        let(:sponsored_benefit) { initial_application.benefit_packages[0].sponsored_benefits[0] }
+        let(:new_reference_product) { product_package.products[2] }
 
-      before do
-        sponsored_benefit.reference_plan_id = product.id
-        sponsored_benefit.save!
-        sponsored_benefit.reload
-        @benefit_application_id = sponsored_benefit.benefit_package.benefit_application.id
-      end
+        before do
+          sponsored_benefit.reference_product_id = new_reference_product.id
+          sponsored_benefit.save!
+          initial_application.reload
+          @benefit_application_id = sponsored_benefit.benefit_package.benefit_application.id
+        end
 
-      it 'changes to the correct product' do
-        benefit_application_from_db = ::BenefitSponsors::BenefitApplications::BenefitApplication.find(@benefit_application_id)
-        expect(sponsored_benefit.reference_product).to eq(product)
-        expect(benefit_application_from_db.benefit_packages.first.sponsored_benefits.first.reference_product).to eq(product)
+        it 'changes to the correct product' do
+          benefit_application_from_db = ::BenefitSponsors::BenefitApplications::BenefitApplication.find(@benefit_application_id)
+          expect(sponsored_benefit.reference_product).to eq(new_reference_product)
+          expect(benefit_application_from_db.benefit_packages.first.sponsored_benefits.first.reference_product).to eq(new_reference_product)
+        end
       end
     end
   end
