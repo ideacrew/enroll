@@ -9,21 +9,19 @@
         | Employer Contribution 
         i.fas.fa-question-circle
   .col-xs-12
-    - f.object.sponsor_contribution.contribution_levels.each do |level|
+    = f.fields_for :contribution_levels, f.object.contribution_levels, errors: {}, fieldset: false do |f|
       .row.mb-1
         .col-xs-4.ml-4.mt-1
-          i.far.fa-check-square.fa-2x.fl style="width:60px"
-          = level.display_name
+          = f.check_box :is_offered, {disabled: (f.object.display_name == /Employee/i ? true : nil )}, "true", "false"
+          = f.object.display_name
+          = f.hidden_field :display_name, value: f.object.display_name
         .col-xs-6
           .col-xs-3
-            input type="number" id="#{level.id}" value="#{(level.contribution_factor * 100).to_i}"
+            = f.number_field :contribution_factor, {value: "#{(f.object.contribution_factor * 100).to_i}", id: "#{f.object.id}"}
           .col-xs-9
-            input type="range" min="0" max="100" value="#{(level.contribution_factor * 100).to_i}" step="5" class="slider" id="#{level.id}" onchange="setInputValue(this)" data-id="#{level.id}"
+            input type="range" min="0" max="100" value="#{(f.object.contribution_factor * 100).to_i}" step="5" class="slider" id="#{f.object.id}" onchange="setInputValue(this)" data-id="#{f.object.id}"
 
 javascript:
   function setInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
   }
-
-
-
