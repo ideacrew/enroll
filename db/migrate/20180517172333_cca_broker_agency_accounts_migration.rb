@@ -4,7 +4,7 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/cca_baa_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( organization_id old_bk_agency_accs benefit_sponsor_organization_id
+      field_names = %w( hbx_id legal_name old_bk_agency_accs benefit_sponsor_organization_id
                         total_benefit_sponsorships accounts_in_each_benefit_sponsorship migrated_bk_agency_accs status)
 
       logger = Logger.new("#{Rails.root}/log/cca_baa_migration.log") unless Rails.env.test?
@@ -104,7 +104,7 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
         arrayed = total_bss.unscoped.map {|benefit_sponsorship| benefit_sponsorship.broker_agency_accounts.unscoped.count}
         total_migrated_bk_agency_accs = arrayed.reduce(0, :+)
         print '.' unless Rails.env.test?
-        csv << [old_org.first.id, total_bk_agency_accs, organization.id, total_benefit_sponsorships, arrayed, total_migrated_bk_agency_accs, (total_bk_agency_accs == total_migrated_bk_agency_accs)]
+        csv << [old_org.first.hbx_id, old_org.first.legal_name, total_bk_agency_accs, organization.id, total_benefit_sponsorships, arrayed, total_migrated_bk_agency_accs, (total_bk_agency_accs == total_migrated_bk_agency_accs)]
       rescue Exception => e
         logger.error "Broker Accounts Migration Failed for old Organization HBX_ID: #{old_org.first.hbx_id},
           #{e.inspect}" unless Rails.env.test?

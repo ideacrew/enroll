@@ -125,7 +125,7 @@ module BenefitSponsors
 
       scope :by_employer_profile,             ->( profile_id ){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
       scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
-      scope :broker_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
+      scope :broker_by_hbx_id,                ->( hbx_id ){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
       scope :employer_by_fein,                ->( fein ){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
 
       scope :employer_profiles_applicants,   ->{
