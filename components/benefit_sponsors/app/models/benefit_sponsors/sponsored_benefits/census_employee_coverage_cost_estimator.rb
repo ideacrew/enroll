@@ -202,7 +202,8 @@ module BenefitSponsors
           :hired_on => {"$lte" => coverage_start},
           "$or" => [
             { "terminated_on" => nil },
-            { "terminated_on" => { "$gt" => coverage_start } }
+            { "terminated_on" => { "$gt" => coverage_start } },
+            { "terminated_on" => { "$lte" => coverage_start }, "aasm_state" => { "$in" => ["cobra_eligible", "cobra_linked", "cobra_termination_pending"] } }
           ]
         )
       end

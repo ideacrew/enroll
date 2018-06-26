@@ -14,6 +14,8 @@ module BenefitSponsors
       attribute :parent, BenefitSponsors::Forms::BenefitApplicationForm
       attribute :probation_period_display_name, String
 
+      attribute :is_new_package, Boolean
+
       attr_accessor :catalog, :sponsored_benefits
 
       # attr_accessor :benefit_application, :product_packages
@@ -60,6 +62,7 @@ module BenefitSponsors
       def self.for_update(params)
         form = self.new(params)
         form.service.load_form_metadata(form)
+        form.service.load_form_params_from_previous_selection(form)
         form
       end
 
@@ -104,7 +107,7 @@ module BenefitSponsors
       end
 
       def new_record?
-        true
+        is_new_package
       end
 
       def benefit_package_info

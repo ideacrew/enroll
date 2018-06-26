@@ -236,7 +236,7 @@ module SponsoredBenefits
             document.format = 'application/pdf'
             document.subject = 'invoice'
             document.title = File.basename(file_path)
-            org.documents << document
+            org.employer_profile.documents << document
             logger.debug "associated file #{file_path} with the Organization"
             return document
           end
@@ -272,7 +272,7 @@ module SponsoredBenefits
       end
 
       def self.invoice_exist?(invoice_date,org)
-        docs =org.documents.where("date" => invoice_date)
+        docs = org.invoices.select{|doc| doc.date == invoice_date }
         matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
         return true if matching_documents.count > 0
       end

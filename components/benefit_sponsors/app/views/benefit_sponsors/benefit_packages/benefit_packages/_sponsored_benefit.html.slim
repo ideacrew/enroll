@@ -1,24 +1,30 @@
-- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false  
-
+- is_new_package = @benefit_package_form.is_new_package
 .row.health
   = f.hidden_field :id, value: f.object.id if f.object.id.present?
   
-  - unless @benefit_package_form.new_record?
-    .col-xs-3
+  - unless is_new_package
+    .col-xs-3.pull-right
       span.pull-right
         #edit_employer_cost_info_btn style="padding-top:12px"
           .btn.btn-default Employee Detail Costs
+  br
   .col-md-12.col-sm-12.col-xs-12.top-pd
     .reference_plan_info style='clear: both;'
       h4
       .content
   #planSelection
     = render "./ui-components/v1/cards/metal_level_select", f: f
-- if show_benefit_application_tile == "true"
-  #scEdit
-    = render "./ui-components/v1/cards/sponsor_contributions", f: f
   br
   br
+
+  #scEdit.hidden
+    = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
+      = render "./ui-components/v1/cards/sponsor_contributions", f: sc
+  br
+  br
+
+- if !is_new_package
+
   #referencePlanEdit
     = render "./ui-components/v1/cards/reference_plan", f: f
   i.fas.fa-info-circle.mr-1 
@@ -26,22 +32,10 @@
   br
   br
 
-javascript:
-  window.onload = function() {
-    showFormButtons()
-  }
 
-  function showFormButtons() {
-    document.getElementById('addBenefitPackage').classList.remove('hidden')
-    document.getElementById('submitBenefitPackage').classList.remove('hidden')
-    document.getElementById('cancelBenefitPackage').classList.remove('hidden')
-  }
-
-- if show_benefit_application_tile == "true"
+- if !is_new_package
   javascript:
     window.onload = function() {
       document.getElementById('planSelection').classList.add('hidden')
-      document.getElementById('scEdit').classList.add('hidden')
+      document.getElementById('scEdit').classList.remove('hidden')
     }
-
-

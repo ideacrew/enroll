@@ -204,13 +204,12 @@ javascript:
       div.innerHTML = '<div class="row">\
         <input id="' + attrPrefix + '[id]" name="' + attrPrefix + '[id]" type="hidden" value="' + contribution['id'] + '" />\
         <div class="col-xs-6 pr-3">\
-          <div class="row ml-4">\
-            <i class="far fa-check-square fa-2x fl" style="width:60px"></i><p class="ml-2 fl">' +contribution.display_name+'</p>\
+          <div class="row ml-1">\
+            <input checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" type="checkbox" value="' + contribution["is_offered"] +'" /> <label>' +contribution.display_name+'</label>\
           </div>\
         </div>\
         <div class="col-xs-6">\
           <div class="col-xs-3">\
-            <input checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" type="hidden" value="' + contribution["is_offered"] +'" />\
             <input id="' + attrPrefix + '[display_name]" name="' + attrPrefix + '[display_name]" type="hidden" value="' + contribution["display_name"] + '" />\
             <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '">\
           </div>\

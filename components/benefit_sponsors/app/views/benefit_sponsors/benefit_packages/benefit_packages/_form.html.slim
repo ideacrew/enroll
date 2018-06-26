@@ -1,4 +1,4 @@
-- i = f.index
+- add_new_package = (params["add_new_benefit_package"] == "true")
 .reference-summary
 
 = f.hidden_field :benefit_application_id
@@ -17,11 +17,18 @@ h1.heading-text Benefit Package - Set Up
     = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
       = render "sponsored_benefit", f: sb
 
-  button.btn.btn-default.hidden#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
-  button.btn.btn-primary.hidden#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Save Plan Year
+  button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Save Plan Year
   
 
-  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1 hidden', id:'cancelBenefitPackage'
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
       
 javascript:
   var disableSelectric = false;
+
+- if add_new_package
+  javascript:
+    window.onload = function(){
+      document.getElementById("addBenefitPackage").classList.add("hidden")
+    }
+

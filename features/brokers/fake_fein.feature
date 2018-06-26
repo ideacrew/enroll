@@ -25,7 +25,7 @@ Scenario: Primary Broker should not see FAKE Fein in his account
   And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
-  Then Hbx Admin should see the broker application
+  Then Hbx Admin should see the broker application with carrier appointments
   When Hbx Admin clicks on approve broker button
   Then Hbx Admin should see the broker successfully approved message
   And Hbx Admin logs out
@@ -72,7 +72,7 @@ Scenario: Hbx Admin should see fake fein in broker's account
   And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
-  Then Hbx Admin should see the broker application
+  Then Hbx Admin should see the broker application with carrier appointments
   When Hbx Admin clicks on approve broker button
   Then Hbx Admin should see the broker successfully approved message
   And Hbx Admin logs out
