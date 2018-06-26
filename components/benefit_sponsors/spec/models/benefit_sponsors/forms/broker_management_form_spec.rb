@@ -6,7 +6,7 @@ module BenefitSponsors
     subject { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
     let!(:rating_area) { create(:benefit_markets_locations_rating_area) }
 
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market) }
+    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
     let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let(:employer_profile) { organization.employer_profile }
     let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }

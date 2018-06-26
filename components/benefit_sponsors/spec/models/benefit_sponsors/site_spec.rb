@@ -33,6 +33,26 @@ module BenefitSponsors
       }
     end
 
+    describe 'Site model attributes' do
+      it do
+        is_expected.to have_fields(:long_name, :short_name, :byline, :domain_name, :home_url, :help_url, :faqs_url, :logo_file_name).of_type(String)
+        is_expected.to have_many(:site_organizations).as_inverse_of(:site)
+        is_expected.to have_index_for(site_key: 1).with_options(unique: true)
+      end
+
+      it 'should check for validators' do
+        is_expected.to validate_presence_of(:site_key)
+        is_expected.to validate_presence_of(:owner_organization)
+      end
+    end
+
+    describe 'Site Model has a' do
+      let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca)}
+      it 'has a valid factory' do
+        expect(site.valid?).to be_truthy
+      end
+    end
+
     context "ability to create, validate and persist instances of this class" do
       context "with no arguments" do
         let(:site)  { Site.new }
@@ -149,12 +169,6 @@ module BenefitSponsors
           site.site_key = funky_key
           expect(site.site_key).to eq "mykey".to_sym
         end
-      end
-
-      context "with duplicate keys" do
-        let(:site_key)  { :mykey }
-
-        it "should reject duplicate key"
       end
     end
 
