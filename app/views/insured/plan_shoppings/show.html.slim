@@ -9,6 +9,8 @@
         .ct-1
           h1.heading-text = l10n("choose_plan")
           h4.switch-header = l10n(".choose_plan_filter_results_header")
+          h4.swtich-header 
+            strong Please note your final cost may change based on the final enrollment of all employees.
           - if display_plan_cost_warning(@benefit_group)
             b = l10n("insured.plan_shoppings.final_cost_change")
           .row.no-buffer
