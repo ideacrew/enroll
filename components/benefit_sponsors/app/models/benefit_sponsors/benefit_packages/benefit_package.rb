@@ -5,7 +5,8 @@ module BenefitSponsors
       include Mongoid::Timestamps
 
 
-      embedded_in :benefit_application, class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+      embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
+                  inverse_of: :benefit_packages
 
       field :title, type: String, default: ""
       field :description, type: String, default: ""

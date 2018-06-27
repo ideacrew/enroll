@@ -77,7 +77,7 @@ module BenefitSponsors
       class_name: "BenefitSponsors::Organizations::Organization"
 
     embeds_many :benefit_applications,
-      class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+      class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
