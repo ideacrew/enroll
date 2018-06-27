@@ -12,6 +12,7 @@ module BenefitSponsors
       def load_default_form_params(form)
         application  = find_benefit_application(form)
         form.id = application.benefit_packages.new.id
+        form.is_new_package = true
       end
 
       def load_form_metadata(form)
@@ -26,7 +27,23 @@ module BenefitSponsors
         if load_benefit_application_form
           form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         end
+        form.is_new_package = false
         attributes_to_form_params(benefit_package, form)
+      end
+
+      def load_form_params_from_previous_selection(form)
+        form.sponsored_benefits.each do |sb_form|
+          load_form_params_from_previous_sponsored_benefit(form, sb_form) if sb_form.product_package_kind.blank?
+        end
+        form
+      end
+
+      def load_form_params_from_previous_sponsored_benefit(form, sb_form)
+        benefit_package = find_model_by_id(form.id)
+        sb = benefit_package.sponsored_benefits.where(id: sb_form.id).first
+        sb_form.reference_plan_id = sb.reference_product_id
+        sb_form.product_package_kind = sb.product_package_kind
+        sb_form
       end
 
       def disable_benefit_package(form)

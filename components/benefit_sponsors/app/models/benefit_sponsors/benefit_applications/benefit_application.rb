@@ -802,11 +802,6 @@ module BenefitSponsors
       sponsor_profile
     end
 
-    def enrolled_families
-      warn "[Deprecated] Instead use: enrolled_families" unless Rails.env.production?
-      enrolled_families
-    end
-
     # Assign local attributes derived from benefit_sponsorship parent instance
     def pull_benefit_sponsorship_attributes
       return unless benefit_sponsorship.present?

@@ -402,12 +402,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def collect_and_sort_invoices(sort_order='ASC')
-    @invoices = @employer_profile.organization.try(:documents)
+    @invoices = []
+    @invoices << @employer_profile.organization.try(:documents).to_a
+    invoice_documents = @employer_profile.documents.where(:subject => 'initial_invoice').to_a
+    @invoices << invoice_documents if invoice_documents.present?
+    @invoices.flatten!
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
   def check_and_download_invoice
-    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+    @invoice = @employer_profile.organization.invoices.select{ |inv| inv.id.to_s == params[:invoice_id]}.first
   end
 
   def sort_plan_years(plans)

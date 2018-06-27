@@ -8,6 +8,7 @@ module ModelEvents
     #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
     #TODO: This is the temporary fix until then.
     OTHER_EVENTS = [
+      :generate_initial_employer_invoice,
       :broker_hired_confirmation_to_employer,
       :welcome_notice_to_employer
     ]
@@ -20,7 +21,6 @@ module ModelEvents
 
     def notify_on_save
       if aasm_state_changed?
-
         if is_transition_matching?(to: :binder_paid, from: :eligible, event: :binder_credited)
           is_initial_employee_plan_selection_confirmation = true
         end

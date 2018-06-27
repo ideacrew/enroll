@@ -37,6 +37,10 @@ class CensusMember
     end
   end
 
+  def full_name
+    [first_name, middle_name, last_name, name_sfx].compact.join(" ")
+  end
+
 
   class << self 
     

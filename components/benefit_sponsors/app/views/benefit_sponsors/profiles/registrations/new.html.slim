@@ -15,7 +15,7 @@
       
       = f.fields_for :organization, f.object.organization, errors: {}, field_set: false do |f|
         fieldset
-          legend Broker Agency Information:
+          legend Broker Agency Information
           = render partial: './ui-components/v1/forms/broker_registration/broker_agency_information', locals: {f: f}
           = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f|
             = render partial: './ui-components/v1/forms/broker_registration/broker_profile_information', locals: {f: f}
@@ -26,7 +26,7 @@
               h5.heading-text
                 = l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)
 
-        = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right'
+        = f.submit 'CREATE BROKER AGENCY', class:'btn btn-primary float-right', id:'broker-btn'
 - else
   = form_for @agency, as: :agency, url: {action: "create"},  html: { class: "needs-validation s508", novalidate:true } do |f|
     = f.hidden_field :profile_type, value: params[:profile_type]

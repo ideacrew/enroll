@@ -2,11 +2,11 @@
 module InvoiceHelper
 # module Prawn::Graphics
 
-	def default_options 
-		{
-			:width => 250
-		}
-	end
+  def default_options 
+    {
+      :width => 250
+    }
+  end
 
   def currency_format(number)
     number_string = "%.2f"%number
@@ -164,24 +164,24 @@ module InvoiceHelper
   end
 
 
-	def dchbx_plan_header(data)
-		@pdf.table(data, :width => @pdf.bounds.width) do
-		  style(row(0), :border_color => '000000', :size => 10, :border_width => 0.5, :borders => [:top, :bottom])
-		  style(row(0).column(0), :borders => [:left,:top, :bottom])
-		  style(row(0).column(2), :borders => [:right,:top, :bottom])
-		  style(columns(0), :font_style => :bold, :width => 125, )
-		  style(columns(2), :width => 400, :align => :right)
-		end
-	end
+  def dchbx_plan_header(data)
+    @pdf.table(data, :width => @pdf.bounds.width) do
+      style(row(0), :border_color => '000000', :size => 10, :border_width => 0.5, :borders => [:top, :bottom])
+      style(row(0).column(0), :borders => [:left,:top, :bottom])
+      style(row(0).column(2), :borders => [:right,:top, :bottom])
+      style(columns(0), :font_style => :bold, :width => 125, )
+      style(columns(2), :width => 400, :align => :right)
+    end
+  end
 
-	def dchbx_table_light_blue(data,position=25,options={})
-		options=default_options.merge(options)
-	  @pdf.table(data, :position => position, :width => options[:width]) do
+  def dchbx_table_light_blue(data,position=25,options={})
+    options=default_options.merge(options)
+    @pdf.table(data, :position => position, :width => options[:width]) do
       style(row(0..5).columns(0..1), :padding => [1, 5, 1, 5], :borders => [])
       style(row(0..5), :background_color => 'CDDDEE', :border_color => 'dddddd', :font_style => :bold)
       style(column(1), :align => :right)
     end
-	end
+  end
 
   def stroke_dashed_horizontal_line(position=25,options={})
     @pdf.stroke do 
@@ -192,8 +192,8 @@ module InvoiceHelper
   end
 
   def dchbx_table_item_list(data,position=0,options={})
-  	options=default_options.merge(options)
-  	@pdf.table(data, :position=> position, :width => @pdf.bounds.width) do
+    options=default_options.merge(options)
+    @pdf.table(data, :position=> position, :width => @pdf.bounds.width) do
       style(row(1..-1).columns(0..-1), :padding => [4, 5, 4, 5], :borders => [:bottom], :border_color => 'dddddd')
       style(row(0), :background_color => 'e9e9e9', :border_color => 'dddddd', :font_style => :bold)
       style(row(0).columns(0..-1), :borders => [:top, :bottom])

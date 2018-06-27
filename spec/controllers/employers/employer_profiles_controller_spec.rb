@@ -265,6 +265,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
+        allow(employer_profile).to receive(:documents).and_return(Document.all)
         sign_in(user)
       end
 
@@ -316,7 +317,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
         census_employee.update(aasm_state: 'employment_terminated')
         employee_role.census_employee_id = census_employee.id
         employee_role.save
-        employer_profile.plan_years = [plan_year]
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
         sign_in(user)
       end
 
@@ -336,7 +337,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
         allow(user).to receive(:last_portal_visited=).and_return("true")
         employee_role.census_employee_id = census_employee.id
         employee_role.save
-        employer_profile.plan_years = [plan_year]
+        allow(employer_profile).to receive(:plan_years).and_return([plan_year])
         sign_in(user)
       end
 

@@ -44,4 +44,9 @@
             td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.plan_kind}
             td colspan="2" #{benefit_package_form.sponsored_benefits[0].reference_product.metal_level_kind}
             td colspan="2" N/A
+
+row
+  = link_to 'Add Benefit Package', new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.benefit_sponsorship_id, @benefit_application_form.id, add_new_benefit_package: true, :tab=>'benefits'), :class => 'btn btn-default pull-left mr-1'
+
+  = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_application_form.service.benefit_sponsorship.profile_id, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
           
