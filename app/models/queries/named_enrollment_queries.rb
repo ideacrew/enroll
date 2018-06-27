@@ -84,6 +84,24 @@ module Queries
       end
     end
 
+    class RenewalTransmissionEligibleFilter
+      include Enumerable
+
+      def initialize(enum_from_aggregation)
+        @source_enum = enum_from_aggregation 
+      end
+
+      def each
+        @source_enums.each do |agg|
+          agg.each do |rec|
+            unless ["renewing_waived", "inactive", "void", "coverage_canceled"].include?(rec["aasm_state"].to_s)
+              yield rec["hbx_enrollment_id"]
+            end
+          end
+        end
+      end
+    end
+
     def self.shop_initial_enrollments(organization, effective_on)
       sponsored_benefits = find_ie_sponsored_benefits(organization, effective_on)
       last_chance_to_cancel_at = nil
@@ -132,6 +150,39 @@ module Queries
             }
           }
         ])
+    end
+
+    def self.find_renewal_transmission_enrollments(sb, as_of_time)
+      sb_id = sb.id
+      aggregation = Family.collection.aggregate([
+        {
+          "$match" => {
+            "households.hbx_enrollments.sponsored_benefit_id" => sb_id
+          }
+        },
+        {"$unwind" => "$households"},
+        {"$unwind" => "$households.hbx_enrollments"},
+        { "$match" => {
+          "households.hbx_enrollments.sponsored_benefit_id" => sb_id,
+          "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
+          "households.hbx_enrollments.kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
+          "households.hbx_enrollments.submitted_at" => {"$lte" => as_of_time}
+        }},
+        {"$sort" => {"households.hbx_enrollments.submitted_at" => 1}},
+        {
+          "$group" => {
+            "_id" => {
+              "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
+              "sponsored_benefit_id" => "$households.sponsored_benefit_id"
+            },
+            "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
+            "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
+            "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"},
+            "product_id" => {"$last" => "$households.hbx_enrollments.product_id"}
+          }
+        }
+      ])
+      RenewalTransmissionEligibleFilter.new(aggregation)
     end
 
     def self.find_ie_sponsored_benefits(organization, effective_on)
