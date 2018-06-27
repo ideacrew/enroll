@@ -31,7 +31,7 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   def self.migrate_plan_years_to_benefit_applications(csv, logger)
 
-    old_organizations = Organization.unscoped.exists(:"employer_profile.plan_years" => true).where(fein:'441544565')
+    old_organizations = Organization.unscoped.exists(:"employer_profile.plan_years" => true)
 
     success = 0
     failed = 0
