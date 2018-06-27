@@ -168,7 +168,15 @@
                   <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.<br/>
                 </li>
               </ol>
+
               <% end %>
+              <form action="http://localhost:3000/saml/auth" method="post" target="_blank" id="pay_now_form">
+                <%= hidden_field_tag saml_response: "something else" %>
+                <button type="submit" class="btn btn-default interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
+                  Leave DC
+                  LINK
+                </button>
+              </form>
             </div>
             <br/>
             <br/>
@@ -198,3 +206,30 @@
     </div>
   </div>
 </div><br>
+
+<script type="text/javascript">
+    var $printSection = document.getElementById("printSection");
+
+    if (!$printSection) {
+        var $printSection = document.createElement("div");
+        $printSection.id = "printSection";
+        document.body.appendChild($printSection);
+    }
+    $("#pay-now").on('click', function () {
+        $.ajax({
+            url: "/saml/third_party",
+            method: 'POST',
+            data: {enrollment_id: $("#pay-now").val()},
+            success: function (response) {
+                debugger
+                $("input[name]")[0].name = response
+                // $("#pay_now_form").append(response);
+                $("#pay_now_form").submit();
+            },
+            error: function (response) {
+                window.location.replace('<%= SamlInformation.iam_login_url %>');
+            }
+        });
+
+    });
+</script>

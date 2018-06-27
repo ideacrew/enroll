@@ -23,6 +23,12 @@ Rails.application.routes.draw do
     end
   end
 
+  get '/saml/auth' => 'saml_idp#new'
+  get '/saml/metadata' => 'saml_idp#show'
+  post '/saml/auth' => 'saml_idp#other_service'
+  post '/saml/third_party' => 'saml_idp#third_party'
+  match '/saml/logout' => 'saml_idp#logout', via: [:get, :post, :delete]
+
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]

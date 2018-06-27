@@ -186,6 +186,7 @@ class HbxEnrollment
   embeds_many :workflow_state_transitions, as: :transitional
 
   embeds_many :hbx_enrollment_members
+  embeds_many :payment_transactions
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true
 
   embeds_many :comments
@@ -399,6 +400,10 @@ class HbxEnrollment
     else
       nil
     end
+  end
+
+  def name_id_format
+    "FFM"
   end
 
   def market_name
