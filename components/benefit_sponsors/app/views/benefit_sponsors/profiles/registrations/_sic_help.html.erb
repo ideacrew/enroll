@@ -19,7 +19,7 @@
     $.ajax({
       async: true,
       type: "GET",
-      url: "/employers/employer_profiles/generate_sic_tree",
+      url: "/benefit_sponsors/profiles/employers/employer_profiles/generate_sic_tree",
       dataType: "json",
       success: function(json) {
         createJSTrees(json);
