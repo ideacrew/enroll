@@ -16,6 +16,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:has_active_consumer_role?).and_return true
       assign :person, person
+      assign :dependent, dependent
       assign(:support_texts, {support_text_key: "support-text-description"})
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
@@ -78,6 +79,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       allow(person).to receive(:has_active_consumer_role?).and_return false
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign :person, person
+      assign :dependent, dependent
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
