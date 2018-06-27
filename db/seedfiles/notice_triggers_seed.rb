@@ -1929,6 +1929,27 @@ elsif Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
+      hbx_id: 'SHOP_D073',
+      title: 'Employee Plan Selection Confirmation',
+      description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
+      resource_name: 'employee_role',
+      event_name: 'notify_employee_of_plan_selection_in_open_enrollment',
+      notice_triggers: [
+        {
+          name: 'Notice to employee after they select a plan during Annual Open Enrollment',
+          notice_template: 'notices/shop_employee_notices/employee_select_plan_during_open_enrollment',
+          notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
+          mpi_indicator: 'SHOP_D073',
+          notice_trigger_element_group: {
+            market_places: ['shop'],
+            primary_recipients: ["employee"],
+            primary_recipient_delivery_method: ["secure_message"],
+            secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
       hbx_id: 'SHOP_D049',
       title: 'Confirmation - Broker Hired',
       description: 'Confirmation of Broker Hired Sent to Employer',
