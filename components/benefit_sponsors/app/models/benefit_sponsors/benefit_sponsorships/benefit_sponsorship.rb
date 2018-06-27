@@ -145,6 +145,16 @@ module BenefitSponsors
       )
     }
 
+    scope :eligible_renewal_applications_on, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {
+          :"effective_period.min" => compare_date,
+          :predecessor_id => {"$ne" => nil},
+          :aasm_state => {"$in" => [:enrollment_eligible, :active]}
+        }
+      })
+    }
+
     # Fix Me: verify the state check...probably need to use termination_pending
     scope :may_terminate_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
