@@ -49,7 +49,9 @@ function addOfficeLocation() {
   selectKindOption.remove(1)
   // clears inputs from new location
   newOfficeField.querySelectorAll('input').forEach(function(input) {
-    input.value = ''
+    if (input.value != 'phone main') {
+      input.value = ''
+    }
   })
   // clears all selects
   newOfficeField.querySelectorAll('select#inputCounty').forEach(function(input) {
