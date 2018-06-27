@@ -2,7 +2,7 @@
 .row.health
   = f.hidden_field :id, value: f.object.id if f.object.id.present?
   
-  - unless is_new_package
+  - if !is_new_package && !is_new_package.nil?
     .col-xs-3.pull-right
       span.pull-right
         #edit_employer_cost_info_btn style="padding-top:12px"
@@ -23,7 +23,7 @@
   br
   br
 
-- if !is_new_package
+- if !is_new_package && !is_new_package.nil?
 
   #referencePlanEdit
     = render "./ui-components/v1/cards/reference_plan", f: f
@@ -33,7 +33,7 @@
   br
 
 
-- if !is_new_package
+- if !is_new_package && !is_new_package.nil?
   javascript:
     window.onload = function() {
       document.getElementById('planSelection').classList.add('hidden')
