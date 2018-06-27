@@ -133,6 +133,7 @@ module BenefitSponsors
 
       let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
       let!(:employer_profile) {general_org.employer_profile}
+      let!(:primary_office_location_address){employer_profile.primary_office_location.address }
       let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
       let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
@@ -140,6 +141,7 @@ module BenefitSponsors
       let(:user) { FactoryGirl.create(:user, :person => person)}
 
       before :each do
+        primary_office_location_address.update_attributes!(kind: 'primary')
         broker_agency_profile.update_attributes!(ach_account_number: "1234567890", ach_routing_number: "011000015")
       end
 
