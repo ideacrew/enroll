@@ -25,9 +25,11 @@ module Notifier
     attribute :created_at, String
     attribute :premium_amount, String
     attribute :aasm_state, String
+    attribute :aptc_amount, String
     attribute :subscriber, MergeDataModels::Person
     attribute :enrollees, Array[MergeDataModels::Person]
-    attribute :current_health_enrollments, String
+    attribute :health_plan, Boolean
+    attribute :enrolles_count, Integer
 
     def self.stubbed_object
       Notifier::MergeDataModels::Enrollment.new({
@@ -42,24 +44,9 @@ module Notifier
         employee_first_name: 'David',
         employee_last_name: 'Finch',
         coverage_year: '2018',
-        plan_carrier: "Kaiser"
+        plan_carrier: "Kaiser",
+        enrollees: [Notifier::MergeDataModels::Person.stubbed_object]
         })
-    end
-
-    # def collections
-    #   %w{enrollees}
-    # end
-    #
-    # def enrollees
-    #   enrollment.enrollees
-    # end
-    #
-    def plan_family_deductible
-      number_to_currency(family_deductible.to_f)
-    end
-
-    def plan_name
-      plan_name
     end
   end
 end

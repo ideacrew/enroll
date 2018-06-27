@@ -61,7 +61,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record) }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
@@ -81,8 +81,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def check_for_unverified_individuals
     family = recipient.primary_family
     date = TimeKeeper.date_of_record
-    start_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
-    end_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
+    start_time = (date ).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+    end_time = (date).in_time_zone("Eastern Time (US & Canada)").end_of_day
     enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
       (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&

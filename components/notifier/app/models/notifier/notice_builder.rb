@@ -1,6 +1,7 @@
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
+    include Config::AcaHelper
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
@@ -32,6 +33,7 @@ module Notifier
         element_retriver = elements.reject{|ele| ele == recipient_klass_name.to_s}.join('_')
         builder.instance_eval(element_retriver)
       end
+      binding.pry
       builder.merge_model
     end
 
@@ -58,7 +60,7 @@ module Notifier
     end 
   
     def to_pdf
-      WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options)
+      WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options_custom)
     end
 
     def generate_pdf_notice
@@ -71,27 +73,66 @@ module Notifier
       # clear_tmp
     end
 
-    def pdf_options
+    def generate_ivl_pdf_notice
+      File.open(notice_path, 'wb') do |file|
+        file << self.to_pdf
+      end
+
+      # attach_envelope
+      # non_discrimination_attachment
+      # clear_tmp
+    end
+    #
+    # def pdf_options
+    #   {
+    #     margin:  {
+    #       top: 15,
+    #       bottom: 28,
+    #       left: 22,
+    #       right: 22
+    #     },
+    #     disable_smart_shrinking: true,
+    #     dpi: 96,
+    #     page_size: 'Letter',
+    #     formats: :html,
+    #     encoding: 'utf8',
+    #     header: {
+    #       content: ApplicationController.new.render_to_string({
+    #         template: "notifier/notice_kinds/header_with_page_numbers.html.erb",
+    #         layout: false,
+    #         locals: {notice: self, recipient: notice_recipient}
+    #         }),
+    #       }
+    #   }
+    # end
+
+    def pdf_options_custom
       {
-        margin:  {
-          top: 15,
-          bottom: 28,
-          left: 22,
-          right: 22 
-        },
-        disable_smart_shrinking: true,
-        dpi: 96,
-        page_size: 'Letter',
-        formats: :html,
-        encoding: 'utf8',
-        header: {
+          margin:  {
+              top: 15,
+              bottom: 20,
+              left: 22,
+              right: 22
+          },
+          disable_smart_shrinking: true,
+          dpi: 96,
+          page_size: 'Letter',
+          formats: :html,
+          encoding: 'utf8',
+          header: {
+              content: ApplicationController.new.render_to_string({
+                                                                      template: 'notices/shared/header_for_documents.html.erb',
+                                                                      layout: false,
+                                                                      locals: { recipient: notice_recipient, notice: self}
+                                                                  })
+          },
+      footer: {
           content: ApplicationController.new.render_to_string({
-            template: "notifier/notice_kinds/header_with_page_numbers.html.erb",
-            layout: false,
-            locals: {notice: self, recipient: notice_recipient}
-            }),
-          }
-      }
+                                                                  template: "notices/shared/footer_ivl.html.erb",
+                                                                  layout: false,
+                                                                  locals: {notice: self}
+                                                               })
+              }}
     end
 
     def notice_path
@@ -112,6 +153,26 @@ module Notifier
 
     def attach_envelope
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
+    end
+
+    def attach_dchl_rights
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf')]
+    end
+
+    def attach_voter_application
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
+    end
+
+    def attach_taglines
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
+    end
+
+    def attach_appeals
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')]
+    end
+
+    def attach_non_discrimination
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_non_discrimination.pdf')]
     end
 
     def join_pdfs(pdfs)
@@ -148,6 +209,10 @@ module Notifier
       end
 
       if resource.is_a?(EmployeeRole)
+        return resource.person.work_email_or_best
+      end
+
+      if resource.is_a?(ConsumerRole)
         return resource.person.work_email_or_best
       end
     end

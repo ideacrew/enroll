@@ -37,9 +37,6 @@ module Notifier
       merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
     end
 
-    # def enrollment_enrollees
-    #   merge_model.enrollment.enrollees = enrollment.enrollees
-    # end
     def enrollment_enrollees
       merge_model.enrollments.flat_map(&:enrollees)
     end
@@ -78,8 +75,6 @@ module Notifier
       return if enrollment.blank?
       merge_model.enrollment.employee_last_name = enrollment.census_employee.last_name
     end
-
-
 
     def ivl_coverage_year
       hbx_enrollments = []

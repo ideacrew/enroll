@@ -26,29 +26,33 @@ CKEDITOR.editorConfig = function( config )
 
   config.removeButtons = "Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,About,Print,Save,NewPage,Preview,Save,Language,Flash,Smiley,Image,Iframe";
 
-  config.placeholder_selects = [
-      {
-        key: 'select_system_settings',
-        title: 'Select Application Settings',
-        placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.settings_placeholders.to_json %>
-      },
-      {
-        key: 'select_conditional_statement',
-        title: 'Select Condition/Loop',
-        placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
-      },
-      {
-          key: 'select_system_settings',
-          title: 'Select Application Settings',
-          placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.settings_placeholders.to_json %>
-      },
-      {
-          key: 'select_conditional_statement',
-          title: 'Select Condition/Loop',
-          placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.place_holders.to_json %>
-      }
-     
-      ];
+  var recipient = $('#notice_kind_recipient').val()
+  if (recipient == "Notifier::MergeDataModels::ConsumerRole") {
+      config.placeholder_selects = [
+          {
+              key: 'select_system_settings',
+              title: 'Select Application Settings',
+              placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.settings_placeholders.to_json %>
+          },
+          {
+              key: 'select_conditional_statement',
+              title: 'Select Condition/Loop',
+              placeholders: <%= Notifier::MergeDataModels::ConsumerRole.new.place_holders.to_json %>
+          }];
+
+  } else {
+      config.placeholder_selects = [
+          {
+              key: 'select_system_settings',
+              title: 'Select Application Settings',
+              placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.settings_placeholders.to_json %>
+          },
+          {
+              key: 'select_conditional_statement',
+              title: 'Select Condition/Loop',
+              placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+          }];
+  }
 
 
   config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';

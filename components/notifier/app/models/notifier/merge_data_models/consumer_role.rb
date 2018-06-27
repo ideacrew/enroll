@@ -8,19 +8,26 @@ module Notifier
     attribute :first_name, String
     attribute :last_name, String
     attribute :mailing_address, MergeDataModels::Address
-    # attribute :coverage_begin_date, Date
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollments, Array[MergeDataModels::Enrollment]
-    attribute :subject_line, String
+    attribute :enr_subject_line, String
     attribute :documents_needed, Boolean
     attribute :current_health_enrollments, Array
+    attribute :documents_due_date, String
+    attribute :appeal_deadline, String
+    attribute :coverage_year, String
+    attribute :ssa_unverified, Array[MergeDataModels::Person]
+    attribute :immigration_unverified, Array[MergeDataModels::Person]
+    attribute :american_indian_unverified, Array[MergeDataModels::Person]
+    attribute :residency_inconsistency, Array[MergeDataModels::Person]
+
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::ConsumerRole.new({
                                                                   notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
                                                                   first_name: 'John',
                                                                   last_name: 'Whitmore',
-                                                                  subject_line: 'Hello world'
+                                                                  enr_subject_line: 'Hello world'
                                                                   # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
                                                               })
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
@@ -34,27 +41,29 @@ module Notifier
     end
 
     def conditions
-      %w{uqhp_present? aqhp_present? uqhp_and_dental_present? aqhp_and_dental_present? documents_needed? }
+      %w{uqhp_present? aqhp_present? uqhp_and_dental_present? aqhp_and_dental_present? documents_needed? aqhp_or_uqhp_present? csr_enrollment_present? uqhp_or_dental_present?}
     end
+
 
     def uqhp_present?
-      true #self.person.primary_family.enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year.to_s == "2018" && enrollment.is_receiving_assistance != true}.present?
     end
 
-    def aqhp_present?
-      true #self.person.primary_family.enrollments.select{|enrollment| enrollment.is_receiving_assistance == true  && enrollment.effective_on.year.to_s == "2018"}.present?
+    def csr_enrollment_present?
     end
 
     def uqhp_and_dental_present?
-      uqhp_present? && self.person.primary_family.enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == "2018" && enrollment.is_receiving_assistance != true}.present?
     end
 
     def aqhp_and_dental_present?
-      aqhp_present? &&  self.person.primary_family.enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == "2018"}.present?
+    end
+
+    def aqhp_or_uqhp_present?
     end
 
     def documents_needed?
-      true
+    end
+
+    def aqhp_present?
     end
 
     def broker_present?

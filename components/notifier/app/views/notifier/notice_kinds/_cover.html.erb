@@ -1,33 +1,95 @@
 <div class="break">
-<%= render :partial => "notices/shared/logo" %>
-<table class="total_table address custom-address" border="0">
-  <tbody>
-  <tr><td><br><br><br></td></tr>
-    <tr>
-      <td class="fssize health-connector-address" align="left"><%= recipient.first_name %> <%= recipient.last_name %></td>
-    </tr>
-    <tr>
-       <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_1 %></td>
-    </tr>
-    <% if recipient.mailing_address.street_2.present? %>
-    <tr>
-      <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_2 %></td>
-    </tr>
-    <% end %>
-    <tr>
-    <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
-    </tr>
-  </tbody>
-</table>
-<br><br><br><br><br><br><br>
+<%= render :partial => "logo" %>
+  <% if individual_market_is_enabled? %>
+    <table class="total_table address" border="0">
+      <tbody>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td><%= recipient.first_name %> <%= recipient.last_name %></td>
+      </tr>
+      <tr class="fssize1">
+        <td><%= recipient.mailing_address.street_1 %></td>
+      </tr>
+      <% if recipient.mailing_address.street_2.present? %>
+        <tr class="fssize1">
+          <td><%= recipient.mailing_address.street_2 %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+        <td style="text-align: right;"><%= notice_number || "IVL_M001" %></td>
+      </tr>
+      <tr>
+        <td>
+          <br>
+        </td>
+      </tr>
+      <% if !recipient.mailing_address.street_2.present? %>
+        <tr class="fssize1">
+          <td><br></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
 
-<h1 class="headers-notice" align="center"><strong>THIS IS A COVER PAGE</strong></h1>
-<p class="notice-font-padding1" align="center">___________________________________________________________________________________________________________________________________________________</p>
-<p class="notice-font-padding1"> The enclosed letter has important information about your health insurance, including steps you need to take to get or keep your insurance. </p><br><br><br><br><br><br><br><br><br>
-<p class="mpi_indicator"><%= notice_number %> </p>
+  <% else %>
+
+    <table class="total_table address custom-address" border="0">
+      <tbody>
+      <tr><td colspan="2"><br><br></td></tr>
+      <tr>
+        <td colspan="2" class="fssize health-connector-address "><%= recipient.first_name %> <%= recipient.last_name %></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="fssize1 health-connector-address"><%= recipient.mailing_address.street_1 %></td>
+      </tr>
+      <% if recipient.mailing_address.street_2.present? %>
+        <tr>
+          <td colspan="2" class="fssize1 health-connector-address"><%= recipient.mailing_address.street_2 %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td class="fssize1 health-connector-address"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
+        <td align="right" style="padding-right: 15px"><%= notice_number || "SHOP_M001" %></td>
+      </tr>
+      </tbody>
+    </table>
+
+  <% end %>
+<br><br><br><br>
+
+  <table class="total_table" border="0">
+    <tbody>
+    <tr>
+      <br></br>
+    </tr>
+    <tr>
+      <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+        <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+      </td>
+    </tr>
+    <tr>
+      <td style="font-size: 18px; text-align: center;">
+        The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+      </td>
+    </tr>
+    <tr>
+      <br></br>
+    </tr>
+    </tbody>
+  </table>
+
+  <table class="total_table" border="0" style="margin-top: 260px;">
+    <tbody>
+    <tr>
+      <td><%= notice_number %></td>
+    </tr>
+    </tbody>
+  </table>
 </div>
-
-<div class="page-break-after">
+<div class="page-break">
   <table class="total_table" border="0">
     <tbody>
     <tr>

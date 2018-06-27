@@ -1,6 +1,31 @@
+<% if individual_market_is_enabled? %>
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td>
+      <b><%= Settings.site.short_name %></b><br>
+      1225 I Street, NW<br>
+      Suite 400<br>
+      Washington, DC 20005
+    </td>
+    <td colspan="2" align="right"><a href=
+                                         "https://dchealthlink.com/"
+                                     target=
+                                         "_blank">
+      <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "100"  %>
+    </a></td>
+  </tr>
+  <tr>
+    <td><br></td>
+  </tr>
+  </tbody>
+</table>
+
+<%else %>
+
 <table class="total_table custom-address" border="0">
   <tbody>
-  <tr><td></br></td></tr>
+  <tr><td><br></br></td></tr>
     <tr>
     <td class="health-connector-address" align="left"><strong>Commonwealth Health Insurance</strong><br>
             1225 Eye St NW Suite 400<br>
@@ -14,3 +39,4 @@
     </tr>
   </tbody>
 </table>
+<% end %>
