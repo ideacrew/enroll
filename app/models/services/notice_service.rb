@@ -6,8 +6,12 @@ module Services
 
     def deliver(recipient:, event_object:, notice_event:, notice_params: {})
       return if recipient.blank? || event_object.blank?
-      delivery_method = can_be_proccessed_as_legacy?(recipient, notice_event) ? :create_notice_job : :trigger_notice_event
-      send(delivery_method, recipient, event_object, notice_event, notice_params)
+      begin
+        delivery_method = can_be_proccessed_as_legacy?(recipient, notice_event) ? :create_notice_job : :trigger_notice_event
+        send(delivery_method, recipient, event_object, notice_event, notice_params)
+      rescue => e
+        Rails.logger.error {"Unable to deliver #{notice_event.to_s} to #{recipient.id.to_s} due to #{e}"} unless Rails.env.test?
+      end
     end
 
     def create_notice_job(recipient, event_object, notice_event, notice_params)
