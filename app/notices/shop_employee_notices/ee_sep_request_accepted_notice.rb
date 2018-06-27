@@ -3,9 +3,9 @@ class ShopEmployeeNotices::EeSepRequestAcceptedNotice < ShopEmployeeNotice
   attr_accessor :census_employee
 
   def initialize(census_employee, args)
-    @qle_on = args[:options][:qle_on]
-    @end_on = args[:options][:end_on]
-    @title = args[:options][:title]
+    @qle_on = args[:options][:event_object][:qle_on]
+    @end_on = args[:options][:event_object][:end_on]
+    @title = args[:options][:event_object][:title]
     super(census_employee, args)
   end
 
@@ -21,8 +21,8 @@ class ShopEmployeeNotices::EeSepRequestAcceptedNotice < ShopEmployeeNotice
 
   def append_data
     notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
-      :qle_on => Date.strptime(@qle_on,"%m/%d/%Y"),
-      :end_on => Date.strptime(@end_on,"%m/%d/%Y"),
+      :qle_on => @qle_on.strftime("%m/%d/%Y"),
+      :end_on => @end_on.strftime("%m/%d/%Y"),
       :title => @title
       })
 

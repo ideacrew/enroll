@@ -1,7 +1,7 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def perform(recipient, event_object, notice_event, notice_params: {})
+  def perform(recipient, event_object, notice_event, notice_params={})
     Resque.logger.level = Logger::DEBUG
 
     resource_hash = {:employee => "employee_role", :employer => "employer", :broker_agency => "broker_role", :consumer_role => "consumer_role", :broker => "broker_role", :general_agency => "general_agent_profile"}

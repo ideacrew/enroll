@@ -4,10 +4,9 @@ class ShopBrokerNotices::BrokerFiredNotice < ShopBrokerNotice
   attr_accessor :broker
   attr_accessor :employer_profile
 
-  def initialize(employer_profile, args = {})
-    self.employer_profile = employer_profile
-    broker_role = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.primary_broker_role.person
-    self.broker = broker_role
+  def initialize(broker_role, args = {})
+    self.employer_profile = args[:options][:event_object]
+    self.broker = broker_role.person
     args[:recipient] = broker
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new

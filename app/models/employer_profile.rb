@@ -170,13 +170,13 @@ class EmployerProfile
     trigger_notice_observer(active_broker_agency_account.broker_agency_profile.primary_broker_role, self, "broker_fired_confirmation_to_broker")
   end
 
-  def broker_fired_confirmation_to_broker
-    trigger_notices('broker_fired_confirmation_to_broker')
-  end
+  # def broker_fired_confirmation_to_broker
+  #   trigger_notices('broker_fired_confirmation_to_broker')
+  # end
 
-  def employer_broker_fired
-    trigger_notices('employer_broker_fired')
-  end
+  # def employer_broker_fired
+  #   trigger_notices('employer_broker_fired')
+  # end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
 

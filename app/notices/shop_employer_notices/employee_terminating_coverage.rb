@@ -3,7 +3,7 @@ class ShopEmployerNotices::EmployeeTerminatingCoverage < ShopEmployerNotice
   attr_accessor :hbx_enrollment
 
   def initialize(employer_profile, args = {})
-    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment]).first
+    self.hbx_enrollment = args[:options][:event_object]
     super(employer_profile, args)
   end
 

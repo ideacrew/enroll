@@ -33,7 +33,7 @@
   content: "If you have not already done so, you and any eligible dependents can now enroll in an employer-sponsored health insurance plan through #{Settings.site.short_name} with <strong>#{notice.employer_name}</strong>. If you are already enrolled in employer-sponsored health insurance through #{Settings.site.short_name}, you are now eligible to make changes to your insurance plan. If you are already enrolled in a #{Settings.site.short_name} plan and do not make any changes, your current plan enrollment will continue."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>You must make changes to your plan before #{notice.sep.end_on.strftime("%m/%d/%Y")}. The day the coverage changes take effect depends on the qualifying event you experienced</strong>. In most cases, the changes will take effect on the first day of the month after you experienced a qualifying event. In cases of birth, adoption, placement for adoption, and placement of a foster child, you are eligible to select an effective date on the date of the event."} %>
+content: "<strong>You must make changes to your plan before #{notice.sep.end_on}. The day the coverage changes take effect depends on the qualifying event you experienced</strong>. In most cases, the changes will take effect on the first day of the month after you experienced a qualifying event. In cases of birth, adoption, placement for adoption, and placement of a foster child, you are eligible to select an effective date on the date of the event."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Selecting an Employer-sponsored Insurance Plan</strong>"} %>

@@ -1534,7 +1534,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Ineligible for SHOP Coverage Offered through DC Health Link',
       description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
       resource_name: 'employee_role',
-      event_name: 'employee_termination_notice',
+      event_name: 'employee_notice_for_employee_terminated_from_roster',
       notice_triggers: [
         {
           name: 'Employee Termination Notice',
@@ -1870,7 +1870,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Special Enrollment Period Denial',
       description: 'EE SEP Requested by Employee outside of allowable time frame',
       resource_name: 'employee_role',
-      event_name: 'sep_request_denial_notice',
+      event_name: 'employee_notice_for_sep_denial',
       notice_triggers: [
         {
           name: 'Denial of SEP Requested by EE outside of allowable time frame',
@@ -2080,7 +2080,7 @@ elsif Settings.aca.state_abbreviation == "DC"
       title: 'Employee Enrollment Confirmation',
       description: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
       resource_name: 'employee_role',
-      event_name: 'ee_plan_selection_confirmation_sep_new_hire',
+      event_name: 'employee_plan_selection_confirmation_sep_new_hire',
       notice_triggers: [
         {
           name: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',

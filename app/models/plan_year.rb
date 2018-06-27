@@ -1234,41 +1234,41 @@ class PlanYear
     end
   end
 
-  def trigger_renewal_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    if event_name == "publish"
-      begin
-        self.employer_profile.trigger_notices("planyear_renewal_3a")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer renewal publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    elsif event_name == "force_publish"
-      begin
-        self.employer_profile.trigger_notices("planyear_renewal_3b")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer renewal force publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
+  # def trigger_renewal_notice
+  #   return true if benefit_groups.any?{|bg| bg.is_congress?}
+  #   event_name = aasm.current_event.to_s.gsub(/!/, '')
+  #   if event_name == "publish"
+  #     begin
+  #       self.employer_profile.trigger_notices("planyear_renewal_3a")
+  #     rescue Exception => e
+  #       Rails.logger.error { "Unable to deliver employer renewal publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+  #     end
+  #   elsif event_name == "force_publish"
+  #     begin
+  #       self.employer_profile.trigger_notices("planyear_renewal_3b")
+  #     rescue Exception => e
+  #       Rails.logger.error { "Unable to deliver employer renewal force publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+  #     end
+  #   end
+  # end
 
-  def renewal_group_notice
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.is_converting?
-      begin
-        self.employer_profile.trigger_notices("conversion_group_renewal")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer conversion group renewal notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    else
-      begin
-        self.employer_profile.trigger_notices("group_renewal_5")
-      rescue Exception => e
-        Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
-      end
-    end
-  end
+  # def renewal_group_notice
+  #   event_name = aasm.current_event.to_s.gsub(/!/, '')
+  #   return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
+  #   if self.employer_profile.is_converting?
+  #     begin
+  #       self.employer_profile.trigger_notices("conversion_group_renewal")
+  #     rescue Exception => e
+  #       Rails.logger.error { "Unable to deliver employer conversion group renewal notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+  #     end
+  #   else
+  #     begin
+  #       self.employer_profile.trigger_notices("group_renewal_5")
+  #     rescue Exception => e
+  #       Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+  #     end
+  #   end
+  # end
 
   #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
   def notify_employee_of_renewing_employer_ineligibility
