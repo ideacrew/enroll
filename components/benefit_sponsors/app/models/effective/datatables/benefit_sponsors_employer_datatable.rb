@@ -66,7 +66,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            # ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(@employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Transmit XML', "#", "static"],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization]), generate_invoice_link_type(@employer_profile)],
+           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
           ]
           # if individual_market_is_enabled?
           #   people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)
