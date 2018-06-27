@@ -85,10 +85,10 @@ module SponsoredBenefits
 
 
         # this method creates a draft plan year from a valid claim code entered on benefits page(in employer portal).
-        def build_plan_year_from_quote(employer_profile, quote)
-          builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(quote, employer_profile)
+        def build_plan_year_from_quote(organization, quote)
+          builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(quote, organization)
           if builder.quote_valid?
-            builder.add_plan_year
+            builder.add_benefit_sponsors_benefit_application
             # builder.add_census_members
             quote.claim_date = TimeKeeper.date_of_record
             quote.claim!

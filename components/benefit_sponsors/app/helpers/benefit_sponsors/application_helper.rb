@@ -72,6 +72,17 @@ module BenefitSponsors
       provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
     end
 
+    def benefit_application_claim_quote_warnings(benefit_applications)
+      benefit_application = benefit_applications.where(aasm_state: :draft).first
+      return [], "#claimBenefitApplicationQuoteModal" unless benefit_application
+
+      if benefit_application.is_renewing?
+        return ["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+      else
+        return ["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+      end
+    end
+
     def retrieve_inbox(provider, folder: 'inbox')
       broker_agency_mailbox = inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
       return broker_agency_mailbox if provider.try(:broker_role)
