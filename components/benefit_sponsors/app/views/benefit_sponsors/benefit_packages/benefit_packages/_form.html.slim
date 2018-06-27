@@ -18,7 +18,7 @@ h1.heading-text Benefit Package - Set Up
       = render "sponsored_benefit", f: sb
 
   button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
-  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Save Plan Year
+  button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
   
 
   = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
