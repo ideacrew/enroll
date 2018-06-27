@@ -17,7 +17,8 @@
   br
   br
 
-  #scEdit.hidden
+- if !is_new_package && !is_new_package.nil?
+  #scEdit
     = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
       = render "./ui-components/v1/cards/sponsor_contributions", f: sc
   br
@@ -37,5 +38,4 @@
   javascript:
     window.onload = function() {
       document.getElementById('planSelection').classList.add('hidden')
-      document.getElementById('scEdit').classList.remove('hidden')
     }

@@ -12,12 +12,12 @@
     = f.fields_for :contribution_levels, f.object.contribution_levels, errors: {}, fieldset: false do |f|
       .row.mb-1
         .col-xs-4.ml-4.mt-1
-          = f.check_box :is_offered, {disabled: f.object.display_name.match(/Employee/i)}, "true", "false"
+          = f.check_box :is_offered, {}, "true", "false"
           = f.object.display_name
           = f.hidden_field :display_name, value: f.object.display_name
         .col-xs-6
           .col-xs-3
-            = f.number_field :contribution_factor, {value: "#{(f.object.contribution_factor * 100).to_i}", id: "#{f.object.id}"}
+            = f.number_field :contribution_factor, {value: "#{(f.object.contribution_factor * 100).to_i}", id: "#{f.object.id}", min: 0, max: 100}
           .col-xs-9
             input type="range" min="0" max="100" value="#{(f.object.contribution_factor * 100).to_i}" step="5" class="slider" id="#{f.object.id}" onchange="setInputValue(this)" data-id="#{f.object.id}"
 
