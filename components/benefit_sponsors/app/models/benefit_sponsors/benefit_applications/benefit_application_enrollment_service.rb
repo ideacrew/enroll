@@ -11,7 +11,7 @@ module BenefitSponsors
 
     def renew_application
       if business_policy_satisfied_for?(:renew_benefit_application)
-        renewal_effective_date = benefit_application.effective_period.end.next_day
+        renewal_effective_date = benefit_application.effective_period.end.to_date.next_day
         service_areas = benefit_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
         benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
 
