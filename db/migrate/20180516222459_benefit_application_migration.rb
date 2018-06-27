@@ -138,11 +138,11 @@ class BenefitApplicationMigration < Mongoid::Migration
         new_organization = new_org(old_org)
         benefit_sponsorship = new_organization.first.active_benefit_sponsorship
 
-        if benefit_sponsorship.blank? || benefit_sponsorship.service_areas.blank? ||  benefit_sponsorship.rating_area.blank?
-          print 'F' unless Rails.env.test?
-          csv << [old_org.legal_name, old_org.fein, '', '', 'service area (or) rating areas missing for benefit sponsorship']
-          next
-        end
+        # if benefit_sponsorship.blank? || benefit_sponsorship.service_areas.blank? ||  benefit_sponsorship.rating_area.blank?
+        #   print 'F' unless Rails.env.test?
+        #   csv << [old_org.legal_name, old_org.fein, '', '', 'service area (or) rating areas missing for benefit sponsorship']
+        #   next
+        # end
 
         # update benefit_sponsorship
         benefit_sponsorship.aasm_state = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[old_org.employer_profile.aasm_state.to_sym]
