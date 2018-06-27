@@ -34,6 +34,7 @@ BenefitSponsors::Engine.routes.draw do
         post :bulk_employee_upload
         get :coverage_reports
         collection do
+          get :generate_sic_tree
           get :show_pending
         end
         member do

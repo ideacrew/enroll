@@ -106,6 +106,11 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@invoice.identifier) , options
         end
 
+        def generate_sic_tree
+          sic_tree = SicCode.generate_sic_array
+          render :json => sic_tree
+        end
+
         private
 
         def check_and_download_invoice
