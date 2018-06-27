@@ -35,7 +35,20 @@ export default class extends Controller {
     newLocation.querySelectorAll('select').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`)
       input.setAttribute('name', name)
-      input.value = ''
+
+      if (input.value != "phone main" && input.id != "kindSelect") {
+        input.value = ''
+      }
+      
+      if (input.id == "kindSelect") {
+        input[0].remove();
+        input[1].remove();
+        var option = document.createElement('option');
+        option.selected = "Select Address Kind";
+        option.innerHTML = "Select Address Kind"
+        input.append(option)
+      }
+      
     })
 
     this.officeLocationsTarget.appendChild(newLocation)
