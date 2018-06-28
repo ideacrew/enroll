@@ -144,8 +144,8 @@ module SponsoredBenefits
         new_benefit_application.pull_benefit_sponsorship_attributes
         if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
           cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
-          new_benefit_application.save
           update_benefit_sponsor_catalog(new_benefit_application, new_benefit_sponsorship)
+          new_benefit_application.save!
           add_benefit_packages(new_benefit_application)
         end
 
