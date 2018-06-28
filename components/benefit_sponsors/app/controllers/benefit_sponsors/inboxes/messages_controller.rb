@@ -5,7 +5,7 @@ module BenefitSponsors
       before_action :find_inbox_provider, except: [:msg_to_portal]
       before_action :find_message
       before_action :set_sent_box, only: [:show, :destroy], if: :is_broker?
-      before_action :find_organization ,only: [:msg_to_portal]
+      before_action :find_profile, only: [:msg_to_portal]
 
       def new
       end
@@ -30,8 +30,7 @@ module BenefitSponsors
       end
 
       def msg_to_portal
-        @broker_agency_provider = @organizations.first.broker_agency_profile if @organizations.present?
-        @inbox_provider = @broker_agency_provider
+        @inbox_provider = @profile
         @inbox_provider_name = @inbox_provider.try(:legal_name)
         @inbox_to_name = "HBX Admin"
         log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
@@ -49,22 +48,22 @@ module BenefitSponsors
       end
 
       def is_broker?
-        return (current_user.person == @inbox_provider) || /.*BrokerAgencyProfile$/.match(@inbox_provider._type)
+        return (@inbox_provider.class.to_s == "Person") && (/.*BrokerAgencyProfile$/.match(@inbox_provider.broker_role.broker_agency_profile._type))
       end
 
       def find_inbox_provider
-        id = params["id"]||params['profile_id']
-        if current_user.person._id.to_s == id
-          @inbox_provider = current_user.person
-        else
-          organizations = find_organization
-          @inbox_provider = organizations.first.profiles.first
+        person = Person.where(id: params["id"])
+
+        if person.present? && person.first.broker_role.present?
+          @inbox_provider = person.first
+        elsif find_profile.present?
+          @inbox_provider = find_profile
           @inbox_provider_name = @inbox_provider.legal_name if /.*EmployerProfile$/.match(@inbox_provider._type)
         end
       end
 
-      def find_organization
-        @organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(params["id"]||params['profile_id']))
+      def find_profile
+        @profile = BenefitSponsors::Organizations::Profile.find(params["id"])
       end
 
       def find_message
