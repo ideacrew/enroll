@@ -22,7 +22,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
                                       recorded_service_areas: service_areas,
                                       fte_count: 5,
                                       pte_count: 0,
-                                      msp_count: 0,
+                                      msp_count: 0
                                   ) }
   
   # let!(:initial_application)  { build(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
@@ -42,7 +42,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
 
   before do
     initial_application.benefit_packages = [current_benefit_package]
-    benefit_sponsorship.benefit_applications << initial_application
+    benefit_sponsorship.benefit_applications = [initial_application]
     benefit_sponsorship.save!
   end
 

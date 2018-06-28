@@ -27,88 +27,6 @@ class BenefitApplicationMigration < Mongoid::Migration
   def self.down
   end
 
-  # class BenefitSponsorshipMigrationService
-  #   def self.fetch_sponsorship_for(new_organization, plan_year)
-  #     self.new(new_organization, plan_year).benefit_sponsorship
-  #   end
-  #
-  #   def initialize(new_organization, plan_year)
-  #     find_or_create_benefit_sponsorship(new_organization, plan_year)
-  #   end
-  #
-  #   def find_or_create_benefit_sponsorship( new_organization, plan_year)
-  #     @benefit_sponsorship = benefit_sponsorship_for(new_organization, plan_year.start_on)
-  #
-  #     if @benefit_sponsorship.blank?
-  #       create_new_benefit_sponsorship(new_organization, plan_year)
-  #     end
-  #
-  #     if is_plan_year_effectuated?(plan_year)
-  #       if [:active, :suspended, :terminated, :ineligible].exclude?(@benefit_sponsorship.aasm_state)
-  #         effectuate_benefit_sponsorship(plan_year)
-  #       end
-  #
-  #       if has_no_successor_plan_year?(plan_year)
-  #         @benefit_sponsorship.terminate_enrollment(plan_year.terminated_on || plan_year.end_on)
-  #       end
-  #     end
-  #   end
-  #
-  #   def benefit_sponsorship_for(new_organization, plan_year_start)
-  #     if new_organization.benefit_sponsorships.size == 1
-  #       return new_organization.benefit_sponsorships[0] if new_organization.benefit_sponsorships[0].effective_begin_on.blank?
-  #     end
-  #
-  #     benefit_sponsorship = new_organization.benefit_sponsorships.desc(:effective_begin_on).effective_begin_on(plan_year_start).first
-  #
-  #     if benefit_sponsorship && benefit_sponsorship.effective_end_on.present?
-  #       (benefit_sponsorship.effective_end_on > plan_year_start) ? benefit_sponsorship : nil
-  #     else
-  #       benefit_sponsorship
-  #     end
-  #   end
-  #
-  #   # Add proper state transitions to benefit sponsorship
-  #   def effectuate_benefit_sponsorship(plan_year)
-  #     @benefit_sponsorship
-  #   end
-  #
-  #   def create_new_benefit_sponsorship(new_organization, plan_year)
-  #     @benefit_sponsorship
-  #   end
-  #
-  #   def is_plan_year_effectuated?(plan_year)  # add renewing_draft,renewing_enrolling,renewning enrolled
-  #     %w(active suspended expired terminated termination_pending, renewing_draft,renewing_enrolling,renewning enrolled).include?(plan_year.aasm_state)
-  #   end
-  #
-  #   def has_no_successor_plan_year?(plan_year)
-  #     other_plan_years = plan_year.employer_profile.plan_years
-  #
-  #     if plan_year.end_on > TimeKeeper.datetime_of_record
-  #       true
-  #     else
-  #       other_plan_years.any?{|py| py != plan_year && py.start_on == plan_year.end_on.next_day && is_plan_year_effectuated?(py) }
-  #     end
-  #   end
-  #
-  #   def benefit_sponsorship
-  #     @benefit_sponsorship
-  #   end
-  #
-  #   def benefit_market
-  #     site.benefit_market_for(:aca_shop)
-  #   end
-  #
-  #   def self.find_site(site_key)
-  #     BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
-  #   end
-  #
-  #   # check if organization has continuous coverage
-  #   def has_continuous_coverage_previously?(org)
-  #     true
-  #   end
-  # end
-
   private
 
   def self.migrate_plan_years_to_benefit_applications(csv, logger)
@@ -123,12 +41,6 @@ class BenefitApplicationMigration < Mongoid::Migration
     say_with_time("Time take to migrate plan years") do
       old_organizations.batch_size(limit).no_timeout.each do |old_org|
 
-        unless continuous_coverage?(old_org)
-          print 'F' unless Rails.env.test?
-          csv << [old_org.legal_name, old_org.fein, '', '', 'Failed due to org has no contionus coverage']
-          next
-        end
-
         unless new_org(old_org).present?
           print 'F' unless Rails.env.test?
           csv << [old_org.legal_name, old_org.fein, '', '', "New organization not found for fein: #{old_org.fein}"]
@@ -136,16 +48,11 @@ class BenefitApplicationMigration < Mongoid::Migration
         end
 
         new_organization = new_org(old_org)
+
         benefit_sponsorship = new_organization.first.active_benefit_sponsorship
-
-        # if benefit_sponsorship.blank? || benefit_sponsorship.service_areas.blank? ||  benefit_sponsorship.rating_area.blank?
-        #   print 'F' unless Rails.env.test?
-        #   csv << [old_org.legal_name, old_org.fein, '', '', 'service area (or) rating areas missing for benefit sponsorship']
-        #   next
-        # end
-
-        # update benefit_sponsorship
         benefit_sponsorship.aasm_state = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[old_org.employer_profile.aasm_state.to_sym]
+        benefit_sponsorship.registered_on = old_org.employer_profile.registered_on
+        benefit_sponsorship.effective_begin_on = self.get_benefit_sponsorship_effective_on(old_org)
         construct_workflow_state_for_benefit_sponsorship(benefit_sponsorship, old_org)
         benefit_sponsorship.save
 
@@ -155,7 +62,6 @@ class BenefitApplicationMigration < Mongoid::Migration
 
           @benefit_package_map = {}
           begin
-            # benefit_sponsorship = BenefitSponsorshipMigrationService.fetch_sponsorship_for(new_organization, plan_year)
             benefit_application = convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year,csv)
             next unless benefit_application
 
@@ -199,19 +105,13 @@ class BenefitApplicationMigration < Mongoid::Migration
 
     benefit_application = benefit_sponsorship.benefit_applications.new(application_attrs)
     benefit_application.effective_period = (plan_year.start_on..plan_year.end_on)
-    # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
-    benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on
+    benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on  # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
     benefit_application.pull_benefit_sponsorship_attributes
-
     predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
     benefit_application.predecessor_application_id = predecessor_application.first.id if predecessor_application.present?
 
-    # successor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => benefit_application.effective_period.max.next_day, :aasm_state.in=> [:draft, :approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :terminated, :expired])
-    # benefit_application.successor_application_ids = successor_application.map(&:id) if successor_application.present?
-
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
-
     catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
     plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
 
@@ -258,6 +158,10 @@ class BenefitApplicationMigration < Mongoid::Migration
     else
       return true
     end
+  end
+
+  def self.get_benefit_sponsorship_effective_on(old_org)
+    old_org.employer_profile.plan_years.asc(:start_on).where(:aasm_state.in=> [:active, :terminated, :expired]).first.start_on
   end
 
   def self.get_plan_hios_ids_of_plan_year(plan_year)

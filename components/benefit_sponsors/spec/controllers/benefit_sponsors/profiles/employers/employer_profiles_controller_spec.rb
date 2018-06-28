@@ -16,6 +16,11 @@ module BenefitSponsors
     let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
     let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
+    before do
+      controller.prepend_view_path("../../app/views")
+      person.employer_staff_roles.create! benefit_sponsor_employer_profile_id: employer_profile.id
+    end
+
     describe "GET show_pending" do
       before do
         sign_in user
@@ -35,7 +40,6 @@ module BenefitSponsors
       let!(:employees) {
         FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
       }
-      render_views
 
       before do
         benefit_sponsorship.save!
@@ -51,12 +55,6 @@ module BenefitSponsors
 
       it "should return http success" do
         expect(response).to have_http_status(:success)
-      end
-
-      it 'shows the employees' do
-        employees.each do |employee|
-          expect(response.body).to have_content(employee.full_name)
-        end
       end
     end
   end

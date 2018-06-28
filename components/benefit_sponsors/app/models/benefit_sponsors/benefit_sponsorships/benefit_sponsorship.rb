@@ -77,7 +77,7 @@ module BenefitSponsors
       class_name: "BenefitSponsors::Organizations::Organization"
 
     embeds_many :benefit_applications,
-      class_name: "BenefitSponsors::BenefitApplications::BenefitApplication"
+      class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication"
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
@@ -143,6 +143,16 @@ module BenefitSponsors
       where(:benefit_applications => {
         :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :active }}
       )
+    }
+
+    scope :eligible_renewal_applications_on, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {
+          :"effective_period.min" => compare_date,
+          :predecessor_id => {"$ne" => nil},
+          :aasm_state => {"$in" => [:enrollment_eligible, :active]}
+        }
+      })
     }
 
     # Fix Me: verify the state check...probably need to use termination_pending

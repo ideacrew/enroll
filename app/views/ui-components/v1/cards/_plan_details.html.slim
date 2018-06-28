@@ -52,10 +52,11 @@
                 span class="#{plan_level.downcase}-icon"
                   = plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize
               td
-                - if plan.network_information.present?
-                  | NETWORK NOTES
-                  a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="#{plan.network_information}"
-                    i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+                - if offers_nationwide_plans?
+                  - if plan.network_information.present?
+                    | NETWORK NOTES
+                    a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="#{plan.network_information}"
+                      i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
 
               td 
                 - if @hbx_enrollment.hbx_enrollment_members.size > 1

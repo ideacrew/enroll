@@ -5,12 +5,12 @@ module BenefitSponsors
       include Mongoid::Timestamps
 
       embedded_in :benefit_package, 
-                  class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
+                  class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage", inverse_of: :sponsored_benefits
 
       field :product_package_kind,  type: Symbol
       field :product_option_choice, type: String # carrier id / metal level
 
-      belongs_to :reference_product, class_name: "::BenefitMarkets::Products::HealthProducts::HealthProduct", inverse_of: nil
+      belongs_to :reference_product, class_name: "::BenefitMarkets::Products::Product", inverse_of: nil
 
       embeds_one  :sponsor_contribution, 
                   class_name: "::BenefitSponsors::SponsoredBenefits::SponsorContribution"

@@ -1,6 +1,6 @@
 module Effective
   module Datatables
-    class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
+    class EmployeeDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
 
       SOURCE_KINDS = ([:all]+ BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
@@ -8,8 +8,8 @@ module Effective
       datatable do
 
         bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
-          bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
-          bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+          bulk_action 'Generate Invoice', main_app.generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
+          bulk_action 'Mark Binder Paid', main_app.binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row|
@@ -44,9 +44,7 @@ module Effective
             row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
 
-        table_column :invoiced?, :proc => Proc.new { |row|
-          boolean_to_glyph(@employer_profile.current_month_invoice.present?)}, :filter => false
-
+        # # table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         # table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
 
         if employer_attestation_is_enabled?
@@ -66,7 +64,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            # ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(@employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Transmit XML', "#", "static"],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
+           ['Generate Invoice', main_app.generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization]), generate_invoice_link_type(@employer_profile)],
           ]
           # if individual_market_is_enabled?
           #   people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)
@@ -92,34 +90,19 @@ module Effective
       def collection
         return @employer_collection if defined? @employer_collection
 
-        benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
+        @benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all
 
-        if attributes[:employers].present? && !['all'].include?(attributes[:employers])
+        @employer_collection = @benefit_sponsorships unless employer_kinds.include?(attributes[:employers])
 
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:attestations]) if attributes[:attestations].present?
-
-          if attributes[:upcoming_dates].present?
-              if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
-                benefit_sponsorships = benefit_sponsorships.effective_date_begin_on(date)
-              end
+          if employer_attestation_kinds.include?(attributes[:attestations])
+            benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
+          elsif enrolling_kinds.include?(attributes[:enrolling])
+            #TODO for employer enrolling kinds
+          elsif enrolled_kinds.include?(attributes[:enrolled])
+            #TODO for employer enrolled kinds
+          else
+            benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
           end
-
-        end
-
-          # if employer_attestation_kinds.include?(attributes[:attestations])
-          #   benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
-          # elsif enrolling_kinds.include?(attributes[:enrolling])
-          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:enrolling])
-          # elsif enrolled_kinds.include?(attributes[:enrolled])
-          #   #TODO for employer enrolled kinds
-          # else
-          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
-          # end
 
           # employers = @employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
           # employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
@@ -127,7 +110,11 @@ module Effective
 
           # employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
 
-
+          # if attributes[:upcoming_dates].present?
+          #     if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
+          #       employers = employers.employer_profile_plan_year_start_on(date)
+          #     end
+          # end
           @employer_collection = benefit_sponsorships
       end
 
@@ -187,8 +174,8 @@ module Effective
         #   ],
         enrolled:
           [
-            {scope:'benefit_application_enrolled', label: 'All' },
-            {scope:'benefit_application_suspended', label: 'Suspended' },
+            {scope:'employer_profiles_enrolled', label: 'All' },
+            {scope:'employer_profiles_suspended', label: 'Suspended' },
           ],
         upcoming_dates:
           [
@@ -204,8 +191,6 @@ module Effective
             # {scope: 'employer_profiles_initial_eligible', label: 'Initial', subfilter: :enrolling_initial},
             # {scope: 'employer_profiles_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
             # {scope: 'employer_profiles_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
-            {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
-            {scope: 'benefit_application_imported', label: 'Converting'}
           ],
          attestations:
           [
@@ -220,11 +205,11 @@ module Effective
            {scope:'all', label: 'All'},
            {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
 
-           {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
-           #{scope:'benefit_application_enrolling', label: 'Enrolling'},
+           #{scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
+           {scope:'benefit_application_enrolling', label: 'Enrolling'},
 
-           {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled},
-           #{scope:'benefit_application_enrolled', label: 'Enrolled'},
+           #{scope:'employer_profiles_enrolled', label: 'Enrolled', subfilter: :enrolled},
+           {scope:'benefit_application_enrolled', label: 'Enrolled'},
          ],
         top_scope: :employers
         }

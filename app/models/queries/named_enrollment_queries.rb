@@ -87,14 +87,14 @@ module Queries
     class RenewalTransmissionEligibleFilter
       include Enumerable
 
-      def initialize(enum_from_aggregation)
-        @source_enum = enum_from_aggregation 
+      def initialize(enums_from_aggregations)
+        @source_enums = enums_from_aggregations
       end
 
       def each
         @source_enums.each do |agg|
           agg.each do |rec|
-            unless ["renewing_waived", "inactive", "void", "coverage_canceled"].include?(rec["aasm_state"].to_s)
+            unless ["renewing_waived", "inactive", "void", "coverage_canceled", "coverage_terminated"].include?(rec["aasm_state"].to_s)
               yield rec["hbx_enrollment_id"]
             end
           end
@@ -152,9 +152,17 @@ module Queries
         ])
     end
 
+    def self.renewal_gate_lifted_enrollments(organization, effective_on, as_of_time = ::TimeKeeper.date_of_record)
+      sponsored_benefits = find_renewal_sponsored_benefits(organization, effective_on)
+      aggregations = sponsored_benefits.map do |sb|
+        find_renewal_transmission_enrollments(sb, as_of_time)
+      end
+      RenewalTransmissionEligibleFilter.new(aggregations)
+    end
+
     def self.find_renewal_transmission_enrollments(sb, as_of_time)
       sb_id = sb.id
-      aggregation = Family.collection.aggregate([
+      Family.collection.aggregate([
         {
           "$match" => {
             "households.hbx_enrollments.sponsored_benefit_id" => sb_id
@@ -182,11 +190,20 @@ module Queries
           }
         }
       ])
-      RenewalTransmissionEligibleFilter.new(aggregation)
+    end
+
+    def self.find_renewal_sponsored_benefits(organization, effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
+
+      benefit_sponsorships.flat_map do |bs|
+        bs.benefit_applications.select do |ba|
+          (ba.start_on == effective_on) && ["active", "enrollment_eligible"].include?(ba.aasm_state.to_s)
+        end
+      end.flat_map(&:benefit_packages).flat_map(&:sponsored_benefits)
     end
 
     def self.find_ie_sponsored_benefits(organization, effective_on)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).eligible_renewal_applications_on(effective_on)
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|
