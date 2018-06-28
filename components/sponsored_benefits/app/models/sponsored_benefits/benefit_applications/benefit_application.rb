@@ -131,29 +131,152 @@ module SponsoredBenefits
         end
       end
 
-      def to_plan_year
-        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
+      def to_benefit_sponsors_benefit_application(organization)
+        return unless(benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?)
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
-        # CCA-specific attributes (move to subclass)
-        recorded_sic_code               = ""
-        recorded_rating_area            = ""
+        new_benefit_sponsorship = build_benefit_sponsors_benefit_sponsorship_if_needed(organization, benefit_sponsorship)
 
-        copied_benefit_groups = []
-        benefit_groups.each do |benefit_group|
-          benefit_group.attributes.delete("_type")
-          new_benefit_group = ::BenefitGroup.new(benefit_group.attributes)
-          new_benefit_group.relationship_benefits = benefit_group.relationship_benefits
-          copied_benefit_groups << new_benefit_group
+        new_benefit_application = new_benefit_sponsorship.benefit_applications.new(
+          effective_period: effective_period,
+          open_enrollment_period: open_enrollment_period
+        )
+        new_benefit_application.pull_benefit_sponsorship_attributes
+        if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
+          cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
+          update_benefit_sponsor_catalog(new_benefit_application, new_benefit_sponsorship)
+          new_benefit_application.save!
+          add_benefit_packages(new_benefit_application)
         end
 
-        ::PlanYear.new(
-          start_on: effective_period.begin,
-          end_on: effective_period.end,
-          open_enrollment_start_on: open_enrollment_period.begin,
-          open_enrollment_end_on: open_enrollment_period.end,
-          benefit_groups: copied_benefit_groups
-        )
+        new_benefit_application
+      end
+
+      def cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
+        new_benefit_sponsorship.benefit_applications.each do |benefit_application|
+          next unless ((new_benefit_application.id != benefit_application.id) && (benefit_application.start_on == new_benefit_application.start_on))
+          benefit_application.cancel! if benefit_application.may_cancel?
+        end
+      end
+
+      def add_benefit_packages(new_benefit_application)
+        benefit_groups.each do |benefit_group|
+          benefit_package = BenefitSponsors::BenefitPackages::BenefitPackageFactory.call(new_benefit_application, benefit_package_attributes(benefit_group))
+          if benefit_package.valid? && benefit_package.save!
+            benefit_package.sponsored_benefits.each do |sb|
+              cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(new_benefit_application.benefit_sponsorship, new_benefit_application.effective_period.min)
+              sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+              sbenefit.save!
+            end
+          end
+        end
+      end
+
+      def build_benefit_sponsors_benefit_sponsorship_if_needed(organization, old_benefit_sponsorship)
+        if organization.active_benefit_sponsorship.present?
+          organization.active_benefit_sponsorship
+        else
+          organization.benefit_sponsorships.new
+          #TODO: Update data from sponsored_benefit benefit sponsorship model.
+        end
+      end
+
+      def benefit_package_attributes(benefit_group)
+        attributes = {
+          title: benefit_group.title,
+          description: benefit_group.description,
+          probation_period_kind: benefit_group.effective_on_kind,
+          sponsored_benefits_attributes: sponsored_benefits_attributes(benefit_group)
+        }
+      end
+
+      def sponsored_benefits_attributes(benefit_group)
+        attributes = []
+        sponsored_benefit_kinds(benefit_group).each do |sponsored_benefit_kind|
+          pp_kind = product_package_kind(benefit_group)
+
+          attributes << {
+            kind: sponsored_benefit_kind,
+            product_package_kind: pp_kind,
+            product_option_choice: product_option_choice(benefit_group, sponsored_benefit_kind, pp_kind),
+            reference_plan_id: set_reference_product_id(benefit_group, sponsored_benefit_kind),
+            sponsor_contribution_attributes: sponsor_contribution_attributes(benefit_group, sponsored_benefit_kind, pp_kind)
+          }
+        end
+        attributes
+      end
+
+      def sponsor_contribution_attributes(benefit_group, kind, pp_kind)
+        rel_benefits = if kind == :health && pp_kind == :single_product
+          benefit_group.composite_tier_contributions
+        elsif kind == :health
+          benefit_group.relationship_benefits
+        elsif kind == :dental
+          benefit_group.dental_relationship_benefits
+        end
+        contribution_levels = rel_benefits.where(:relationship.ne => "child_26_and_over").inject([]) do |contribution_levels, rel_benefit|
+          contribution_levels << {
+            display_name: (rel_benefit.try(:relationship) || rel_benefit.try(:composite_rating_tier)).titleize,
+            contribution_factor: ((rel_benefit.try(:premium_pct) || rel_benefit.try(:employer_contribution_percent)) * 0.01),
+            is_offered: rel_benefit.offered
+          }
+        end
+
+        { contribution_levels_attributes: contribution_levels}
+      end
+
+      def set_reference_product_id(benefit_group, sponsored_benefit_kind)
+        plan = fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
+        product = fetch_product_from_plan(plan)
+        product.id
+      end
+
+      #returns health or dental plan
+      def fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
+        if sponsored_benefit_kind == :health
+          benefit_group.reference_plan
+        elsif sponsored_benefit_kind == :dental
+          benefit_group.dental_reference_plan
+        end
+      end
+
+      def product_option_choice(benefit_group, sponsored_benefit_kind, pp_kind)
+        plan = fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
+        product = fetch_product_from_plan(plan)
+        {
+          :single_issuer => product.issuer_profile_id,
+          :single_product => product.issuer_profile_id,
+          :metal_level => product.metal_level_kind
+        }[pp_kind]
+      end
+
+      #returns corresponding product for a plan
+      def fetch_product_from_plan(plan)
+        BenefitMarkets::Products::Product.where({
+          "application_period.min" => {"$lte" => effective_period.min},
+          "application_period.max" => {"$gte" => effective_period.min},
+          "hios_id" => plan.hios_id
+        }).first
+      end
+
+      def product_package_kind(benefit_group)
+        case benefit_group.plan_option_kind
+        when "single_carrier"
+          :single_issuer
+        when "single_plan"
+          :single_product
+        when "metal_level"
+          :metal_level
+        when "sole_source"
+          :single_product
+        end
+      end
+
+      def sponsored_benefit_kinds(benefit_group)
+        sponsored_benefit_kinds = []
+        sponsored_benefit_kinds << benefit_group.reference_plan.coverage_kind.to_sym if benefit_group.reference_plan
+        sponsored_benefit_kinds << benefit_group.dental_reference_plan.coverage_kind.to_sym if benefit_group.dental_reference_plan
+        sponsored_benefit_kinds
       end
 
       class << self
@@ -255,8 +378,6 @@ module SponsoredBenefits
         end
       end
 
-
-
       def open_enrollment_date_checks
         return if effective_period.blank? || open_enrollment_period.blank?
 
@@ -295,6 +416,16 @@ module SponsoredBenefits
         # end
       end
 
+      private
+
+
+      def update_benefit_sponsor_catalog(benefit_application, benefit_sponsorship)
+        #update benefit sponsor catalog details
+        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+        catalog = benefit_application.benefit_sponsor_catalog
+        catalog.benefit_application = benefit_application
+        catalog.save
+      end
 
     end
   end

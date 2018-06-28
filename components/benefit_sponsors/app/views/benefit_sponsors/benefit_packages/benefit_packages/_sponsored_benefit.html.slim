@@ -1,7 +1,14 @@
 - is_new_package = @benefit_package_form.is_new_package
 .row.health
   = f.hidden_field :id, value: f.object.id if f.object.id.present?
-  
+
+  br
+  - if is_new_package
+    h1.heading-text Health – Set Up Benefit Package
+  - if !is_new_package
+    h1.heading-text Health - Edit Benefit Package
+  h4 Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
+
   - if !is_new_package && !is_new_package.nil?
     .col-xs-3.pull-right
       span.pull-right

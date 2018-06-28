@@ -7,8 +7,7 @@
     <div class="col-xs-4">
       <% if site_broker_claim_quoting_enabled? %>
         <% if hide_or_show_claim_quote_button(@employer_profile) %>
-          <% claim_warnings, claim_modal_name = claim_quote_warnings(@employer_profile) %>
-
+          <% claim_warnings, claim_modal_name = benefit_application_claim_quote_warnings(@benefit_applications) %>
           <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#{claim_modal_name}" }, class: 'btn btn-default btn-block' %>
 
           <% if claim_warnings.present? %>
@@ -260,4 +259,4 @@
   </div>
 </div>
 
-<%#= render "employers/plan_years/claim_quote_modal" %>
+<%= render "benefit_sponsors/profiles/employers/benefit_applications/claim_quote_modal" %>

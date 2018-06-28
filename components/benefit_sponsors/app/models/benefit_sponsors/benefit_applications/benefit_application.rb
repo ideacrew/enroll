@@ -6,7 +6,8 @@ module BenefitSponsors
     include AASM
 
     embedded_in :benefit_sponsorship,
-                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+                inverse_of: :benefit_applications
 
     APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
     APPLICATION_DRAFT_STATES      = [:draft, :imported] + APPLICATION_EXCEPTION_STATES.freeze
@@ -76,7 +77,7 @@ module BenefitSponsors
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
-      class_name: "BenefitSponsors::BenefitPackages::BenefitPackage"
+      class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage"
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 

@@ -65,9 +65,14 @@ class Products::QhpCostShareVariance
   def plan
     # return @qhp_plan if defined? @qhp_plan
     Rails.cache.fetch("qcsv-plan-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
-      # Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
-      BenefitMarkets::Products::Product.where(hios_id: hios_plan_and_variant_id).select{|a| a.active_year == qhp.active_year}.first
+      Plan.find_by(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id)
     end
   end
 
+
+  def product
+    Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
+      BenefitMarkets::Products::Product.where(hios_id: hios_plan_and_variant_id).select{|a| a.active_year == qhp.active_year}.first
+    end
+  end
 end

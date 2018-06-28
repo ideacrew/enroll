@@ -158,20 +158,22 @@ module BenefitSponsors
         include_context "setup benefit market with market catalogs and product packages"
         include_context "setup initial benefit application"
 
-        let(:sponsored_benefit) { initial_application.benefit_packages[0].sponsored_benefits[0] }
+        let(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
         let(:new_reference_product) { product_package.products[2] }
 
         before do
-          sponsored_benefit.reference_product_id = new_reference_product.id
-          sponsored_benefit.save!
-          initial_application.reload
           @benefit_application_id = sponsored_benefit.benefit_package.benefit_application.id
+          sponsored_benefit.reference_product_id = new_reference_product._id
+          sponsored_benefit.save!
         end
 
         it 'changes to the correct product' do
-          benefit_application_from_db = ::BenefitSponsors::BenefitApplications::BenefitApplication.find(@benefit_application_id)
+          bs = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.benefit_application_find([@benefit_application_id]).first
+          benefit_application_from_db = bs.benefit_applications.detect { |ba| ba.id == @benefit_application_id }
           expect(sponsored_benefit.reference_product).to eq(new_reference_product)
-          expect(benefit_application_from_db.benefit_packages.first.sponsored_benefits.first.reference_product).to eq(new_reference_product)
+          sponsored_benefit_from_db = benefit_application_from_db.benefit_packages.first.sponsored_benefits.first
+          expect(sponsored_benefit_from_db.id).to eq(sponsored_benefit.id)
+          expect(sponsored_benefit_from_db.reference_product).to eq(new_reference_product)
         end
       end
     end

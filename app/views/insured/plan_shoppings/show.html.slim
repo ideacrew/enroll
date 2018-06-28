@@ -9,6 +9,8 @@
         .ct-1
           h1.heading-text = l10n("choose_plan")
           h4.switch-header = l10n(".choose_plan_filter_results_header")
+          h4.swtich-header 
+            strong Please note your final cost may change based on the final enrollment of all employees.
           - if display_plan_cost_warning(@benefit_group)
             b = l10n("insured.plan_shoppings.final_cost_change")
           .row.no-buffer
@@ -311,7 +313,6 @@ javascript:
                           <td>${result.product.health_plan_kind.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
                           <td>
-                            </a>
                             NETWORK NOTES
                             <a data-container="body" href="#" data-toggle="tooltip" data-placement="right" title='${result.product.network_information}'>
                               <i aria-hidden="true" class="fas fa-question-circle fa-lg pl-1"></i>

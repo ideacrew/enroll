@@ -8,7 +8,7 @@ module SponsoredBenefits
                   :benefit_application,
                   :employer_profile
 
-      def initialize(plan_design_proposal, employer_profile=nil)
+      def initialize(plan_design_proposal, organization=nil)
 
         @plan_design_proposal = plan_design_proposal
         @plan_design_organization = @plan_design_proposal.plan_design_organization
@@ -19,8 +19,8 @@ module SponsoredBenefits
         # TODO #FIXME We dont have owner_profile_id in plan design organization for new prospect employers
         # So we dont have a mapping from plan design organization to ::EmployerProfile.
         # If this is not correct, then we need to fix the below line.
-        @employer_profile = employer_profile #|| ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
-        @employer_profile_exists = @employer_profile.persisted?
+        @organization = organization #|| ::EmployerProfile.find_or_create_by_plan_design_organization(@plan_design_organization)
+        @organization_exists = @organization.persisted?
       end
 
       def quote_valid?
@@ -28,11 +28,12 @@ module SponsoredBenefits
       end
 
       def validate_effective_date
-        if @employer_profile.present?
-          if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
-            base_plan_year = @employer_profile.active_plan_year || @employer_profile.published_plan_year
+        if @organization.present?
+          benefit_sponsorship = @organization.active_benefit_sponsorship
+          if (benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?) || benefit_sponsorship.is_conversion?
+            base_benefit_application = benefit_sponsorship.active_benefit_application || benefit_sponsorship.published_benefit_application
 
-            if base_plan_year.start_on.next_year != plan_design_proposal.effective_date
+            if base_benefit_application.start_on.next_year != plan_design_proposal.effective_date
               raise "Quote effective date is invalid"
             end
           end
@@ -42,31 +43,22 @@ module SponsoredBenefits
       end
 
       def add_employer_profile
-        add_census_members unless @employer_profile_exists
+        add_census_members unless @organization_exists
       end
 
-      def add_plan_year
-        quote_plan_year = @benefit_application.to_plan_year
-
-        if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
-          quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
-        end
-
-        if quote_plan_year.valid? && @employer_profile.valid?
-          @employer_profile.plan_years.each do |plan_year|
-            next unless plan_year.start_on == quote_plan_year.start_on
-            if plan_year.is_renewing?
-              plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
-            else
-              plan_year.cancel! if plan_year.may_cancel?
-            end
+      def add_benefit_sponsors_benefit_application
+        quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
+        if @organization.active_benefit_sponsorship.active_benefit_application.present? || @organization.active_benefit_sponsorship.is_conversion?
+          enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(quote_benefit_application)
+          status, renewed_benefit_application, results = enrollment_service.renew_application
+          if status
+            renewed_benefit_application
+          else
+            Rails.logger.error { "Unable to renew plan year for #{@organization.legal_name} due to #{results.values.to_sentence}" }
           end
         end
 
-        @employer_profile.plan_years << quote_plan_year
-        @employer_profile.save!
-
-        @employer_profile.census_employees.each do |census_employee|
+        @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
           census_employee.save
         end
       end

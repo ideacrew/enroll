@@ -17,7 +17,7 @@ module ShopPolicyCalculations
       [member_provider] + member_provider.census_dependents
     when QuoteHousehold
       member_provider.quote_members
-    when BenefitSponsors::CensusMembers::PlanDesignCensusEmployee
+    when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
       [member_provider] + member_provider.census_dependents
     end
   end
@@ -52,7 +52,7 @@ module ShopPolicyCalculations
       else
         benefit_relationship(member.primary_relationship)
       end
-    when BenefitSponsors::CensusMembers::PlanDesignCensusEmployee
+    when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
       'employee'
     else
       member.employee_relationship

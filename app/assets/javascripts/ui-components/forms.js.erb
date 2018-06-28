@@ -23,13 +23,17 @@ function validateForm() {
 
 count = 0;
 
-function addOfficeLocation(element) {
+function addOfficeLocation() {
   // Makes a new node for existing office location
   var officeField = document.querySelector('#officeLocations');
   var newOfficeField = document.importNode(officeField, true)
   count ++;
   currentCount = count - 1;
   officeField.querySelectorAll('input').forEach(function(input) {
+    var name = input.getAttribute('name').replace('['+currentCount+']', '['+count+']')
+    input.setAttribute('name', name);
+  })
+  officeField.querySelectorAll('select').forEach(function(input) {
     var name = input.getAttribute('name').replace('['+currentCount+']', '['+count+']')
     input.setAttribute('name', name);
   })
@@ -45,7 +49,9 @@ function addOfficeLocation(element) {
   selectKindOption.remove(1)
   // clears inputs from new location
   newOfficeField.querySelectorAll('input').forEach(function(input) {
-    input.value = ''
+    if (input.value != 'phone main') {
+      input.value = ''
+    }
   })
   // clears all selects
   newOfficeField.querySelectorAll('select#inputCounty').forEach(function(input) {
