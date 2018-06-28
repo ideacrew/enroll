@@ -109,6 +109,17 @@ module BenefitSponsors
       employer_profile.census_employees.active.count
     end
 
+    def total_messages(record_id)
+      profile = BenefitSponsors::Organizations::Profile.find(record_id)
+
+      if profile.primary_broker_role.present?
+        person = profile.primary_broker_role.person
+        person.inbox.unread_messages.count
+      else
+        return 0
+      end
+    end
+
     def format_name(first_name: nil, last_name: nil, middle_name: nil, name_sfx: nil)
       given_name = [first_name, middle_name].reject(&:nil? || empty?).join(' ')
       sir_name  = content_tag(:strong, mixed_case(last_name))

@@ -253,6 +253,9 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
     context "it should return published plan year ", dbclean: :after_each do
       let(:broker_agency_account) { FactoryGirl.build_stubbed(:broker_agency_account) }
+      let(:invoice) { instance_double("Document", id: double("id"), subject: 'invoice', date: Time.now) }
+      let(:initial_invoice) { instance_double("Document", id: double("id"), subject: 'initial_invoice', date: Time.now) }
+      let(:invalid_invoice) { instance_double("Document", id: double("id"), subject: 'invalid_invoice', date: Time.now) }
 
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
@@ -265,7 +268,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
-        allow(employer_profile).to receive(:documents).and_return(Document.all)
+        allow(employer_profile).to receive(:documents).and_return([invoice, initial_invoice, invalid_invoice])
         sign_in(user)
       end
 
@@ -277,13 +280,20 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
         expect(assigns(:current_plan_year)).to eq plan_year
       end
 
-
       it "should get announcement" do
         FactoryGirl.create(:announcement, content: "msg for Employer", audiences: ['Employer'])
         allow(user).to receive(:person).and_return(person)
         allow(user).to receive(:has_employer_staff_role?).and_return true
         get :show, id: employer_profile.id, tab: "home"
         expect(flash.now[:warning]).to eq ["msg for Employer"]
+      end
+
+      it "should return initial invoice and invoice" do
+        allow(user).to receive(:person).and_return(person)
+        get :show, id: employer_profile.id, tab: "billing"
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+        expect(assigns(:invoices)).to eq [initial_invoice, invoice]
       end
     end
   end

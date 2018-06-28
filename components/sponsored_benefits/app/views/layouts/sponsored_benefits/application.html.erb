@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +10,7 @@
   <%= csrf_meta_tags %>
 </head>
 <body class="font">
-    <%= render 'layouts/header' %>
+    <%= render './ui-components/v1/navs/header' %>
     <%= render 'shared/engines/broker_menu' %>
     <%= render_flash %>
     <div class="content <%= controller_name %>">
@@ -18,3 +19,4 @@
 
 </body>
 </html>
+
