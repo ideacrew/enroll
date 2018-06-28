@@ -101,7 +101,7 @@ class BenefitApplicationMigration < Mongoid::Migration
   # "updated_by_id"=>BSON::ObjectId('5909e07d082e766d68000078'),
   def self.convert_plan_year_to_benefit_application(benefit_sponsorship, plan_year, csv)
     py_attrs = plan_year.attributes.except(:benefit_groups, :workflow_state_transitions)
-    application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :enrolled_summary, :waived_summary, :created_at, :updated_at, :terminated_on)
+    application_attrs = py_attrs.slice(:fte_count, :pte_count, :msp_count, :created_at, :updated_at, :terminated_on)
 
     benefit_application = benefit_sponsorship.benefit_applications.new(application_attrs)
     benefit_application.effective_period = (plan_year.start_on..plan_year.end_on)
@@ -161,7 +161,12 @@ class BenefitApplicationMigration < Mongoid::Migration
   end
 
   def self.get_benefit_sponsorship_effective_on(old_org)
-    old_org.employer_profile.plan_years.asc(:start_on).where(:aasm_state.in=> [:active, :terminated, :expired]).first.start_on
+    plan_years = old_org.employer_profile.plan_years.asc(:start_on).where(:aasm_state.in=> [:active, :terminated, :expired])
+    if plan_years.present?
+      plan_years.first.start_on
+    else
+      return nil
+    end
   end
 
   def self.get_plan_hios_ids_of_plan_year(plan_year)
