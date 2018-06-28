@@ -312,7 +312,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -327,14 +327,14 @@ Then(/^Individual fills in the form$/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 end
 
 Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find('#address_info .selectric p.label').trigger 'click'
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
+  find('#dependent_addresses_0_state').find(:xpath, 'option[10]').select_option
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
   all(:css, ".mz").last.click
   find('#btn-continue').click
