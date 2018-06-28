@@ -128,16 +128,6 @@ module BenefitSponsors
       scope :broker_by_hbx_id,                ->( hbx_id ){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
       scope :employer_by_fein,                ->( fein ){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
 
-      scope :employer_profiles_applicants,   ->{
-        where(
-          :"profiles" => {
-            :$elemMatch => {
-              :"aasm_state" => "applicant",
-              :"_type" => /.*EmployerProfile$/
-            }
-          })
-      }
-
       scope :'employer_profiles_renewing_application_pending', -> {}
       scope :'employer_profiles_renewing_open_enrollment',     -> {}
 
@@ -189,7 +179,7 @@ module BenefitSponsors
 
           benefit_market  = site.benefit_market_for(:aca_shop)
           new_sponsorship = benefit_sponsorships.build(profile: profile, benefit_market: benefit_market)
-          
+
           # new_sponsorship.refresh_rating_area
           # new_sponsorship.refresh_service_areas
         else

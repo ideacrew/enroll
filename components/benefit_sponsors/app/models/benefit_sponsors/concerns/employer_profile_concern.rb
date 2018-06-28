@@ -4,29 +4,25 @@ module BenefitSponsors
   module Concerns
     module EmployerProfileConcern
       extend ActiveSupport::Concern
-      include StateMachines::EmployerProfileStateMachine
+      # include StateMachines::EmployerProfileStateMachine
       include Config::AcaModelConcern
 
       attr_accessor :broker_role_id
 
       included do
-        ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
-        INACTIVE_STATES ||= ["suspended", "ineligible"]
+        # ACTIVE_STATES   ||= ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+        # INACTIVE_STATES ||= ["suspended", "ineligible"]
 
-        INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
-        INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+        # INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
+        # INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
-        ENROLLED_STATE ||= %w(enrolled suspended)
+        # ENROLLED_STATE ||= %w(enrolled suspended)
 
-        # Workflow attributes
-        field :aasm_state, type: String, default: "applicant"
+        # # Workflow attributes
+        # scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
+        # scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
-        field :xml_transmitted_timestamp, type: DateTime
-
-        scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
-        scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
-
-        delegate :legal_name, :end_on, :entity_kind, to: :organization
+        # delegate :legal_name, :end_on, :entity_kind, to: :organization
         delegate :roster_size, :broker_agency_accounts, to: :active_benefit_sponsorship
       end
 
