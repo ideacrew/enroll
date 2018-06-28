@@ -110,7 +110,7 @@ module BenefitSponsors
     end
 
     def total_messages(record_id)
-      profile = ::BenefitSponsors::Organizations::Profile.find(params[:id])
+      profile = BenefitSponsors::Organizations::Profile.find(record_id)
 
       if profile.primary_broker_role.present?
         person = profile.primary_broker_role.person
