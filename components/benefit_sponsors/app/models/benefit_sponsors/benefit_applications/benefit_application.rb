@@ -50,8 +50,8 @@ module BenefitSponsors
     end
 
     # Calculated Fields for DataTable
-    field :enrolled_summary,        type: Integer,  default: 0
-    field :waived_summary,          type: Integer,  default: 0
+    # field :enrolled_summary,        type: Integer,  default: 0
+    # field :waived_summary,          type: Integer,  default: 0
 
     # Sponsor self-reported number of full-time employees
     field :fte_count,               type: Integer,  default: 0
@@ -653,8 +653,8 @@ module BenefitSponsors
       event :activate_enrollment do
         transitions from:   :enrollment_eligible,
           to:     :active
-        transitions from:   [:denied, :enrollment_closed, :enrollment_ineligible],
-          to:     :expired
+        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
+          to:     :canceled
       end
 
       event :expire do
