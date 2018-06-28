@@ -47,27 +47,18 @@ module SponsoredBenefits
       end
 
       def add_benefit_sponsors_benefit_application
-        quote_plan_year = @benefit_application.to_benefit_sponsors_benefit_application
-
-        if @employer_profile.active_plan_year.present? || @employer_profile.is_converting?
-          quote_plan_year.renew_plan_year if quote_plan_year.may_renew_plan_year?
-        end
-
-        if quote_plan_year.valid? && @employer_profile.valid?
-          @employer_profile.plan_years.each do |plan_year|
-            next unless plan_year.start_on == quote_plan_year.start_on
-            if plan_year.is_renewing?
-              plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
-            else
-              plan_year.cancel! if plan_year.may_cancel?
-            end
+        quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
+        if @organization.active_benefit_sponsorship.active_benefit_application.present? || @organization.active_benefit_sponsorship.is_conversion?
+          enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(quote_benefit_application)
+          status, renewed_benefit_application, results = enrollment_service.renew_application
+          if status
+            renewed_benefit_application
+          else
+            Rails.logger.error { "Unable to renew plan year for #{@organization.legal_name} due to #{results.values.to_sentence}" }
           end
         end
 
-        @employer_profile.plan_years << quote_plan_year
-        @employer_profile.save!
-
-        @employer_profile.census_employees.each do |census_employee|
+        @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
           census_employee.save
         end
       end
