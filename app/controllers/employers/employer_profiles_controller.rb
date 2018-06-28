@@ -404,7 +404,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = []
     @invoices << @employer_profile.organization.try(:documents).to_a
-    invoice_documents = @employer_profile.documents.where(:subject => 'initial_invoice').to_a
+    invoice_documents = @employer_profile.documents.select{ |invoice| ["invoice", "initial_invoice"].include? invoice.subject }
     @invoices << invoice_documents if invoice_documents.present?
     @invoices.flatten!
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
