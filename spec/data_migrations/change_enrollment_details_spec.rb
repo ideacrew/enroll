@@ -122,6 +122,25 @@ describe ChangeEnrollmentDetails do
 
     end
 
+
+    context "change enrollment aasm state" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
+        allow(ENV).to receive(:[]).with("new_aasm_state").and_return "move_to_enrolled"
+        hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
+        hbx_enrollment.reload
+      end
+
+      it "should change the aasm state " do
+        expect(hbx_enrollment.may_move_to_enrolled?).to eq true
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
+      end
+
+    end
+
     context "it should cancel the enrollment when it is eligible for cancelling" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)

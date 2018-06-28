@@ -123,7 +123,7 @@ group :test do
 end
 
 group :production do
-  gem 'eye'
+  gem 'eye', '0.8.0'
   gem 'newrelic_rpm'
   gem 'unicorn', '~> 4.8.3'
 end

@@ -515,7 +515,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+          #allow(hbx_enrollment).to receive_message_chain(:employee_rol,:census_employe).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
@@ -533,6 +535,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -550,6 +553,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
@@ -570,8 +574,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:employee_roles).and_return []
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(hbx_enrollment).to receive(:kind).and_return 'shop'
+          allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
           get :show, id: "hbx_id"
         end
 

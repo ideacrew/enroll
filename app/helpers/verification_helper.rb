@@ -44,7 +44,7 @@ module VerificationHelper
         "warning"
       when "outstanding"
         "danger"
-      when "curam"
+      when "External Source"
         "default"
       when "attested"
         "default"
@@ -172,7 +172,7 @@ module VerificationHelper
   end
 
   def show_v_type(v_type, person, admin = false)
-    verification_type_status(v_type, person, admin).capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+    verification_type_status(v_type, person, admin).split.map(&:capitalize).join(' ').center(12).gsub(' ', '&nbsp;').html_safe
   end
 
   def show_ridp_type(ridp_type, person)
