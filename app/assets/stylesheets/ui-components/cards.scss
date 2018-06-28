@@ -208,7 +208,7 @@
   .tab-pane#level {
     background-color:$primary-white;
     padding:20px;
-    min-height:220px;
+    min-height:370px;
   }
   .tab-pane#plan {
     background-color:$primary-white;
@@ -236,7 +236,7 @@
     background-color:$primary-white;
     overflow-y: scroll;
     .col-xs-12 {
-      min-height:168px;
+      min-height:170px;
       border-bottom:1px solid $primary-dark-gray;
     }
     .col-xs-12:hover {
