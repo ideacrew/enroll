@@ -254,6 +254,8 @@ class BenefitApplicationMigration < Mongoid::Migration
     @benefit_package_map.each do |benefit_group, benefit_package|
       benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
+          census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.profile.id)
+          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.profile.id
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 

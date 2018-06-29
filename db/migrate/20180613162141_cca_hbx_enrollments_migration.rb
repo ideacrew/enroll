@@ -129,7 +129,6 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
 
   def self.new_model_ids_nil? enrollment
     (enrollment.product_id.nil? &&
-    enrollment.issuer_profile_id.nil? &&
     enrollment.benefit_sponsorship_id.nil? &&
     enrollment.sponsored_benefit_package_id.nil? &&
     enrollment.sponsored_benefit_id.nil? &&
