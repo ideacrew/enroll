@@ -46,6 +46,22 @@ module BenefitSponsors
       raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
     end
 
+    def show_oop_pdf_link(aasm_state)
+      false
+    end
+
+    def eligibility_criteria(employer)
+      "Ineligible"
+    end
+
+    def env_bucket_name(bucket_name)
+      aws_env = ENV['AWS_ENV'] || "qa"
+    end
+
+    def get_header_text(controller_name)
+      'Test'
+    end
+
     def render_flash
       rendered = []
       flash.each do |type, messages|
