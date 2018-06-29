@@ -56,6 +56,10 @@ module BenefitSponsors
         end
       end
 
+      def is_new_employer?
+        !latest_benefit_sponsorship.renewal_benefit_application.present?
+      end
+
       def primary_office_location
         office_locations.detect(&:is_primary?)
       end
