@@ -91,7 +91,7 @@ module Notifier
 
     def enrollment_plan_name
       if enrollment.present?
-        merge_model.enrollment.plan_name = enrollment.plan.name
+        merge_model.enrollment.plan_name = enrollment.product.name
       end
     end
 
@@ -155,13 +155,13 @@ module Notifier
 
     def census_employee_latest_terminated_health_enrollment_plan_name
       if latest_terminated_health_enrollment.present?
-        merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.plan.name
+        merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.product.name
       end
     end
 
     def census_employee_latest_terminated_dental_enrollment_plan_name
       if latest_terminated_dental_enrollment.present?
-        merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.plan.name
+        merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.product.name
       end
     end
 
