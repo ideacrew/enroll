@@ -22,7 +22,7 @@ attributes: !ruby/hash:BSON::Document
     name: employee_only
     display_name: Employee Only
     order: 0
-    default_contribution_factor: 0.75
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -47,7 +47,7 @@ attributes: !ruby/hash:BSON::Document
     name: family
     display_name: Family
     order: 1
-    default_contribution_factor: 0.5
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId

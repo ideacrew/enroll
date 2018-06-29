@@ -45,6 +45,7 @@ site:
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
   mail_address: "noreply@healthconnector.org"
+  privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
 
   social_media:
     facebook_url: ""

@@ -114,6 +114,7 @@ javascript:
   
   function radioSelected(element) {
     setCircle(element)
+    disablePlanYearButton()
   }
   
   function setCircle(element) {
@@ -213,7 +214,7 @@ javascript:
           <div class="row sc-container">
             <div class="col-xs-12 ml-2 mt-2">
               <label class="container ml-1">${contribution.display_name}
-                <input type="checkbox" checked="checked" id="${attrPrefix}[is_offered]" class="contribution_handler" name="${attrPrefix}[is_offered]" type="checkbox" value="${contribution}["is_offered"]">
+                <input type="checkbox" checked="checked" id="${attrPrefix}[is_offered]" class="contribution_handler" name="${attrPrefix}[is_offered]" type="checkbox" onchange="contributionAmounts(this)" value="${contribution}["is_offered"]" data-displayname="${contribution.display_name}">
                 <span class="checkmark"></span>
               </label>
             </div>
@@ -222,7 +223,7 @@ javascript:
         <div class="col-xs-6">
           <div class="col-xs-3">
             <input id="${attrPrefix}[display_name]" name="${attrPrefix}[display_name]" type="hidden" value="${contribution}["display_name"]">
-            <input type="number" id="${contribution.id}" name="${attrPrefix}[contribution_factor]" value="${(contribution["contribution_factor"] * 100)}">
+            <input type="number" id="${contribution.id}" name="${attrPrefix}[contribution_factor]" value="${(contribution["contribution_factor"] * 100)}" onchange="setInputSliderValue(this)" data-displayname="${contribution.display_name}" data-contribution-input=true>
           </div>
           <div class="col-xs-9">
             <input type="range" min="0" max="100" value="${(contribution["contribution_factor"] * 100)}" step="5" class="slider" id="${contribution.id}" onchange="setInputValue(this)" data-id="${contribution.id}" data-name="${contribution.display_name}">
@@ -277,6 +278,11 @@ javascript:
     document.getElementById(element.dataset.id).value = element.value;
     contributionAmounts(element)
   }
+
+  function setInputSliderValue(element) {
+    document.querySelector("[data-id='"+element.id+"']").value = element.value
+    contributionAmounts(element)
+  }
   
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
@@ -300,32 +306,79 @@ javascript:
     savePlanYearButton.classList.remove('disabled')
   }
   
-  var eeContribution = Number;
-  var spouse = Number;
-  var domesticPartner = Number;
-  var childUnder26 = Number;
+  var eeContribution;
+  var spouse;
+  var domesticPartner;
+  var childUnder26;
+  var employeeOnly;
+  var familyOnly;
+  var contributionInputs;
   
   function contributionAmounts(element) {
-    var sliderName = element.dataset.name;
-    var sliderValue = element.value;
+    contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
+    contributionHandlers = document.querySelectorAll(".contribution_handler")
 
-    switch (sliderName) {
-      case 'Employee':
-        eeContribution = sliderValue;
-      break;
-      case 'Spouse':
-        spouse = sliderValue;
-      break;
-      case 'Domestic Partner':
-        domesticPartner = sliderValue;
-      break;
-      case 'Child Under 26':
-        childUnder26 = sliderValue;
-      break;
-    }
-    if (eeContribution < 50) {
+    contributionInputs.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          eeContribution = element.value;
+        break;
+        case 'Spouse':
+          spouse = element.value;
+        break;
+        case 'Domestic Partner':
+          domesticPartner = element.value;
+        break;
+        case 'Child Under 26':
+          childUnder26 = element.value;
+        break;
+        case 'Employee Only':
+          employeeOnly = element.value;
+        break;
+        case 'Family':
+          familyOnly = element.value;
+        break;
+      }
+    })
+
+    contributionHandlers.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          if(!(element.checked)) {
+            eeContribution = 100
+          }
+        break;
+        case 'Spouse':
+          if(!(element.checked)) {
+            spouse = 100
+          }
+        break;
+        case 'Domestic Partner':
+          if(!(element.checked)) {
+            domesticPartner = 100
+          }
+        break;
+        case 'Child Under 26':
+          if(!(element.checked)) {
+            childUnder26 = 100
+          }
+        break;
+        case 'Employee Only':
+          if(!(element.checked)) {
+            employeeOnly = 100
+          }
+        break;
+        case 'Family':
+          if(!(element.checked)) {
+            familyOnly = 100
+          }
+        break;
+      }
+    })
+
+    if (eeContribution < 50 || employeeOnly < 50) {
       disablePlanYearButton()
-    } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+    } else if (familyOnly < 50 || spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
       disablePlanYearButton()
     } else {
       enablePlanYearButton()
@@ -338,11 +391,3 @@ javascript:
     $('#viewSummaryModal').modal('show');
     $('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent')
   }
-  
-  
-
-
-  
-  
-
-  
