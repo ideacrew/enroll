@@ -97,7 +97,7 @@
         def er_state(row)
           return 'N/A' if row.is_prospect?
           return 'Former Client' if row.broker_relationship_inactive?
-          row.employer_profile.aasm_state.capitalize
+          row.employer_profile.organization.active_benefit_sponsorship.aasm_state.capitalize
         end
 
         def er_fein(row)
