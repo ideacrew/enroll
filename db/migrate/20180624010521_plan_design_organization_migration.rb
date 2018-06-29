@@ -12,7 +12,7 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
       CSV.open(file_name, 'w') do |csv|
         csv << field_names
 
-        # update_plan_design_organization(csv, logger)
+        update_plan_design_organization(csv, logger)
 
         puts "" unless Rails.env.test?
         puts "Check plan_design_migration_data logs & plan_design_migration_status csv for additional information." unless Rails.env.test?
@@ -43,7 +43,7 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
 
     pdos.batch_size(1000).no_timeout.all.each do |pdo|
 
-      next unless (pdo.owner_profile_class_name == "::BrokerAgencyProfile") && (pdo.sponsor_profile_class_name == "::EmployerProfile")
+      next unless (pdo.owner_profile_class_name == "::BrokerAgencyProfile")
 
       total += 1
 
@@ -64,30 +64,36 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
           end
         end
 
-        pdo.history_owner_profile_id = pdo.owner_profile_id
-        pdo.history_owner_profile_class_name = pdo.owner_profile_class_name
-        pdo.history_sponsor_profile_id = pdo.sponsor_profile_id
-        pdo.history_sponsor_profile_class_name = pdo.sponsor_profile_class_name
+        if owner_profile_id.present?
+          pdo.past_owner_profile_id = pdo.owner_profile_id
+          pdo.past_owner_profile_class_name = pdo.owner_profile_class_name
+          pdo.past_sponsor_profile_id = pdo.sponsor_profile_id
+          pdo.past_sponsor_profile_class_name = pdo.sponsor_profile_class_name
+          pdo.save!(validate: false)
 
-        pdo.owner_profile_id = owner_profile_id if owner_profile_id.present?
-        pdo.owner_profile_class_name = "::BenefitSponsors::Organizations::Profile"
-        pdo.sponsor_profile_id = sponsor_profile_id if sponsor_profile_id.present?
-        pdo.sponsor_profile_class_name = "::BenefitSponsors::Organizations::Profile"
-
-        pdo.save!(validate: false)
-        success += 1
-        print '.' unless Rails.env.test?
-        csv << [pdo.legal_name, pdo.id, "updated", pdo.owner_profile_id, pdo.sponsor_profile_id]
+          pdo.owner_profile_id = owner_profile_id
+          pdo.owner_profile_class_name = "::BenefitSponsors::Organizations::Profile"
+          pdo.sponsor_profile_id = sponsor_profile_id if sponsor_profile_id.present?
+          pdo.sponsor_profile_class_name = "::BenefitSponsors::Organizations::Profile" if sponsor_profile_id.present?
+          pdo.save!(validate: false)
+          success += 1
+          print '.' unless Rails.env.test?
+          csv << [pdo.legal_name, pdo.id, "updated", pdo.owner_profile_id, pdo.sponsor_profile_id]
+        else
+          failed += 1
+          print 'S' unless Rails.env.test?
+          csv << [pdo.legal_name, pdo.id, "skipped as no matching owner_profile_id present in new model", pdo.owner_profile_id, pdo.sponsor_profile_id]
+        end
 
       rescue Exception => e
         failed += 1
         print 'F' unless Rails.env.test?
-        csv << [pdo.legal_name, pdo.id, "updated", pdo.owner_profile_id, pdo.sponsor_profile_id]
+        csv << [pdo.legal_name, pdo.id, e.inspect.to_s, pdo.owner_profile_id, pdo.sponsor_profile_id]
         logger.error "update failed for: #{pdo.id}, #{e.inspect}" unless Rails.env.test?
       end
     end
     logger.info " Total #{total} plan design organizations to be migrated" unless Rails.env.test?
     logger.info " #{success} plan design organizations updated at this point." unless Rails.env.test?
-    logger.info " #{failed} plan design organizations updated at this point." unless Rails.env.test?
+    logger.info " #{failed} plan design organizations not migrated at this point." unless Rails.env.test?
   end
 end
