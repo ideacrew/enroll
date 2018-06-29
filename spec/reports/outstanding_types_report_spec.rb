@@ -10,6 +10,10 @@ describe OutstandingTypesReport do
     @file = "#{Rails.root}/app/reports/outstanding_types_report.csv"
   end
 
+  after do
+    File.delete(@file) if File.exist?(@file)
+  end
+
   it "creates csv file" do
     file_context = CSV.read(@file)
     expect(file_context.size).to be > 0
