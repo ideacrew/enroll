@@ -47,6 +47,7 @@ javascript:
   function checkOLKind(element) {
     var addressKind = element.value;
     var row = element.closest(".row").nextSibling.nextSibling;
+    console.log(addressKind)
     if (addressKind == "primary") {
       row.querySelector('#inputCounty').setAttribute('required', true);
       row.querySelector('#inputCounty').setAttribute('disabled', true);
@@ -58,11 +59,20 @@ javascript:
       row.querySelector('#inputZip').removeAttribute('data-action');
       row.querySelector('#inputZip').removeAttribute('required');
       row.querySelector('#inputZip').removeAttribute('data-options');
+      // removes blank option from select options
+      setTimeout(function() {
+        element.options[0].remove()
+      },300)
     }
+  }
+  
+  function checkKind(element) {
+    checkOLKind(element)
   }
   
   (function() {
     var element = document.getElementById('kindSelect');
-    checkOLKind(element)
+    var value = element.value;
+    checkKind(element, value)
   })();
   
