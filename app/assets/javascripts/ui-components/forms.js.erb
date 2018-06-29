@@ -58,6 +58,10 @@ function addOfficeLocation() {
     input.value = ''
     input.setAttribute('disabled',true)
   })
+  // Sets validations if kind is empty for new office location
+  var element = newOfficeField.querySelector('#kindSelect');
+  var defaultValue = newOfficeField.querySelector('#kindSelect').value;
+  checkKind(element, defaultValue)
 }
 
 function removeOfficeLocation() {
