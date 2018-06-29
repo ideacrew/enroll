@@ -60,7 +60,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
           if existing_new_organizations.count == 0
             @old_profile = old_org.employer_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :profile_source, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+            json_data = @old_profile.to_json(:except => [:_id,:xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
             old_profile_params = JSON.parse(json_data)
 
             @new_profile = initialize_new_profile(old_org, old_profile_params)
@@ -115,7 +115,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
   end
 
   def self.find_new_organization(old_org)
-    BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id)
+    BenefitSponsors::Organizations::Organization.where(fein: old_org.fein)
   end
 
   def self.initialize_new_profile(old_org, old_profile_params)
