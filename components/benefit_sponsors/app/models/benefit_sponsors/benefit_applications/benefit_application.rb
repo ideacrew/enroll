@@ -748,6 +748,14 @@ module BenefitSponsors
       all_enrolled_and_waived_member_count
     end
 
+    def enrollment_ratio
+      if members_eligible_to_enroll_count == 0
+        0
+      else
+        ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+      end
+    end
+
     def total_enrolled_count
       warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
       all_enrolled_and_waived_member_count

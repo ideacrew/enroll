@@ -145,9 +145,9 @@ module Notifier
 
     def benefit_application_enrollment_errors
       enrollment_errors = []
-      plan_year = (renewal_benefit_application || current_benefit_application)
-      if plan_year.present?
-        plan_year.enrollment_errors.each do |k, _|
+      benefit_application = (renewal_benefit_application || current_benefit_application)
+      if benefit_application.present?
+        benefit_application.enrollment_errors.each do |k, _|
           case k.to_s
           when "enrollment_ratio"
             enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
