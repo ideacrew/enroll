@@ -394,6 +394,11 @@ module BenefitSponsors
       total_enrolled    -= families_to_filter
     end
 
+    def hbx_enrollments
+      @hbx_enrollments = [] if benefit_packages.size == 0
+      @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
     def enrolled_non_business_owner_members
       return @enrolled_non_business_owner_members if defined? @enrolled_non_business_owner_members
 

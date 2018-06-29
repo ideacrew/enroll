@@ -171,7 +171,7 @@ module Notifier
     end
 
     def recipient_name
-      if resource.is_a?(EmployerProfile)
+      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
         return resource.staff_roles.first.full_name.titleize
       end
 
@@ -181,7 +181,7 @@ module Notifier
     end
 
     def recipient_to
-      if resource.is_a?(EmployerProfile)
+      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
         return resource.staff_roles.first.work_email_or_best
       end
 
@@ -196,7 +196,7 @@ module Notifier
     end
 
     def send_generic_notice_alert_to_broker
-      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
+      if resource.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile) && resource.broker_agency_profile.present?
         broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
         broker_email = resource.broker_agency_profile.primary_broker_role.email_address
         UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now

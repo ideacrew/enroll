@@ -1202,6 +1202,13 @@ class HbxEnrollment
     end
   end
 
+  def self.all_enrollments_under_benefit_application(benefit_application)
+    id_list = benefit_application.benefit_packages.collect(&:_id).uniq
+    benefit_application.enrolled_families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => id_list).enrolled_and_renewing.to_a
+    end
+  end
+
   def self.enrolled_shop_health_benefit_group_ids(benefit_group_assignment_list)
     return [] if benefit_group_assignment_list.empty?
     enrollment_list = []
