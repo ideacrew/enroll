@@ -49,7 +49,7 @@ module Notifier
           sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
           employer_contribution_amount << _cont.to_i
         end
-        merge_model.benefit_application.monthly_employer_contribution_amount = number_to_currency(employer_contribution_amount.sum))
+        merge_model.benefit_application.monthly_employer_contribution_amount = number_to_currency(employer_contribution_amount.sum)
       end
     end
 
@@ -111,7 +111,7 @@ module Notifier
 
     def benefit_application_binder_payment_due_date
       if current_benefit_application.present?
-        schedular =  BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(current_benefit_application.start_on))
       end
     end
