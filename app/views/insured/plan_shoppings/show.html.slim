@@ -224,12 +224,14 @@ javascript:
     deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
     deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
 
-    availableEnrollments.filter(function(enrollment) {
-      deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
-      if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
-        resultsArray.push(enrollment);
-      }
-    })
+    if (selections.deductibleFromAmountValue != ""){
+      availableEnrollments.filter(function(enrollment) {
+        deductible = parseFloat(enrollment.product.deductible.replace(',','').replace('$','')).toFixed(0);
+        if (Number(deductible) >= Number(deductibleFrom) && Number(deductible) <= Number(deductibleTo)) {
+          resultsArray.push(enrollment);
+        }
+      })
+    }
 
     if (selections.selectedHSA) {
       var hsa = Boolean;
