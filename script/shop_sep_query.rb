@@ -77,7 +77,7 @@ term_ids = Family.collection.aggregate([
 ]).map { |rec| rec["_id"] }
 
 def is_valid_benefit_application?(benefit_application)
- ["enrollment_eligible", "active", "terminated","expired"].include?(benefit_application.aasm_state)
+ ["enrollment_eligible", "active", "terminated","expired"].include?(benefit_application.aasm_state.to_s)
 end
 
 def term_states
