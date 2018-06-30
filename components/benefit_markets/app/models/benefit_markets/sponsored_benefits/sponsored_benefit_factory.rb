@@ -14,7 +14,7 @@ module BenefitMarkets
         validate_product_package_kind!(new_product_package_kind)
 
         @sponsored_benefit.product_package = product_package_class_name.constantize.new
-        @product_package_kind = product_package_kind
+        @product_package_kind = new_product_package_kind
       end
 
       def sponsored_benefit
@@ -36,7 +36,7 @@ module BenefitMarkets
       def set_sponsored_benefit
         if @product_kind.present? && @product_package_kind.present?
           namespace = namespace_for(self)
-        end        
+        end
       end
 
       def add_contribution_model(new_contribution_model)
