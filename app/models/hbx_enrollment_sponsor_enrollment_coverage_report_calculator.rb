@@ -24,6 +24,12 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 		def initialize(he_id_list, s_benefit)
 			@hbx_enrollment_id_list = he_id_list
 			@sponsored_benefit = s_benefit
+			@issuer_profile_id_map = {}
+			@active_year_map = {}
+			::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+				@issuer_profile_id_map[rec.first] = rec[1]
+				@active_year_map[rec.first] = rec.last["min"].year
+			end
 		end
 
 		def each
@@ -52,7 +58,6 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
 							"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
 							"_id" => "$households.hbx_enrollments._id",
               "product_id" => "$households.hbx_enrollments.product_id",
-							"issuer_profile_id" => "$households.hbx_enrollments.issuer_profile_id",
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
               "kind" => "$households.hbx_enrollments.kind"
 						},
@@ -172,8 +177,8 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       end
       product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
-            enrollment_record["hbx_enrollment"]["issuer_profile_id"],
-            enrollment_record["hbx_enrollment"]["effective_on"].year
+            @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
           )
       contribution_prohibited = (enrollment_record["hbx_enrollment"]["kind"].to_s == "employer_sponsored_cobra")
       group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
