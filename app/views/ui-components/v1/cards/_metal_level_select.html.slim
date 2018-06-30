@@ -111,6 +111,8 @@ javascript:
   var referencePlanID = String;
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
+  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+  var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
   
   function radioSelected(element) {
     setCircle(element)
@@ -376,9 +378,9 @@ javascript:
       }
     })
 
-    if (eeContribution < 50 || employeeOnly < 50) {
+    if (eeContribution < erCL || employeeOnly < erCL) {
       disablePlanYearButton()
-    } else if (familyOnly < 50 || spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+    } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
       disablePlanYearButton()
     } else {
       enablePlanYearButton()
