@@ -3,6 +3,9 @@ module BenefitSponsors
     class Document
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::BenefitSponsors::ModelEvents::Document
+      include BenefitSponsors::Concerns::Observable
+      include Config::AcaModelConcern
 
       SUBJECT_KINDS = %w(
                           urn:openhbx:documents:v1::employer#invoice
@@ -11,6 +14,8 @@ module BenefitSponsors
                       )
                       
       ACCESS_RIGHTS = %w(public pii_restricted)
+
+      after_save :notify_on_save
 
       belongs_to :documentable, polymorphic: true
 

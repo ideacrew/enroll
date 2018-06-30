@@ -12,7 +12,7 @@ module BenefitSponsors
         current_date = TimeKeeper.date_of_record
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-        if BenefitSponsors::BenefitApplication::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        if BenefitSponsors::ModelEvents::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
           benefit_application = new_model_event.klass_instance
 
           if new_model_event.event_key == :renewal_application_denied
@@ -63,19 +63,19 @@ module BenefitSponsors
             end
           end
           
-          if new_model_event.event_key == :ineligible_initial_application_submitted
-            if (benefit_application.application_eligibility_warnings.include?(:primary_office_location) || benefit_application.application_eligibility_warnings.include?(:fte_count))
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_initial_eligibility_denial_notice")
-            end
-          end
-
-          if new_model_event.event_key == :ineligible_renewal_application_submitted
-            if benefit_application.application_eligibility_warnings.include?(:primary_office_location)
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
-              benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
-                if ce.employee_role.present?
-                  deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
+          if new_model_event.event_key == :ineligible_application_submitted
+            if benefit_application.is_renewing?
+              if benefit_application.application_eligibility_warnings.include?(:primary_office_location)
+                deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
+                benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                  if ce.employee_role.present?
+                    deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
+                  end
                 end
+              end
+            else
+              if (benefit_application.application_eligibility_warnings.include?(:primary_office_location) || benefit_application.application_eligibility_warnings.include?(:fte_count))
+                deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_initial_eligibility_denial_notice")
               end
             end
           end
@@ -188,7 +188,7 @@ module BenefitSponsors
       def document_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-        if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        if BenefitSponsors::ModelEvents::Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
           document = new_model_event.klass_instance
           if new_model_event.event_key == :initial_employer_invoice_available
             employer_profile = document.documentable
@@ -205,7 +205,7 @@ module BenefitSponsors
 
       def benefit_application_date_change(model_event)
         current_date = TimeKeeper.date_of_record
-        if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
+        if BenefitSponsors::ModelEvents::BenefitApplication::DATA_CHANGE_EVENTS.include?(model_event.event_key)
 
           if model_event.event_key == :low_enrollment_notice_for_employer
             BenefitSponsors::Queries::NoticeQueries.organizations_for_low_enrollment_notice(current_date).each do |benefit_sponsorship|
@@ -213,7 +213,7 @@ module BenefitSponsors
                benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_open).first
                #exclude congressional employees
                 next if ((benefit_application.benefit_packages.any?{|bg| bg.is_congress?}) || (benefit_application.effective_period.min.yday == 1))
-                if benefit_application.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+                if benefit_application.enrollment_ratio < benefit_application.benefit_market.configuration.ee_ratio_min
                   deliver(recipient: benefit_sponsorship.employer_profile, event_object: benefit_application, notice_event: "low_enrollment_notice_for_employer")
                 end
               end
