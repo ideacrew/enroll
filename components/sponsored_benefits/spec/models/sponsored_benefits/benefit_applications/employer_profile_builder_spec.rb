@@ -17,10 +17,7 @@ module SponsoredBenefits
       }
     end
 
-    context "add_plan_year" do
-
-      let(:employer_profile)          { EmployerProfile.new(entity_kind:'governmental_employer',sic_code:'01330') }
-      let!(:organization)              { Organization.create(employer_profile:employer_profile) }
+    context "add_benefit_sponsors_benefit_application" do
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",
@@ -36,34 +33,45 @@ module SponsoredBenefits
         )
       }
 
+      let(:benefit_market)      { site.benefit_markets.first }
+      let(:current_effective_date)  { TimeKeeper.date_of_record }
+      let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+                                              benefit_market: benefit_market,
+                                              title: "SHOP Benefits for #{current_effective_date.year}",
+                                              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+                                      }
+      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_sponsor_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:sponsor_benefit_sponsorship) { benefit_sponsor_organization.employer_profile.add_benefit_sponsorship }
+
       let(:plan_design_organization)  { SponsoredBenefits::Organizations::PlanDesignOrganization.new(legal_name: "xyz llc", office_locations: [office_location]) }
       let(:plan_design_proposal)      { SponsoredBenefits::Organizations::PlanDesignProposal.new(title: "New Proposal") }
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
-      let!(:relationship_benefits) do
-          [
-            ::RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
-            ::RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
-            ::RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
-          ]
-        end
-      let(:plan) {::Plan.create}
+
+      let(:product)  { FactoryGirl.create :benefit_markets_products_health_products_health_product }
+      let(:plan )    { FactoryGirl.create(:plan, hios_id: product.hios_id) }
+      let(:benefit_group)             { FactoryGirl.create(:benefit_group, reference_plan_id: plan.id) }
 
       before(:each) do
+        sponsor_benefit_sponsorship.rating_area = rating_area
+        sponsor_benefit_sponsorship.service_areas = [service_area]
+        sponsor_benefit_sponsorship.save
         plan_design_organization.plan_design_proposals << [plan_design_proposal]
         plan_design_proposal.profile = profile
         profile.benefit_sponsorships = [benefit_sponsorship]
         benefit_sponsorship.benefit_applications = [benefit_application]
-        benefit_application.benefit_groups.build(relationship_benefits: relationship_benefits, reference_plan_id: plan.id, plan_option_kind: "single_plan", elected_plan_ids: [plan.id])
+        benefit_application.benefit_groups << benefit_group
         plan_design_organization.save
       end
 
       it "should successfully add plan year to employer profile with published quote" do
-        allow(employer_profile).to receive(:active_plan_year).and_return(nil)
         plan_design_proposal.publish!
-        builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(plan_design_proposal, employer_profile)
-        expect(employer_profile.plan_years.present?).to eq false
-        builder.add_plan_year
-        expect(employer_profile.plan_years.present?).to eq true
+        builder = SponsoredBenefits::BenefitApplications::EmployerProfileBuilder.new(plan_design_proposal, benefit_sponsor_organization)
+        expect(benefit_sponsor_organization.active_benefit_sponsorship.benefit_applications.present?).to eq false
+        builder.add_benefit_sponsors_benefit_application
+        expect(benefit_sponsor_organization.active_benefit_sponsorship.benefit_applications.present?).to eq true
       end
     end
   end
