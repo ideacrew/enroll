@@ -102,7 +102,9 @@ module BenefitSponsors
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
 
-      before_save :generate_hbx_id
+      before_save  :generate_hbx_id
+      after_update :notify_observers
+
 
       index({ legal_name: 1 })
       index({ dba: 1 },   { sparse: true })

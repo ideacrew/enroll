@@ -3,8 +3,6 @@ module BenefitSponsors
     extend ActiveSupport::Concern
 
     included do
-      after_update :notify_observers
-
       def notify_observers(args={})
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|

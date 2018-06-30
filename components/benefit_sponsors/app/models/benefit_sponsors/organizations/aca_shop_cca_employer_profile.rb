@@ -15,6 +15,8 @@ module BenefitSponsors
 
       add_observer BenefitSponsors::Observers::EmployerProfileObserver.new
 
+      after_update :notify_observers
+
       # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
