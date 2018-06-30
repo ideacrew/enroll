@@ -42,7 +42,8 @@ purchase_ids = Family.collection.aggregate([
         }
       }
     },
-    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds}
+    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds},
+    "households.hbx_enrollments.sponsored_benefit_id" => {"$ne" => nil}
   }},
   {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
@@ -71,7 +72,8 @@ term_ids = Family.collection.aggregate([
         }
       }
     },
-    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds}
+    "households.hbx_enrollments.kind" => {"$in" => enrollment_kinds},
+    "households.hbx_enrollments.sponsored_benefit_id" => {"$ne" => nil}
   }},
   {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
 ]).map { |rec| rec["_id"] }
