@@ -1,7 +1,7 @@
 #addressDetails
   .row.pl-1
     h4 Office Location
-  .row[data-controller='zip-check']
+  .row
     .col-md-9.col-sm-6.col-xs-12
       label for="inputAddress1" Address
       = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
@@ -47,7 +47,6 @@ javascript:
   function checkOLKind(element) {
     var addressKind = element.value;
     var row = element.closest(".row").nextSibling.nextSibling;
-    console.log(addressKind)
     if (addressKind == "primary") {
       row.querySelector('#inputCounty').setAttribute('required', true);
       row.querySelector('#inputCounty').setAttribute('disabled', true);
