@@ -16,10 +16,11 @@ module BenefitSponsors
       # TODO: Add logic to manage benefit sponsorships for Gapped coverage, early termination, banned employers
 
       # Share common attributes across all Profile kinds
-      delegate :hbx_id,                                 to: :organization, allow_nil: false
-      delegate :legal_name,               :legal_name=, to: :organization, allow_nil: false
-      delegate :dba,                      :dba=,        to: :organization, allow_nil: true
-      delegate :fein,                     :fein=,       to: :organization, allow_nil: true
+      delegate :hbx_id,                   to: :organization, allow_nil: false
+      delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
+      delegate :dba,        :dba=,        to: :organization, allow_nil: true
+      delegate :fein,       :fein=,       to: :organization, allow_nil: true
+      delegate :entity_kind,              to: :organization, allow_nil: true
 
       embeds_many :office_locations,
                   class_name:"BenefitSponsors::Locations::OfficeLocation"
@@ -53,6 +54,10 @@ module BenefitSponsors
             benefit_sponsorship.profile_event_subscriber(:primary_office_location_change)
           end
         end
+      end
+
+      def is_new_employer?
+        !latest_benefit_sponsorship.renewal_benefit_application.present?
       end
 
       def primary_office_location

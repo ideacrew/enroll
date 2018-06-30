@@ -49,7 +49,6 @@ module BenefitSponsors
       end
 
       def eligible_on(date_of_hire) # date_of_hire probation type is deprecated
-        return (date_of_hire.end_of_month + 1.day) if effective_on_offset == 1
         return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
 
         (date_of_hire + effective_on_offset.days).end_of_month + 1.day
@@ -122,8 +121,7 @@ module BenefitSponsors
 
       def effective_on_offset
         offset_mapping = {
-          date_of_hire: 0,
-          first_of_month: 1,
+          first_of_month: 0,
           first_of_month_after_30_days: 30,
           first_of_month_after_60_days: 60
         }

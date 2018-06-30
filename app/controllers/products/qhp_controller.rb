@@ -50,7 +50,7 @@ class Products::QhpController < ApplicationController
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
     # @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.plan)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-    @member_group = sponsored_cost_calculator.groups_for_products([@qhp.plan]).first
+    @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
 
     respond_to do |format|
       format.html

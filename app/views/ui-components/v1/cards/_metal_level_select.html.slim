@@ -39,37 +39,41 @@
         .tab-content
           .tab-pane.fade#carrier role="tabpanel"
             h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+            br
             - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
                 .col-xs-12 style="min-height:130px"
-                  .col-xs-3
+                  label.container 
+                    = issuer_name
                     = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: issuer_name}
-                  .col-xs-9
-                    h5.heading-text = issuer_name
+                    span.checkmark
               
           .tab-pane.fade#level role="tabpanel"
             h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.
+            br
             - @benefit_package_form.catalog.metal_levels.each do |kind|
               .col-xs-3.metals
                 .col-xs-12
-                  .col-xs-3
+                  label.container 
+                    = kind
                     = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: kind}
-                  .col-xs-9
-                    h5.heading-text = kind
+                    span.checkmark
                     
           .tab-pane.fade#plan role="tabpanel"
             h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?
+            br
             - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
                 .col-xs-12
-                  .col-xs-3
+                  label.container 
+                    = carrier_name
                     = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: carrier_name}
-                  .col-xs-9
-                    h5.heading-text = carrier_name
+                    span.checkmark
+                
         
         #referencePlans.hidden
-          h2.heading-text.pt-1 Select Your Reference Plan
+          h2.heading-text.pt-1.float-left Select Your Reference Plan
 
           h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
           #yourPlans
@@ -107,9 +111,12 @@ javascript:
   var referencePlanID = String;
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
+  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+  var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
   
   function radioSelected(element) {
     setCircle(element)
+    disablePlanYearButton()
   }
   
   function setCircle(element) {
@@ -120,6 +127,7 @@ javascript:
     for (item of items) {
       if (item.querySelector('.fa-dot-circle')) {
         item.querySelector('.fa-dot-circle').classList.toggle('fa-circle')
+        item.querySelector('a').classList.remove('active')
       }
     
       if (item.innerText == element.innerText) {
@@ -128,6 +136,7 @@ javascript:
         productOptionKind = element.querySelector('a').dataset.name;
         // Sets kind to hidden input field for form submission
         document.getElementById('ppKind').setAttribute('value', productOptionKind)
+        item.querySelector('a').classList.add('active')
       }
     }
   }
@@ -169,17 +178,16 @@ javascript:
         div.innerHTML =
         `<div class="col-xs-4 reference-plans">
           <div class="col-xs-12 p0 mb-1">
-            <div class="col-xs-3 p0">
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
-            </div>
-            <div class="col-xs-9 p0 rp-info mb-1">
+            <label class="container">
               <p class="heading-text reference-plan-title mb-1"> ${plan.title}</p>
               <span class="plan-label">Type:</span> <span class="rp-plan-info">${plan.health_plan_kind}</span><br>
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
-              <span class="plan-label">Network:</span><br>
+              <span class="plan-label">Network:</span> <span class="rp-plan-info">Nationwide</span><br>
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}">View Summary</span><br>
-            </div>
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
+              <span class="checkmark"></span>
+            </label>
           </div>
         </div>
         `
@@ -201,23 +209,30 @@ javascript:
       var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
       var div = document.createElement('div')
       div.setAttribute('id', 'yourAvailableContributions')
-      div.innerHTML = '<div class="row">\
-        <input id="' + attrPrefix + '[id]" name="' + attrPrefix + '[id]" type="hidden" value="' + contribution['id'] + '" />\
-        <div class="col-xs-6 pr-3">\
-          <div class="row ml-1">\
-            <input checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" type="checkbox" value="' + contribution["is_offered"] +'" /> <label>' +contribution.display_name+'</label>\
-          </div>\
-        </div>\
-        <div class="col-xs-6">\
-          <div class="col-xs-3">\
-            <input id="' + attrPrefix + '[display_name]" name="' + attrPrefix + '[display_name]" type="hidden" value="' + contribution["display_name"] + '" />\
-            <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '">\
-          </div>\
-          <div class="col-xs-9">\
-            <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-name="'+contribution.display_name+'">\
-          </div>\
-        </div>\
-      </div>'
+      div.innerHTML =
+      `<div class="row">
+        <input id="${attrPrefix}[id]" name="${attrPrefix}[id]" type="hidden" value="${contribution}['id']">
+         <div class="col-xs-6 pr-3">
+          <div class="row sc-container">
+            <div class="col-xs-12 ml-2 mt-2">
+              <label class="container ml-1">${contribution.display_name}
+                <input type="checkbox" checked="checked" id="${attrPrefix}[is_offered]" class="contribution_handler" name="${attrPrefix}[is_offered]" type="checkbox" onchange="contributionAmounts(this)" value="${contribution}["is_offered"]" data-displayname="${contribution.display_name}">
+                <span class="checkmark"></span>
+              </label>
+            </div>
+          </div>
+         </div>
+        <div class="col-xs-6">
+          <div class="col-xs-3">
+            <input id="${attrPrefix}[display_name]" name="${attrPrefix}[display_name]" type="hidden" value="${contribution}["display_name"]">
+            <input type="number" id="${contribution.id}" name="${attrPrefix}[contribution_factor]" value="${(contribution["contribution_factor"] * 100)}" onchange="setInputSliderValue(this)" data-displayname="${contribution.display_name}" data-contribution-input=true>
+          </div>
+          <div class="col-xs-9">
+            <input type="range" min="0" max="100" value="${(contribution["contribution_factor"] * 100)}" step="5" class="slider" id="${contribution.id}" onchange="setInputValue(this)" data-id="${contribution.id}" data-name="${contribution.display_name}">
+          </div>
+        </div>
+       </div>
+      `
       element.append(div)
     }
   }
@@ -265,6 +280,11 @@ javascript:
     document.getElementById(element.dataset.id).value = element.value;
     contributionAmounts(element)
   }
+
+  function setInputSliderValue(element) {
+    document.querySelector("[data-id='"+element.id+"']").value = element.value
+    contributionAmounts(element)
+  }
   
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
@@ -288,32 +308,79 @@ javascript:
     savePlanYearButton.classList.remove('disabled')
   }
   
-  var eeContribution = Number;
-  var spouse = Number;
-  var domesticPartner = Number;
-  var childUnder26 = Number;
+  var eeContribution;
+  var spouse;
+  var domesticPartner;
+  var childUnder26;
+  var employeeOnly;
+  var familyOnly;
+  var contributionInputs;
   
   function contributionAmounts(element) {
-    var sliderName = element.dataset.name;
-    var sliderValue = element.value;
+    contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
+    contributionHandlers = document.querySelectorAll(".contribution_handler")
 
-    switch (sliderName) {
-      case 'Employee':
-        eeContribution = sliderValue;
-      break;
-      case 'Spouse':
-        spouse = sliderValue;
-      break;
-      case 'Domestic Partner':
-        domesticPartner = sliderValue;
-      break;
-      case 'Child Under 26':
-        childUnder26 = sliderValue;
-      break;
-    }
-    if (eeContribution < 50) {
+    contributionInputs.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          eeContribution = element.value;
+        break;
+        case 'Spouse':
+          spouse = element.value;
+        break;
+        case 'Domestic Partner':
+          domesticPartner = element.value;
+        break;
+        case 'Child Under 26':
+          childUnder26 = element.value;
+        break;
+        case 'Employee Only':
+          employeeOnly = element.value;
+        break;
+        case 'Family':
+          familyOnly = element.value;
+        break;
+      }
+    })
+
+    contributionHandlers.forEach(function(element) {
+      switch (element.dataset.displayname) {
+        case 'Employee':
+          if(!(element.checked)) {
+            eeContribution = 100
+          }
+        break;
+        case 'Spouse':
+          if(!(element.checked)) {
+            spouse = 100
+          }
+        break;
+        case 'Domestic Partner':
+          if(!(element.checked)) {
+            domesticPartner = 100
+          }
+        break;
+        case 'Child Under 26':
+          if(!(element.checked)) {
+            childUnder26 = 100
+          }
+        break;
+        case 'Employee Only':
+          if(!(element.checked)) {
+            employeeOnly = 100
+          }
+        break;
+        case 'Family':
+          if(!(element.checked)) {
+            familyOnly = 100
+          }
+        break;
+      }
+    })
+
+    if (eeContribution < erCL || employeeOnly < erCL) {
       disablePlanYearButton()
-    } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+    } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
       disablePlanYearButton()
     } else {
       enablePlanYearButton()
@@ -326,11 +393,3 @@ javascript:
     $('#viewSummaryModal').modal('show');
     $('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent')
   }
-  
-  
-
-
-  
-  
-
-  

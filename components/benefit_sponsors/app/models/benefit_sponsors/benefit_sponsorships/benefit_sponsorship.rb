@@ -25,6 +25,15 @@ module BenefitSponsors
     # include Concerns::Observable
     include AASM
 
+    ACTIVE_STATES   = [:applicant, :initial_application_under_review, :initial_application_denied, :initial_application_approved,
+                        :initial_enrollment_open, :initial_enrollment_closed, :initial_enrollment_ineligible, :binder_reversed, :active].freeze
+    INACTIVE_STATES = [:suspended, :ineligible, :teminated].freeze
+    ENROLLED_STATES = [:enrolled]
+
+    INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
+    INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+
+
     # Origination of this BenefitSponsorship instance in association
     # with BenefitMarkets::APPLICATION_INTERVAL_KINDS
     #   :self_serve               =>  sponsor independently joined HBX with initial effective date
@@ -112,10 +121,14 @@ module BenefitSponsors
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
       allow_blank: false
 
+    # Workflow attributes
+    scope :active,                      ->{ any_in(aasm_state: ACTIVE_STATES) }
+    scope :inactive,                    ->{ any_in(aasm_state: INACTIVE_STATES) }
+
     scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
     scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
 
-    scope :may_begin_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_begin_open_enrollment?,  -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"open_enrollment_period.min" => compare_date, :aasm_state => :approved }}
       )
@@ -544,6 +557,8 @@ module BenefitSponsors
         begin_coverage! if may_begin_coverage?
       when :expired
         cancel! if may_cancel?
+      when :canceled
+        cancel! if (may_cancel? && aasm.current_event == :activate_enrollment!)
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       end

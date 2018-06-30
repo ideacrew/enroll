@@ -2,7 +2,6 @@ module BenefitSponsors
   module Organizations
     class AcaShopCcaEmployerProfile < BenefitSponsors::Organizations::Profile
       # include Concerns::AcaRatingAreaConfigConcern
-      include Config::AcaModelConcern
       include BenefitSponsors::Concerns::EmployerProfileConcern
       include BenefitSponsors::Concerns::Observable
 

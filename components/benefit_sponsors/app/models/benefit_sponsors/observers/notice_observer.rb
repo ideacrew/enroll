@@ -133,8 +133,7 @@ module BenefitSponsors
         employer_profile = new_model_event.klass_instance.profile
         if BenefitSponsors::ModelEvents::BenefitSponsorship::REGISTERED_EVENTS.include?(new_model_event.event_key)
           if new_model_event.event_key == :initial_employee_plan_selection_confirmation
-            # TODO: Add a method to check if the employer is an initial employer
-            if employer_profile#.is_new_employer?
+            if employer_profile.is_new_employer?
               census_employees = benefit_sponsorship.census_employees.non_terminated
               census_employees.each do |ce|
                 if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_open]).first.start_on

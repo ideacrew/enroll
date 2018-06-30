@@ -51,8 +51,8 @@ module BenefitSponsors
     end
 
     # Calculated Fields for DataTable
-    field :enrolled_summary,        type: Integer,  default: 0
-    field :waived_summary,          type: Integer,  default: 0
+    # field :enrolled_summary,        type: Integer,  default: 0
+    # field :waived_summary,          type: Integer,  default: 0
 
     # Sponsor self-reported number of full-time employees
     field :fte_count,               type: Integer,  default: 0
@@ -394,6 +394,11 @@ module BenefitSponsors
       total_enrolled    -= families_to_filter
     end
 
+    def hbx_enrollments
+      @hbx_enrollments = [] if benefit_packages.size == 0
+      @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
     def enrolled_non_business_owner_members
       return @enrolled_non_business_owner_members if defined? @enrolled_non_business_owner_members
 
@@ -654,8 +659,8 @@ module BenefitSponsors
       event :activate_enrollment do
         transitions from:   :enrollment_eligible,
           to:     :active
-        transitions from:   [:denied, :enrollment_closed, :enrollment_ineligible],
-          to:     :expired
+        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
+          to:     :canceled
       end
 
       event :expire do
@@ -741,6 +746,14 @@ module BenefitSponsors
     def all_enrolled_members_count
       warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
       all_enrolled_and_waived_member_count
+    end
+
+    def enrollment_ratio
+      if members_eligible_to_enroll_count == 0
+        0
+      else
+        ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+      end
     end
 
     def total_enrolled_count

@@ -24,11 +24,9 @@ attributes: !ruby/hash:BSON::Document
         WwR5Veq153KWlF6t
     contact_method: :electronic_only
     _type: BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
-    aasm_state: applicant
     created_at: 2018-05-22 18:43:44.584000000 Z
     sic_code: '4923'
     updated_at: 2018-05-22 18:43:44.584000000 Z
-    xml_transmitted_timestamp:
     is_benefit_sponsorship_eligible: true
     office_locations:
     - !ruby/hash:BSON::Document

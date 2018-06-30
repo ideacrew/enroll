@@ -193,7 +193,7 @@ module Queries
     end
 
     def self.find_renewal_sponsored_benefits(organization, effective_on)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).eligible_renewal_applications_on(effective_on)
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|
@@ -203,7 +203,7 @@ module Queries
     end
 
     def self.find_ie_sponsored_benefits(organization, effective_on)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).eligible_renewal_applications_on(effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|

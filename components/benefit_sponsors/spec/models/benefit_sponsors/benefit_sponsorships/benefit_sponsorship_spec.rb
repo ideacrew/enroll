@@ -387,8 +387,8 @@ module BenefitSponsors
                         expect(benefit_sponsorship.aasm_state).to eq :applicant
                       end
 
-                      it "benefit_application should transition to state: :expired" do
-                        expect(benefit_application.aasm_state).to eq :expired
+                      it "benefit_application should transition to state: :canceled" do
+                        expect(benefit_application.aasm_state).to eq :canceled
                       end
                     end
                   end

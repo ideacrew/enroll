@@ -50,5 +50,7 @@ module BenefitSponsors
     end
 
     alias total_employee_cost employee_cost_total
+    alias total_employer_contribution sponsor_contribution_total
+    alias total_premium product_cost_total
   end
 end

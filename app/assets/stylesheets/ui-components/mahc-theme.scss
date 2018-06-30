@@ -441,24 +441,6 @@ thead {
   text-transform: capitalize;
   font-weight:bold;
 }
-.rp-view-summary {
-  display:none;
-}
-
-.rp-info {
-  border-bottom:1px solid $mhc-light-gray;
-}
-
-.rp-info:hover {
-  cursor:pointer;
-  border-bottom:1px solid $mhc-blue;
-}
-.rp-info:hover .rp-view-summary {
-  display:block;
-  color:$mhc-blue;
-  font-size:12px;
-  font-weight:bold;
-}
 
 #uic-wrapper {
   width:97%;

@@ -48,4 +48,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry-remote'
   s.add_development_dependency 'forgery'
   s.add_development_dependency 'mongoid_rails_migrations'
+  s.add_development_dependency 'rails-perftest'
+  s.add_development_dependency 'ruby-prof'
 end
