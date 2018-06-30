@@ -69,10 +69,14 @@ module BenefitSponsors
       end
 
       def benefit_renewal
-        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_renew_application?(new_date)
+        months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
+        renewal_application_begin = (new_date + months_prior_to_effective.months)
 
-        benefit_sponsorships.each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
+        if renewal_application_begin.mday == 1
+          benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
+          end
         end
       end
 
