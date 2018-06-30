@@ -26,7 +26,7 @@ module BenefitSponsors
             fail:     ->(benefit_application){"Employer contribution percent toward employee premium (#{benefit_application.enrollment_ratio.to_i}%) is less than minimum allowed (#{(ENROLLMENT_RATIO_MINIMUM*100).to_i}%)" }
 
     rule  :non_business_owner_enrollment_count,
-            validate: ->(benefit_application){ benefit_application.enrolled_non_business_owner_count > benefit_application.members_eligible_to_enroll},
+            validate: ->(benefit_application){ benefit_application.enrolled_non_business_owner_count > benefit_application.members_eligible_to_enroll_count},
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"at least #{(ENROLLMENT_RATIO_MINIMUM*100).to_i}% non-owner employee must enroll" }
 

@@ -1,5 +1,5 @@
 --- !ruby/object:BenefitMarkets::ContributionModels::ContributionModel
-__selected_fields: 
+__selected_fields:
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -43,7 +43,7 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WwROSZ+IC11vNseB
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
-    minimum_contribution_factor: 0.0
+    minimum_contribution_factor: 0.33
     name: family
     display_name: Family
     order: 1
