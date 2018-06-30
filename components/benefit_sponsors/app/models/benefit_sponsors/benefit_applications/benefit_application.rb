@@ -50,10 +50,6 @@ module BenefitSponsors
       error_on_all_events { |e| raise WMS::MovementError.new(e.message, original_exception: e, model: self) }
     end
 
-    # Calculated Fields for DataTable
-    # field :enrolled_summary,        type: Integer,  default: 0
-    # field :waived_summary,          type: Integer,  default: 0
-
     # Sponsor self-reported number of full-time employees
     field :fte_count,               type: Integer,  default: 0
 
@@ -77,7 +73,7 @@ module BenefitSponsors
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
-      class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage"
+                class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage"
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
@@ -100,53 +96,46 @@ module BenefitSponsors
     scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
     scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
-
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
-    # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
-    #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
-    #                                             }
+    scope :renewing,                      ->{ where(:$elemMatch => { :$exists => {:predecessor_id => true},
+                                                                      :aasm_state.in => (APPLICATION_DRAFT_STATES + ENROLLING_STATES) })
+                                                                }
 
-    scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.min" => compare_date )
-                                                                                           }
+    scope :effective_date_begin_on,       ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"effective_period.min" => compare_date )
+                                                                }
 
-    scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.max" => compare_date )
-                                                                                           }
+    scope :effective_date_end_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"effective_period.max" => compare_date )
+                                                                }
 
-    scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                             :"effective_period.min".lte => compare_date,
-                                                                                           :"effective_period.max".gte => compare_date)
-                                                                                           }
-    scope :future_effective_date,           ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.min".gte => compare_date )
-                                                                                           }
-    scope :open_enrollment_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                             :"opem_enrollment_period.min".lte => compare_date,
-                                                                                           :"opem_enrollment_period.max".gte => compare_date)
-                                                                                           }
-    scope :open_enrollment_begin_on,        ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.min" => compare_date)
-                                                                                           }
-    scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.max" => compare_date)
-                                                                                           }
-    scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                         :"terminated_on" => compare_date)
-                                                                                         }
-    scope :by_year,                          ->(compare_year = TimeKeeper.date_of_record.year) { where(
-                                                                                                :"effective_period.min".gte => Date.new(compare_year, 1, 1),
-                                                                                                :"effective_period.min".lte => Date.new(compare_year, 12, -1)
-                                                                                              )}
+    scope :effective_period_cover,        ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"effective_period.min".lte => compare_date,
+                                                                  :"effective_period.max".gte => compare_date)
+                                                                }
+    scope :future_effective_date,         ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"effective_period.min".gte => compare_date )
+                                                                }
+    scope :open_enrollment_period_cover,  ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"open_enrollment_period.min".lte => compare_date,
+                                                                  :"open_enrollment_period.max".gte => compare_date)
+                                                                }
+    scope :open_enrollment_begin_on,      ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"open_enrollment_period.min" => compare_date)
+                                                                }
+    scope :open_enrollment_end_on,        ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"open_enrollment_period.max" => compare_date)
+                                                                }
+    scope :benefit_terminate_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
+                                                                  :"terminated_on" => compare_date)
+                                                                }
+    scope :by_year,                       ->(compare_year = TimeKeeper.date_of_record.year) { where(
+                                                                  :"effective_period.min".gte => Date.new(compare_year, 1, 1),
+                                                                  :"effective_period.min".lte => Date.new(compare_year, 12, -1))
+                                                                }
     # TODO
-    scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
-    # scope :renewing,                        ->{ is_renewing } # Deprecate it in future
-
-    # scope :by_effective_date_range,         ->(begin_on, end_on)  { where(:"effective_period.min".gte => begin_on, :"effective_period.min".lte => end_on) }
-    # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
-    # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
-    # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
+    scope :published,                     ->{ any_in(aasm_state: PUBLISHED_STATES) }
 
     scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
       where(
@@ -170,10 +159,6 @@ module BenefitSponsors
       )
     }
 
-    scope :renewing, -> {
-      where("$exists" => {:predecessor_id => true} )
-    }
-
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
@@ -195,8 +180,12 @@ module BenefitSponsors
 
     # Set the benefit_application instance that preceded this one
     def predecessor=(benefit_application)
-      raise ArgumentError.new("expected BenefitApplication") unless benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
-      write_attribute(:predecessor_id, benefit_application._id)
+      if benefit_application.nil?
+        write_attribute(:predecessor_id, nil)
+      else
+        raise ArgumentError.new("expected BenefitApplication") unless benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
+        write_attribute(:predecessor_id, benefit_application._id)
+      end
       @predecessor = benefit_application
     end
 
@@ -212,28 +201,14 @@ module BenefitSponsors
       @successors = benefit_sponsorship.benefit_application_successors_for(self)
     end
 
-    def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
-      raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
-      write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
-      @benefit_sponsor_catalog = new_benefit_sponsor_catalog
-    end
-
-    def benefit_sponsor_catalog
-      return nil if benefit_sponsor_catalog_id.blank?
-      return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
-      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(benefit_sponsor_catalog_id)
-    end
-
     def recorded_rating_area=(new_recorded_rating_area)
       if new_recorded_rating_area.nil?
         write_attribute(:recorded_rating_area_id, nil)
-        @recorded_rating_area = nil
       else
         raise ArgumentError.new("expected RatingArea") unless new_recorded_rating_area.is_a? BenefitMarkets::Locations::RatingArea
         write_attribute(:recorded_rating_area_id, new_recorded_rating_area._id)
-        @recorded_rating_area = new_recorded_rating_area
       end
-      @recorded_rating_area
+      @recorded_rating_area = new_recorded_rating_area
     end
 
     def recorded_rating_area
@@ -262,26 +237,37 @@ module BenefitSponsors
       @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
     end
 
+    def build_benefit_sponsor_catalog
+      self.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_on(start_on) if benefit_sponsorship.present?
+    end
+
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
-      raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
-      write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
+      if new_benefit_sponsor_catalog.nil?
+        write_attribute(:benefit_sponsor_catalog_id, nil)
+      else
+        raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
+        write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
+      end
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
     end
 
     def benefit_sponsor_catalog
       return nil if benefit_sponsor_catalog_id.blank?
       return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
-      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find(benefit_sponsor_catalog_id)
+      @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(benefit_sponsor_catalog_id)
     end
 
+
     def effective_period=(new_effective_period)
+      return nil if new_effective_period.blank?
       effective_range = BenefitSponsors.tidy_date_range(new_effective_period, :effective_period)
-      super(effective_range) unless effective_range.blank?
+      effective_range.present? ? super(effective_range) : super(nil)
     end
 
     def open_enrollment_period=(new_open_enrollment_period)
+      return nil if new_open_enrollment_period.blank?
       open_enrollment_range = BenefitSponsors.tidy_date_range(new_open_enrollment_period, :open_enrollment_period)
-      super(open_enrollment_range) unless open_enrollment_range.blank?
+      open_enrollment_range.present? ? super(open_enrollment_range) : super(nil)
     end
 
     def find_census_employees

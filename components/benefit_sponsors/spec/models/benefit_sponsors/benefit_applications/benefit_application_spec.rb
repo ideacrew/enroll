@@ -1,15 +1,14 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
+  RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :around_each do
     let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:benefit_market)          { site.benefit_markets.first }
     let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-    let(:benefit_sponsor_catalog) { FactoryGirl.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
+    let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
 
     let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
-    let(:service_area) { create_default(:benefit_markets_locations_service_area) }
+    let(:service_areas) { create_default(:benefit_markets_locations_service_area).to_a }
     let(:sic_code)      { "001" }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
@@ -24,11 +23,12 @@ module BenefitSponsors
       {
         effective_period:         effective_period,
         open_enrollment_period:   open_enrollment_period,
-        benefit_sponsor_catalog:  benefit_sponsor_catalog,
+        recorded_rating_area:     rating_area,
+        recorded_service_areas:   service_areas,
       }
     end
 
-    describe "A new model instance" do
+    describe "A new BenefitApplication instance" do
      it { is_expected.to be_mongoid_document }
      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
@@ -110,16 +110,22 @@ module BenefitSponsors
         end
 
         context "and it is saved" do
+          context "and no active BenefitApplications exist during the same period with one or more of the same SponsoredBenefits" do
+            it "should persist" do
+              expect(subject.save).to eq true
+            end
 
-          it "should save" do
-            expect(subject.save).to eq true
+            context "it should be findable" do
+              before { subject.save! }
+              it "should return the instance" do
+                expect(described_class.find(subject.id.to_s)).to eq subject
+              end
+            end
           end
 
-          context "it should be findable" do
-            before { subject.save! }
-            it "should return the instance" do
-              expect(described_class.find(subject.id.to_s)).to eq subject
-            end
+          context "and an active BenefitApplication exists during the same period with one or more of the same SponsoredBenefits" do
+
+            it "should not persist"
           end
         end
       end
@@ -129,6 +135,7 @@ module BenefitSponsors
       let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
       let(:benefit_application)     { described_class.new(params) }
+      # let(:benefit_sponsor_catalog) { FactoryGirl.create(:benefit_markets_benefit_sponsor_catalog, service_areas: service_areas) }
 
       before do
         benefit_application.benefit_sponsorship = benefit_sponsorship
@@ -214,6 +221,76 @@ module BenefitSponsors
             end
 
           end
+        end
+      end
+    end
+
+    describe "Managing BenefitPackages" do
+      describe "Managing Default BenefitPackage" do
+        context "Given a BenefitApplication with one BenefitPackage" do
+
+          it "should be set as default"
+
+          context "and a new member is added to the roster" do
+            it "should assign the new member to default BenefitPackage"
+          end
+
+          context "and a second BenefitPackage is added and set as default" do
+
+            it "the first package should not be default"
+            it "the second package should be default"
+          end
+
+        end
+      end
+
+      describe "Deleting a BenefitPackage" do
+
+        context "Given a BenefitApplication that's not submitted" do
+          context "and the BenefitPackage is the default" do
+            context "and there's one additional BenefitPackage" do
+              context "and the default BenefitPackage is deleted" do
+                it "should set the other Benefitpackage as default"
+                it "should transfer member associations to the default benefit package"
+                it "should delete the BenefitPackage"
+              end
+            end
+
+            context "and there's more that one additional BenefitPackage" do
+            end
+          end
+
+          context "and the BenefitPackage is not the default" do
+            it "should transfer member associations to the default benefit package"
+            it "should delete the BenefitPackage"
+          end
+        end
+
+        context "Given a BenefitPackage that is submitted" do
+          it "should not delete and throw error"
+        end
+      end
+
+      describe "Assigning Members to BenefitPackage" do
+        context "Given a BenefitApplication with one BenefitPackage" do
+
+          it "should be set as default"
+
+          context "and a new member is added to the roster" do
+            it "should assign the new member to default BenefitPackage"
+          end
+
+        end
+
+        context "Given a BenefitApplication with more than one BenefitPackage" do
+          context "and a new member is added to the roster" do
+            it "should assign the new member to default BenefitPackage"
+          end
+
+          context "and an existing member is assigned to a new BenefitPackage" do
+            it "should assign the member to the new BenefitPackage"
+          end
+
         end
       end
     end
@@ -448,7 +525,7 @@ module BenefitSponsors
 
         # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
 
-        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship) }
+        let!(:initial_application) { create(:benefit_sponsors_benefit_application, effective_period: effective_period, benefit_sponsorship:benefit_sponsorship) }
         let(:benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
 
         it "should generate renewal application" do
@@ -591,7 +668,7 @@ module BenefitSponsors
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
                               open_enrollment_period: timetable[:open_enrollment_period],
-                              recorded_service_areas:  [service_area],
+                              recorded_service_areas:  service_areas,
                               recorded_rating_area:    rating_area,
                               recorded_sic_code:       sic_code,
                             )).to be_valid
@@ -605,14 +682,14 @@ module BenefitSponsors
                                                 open_enrollment_period: open_enrollment_period,
                                                 recorded_sic_code: sic_code,
                                                 recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
+                                                recorded_service_areas: service_areas,
                                               ) }
       let(:node_a1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
                                                 effective_period: effective_period,
                                                 open_enrollment_period: open_enrollment_period,
                                                 recorded_sic_code: sic_code,
                                                 recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
+                                                recorded_service_areas: service_areas,
                                                 predecessor: node_a,
                                               ) }
       let(:node_a1a)  { described_class.new(benefit_sponsorship: benefit_sponsorship,
@@ -620,7 +697,7 @@ module BenefitSponsors
                                                 open_enrollment_period: open_enrollment_period,
                                                 recorded_sic_code: sic_code,
                                                 recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
+                                                recorded_service_areas: service_areas,
                                                 predecessor: node_a1,
                                               ) }
       let(:node_b1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
@@ -628,7 +705,7 @@ module BenefitSponsors
                                                 open_enrollment_period: open_enrollment_period,
                                                 recorded_sic_code: sic_code,
                                                 recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
+                                                recorded_service_areas: service_areas,
                                                 predecessor: node_a,
                                               ) }
 
