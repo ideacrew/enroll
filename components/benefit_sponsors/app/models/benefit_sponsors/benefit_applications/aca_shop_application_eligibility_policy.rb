@@ -77,7 +77,7 @@ module BenefitSponsors
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "This employer is ineligible to enroll for coverage at this time" }
 
-    rule :all_contribution_min_levels_met,
+    rule :all_contribution_levels_min_met,
           validate: -> (benefit_application) {
             all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
             all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
@@ -107,7 +107,7 @@ module BenefitSponsors
                     :all_employees_are_assigned_benefit_package,
                     :employer_profile_eligible,
                     :employer_primary_office_location,
-                    :all_contribution_min_levels_met,
+                    :all_contribution_levels_min_met,
                     :benefit_application_fte_count]
 
     business_policy  :stubbed_policy,
