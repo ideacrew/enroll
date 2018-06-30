@@ -47,7 +47,7 @@ module Notifier
         cost_estimator = census_employee_cost_estimator(current_benefit_application)
         current_benefit_application.benefit_packages.flat_map(&:sponsored_benefits).each do |sb|
           sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-          employer_contribution_amount < _cont.to_i
+          employer_contribution_amount << _cont.to_i
         end
         merge_model.benefit_application.monthly_employer_contribution_amount = number_to_currency(employer_contribution_amount.sum))
       end
