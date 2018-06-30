@@ -39,11 +39,11 @@ module BenefitSponsors
           # end
 
           if is_transition_matching?(to: :enrollment_open, from: :approved, event: :begin_open_enrollment)
-            is_initial_employer_open_enrollment_completed = true
+            @is_initial_employer_open_enrollment_completed = true
           end
 
           if is_transition_matching?(to: :pending, from: :draft, event: [:review_application, :request_eligibility_review])
-            is_ineligible_application_submitted = true
+            @is_ineligible_application_submitted = true
           end
 
           # if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: [:publish, :force_publish])
@@ -51,11 +51,11 @@ module BenefitSponsors
           # end
 
           if is_transition_matching?(to: :approved, from: :draft, event: :approve_application)
-            is_application_submitted = true
+            @is_application_submitted = true
           end
 
           if is_transition_matching?(to: :enrollment_open, from: :enrollment_open, event: :end_open_enrollment)
-            is_renewal_enrollment_confirmation = true
+            @is_renewal_enrollment_confirmation = true
           end
 
           # if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :publish)
@@ -67,7 +67,7 @@ module BenefitSponsors
           # end
 
           if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
-            is_application_denied = true
+            @is_application_denied = true
           end
 
           # if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
@@ -75,7 +75,7 @@ module BenefitSponsors
           # end
 
           if is_transition_matching?(to: :terminated, from: :active, event: :terminate_enrollment)
-            is_group_advance_termination_confirmation = true
+            @is_group_advance_termination_confirmation = true
           end
           
           # if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
@@ -88,7 +88,7 @@ module BenefitSponsors
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
           REGISTERED_EVENTS.each do |event|
-            if event_fired = instance_eval("is_" + event.to_s)
+            if event_fired = instance_eval("@is_" + event.to_s)
               # event_name = ("on_" + event.to_s).to_sym
               event_options = {} # instance_eval(event.to_s + "_options") || {}
               notify_observers(ModelEvent.new(event, self, event_options))

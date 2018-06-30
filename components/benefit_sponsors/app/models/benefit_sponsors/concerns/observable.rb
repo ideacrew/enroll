@@ -3,13 +3,15 @@ module BenefitSponsors
     extend ActiveSupport::Concern
 
     included do
-      after_update :notify_observers
-
       def notify_observers(args={})
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
             events.each do |event|
-              k.send event, self, args
+              if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+                k.send event, args
+              else
+                k.send event, self, args
+              end
             end
           end
         end

@@ -1,5 +1,5 @@
 class HbxEnrollmentListSponsorCostCalculator
-	EnrollmentProductAdapter = Struct.new(:id)
+	EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
 
 	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
 		def is_disabled?
@@ -17,6 +17,12 @@ class HbxEnrollmentListSponsorCostCalculator
 		def initialize(he_id_list, s_benefit)
 			@hbx_enrollment_id_list = he_id_list
 			@sponsored_benefit = s_benefit
+			@issuer_profile_id_map = {}
+			@active_year_map = {}
+			::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+				@issuer_profile_id_map[rec.first] = rec[1]
+				@active_year_map[rec.first] = rec.last["min"].year
+			end
 		end
 
 		def each
@@ -123,11 +129,16 @@ class HbxEnrollmentListSponsorCostCalculator
                 coverage_eligibility_on: dep_member["coverage_start_on"]
         })
 			end
+      product = EnrollmentProductAdapter.new(
+            enrollment_record["hbx_enrollment"]["product_id"],
+            @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
+            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]]
+          )
       contribution_prohibited = (enrollment_record["hbx_enrollment"]["kind"].to_s == "employer_sponsored_cobra")
 			group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
 				{
-					product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
-					previous_product: EnrollmentProductAdapter.new(enrollment_record["hbx_enrollment"]["product_id"]),
+					product: product,
+					previous_product: product,
 					rate_schedule_date: @sponsored_benefit.rate_schedule_date,
 					coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
 					member_enrollments: member_enrollments, 

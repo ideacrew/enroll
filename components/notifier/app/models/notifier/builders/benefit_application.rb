@@ -184,7 +184,7 @@ module Notifier
       benefit_application_warnings = []
       if current_benefit_application.present?
         unless eligibility_policy.business_policies[:passes_open_enrollment_period_policy].is_satisfied?(current_benefit_application)
-          eligibility_policy.business_policies.[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
+          eligibility_policy.business_policies[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
             case k.to_s
             when "benefit_application_fte_count"
               benefit_application_warnings << "Full Time Equivalent must be 1-50"
