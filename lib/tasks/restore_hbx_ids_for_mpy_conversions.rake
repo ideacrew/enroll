@@ -159,8 +159,9 @@ namespace :cca do
           if policy.present?
             restore_policy_hbx_id(policy, policy_restorable_hbx_id, primary_person)
           end
+        else
+          restore_policy_hbx_id(policies.first, policy_restorable_hbx_id, primary_person)
         end
-        restore_policy_hbx_id(policies.first, policy_restorable_hbx_id, primary_person)
       rescue Exception => e
         puts "Error while updating policy #{policy_restorable_hbx_id}: #{e}"
       end
