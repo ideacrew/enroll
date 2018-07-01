@@ -43,9 +43,18 @@ module Notifier
 
     def benefit_application_monthly_employer_contribution_amount
       if current_benefit_application.present?
-        payment = current_benefit_application.benefit_groups.map(&:monthly_employer_contribution_amount)
-        merge_model.benefit_application.monthly_employer_contribution_amount = number_to_currency(payment.inject(0){ |sum,a| sum+a })
+        employer_contribution_amount = []
+        cost_estimator = census_employee_cost_estimator(current_benefit_application)
+        current_benefit_application.benefit_packages.flat_map(&:sponsored_benefits).each do |sb|
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+          employer_contribution_amount << _cont.to_i
+        end
+        merge_model.benefit_application.monthly_employer_contribution_amount = number_to_currency(employer_contribution_amount.sum)
       end
+    end
+
+    def census_employee_cost_estimator(benefit_application)
+      BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
     end
 
     def benefit_application_current_py_plus_60_days
@@ -102,7 +111,7 @@ module Notifier
 
     def benefit_application_binder_payment_due_date
       if current_benefit_application.present?
-        schedular =  BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(current_benefit_application.start_on))
       end
     end
@@ -127,13 +136,13 @@ module Notifier
 
     def benefit_application_total_enrolled_count
       if load_benefit_application.present?
-        merge_model.benefit_application.total_enrolled_count = load_benefit_application.total_enrolled_count
+        merge_model.benefit_application.total_enrolled_count = load_benefit_application.all_enrolled_and_waived_member_count
       end
     end
 
     def benefit_application_eligible_to_enroll_count
       if load_benefit_application.present?
-        merge_model.benefit_application.eligible_to_enroll_count = load_benefit_application.eligible_to_enroll_count
+        merge_model.benefit_application.eligible_to_enroll_count = load_benefit_application.members_eligible_to_enroll_count
       end
     end
 
@@ -145,33 +154,47 @@ module Notifier
 
     def benefit_application_enrollment_errors
       enrollment_errors = []
-      plan_year = (renewal_benefit_application || current_benefit_application)
-      if plan_year.present?
-        plan_year.enrollment_errors.each do |k, _|
-          case k.to_s
-          when "enrollment_ratio"
-            enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
-          when "non_business_owner_enrollment_count"
-            enrollment_errors << "One non-owner employee enrolled in health coverage"
+      benefit_application = (renewal_benefit_application || current_benefit_application)
+      if benefit_application.present?
+        unless enrollment_policy.business_policies[:passes_open_enrollment_period_policy].is_satisfied?(benefit_application)
+          enrollment_policy.business_policies[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
+            case k.to_s
+            when "minimum_participation_rule"
+              enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+            when "non_business_owner_enrollment_count"
+              enrollment_errors << "One non-owner employee enrolled in health coverage"
+            end
           end
         end
         merge_model.benefit_application.enrollment_errors = enrollment_errors.join(' AND/OR ')
       end
     end
 
+    def enrollment_policy
+      return @enrollment_policy if defined? @enrollment_policy
+      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+    end
+
+    def eligibility_policy
+      return @eligibility_policy if defined? @eligibility_policy
+      @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    end
+
     def benefit_application_warnings
-      plan_year_warnings = []
+      benefit_application_warnings = []
       if current_benefit_application.present?
-        current_benefit_application.application_eligibility_warnings.each do |k, _|
-          case k.to_s
-          when "fte_count"
-            plan_year_warnings << "Full Time Equivalent must be 1-50"
-          when "primary_office_location"
-            plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+        unless eligibility_policy.business_policies[:passes_open_enrollment_period_policy].is_satisfied?(current_benefit_application)
+          eligibility_policy.business_policies[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
+            case k.to_s
+            when "benefit_application_fte_count"
+              benefit_application_warnings << "Full Time Equivalent must be 1-50"
+            when "employer_primary_office_location"
+              benefit_application_warnings << "primary business address not located in #{Settings.aca.state_name}"
+            end
           end
         end
       end
-      merge_model.benefit_application.warnings = plan_year_warnings.join(', ')
+      merge_model.benefit_application.warnings = benefit_application_warnings.join(', ')
     end
 
     def load_benefit_application

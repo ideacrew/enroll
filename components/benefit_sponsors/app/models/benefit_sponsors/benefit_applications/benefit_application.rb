@@ -3,6 +3,9 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
+    include ::BenefitSponsors::Concerns::Observable
+    include ::BenefitSponsors::ModelEvents::BenefitApplication
+
     include AASM
 
     embedded_in :benefit_sponsorship,
@@ -77,9 +80,12 @@ module BenefitSponsors
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
+
+    add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:on_update]
+
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
-
+    after_save        :notify_on_save
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -378,6 +384,11 @@ module BenefitSponsors
     def filter_enrolled_employees(employees_to_filter, total_enrolled)
       families_to_filter = employees_to_filter.collect{|census_employee| census_employee.family }.compact
       total_enrolled    -= families_to_filter
+    end
+
+    def hbx_enrollments
+      @hbx_enrollments = [] if benefit_packages.size == 0
+      @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
     end
 
     def enrolled_non_business_owner_members
@@ -727,6 +738,14 @@ module BenefitSponsors
     def all_enrolled_members_count
       warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
       all_enrolled_and_waived_member_count
+    end
+
+    def enrollment_ratio
+      if members_eligible_to_enroll_count == 0
+        0
+      else
+        ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+      end
     end
 
     def total_enrolled_count

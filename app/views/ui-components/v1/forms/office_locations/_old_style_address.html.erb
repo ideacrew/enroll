@@ -60,7 +60,7 @@
                    <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: f.object.try(:zip)).pluck(:county_name).uniq %>
                    <% @empty_message = f.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                    <% @counties = [@empty_message] if @counties.empty? %>
-                 <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', required: true, onchange: 'validateCounty(this)')%>
+                 <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', onchange: 'validateCounty(this)')%>
                 </div>
               <% end %>
           </div>

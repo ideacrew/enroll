@@ -27,7 +27,7 @@ module Notifier
 
     def enrollment_plan_name
       return if enrollment.blank?
-      merge_model.enrollment.plan_name = enrollment.plan.name
+      merge_model.enrollment.plan_name = enrollment.product.name
     end
 
     def enrollment_enrolled_count

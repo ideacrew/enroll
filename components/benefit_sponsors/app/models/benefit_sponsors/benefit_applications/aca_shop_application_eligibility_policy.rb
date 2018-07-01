@@ -20,6 +20,8 @@ module BenefitSponsors
 
     OPEN_ENROLLMENT_DAYS_MIN = 15
     MIN_BENEFIT_GROUPS = 1
+    EMPLOYEE_MINIMUM_COUNT = 1
+    EMPLOYEE_MAXIMUM_COUNT = 50
 
     rule  :open_enrollment_period_minimum,
             validate: -> (benefit_application){
@@ -30,6 +32,21 @@ module BenefitSponsors
               number_of_days = benefit_application.open_enrollment_length
               "open enrollment period length #{number_of_days} day(s) is less than #{OPEN_ENROLLMENT_DAYS_MIN} day(s) minimum"
             }
+
+    rule  :benefit_application_fte_count,
+            validate: -> (benefit_application){
+                benefit_application.fte_count >= EMPLOYEE_MINIMUM_COUNT && benefit_application.fte_count < EMPLOYEE_MAXIMUM_COUNT
+              },
+            success:  -> (benfit_application)  { "validated successfully" },
+            fail:     -> (benefit_application) { "Has #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
+
+    #TODO: Do not use Settings.
+    rule  :employer_primary_office_location,
+            validate: -> (benefit_application){
+              benefit_application.sponsor_profile.is_primary_office_local?
+              },
+            success:  -> (benfit_application)  { "validated successfully" },
+            fail:     -> (benefit_application) { "Is a small business located in #{Settings.aca.state_name}" }
 
     rule  :benefit_application_contains_benefit_packages,
             validate: -> (benefit_application){
@@ -60,6 +77,15 @@ module BenefitSponsors
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "This employer is ineligible to enroll for coverage at this time" }
 
+    rule :all_contribution_levels_min_met,
+          validate: -> (benefit_application) {
+            all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
+            all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+          },
+          success:  -> (benfit_application)  { "validated successfully" },
+          fail:     -> (benefit_application) { "one or more contribution minimum not met" }
+
+
     rule  :stubbed_rule_one,
             validate: -> (model_instance) {
               true
@@ -79,7 +105,10 @@ module BenefitSponsors
                     :benefit_application_contains_benefit_packages,
                     :benefit_packages_contains_reference_plans,
                     :all_employees_are_assigned_benefit_package,
-                    :employer_profile_eligible]
+                    :employer_profile_eligible,
+                    :employer_primary_office_location,
+                    :all_contribution_levels_min_met,
+                    :benefit_application_fte_count]
 
     business_policy  :stubbed_policy,
             rules: [:stubbed_rule_one, :stubbed_rule_two ]

@@ -42,11 +42,6 @@ export default class extends Controller {
       
       if (input.id == "kindSelect") {
         input[0].remove();
-        input[1].remove();
-        var option = document.createElement('option');
-        option.selected = "Select Address Kind";
-        option.innerHTML = "Select Address Kind"
-        input.append(option)
       }
       
     })

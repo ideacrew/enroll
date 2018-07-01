@@ -38,9 +38,16 @@
 
 - if show_benefit_application_tile == "true"
   javascript:
+    var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
+    var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
 
     function setInputValue(element) {
       document.getElementById(element.dataset.id).value = element.value;
+      contributionAmounts(element)
+    }
+
+    function setSliderValue(element) {
+      document.querySelector("[data-id='"+element.id+"']").value = element.value;
       contributionAmounts(element)
     }
   
@@ -60,32 +67,79 @@
       savePlanYearButton.classList.remove('disabled')
     }
   
-    var eeContribution = Number;
-    var spouse = Number;
-    var domesticPartner = Number;
-    var childUnder26 = Number;
-  
+    var eeContribution;
+    var spouse;
+    var domesticPartner;
+    var childUnder26;
+    var employeeOnly;
+    var familyOnly;
+    var contributionInputs;
+    
     function contributionAmounts(element) {
-      var sliderName = element.dataset.name;
-      var sliderValue = element.value;
+      contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
+      contributionHandlers = document.querySelectorAll(".contribution_handler")
 
-      switch (sliderName) {
-        case 'Employee':
-          eeContribution = sliderValue;
-        break;
-        case 'Spouse':
-          spouse = sliderValue;
-        break;
-        case 'Domestic Partner':
-          domesticPartner = sliderValue;
-        break;
-        case 'Child Under 26':
-          childUnder26 = sliderValue;
-        break;
-      }
-      if (eeContribution < 50) {
+      contributionInputs.forEach(function(element) {
+        switch (element.dataset.displayname) {
+          case 'Employee':
+            eeContribution = element.value;
+          break;
+          case 'Spouse':
+            spouse = element.value;
+          break;
+          case 'Domestic Partner':
+            domesticPartner = element.value;
+          break;
+          case 'Child Under 26':
+            childUnder26 = element.value;
+          break;
+          case 'Employee Only':
+            employeeOnly = element.value;
+          break;
+          case 'Family':
+            familyOnly = element.value;
+          break;
+        }
+      })
+
+      contributionHandlers.forEach(function(element) {
+        switch (element.dataset.displayname) {
+          case 'Employee':
+            if(!(element.checked)) {
+              eeContribution = 100
+            }
+          break;
+          case 'Spouse':
+            if(!(element.checked)) {
+              spouse = 100
+            }
+          break;
+          case 'Domestic Partner':
+            if(!(element.checked)) {
+              domesticPartner = 100
+            }
+          break;
+          case 'Child Under 26':
+            if(!(element.checked)) {
+              childUnder26 = 100
+            }
+          break;
+          case 'Employee Only':
+            if(!(element.checked)) {
+              employeeOnly = 100
+            }
+          break;
+          case 'Family':
+            if(!(element.checked)) {
+              familyOnly = 100
+            }
+          break;
+        }
+      })
+
+      if (eeContribution < erCL || employeeOnly < erCL) {
         disablePlanYearButton()
-      } else if (spouse < 30 || domesticPartner < 30 || childUnder26 < 30) {
+      } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
         disablePlanYearButton()
       } else {
         enablePlanYearButton()

@@ -1,7 +1,7 @@
 #addressDetails
   .row.pl-1
     h4 Office Location
-  .row[data-controller='zip-check']
+  .row
     .col-md-9.col-sm-6.col-xs-12
       label for="inputAddress1" Address
       = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
@@ -58,11 +58,20 @@ javascript:
       row.querySelector('#inputZip').removeAttribute('data-action');
       row.querySelector('#inputZip').removeAttribute('required');
       row.querySelector('#inputZip').removeAttribute('data-options');
+      // removes blank option from select options
+      setTimeout(function() {
+        element.options[0].remove()
+      },300)
     }
+  }
+  
+  function checkKind(element) {
+    checkOLKind(element)
   }
   
   (function() {
     var element = document.getElementById('kindSelect');
-    checkOLKind(element)
+    var value = element.value;
+    checkKind(element, value)
   })();
   

@@ -14,6 +14,7 @@ class BrokerEmailInvitation < MongoidMigrationTask
     if broker_email.present?
         if (invitation.empty? && aasm_state == "active")
           Invitation.invite_broker!(broker_role)
+          puts "Invitation sent to broker email successfully." unless Rails.env.test?
         else
          puts "Broker has already been sent a signup invitation email" unless Rails.env.test?
         end 
