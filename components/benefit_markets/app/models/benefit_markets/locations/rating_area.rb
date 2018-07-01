@@ -29,10 +29,14 @@ module BenefitMarkets
     end
 
     def self.rating_area_for(address, during: TimeKeeper.date_of_record)
+      county_name = address.county.blank? ? "" : address.county.titlecase
+      zip_code = address.zip
+      state_abbrev = address.state.blank? ? "" : address.state.upcase
+      
       county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-        :zip => address.zip,
-        :county_name => address.county.titlecase,
-        :state => address.state.upcase
+        :zip => zip_code,
+        :county_name => county_name,
+        :state => state_abbrev
       ).map(&:id)
       
       # TODO FIX
@@ -42,7 +46,7 @@ module BenefitMarkets
         "active_year" => during.year,
         "$or" => [
           {"county_zip_ids" => { "$in" => county_zip_ids }},
-          {"covered_states" => address.state.upcase}
+          {"covered_states" => state_abbrev}
         ]
       ).first
     end
