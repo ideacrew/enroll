@@ -196,19 +196,23 @@ module BenefitSponsors
       where(:"benefit_applications.benefit_packages._id" => BSON::ObjectId.from_string(id))
     }
 
-    scope :by_profile,                   ->(profile) {
-      where(:profile_id => profile._id)
-    }
+    scope :by_profile,                   ->(profile) { where(:profile_id => profile._id) }
 
     index({ hbx_id: 1 })
     index({ aasm_state: 1 })
     index({ profile_id: 1 })
 
     index({"benefit_application._id" => 1})
-    index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
+    index({"benefit_application.predecessor_id" => 1}, {sparse: true})
+    index({"benefit_application.terminated_on" => 1},  {sparse: true})
+    index({"benefit_application.recorded_rating_area_id" => 1})
+    index({"benefit_application.aasm_state" => 1})
+    index({"benefit_application.effective_period.min" => 1,
+           "benefit_application.effective_period.max" => 1},
             { name: "effective_period" })
 
-    index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
+    index({"benefit_application.open_enrollment_period.min" => 1,
+           "benefit_application.open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
 
 
@@ -341,9 +345,25 @@ module BenefitSponsors
       ["ineligible", "terminated"].exclude?(aasm_state)
     end
 
-    def benefit_sponsor_catalog_for(recorded_service_areas, effective_date)
+    # FIX - change this to class method
+    def benefit_sponsor_catalog_for(service_areas, effective_date)
       benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
-      benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: recorded_service_areas, effective_date: effective_date)
+      benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
+    end
+
+    # Generate a BenefitSponsorCatalog using this BenefitSponsorship's Profile on certain date
+    def benefit_sponsor_catalog_on(effective_date)
+      benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      if benefit_market_catalog.present?
+        service_areas = service_areas_on(effective_date)
+        if service_areas.present?
+          benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
+        else
+          raise "unable to generate benefit_sponsorship_catalog on date: #{effecive_date} for service_areas: #{ser}"
+        end
+      else
+        raise "unable to find benefit_market_catalog effective on date: #{effecive_date}"
+      end
     end
 
     def published_benefit_application
