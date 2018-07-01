@@ -224,7 +224,6 @@
   }
   p.reference-plan-title {
     font-size:12px;
-    font-weight:bold;
   }
   .rp-info {
     min-height:140px;
@@ -442,6 +441,7 @@
     color: #b7b7b7;
     font-size: 10px;
     text-transform: uppercase;
+    font-weight:bold;
   }
 }
 #employee-enrollments, #employer-plan-year, #employer-benefit-groups {
@@ -536,7 +536,7 @@
     padding-left: 35px;
     margin-bottom: 12px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     color:$mhc-orange;
     font-weight: bold;
     -webkit-user-select: none;
