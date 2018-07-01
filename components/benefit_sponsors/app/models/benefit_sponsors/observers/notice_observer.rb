@@ -106,7 +106,7 @@ module BenefitSponsors
 
           end
 
-          if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
+          if BenefitSponsors::BenefitApplications::BenefitApplication::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
           end
         end
       end
