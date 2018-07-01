@@ -37,10 +37,11 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
   let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
-
+  # let(:health_sponsored_benefit)  { build(:benefit_sponsors_sponsored_benefits_health_sponsored_benefit, product_package: product_package, benefit_package: current_benefit_package) }
   # before { binding.pry; benefit_sponsorship.save!; initial_application.save! }
 
   before do
+    # current_benefit_package.sponsored_benefits = [health_sponsored_benefit]
     initial_application.benefit_packages = [current_benefit_package]
     benefit_sponsorship.benefit_applications = [initial_application]
     benefit_sponsorship.save!
