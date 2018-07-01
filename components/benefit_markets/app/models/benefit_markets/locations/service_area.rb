@@ -32,17 +32,21 @@ module BenefitMarkets
       end
 
       def self.service_areas_for(address, during: TimeKeeper.date_of_record)
+        county_name = address.county.blank? ? "" : address.county.titlecase
+        zip_code = address.zip
+        state_abbrev = address.state.blank? ? "" : address.state.upcase
+
         county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-          :county_name => address.county,
-          :zip => address.zip,
-          :state => address.state
+          :county_name => county_name,
+          :zip => zip_code,
+          :state => state_abbrev
         ).map(&:id).uniq
 
         service_areas = self.where(
           "active_year" => during.year,
           "$or" => [
             {"county_zip_ids" => { "$in" => county_zip_ids }},
-            {"covered_states" =>  address.state}
+            {"covered_states" =>  state_abbrev}
           ]
         )
         service_areas
