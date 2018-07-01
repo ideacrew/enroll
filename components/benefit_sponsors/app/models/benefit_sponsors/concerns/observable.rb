@@ -4,17 +4,17 @@ module BenefitSponsors
 
     included do
       def notify_observers(args={})
-        if self.class.observer_peers.any?
-          self.class.observer_peers.each do |k, events|
-            events.each do |event|
-              if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-                k.send event, args
-              else
-                k.send event, self, args
-              end
-            end
-          end
-        end
+        # if self.class.observer_peers.any?
+        #   self.class.observer_peers.each do |k, events|
+        #     events.each do |event|
+        #       if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+        #         k.send event, args
+        #       else
+        #         k.send event, self, args
+        #       end
+        #     end
+        #   end
+        # end
       end
     end
 
