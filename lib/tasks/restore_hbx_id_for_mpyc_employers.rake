@@ -1,7 +1,7 @@
 namespace :cca do
   desc "Restore HbxId for MPYC Employers"
   task :restore_hbx_id_for_mpyc_employers => :environment do
-    file_path = "" # NEED to get confirmation on where to add this csv.
+    file_path = File.join(Rails.root, 'db', 'seedfiles', "mpyc_employers.csv")
 
     file = Roo::Spreadsheet.open(file_path)
     sheet = file.sheet(0)

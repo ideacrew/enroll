@@ -1,7 +1,7 @@
 namespace :cca do
   desc "Restore Person/Enrollment HbxIds for MPYC"
   task :restore_hbx_ids_for_mpy_conversions => :environment do
-    file_path = "" # NEED to get confirmation on where to add this csv.
+    file_path = File.join(Rails.root, 'db', 'seedfiles', "mpyc_policies_and_people.csv")
 
     MPY_EFFECTIVE_DATES = [Date.new(2018, 4, 1), Date.new(2018, 5, 1)]
     file = Roo::Spreadsheet.open(file_path)
