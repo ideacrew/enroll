@@ -108,8 +108,8 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on  # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
     benefit_application.pull_benefit_sponsorship_attributes
-    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
-    benefit_application.predecessor_application_id = predecessor_application.first.id if predecessor_application.present?
+    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
+    benefit_application.predecessor_id = predecessor_application.first.id if predecessor_application.present?
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
     catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
@@ -254,8 +254,8 @@ class BenefitApplicationMigration < Mongoid::Migration
     @benefit_package_map.each do |benefit_group, benefit_package|
       benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
-          census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.profile.id)
-          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.profile.id
+          census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) if census_employee.employee_role && census_employee.employee_role.benefit_sponsors_employer_profile_id.blank?
+          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 
