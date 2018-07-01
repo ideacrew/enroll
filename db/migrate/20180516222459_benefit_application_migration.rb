@@ -116,9 +116,13 @@ class BenefitApplicationMigration < Mongoid::Migration
     plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
 
     unless self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
-      print 'F' unless Rails.env.test?
-      csv << [plan_year.employer_profile.legal_name, plan_year.employer_profile.fein, plan_year.id, plan_year.start_on, "benefit sponsor catalog products mismatch with old model plan year products"]
-      return false
+      if (plan_year.benefit_groups.count < 2 && ["sole_source","single_plan"].include?(plan_year.benefit_groups.first.plan_option_kind))
+        self.update_sponsor_catalog_single_product_package(@benefit_sponsor_catalog, plan_year)
+      else
+        print 'F' unless Rails.env.test?
+        csv << [plan_year.employer_profile.legal_name, plan_year.employer_profile.fein, plan_year.id, plan_year.start_on, "benefit sponsor catalog products mismatch with old model plan year products"]
+        return false
+      end
     end
 
     @benefit_sponsor_catalog.benefit_application = benefit_application
@@ -199,6 +203,15 @@ class BenefitApplicationMigration < Mongoid::Migration
 
   def self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
     plan_year_plan_hios_ids.all? {|hios_id| catalog_product_hios_id.include?(hios_id)}
+  end
+
+  def self.update_sponsor_catalog_single_product_package(benefit_sponsor_catalog, plan_year)
+    benefit_group = plan_year.benefit_groups.first
+    reference_plan = benefit_group.reference_plan
+    package_kind = self.map_product_package_kind(benefit_group.plan_option_kind)
+    product_product = benefit_sponsor_catalog.product_packages.where(package_kind: package_kind).first
+    product = BenefitMarkets::Products::Product.where(hios_id: reference_plan.hios_id).select {|product| product.active_year == reference_plan.active_year }.to_a
+    product_product.products = product
   end
 
   def self.map_product_package_kind(plan_option_kind)
