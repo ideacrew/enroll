@@ -12,7 +12,7 @@ module BenefitSponsors
         current_date = TimeKeeper.date_of_record
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-        if BenefitSponsors::BenefitApplication::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        if BenefitSponsors::BenefitApplications::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
           benefit_application = new_model_event.klass_instance
 
           if new_model_event.event_key == :renewal_application_denied
