@@ -533,8 +533,8 @@ module BenefitSponsors
         let(:initial_application_state) { :active }
 
         it "should find sponsorships with application in active state and matching effective period begin date" do
-          expect(subject.may_renew_application?(april_effective_date.prev_year).size).to eq (april_renewal_sponsors.size)
-          expect(subject.may_renew_application?(april_effective_date.prev_year).to_a).to eq (april_renewal_sponsors)
+          expect(subject.may_renew_application?(april_effective_date.prev_day).size).to eq (april_renewal_sponsors.size)
+          expect(subject.may_renew_application?(april_effective_date.prev_day).to_a).to eq (april_renewal_sponsors)
         end
       end
 
