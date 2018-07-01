@@ -3,7 +3,7 @@ module BenefitSponsors
     class BenefitApplicationObserver
       include ::Acapi::Notifiers
 
-      def on_update
+      def on_update(benefit_application, options={})
         
       end
     end
