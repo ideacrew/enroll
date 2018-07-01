@@ -1,7 +1,7 @@
 namespace :cca do
   desc "Restore Person/Enrollment HbxIds for MPYC"
   task :restore_hbx_ids_for_mpy_conversions => :environment do
-    file_path = "/Users/nisanthyaganti/Downloads/conversion_hbxid_importers_628_results/conversion_employee_policy_results/employees_and_policies_.csv"
+    file_path = "" # NEED to get confirmation on where to add this csv.
 
     MPY_EFFECTIVE_DATES = [Date.new(2018, 4, 1), Date.new(2018, 5, 1)]
     file = Roo::Spreadsheet.open(file_path)
