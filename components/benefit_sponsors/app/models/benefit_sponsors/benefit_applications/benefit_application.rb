@@ -490,6 +490,9 @@ module BenefitSponsors
 
       renewal_application.pull_benefit_sponsorship_attributes
 
+      new_benefit_sponsor_catalog.benefit_application = renewal_application
+      new_benefit_sponsor_catalog.save
+
       benefit_packages.each do |benefit_package|
         new_benefit_package = renewal_application.benefit_packages.build
         benefit_package.renew(new_benefit_package)
