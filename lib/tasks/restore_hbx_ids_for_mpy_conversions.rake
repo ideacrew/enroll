@@ -100,11 +100,6 @@ namespace :cca do
       primary_dob = parse_date(row["Subscriber DOB"])
       restorable_hbx_id = parse_text(row["Employee Hbx ID"])
 
-      if restorable_hbx_id.blank?
-        puts "No HBX ID given in Spreadsheet for #{primary_last_name} #{primary_first_name}."
-        next
-      end
-
       people = find_people(primary_ssn, primary_dob, primary_last_name)
 
       if people.blank?
@@ -120,7 +115,10 @@ namespace :cca do
       end
 
       primary_person = people.first
-      restore_person_hbx_id(primary_person, restorable_hbx_id)
+
+      if restorable_hbx_id.present?
+        restore_person_hbx_id(primary_person, restorable_hbx_id)
+      end
 
       Array(1..6).each do |i|
         dependent_ssn = parse_ssn(row["Dep#{i} SSN"])
@@ -130,13 +128,10 @@ namespace :cca do
 
         break if dependent_last_name.blank?
 
-        if dependent_restorable_hbx_id.blank?
-          puts "**** No HBX ID for the dependent in Spreadsheet. Subscriber HBX ID: #{primary_person.hbx_id} ****"
-          next
+        if dependent_restorable_hbx_id.present?
+          dependents = find_people(dependent_ssn, dependent_dob, dependent_last_name)
+          initiate_dependent_restore(dependents, dependent_restorable_hbx_id, dependent_last_name)
         end
-
-        dependents = find_people(dependent_ssn, dependent_dob, dependent_last_name)
-        initiate_dependent_restore(dependents, dependent_restorable_hbx_id, dependent_last_name)
       end
 
       begin
