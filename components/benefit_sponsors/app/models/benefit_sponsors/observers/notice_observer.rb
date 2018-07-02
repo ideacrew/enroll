@@ -157,7 +157,7 @@ module BenefitSponsors
 
           if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
             
-            is_valid_employer_py_oe = (hbx_enrollment.sponsored_benefit_package.benefit_application.enrollment_period.cover?(hbx_enrollment.submitted_at) || hbx_enrollment.sponsored_benefit_package.benefit_application.enrollment_period.cover?(hbx_enrollment.created_at))
+            is_valid_employer_py_oe = (hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.submitted_at) || hbx_enrollment.sponsored_benefit_package.benefit_application.open_enrollment_period.cover?(hbx_enrollment.created_at))
 
             if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
               if is_valid_employer_py_oe
