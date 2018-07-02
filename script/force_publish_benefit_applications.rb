@@ -48,7 +48,6 @@ def find_renewable_benefit_applications(start_date, already_renewed_ids)
 end
 
 benefit_applications = []
-benefit_sponsorships.each{|bs| benefit_applications << select_benefit_application(bs)}
 
 force_renewal_eligible = find_renewable_benefit_applications(
   start_on_date,
