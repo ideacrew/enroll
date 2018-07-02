@@ -1,15 +1,24 @@
 require 'rails_helper'
 
-# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 # require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+  # require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 RSpec.describe ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit, type: :model, :dbclean => :after_each do
+
   let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_market)          { site.benefit_markets.first }
+  let(:effective_period)        { Date.today.end_of_month.next_day..Date.today.end_of_month.next_year }
+  let(:effective_period_begin)  { effective_period_begin }
+
+  let!(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+    benefit_market: benefit_market,
+    title: "SHOP Benefits for #{effective_period_begin.year}",
+    application_period: (effective_period_begin.beginning_of_year..effective_period_begin.end_of_year))
+  }
+
   let(:employer_organization)   { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-  let(:effective_period)        { Date.today.end_of_month..Date.today.end_of_month.next_year.prev_day }
-  let(:open_enrollment_period)  { (effective_period.min - 1.month)..(effective_period.min - 1.month + 10.days) }
+  let(:open_enrollment_period)  { (effective_period_begin - 1.month)..(effective_period_begin - 1.month + 10.days) }
   let(:benefit_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
                                       benefit_sponsorship: benefit_sponsorship,
                                       # benefit_sponsor_catalog: benefit_sponsor_catalog,
@@ -19,6 +28,9 @@ RSpec.describe ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit, type: :mo
                                       pte_count: 0,
                                       msp_count: 0
                                   ) }
+
+  let(:service_areas)           { benefit_application.recorded_service_areas }
+  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period_begin) }
 
   let(:benefit_package)         { build(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application) }
   let(:product_package)         { build(:benefit_markets_products_product_package) }
@@ -33,6 +45,8 @@ RSpec.describe ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit, type: :mo
       pricing_determinations: pricing_determinations,
     }
   end
+
+  before { benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog }
 
   describe "A new SponsoredBenefit instance" do
     it { is_expected.to be_mongoid_document }

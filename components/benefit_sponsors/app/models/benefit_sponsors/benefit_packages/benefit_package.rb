@@ -4,16 +4,16 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
 
-
-      embedded_in :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
+      embedded_in :benefit_application,
+                  class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
                   inverse_of: :benefit_packages
 
-      field :title, type: String, default: ""
-      field :description, type: String, default: ""
+      field :title,                 type: String, default: ""
+      field :description,           type: String, default: ""
       field :probation_period_kind, type: Symbol
-      field :is_default, type: Boolean, default: false
-      field :is_active, type: Boolean, default: true
-      field :predecessor_id, type: BSON::ObjectId
+      field :is_default,            type: Boolean, default: false
+      field :is_active,             type: Boolean, default: true
+      field :predecessor_id,        type: BSON::ObjectId
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -24,46 +24,26 @@ module BenefitSponsors
 
       accepts_nested_attributes_for :sponsored_benefits
 
-      delegate :benefit_sponsor_catalog, to: :benefit_application
-      delegate :rate_schedule_date,      to: :benefit_application
-      delegate :effective_period,        to: :benefit_application
-      delegate :predecessor_application, to: :benefit_application
-      delegate :recorded_sic_code, to: :benefit_application
+      delegate :benefit_sponsor_catalog,  to: :benefit_application
+      delegate :rate_schedule_date,       to: :benefit_application
+      delegate :effective_period,         to: :benefit_application
+      delegate :predecessor_application,  to: :benefit_application
+      delegate :recorded_sic_code,        to: :benefit_application
 
-      delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
-      delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
-      delegate :recorded_rating_area, to: :benefit_application
-      delegate :benefit_sponsorship, to: :benefit_application
-      delegate :recorded_service_area_ids, to: :benefit_application
-      delegate :benefit_market, to: :benefit_application
-      delegate :is_conversion?, to: :benefit_application
+      delegate :start_on, :end_on, :open_enrollment_period,         to: :benefit_application
+      delegate :open_enrollment_start_on, :open_enrollment_end_on,  to: :benefit_application
+      delegate :recorded_rating_area,                               to: :benefit_application
+      delegate :benefit_sponsorship,                                to: :benefit_application
+      delegate :recorded_service_area_ids,                          to: :benefit_application
+      delegate :benefit_market,                                     to: :benefit_application
+      delegate :is_conversion?,                                     to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
       default_scope ->{ where(is_active: true) }
 
-      # calculate effective on date based on probation period kind
-      # Logic to deal with hired_on and created_at
       # returns a roster
       def new_hire_effective_on(roster)
-      end
-
-      def eligible_on(date_of_hire) # date_of_hire probation type is deprecated
-        return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
-
-        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
-      end
-
-      def effective_on_for(date_of_hire)
-        [start_on, eligible_on(date_of_hire)].max
-      end
-
-      def effective_on_for_cobra(date_of_hire)
-        [start_on, eligible_on(date_of_hire)].max
-      end
-
-      def open_enrollment_contains?(date)
-        open_enrollment_period.include?(date)
       end
 
       def package_for_open_enrollment(shopping_date)
@@ -75,6 +55,18 @@ module BenefitSponsors
         else
           return nil unless successor.present?
           successor.package_for_open_enrollment(shopping_date)
+        end
+      end
+
+      def package_for_date(coverage_start_date)
+        if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
+          return self
+        elsif (coverage_start_date < start_on)
+          return nil unless predecessor.present?
+          predecessor.package_for_date(coverage_start_date)
+        else
+          return nil unless successor.present?
+          successor.package_for_date(coverage_start_date)
         end
       end
 
@@ -90,21 +82,29 @@ module BenefitSponsors
         ).first
       end
 
-      def package_for_date(coverage_start_date)
-        if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
-          return self
-        elsif (coverage_start_date < start_on)
-          return nil unless predecessor.present?
-          predecessor.package_for_date(coverage_start_date)
-        else
-          return nil unless successor.present?
-          successor.package_for_date(coverage_start_date)
+
+      # Only one sponsored benefit of each kind is permitted within a BenefitPackage
+      def add_sponsored_benefit(new_sponsored_benefit)
+        self.sponsored_benefits << new_sponsored_benefit unless sponsored_benefit_for(new_sponsored_benefit.product_kind).present?
+      end
+
+      def drop_sponsored_benefit(sponsored_benefit)
+        sponsored_benefits.delete(sponsored_benefit)
+      end
+
+      def sponsored_benefits=(sponsored_benefits_attrs)
+        sponsored_benefits_attrs.each do |sponsored_benefit_attrs|
+          sponsored_benefit = sponsored_benefits.build
+          sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
         end
       end
 
-      # TODO: there can be only one sponsored benefit of each kind
-      def add_sponsored_benefit(new_sponsored_benefit)
-        sponsored_benefits << new_sponsored_benefit
+      def sponsored_benefit_for(benefit_kind)
+        sponsored_benefits.detect { |sponsored_benefit| sponsored_benefit.product_kind == benefit_kind.to_sym }
+      end
+
+      def sponsored_benefit_kinds
+        sponsored_benefits.map(&:product_kind)
       end
 
       def effective_on_kind
@@ -113,7 +113,6 @@ module BenefitSponsors
           first_of_month: 'first_of_month',
           first_of_month_after_30_days: 'first_of_month',
           first_of_month_after_60_days: 'first_of_month'
-
         }
 
         effective_on_kind_mapping[probation_period_kind]
@@ -168,25 +167,35 @@ module BenefitSponsors
       end
 
       def rating_area
-        recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
+        recorded_rating_area
       end
-      
-      def drop_sponsored_benefit(sponsored_benefit)
-        sponsored_benefits.delete(sponsored_benefit)
+
+      # Set the prior_benefit_package instance that preceded this one
+      def predecessor=(prior_benefit_package)
+        if prior_benefit_package.nil?
+          write_attribute(:predecessor_id, nil)
+        else
+          raise ArgumentError.new("expected BenefitPackage") unless prior_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+          write_attribute(:predecessor_id, prior_benefit_package._id)
+        end
+        @predecessor = prior_benefit_package
       end
 
       def predecessor
-        return @predecessor if @predecessor
         return nil if predecessor_id.blank?
-        @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
+        return @predecessor if defined? @predecessor
+        @predecessor = benefit_application.predecessor.find_benefit_package(predecessor_id)
       end
 
-      def predecessor=(old_benefit_package)
-        raise ArgumentError.new("expected BenefitPackage") unless old_benefit_package.kind_of? BenefitSponsors::BenefitPackages::BenefitPackage
-        @predecessor = old_benefit_package
-        self.predecessor_id = old_benefit_package.id
-      end
+      # def successors
+      #   return [] if benefit_application.blank?
+      #   return @successors if defined? @successors
+      #   @successors = benefit_application.successors.reduce([]) do |list, successor_application|
+      #     list << successor_application.benefit_packages.collect { |benefit_package| benefit_package. }
+      #   end
+      # end
 
+      ## FIXME Move this to UI Helper Method
       def probation_period_display_name
         probation_period_display_texts = {
           first_of_month: "First of the month following or coinciding with date of hire",
@@ -264,7 +273,7 @@ module BenefitSponsors
       end
 
       def effectuate_member_benefits
-        enrolled_families.each do |family| 
+        enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
@@ -284,14 +293,14 @@ module BenefitSponsors
           end
         end
       end
- 
+
       def terminate_member_benefits
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            
+
             if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
               hbx_enrollment.terminate_coverage!
               hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
@@ -337,10 +346,6 @@ module BenefitSponsors
         sponsored_benefit = sponsored_benefit_for(product_kind)
         return [] unless sponsored_benefit
         sponsored_benefit.issuers_offered
-      end
-
-      def sponsored_benefit_for(coverage_kind)
-        sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind.to_sym }
       end
 
       def census_employees_assigned_on(effective_date, is_active = true)
@@ -389,14 +394,30 @@ module BenefitSponsors
 
       end
 
-      def sponsored_benefits=(sponsored_benefits_attrs)
-        sponsored_benefits_attrs.each do |sponsored_benefit_attrs|
-          sponsored_benefit = sponsored_benefits.build
-          sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
-        end
+      # Deprecate below methods in future
+
+    ### FIXME Move these methods to Domain Logic
+      # calculate effective_on date based on probation period kind
+      # Logic to deal with hired_on and created_at
+
+      def eligible_on(date_of_hire) # date_of_hire probation type is deprecated
+        return (date_of_hire + effective_on_offset.days) if (date_of_hire + effective_on_offset.days).day == 1
+
+        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
       end
 
-      # Deprecate below methods in future
+      def effective_on_for(date_of_hire)
+        [start_on, eligible_on(date_of_hire)].max
+      end
+
+      def effective_on_for_cobra(date_of_hire)
+        [start_on, eligible_on(date_of_hire)].max
+      end
+
+      def open_enrollment_contains?(date)
+        open_enrollment_period.include?(date)
+      end
+    ###
 
       def plan_year
         warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?

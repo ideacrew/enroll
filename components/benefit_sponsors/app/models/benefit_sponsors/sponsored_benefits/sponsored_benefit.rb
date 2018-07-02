@@ -23,6 +23,8 @@ module BenefitSponsors
     embeds_many :pricing_determinations,
                 class_name: "::BenefitSponsors::SponsoredBenefits::PricingDetermination"
 
+    delegate :product_kind,               to: :product_package
+    delegate :package_kind,               to: :product_package
     delegate :contribution_model,         to: :product_package, allow_nil: true
     delegate :pricing_model,              to: :product_package, allow_nil: true
     delegate :pricing_calculator,         to: :product_package, allow_nil: true
@@ -50,18 +52,18 @@ module BenefitSponsors
       product_package_id.present?
     end
 
-    def product_package_kind=(new_product_package_kind)
-      @product_package_kind = new_product_package_kind
-    end
+    # def product_package_kind=(new_product_package_kind)
+    #   @product_package_kind = new_product_package_kind
+    # end
 
-    def product_package_kind
-      @product_package_kind
-      # product_package.package_kind if product_package.present?
-    end
+    # def product_package_kind
+    #   @product_package_kind
+    #   # product_package.package_kind if product_package.present?
+    # end
 
-    def product_kind
-      product_package.product_kind if product_package.present?
-    end
+    # def product_kind
+    #   product_package.product_kind if product_package.present?
+    # end
 
 #####
 
@@ -71,13 +73,13 @@ module BenefitSponsors
     end
 
     def single_plan_type?
-      product_package_kind == :single_product
+      package_kind == :single_product
     end
 
 
     # FIXME Remove date argument
     def products(coverage_date = nil)
-      return [reference_product] if product_package_kind == :single_product
+      return [reference_product] if package_kind == :single_product
       product_package.products.present? ? product_package.products : []
     end
 
@@ -148,7 +150,7 @@ module BenefitSponsors
       if new_product_package.present? && reference_product.present?
         if reference_product.renewal_product.present? && new_product_package.active_products.include?(reference_product.renewal_product)
           self.class.new(
-            product_package_kind: product_package_kind,
+            # product_package_kind: product_package_kind,
             product_option_choice: product_option_choice,
             reference_product: reference_product.renewal_product,
             sponsor_contribution: sponsor_contribution.renew(new_product_package)

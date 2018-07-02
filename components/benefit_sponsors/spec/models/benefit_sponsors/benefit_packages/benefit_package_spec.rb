@@ -1,14 +1,49 @@
 require 'rails_helper'
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
+# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
 
-    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_market)          { site.benefit_markets.first }
+  let(:effective_period)        { Date.today.end_of_month.next_day..Date.today.end_of_month.next_year }
+  let(:effective_period_begin)  { effective_period.min }
 
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
+  let!(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+    benefit_market: benefit_market,
+    title: "SHOP Benefits for #{effective_period_begin.year}",
+    application_period: (effective_period_begin.beginning_of_year..effective_period_begin.end_of_year))
+  }
+
+  let(:employer_organization)   { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+  let(:open_enrollment_period)  { (effective_period_begin - 1.month)..(effective_period_begin - 1.month + 10.days) }
+  let(:initial_benefit_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
+                                      benefit_sponsorship: benefit_sponsorship,
+                                      # benefit_sponsor_catalog: benefit_sponsor_catalog,
+                                      effective_period: effective_period,
+                                      open_enrollment_period: open_enrollment_period,
+                                      fte_count: 5,
+                                      pte_count: 0,
+                                      msp_count: 0
+                                  ) }
+
+
+  let!(:rating_area)            { create_default(:benefit_markets_locations_rating_area) }
+  let(:service_areas)           { initial_benefit_application.recorded_service_areas }
+  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period_begin) }
+
+  let(:current_benefit_package) { build(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_benefit_application) }
+  let(:product_package)         { build(:benefit_markets_products_product_package) }
+  let(:sponsor_contribution)    { build(:benefit_sponsors_sponsored_benefits_sponsor_contribution) }
+  let(:pricing_determinations)  { BenefitSponsors::SponsoredBenefits::PricingDetermination.new.to_a }
+
+
+
+    # include_context "setup benefit market with market catalogs and product packages"
+    # include_context "setup initial benefit application"
 
     let(:title)                 { "Generous BenefitPackage - 2018"}
     let(:probation_period_kind) { :first_of_month_after_30_days }
@@ -20,7 +55,7 @@ module BenefitSponsors
       }
     end
 
-    context "A new model instance" do
+    context "A new BenefitPackage instance" do
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_field(:title).of_type(String).with_default_value_of("")}
       it { is_expected.to have_field(:description).of_type(String).with_default_value_of("")}
@@ -81,7 +116,7 @@ module BenefitSponsors
           reference_product.save!
         }
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
-        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+        let(:renewal_application)             { initial_benefit_application.renew(renewal_benefit_sponsor_catalog) }
         let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
         before do
@@ -89,9 +124,9 @@ module BenefitSponsors
         end
 
         it "should have valid applications" do
-          initial_application.validate
+          initial_benefit_application.validate
           renewal_application.validate
-          expect(initial_application).to be_valid
+          expect(initial_benefit_application).to be_valid
           expect(renewal_application).to be_valid
         end
 
@@ -149,16 +184,94 @@ module BenefitSponsors
     end
 
     describe '.renew_employee_benefits' do
-      include_context "setup employees with benefits"
+      # include_context "setup employees with benefits"
 
     end
 
-    describe 'changing reference product' do
-      context 'changing reference product' do
-        include_context "setup benefit market with market catalogs and product packages"
-        include_context "setup initial benefit application"
+    describe "Managing SponsoredBenefits" do
 
-        let(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
+      context "Given a BenefitPackage, ProductPackage and SponsoredBenefit" do
+        let(:fresh_benefit_package) { described_class.new(benefit_application: initial_benefit_application, title: title, probation_period_kind: probation_period_kind) }
+
+        let(:health_metal_level_product_package)      { benefit_sponsor_catalog.product_packages.detect { |pp| pp.package_kind == :metal_level }}
+        let(:health_single_issuer_product_package)    { benefit_sponsor_catalog.product_packages.detect { |pp| pp.package_kind == :single_issuer }}
+
+        let(:health_single_issuer_sponsored_benefit)  { BenefitSponsors::SponsoredBenefits::SponsoredBenefit.new(product_package: health_single_issuer_product_package) }
+
+        context "and a SponsoredBenefit is added to ProductPackage" do
+          let(:health_metal_level_sponsored_benefit)  { BenefitSponsors::SponsoredBenefits::SponsoredBenefit.new(product_package: health_metal_level_product_package) }
+
+          before { fresh_benefit_package.add_sponsored_benefit(health_metal_level_sponsored_benefit) }
+
+          context "and the SponsoredBenefit kind is unique for this BenefitPackage" do
+
+            it "should add the SponsoredBenefit" do
+              expect(fresh_benefit_package.sponsored_benefits.size).to eq 1
+              expect(fresh_benefit_package.sponsored_benefits).to eq health_metal_level_sponsored_benefit.to_a
+            end
+
+            context "and another SponsoredBenefit of the same kind is added" do
+
+              it "should not add the SponsoredBenefit" do
+                fresh_benefit_package.add_sponsored_benefit(health_single_issuer_product_package)
+                expect(fresh_benefit_package.sponsored_benefits.size).to eq 1
+                expect(fresh_benefit_package.sponsored_benefits.first).to eq health_metal_level_sponsored_benefit
+              end
+            end
+
+            context "and the SponsoredBenefit is searched by kind" do
+              it "should find the correct SponsoredBenefit" do
+                expect(fresh_benefit_package.sponsored_benefit_for(health_metal_level_sponsored_benefit.product_kind)).to eq health_metal_level_sponsored_benefit
+              end
+
+              it "should not find SponsoredBenefit for kind that's not present" do
+                expect(fresh_benefit_package.sponsored_benefit_for(:dental)).to be_nil
+              end
+            end
+
+            context "and a SponsoredBenefit is dropped" do
+
+              it "should remove the sponsored_benefit" do
+                expect(fresh_benefit_package.sponsored_benefits.size).to eq 1
+                expect(fresh_benefit_package.sponsored_benefits).to eq health_metal_level_sponsored_benefit.to_a
+                fresh_benefit_package.drop_sponsored_benefit(health_metal_level_sponsored_benefit)
+                expect(fresh_benefit_package.sponsored_benefits.size).to eq 0
+              end
+            end
+          end
+        end
+      end
+    end
+
+    describe "Managing Contribution Model" do
+      context "Setting a Contribution Model" do
+      end
+
+      context "Changing a Contribution Model" do
+        context "Given a BenefitPackage using one Contribution Model" do
+
+          context "is updated to an incompatible Contribution Model" do
+            it "should not change associated members"
+
+            it "should reset the sponsored benefits"
+
+            it "should reset the contribution model"
+
+            it "should reset the pricing model"
+          end
+
+          context "is updated to a compatible Contriburtion Model" do
+          end
+        end
+      end
+    end
+
+    describe 'Changing Reference Product' do
+      context 'changing reference product' do
+        # include_context "setup benefit market with market catalogs and product packages"
+        # include_context "setup initial benefit application"
+
+        let(:sponsored_benefit) { initial_benefit_application.benefit_packages.first.sponsored_benefits.first }
         let(:new_reference_product) { product_package.products[2] }
 
         before do
