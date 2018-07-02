@@ -69,11 +69,17 @@ class BenefitApplicationMigration < Mongoid::Migration
             benfit_application_product_hios_ids = self.get_plan_hios_ids_of_benefit_application(benefit_application)
 
             unless self.new_benfit_application_product_valid(plan_year_plan_hios_ids, benfit_application_product_hios_ids)
-              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old model plan year products"]
-              next
+              if self.tufts_case(plan_year_plan_hios_ids, benfit_application_product_hios_ids, plan_year.start_on.year)
+                self.update_sponsor_catalog_product_package(@benefit_sponsor_catalog, plan_year)
+                @benefit_sponsor_catalog.save
+              else
+                print 'F' unless Rails.env.test?
+                csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old model plan year products"]
+                next
+              end
             end
 
-            if benefit_application.valid?
+            if benefit_application.valid? && self.new_benfit_application_product_valid(self.get_plan_hios_ids_of_plan_year(plan_year), self.get_plan_hios_ids_of_benefit_application(benefit_application))
               benefit_application.save!
               assign_employee_benefits(benefit_sponsorship)
               print '.' unless Rails.env.test?
@@ -108,17 +114,15 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on  # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
     benefit_application.pull_benefit_sponsorship_attributes
-    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
-    benefit_application.predecessor_application_id = predecessor_application.first.id if predecessor_application.present?
+    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
+    benefit_application.predecessor_id = predecessor_application.first.id if predecessor_application.present?
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
     catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
     plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
 
     unless self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
-      print 'F' unless Rails.env.test?
-      csv << [plan_year.employer_profile.legal_name, plan_year.employer_profile.fein, plan_year.id, plan_year.start_on, "benefit sponsor catalog products mismatch with old model plan year products"]
-      return false
+      self.update_sponsor_catalog_product_package(@benefit_sponsor_catalog, plan_year)
     end
 
     @benefit_sponsor_catalog.benefit_application = benefit_application
@@ -201,6 +205,28 @@ class BenefitApplicationMigration < Mongoid::Migration
     plan_year_plan_hios_ids.all? {|hios_id| catalog_product_hios_id.include?(hios_id)}
   end
 
+  def self.update_sponsor_catalog_product_package(benefit_sponsor_catalog, plan_year)
+    plan_year.benefit_groups.each do |benefit_group|
+      plans = benefit_group.elected_plans
+      products =  plans.inject([]) do |product, plan|
+        product += BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select {|product| product.active_year == plan.active_year }
+      end
+      package_kind = self.map_product_package_kind(benefit_group.plan_option_kind)
+      product_package = benefit_sponsor_catalog.product_packages.where(package_kind: package_kind).first
+      product_package.products = products
+    end
+  end
+
+  def self.tufts_case(plan_hios, product_hios, year)
+    tufts_exists_in_plan_year = Plan.where(:"hios_id".in=>plan_hios, active_year: year).select{|product| product.carrier_profile.legal_name == "Tufts Health Direct"}
+    tufts_exists_in_benefit_application = BenefitMarkets::Products::Product.where(:'hios_id'.in=>product_hios).select{|product| ((product.issuer_profile.legal_name == "Tufts Health Direct") && (product.active_year == year))}
+    if tufts_exists_in_plan_year.blank? && tufts_exists_in_benefit_application.present?
+      return true
+    else
+      return false
+    end
+  end
+
   def self.map_product_package_kind(plan_option_kind)
     package_kind_mapping = {
         sole_source: :single_product,
@@ -254,6 +280,8 @@ class BenefitApplicationMigration < Mongoid::Migration
     @benefit_package_map.each do |benefit_group, benefit_package|
       benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
+          census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) if census_employee.employee_role && census_employee.employee_role.benefit_sponsors_employer_profile_id.blank?
+          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 

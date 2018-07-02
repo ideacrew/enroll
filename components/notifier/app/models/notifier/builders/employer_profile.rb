@@ -89,16 +89,21 @@ module Notifier
       merge_model.invoice_date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     end
 
+    def active_benefit_sponsorship
+      employer_profile.active_benefit_sponsorship
+    end
+
     def coverage_month
       merge_model.coverage_month = TimeKeeper.date_of_record.next_month.strftime("%m/%Y")
     end
 
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(employer_profile.plan_years.enrolled.first.hbx_enrollments.map(&:total_premium).sum)
+      merge_model.total_amount_due = number_to_currency(active_benefit_sponsorship.benefit_applications.where(:aasm_state => "enrollment_closed").first.hbx_enrollments.map(&:total_premium).sum)
     end
 
     def date_due
-      merge_model.date_due = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
+      schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+      merge_model.date_due = schedular.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
     end
   end
 end

@@ -40,7 +40,7 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
 
     migrated_organizations.batch_size(limit_count).no_timeout.each do |organization|
 
-      old_org = Organization.all_employer_profiles.where(hbx_id: organization.hbx_id)
+      old_org = Organization.all_employer_profiles.where(fein: organization.fein)
       next unless old_org.present?
 
       old_ep = old_org.first.employer_profile

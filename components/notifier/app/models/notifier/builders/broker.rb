@@ -6,7 +6,7 @@ module Notifier
     end
 
     def terminated_broker_agency_account
-      if payload['event_object_kind'].constantize == BrokerAgencyAccount
+      if payload['event_object_kind'].constantize == BenefitSponsors::Accounts::BrokerAgencyAccount
         employer_profile.broker_agency_accounts.unscoped.find(payload['event_object_id'])
       end
     end

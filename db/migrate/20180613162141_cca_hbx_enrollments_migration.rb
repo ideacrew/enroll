@@ -62,6 +62,9 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
         next unless enrollments.present?
 
         enrollments.each do |enrollment|
+
+          next unless new_model_ids_nil?(enrollment)
+
           total_enrollments = total_enrollments + 1
           begin
 
@@ -119,9 +122,13 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
         end
       end
     end
-    logger.info " Total #{total_enrollments} enrollments for census employees" unless Rails.env.test?
+    logger.info " Total #{total_enrollments} enrollments to be migrated" unless Rails.env.test?
     logger.info " #{updated_enrollments} enrollments updated at this point." unless Rails.env.test?
     return true
+  end
+
+  def self.new_model_ids_nil? enrollment
+    enrollment.sponsored_benefit_id.nil?
   end
 
   def self.get_hbx_enrollments(bga)

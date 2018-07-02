@@ -102,6 +102,28 @@ module Queries
       end
     end
 
+
+    class RenewalSimulationEligibleFilter
+      include Enumerable
+
+      def initialize(enums_from_aggregations, coverage_start_date)
+        @source_enums = enums_from_aggregations
+        @coverage_start_date = coverage_start_date
+      end
+
+      def each
+        @source_enums.each do |agg|
+          agg.each do |rec|
+            unless ["renewing_waived", "inactive", "void", "coverage_canceled", "coverage_terminated"].include?(rec["aasm_state"].to_s)
+              if (rec["_id"]["effective_on"] == @coverage_start_date) 
+                yield rec["hbx_enrollment_id"]
+              end
+            end
+          end
+        end
+      end
+    end
+
     def self.shop_initial_enrollments(organization, effective_on)
       sponsored_benefits = find_ie_sponsored_benefits(organization, effective_on)
       last_chance_to_cancel_at = nil
@@ -140,7 +162,7 @@ module Queries
             "$group" => {
               "_id" => {
                 "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-                "sponsored_benefit_id" => "$households.sponsored_benefit_id"
+                "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id"
               },
               "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
               "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
@@ -158,6 +180,13 @@ module Queries
         find_renewal_transmission_enrollments(sb, as_of_time)
       end
       RenewalTransmissionEligibleFilter.new(aggregations)
+    end
+
+    def self.find_simulated_renewal_enrollments(sponsored_benefits, effective_on, as_of_time = ::TimeKeeper.date_of_record)
+      aggregations = sponsored_benefits.map do |sb|
+        find_renewal_transmission_enrollments(sb, as_of_time)
+      end
+      RenewalSimulationEligibleFilter.new(aggregations, effective_on)
     end
 
     def self.find_renewal_transmission_enrollments(sb, as_of_time)
@@ -181,7 +210,8 @@ module Queries
           "$group" => {
             "_id" => {
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-              "sponsored_benefit_id" => "$households.sponsored_benefit_id"
+              "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id",
+              "effective_on" => "$households.hbx_enrollments.effective_on"
             },
             "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
             "aasm_state" => {"$last" => "$households.hbx_enrollments.aasm_state"},
@@ -193,7 +223,7 @@ module Queries
     end
 
     def self.find_renewal_sponsored_benefits(organization, effective_on)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).eligible_renewal_applications_on(effective_on)
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|
@@ -203,7 +233,7 @@ module Queries
     end
 
     def self.find_ie_sponsored_benefits(organization, effective_on)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).eligible_renewal_applications_on(effective_on)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(organization.employer_profile).may_transmit_initial_enrollment?(effective_on)
 
       benefit_sponsorships.flat_map do |bs|
         bs.benefit_applications.select do |ba|

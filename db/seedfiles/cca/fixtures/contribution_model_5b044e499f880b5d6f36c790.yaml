@@ -1,5 +1,5 @@
 --- !ruby/object:BenefitMarkets::ContributionModels::ContributionModel
-__selected_fields: 
+__selected_fields:
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -19,11 +19,11 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WwROSZ+IC11vNseR
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
-    minimum_contribution_factor: 0.0
+    minimum_contribution_factor: 0.5
     name: employee
     display_name: Employee
     order: 0
-    default_contribution_factor: 0.75
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -37,11 +37,11 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WwROSZ+IC11vNseT
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
-    minimum_contribution_factor: 0.0
+    minimum_contribution_factor: 0.33
     name: spouse
     display_name: Spouse
     order: 1
-    default_contribution_factor: 0.5
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -55,11 +55,11 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WxF/wZ+ICzQ1Tk5y
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
-    minimum_contribution_factor: 0.0
+    minimum_contribution_factor: 0.33
     name: domestic_partner
     display_name: Domestic Partner
     order: 2
-    default_contribution_factor: 0.25
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
@@ -73,11 +73,11 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WwROSZ+IC11vNseV
     _type: BenefitMarkets::ContributionModels::FixedPercentContributionUnit
-    minimum_contribution_factor: 0.0
+    minimum_contribution_factor: 0.33
     name: dependent
     display_name: Child Under 26
     order: 3
-    default_contribution_factor: 0.25
+    default_contribution_factor: 0.0
     member_relationship_maps:
     - !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId

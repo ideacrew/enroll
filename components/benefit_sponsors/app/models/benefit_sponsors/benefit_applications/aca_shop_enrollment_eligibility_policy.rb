@@ -18,23 +18,21 @@ module BenefitSponsors
   class BenefitApplications::AcaShopEnrollmentEligibilityPolicy
     include BenefitMarkets::BusinessRulesEngine
 
+    ENROLLMENT_RATIO_MINIMUM = 0.75
 
-    rule  :open_enrollment_period_minimum_rule,
-            # params:     { number_of_days: (@benefit_application.open_enrollment_period.max - @benefit_application.open_enrollment_period.min) },
-            validate: -> (benefit_application){
-              number_of_days = (benefit_application.open_enrollment_period.max.to_date - benefit_application.open_enrollment_period.min.to_date)
-              number_of_days < @benefit_market.configuration.open_enrollment_days_min
-              },
-            fail:     -> (number_of_days){"open enrollment period length #{number_of_days} day(s) is less than #{@benefit_market.configuration.open_enrollment_days_min} day(s) minimum" }
+    rule  :minimum_participation_rule,
+            validate: ->(benefit_application){ benefit_application.enrollment_ratio >= ENROLLMENT_RATIO_MINIMUM },
+            success:  ->(benefit_application){"validated successfully"},
+            fail:     ->(benefit_application){"Employer contribution percent toward employee premium (#{benefit_application.enrollment_ratio.to_i}%) is less than minimum allowed (#{(ENROLLMENT_RATIO_MINIMUM*100).to_i}%)" }
 
-    rule  :period_begin_before_end_rule,
-            # params:   { date_range: @benefit_application.open_enrollment_period },
-            validate: ->(date_range){ date_range.min < date_range.max },
-            fail:     ->{"begin date must be earlier than end date" }
-
+    rule  :non_business_owner_enrollment_count,
+            validate: ->(benefit_application){ benefit_application.enrolled_non_business_owner_count > benefit_application.members_eligible_to_enroll_count},
+            success:  ->(benefit_application){"validated successfully"},
+            fail:     ->(benefit_application){"at least #{(ENROLLMENT_RATIO_MINIMUM*100).to_i}% non-owner employee must enroll" }
 
     business_policy :passes_open_enrollment_period_policy,
-            rules: [:period_begin_before_end_rule, :open_enrollment_period_minimum_rule]
+            rules: [:minimum_participation_rule,
+                    :non_business_owner_enrollment_count]
 
 
     # business_policy :loosely_passes_open_enrollment_period_policy,

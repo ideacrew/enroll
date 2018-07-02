@@ -3,6 +3,9 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
+    include ::BenefitSponsors::Concerns::Observable
+    include ::BenefitSponsors::ModelEvents::BenefitApplication
+
     include AASM
 
     embedded_in :benefit_sponsorship,
@@ -81,9 +84,12 @@ module BenefitSponsors
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
+
+    add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:on_update]
+
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
-
+    after_save        :notify_on_save
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -284,6 +290,12 @@ module BenefitSponsors
       super(open_enrollment_range) unless open_enrollment_range.blank?
     end
 
+    def adjust_open_enrollment_date
+      if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
+        open_enrollment_period=((TimeKeeper.date_of_record.to_time.utc.beginning_of_day)..open_enrollment_end_on)
+      end
+    end
+
     def find_census_employees
       return @census_employees if defined? @census_employees
       @census_employees ||= CensusEmployee.benefit_application_assigned(self)
@@ -394,6 +406,11 @@ module BenefitSponsors
       total_enrolled    -= families_to_filter
     end
 
+    def hbx_enrollments
+      @hbx_enrollments = [] if benefit_packages.size == 0
+      @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
     def enrolled_non_business_owner_members
       return @enrolled_non_business_owner_members if defined? @enrolled_non_business_owner_members
 
@@ -479,6 +496,9 @@ module BenefitSponsors
 
       renewal_application.pull_benefit_sponsorship_attributes
 
+      new_benefit_sponsor_catalog.benefit_application = renewal_application
+      new_benefit_sponsor_catalog.save
+
       benefit_packages.each do |benefit_package|
         new_benefit_package = renewal_application.benefit_packages.build
         benefit_package.renew(new_benefit_package)
@@ -538,6 +558,11 @@ module BenefitSponsors
       end
 
       self
+    end
+
+    def accept_application
+      adjust_open_enrollment_date
+      transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
     end
 
     class << self
@@ -658,6 +683,10 @@ module BenefitSponsors
           to:     :canceled
       end
 
+      event :simulate_provisional_renewal do 
+        transitions from: [:draft, :approved], to: :enrollment_open
+      end
+
       event :expire do
         transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :active],
           to:     :expired
@@ -741,6 +770,14 @@ module BenefitSponsors
     def all_enrolled_members_count
       warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
       all_enrolled_and_waived_member_count
+    end
+
+    def enrollment_ratio
+      if members_eligible_to_enroll_count == 0
+        0
+      else
+        ((all_enrolled_and_waived_member_count * 1.0)/ members_eligible_to_enroll_count)
+      end
     end
 
     def total_enrolled_count

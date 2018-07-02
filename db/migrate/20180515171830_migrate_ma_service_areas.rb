@@ -62,6 +62,12 @@ class MigrateMaServiceAreas < Mongoid::Migration
         ])
 
         service_area_non_state_aggregate.each do |rec|
+          existing_state_wide_areas = ::BenefitMarkets::Locations::ServiceArea.where(
+            active_year: rec["_id"]["active_year"].to_i,
+            issuer_provided_code: rec["_id"]["issuer_provided_code"],
+            issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]]
+          )
+          next if existing_state_wide_areas.count > 0
           location_ids = rec['locations'].map do |loc_record|
             county_zip = ::BenefitMarkets::Locations::CountyZip.where({
              zip: loc_record['zip'],

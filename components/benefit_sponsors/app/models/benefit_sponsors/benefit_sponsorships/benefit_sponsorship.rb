@@ -154,7 +154,7 @@ module BenefitSponsors
 
     scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :active }}
+        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
       )
     }
 
