@@ -182,7 +182,7 @@ module Queries
       RenewalTransmissionEligibleFilter.new(aggregations)
     end
 
-    def self.find_simulated_renewal_enrollments(sponsored_benefits, effective_on, as_of_time, ::TimeKeeper.date_of_record)
+    def self.find_simulated_renewal_enrollments(sponsored_benefits, effective_on, as_of_time = ::TimeKeeper.date_of_record)
       aggregations = sponsored_benefits.map do |sb|
         find_renewal_transmission_enrollments(sb, as_of_time)
       end
