@@ -290,6 +290,12 @@ module BenefitSponsors
       super(open_enrollment_range) unless open_enrollment_range.blank?
     end
 
+    def adjust_open_enrollment_date
+      if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
+        open_enrollment_period=((TimeKeeper.date_of_record.to_time.utc.beginning_of_day)..open_enrollment_end_on)
+      end
+    end
+
     def find_census_employees
       return @census_employees if defined? @census_employees
       @census_employees ||= CensusEmployee.benefit_application_assigned(self)
@@ -554,6 +560,11 @@ module BenefitSponsors
       self
     end
 
+    def accept_application
+      adjust_open_enrollment_date
+      transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
+    end
+
     class << self
 
       def find(id)
@@ -670,6 +681,10 @@ module BenefitSponsors
           to:     :active
         transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled
+      end
+
+      event :simulate_provisional_renewal do 
+        transitions from: [:draft, :approved], to: :enrollment_open
       end
 
       event :expire do
