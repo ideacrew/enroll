@@ -29,7 +29,7 @@ def find_renewed_sponsorships(start_date)
   })
 end
 
-renewed_sponsorships = find_renewed_sponsorships
+renewed_sponsorships = find_renewed_sponsorships(start_on_date)
 
 f = File.open("policies_to_pull.txt","w")
 
