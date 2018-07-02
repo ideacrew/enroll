@@ -714,7 +714,7 @@ module ApplicationHelper
 
   def json_for_plan_shopping_member_groups(member_groups, issuer_profiles)
     ip_lookup_table = {}
-    issuer_profiles.each do |ipo
+    issuer_profiles.each do |ipo|
       ip_lookup_table[ipo.issuer_profile.id] = ipo.issuer_profile
     end
     member_groups.map do |mg|
