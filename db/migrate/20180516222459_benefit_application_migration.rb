@@ -69,11 +69,17 @@ class BenefitApplicationMigration < Mongoid::Migration
             benfit_application_product_hios_ids = self.get_plan_hios_ids_of_benefit_application(benefit_application)
 
             unless self.new_benfit_application_product_valid(plan_year_plan_hios_ids, benfit_application_product_hios_ids)
-              csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old model plan year products"]
-              next
+              if self.tufts_case(plan_year_plan_hios_ids, benfit_application_product_hios_ids, plan_year.start_on.year)
+                self.update_sponsor_catalog_product_package(@benefit_sponsor_catalog, plan_year)
+                @benefit_sponsor_catalog.save
+              else
+                print 'F' unless Rails.env.test?
+                csv << [old_org.legal_name, old_org.fein, plan_year.id, plan_year.start_on, "benefit application products mismatch with old model plan year products"]
+                next
+              end
             end
 
-            if benefit_application.valid?
+            if benefit_application.valid? && self.new_benfit_application_product_valid(self.get_plan_hios_ids_of_plan_year(plan_year), self.get_plan_hios_ids_of_benefit_application(benefit_application))
               benefit_application.save!
               assign_employee_benefits(benefit_sponsorship)
               print '.' unless Rails.env.test?
@@ -116,13 +122,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
 
     unless self.new_benefit_sponsor_catalog_product_valid(catalog_product_hios_id, plan_year_plan_hios_ids)
-      if (plan_year.benefit_groups.count < 2 && ["sole_source","single_plan"].include?(plan_year.benefit_groups.first.plan_option_kind))
-        self.update_sponsor_catalog_single_product_package(@benefit_sponsor_catalog, plan_year)
-      else
-        print 'F' unless Rails.env.test?
-        csv << [plan_year.employer_profile.legal_name, plan_year.employer_profile.fein, plan_year.id, plan_year.start_on, "benefit sponsor catalog products mismatch with old model plan year products"]
-        return false
-      end
+      self.update_sponsor_catalog_product_package(@benefit_sponsor_catalog, plan_year)
     end
 
     @benefit_sponsor_catalog.benefit_application = benefit_application
@@ -205,13 +205,26 @@ class BenefitApplicationMigration < Mongoid::Migration
     plan_year_plan_hios_ids.all? {|hios_id| catalog_product_hios_id.include?(hios_id)}
   end
 
-  def self.update_sponsor_catalog_single_product_package(benefit_sponsor_catalog, plan_year)
-    benefit_group = plan_year.benefit_groups.first
-    reference_plan = benefit_group.reference_plan
-    package_kind = self.map_product_package_kind(benefit_group.plan_option_kind)
-    product_product = benefit_sponsor_catalog.product_packages.where(package_kind: package_kind).first
-    product = BenefitMarkets::Products::Product.where(hios_id: reference_plan.hios_id).select {|product| product.active_year == reference_plan.active_year }.to_a
-    product_product.products = product
+  def self.update_sponsor_catalog_product_package(benefit_sponsor_catalog, plan_year)
+    plan_year.benefit_groups.each do |benefit_group|
+      plans = benefit_group.elected_plans
+      products =  plans.inject([]) do |product, plan|
+        product += BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select {|product| product.active_year == plan.active_year }
+      end
+      package_kind = self.map_product_package_kind(benefit_group.plan_option_kind)
+      product_package = benefit_sponsor_catalog.product_packages.where(package_kind: package_kind).first
+      product_package.products = products
+    end
+  end
+
+  def self.tufts_case(plan_hios, product_hios, year)
+    tufts_exists_in_plan_year = Plan.where(:"hios_id".in=>plan_hios, active_year: year).select{|product| product.carrier_profile.legal_name == "Tufts Health Direct"}
+    tufts_exists_in_benefit_application = BenefitMarkets::Products::Product.where(:'hios_id'.in=>product_hios).select{|product| ((product.issuer_profile.legal_name == "Tufts Health Direct") && (product.active_year == year))}
+    if tufts_exists_in_plan_year.blank? && tufts_exists_in_benefit_application.present?
+      return true
+    else
+      return false
+    end
   end
 
   def self.map_product_package_kind(plan_option_kind)
