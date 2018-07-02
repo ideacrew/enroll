@@ -1660,7 +1660,8 @@ class HbxEnrollment
       coverage_start_on: effective_on,
       member_enrollments: group_enrollment_members,
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
-      rating_area: rating_area.exchange_provided_code
+      rating_area: rating_area.exchange_provided_code,
+      sponsor_contribution_prohibited: is_cobra_status?
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,
