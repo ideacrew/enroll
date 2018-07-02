@@ -180,6 +180,17 @@ module BenefitSponsors
       where("$exists" => {:predecessor_id => true} )
     }
 
+    scope :published_or_renewing_published, -> {
+      warn "[Deprecated in the future]" unless Rails.env.test?
+      where(
+        "$or" => [
+          {:aasm_state.in => APPROVED_STATES },
+          {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
+
+
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
@@ -683,7 +694,7 @@ module BenefitSponsors
           to:     :canceled
       end
 
-      event :simulate_provisional_renewal do 
+      event :simulate_provisional_renewal do
         transitions from: [:draft, :approved], to: :enrollment_open
       end
 
