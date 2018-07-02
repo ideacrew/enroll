@@ -6,6 +6,7 @@ module BenefitSponsors
     class Profile
       include Mongoid::Document
       include Mongoid::Timestamps
+      include ::BenefitSponsors::ModelEvents::Profile
 
       embedded_in :organization,  class_name: "BenefitSponsors::Organizations::Organization"
 

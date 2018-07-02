@@ -2,21 +2,21 @@ module Notifier
   module Builders::OfferedProduct
 
     def offered_products
-      plan_year = load_plan_year      
-      enrollments = plan_year.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.beginning_of_month)
+      benefit_application = load_benefit_application
+      enrollments = benefit_application.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.beginning_of_month)
       merge_model.offered_products = build_offered_products(enrollments)
     end
 
     def build_offered_products(enrollments)
-      enrollments.group_by(&:plan_id).collect do |plan_id, enrollments|
-        build_offered_product(plan_id, enrollments)
+      enrollments.group_by(&:product_id).collect do |product_id, enrollments|
+        build_offered_product(product_id, enrollments)
       end
     end
 
-    def build_offered_product(plan_id, enrollments)
+    def build_offered_product(product_id, enrollments)
       offered_product = Notifier::MergeDataModels::OfferedProduct.new
-      plan = Plan.find(plan_id)
-      offered_product.plan_name = plan.name
+      product = BenefitMarkets::Products::Product.find(product_id)
+      offered_product.product_name = product.title
       offered_product.enrollments = build_enrollments(enrollments)
       offered_product
     end
@@ -24,8 +24,7 @@ module Notifier
     def build_enrollments(enrollments)
       enrollments.collect do |enr|
         enrollment = Notifier::MergeDataModels::Enrollment.new
-
-        enrollment.plan_name = enr.plan.name
+        enrollment.plan_name = enr.product.title
         enrollment.employee_responsible_amount = enr.total_employer_contribution
         enrollment.employer_responsible_amount = enr.total_employee_cost
         enrollment.premium_amount = enr.total_premium

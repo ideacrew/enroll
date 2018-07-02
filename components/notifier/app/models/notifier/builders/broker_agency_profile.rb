@@ -17,7 +17,7 @@ module Notifier
     end
 
     def append_contact_details
-      office_address = broker_agency_profile.organization.primary_office_location.address
+      office_address = broker_agency_profile.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: office_address.address_1,
@@ -50,8 +50,8 @@ module Notifier
     end
 
     def employer
-      if payload['event_object_kind'].constantize == EmployerProfile
-        employer = EmployerProfile.find payload['event_object_id']
+      if payload['event_object_kind'].constantize == BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+        employer = BenefitSponsors::Organizations::Profile.find payload['event_object_id']
       end
     end
 

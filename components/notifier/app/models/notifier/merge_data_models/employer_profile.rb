@@ -26,7 +26,7 @@ module Notifier
     # attribute :to, String
     # attribute :plan, MergeDataModels::Plan
     attribute :benefit_application, MergeDataModels::BenefitApplication
-    attribute :plan_year, MergeDataModels::PlanYear
+    # attribute :plan_year, MergeDataModels::PlanYear
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Enrollment
 

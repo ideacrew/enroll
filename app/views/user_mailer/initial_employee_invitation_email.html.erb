@@ -6,11 +6,11 @@
 <br/>
 <br/>
 <div>
-  Good News! <%= census_employee.employer_profile.legal_name.titleize %> has chosen to offer <%= site_short_name %> coverage to its employees through The <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable. Your new open enrollment period begins on <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_start_on.to_date.to_formatted_s %>.
+  Good News! <%= census_employee.employer_profile.legal_name.titleize %> has chosen to offer <%= site_short_name %> coverage to its employees through The <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable. Your new open enrollment period begins on <%=  census_employee.published_benefit_group_assignment.benefit_application.open_enrollment_period.min.to_date.to_formatted_s %>.
 </div>
 <br/>
 <div>
- You are now able to plan shop for insurance that will start on <%= census_employee.published_benefit_group_assignment.plan_year.start_on%>, as part of your open enrollment period. To enroll into employer-sponsored insurance through The <%= site_short_name %>, you must complete your application by <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_end_on %>.
+ You are now able to plan shop for insurance that will start on <%= census_employee.published_benefit_group_assignment.benefit_application.start_on.to_date.to_formatted_s%>, as part of your open enrollment period. To enroll into employer-sponsored insurance through The <%= site_short_name %>, you must complete your application by <%= census_employee.published_benefit_group_assignment.benefit_application.open_enrollment_period.max.to_date.to_formatted_s %>.
 </div>
 <br/>
 <div>
