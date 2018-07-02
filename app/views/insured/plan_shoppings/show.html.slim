@@ -32,7 +32,7 @@
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 #plans
                  = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
-                #filteredPlans data-enrollments="#{@member_groups.map {|mg| mg.group_enrollment.to_json}}" data-carriers="#{@member_groups.map {|mg| ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, mg.group_enrollment.product.issuer_profile_id).to_json { mg.group_enrollment.product.issuer_profile }}}"
+                #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups, @issuer_profiles)}" data-carriers="#{@member_groups.map {|mg| ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, mg.group_enrollment.product.issuer_profile_id).to_json { mg.group_enrollment.product.issuer_profile }}}"
 
       .no-buffer
       p.pull-right
