@@ -66,8 +66,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @organizations = @benfit_sponsorships.map(&:organization)
     @employer_profiles = @organizations.flat_map(&:employer_profile)
     @employer_profiles.each do |employer_profile|
-      @employer_invoice = BenefitSponsors::EmployerInvoice.new(employer_profile.organization)
-      @employer_invoice.save_and_notify_with_clean_up
+      employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."

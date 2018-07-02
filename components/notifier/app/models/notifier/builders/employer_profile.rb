@@ -37,7 +37,7 @@ module Notifier
     end
 
     def primary_address
-      office_address = employer_profile.organization.primary_office_location.address
+      office_address = employer_profile.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: office_address.address_1,
