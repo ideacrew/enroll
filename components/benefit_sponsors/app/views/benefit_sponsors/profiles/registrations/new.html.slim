@@ -4,7 +4,7 @@
     h1.heading-text Broker Registration
     
     - flash.each do |key, value|
-			div class="alert alert-#{key}" role="alert"
+			div class="alert alert-#{key} alert-dismissible" role="alert"
 				button.close type="button" data-dismiss="alert" aria-label="Close"
 					span aria-hidden="true" &times
 				= value
