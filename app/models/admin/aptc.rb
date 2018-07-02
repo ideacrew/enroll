@@ -302,7 +302,7 @@ class Admin::Aptc < ApplicationController
     end
 
     # Redetermine Eligibility on Max APTC / CSR Update.
-    def redetermine_eligibility_with_updated_values(family, params, hbxs, year, max_available_aptc = 0)
+    def redetermine_eligibility_with_updated_values(family, params, hbxs, year, max_available_aptc, max_available_aptc_applied = false)
       eligibility_redetermination_result = false
       latest_eligibility_determination = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination
       max_aptc = latest_eligibility_determination.max_aptc
@@ -327,7 +327,8 @@ class Admin::Aptc < ApplicationController
                                                         "benchmark_plan_id"             => latest_eligibility_determination.benchmark_plan_id,
                                                         "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
                                                         "source"                        => "Admin",
-                                                        "max_available_aptc"            => max_available_aptc
+                                                        "max_available_aptc"            => max_available_aptc,
+                                                        "max_available_aptc_applied"    => max_available_aptc_applied
                                                        }).save!
         eligibility_redetermination_result = true
       end

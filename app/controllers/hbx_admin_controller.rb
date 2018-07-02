@@ -30,7 +30,7 @@ class HbxAdminController < ApplicationController
     @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(year).by_coverage_kind("health")
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(year, @family, @hbxs, params[:max_aptc].to_f, params[:csr_percentage])
     if @family.present? #&& TimeKeeper.date_of_record.year == year
-      @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, year, @household_info['available_aptc'].values.last)
+      @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, year, @household_info['available_aptc'].values.last, true)
       @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, year)
     end
     respond_to do |format|

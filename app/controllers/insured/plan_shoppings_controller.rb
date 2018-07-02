@@ -156,8 +156,9 @@ class Insured::PlanShoppingsController < ApplicationController
     shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
-      max_available_aptc = @tax_household.eligibility_determinations.last.max_available_aptc.to_f
-      if max_available_aptc > 0 
+      latest_eligibility_determination = @tax_household.eligibility_determinations.last
+      max_available_aptc = latest_eligibility_determination.max_available_aptc.to_f
+      if max_available_aptc > 0 || latest_eligibility_determination.max_available_aptc_applied
          unwanted_family_members = @tax_household.family.active_family_members - @hbx_enrollment.hbx_enrollment_members.map(&:family_member)
          deduct_amount = @tax_household.total_benchmark_amount(unwanted_family_members)
          total = max_available_aptc - deduct_amount
