@@ -4,7 +4,7 @@ module BenefitSponsors
 
       REGISTERED_EVENTS = [
         # :renewal_application_created,
-        :application_submitted,
+        :initial_application_submitted,
         :renewal_application_submitted,
         :renewal_application_autosubmitted,
         :renewal_enrollment_confirmation,
@@ -51,7 +51,7 @@ module BenefitSponsors
           # end
 
           if is_transition_matching?(to: :approved, from: :draft, event: :approve_application)
-            @is_application_submitted = true
+            @is_initial_application_submitted = true
           end
 
           if is_transition_matching?(to: :enrollment_open, from: :enrollment_open, event: :end_open_enrollment)

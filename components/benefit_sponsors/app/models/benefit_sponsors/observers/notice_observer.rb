@@ -29,6 +29,10 @@ module BenefitSponsors
             end
           end
 
+          if new_model_event.event_key == :initial_application_submitted
+            deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_application_submitted")
+          end
+
           if new_model_event.event_key == :zero_employees_on_roster
             trigger_zero_employees_on_roster_notice(benefit_application)
           end
