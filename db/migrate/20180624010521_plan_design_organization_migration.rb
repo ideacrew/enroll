@@ -33,8 +33,8 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
 
     pdos = SponsoredBenefits::Organizations::PlanDesignOrganization.all
     emp_orgs = BenefitSponsors::Organizations::Organization.employer_profiles
-    bk_orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles
-    sponsored_benefit_org = SponsoredBenefits::Organizations::Organization.all
+    new_bk_orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles
+    old_bk_orgs =  Organization.has_broker_agency_profile
 
     #counters
     total = 0
@@ -55,10 +55,10 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
           sponsor_profile_id = emp_org.employer_profile.id
         end
 
-        bk_org = sponsored_benefit_org.where(:"broker_agency_profile._id" => pdo.broker_agency_profile_id).first
+        old_bk_org = old_bk_orgs.where(:"broker_agency_profile._id" => pdo.owner_profile_id).first
 
-        if bk_org.present?
-          new_org = bk_orgs.broker_by_hbx_id(bk_org.hbx_id).first
+        if old_bk_org.present?
+          new_org = new_bk_orgs.broker_by_hbx_id(old_bk_org.hbx_id).first
           if new_org.present?
             owner_profile_id = new_org.broker_agency_profile._id
           end
