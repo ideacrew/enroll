@@ -19,7 +19,7 @@ def find_renewed_sponsorships(start_date)
     "benefit_applications" => {
       "$elemMatch" => {
         "effective_period.min" => start_date,
-        "predecessor_id" => {"$ne" => nil},
+        # "predecessor_id" => {"$ne" => nil},
         "aasm_state" => {"$in" => [
           :enrollment_open,
           :enrollment_closed,
@@ -36,7 +36,7 @@ def find_renewable_benefit_applications(start_date, already_renewed_ids)
     "benefit_applications" => {
       "$elemMatch" => {
         "effective_period.min" => start_date,
-        "predecessor_id" => {"$ne" => nil},
+        # "predecessor_id" => {"$ne" => nil},
         "aasm_state" => {"$in" => [
           :draft,
           :approved
