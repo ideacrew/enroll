@@ -210,7 +210,7 @@ module Queries
           "$group" => {
             "_id" => {
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
-              "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id"
+              "sponsored_benefit_id" => "$households.hbx_enrollments.sponsored_benefit_id",
               "effective_on" => "$households.hbx_enrollments.effective_on"
             },
             "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
