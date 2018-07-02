@@ -276,11 +276,31 @@ module BenefitSponsors
         end
       end
 
+      def broker_agency_account_update(new_model_event)
+        broker_agency_account = new_model_event.klass_instance
+        broker_agency_profile = broker_agency_account.broker_agency_profile
+        broker = broker_agency_profile.primary_broker_role
+        employer_profile = broker_agency_account.employer_profile
+
+        if BrokerAgencyAccount::BROKER_HIRED_EVENTS.include?(new_model_event.event_key)
+          deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_hired_notice_to_broker")
+          deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_hired_confirmation")
+          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+        end
+
+        if BrokerAgencyAccount::BROKER_FIRED_EVENTS.include?(new_model_event.event_key)
+          deliver(recipient: broker, event_object: employer_profile, notice_event: "broker_fired_confirmation_to_broker")
+          deliver(recipient: broker_agency_profile, event_object: employer_profile, notice_event: "broker_agency_fired_confirmation")
+          deliver(recipient: employer_profile, event_object: broker_agency_account, notice_event: "broker_fired_confirmation_to_employer")
+        end
+      end
+
       def employer_profile_date_change; end
       def hbx_enrollment_date_change; end
       def census_employee_date_change; end
       def document_date_change; end
       def special_enrollment_period_date_change; end
+      def broker_agency_account_date_change; end
 
       def census_employee_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
