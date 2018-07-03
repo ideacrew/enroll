@@ -81,7 +81,7 @@ module BenefitSponsors
               })
             ::BenefitSponsors::Members::MemberGroup.new(
               member_entries,
-              {group_enrollment: group_enrollment}
+              {group_enrollment: group_enrollment, group_id: census_employee.id}
             )
           end
         end
