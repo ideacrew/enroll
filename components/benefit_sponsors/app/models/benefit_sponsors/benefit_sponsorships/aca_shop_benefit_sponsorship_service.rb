@@ -37,7 +37,12 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
       if benefit_application.present?
-        application_service_for(benefit_application).end_open_enrollment
+        policy = business_policy_for(benefit_application, :end_open_enrollment)
+        if policy.is_satisfied?(benefit_application)
+          application_service_for(benefit_application).end_open_enrollment
+        else
+          #log errors - policy.fail_results
+        end
       end
     end
 
@@ -103,6 +108,11 @@ module BenefitSponsors
     end
 
     private
+
+    def enrollment_policy
+      return @enrollment_policy if defined?(@enrollment_policy)
+      @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+    end
 
     def business_policy_for(benefit_application, event_name)
       enrollment_policy.business_policies_for(benefit_application, event_name)

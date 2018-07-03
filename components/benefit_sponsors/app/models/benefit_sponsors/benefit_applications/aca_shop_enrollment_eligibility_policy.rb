@@ -38,5 +38,17 @@ module BenefitSponsors
     # business_policy :loosely_passes_open_enrollment_period_policy,
     #         rules: [:period_begin_before_end_rule]
 
+    def business_policies_for(model_instance, event_name)
+      if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+
+        case event_name
+        when :end_open_enrollment
+          business_policies[:passes_open_enrollment_period_policy]
+        else
+          business_policies[:passes_open_enrollment_period_policy]
+        end
+      end
+    end
+
   end
 end
