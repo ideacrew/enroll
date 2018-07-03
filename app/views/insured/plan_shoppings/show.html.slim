@@ -238,6 +238,15 @@ javascript:
         }
       })
     }
+	  // Filters based on Carrier
+	  carrier = selections.selectedCarrier;
+	  if (carrier) {
+	    availableEnrollments.forEach(function(enrollment) {
+	      if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
+	        resultsArray.push(enrollment);
+	      }
+	    })
+	  }
 
     if (selections.selectedHSA) {
       var hsa = Boolean;
