@@ -5,7 +5,10 @@ export default class extends Controller {
   static targets = ['countySelect']
 
   initialize() {
-    document.getElementById('kindSelect').value = "primary";
+    let kind_select = document.getElementById('kindSelect')
+    if (kind_select) {
+      kind_select.value = "primary";
+    }
   }
 
   zipChange(event) {
@@ -43,6 +46,9 @@ export default class extends Controller {
         this.countySelectTarget.add(newOption)
         event.target.parentElement.classList.add('was-validated')
         event.target.setCustomValidity("Zipcode outside of MA")
+      }
+      if (this.countySelectTarget.parentElement.className == 'selectric-hide-select') {
+        $(this.countySelectTarget).selectric('refresh')
       }
     })
   }
