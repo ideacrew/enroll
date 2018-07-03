@@ -290,24 +290,38 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  
+  /*
   $('.fa-circle').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
       input.prop('checked', true)
     });
-    var cb = $(this).closest('input[type=checkbox]:checked')
-    console.log(cb)
+  })*/
+  
+  
+  icons = document.querySelectorAll('.fa-circle');
+  tempId = 1;
+  icons.forEach((icon)=> {
+    tempId ++;
+    icon.addEventListener("click", this.setRadioBtn.bind(this));
+    icon.setAttribute("data-tempId", tempId)
   })
+}
+
+function setRadioBtn(element) {
+  dotIcons = document.querySelectorAll('.fa-dot-circle');
+  icons = document.querySelectorAll('.fa-circle');
+  iconId = element.target.dataset.tempId;
   
+  dotIcons.forEach((icon)=> {
+    icon.classList.add('fa-circle')
+  });
   
-  //icons = document.querySelectorAll('.fa-circle');
-  //tempId = 1;
-  //icons.forEach((icon)=> {
-    //tempId ++;
-    //icon.addEventListener("click", this.setRadioBtn.bind(this));
-    //icon.setAttribute("data-tempId", tempId)
-  //})
+  icons.forEach((icon)=> {
+    if (icon.dataset.tempId == iconId) {
+      icon.classList.add('fa-dot-circle')
+    }
+  });
 }
 
 
