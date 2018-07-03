@@ -354,6 +354,14 @@ module BenefitSponsors
       start_on
     end
 
+    def last_day_to_publish
+      (start_on - 1.month).beginning_of_month + publish_due_day_of_month
+    end
+
+    def publish_due_day_of_month
+      benefit_market.configuration.initial_application_configuration.pub_due_dom.days || 20.days
+    end
+
     def default_benefit_group
       benefit_packages.detect(&:is_default)
     end
