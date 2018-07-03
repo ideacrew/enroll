@@ -115,6 +115,17 @@ module BenefitSponsors
         end
       end
 
+      def organization_create(new_model_event)
+        raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+        organization = new_model_event.klass_instance
+
+        if BenefitSponsors::ModelEvents::Organization::REGISTERED_EVENTS.include?(new_model_event.event_key)
+          if new_model_event.event_key == :welcome_notice_to_employer
+            deliver(recipient: organization.employer_profile, event_object: organization.employer_profile, notice_event: "welcome_notice_to_employer")
+          end
+        end
+      end
+
       def profile_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
         employer_profile = new_model_event.klass_instance
@@ -125,8 +136,6 @@ module BenefitSponsors
         if BenefitSponsors::ModelEvents::Profile::OTHER_EVENTS.include?(new_model_event.event_key)
           if new_model_event.event_key == :broker_hired_confirmation_to_employer
             deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-          elsif new_model_event.event_key == :welcome_notice_to_employer
-            deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
           end
         end
       end

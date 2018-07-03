@@ -8,7 +8,6 @@ module BenefitSponsors
       #TODO: This is the temporary fix until then.
       OTHER_EVENTS = [
         :broker_hired_confirmation_to_employer,
-        :welcome_notice_to_employer,
         :generate_initial_employer_invoice
       ]
 

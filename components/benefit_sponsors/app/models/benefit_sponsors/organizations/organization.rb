@@ -6,6 +6,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include BenefitSponsors::Concerns::Observable
+      include BenefitSponsors::ModelEvents::Organization
 
       ENTITY_KINDS =[
         :tax_exempt_organization,
@@ -104,6 +105,7 @@ module BenefitSponsors
 
       before_save  :generate_hbx_id
       after_update :notify_observers
+      after_create :notify_on_create
 
 
       index({ legal_name: 1 })
