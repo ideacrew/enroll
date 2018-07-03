@@ -8,7 +8,7 @@ h1.heading-text Add Benefit Package
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
         = f.hidden_field :benefit_sponsorship_id
-        = f.select :start_on, benefit_application_start_dates,{:prompt => "SELECT START ON", :selected => formatted_start_on}, class:'floatlabel benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate'
+        = f.select :start_on, benefit_application_start_dates,{:prompt => "SELECT START ON", :selected => formatted_start_on}, class:'floatlabel benefit-application-start-date', onchange:'selectedDate(this)', id:'baStartDate', disabled: f.object.is_renewing?
       .col-md-6.col-sm-12
         = f.text_field :end_on, class: "form-control", required: true, placeholder: 'END ON', readonly: true
 .row.pl-1

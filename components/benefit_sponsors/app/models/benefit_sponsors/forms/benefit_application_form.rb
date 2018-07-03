@@ -116,6 +116,11 @@ module BenefitSponsors
           errors.add(:start_on, "can't be later than end on date")
         end
       end
+
+      def is_renewing?
+        benefit_packages.present? ? benefit_packages.first.service.benefit_application.is_renewing? : false
+      end
+
     end
   end
 end

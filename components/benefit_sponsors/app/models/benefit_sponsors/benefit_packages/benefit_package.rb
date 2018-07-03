@@ -27,7 +27,6 @@ module BenefitSponsors
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
-      delegate :predecessor_application, to: :benefit_application
       delegate :recorded_sic_code, to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
@@ -76,6 +75,11 @@ module BenefitSponsors
           return nil unless successor.present?
           successor.package_for_open_enrollment(shopping_date)
         end
+      end
+
+      def predecessor_application
+        return nil unless benefit_application
+        benefit_application.predecessor
       end
 
       def successor
