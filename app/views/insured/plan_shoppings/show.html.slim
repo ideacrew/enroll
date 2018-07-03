@@ -33,7 +33,7 @@
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 #plans
                  = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
-                #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups, @issuer_profiles)}" data-carriers="#{@member_groups.map {|mg| ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, mg.group_enrollment.product.issuer_profile_id).to_json { mg.group_enrollment.product.issuer_profile }}}"
+                #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups)}"
 
       .no-buffer
       p.pull-right
@@ -115,17 +115,12 @@ javascript:
 
   function getEnrollments() {
     enrollments = JSON.parse(enrollments)
-    carriers = JSON.parse(carriers)
+		console.log(enrollments)
 
     // Formats enrollment to proper JSON format for filters
     for(enrollment of enrollments) {
-      enrollment = JSON.parse(enrollment)
+      enrollment = enrollment
       availableEnrollments.push(enrollment)
-    }
-    // Formats carriers to proper JSON format for filters
-    for(carrier of carriers) {
-      carrier = JSON.parse(carrier)
-      availableCarriers.push(carrier)
     }
   }
 
@@ -182,6 +177,16 @@ javascript:
 
     if (type == "plan-carrier") {
       // Filters by Carrier
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var nameA = a.product.issuer_name.toLowerCase();
+        var nameB = b.product.issuer_name.toLowerCase();
+        if (nameA < nameB) //sort string ascending
+          return -1
+        if (nameA > nameB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
     }
 
     showFilteredResults()
@@ -288,7 +293,7 @@ javascript:
                   <div class="col-md-7" id="plans">
                     <h3 class="no-buffer"><a data-remote="true">${result.product.title}</a>
                       <br>
-                      <small>Carrier Name</small>
+                      <small>${result.product.issuer_name}</small>
                     </h3>
                   </div>
                   <div class="col-md-3">
