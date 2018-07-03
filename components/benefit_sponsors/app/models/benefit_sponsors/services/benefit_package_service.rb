@@ -107,7 +107,7 @@ module BenefitSponsors
           end
           visit_types
         else
-          visit_types = qhps.first.qhp_service_visits.map(&:visit_type)
+          visit_types = qhps.first.qhp_service_visits
         end
 
         [qhps, visit_types]
