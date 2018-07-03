@@ -16,14 +16,16 @@ module BenefitSponsors
           benefit_application = new_model_event.klass_instance
 
           if new_model_event.event_key == :renewal_application_denied
-            errors = benefit_application.enrollment_errors
+            policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+            unless policy.is_satisfied?(benefit_application)
 
-            if(errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_employer_ineligibility_notice")
+              if (policy.fail_results.include?(:minimum_participation_rule) || policy.fail_results.include?(:non_business_owner_enrollment_count))
+                deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_employer_ineligibility_notice")
 
-              benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
-                if ce.employee_role.present?
-                  deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "employee_renewal_employer_ineligibility_notice")
+                benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                  if ce.employee_role.present?
+                    deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "employee_renewal_employer_ineligibility_notice")
+                  end
                 end
               end
             end
@@ -68,17 +70,18 @@ module BenefitSponsors
           end
           
           if new_model_event.event_key == :ineligible_application_submitted
-            if benefit_application.is_renewing?
-              if benefit_application.application_eligibility_warnings.include?(:primary_office_location)
-                deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
-                benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
-                  if ce.employee_role.present?
-                    deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
+            policy = eligibility_policy.business_policies_for(benefit_application, :submit_benefit_application)
+            unless policy.is_satisfied?(benefit_application)
+              if benefit_application.is_renewing?
+                if policy.fail_results.include?(:employer_primary_office_location)
+                  deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
+                  benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                    if ce.employee_role.present?
+                      deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
+                    end
                   end
                 end
-              end
-            else
-              if (benefit_application.application_eligibility_warnings.include?(:primary_office_location) || benefit_application.application_eligibility_warnings.include?(:fte_count))
+              elsif (policy.fail_results.include?(:employer_primary_office_location) || policy.fail_results.include?(:benefit_application_fte_count))
                 deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_initial_eligibility_denial_notice")
               end
             end
@@ -96,23 +99,34 @@ module BenefitSponsors
           end
 
           if new_model_event.event_key == :application_denied
-            errors = benefit_application.enrollment_errors
+            policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+            unless policy.is_satisfied?(benefit_application)
             
-            if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
-              benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
-                if ce.employee_role.present?
-                  deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "group_ineligibility_notice_to_employee")
+              if (policy.fail_results.include?(:minimum_participation_rule) || policy.fail_results.include?(:non_business_owner_enrollment_count))
+                benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                  if ce.employee_role.present?
+                    deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "group_ineligibility_notice_to_employee")
+                  end
                 end
               end
+
+              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_application_denied")
             end
-
-            deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_application_denied")
-
           end
 
           if BenefitSponsors::BenefitApplications::BenefitApplication::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
           end
         end
+      end
+
+      def eligibility_policy
+        return @eligibility_policy if defined? @eligibility_policy
+        @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+      end
+
+      def enrollment_policy
+        return @enrollment_policy if defined? @enrollment_policy
+        @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
       end
 
       def organization_create(new_model_event)
