@@ -440,7 +440,7 @@ javascript:
 		fetch('/benefit_sponsors/benefit_sponsorships/'+bsID+'/benefit_applications/'+baID+'/benefit_packages/reference_product_summary?reference_plan_id='+element.dataset.planId)
 			.then((res)=> res.json())
 			.then((data)=> {
-				data[0][0]['qhp_service_visits'].map((s)=> {
+				data[1].map((s)=> {
 				var tr = document.createElement('tr');
 				var tbody = document.getElementById('modalSummaryData');
 				tr.innerHTML = `<td class="active">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;

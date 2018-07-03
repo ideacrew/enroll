@@ -100,7 +100,12 @@ module BenefitSponsors
         coverage_kind = product.kind.to_s
         qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)
         if details.nil?
-          visit_types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+          types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+          visit_types = []
+          types.each do |type|
+            visit_types << qhps.first.qhp_service_visits.where(visit_type: type).first
+          end
+          visit_types
         else
           visit_types = qhps.first.qhp_service_visits.map(&:visit_type)
         end
