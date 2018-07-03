@@ -106,7 +106,9 @@ module BenefitSponsors
             fail:     -> (model_instance){ "something went wrong!!" },
             success:  -> (model_instance){ "validated successfully" }
 
-    business_policy :passes_open_enrollment_period_policy,
+    business_policy :passes_open_enrollment_period_policy, rules: []
+
+    business_policy :submit_benefit_application,
             rules: [:open_enrollment_period_minimum,
                     :benefit_application_contains_benefit_packages,
                     :benefit_packages_contains_reference_plans,
@@ -114,6 +116,7 @@ module BenefitSponsors
                     :employer_profile_eligible,
                     :employer_primary_office_location,
                     :all_contribution_levels_min_met,
+                    :within_last_day_to_publish,
                     :benefit_application_fte_count]
 
     business_policy  :stubbed_policy,
@@ -125,7 +128,7 @@ module BenefitSponsors
 
         case event_name
         when :submit_benefit_application
-          business_policies[:passes_open_enrollment_period_policy]
+          business_policies[:submit_benefit_application]
         else
           business_policies[:stubbed_policy]
         end
