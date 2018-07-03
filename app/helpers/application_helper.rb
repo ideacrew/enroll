@@ -712,17 +712,13 @@ module ApplicationHelper
     return summary_text.strip
   end
 
-  def json_for_plan_shopping_member_groups(member_groups, issuer_profiles)
-    ip_lookup_table = {}
-    issuer_profiles.each do |ipo|
-      ip_lookup_table[ipo.id] = ipo
-    end
-    member_groups.map do |mg|
-      mg.as_json.first.merge({
-        :carrier_name => ip_lookup_table[mg.group_enrollment.product.issuer_profile_id].legal_name,
-        :carrier_logo => "ADD LOGO HELPER HERE"
-      })
+  def json_for_plan_shopping_member_groups(member_groups)
+    member_groups.map do |member_group|
+      member_group_hash = JSON.parse(member_group.group_enrollment.to_json)
+      member_group_hash['product'].merge!(
+        "issuer_name" => member_group.group_enrollment.product.issuer_profile.legal_name
+      )
+      member_group_hash
     end.to_json
   end
-
 end
