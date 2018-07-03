@@ -102,7 +102,7 @@
 					
       .modal-footer
         .pull-left 
-          a href="/"
+          a href="/" id="sbcLink"
             i.far.fa-file-pdf.fa-2x.mr-1
             | Summary of Benefits and Coverage
         .pull-right
@@ -440,6 +440,7 @@ javascript:
 			.then((res)=> res.json())
 			.then((data)=> {
 				data[1].map((s)=> {
+        document.getElementById('sbcLink').setAttribute('href', data[2])
 				var tr = document.createElement('tr');
 				var tbody = document.getElementById('modalSummaryData');
 				tr.innerHTML = `<td class="active">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
