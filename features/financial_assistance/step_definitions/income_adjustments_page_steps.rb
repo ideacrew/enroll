@@ -23,7 +23,7 @@ Given(/^the user checks a income adjustments checkbox$/) do
 end
 
 Then(/^the income adjustments form should show$/) do
-  expect(page).to have_content "AMOUNT *"
+  expect(page).to have_content "Amount *"
   expect(page).to have_content "How Often *"
 end
 
