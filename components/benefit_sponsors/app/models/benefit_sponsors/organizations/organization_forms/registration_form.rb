@@ -55,7 +55,11 @@ module BenefitSponsors
       end
 
       def self.for_update(attrs)
-        new(attrs)
+        service = resolve_service(profile_id: attrs[:profile_id])
+        attrs.merge!({
+          profile_type: service.profile_type
+        })
+        form = new(attrs)
       end
 
       def save
