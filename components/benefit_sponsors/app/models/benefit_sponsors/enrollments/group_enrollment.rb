@@ -49,7 +49,7 @@ module BenefitSponsors
       product_cost_total - sponsor_contribution_total
     end
 
-    def as_json
+    def as_json(params = {})
       super(except: ['product', 'previous_product']).merge({ product: product.as_json(except: 'premium_tables'), previous_product: previous_product.as_json(except: 'premium_tables') })
     end
 

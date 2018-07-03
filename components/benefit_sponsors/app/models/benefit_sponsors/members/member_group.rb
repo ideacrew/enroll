@@ -72,7 +72,7 @@ module BenefitSponsors
       )
     end
 
-    def as_json(params)
+    def as_json(params = {})
       {
         members: members.as_json,
         group_id: group_id,
