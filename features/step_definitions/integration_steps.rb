@@ -645,26 +645,27 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+  click_link "Add New Person"
 end
 
 Then(/^.+ should see the new dependent form$/) do
 
-  expect(page).to have_content('Confirm Member')
+  expect(page).to have_content('CONFIRM MEMBER')
 end
 
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, "//h2[@class='darkblue'][contains(., 'Household Info')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'choose')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  expect(page).to have_link('Add New Person')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
