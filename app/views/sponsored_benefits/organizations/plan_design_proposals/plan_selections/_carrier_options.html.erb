@@ -7,7 +7,6 @@
         <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
         <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
           <i class="far fa-circle"></i>
-          <i class="far fa-dot-circle"></i>
           <div class="pdp_carrier_title">
             <%= fetch_plan_title_for_sole_source %>
           </div>
@@ -19,7 +18,6 @@
         <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
         <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
           <i class="far fa-circle"></i>
-          <i class="far fa-dot-circle"></i>
           <div class="pdp_carrier_title">
             Single plan
           </div>
@@ -31,7 +29,6 @@
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
         <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
           <i class="far fa-circle"></i>
-          <i class="far fa-dot-circle"></i>
           <div class="pdp_carrier_title">
             <% if check_plan_options_title %>
                 <%= fetch_plan_title_for_single_carrier %>
@@ -47,7 +44,6 @@
         <%= f.radio_button :plan_option_kind, "metal_level" %>
         <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
           <i class="far fa-circle"></i>
-          <i class="far fa-dot-circle"></i>
           <div class="pdp_carrier_title">
             <% if check_plan_options_title %>
                 <%= fetch_plan_title_for_metal_level %>
