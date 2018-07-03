@@ -210,29 +210,28 @@ javascript:
       var div = document.createElement('div')
       div.setAttribute('id', 'yourAvailableContributions')
       div.innerHTML =
-      `<div class="row">
-        <input id="${attrPrefix}[id]" name="${attrPrefix}[id]" type="hidden" value="${contribution}['id']">
-         <div class="col-xs-6 pr-3">
-          <div class="row sc-container">
-            <div class="col-xs-12 ml-2 mt-2">
-              <label class="container ml-1">${contribution.display_name}
-                <input type="checkbox" checked="checked" id="${attrPrefix}[is_offered]" class="contribution_handler" name="${attrPrefix}[is_offered]" type="checkbox" onchange="contributionAmounts(this)" value="${contribution}["is_offered"]" data-displayname="${contribution.display_name}">
-                <span class="checkmark"></span>
-              </label>
-            </div>
-          </div>
-         </div>
-        <div class="col-xs-6">
-          <div class="col-xs-3">
-            <input id="${attrPrefix}[display_name]" name="${attrPrefix}[display_name]" type="hidden" value="${contribution}["display_name"]">
-            <input type="number" id="${contribution.id}" name="${attrPrefix}[contribution_factor]" value="${(contribution["contribution_factor"] * 100)}" onchange="setInputSliderValue(this)" data-displayname="${contribution.display_name}" data-contribution-input=true>
-          </div>
-          <div class="col-xs-9">
-            <input type="range" min="0" max="100" value="${(contribution["contribution_factor"] * 100)}" step="5" class="slider" id="${contribution.id}" onchange="setInputValue(this)" data-id="${contribution.id}" data-name="${contribution.display_name}">
-          </div>
-        </div>
-       </div>
-      `
+			'<div class="row">\
+			  <input id="' + attrPrefix + '[id]" name="' + attrPrefix + '[id]" type="hidden" value="' + contribution['id'] + '" />\
+			    <div class="col-xs-6 pr-3">\
+			      <div class="row sc-container">\
+			        <div class="col-xs-12 ml-2 mt-2">\
+			          <label class="container ml-1">' +contribution.display_name+'\
+			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="contributionAmounts(this)"/>\
+			            <span class="checkmark"></span>\
+			          </label>\
+			        </div>\
+			      </div>\
+			    </div>\
+			    <div class="col-xs-6">\
+			      <div class="col-xs-3">\
+			        <input id="' + attrPrefix + '[display_name]" name="' + attrPrefix + '[display_name]" type="hidden" value="' + contribution["display_name"] + '" />\
+			        <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '">\
+			      </div>\
+			      <div class="col-xs-9">\
+			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-name="'+contribution.display_name+'">\
+			      </div>\
+			    </div>\
+			</div>'
       element.append(div)
     }
   }
