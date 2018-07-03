@@ -290,12 +290,29 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  $('.fa-circle-o').each(function() {
+  
+  $('.fa-circle').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
       input.prop('checked', true)
     });
+    var cb = $(this).closest('input[type=checkbox]:checked')
+    console.log(cb)
   })
+  
+  
+  //icons = document.querySelectorAll('.fa-circle');
+  //tempId = 1;
+  //icons.forEach((icon)=> {
+    //tempId ++;
+    //icon.addEventListener("click", this.setRadioBtn.bind(this));
+    //icon.setAttribute("data-tempId", tempId)
+  //})
+}
+
+
+function removeRadioSelectors() {
+  
 }
 
 function preventSubmitPlanDesignProposal(event) {
