@@ -70,7 +70,8 @@
       </div>
       <div class="col-md-2 key col-sm-3 col-xs-12"></div>
     </div><br>
-    <%= office_fields.fields_for :phone, office_fields.object.phone, errors: {}, fieldset: false do |phone| %>
+    <%# MPYC missing phone fields. we should always have persisted phone record while editing business info %>
+    <%= office_fields.fields_for :phone, office_fields.object.phone || BenefitSponsors::Organizations::OrganizationForms::PhoneForm.new, errors: {}, fieldset: false do |phone| %>
     <%= phone.hidden_field :id, value: phone.object.id if phone.object.id.present? %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
