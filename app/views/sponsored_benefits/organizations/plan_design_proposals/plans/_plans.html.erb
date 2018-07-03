@@ -11,7 +11,7 @@
 
       <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
       <%= label_tag "#{@location_id}_reference_plan_id" do %>
-      <i class="far fa-circle"></i>
+      <i class="far fa-circle" onclick="setRadioButtons(this)" data-tempId="<%= plan.id %>"></i>
       <% end %>
     </div>
 
@@ -37,3 +37,23 @@
   </div>
 </div>
 <% end %>
+
+<script>
+	function setRadioButtons(element) {
+		var plans = document.querySelectorAll('.reference-plan');
+		plans.forEach((plan) => {
+			var icons = plan.querySelectorAll('.fa-circle');
+			icons.forEach((icon)=> {
+				if (icon.dataset.tempid == element.dataset.tempid) {
+					icon.classList.add('fa-dot-circle')
+				}
+			});
+			var dotIcons = plan.querySelectorAll('.fa-dot-circle');
+			dotIcons.forEach((icon)=> {
+				if (icon.dataset.tempid != element.dataset.tempid) {
+					icon.classList.add('fa-circle')
+				}
+			});
+		});
+	}
+</script>
