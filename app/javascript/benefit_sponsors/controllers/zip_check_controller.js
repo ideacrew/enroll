@@ -3,7 +3,7 @@ import axios from 'axios'
 
 export default class extends Controller {
   static targets = ['countySelect']
-  
+
   initialize() {
     document.getElementById('kindSelect').value = "primary";
   }
@@ -11,7 +11,7 @@ export default class extends Controller {
   zipChange(event) {
     axios({
       method: 'POST',
-      url: 'counties_for_zip_code',
+      url: '/benefit_sponsors/profiles/registrations/counties_for_zip_code',
       data: { zip_code: event.currentTarget.value },
       headers: {
         'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
@@ -24,7 +24,7 @@ export default class extends Controller {
         event.target.parentElement.classList.remove('was-validated')
         event.target.setCustomValidity("")
         let optionValues = JSON.parse(this.countySelectTarget.dataset.options);
-        
+
         for (let option of optionValues) {
           if (response.data.includes(option)) {
             let newOption = document.createElement("option")
@@ -33,7 +33,7 @@ export default class extends Controller {
             this.countySelectTarget.add(newOption)
           }
         }
-        
+
       } else {
         this.countySelectTarget.setAttribute('disabled', true);
         this.countySelectTarget.options.length = 0;
