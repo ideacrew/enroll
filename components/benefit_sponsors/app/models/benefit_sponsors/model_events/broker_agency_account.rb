@@ -8,12 +8,14 @@ module BenefitSponsors
       ]
 
       def notify_on_save
-        if !persisted? && valid?
-          is_broker_hired = true
-        end
+        if is_active_changed? && (!is_active.nil?)
+          if is_active
+            is_broker_hired = true
+          end
 
-        if persisted? && changed? && changed_attributes.include?("is_active")
-          is_broker_fired = true
+          if !is_active
+            is_broker_fired = true
+          end
         end
 
         REGISTERED_EVENTS.each do |event|
