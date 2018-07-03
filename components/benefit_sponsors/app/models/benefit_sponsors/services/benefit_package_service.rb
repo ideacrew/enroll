@@ -85,11 +85,11 @@ module BenefitSponsors
         sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, selected_package)
 
         minimum_cost = sponsored_benefit_with_lowest_cost_product.lazy.map do |mg|
-          BigDecimal.new(mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+          BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
         end.min
 
         maximum_cost = sponsored_benefit_with_highest_cost_product.lazy.map do |mg|
-          BigDecimal.new(mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+          BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
         end.max
 
         {
