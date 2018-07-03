@@ -114,7 +114,7 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on  # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
     benefit_application.pull_benefit_sponsorship_attributes
-    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
+    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
     benefit_application.predecessor_id = predecessor_application.first.id if predecessor_application.present?
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
