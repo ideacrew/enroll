@@ -10,7 +10,7 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
-  include Concerns::Observable
+  include BenefitSponsors::Concerns::Observable
   include ModelEvents::CensusEmployee
 
   require 'roo'
@@ -77,6 +77,8 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+
+  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
 
   index({aasm_state: 1})
   index({last_name: 1})

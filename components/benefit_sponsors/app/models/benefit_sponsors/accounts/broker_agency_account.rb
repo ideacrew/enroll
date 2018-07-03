@@ -4,8 +4,8 @@ module BenefitSponsors
       include Mongoid::Document
       include SetCurrentUser
       include Mongoid::Timestamps
-
       include ::BenefitSponsors::Concerns::Observable
+      include ::BenefitSponsors::ModelEvents::BrokerAgencyAccount
 
       embedded_in :benefit_sponsorship,
                 class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
@@ -32,9 +32,9 @@ module BenefitSponsors
 
       before_create :notify_observers
       after_update  :notify_observers
+      after_save    :notify_on_save
 
-      add_observer ::BenefitSponsors::Observers::BrokerAgencyAccountObserver.new, [:broker_fired?, :broker_hired?]
-
+      add_observer ::BenefitSponsors::Observers::BrokerAgencyAccountObserver.new, [:broker_fired?, :broker_hired?, :notifications_send]
 
       # belongs_to broker_agency_profile
       def broker_agency_profile=(new_broker_agency_profile)
