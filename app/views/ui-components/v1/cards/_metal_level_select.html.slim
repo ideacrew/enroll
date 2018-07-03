@@ -242,15 +242,15 @@ javascript:
     }
   }
 
-  function calculateEmployerContributions(productOptionKind,referencePlanID, sponsoredBenefitID)  {
+  function calculateEmployerContributions(productOptionKind,referencePlanID)  {
     $.ajax({
       type: "GET",
-      data:{product_package_kind: productOptionKind,reference_plan_id: referencePlanID, sponsored_benefit_id: sponsoredBenefitID},
+      data:{product_package_kind: productOptionKind,reference_plan_id: referencePlanID},
       url: "calculate_employer_contributions",
       success: function (d) {
-        var eeMin = parseFloat(d[0][2]).toFixed(2);
-        var eeCost = parseFloat(d[1][2]).toFixed(2);
-        var eeMax = parseFloat(d[2][2]).toFixed(2);
+        var eeMin = parseFloat(d[0][1]).toFixed(2);
+        var eeCost = parseFloat(d[1][1]).toFixed(2);
+        var eeMax = parseFloat(d[2][1]).toFixed(2);
         showCostDetails(eeCost,eeMin,eeMax)
       }
     });
@@ -262,8 +262,7 @@ javascript:
     carrierName = element.dataset.planCarrier;
     planType = element.dataset.planType;
     referencePlanID = element.id;
-    sponsoredBenefitID = null;
-    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitID)
+    calculateEmployerContributions(productOptionKind, referencePlanID)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'

@@ -71,23 +71,14 @@ module BenefitSponsors
 
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
-        benefit_application = find_benefit_application(form)
-        if form.sponsored_benefits[0].id.present?
-          benefit_package = find_model_by_id(form.id)
-          sponsored_benefit = benefit_package.sponsored_benefits.find(form.sponsored_benefits[0].id)
-          selected_package = sponsored_benefit.product_package
-          reference_product = sponsored_benefit.reference_product
-        else
-          sponsored_benefit = nil
-          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
-          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-        end
+        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
         lowest_cost_product = selected_package.lowest_cost_product
         highest_cost_product = selected_package.highest_cost_product
+        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
 
-        sponsored_benefit_with_lowest_cost_product  = decorated_sponsored_benefit(sponsored_benefit, lowest_cost_product, selected_package)
-        sponsored_benefit_with_highest_cost_product = decorated_sponsored_benefit(sponsored_benefit, highest_cost_product, selected_package)
-        sponsored_benefit_with_reference_product    = decorated_sponsored_benefit(sponsored_benefit, reference_product, selected_package)
+        sponsored_benefit_with_lowest_cost_product  = decorated_sponsored_benefit(lowest_cost_product, selected_package)
+        sponsored_benefit_with_highest_cost_product = decorated_sponsored_benefit(highest_cost_product, selected_package)
+        sponsored_benefit_with_reference_product    = decorated_sponsored_benefit(reference_product, selected_package)
 
         [sponsored_benefit_with_lowest_cost_product, sponsored_benefit_with_reference_product, sponsored_benefit_with_highest_cost_product]
       end
@@ -118,17 +109,12 @@ module BenefitSponsors
         BenefitMarkets::Products::Product.find product_id
       end
 
-      def decorated_sponsored_benefit(sponsored_benefit, product, package)
-        selected_sponsored_benefit = if sponsored_benefit.present?
-          sponsored_benefit
-        else
-          dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
-          dummy_sponsored_benefit.reference_product = product
-          dummy_sponsored_benefit
-        end
+      def decorated_sponsored_benefit(product, package)
+        dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
+        dummy_sponsored_benefit.reference_product = product
 
         cost_estimator = initialize_cost_estimator
-        cost_estimator.calculate(selected_sponsored_benefit, product, package)
+        cost_estimator.calculate(dummy_sponsored_benefit, product, package)
       end
 
       # Creating dummy sponsored benefit as estimator expects one.
