@@ -1,3 +1,9 @@
+function showCostDetails(cost,min,max) {
+  document.getElementById('rpEstimatedMonthlyCost').append('$ '+cost);
+  document.getElementById('rpMin').append('$ '+min);
+  document.getElementById('rpMax').append('$ '+max);
+}
+
 function calculateEmployerContributions(productOptionKind,referencePlanID)  {
     $.ajax({
       type: "GET",
