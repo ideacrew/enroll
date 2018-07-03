@@ -89,6 +89,12 @@ module BenefitSponsors
         hios_id = [] << product.hios_id
         year = benefit_application.start_on.year
         coverage_kind = product.kind.to_s
+
+        bucket = product.sbc_document.identifier.split("#")[0].split(":")[-1]
+        key = product.sbc_document.identifier.split("#")[1]
+
+        sbc_url = "/document/download/#{bucket}/#{key}?content_type=application/pdf&filename=#{product.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
+
         qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)
         if details.nil?
           types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
@@ -101,7 +107,7 @@ module BenefitSponsors
           visit_types = qhps.first.qhp_service_visits
         end
 
-        [qhps, visit_types]
+        [qhps, visit_types, sbc_url]
       end
 
       def find_product(form)

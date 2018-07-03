@@ -68,14 +68,6 @@ module BenefitSponsors
 
       def reference_product_summary
         @product_summary = BenefitSponsors::Forms::BenefitPackageForm.for_reference_product_summary(reference_product_params, params[:details])
-
-
-        product = @product_summary[0].first.product
-        bucket = product.sbc_document.identifier.split("#")[0].split(":")[-1]
-        key = product.sbc_document.identifier.split("#")[1]
-        sbc_url = main_app.document_download_path(bucket, key) + "?content_type=application/pdf&filename=#{product.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
-        @product_summary[2] = sbc_url
-
         render json: @product_summary
       end
 
