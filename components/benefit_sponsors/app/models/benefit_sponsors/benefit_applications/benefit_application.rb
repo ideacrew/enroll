@@ -430,6 +430,12 @@ module BenefitSponsors
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
     end
 
+    def cancel_enrollments
+      hbx_enrollments.each do |enrollment|
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      end
+    end
+
     def enrolled_non_business_owner_members
       return @enrolled_non_business_owner_members if defined? @enrolled_non_business_owner_members
 
@@ -692,7 +698,7 @@ module BenefitSponsors
           :enrollment_eligible, :enrollment_ineligible,
           :active
         ] + APPLICATION_EXCEPTION_STATES,
-          to:     :draft
+          to:     :draft, :after => [:cancel_enrollments]
       end
 
       event :activate_enrollment do
