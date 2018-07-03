@@ -60,8 +60,6 @@ end
 
 renewed_sponsorships = find_renewed_sponsorships(start_on_date)
 
-f = File.open("policies_to_pull.txt","w")
-
 renewed_sponsorships.each do |bs|
   fein = bs.profile.organization.fein
   selected_application = bs.benefit_applications.detect do |ba|
@@ -73,17 +71,20 @@ renewed_sponsorships.each do |bs|
         :active].include?(ba.aasm_state)
   end
 
-  initial_enrollments = []
+initial_file = File.open("policies_to_pull_ies.txt","w")
 
-  renewal_enrollments = []
+renewal_file = Fil.eopen("policies_to_pull_renewals.txt","w")
 
   employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(selected_application.sponsored_benefits, start_on_date)
   employer_enrollment_query.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
     if initial_or_renewal(enrollment,plan_cache) == 'initial'
-      initial_enrollments << enrollment_hbx_id
+      initial_file.puts(enrollment_hbx_id)
     elsif initial_or_renewal(enrollment,plan_cache) == 'renewal'
-      renewal_enrollments << enrollment_hbx_id
-    f.puts(enrollment_hbx_id)
+      renewal_file.puts(enrollment_hbx_id)
   end
 end
+
+initial_file.close
+renewal_file.close
+
