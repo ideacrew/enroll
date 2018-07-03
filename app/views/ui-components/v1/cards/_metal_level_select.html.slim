@@ -93,7 +93,13 @@
         button.close type="button" data-dismiss="modal" aria-label="close" x
         h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
       .modal-body
-        | Summary Data Here
+        table.table.bordered.compare-table#modalSummaryData style="font-size:11px"
+					tr
+						td.active PLAN BENEFITS
+						td.active CO-PAY
+						td.active COINSURANCE
+					tbody#modalSummaryData
+					
       .modal-footer
         .pull-left 
           a href="/"
@@ -184,7 +190,7 @@ javascript:
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
               <span class="plan-label">Network:</span> <span class="rp-plan-info">Nationwide</span><br>
-              <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}">View Summary</span><br>
+              <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
               <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
               <span class="checkmark"></span>
             </label>
@@ -425,7 +431,22 @@ javascript:
   
   function viewSummary(element) {
     var title = element.dataset.planTitle;
+		var bsID = "#{params[:benefit_sponsorship_id]}";
+		var baID = "#{params[:benefit_application_id]}";
+		var summaryData;
     document.getElementById('viewSummaryTitle').innerHTML = title;
-    $('#viewSummaryModal').modal('show');
-    $('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent')
+		var tableData = document.getElementById('modalSummaryData');
+    //$('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent');
+		fetch('/benefit_sponsors/benefit_sponsorships/'+bsID+'/benefit_applications/'+baID+'/benefit_packages/reference_product_summary?reference_plan_id='+element.dataset.planId)
+			.then((res)=> res.json())
+			.then((data)=> {
+				data[0][0]['qhp_service_visits'].map((s)=> {
+				var tr = document.createElement('tr');
+				var tbody = document.getElementById('modalSummaryData');
+				tr.innerHTML = `<td class="active">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+				tbody.appendChild(tr)
+				});
+			})
+			.then($('#viewSummaryModal').modal('show'))
+		
   }
