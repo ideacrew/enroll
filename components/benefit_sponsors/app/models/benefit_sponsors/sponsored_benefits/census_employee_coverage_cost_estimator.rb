@@ -74,7 +74,8 @@ module BenefitSponsors
               rate_schedule_date: @sponsored_benefit.rate_schedule_date,
               coverage_start_on: coverage_start,
               member_enrollments: member_enrollments,
-              rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code
+              rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
+              sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state)
             })
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,
