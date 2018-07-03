@@ -249,6 +249,7 @@ javascript:
     planType = element.dataset.planType;
     referencePlanID = element.id;
     calculateEmployerContributions(productOptionKind, referencePlanID)
+    calculateEmployeeCosts(productOptionKind, referencePlanID)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
