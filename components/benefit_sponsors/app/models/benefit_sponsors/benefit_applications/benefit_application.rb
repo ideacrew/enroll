@@ -359,7 +359,7 @@ module BenefitSponsors
     end
 
     def publish_due_day_of_month
-      benefit_market.configuration.initial_application_configuration.pub_due_dom.days || 20.days
+      is_renewing? ? benefit_market.configuration.renewal_application_configuration.pub_due_dom.days : benefit_market.configuration.initial_application_configuration.pub_due_dom.days
     end
 
     def default_benefit_group
