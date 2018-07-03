@@ -93,11 +93,14 @@
         button.close type="button" data-dismiss="modal" aria-label="close" x
         h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
       .modal-body
-        table.table.bordered.compare-table#modalSummaryData style="font-size:11px"
+        table.table.compare-table#modalSummaryData style="font-size:11px"
 					tr
-						td.active PLAN BENEFITS
-						td.active CO-PAY
-						td.active COINSURANCE
+						td.active 
+							strong PLAN BENEFITS
+						td 
+							strong CO-PAY
+						td
+							strong COINSURANCE
 					tbody#modalSummaryData
 					
       .modal-footer
@@ -427,7 +430,7 @@ javascript:
         document.getElementById('sbcLink').setAttribute('href', data[2])
 				var tr = document.createElement('tr');
 				var tbody = document.getElementById('modalSummaryData');
-				tr.innerHTML = `<td class="active">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+				tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
 				tbody.appendChild(tr)
 				});
 			})
