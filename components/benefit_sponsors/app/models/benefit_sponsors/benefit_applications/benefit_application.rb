@@ -362,7 +362,7 @@ module BenefitSponsors
     end
 
     def may_publish?
-      last_day_to_publish > TimeKeeper.date_of_record
+      last_day_to_publish >= TimeKeeper.date_of_record
     end
 
     def default_benefit_group
