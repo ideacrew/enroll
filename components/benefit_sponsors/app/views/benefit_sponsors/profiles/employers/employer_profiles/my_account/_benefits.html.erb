@@ -62,7 +62,7 @@
           <%#= pundit_span EmployerProfile, :updateable? %>
           <% if benefit_application.draft? %>
               <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
-              <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right" %>
+              <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right", :disabled => !benefit_application.may_publish? %>
               <%# end %>
               <% if benefit_application.benefit_packages.empty? || benefit_application.benefit_packages.count > 1 %>
                 <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1"%>

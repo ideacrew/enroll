@@ -361,6 +361,10 @@ module BenefitSponsors
       is_renewing? ? benefit_market.configuration.renewal_application_configuration.pub_due_dom.days : benefit_market.configuration.initial_application_configuration.pub_due_dom.days
     end
 
+    def may_publish?
+      last_day_to_publish >= TimeKeeper.date_of_record
+    end
+
     def default_benefit_group
       benefit_packages.detect(&:is_default)
     end
