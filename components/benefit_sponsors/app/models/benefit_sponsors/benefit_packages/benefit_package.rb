@@ -83,15 +83,9 @@ module BenefitSponsors
       end
 
       def successor
-        successor_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
-          :"benefit_applications.benefit_packages.predecessor_id" => predecessor_id
-        ).first
-
-        return nil if successor_application.blank?
-
-        successor_application.benefit_packages.where(
-          :"predecessor_id" => predecessor_id
-        ).first
+        self.benefit_application.benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).detect do |bp|
+          bp.predecessor_id.to_s == self.id.to_s
+        end
       end
 
       def package_for_date(coverage_start_date)

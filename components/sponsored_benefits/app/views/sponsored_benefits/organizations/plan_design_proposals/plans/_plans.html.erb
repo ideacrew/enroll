@@ -41,15 +41,15 @@
 <script>
 	function setRadioButtons(element) {
 		var plans = document.querySelectorAll('.reference-plan');
-		plans.forEach((plan) => {
+		plans.forEach(function(plan) {
 			var icons = plan.querySelectorAll('.fa-circle');
-			icons.forEach((icon)=> {
+			icons.forEach(function(icon) {
 				if (icon.dataset.tempid == element.dataset.tempid) {
 					icon.classList.add('fa-dot-circle')
 				}
 			});
 			var dotIcons = plan.querySelectorAll('.fa-dot-circle');
-			dotIcons.forEach((icon)=> {
+			dotIcons.forEach(function(icon) {
 				if (icon.dataset.tempid != element.dataset.tempid) {
 					icon.classList.add('fa-circle')
 				}

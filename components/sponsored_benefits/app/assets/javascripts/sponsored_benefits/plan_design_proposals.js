@@ -301,7 +301,7 @@ function formatRadioButtons() {
   
   icons = document.querySelectorAll('.fa-circle');
   tempId = 1;
-  icons.forEach((icon)=> {
+  icons.forEach(function() {
     tempId ++;
     icon.addEventListener("click", this.setRadioBtn.bind(this));
     icon.setAttribute("data-tempId", tempId)
@@ -313,11 +313,11 @@ function setRadioBtn(element) {
   icons = document.querySelectorAll('.fa-circle');
   iconId = element.target.dataset.tempId;
   
-  dotIcons.forEach((icon)=> {
+  dotIcons.forEach(function(icon) {
     icon.classList.add('fa-circle')
   });
   
-  icons.forEach((icon)=> {
+  icons.forEach(function(icon) {
     if (icon.dataset.tempId == iconId) {
       icon.classList.add('fa-dot-circle')
     }

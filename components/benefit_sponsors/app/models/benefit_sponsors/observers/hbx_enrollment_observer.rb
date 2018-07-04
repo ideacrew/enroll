@@ -5,13 +5,6 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def on_update(instance, options = {})
-        return unless instance.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-        observer = Observers::NoticeObserver.new
-        observer.hbx_enrollment_update instance
-      end
-
-
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
           if ::HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
@@ -33,13 +26,13 @@ module BenefitSponsors
                 end
 
                 if !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-                  deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
+                  deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
                 end
               end
             end
 
             if new_model_event.event_key == :employee_waiver_confirmation
-              deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
             end
 
             if new_model_event.event_key == :employee_coverage_termination
