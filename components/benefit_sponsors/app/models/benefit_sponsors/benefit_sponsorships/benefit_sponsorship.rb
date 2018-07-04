@@ -20,6 +20,8 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include BenefitSponsors::Concerns::EmployerDatatableConcern
+    include BenefitSponsors::Concerns::Observable
+    include BenefitSponsors::ModelEvents::BenefitSponsorship
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
@@ -211,7 +213,8 @@ module BenefitSponsors
     index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
 
-
+    add_observer ::BenefitSponsors::Observers::BenefitSponsorshipObserver.new, [:notifications_send]
+    after_save :notify_on_save
     before_create :generate_hbx_id
     before_validation :pull_profile_attributes, :pull_organization_attributes, :validate_profile_organization
 

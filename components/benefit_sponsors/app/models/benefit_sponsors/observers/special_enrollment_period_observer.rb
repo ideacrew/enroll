@@ -1,19 +1,19 @@
 module BenefitSponsors
   module Observers
-    class EmployerProfileObserver
+    class SpecialEnrollmentPeriodObserver
       include ::Acapi::Notifiers
 
       attr_accessor :notifier
 
-      def update(employer_profile, options={})
-        employer_profile.office_locations.each do |office_location|
-          notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"}) unless office_location.address.changes.empty?
-        end
-      end
-
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-          #add triggers
+          special_enrollment_period = new_model_event.klass_instance
+          if special_enrollment_period.is_shop?
+            primary_applicant = special_enrollment_period.family.primary_applicant
+            if employee_role = primary_applicant.person.active_employee_roles[0]
+              deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
+            end
+          end
         end
       end
 

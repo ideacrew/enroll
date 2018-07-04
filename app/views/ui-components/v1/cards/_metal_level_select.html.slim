@@ -93,11 +93,14 @@
         button.close type="button" data-dismiss="modal" aria-label="close" x
         h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
       .modal-body
-        table.table.bordered.compare-table#modalSummaryData style="font-size:11px"
+        table.table.compare-table#modalSummaryData style="font-size:11px"
 					tr
-						td.active PLAN BENEFITS
-						td.active CO-PAY
-						td.active COINSURANCE
+						td.active 
+							strong PLAN BENEFITS
+						td 
+							strong CO-PAY
+						td
+							strong COINSURANCE
 					tbody#modalSummaryData
 					
       .modal-footer
@@ -286,13 +289,23 @@ javascript:
   
   function disablePlanYearButton() {
     var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.add('disabled')
+    savePlanYearButton.classList.add('disabled');
+		resetContributionValues()
   }
   
   function enablePlanYearButton() {
     var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.remove('disabled')
   }
+	
+	function resetContributionValues() {
+		ee = 0;
+		sp = 0;
+		dp = 0;
+		cu26 = 0;
+	  fam = 0;
+		eo = 0;
+	}
   
   var eeContribution;
   var spouse;
@@ -378,6 +391,7 @@ javascript:
 	var dp;
 	var cu26;
   var fam;
+	var eo;
 	
 	function checkMinimumContributionLevels(element) {
 		// Updates slider value if changed number in textbox
@@ -403,14 +417,31 @@ javascript:
         break;
       case 'Family':
         fam = element.value;
+				break;
+			case 'Employee Only':
+				eo = element.value;
+				break;
     }
-		// disables create plan year button if contribution levels aren't correct
-		if (ee >= 50 && sp >= 33 && dp >= 33 && cu26 >= 33, fam >= 33) {
-			enablePlanYearButton()
-		} else {
-		  disablePlanYearButton()
+		
+		console.log(ee,eo,sp,dp,cu26,fam)
+		if (ee && sp && dp && cu26) {
+			// disables create plan year button if contribution levels aren't correct
+			if (ee >= 50 && sp >= 33 && dp >= 33 && cu26 >= 33) {
+				enablePlanYearButton()
+			} else {
+				disablePlanYearButton()
+			}
+		}
+		
+		if (eo && fam) {
+			if (eo >= 50 && fam >= 33) {
+				enablePlanYearButton()
+			} else {
+				disablePlanYearButton()
+			}
 		}
 	}
+	
   
   function viewSummary(element) {
     var title = element.dataset.planTitle;
@@ -427,7 +458,7 @@ javascript:
         document.getElementById('sbcLink').setAttribute('href', data[2])
 				var tr = document.createElement('tr');
 				var tbody = document.getElementById('modalSummaryData');
-				tr.innerHTML = `<td class="active">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+				tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
 				tbody.appendChild(tr)
 				});
 			})

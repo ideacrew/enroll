@@ -35,7 +35,7 @@ module BenefitSponsors
 
         it "should trigger model event" do
           model_instance.class.observer_peers.keys.each do |observer|
-            expect(observer).to receive(:on_update) do |model_event|
+            expect(observer).to receive(:notifications_send) do |instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :initial_application_submitted, :klass_instance => model_instance, :options => {})
             end
