@@ -89,8 +89,8 @@ class Insured::EmployeeRolesController < ApplicationController
       build_nested_models
     end
     
-    observer = Observers::NoticeObserver.new
-    observer.deliver(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster")
+    notifier = BenefitSponsors::Services::NoticeService.new
+    notifier.deliver(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster", notice_params: {})
   end
 
   def update
