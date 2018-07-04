@@ -24,7 +24,7 @@ module BenefitSponsors
       delegate :entity_kind,              to: :organization, allow_nil: true
 
       embeds_many :office_locations,
-                  class_name:"BenefitSponsors::Locations::OfficeLocation"
+                  class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
 
       embeds_one  :inbox, as: :recipient, cascade_callbacks: true,
                   class_name:"BenefitSponsors::Inboxes::Inbox"
