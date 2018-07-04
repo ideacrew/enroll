@@ -87,7 +87,7 @@ module BenefitSponsors
 
     rule :within_last_day_to_publish,
           validate: -> (benefit_application) {
-            TimeKeeper.date_of_record < benefit_application.last_day_to_publish
+            TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
           },
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "#{benefit_application.last_day_to_publish} was the last day to publish your Plan Year" }
