@@ -5,13 +5,6 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def on_update(instance, options = {})
-        return unless instance.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-        observer = Observers::NoticeObserver.new
-        observer.hbx_enrollment_update instance
-      end
-
-
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
           if ::HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
