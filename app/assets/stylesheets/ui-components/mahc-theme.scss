@@ -527,37 +527,4 @@ thead {
       }
     }
   }
-  &.update-browser-warning {
-    color: #000;
-    position: relative;
-    width: 50%;
-    top: 15%;
-    border: solid 1px #b7b7b7;
-    background-color: rgba(256,256,256,1);
-    margin: auto;
-    text-align: center;
-    padding-bottom: 50px;
-    .starter {
-      margin: auto;
-      padding: 15px 20px 20px;
-    }
-    .bg-grey {
-      padding: 10px;
-    }
-    .browser-icon {
-      height: 64px;
-      width: 64px;
-      margin: 0 auto 7px;
-      text-align: center;
-      background: url('<%= asset_path("images/broswericons_128.png") %>');
-      &.chrome {
-        background-position: left top;
-      }
-      &.safari {
-        background-position: right top;
-      }
-      &.firefox {
-        background-position: left bottom;
-      }
-    }
-  }
+ 
