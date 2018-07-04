@@ -90,7 +90,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Site"
 
       embeds_many :profiles,
-                  class_name: "BenefitSponsors::Organizations::Profile"
+                  class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true
 
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
       has_many    :benefit_sponsorships,
