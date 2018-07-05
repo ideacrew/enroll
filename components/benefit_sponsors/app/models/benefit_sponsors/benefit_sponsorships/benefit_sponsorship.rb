@@ -279,6 +279,10 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
+    def add_benefit_application
+      benefit_application.build unless benefit_applications.count > 0
+    end
+
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)
@@ -305,16 +309,6 @@ module BenefitSponsors
       if event == :primary_office_location_change && ![:terminated, :ineligible].include?(aasm_state)
         pull_profile_attributes
         self.save!
-      end
-    end
-
-    def reset_organization=(new_organization)
-      if new_organization.nil?
-        self.organization = nil
-        self.benefit_market = nil
-      else
-        self.organization = new_organization
-        pull_organization_attributes
       end
     end
 
@@ -345,24 +339,32 @@ module BenefitSponsors
       ["ineligible", "terminated"].exclude?(aasm_state)
     end
 
+    def benefit_market_catalog_on(effective_date)
+      if (defined?(@benefit_market_catalog)) && (@benefit_market_catalog.application_period_cover?(effective_date))
+        return @benefit_market_catalog
+      else
+        @benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      end
+    end
+
     # FIX - change this to class method
     def benefit_sponsor_catalog_for(service_areas, effective_date)
-      benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      benefit_market_catalog = benefit_market_catalog_on(effective_date)
       benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
     end
 
     # Generate a BenefitSponsorCatalog using this BenefitSponsorship's Profile on certain date
     def benefit_sponsor_catalog_on(effective_date)
-      benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      benefit_market_catalog = benefit_market_catalog_on(effective_date)
       if benefit_market_catalog.present?
         service_areas = service_areas_on(effective_date)
         if service_areas.present?
-          benefit_sponsor_catalog_for(service_areas: service_areas, effective_date: effective_date)
+          benefit_sponsor_catalog_for(service_areas, effective_date)
         else
-          raise "unable to generate benefit_sponsorship_catalog on date: #{effecive_date} for service_areas: #{ser}"
+          raise "unable to generate benefit_sponsorship_catalog on date: #{effective_date} for service_areas: #{service_areas}"
         end
       else
-        raise "unable to find benefit_market_catalog effective on date: #{effecive_date}"
+        raise "unable to find benefit_market_catalog effective on date: #{effective_date}"
       end
     end
 
@@ -628,6 +630,16 @@ module BenefitSponsors
     end
 
     def pull_profile_attributes
+    end
+
+    def reset_organization=(new_organization)
+      if new_organization.nil?
+        self.organization = nil
+        self.benefit_market = nil
+      else
+        self.organization = new_organization
+        pull_organization_attributes
+      end
     end
 
     def generate_hbx_id

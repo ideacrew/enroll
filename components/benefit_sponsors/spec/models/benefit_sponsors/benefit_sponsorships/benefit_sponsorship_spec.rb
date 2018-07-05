@@ -1,19 +1,15 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
-    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
-    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
-    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
-    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
-
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:benefit_market)  { site.benefit_markets.first }
 
     let(:employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
     describe "A new model instance" do
+      include_context "setup benefit market with market catalogs and product packages"
+
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_fields(:hbx_id, :profile_id)}
       it { is_expected.to have_field(:source_kind).of_type(Symbol).with_default_value_of(:self_serve)}
@@ -126,6 +122,8 @@ module BenefitSponsors
     end
 
     describe "Navigating BenefitSponsorship Predecessor/Successor linked list" do
+      include_context "setup benefit market with market catalogs and product packages"
+
       let(:linked_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:linked_profile)      { linked_organization.employer_profile }
 
@@ -171,6 +169,8 @@ module BenefitSponsors
       end
 
       context "when benefit sponsorship is CCA SHOP employer" do
+        include_context "setup benefit market with market catalogs and product packages"
+
         let(:cca_employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
         let(:cca_profile)                 { cca_employer_organization.employer_profile  }
         let(:benefit_sponsorship)         { cca_profile.add_benefit_sponsorship }
@@ -182,6 +182,8 @@ module BenefitSponsors
     end
 
     describe "Finding a BenefitSponsorCatalog" do
+      include_context "setup benefit market with market catalogs and product packages"
+
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:next_year)                           { Date.today.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
@@ -192,7 +194,6 @@ module BenefitSponsors
       it "should belong to the same site and benefit_market and include benefit_market_catalog_next_year", :aggregate_failures do
         expect(benefit_sponsorship.profile.organization.site).to eq benefit_market.site
         expect(benefit_sponsorship.benefit_market).to eq benefit_market
-        expect(benefit_market.benefit_market_catalogs.size).to eq 1
         expect(benefit_market.benefit_market_catalogs.first).to eq benefit_market_catalog_next_year
       end
 
@@ -215,6 +216,9 @@ module BenefitSponsors
     end
 
     describe "Working with subclassed parent Profiles" do
+
+      include_context "setup benefit market with market catalogs and product packages"
+
       context "using sic_code helper method" do
         let(:cca_employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
         let(:cca_employer_profile)        { cca_employer_organization.employer_profile }
@@ -280,6 +284,8 @@ module BenefitSponsors
     end
 
     describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
+      include_context "setup benefit market with market catalogs and product packages"
+
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
       let(:this_year)                           { Date.today.year }
       let(:benefit_application)                 { build(:benefit_sponsors_benefit_application,
@@ -449,6 +455,8 @@ module BenefitSponsors
     end
 
     describe "Scopes", :dbclean => :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+
       let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
       let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
       let(:this_year)                       { TimeKeeper.date_of_record.year }
