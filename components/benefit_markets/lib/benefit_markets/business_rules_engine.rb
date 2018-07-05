@@ -123,7 +123,7 @@ module BenefitMarkets
             f << "---------" + "\n"
             f << Time.now.getutc.to_s + "\n"
             f << model_instance.class.to_s + "\n"
-            f << model_instance.id + "\n"
+            f << model_instance.id.to_s + "\n"
             f << @fail_results.to_s + "\n"
             f << "---------" + "\n"
           }
