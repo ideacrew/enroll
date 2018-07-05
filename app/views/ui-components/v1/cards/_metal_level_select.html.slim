@@ -234,7 +234,7 @@ javascript:
 			    <div class="col-xs-6">\
 			      <div class="col-xs-3">\
 			        <input id="' + attrPrefix + '[display_name]" name="' + attrPrefix + '[display_name]" type="hidden" value="' + contribution["display_name"] + '" />\
-			        <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '" onblur="checkMinimumContributionLevels(this)" data-displayname="'+contribution.display_name+'">\
+			        <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '" onchange="setInputSliderValue(this)" data-displayname="'+contribution.display_name+'" data-contribution-input="true">\
 			      </div>\
 			      <div class="col-xs-9">\
 			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
@@ -267,7 +267,6 @@ javascript:
   function setInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
     contributionAmounts(element)
-		checkMinimumContributionLevels(element)
   }
 
   function setInputSliderValue(element) {
@@ -290,22 +289,12 @@ javascript:
   function disablePlanYearButton() {
     var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
-		resetContributionValues()
   }
   
   function enablePlanYearButton() {
     var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.remove('disabled')
   }
-	
-	function resetContributionValues() {
-		ee = 0;
-		sp = 0;
-		dp = 0;
-		cu26 = 0;
-	  fam = 0;
-		eo = 0;
-	}
   
   var eeContribution;
   var spouse;
@@ -382,66 +371,9 @@ javascript:
     } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
       disablePlanYearButton()
     } else {
-			
+			enablePlanYearButton()
     }
-  }
-	
-	var ee;
-	var sp;
-	var dp;
-	var cu26;
-  var fam;
-	var eo;
-	
-	function checkMinimumContributionLevels(element) {
-		// Updates slider value if changed number in textbox
-		var ranges = document.querySelectorAll("input[type=range]");
-		ranges.forEach((range)=> {
-			if (range.id == element.id) {
-				range.value = element.value;
-			}
-		})
-		// Sets values for contribution levels
-    switch (element.dataset.displayname) {
-      case 'Employee':
-        ee = element.value;
-        break;
-      case 'Spouse':
-        sp = element.value;
-        break;
-      case 'Domestic Partner':
-        dp = element.value;
-        break;
-      case 'Child Under 26':
-        cu26 = element.value;
-        break;
-      case 'Family':
-        fam = element.value;
-				break;
-			case 'Employee Only':
-				eo = element.value;
-				break;
-    }
-		
-		console.log(ee,eo,sp,dp,cu26,fam)
-		if (ee && sp && dp && cu26) {
-			// disables create plan year button if contribution levels aren't correct
-			if (ee >= 50 && sp >= 33 && dp >= 33 && cu26 >= 33) {
-				enablePlanYearButton()
-			} else {
-				disablePlanYearButton()
-			}
-		}
-		
-		if (eo && fam) {
-			if (eo >= 50 && fam >= 33) {
-				enablePlanYearButton()
-			} else {
-				disablePlanYearButton()
-			}
-		}
-	}
-	
+  }	
   
   function viewSummary(element) {
     var title = element.dataset.planTitle;
