@@ -24,6 +24,11 @@ module BenefitSponsors
         end
       end
 
+      def is_offered=(val)
+        is_offered = is_employee_cl ? "true" : val
+        super is_offered
+      end
+
       def self.contribution_levels
         # TODO: query contribution model based on market
         contribution_model = BenefitMarkets::ContributionModels::ContributionModel.all.first
@@ -36,6 +41,10 @@ module BenefitSponsors
             contribution_factor: unit.default_contribution_factor, 
           }  
         end
+      end
+
+      def is_employee_cl
+        display_name == "Employee" || display_name == "Employee Only"
       end
     end
   end

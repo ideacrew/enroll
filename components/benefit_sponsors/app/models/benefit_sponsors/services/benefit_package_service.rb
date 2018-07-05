@@ -324,7 +324,7 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: (contribution_level.contribution_factor * 0.01),
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered
           }
         end
 
