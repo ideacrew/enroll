@@ -1,3 +1,4 @@
+import "babel-polyfill";
 import { Application } from "stimulus"
 import { definitionsFromContext } from "stimulus/webpack-helpers"
 
