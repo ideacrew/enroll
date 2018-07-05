@@ -43,15 +43,10 @@ def matching_plan_details(enrollment, other_hbx_enrollment, plan_cache)
     (old_plan.active_year == new_plan.active_year - 1)
 end
 
-def initial_or_renewal(enrollment,plan_cache)
-  renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select do |hbx_enrollment|
-    hbx_enrollment.is_shop? &&
-      (hbx_enrollment.employee_role_id == enrollment.employee_role_id) &&
-      hbx_enrollment.terminated_on.blank? &&
-      matching_plan_details(enrollment, hbx_enrollment, plan_cache) &&
-      (!%w(coverage_terminated unverified void shopping coverage_canceled inactive).include?(hbx_enrollment.aasm_state))
-  end
-  if renewal_enrollments.any?
+def initial_or_renewal(enrollment,plan_cache,predecessor_id)
+  renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_id == predecessor_id}
+  renewal_plans = renewal_enrollments.map(&:plan).compact.map(&:renewal_plan_id)
+  if renewal_enrollments.present? && renewal_plans.include?(enrollment.plan_id)
     return "renewal"
   else
     return "initial"
@@ -76,11 +71,13 @@ initial_file = File.open("policies_to_pull_ies.txt","w")
 renewal_file = Fil.eopen("policies_to_pull_renewals.txt","w")
 
   employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(selected_application.sponsored_benefits, start_on_date)
+
+
   employer_enrollment_query.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
-    if initial_or_renewal(enrollment,plan_cache) == 'initial'
+    if initial_or_renewal(enrollment,plan_cache,benefit_application.predecessor_id) == 'initial'
       initial_file.puts(enrollment_hbx_id)
-    elsif initial_or_renewal(enrollment,plan_cache) == 'renewal'
+    elsif initial_or_renewal(enrollment,plan_cache,benefit_application.predecessor_id) == 'renewal'
       renewal_file.puts(enrollment_hbx_id)
   end
 end
