@@ -17,6 +17,8 @@ module BenefitSponsors
 
       after_save :notify_on_save
 
+      add_observer ::BenefitSponsors::Observers::DocumentObserver.new, [:notifications_send]
+
       belongs_to :documentable, polymorphic: true
 
       # Dublin Core metadata elements
