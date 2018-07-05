@@ -433,7 +433,7 @@ class HbxEnrollment
   end
 
   def is_cobra_status?
-    kind == 'employer_sponsored_cobra'
+    kind.to_s == 'employer_sponsored_cobra'
   end
 
   def future_enrollment_termination_date

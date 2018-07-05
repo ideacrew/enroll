@@ -41,7 +41,8 @@ module BenefitSponsors
         product: new_product,
         rate_schedule_date: @rate_schedule_date,
         rating_area: @rating_area,
-        member_enrollments: member_enrollments.map(&:clone_for_coverage)
+        member_enrollments: member_enrollments.map(&:clone_for_coverage),
+        sponsor_contribution_prohibited: @sponsor_contribution_prohibited
       })
     end
 
