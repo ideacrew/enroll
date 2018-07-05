@@ -247,9 +247,8 @@ class Household
     coverage_households.sort_by(&:submitted_at).last.submitted_at
   end
 
-  def latest_active_tax_household
-    return tax_households.first if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  def latest_active_tax_households
+    tax_households.where(effective_ending_on: nil, is_eligibility_determined: true)
   end
 
   def latest_active_tax_households_with_year(year)

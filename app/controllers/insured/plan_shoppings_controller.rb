@@ -183,7 +183,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     application = @person.primary_family.active_approved_application
-    if (application.present? && application.tax_households.present?) || @person.primary_family.active_household.latest_active_tax_household.present?
+    if (application.present? && application.tax_households.present?) || @person.primary_family.active_household.latest_active_tax_households.present?
       if is_eligibility_determined_and_not_csr_100?(@person, params[:family_member_ids])
         sort_for_csr(@plans)
       else
@@ -221,7 +221,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if primary_family.application_in_progress.present?
       csr_kinds << "csr_100"
     else
-      if !primary_family.active_household.latest_active_tax_household.map(&:application_id).include?(nil)
+      if !primary_family.active_household.latest_active_tax_households.map(&:application_id).include?(nil)
         if primary_family.active_approved_application.present?
           family_member_ids.each do |member_id|
             applicant = primary_family.active_approved_application.active_applicants.where(family_member_id: member_id).first
@@ -236,7 +236,7 @@ class Insured::PlanShoppingsController < ApplicationController
         end
       else
         family_member_ids.each do |member_id|
-          primary_family.active_household.latest_active_tax_household.each do |thh|
+          primary_family.active_household.latest_active_tax_households.each do |thh|
             tax_household_member = thh.tax_household_members.where(applicant_id: member_id).first
             if tax_household_member.present?
               if tax_household_member.non_ia_eligible?
