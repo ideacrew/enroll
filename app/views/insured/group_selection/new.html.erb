@@ -82,14 +82,16 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_dental_offered?(@employee_role) %>">
-                  <label class="n-radio" for="coverage_kind_dental">
-                    <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
-                    <span class="n-radio">
-                    </span>
-                    <%= l10n("dental") %>
-                  </label>
-                </div>
+                <% if dental_market_enabled? %>
+                  <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_dental_offered?(@employee_role) %>">
+                    <label class="n-radio" for="coverage_kind_dental">
+                      <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
+                      <span class="n-radio">
+                      </span>
+                      <%= l10n("dental") %>
+                    </label>
+                  </div>
+                <% end %>
               </div>
           </div>
 
