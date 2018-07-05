@@ -304,8 +304,9 @@ class CensusEmployee < CensusMember
   end
 
   def employee_role
-    return @employee_role if defined? @employee_role
-    @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
+    return nil if self.employee_role_id.nil?
+    return @employee_role if @employee_role
+    @employee_role = EmployeeRole.find(self.employee_role_id)
   end
 
   def benefit_sponsorship=(benefit_sponsorship)

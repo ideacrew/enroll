@@ -224,7 +224,10 @@ module BenefitSponsors
       end
 
       def renew_member_benefits
-        census_employees_assigned_on(effective_period.min, false).each { |member| renew_member_benefit(member) }
+        # FIXME: There is no reason to assume that the renewal benefit package assignment
+        #        will have is_active == false, I think this may always return an empty set.
+        #        Because of this, I have removed the 'false' constraint.
+        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
       end
 
       def renew_member_benefit(census_employee)
