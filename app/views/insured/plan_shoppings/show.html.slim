@@ -220,12 +220,14 @@ javascript:
     premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
     premiumTo = parseFloat(selections.premiumToAmountValue || 0).toFixed(2);
 
-    availableEnrollments.filter(function(enrollment) {
-      premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
-      if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
-        resultsArray.push(enrollment);
-      }
-    })
+    if (selections.deductibleFromAmountValue != ""){
+      availableEnrollments.filter(function(enrollment) {
+        premiumTotal = parseFloat(enrollment.product_cost_total - enrollment.sponsor_contribution_total).toFixed(2);
+        if (Number(premiumTotal) >= Number(premiumFrom) && Number(premiumTotal) <= Number(premiumTo)) {
+          resultsArray.push(enrollment);
+        }
+      })
+    }
     // Filters based on Deductible Amount
     deductibleFrom = parseFloat(selections.deductibleFromAmountValue || 0).toFixed(0);
     deductibleTo = parseFloat(selections.deductibleToAmountValue || 0).toFixed(0);
