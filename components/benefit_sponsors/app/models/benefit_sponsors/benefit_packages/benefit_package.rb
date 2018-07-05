@@ -234,6 +234,7 @@ module BenefitSponsors
         predecessor_benefit_package = predecessor
 
         employee_role = census_employee.employee_role
+        return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
 
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
