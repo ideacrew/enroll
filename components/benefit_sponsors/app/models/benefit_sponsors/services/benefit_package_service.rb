@@ -19,6 +19,23 @@ module BenefitSponsors
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
+        load_employer_estimates(form) if form.sponsored_benefits.present?
+      end
+
+      def load_employer_estimates(form)
+        form.sponsored_benefits.each do |sponsored_benefit_form|
+          if sponsored_benefit_form.id
+            benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
+            sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
+            sponsored_benefit_form.employer_estimated_monthly_cost = montly_estimated_cost(sponsored_benefit)
+          end
+        end
+      end
+
+      def montly_estimated_cost(sponsored_benefit)
+        estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
+        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+        estimated_employer_cost
       end
 
       def load_form_params_from_resource(form, load_benefit_application_form)
@@ -307,7 +324,7 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: (contribution_level.contribution_factor * 0.01),
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered
           }
         end
 

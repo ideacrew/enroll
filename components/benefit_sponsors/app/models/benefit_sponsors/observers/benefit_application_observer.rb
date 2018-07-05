@@ -6,7 +6,7 @@ module BenefitSponsors
       attr_accessor :notifier
 
       def notifications_send(model_instance, new_model_event)
-        if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+        if new_model_event.present? && new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
 
           if BenefitSponsors::ModelEvents::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
             benefit_application = new_model_event.klass_instance
@@ -117,9 +117,8 @@ module BenefitSponsors
             if new_model_event.event_key == :low_enrollment_notice_for_employer
               BenefitSponsors::Queries::NoticeQueries.organizations_for_low_enrollment_notice(current_date).each do |benefit_sponsorship|
                begin
-                 benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_open).first
-                 #exclude congressional employees
-                  next if ((benefit_application.benefit_packages.any?{|bg| bg.is_congress?}) || (benefit_application.effective_period.min.yday == 1))
+                 benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_open).sort_by(&:created_at).last
+                  next if benefit_application.effective_period.min.yday == 1
                   if benefit_application.enrollment_ratio < benefit_application.benefit_market.configuration.ee_ratio_min
                     deliver(recipient: benefit_sponsorship.employer_profile, event_object: benefit_application, notice_event: "low_enrollment_notice_for_employer")
                   end
@@ -138,11 +137,11 @@ module BenefitSponsors
 
             if [:initial_employer_first_reminder_to_publish_plan_year,
                 :initial_employer_second_reminder_to_publish_plan_year,
-                :initial_employer_final_reminder_to_publish_plan_year].include?(new_mo del_event.event_key)
+                :initial_employer_final_reminder_to_publish_plan_year].include?(new_model_event.event_key)
               start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
               organizations = BenefitSponsors::Queries::NoticeQueries.initial_employers_by_effective_on_and_state(start_on: start_on, aasm_state: :draft)
               organizations.each do|organization|
-                benefit_application = organization.active_benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).first
+                benefit_application = organization.active_benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).sort_by(&:created_at).last
                 deliver(recipient: organization.employer_profile, event_object: benefit_application, notice_event: new_model_event.event_key.to_s)
               end
             end

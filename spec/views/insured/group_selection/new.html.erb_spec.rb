@@ -65,25 +65,30 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member2, nil, effective_on).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member3, nil, effective_on).and_return("ineligible_dental_row_#{employee_role.id}")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member4, nil, effective_on).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
+        render :template => "insured/group_selection/new.html.erb"
       end
 
       it "should show the title of family members" do
-        render :template => "insured/group_selection/new.html.erb"
         expect(rendered).to match /Choose Coverage for your Household/
       end
 
+      if ExchangeTestingConfigurationHelper.dental_market_enabled?
+      else
+        it "should not display dental option for MA" do
+          expect(rendered).to_not have_text("dental")
+          expect(rendered).to_not have_selector('#coverage_kind_dental')
+        end
+      end
+
       it "should have four checkbox option" do
-        render :template => "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector("input[type='checkbox']", count: 4)
       end
 
       it "should have two checked checkbox option and two checked radio button one for benefit_type and other for employer" do
-        render :template => "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector("input[checked='checked']", count: 4)
       end
 
       it "should have a disabled checkbox option" do
-        render :template => "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector("input[disabled='disabled']", count: 2)
       end
 
@@ -93,7 +98,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "should have a 'not eligible'" do
-        render :template => "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.', count: 2)
       end
     end
@@ -541,9 +545,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
   end
-
-
-
 
   context "change plan with ee role" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role) }
