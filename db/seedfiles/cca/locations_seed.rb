@@ -1,8 +1,6 @@
-cz_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "county_zips", "county_zips_*.yaml")
-ra_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "rating_areas", "rating_area_*.yaml")
-sa_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "service_areas", "service_area_*.yaml")
+def load_cca_locations_county_zips_seed
+  cz_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "county_zips", "county_zips_*.yaml")
 
-Mongoid::Migration.say_with_time("Load MA County Zips") do
   Dir.glob(cz_pattern).each do |f_name|
     loaded_class = ::BenefitMarkets::Locations::CountyZip
     yaml_str = File.read(f_name)
@@ -12,7 +10,8 @@ Mongoid::Migration.say_with_time("Load MA County Zips") do
   end
 end
 
-Mongoid::Migration.say_with_time("Load MA Rating Areas") do
+def load_ma_locations_rating_areas_seed
+  ra_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "rating_areas", "rating_area_*.yaml")
   Dir.glob(ra_pattern).each do |f_name|
     loaded_class = ::BenefitMarkets::Locations::RatingArea
     yaml_str = File.read(f_name)
@@ -22,7 +21,8 @@ Mongoid::Migration.say_with_time("Load MA Rating Areas") do
   end
 end
 
-Mongoid::Migration.say_with_time("Load MA Service Areas") do
+def load_ma_locations_service_areas_seed
+  sa_pattern = File.join(File.dirname(__FILE__), "fixtures", "locations", "service_areas", "service_area_*.yaml")
   Dir.glob(sa_pattern).each do |f_name|
     loaded_class = ::BenefitMarkets::Locations::ServiceArea
     yaml_str = File.read(f_name)

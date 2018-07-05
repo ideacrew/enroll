@@ -1,7 +1,6 @@
-site_glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "site_*.yaml")
-owner_org_glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "owner_organization_*.yaml")
-
-Mongoid::Migration.say_with_time("Load MA Site") do
+def load_cca_site_seed
+  site_glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "site_*.yaml")
+  owner_org_glob_pattern = File.join(File.dirname(__FILE__), "fixtures", "owner_organization_*.yaml")
   owner_org = nil
   Dir.glob(owner_org_glob_pattern).each do |f_name|
     loaded_class = ::BenefitSponsors::Organizations::ExemptOrganization
