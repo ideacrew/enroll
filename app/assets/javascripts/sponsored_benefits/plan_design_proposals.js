@@ -30,7 +30,9 @@ function pageInit() {
     calcPlanDesignContributions();
   } else {
     disableActionButtons();
-    $('li.sole-source-tab').find('label').trigger('click');
+    setTimeout(function() {
+      $('li.sole-source-tab').find('label').trigger('click');
+    },600)
   }
   initSlider();
   $('.loading-plans-button').hide();
@@ -290,21 +292,11 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  /*
   $('.fa-circle').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
       input.prop('checked', true)
     });
-  })*/
-  
-  
-  icons = document.querySelectorAll('.fa-circle');
-  tempId = 1;
-  icons.forEach(function() {
-    tempId ++;
-    icon.addEventListener("click", this.setRadioBtn.bind(this));
-    icon.setAttribute("data-tempId", tempId)
   })
 }
 
@@ -609,4 +601,40 @@ function sortPlans() {
       plan.parent().addClass('hidden');
     }
   });
+}
+
+function setCarrierRadio(element) {
+  elementId = element.getElementsByTagName('svg')[0].dataset.tempId;
+  var carriers = document.querySelectorAll('.carriers');
+  carriers.forEach(function(carrier) {
+    carrier.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = carrier.getElementsByTagName('svg')[0].dataset.tempId;
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  });
+}
+
+function setMetalRadio(element) {
+  elementId = element.getElementsByTagName('svg')[0].dataset.tempId;
+  var metals = document.querySelectorAll('.metals');
+  metals.forEach(function(metal) {
+    metal.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = metal.getElementsByTagName('svg')[0].dataset.tempId;
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  });
+}
+
+function setTopLevelRadios(element) {
+  elementId = element.getElementsByTagName('svg')[0].closest('label').dataset.tempid;
+  var tabs = document.querySelectorAll('.elected_plan');
+  tabs.forEach(function(tab) {
+    tab.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = tab.dataset.tempid
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  })
 }

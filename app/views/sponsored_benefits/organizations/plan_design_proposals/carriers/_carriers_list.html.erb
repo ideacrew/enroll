@@ -7,7 +7,7 @@
     active_year: active_year), remote: true do %>
     <div class="col-xs-3">
       <%= radio_button_tag :carrier_for_elected_plan, "#{ck}", false %>
-      <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
+      <%= label_tag "carrier_for_elected_plan_#{ck}", onclick:'setCarrierRadio(this)' do %>
       <i class="far fa-circle"></i>
       <% end %>
     </div>
@@ -31,7 +31,7 @@
           active_year: active_year), remote: true do %>
             <div class="col-xs-3">
               <%= radio_button_tag :metal_level_for_elected_plan, kind %>
-              <%= label_tag "metal_level_for_elected_plan_#{kind}" do %>
+              <%= label_tag "metal_level_for_elected_plan_#{kind}", onclick:'setMetalRadio(this)' do %>
                 <i class="far fa-circle"></i>
               <% end %>
             </div>
