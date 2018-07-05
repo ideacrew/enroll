@@ -56,7 +56,7 @@ module BenefitSponsors
 
       def calculate_employee_cost_details
         @employee_cost_details = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employee_cost_details(employer_contribution_params)
-        render json: @employee_cost_details
+        render json: @employee_cost_details.to_json
       end
 
       def destroy
@@ -97,12 +97,8 @@ module BenefitSponsors
         params.permit(:benefit_application_id).merge({:sponsored_benefits_attributes => {"0" => {:reference_plan_id => params[:reference_plan_id]} }})
       end
 
-      def sponsored_benefit_params
-        {:sponsored_benefits_attributes => {"0" => {:product_package_kind => params[:product_package_kind], :reference_plan_id => params[:reference_plan_id]}}}
-      end
-
       def employer_contribution_params
-        params.permit(:benefit_application_id).merge(sponsored_benefit_params)
+        params.permit(:benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id])
       end
     end
   end
