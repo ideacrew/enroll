@@ -1,15 +1,16 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :around_each do
-    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:benefit_market)          { site.benefit_markets.first }
+
+    include_context "setup benefit market with market catalogs and product packages"
+
+    # let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    # let(:benefit_market)          { site.benefit_markets.first }
+
     let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-
-    let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
-    let(:service_areas) { create_default(:benefit_markets_locations_service_area).to_a }
-    let(:sic_code)      { "001" }
 
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
@@ -23,8 +24,8 @@ module BenefitSponsors
       {
         effective_period:         effective_period,
         open_enrollment_period:   open_enrollment_period,
-        recorded_rating_area:     rating_area,
-        recorded_service_areas:   service_areas,
+        # recorded_rating_area:     rating_area,
+        # recorded_service_areas:   service_areas,
       }
     end
 
@@ -225,7 +226,7 @@ module BenefitSponsors
       end
     end
 
-    describe "Managing BenefitPackages" do
+    describe "Manage BenefitPackages" do
       describe "Managing Default BenefitPackage" do
         context "Given a BenefitApplication with one BenefitPackage" do
 
@@ -293,6 +294,13 @@ module BenefitSponsors
 
         end
       end
+    end
+
+    describe "Manage BenefitSponsorCatalog" do
+      # let(:initial_catalog)       {  }
+      # let(:replacement_catalog)   {  }
+
+
     end
 
     describe "Scopes", :dbclean => :after_each do
@@ -452,10 +460,9 @@ module BenefitSponsors
           end
         end
       end
-
     end
 
-    describe ".renew" do
+    describe "Renew a BenefitApplication" do
 
       context "when renewal benefit sponsor catalog available" do
 
@@ -588,6 +595,10 @@ module BenefitSponsors
       end
 
       context "and an effective date is passed to enrollment timetable by effective date method" do
+        let(:rating_area)   { create_default(:benefit_markets_locations_rating_area) }
+        let(:service_areas) { create_default(:benefit_markets_locations_service_area).to_a }
+        let(:sic_code)      { "010"  }
+
         let(:effective_date)                  { TimeKeeper.date_of_record.next_month.end_of_month + 1.day }
 
         let(:prior_month)                     { effective_date - 1.month }
@@ -637,6 +648,10 @@ module BenefitSponsors
     end
 
     describe "Navigating BenefitSponsorship Predecessor/Successor linked list", :dbclean => :after_each do
+      let(:rating_area)   { create_default(:benefit_markets_locations_rating_area) }
+      let(:service_areas) { create_default(:benefit_markets_locations_service_area).to_a }
+      let(:sic_code)      { "010"  }
+
       let(:node_a)    { described_class.new(benefit_sponsorship: benefit_sponsorship,
                                                 effective_period: effective_period,
                                                 open_enrollment_period: open_enrollment_period,

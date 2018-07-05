@@ -37,7 +37,6 @@ module BenefitSponsors
                                                   canceled:   :cancel
                                                 }
 
-
     # The date range when this application is active
     field :effective_period,        type: Range
 
@@ -104,6 +103,9 @@ module BenefitSponsors
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
 
+    scope :is_renewal,                      ->{ exists(:predecessor_id => true) }
+
+    # Deprecate in favor of chained scopes, e.g. is_renewal.submitted
     scope :renewing,                      ->{ where(:$elemMatch => { :$exists => {:predecessor_id => true},
                                                                       :aasm_state.in => (APPLICATION_DRAFT_STATES + ENROLLING_STATES) })
                                                                 }
@@ -243,15 +245,12 @@ module BenefitSponsors
       @recorded_service_areas = BenefitMarkets::Locations::ServiceArea.find(recorded_service_area_ids)
     end
 
-    def build_benefit_sponsor_catalog
-      self.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_on(start_on) if benefit_sponsorship.present?
-    end
-
     def benefit_sponsor_catalog=(new_benefit_sponsor_catalog)
       if new_benefit_sponsor_catalog.nil?
         write_attribute(:benefit_sponsor_catalog_id, nil)
       else
         raise ArgumentError.new("expected BenefitSponsorCatalog") unless new_benefit_sponsor_catalog.is_a? BenefitMarkets::BenefitSponsorCatalog
+        drop_benefit_sponsor_catalog
         write_attribute(:benefit_sponsor_catalog_id, new_benefit_sponsor_catalog._id)
       end
       @benefit_sponsor_catalog = new_benefit_sponsor_catalog
@@ -262,7 +261,6 @@ module BenefitSponsors
       return @benefit_sponsor_catalog if defined? @benefit_sponsor_catalog
       @benefit_sponsor_catalog = BenefitMarkets::BenefitSponsorCatalog.find_by(benefit_sponsor_catalog_id)
     end
-
 
     def effective_period=(new_effective_period)
       return nil if new_effective_period.blank?
@@ -517,24 +515,6 @@ module BenefitSponsors
 
       # :effectuate, :expire, :terminate, :cancel
       benefit_packages.each { |benefit_package| benefit_package.send("#{transition_kind}_member_benefits".to_sym) }
-    end
-
-    def refresh(new_benefit_sponsor_catalog)
-      warn "[Deprecated] Instead use refresh_benefit_sponsor_catalog" unless Rails.env.test?
-      refresh_benefit_sponsor_catalog(new_benefit_sponsor_catalog)
-    end
-
-    def refresh_benefit_sponsor_catalog(new_benefit_sponsor_catalog)
-      if benefit_sponsorship_catalog != new_benefit_sponsor_catalog
-
-        benefit_packages.each do |benefit_package|
-          benefit_package.refresh(new_benefit_sponsor_catalog)
-        end
-
-        self.benefit_sponsor_catalog = new_benefit_sponsor_catalog
-      end
-
-      self
     end
 
     class << self
@@ -810,14 +790,30 @@ module BenefitSponsors
 
     # Assign local attributes derived from benefit_sponsorship parent instance
     def pull_benefit_sponsorship_attributes
-      return unless benefit_sponsorship.present?
-      return if self.start_on.blank?
-      refresh_recorded_rating_area   unless recorded_rating_area.present?
-      refresh_recorded_service_areas unless recorded_service_areas.size > 0
-      refresh_recorded_sic_code      unless recorded_sic_code.present?
+      return unless benefit_sponsorship.present? && self.start_on.present?
+
+      refresh_recorded_rating_area    unless recorded_rating_area.present?
+      refresh_recorded_service_areas  unless recorded_service_areas.size > 0
+      refresh_recorded_sic_code       unless recorded_sic_code.present?
+      refresh_benefit_sponsor_catalog unless benefit_sponsor_catalog.present?
     end
 
+
     private
+
+    def refresh_benefit_sponsor_catalog
+      if start_on.present?
+        new_benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_on(self.start_on)
+        if new_benefit_sponsor_catalog.present? && new_benefit_sponsor_catalog.save
+          drop_benefit_sponsor_catalog
+          self.benefit_sponsor_catalog = new_benefit_sponsor_catalog
+        end
+      end
+    end
+
+    def drop_benefit_sponsor_catalog
+      benefit_sponsor_catalog.destroy if benefit_sponsor_catalog.present?
+    end
 
     def refresh_recorded_rating_area
       self.recorded_rating_area = benefit_sponsorship.rating_area_on(self.start_on)
