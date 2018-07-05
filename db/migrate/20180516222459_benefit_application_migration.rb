@@ -310,7 +310,7 @@ class BenefitApplicationMigration < Mongoid::Migration
       benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
           census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) if census_employee.employee_role && census_employee.employee_role.benefit_sponsors_employer_profile_id.blank?
-          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id
+          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id if census_employee.benefit_sponsors_employer_profile_id.blank?
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 
@@ -319,6 +319,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
         end
+        CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
         CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
         CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
         census_employee.save(:validate => false)
