@@ -2,7 +2,7 @@
 # Run this task every Month: RAILS_ENV=production bundle exec rake reports:shop:ee_with_waiver_enrollment
 
 require 'csv'
- 
+
 namespace :reports do
   namespace :shop do
 
@@ -13,7 +13,9 @@ namespace :reports do
         HBX_ID
         FULL_NAME
         WAIVED_ENROLLMENT_ID
+        WAIVED_ENROLLMENT_TIME_STAMP
         CANCELED_ENROLLMENT_ID
+        CANCELLED_ENROLLMENT_TIME_STAMP
       )
       processed_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
@@ -82,7 +84,9 @@ namespace :reports do
                     person.hbx_id,
                     person.full_name,
                     cancelled_waived_pair[0].hbx_id,
+                    enrollment_transition_date(cancelled_waived_pair[0], "coverage_canceled")
                     cancelled_waived_pair[1].hbx_id,
+                    enrollment_transition_date(cancelled_waived_pair[1], "inactive")
                   ]
                 end
                 processed_count = processed_count + 1
