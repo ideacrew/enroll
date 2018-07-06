@@ -207,7 +207,7 @@ module BenefitSponsors
         plan_year_end_on = effective_date + 1.year - 1.day
         employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
         employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
-        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}").to_date
         open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
         open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date

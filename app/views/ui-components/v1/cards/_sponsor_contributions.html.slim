@@ -12,7 +12,7 @@
     = f.fields_for :contribution_levels, f.object.contribution_levels, errors: {}, fieldset: false do |f|
       .row.mb-1
         .col-xs-4.ml-4.mt-1
-          = f.check_box :is_offered, {class: 'contribution_handler', "data-displayname" => f.object.display_name, onchange: "contributionAmounts(this)"}, "true", "false"
+          = f.check_box :is_offered, {class: 'contribution_handler', disabled: (f.object.is_employee_cl), "data-displayname" => f.object.display_name, onchange: "contributionAmounts(this)"}, "true", "false"
           = f.object.display_name
           = f.hidden_field :display_name, value: f.object.display_name
         .col-xs-6

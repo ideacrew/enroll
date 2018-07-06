@@ -117,6 +117,20 @@ module BenefitMarkets
       def is_satisfied?(model_instance)
         reset_results
         process_rules(model_instance)
+
+        begin
+            File.open("business_rules_engine_errors.txt", "a+") { |f|
+            f << "---------" + "\n"
+            f << Time.now.getutc.to_s + "\n"
+            f << model_instance.class.to_s + "\n"
+            f << model_instance.id.to_s + "\n"
+            f << @fail_results.to_s + "\n"
+            f << "---------" + "\n"
+          }
+        rescue
+
+        end
+
         @fail_results.empty?
       end
 

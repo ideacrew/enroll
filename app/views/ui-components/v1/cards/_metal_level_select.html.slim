@@ -206,6 +206,7 @@ javascript:
     
     setTimeout(function() {
       buildSponsorContributions(sponsorContribution)
+      disableEmployeeContributionLevel();
     },400);
   }
   
@@ -294,6 +295,14 @@ javascript:
   function enablePlanYearButton() {
     var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.remove('disabled')
+  }
+
+  function disableEmployeeContributionLevel(){
+    document.querySelectorAll(".contribution_handler").forEach(function(element) {
+      if(element.dataset.displayname == 'Employee' || element.dataset.displayname == "Employee Only" ) {
+        element.closest('label').getElementsByTagName('span')[0].classList.add("blocking")
+      }
+    })
   }
   
   var eeContribution;

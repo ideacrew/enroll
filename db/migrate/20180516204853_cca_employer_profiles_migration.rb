@@ -91,8 +91,53 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
             csv << [old_org.hbx_id, old_org.legal_name, new_organization.id, "Migration Success"]
             success = success + 1
           else
+            # handle MPY's census employee who are in production
+            new_org_benefit_sponsorship = existing_new_organizations.first.active_benefit_sponsorship
+            profile = existing_new_organizations.first.employer_profile
+            @old_profile = old_org.employer_profile
+            old_org_census_employees = find_census_employees
+
+            old_org_census_employees.each do |old_census|
+              census_employee_found = new_org_benefit_sponsorship.census_employees.unscoped.by_ssn(old_census.ssn).first if new_org_benefit_sponsorship.census_employees.present?
+              if census_employee_found.present?
+                if old_census.benefit_group_assignments.present?
+                  CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
+                  CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
+                  CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
+                  census_employee_found.benefit_group_assignments << old_census.benefit_group_assignments
+                  census_employee_found.save(:validate => false)
+                  old_census.update(benefit_group_assignments: [])
+                end
+              else
+                old_census.employee_role.update_attributes(benefit_sponsors_employer_profile_id: profile.id) if old_census.employee_role && old_census.employee_role.benefit_sponsors_employer_profile_id.blank?
+                old_census.benefit_sponsors_employer_profile_id = profile.id if old_census.benefit_sponsors_employer_profile_id.blank?
+                old_census.benefit_sponsorship = new_org_benefit_sponsorship
+                CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
+                CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
+                CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
+                old_census.save(:validate => false)
+              end
+            end
+
+            # handle MPY's staff role
+            old_org_staff_roles = find_staff_roles
+            new_org_staff_roles = profile.staff_roles
+            old_org_staff_roles.each do |old_staff|
+              staff_found = new_org_staff_roles.select{|role| role.first_name == old_staff.first_name}.first if new_org_staff_roles.present?
+              unless staff_found.present?
+                staff_role = old_staff.employer_staff_roles.where(employer_profile_id: @old_profile.id).first
+                staff_role.update_attributes(benefit_sponsor_employer_profile_id: profile.id)
+              end
+            end
+
+          #  handles MPY employer document who are in production
+            build_employer_attestation(profile) if @old_profile.employer_attestation.present?
+            build_documents(old_org, profile)
+            build_inbox_messages(profile)
+            profile.organization.save
+            print 'E' unless Rails.env.test?
             existing_organization = existing_organization + 1
-            csv << [old_org.hbx_id, old_org.legal_name, existing_new_organizations.first.id, "Already Migrated to new model, no action taken"]
+            csv << [old_org.hbx_id, old_org.legal_name, existing_new_organizations.first.id, "Already Migrated to new model, handled MPY employer scenario"]
           end
         rescue Exception => e
           failed = failed + 1
