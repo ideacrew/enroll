@@ -31,8 +31,7 @@ module BenefitSponsors
             fail:     ->(benefit_application){"at least #{(ENROLLMENT_RATIO_MINIMUM*100).to_i}% non-owner employee must enroll" }
 
     business_policy :passes_open_enrollment_period_policy,
-            rules: [:minimum_participation_rule,
-                    :non_business_owner_enrollment_count]
+            rules: [:minimum_participation_rule]
 
 
     # business_policy :loosely_passes_open_enrollment_period_policy,
