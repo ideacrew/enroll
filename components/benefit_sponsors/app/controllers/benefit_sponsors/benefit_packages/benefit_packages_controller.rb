@@ -33,7 +33,7 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params.require(:id)}))
         authorize @benefit_package_form, :updateable?
 
         if @benefit_package_form.update
@@ -87,7 +87,7 @@ module BenefitSponsors
           :title, :description, :probation_period_kind, :benefit_application_id,
           :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
-              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor]
+              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
             ]
           ]
         )

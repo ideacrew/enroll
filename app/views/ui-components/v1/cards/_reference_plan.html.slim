@@ -54,7 +54,7 @@
     function showPlanSelection() {
       document.getElementById('planSelection').classList.remove('hidden');
       document.getElementById('referencePlanEdit').classList.add('hidden');
-      document.getElementById('scEdit').classList.add('hidden');
+      document.getElementById('scEdit').remove();
     }
   
     function disablePlanYearButton() {
@@ -80,6 +80,9 @@
       contributionHandlers = document.querySelectorAll(".contribution_handler")
 
       contributionInputs.forEach(function(element) {
+        if (!element.offsetWidth > 0 && !element.offsetHeight > 0) {
+          return
+        }
         switch (element.dataset.displayname) {
           case 'Employee':
             eeContribution = element.value;

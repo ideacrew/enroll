@@ -34,7 +34,7 @@ module BenefitSponsors
 
       def montly_estimated_cost(sponsored_benefit)
         estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
-        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package, build_new_pricing_determination: false)
         estimated_employer_cost
       end
 
@@ -220,15 +220,14 @@ module BenefitSponsors
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
         end
+        benefit_package.sponsored_benefits.each do |sb|
+          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+        end
         save_successful = benefit_package.save
         unless save_successful
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
-        end
-        benefit_package.sponsored_benefits.each do |sb|
-          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-          sbenefit.save!
         end
         [true, benefit_package]
       end
@@ -287,7 +286,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           })
         end
         Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
