@@ -47,7 +47,7 @@ module BenefitSponsors
           pdt_total = pdt.price
           pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
           BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
-        end
+        end if pd.present?
       end
 
       def load_form_params_from_resource(form, load_benefit_application_form)
