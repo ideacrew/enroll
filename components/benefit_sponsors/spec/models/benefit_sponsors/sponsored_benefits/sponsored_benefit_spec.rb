@@ -8,7 +8,7 @@ RSpec.describe ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit, type: :mo
   let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_market)          { site.benefit_markets.first }
   let(:effective_period)        { Date.today.end_of_month.next_day..Date.today.end_of_month.next_year }
-  let(:effective_period_begin)  { effective_period_begin }
+  let(:effective_period_begin)  { effective_period.min }
 
   let!(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
