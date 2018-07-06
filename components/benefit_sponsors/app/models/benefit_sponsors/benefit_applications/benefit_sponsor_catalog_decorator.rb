@@ -3,7 +3,7 @@ module BenefitSponsors
     class BenefitSponsorCatalogDecorator < SimpleDelegator
 
       Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :health_plan_kind)
-      ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered)
+      ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered, :contribution_unit_id)
 
       def sponsor_contributions(benefit_package_id = nil)
         return @contributions if defined? @contributions
@@ -29,7 +29,7 @@ module BenefitSponsors
           contributions[product_package.package_kind.to_s] = {
             id: nil,
             contribution_levels: sponsor_contribution.contribution_levels.collect{|cl| 
-                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true)
+                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
                     }
           }
 

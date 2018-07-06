@@ -103,6 +103,7 @@ module Importers
         errors.add(:base, "matching conflict for this personal data")
         return false
       end
+
       if existing_people.empty?
         begin
           merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
@@ -111,7 +112,20 @@ module Importers
         end
         return true
       end
+
       existing_person = existing_people.first
+
+      if existing_person.has_active_employer_staff_role?
+        #only in new model employer staff role already exist
+        # Future needs to handle one person with 2  different staff roles
+        staff_role_id = existing_person.user.id if existing_person.user
+        existing_person.unset(:user_id)
+        merge_staff.set(:user_id => staff_role_id)
+        existing_person.destroy!
+        merge_staff.save!
+        return true
+      end
+
       merge_poc_and_employee_person(merge_staff, existing_person, employer)
       true
     end

@@ -27,15 +27,12 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            sponsored_benefit_form.employer_estimated_monthly_cost = montly_estimated_cost(sponsored_benefit)
+            costs = calculate_premiums(form)
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_sponsor_exposure] : "0.00"
+            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minium] : "0.00"
+            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : "0.00"
           end
         end
-      end
-
-      def montly_estimated_cost(sponsored_benefit)
-        estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
-        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
-        estimated_employer_cost
       end
 
       def load_form_params_from_resource(form, load_benefit_application_form)
@@ -220,15 +217,14 @@ module BenefitSponsors
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
         end
+        benefit_package.sponsored_benefits.each do |sb|
+          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+        end
         save_successful = benefit_package.save
         unless save_successful
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
-        end
-        benefit_package.sponsored_benefits.each do |sb|
-          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-          sbenefit.save!
         end
         [true, benefit_package]
       end
@@ -287,7 +283,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           })
         end
         Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
@@ -324,7 +321,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: (contribution_level.contribution_factor * 0.01),
-            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered
+            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           }
         end
 

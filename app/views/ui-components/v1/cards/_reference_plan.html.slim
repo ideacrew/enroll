@@ -1,4 +1,4 @@
-- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false  
+- show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 .panel
   .panel-body
@@ -30,11 +30,11 @@
       .col-xs-2
         strong.mb-1 Min
         br
-        | $0.00
+        | #{number_to_currency(f.object.employer_estimated_min_monthly_cost)}
       .col-xs-2
         strong.mb-1 Max
         br
-        | $0.00
+        | #{number_to_currency(f.object.employer_estimated_max_monthly_cost)}
 
 - if show_benefit_application_tile == "true"
   javascript:
@@ -54,7 +54,7 @@
     function showPlanSelection() {
       document.getElementById('planSelection').classList.remove('hidden');
       document.getElementById('referencePlanEdit').classList.add('hidden');
-      document.getElementById('scEdit').classList.add('hidden');
+      document.getElementById('scEdit').remove();
     }
   
     function disablePlanYearButton() {
