@@ -97,56 +97,50 @@ module BenefitSponsors
         end
       end
 
-      def self.included(base)
-        base.extend ClassMethods
-      end
+      def self.date_change_event(new_date)
+        # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1
+          is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
+        end
 
-      module ClassMethods
-        def date_change_event(new_date)
-          # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1
-            is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
-          end
+        # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 8th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2
+          is_renewal_plan_year_first_reminder_before_soft_dead_line = true
+        end
 
-          # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 8th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2
-            is_renewal_plan_year_first_reminder_before_soft_dead_line = true
-          end
+        # renewal_application with enrolling state, reached open-enrollment end date with minimum participation and non-owner-enrolle i.e 15th of month
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
+          is_renewal_employer_open_enrollment_completed = true
+        end
 
-          # renewal_application with enrolling state, reached open-enrollment end date with minimum participation and non-owner-enrolle i.e 15th of month
-          if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
-            is_renewal_employer_open_enrollment_completed = true
-          end
+        #initial employers misses binder payment deadline
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        binder_next_day = schedular.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        if new_date == binder_next_day
+          is_initial_employer_no_binder_payment_received = true
+        end
 
-          #initial employers misses binder payment deadline
-          schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-          binder_next_day = schedular.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
-          if new_date == binder_next_day
-            is_initial_employer_no_binder_payment_received = true
-          end
+        # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
+          is_renewal_plan_year_publish_dead_line = true
+        end
 
-          # renewal_application with un-published plan year, send notice 2 days prior to the publish due date i.e 13th of the month
-          if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
-            is_renewal_plan_year_publish_dead_line = true
-          end
+        if new_date.day == benefit_application.benefit_market.configuration.oe_end_month - 2
+          is_low_enrollment_notice_for_employer = true
+        end
 
-          if new_date.day == benefit_application.benefit_market.configuration.oe_end_month - 2
-            is_low_enrollment_notice_for_employer = true
-          end
+        if new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 2
+          is_initial_employer_first_reminder_to_publish_plan_year = true
+        elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 1
+          is_initial_employer_second_reminder_to_publish_plan_year = true
+        elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.pub_due_dom - 2
+          is_initial_employer_final_reminder_to_publish_plan_year = true
+        end
 
-          if new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 2
-            is_initial_employer_first_reminder_to_publish_plan_year = true
-          elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 1
-            is_initial_employer_second_reminder_to_publish_plan_year = true
-          elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.pub_due_dom - 2
-            is_initial_employer_final_reminder_to_publish_plan_year = true
-          end
-
-          DATA_CHANGE_EVENTS.each do |event|
-            if event_fired = instance_eval("is_" + event.to_s)
-              event_options = {}
-              notify_observers(ModelEvent.new(event, self, event_options))
-            end
+        DATA_CHANGE_EVENTS.each do |event|
+          if event_fired = instance_eval("is_" + event.to_s)
+            event_options = {}
+            notify_observers(ModelEvent.new(event, self, event_options))
           end
         end
       end
