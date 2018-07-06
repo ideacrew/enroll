@@ -109,7 +109,7 @@
             i.far.fa-file-pdf.fa-2x.mr-1
             | Summary of Benefits and Coverage
         .pull-right
-          button.btn.btn-default.btn-sm.btn-more-details More Details
+          a.btn.btn-default.btn-sm.btn-more-details onclick="showMoreDetails()" More Details
           button.btn.btn-default.btn-sm data-dismiss="modal" style="margin-top:-1px" Close
 
 javascript:
@@ -384,16 +384,16 @@ javascript:
 			enablePlanYearButton()
     }
   }	
-  
+  var selectedReferencePlanId;
+	var selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
+	var selectedBenefitApplicationID = "#{params[:benefit_application_id]}";
+	
   function viewSummary(element) {
     var title = element.dataset.planTitle;
-		var bsID = "#{params[:benefit_sponsorship_id]}";
-		var baID = "#{params[:benefit_application_id]}";
-		var summaryData;
+		selectedReferencePlanID = element.dataset.planId;
     document.getElementById('viewSummaryTitle').innerHTML = title;
-		var tableData = document.getElementById('modalSummaryData');
     //$('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent');
-		fetch('/benefit_sponsors/benefit_sponsorships/'+bsID+'/benefit_applications/'+baID+'/benefit_packages/reference_product_summary?reference_plan_id='+element.dataset.planId)
+		fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+element.dataset.planId)
 			.then((res)=> res.json())
 			.then((data)=> {
 				data[1].map((s)=> {
@@ -405,5 +405,23 @@ javascript:
 				});
 			})
 			.then($('#viewSummaryModal').modal('show'))
-		
   }
+	
+	function showMoreDetails() {
+		fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID+'&details=details')
+			.then((res)=> res.json())
+			.then((data)=> {
+				data[1].map((s)=> {
+				var tr = document.createElement('tr');
+				var tbody = document.getElementById('modalSummaryData');
+				tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+				tbody.appendChild(tr)
+				});
+			})
+	}
+	
+	
+	$('#viewSummaryModal').on('hide.bs.modal', function (e) {
+	  // Clears data from modal on close
+		document.getElementById('modalSummaryData').innerHTML = '';
+	})
