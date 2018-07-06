@@ -120,11 +120,12 @@ module BenefitMarkets
 
         begin
             File.open("business_rules_engine_errors.txt", "a+") { |f|
-            f << "---------" + "\n"
+            f << "\n---------" + "\n"
             f << Time.now.getutc.to_s + "\n"
             f << model_instance.class.to_s + "\n"
             f << model_instance.id.to_s + "\n"
             f << @fail_results.to_s + "\n"
+            f << model_instance.benefit_sponsorship.organization.legal_name + "\n"
             f << "---------" + "\n"
           }
         rescue
