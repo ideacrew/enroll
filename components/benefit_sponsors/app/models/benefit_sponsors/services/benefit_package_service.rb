@@ -27,27 +27,12 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            sponsored_benefit_form.employer_estimated_monthly_cost = montly_estimated_cost(sponsored_benefit)
-            costs = set_min_max_costs(sponsored_benefit)
-            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs.min : "0.00"
-            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs.max : "0.00"
+            costs = calculate_premiums(form) rescue nil
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_sponsor_exposure] : "0.00"
+            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minium] : "0.00"
+            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : "0.00"
           end
         end
-      end
-
-      def montly_estimated_cost(sponsored_benefit)
-        estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
-        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package, build_new_pricing_determination: false)
-        estimated_employer_cost
-      end
-
-      def set_min_max_costs(sponsored_benefit)
-        pd = sponsored_benefit.latest_pricing_determination
-        costs = pd.pricing_determination_tiers.map do |pdt|
-          pdt_total = pdt.price
-          pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-          BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
-        end if pd.present?
       end
 
       def load_form_params_from_resource(form, load_benefit_application_form)
