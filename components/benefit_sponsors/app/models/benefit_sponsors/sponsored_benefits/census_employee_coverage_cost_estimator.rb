@@ -121,6 +121,8 @@ module BenefitSponsors
             roster_eligibility_optimizer,
             p_determination_builder
           )
+        else
+          sponsored_benefit.pricing_determinations = []
         end
         price, contribution = calculate_normal_costs(
           pricing_model,
@@ -138,7 +140,9 @@ module BenefitSponsors
       protected
 
       def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package)
-        return sponsored_benefit.sponsor_contribution if sponsored_benefit.sponsor_contribution.present?
+        if sponsored_benefit.sponsor_contribution.present?
+          return sponsored_benefit.sponsor_contribution
+        end
         cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
         sponsor_contribution = cm_builder.build_sponsor_contribution(product_package)
         sponsor_contribution.sponsored_benefit = sponsored_benefit
