@@ -27,7 +27,7 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            costs = calculate_premiums(form)
+            costs = calculate_premiums(form) rescue nil
             sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_sponsor_exposure] : "0.00"
             sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minium] : "0.00"
             sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : "0.00"
