@@ -33,7 +33,7 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params.require(:id)}))
         authorize @benefit_package_form, :updateable?
 
         if @benefit_package_form.update

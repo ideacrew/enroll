@@ -91,7 +91,7 @@ module BenefitSponsors
         @coverage_start = c_start
       end
 
-      def calculate(sponsored_benefit, reference_product, p_package, rebuild_sponsor_contribution: false)
+      def calculate(sponsored_benefit, reference_product, p_package, rebuild_sponsor_contribution: false, build_new_pricing_determination: true)
         pricing_model = p_package.pricing_model
         contribution_model = p_package.contribution_model
         p_calculator = pricing_model.pricing_calculator
@@ -102,14 +102,16 @@ module BenefitSponsors
         price = 0.00
         contribution = 0.00
         if employees_enrolling.count < 1
-          if p_determination_builder
+          if p_determination_builder && build_new_pricing_determination
             create_fake_pricing_determination(sponsored_benefit, sponsor_contribution, pricing_model, contribution_model, p_determination_builder)
             return [sponsor_contribution, price, contribution]
-          else
+          elsif p_determination_builder
             return [sponsor_contribution, price, contribution]
+          else
+            sponsored_benefit.pricing_determinations = []
           end
         end
-        if p_determination_builder
+        if p_determination_builder && build_new_pricing_determination
           precalculate_costs(
             sponsored_benefit,
             pricing_model,
@@ -121,7 +123,7 @@ module BenefitSponsors
             roster_eligibility_optimizer,
             p_determination_builder
           )
-        else
+        elsif !p_determination_builder
           sponsored_benefit.pricing_determinations = []
         end
         price, contribution = calculate_normal_costs(
