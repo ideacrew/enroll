@@ -114,7 +114,7 @@ module SponsoredBenefits
 
       def calculate_start_on_dates
         if employer_profile.present? && employer_profile.active_plan_year.present?
-          [employer_profile.active_plan_year.start_on.next_year]
+          [employer_profile.active_plan_year.end_on.next_day]
         else
           SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
         end
