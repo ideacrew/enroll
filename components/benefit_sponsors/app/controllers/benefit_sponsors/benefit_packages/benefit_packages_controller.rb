@@ -72,7 +72,7 @@ module BenefitSponsors
       end
 
       def reference_product_summary
-        @product_summary = BenefitSponsors::Forms::BenefitPackageForm.for_reference_product_summary(reference_product_params, params[:details])
+        @product_summary = BenefitSponsors::Forms::BenefitPackageForm.for_reference_product_summary(reference_product_params, params[:details]).to_json
         render json: @product_summary
       end
 

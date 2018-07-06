@@ -2,7 +2,7 @@
   .modal-dialog
     .modal-content
       - if @waivable
-        = form_tag(waive_insured_plan_shopping_path(enrollment.id), id: "waiver_reasons_selection_modal_form") do
+        = form_tag(waive_insured_plan_shopping_path(enrollment.id), method: :get, id: "waiver_reasons_selection_modal_form") do
           .modal-header
             button.close type="button" data-dismiss="modal" aria-label="Close"
               | &times;

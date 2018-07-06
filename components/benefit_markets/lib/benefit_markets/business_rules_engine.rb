@@ -128,6 +128,7 @@ module BenefitMarkets
             f << "Non Biz Owner Count: " + model_instance.enrolled_non_business_owner_count.to_s + "\n"
             f << "Members Eligible to Enroll: " + model_instance.members_eligible_to_enroll_count.to_s + "\n"
             f << @fail_results.to_s + "\n"
+            f << @success_results.to_s + "\n"
             f << model_instance.benefit_sponsorship.organization.legal_name + "\n"
             f << "---------" + "\n"
           }

@@ -130,7 +130,7 @@
             <div class="row">
               <span>Employer Estimated Maximum Monthly Cost</span>
 	      <% estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on) %>
-	      <% _sb, estimated_employer_cost, _contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package) %>
+	      <% _sb, estimated_employer_cost, _contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package, build_new_pricing_determination: false) %>
               <h2><%= number_to_currency(estimated_employer_cost) %></h2>
             </div>
           </div>

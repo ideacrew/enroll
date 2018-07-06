@@ -89,7 +89,7 @@ module BenefitSponsors
           validate: -> (benefit_application) {
             TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
           },
-          success:  -> (benfit_application)  { "validated successfully" },
+          success:  -> (benfit_application)  { "PY was bublished before #{benfit_application.last_day_to_publish} on #{TimeKeeper.date_of_record} " },
           fail:     -> (benefit_application) { "#{benefit_application.last_day_to_publish} was the last day to publish your Plan Year" }
 
     rule  :stubbed_rule_one,
