@@ -1,5 +1,6 @@
 <div class="row row-form-wrapper no-buffer">
   <%= f.hidden_field :id, value: f.object.id if f.object.id.present? %>
+  <%= f.hidden_field :contribution_unit_id %>
   <% f.object.is_offered = false if f.object.display_name == 'child_26_and_over' %>
   <fieldset style="<%= 'display: none;' if f.object.display_name == 'child_26_and_over' %>">
     <div class="col-xs-6 form-group form-group-lg">

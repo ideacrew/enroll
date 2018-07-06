@@ -7,11 +7,12 @@ module BenefitSponsors
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
             events.each do |event|
+              model_instance = self
               if args.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-                k.send event, args
-              else
-                k.send event, self, args
+                model_instance = args.klass_instance
+                next unless (event == :notifications_send || args.event_key == :generate_initial_employer_invoice)
               end
+              k.send event, model_instance, args
             end
           end
         end

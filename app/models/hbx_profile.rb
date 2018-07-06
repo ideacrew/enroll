@@ -131,9 +131,7 @@ class HbxProfile
   CallCenterPhoneNumber = contact_center_phone_number
   ShortName = site_short_name
 
-  # IndividualEnrollmentDueDayOfMonth = 15
-  # Temporary change for Dec 2015 extension
-  IndividualEnrollmentDueDayOfMonth = 19
+  IndividualEnrollmentDueDayOfMonth = 15
 
   #New Rule There is no 14 days rule for termination
   # IndividualEnrollmentTerminationMinimum = 14.days

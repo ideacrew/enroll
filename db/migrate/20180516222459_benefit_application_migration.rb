@@ -114,8 +114,17 @@ class BenefitApplicationMigration < Mongoid::Migration
     benefit_application.write_attribute(:effective_period, (plan_year.start_on..plan_year.end_on)) if plan_year.start_on == plan_year.end_on  # benefit_application.effective_period setter method setting value to nil if plan_year.start_on == plan_year.end_on for those cases uses below
     benefit_application.open_enrollment_period = (plan_year.open_enrollment_start_on..plan_year.open_enrollment_end_on)
     benefit_application.pull_benefit_sponsorship_attributes
-    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired])
-    benefit_application.predecessor_id = predecessor_application.first.id if predecessor_application.present?
+    predecessor_application = benefit_sponsorship.benefit_applications.where(:"effective_period.max" => benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
+
+    if predecessor_application.present?
+      if predecessor_application.count < 2
+        benefit_application.predecessor_id = predecessor_application.first.id
+      elsif predecessor_application.where(:"effective_period.max" => Date.new(2018,7,31)).count == 2  # exception case for 8/1 conversion
+        benefit_application.predecessor_id = predecessor_application.where(aasm_state: :imported).first.id
+      else
+        benefit_application.predecessor_id = predecessor_application.first.id
+      end
+    end
 
     @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
     catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
@@ -137,6 +146,7 @@ class BenefitApplicationMigration < Mongoid::Migration
         raise Standard, "Benefit Package creation failed"
       end
       @benefit_package_map[benefit_group] = importer.benefit_package
+      self.set_predecessor_for_benefit_package(benefit_application, importer.benefit_package)
     end
 
     benefit_application.aasm_state = benefit_application.matching_state_for(plan_year)
@@ -227,6 +237,25 @@ class BenefitApplicationMigration < Mongoid::Migration
     end
   end
 
+  def self.set_predecessor_for_benefit_package(benefit_application, benefit_package)
+    return unless benefit_application.predecessor_id.present?
+    predecessor_application = benefit_application.predecessor
+    predecessor_benefit_packages = benefit_application.predecessor.benefit_packages
+
+    if predecessor_benefit_packages.count < 2
+      benefit_package.predecessor_id  = benefit_application.predecessor.benefit_packages.first.id
+      return
+    end
+
+    new_package_hios_id = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
+    predecessor_benefit_packages.each do |predecessor_package|
+      predecessor_package_hios_id = predecessor_package.health_sponsored_benefit.products(predecessor_application.effective_period.min).map(&:hios_id)
+      if ((new_package_hios_id.size == predecessor_package_hios_id.size) && ((new_package_hios_id && predecessor_package_hios_id).size == new_package_hios_id.size))
+        benefit_package.predecessor_id  = predecessor_package.id
+      end
+    end
+  end
+
   def self.map_product_package_kind(plan_option_kind)
     package_kind_mapping = {
         sole_source: :single_product,
@@ -281,7 +310,7 @@ class BenefitApplicationMigration < Mongoid::Migration
       benefit_group.census_employees.unscoped.each do |census_employee|
         if census_employee.benefit_sponsorship_id.blank?
           census_employee.employee_role.update_attributes(benefit_sponsors_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) if census_employee.employee_role && census_employee.employee_role.benefit_sponsors_employer_profile_id.blank?
-          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id
+          census_employee.benefit_sponsors_employer_profile_id = benefit_sponsorship.organization.employer_profile.id if census_employee.benefit_sponsors_employer_profile_id.blank?
           census_employee.benefit_sponsorship = benefit_sponsorship
         end
 
@@ -290,6 +319,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             benefit_group_assignment.benefit_package_id = benefit_package.id
           end
         end
+        CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
         CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
         CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
         census_employee.save(:validate => false)

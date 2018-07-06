@@ -64,7 +64,7 @@ module BenefitSponsors
 
     rule :all_employees_are_assigned_benefit_package,
             validate: -> (benefit_application){
-              benefit_application.benefit_sponsorship.census_employees.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
+              benefit_application.benefit_sponsorship.census_employees.active.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:renewal_benefit_group_assignment).try(:benefit_package_id) || e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
             },
             success:  -> (benfit_application) { "validated successfully" },
             fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
@@ -85,6 +85,12 @@ module BenefitSponsors
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "one or more contribution minimum not met" }
 
+    rule :within_last_day_to_publish,
+          validate: -> (benefit_application) {
+            TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
+          },
+          success:  -> (benfit_application)  { "validated successfully" },
+          fail:     -> (benefit_application) { "#{benefit_application.last_day_to_publish} was the last day to publish your Plan Year" }
 
     rule  :stubbed_rule_one,
             validate: -> (model_instance) {
@@ -100,7 +106,9 @@ module BenefitSponsors
             fail:     -> (model_instance){ "something went wrong!!" },
             success:  -> (model_instance){ "validated successfully" }
 
-    business_policy :passes_open_enrollment_period_policy,
+    business_policy :passes_open_enrollment_period_policy, rules: []
+
+    business_policy :submit_benefit_application,
             rules: [:open_enrollment_period_minimum,
                     :benefit_application_contains_benefit_packages,
                     :benefit_packages_contains_reference_plans,
@@ -108,6 +116,7 @@ module BenefitSponsors
                     :employer_profile_eligible,
                     :employer_primary_office_location,
                     :all_contribution_levels_min_met,
+                    :within_last_day_to_publish,
                     :benefit_application_fte_count]
 
     business_policy  :stubbed_policy,
@@ -119,7 +128,7 @@ module BenefitSponsors
 
         case event_name
         when :submit_benefit_application
-          business_policies[:passes_open_enrollment_period_policy]
+          business_policies[:submit_benefit_application]
         else
           business_policies[:stubbed_policy]
         end

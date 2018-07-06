@@ -12,7 +12,7 @@ module BenefitSponsors
       @group_id                   = nil
       @coverage_start_on          = nil
       @product                    = nil
-      @previous_product           = nil 
+      @previous_product           = nil
 
       @product_cost_total         = 0.00
 
@@ -41,12 +41,17 @@ module BenefitSponsors
         product: new_product,
         rate_schedule_date: @rate_schedule_date,
         rating_area: @rating_area,
-        member_enrollments: member_enrollments.map(&:clone_for_coverage)
+        member_enrollments: member_enrollments.map(&:clone_for_coverage),
+        sponsor_contribution_prohibited: @sponsor_contribution_prohibited
       })
     end
 
     def employee_cost_total
       product_cost_total - sponsor_contribution_total
+    end
+
+    def as_json(params = {})
+      super(except: ['product', 'previous_product']).merge({ product: product.as_json(except: 'premium_tables'), previous_product: previous_product.as_json(except: 'premium_tables') })
     end
 
     alias total_employee_cost employee_cost_total

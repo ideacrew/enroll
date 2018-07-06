@@ -12,6 +12,7 @@ class Person
   include Notify
   include UnsetableSparseFields
   include FullStrippedNames
+  include ::BenefitSponsors::Concerns::Observable
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -152,6 +153,8 @@ class Person
 
   #after_save :generate_family_search
   after_create :create_inbox
+
+  add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})

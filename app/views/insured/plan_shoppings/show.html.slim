@@ -9,8 +9,9 @@
         .ct-1
           h1.heading-text = l10n("choose_plan")
           h4.switch-header = l10n(".choose_plan_filter_results_header")
-          h4.swtich-header 
-            strong Please note your final cost may change based on the final enrollment of all employees.
+          h4.swtich-header
+            - if @hbx_enrollment.sponsored_benefit.single_plan_type?
+              strong Please note your final cost may change based on the final enrollment of all employees.
           - if display_plan_cost_warning(@benefit_group)
             b = l10n("insured.plan_shoppings.final_cost_change")
           .row.no-buffer
@@ -32,7 +33,7 @@
                     a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 #plans
                  = render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan
-                #filteredPlans data-enrollments="#{@member_groups.map {|mg| mg.group_enrollment.to_json}}" data-carriers="#{@member_groups.map {|mg| ::Caches::CustomCache.lookup(::BenefitSponsors::Organizations::Organization, :plan_shopping, mg.group_enrollment.product.issuer_profile_id).to_json { mg.group_enrollment.product.issuer_profile }}}"
+                #filteredPlans data-enrollments="#{json_for_plan_shopping_member_groups(@member_groups)}"
 
       .no-buffer
       p.pull-right
@@ -114,17 +115,12 @@ javascript:
 
   function getEnrollments() {
     enrollments = JSON.parse(enrollments)
-    carriers = JSON.parse(carriers)
+		console.log(enrollments)
 
     // Formats enrollment to proper JSON format for filters
     for(enrollment of enrollments) {
-      enrollment = JSON.parse(enrollment)
+      enrollment = enrollment
       availableEnrollments.push(enrollment)
-    }
-    // Formats carriers to proper JSON format for filters
-    for(carrier of carriers) {
-      carrier = JSON.parse(carrier)
-      availableCarriers.push(carrier)
     }
   }
 
@@ -181,6 +177,16 @@ javascript:
 
     if (type == "plan-carrier") {
       // Filters by Carrier
+      availableEnrollments.forEach(function(enrollment){filteredArray.push(enrollment)})
+      filteredArray.sort(function(a,b) {
+        var nameA = a.product.issuer_name.toLowerCase();
+        var nameB = b.product.issuer_name.toLowerCase();
+        if (nameA < nameB) //sort string ascending
+          return -1
+        if (nameA > nameB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
     }
 
     showFilteredResults()
@@ -232,6 +238,15 @@ javascript:
         }
       })
     }
+	  // Filters based on Carrier
+	  carrier = selections.selectedCarrier;
+	  if (carrier) {
+	    availableEnrollments.forEach(function(enrollment) {
+	      if (enrollment.product.issuer_name.toLowerCase() == carrier.toLowerCase()) {
+	        resultsArray.push(enrollment);
+	      }
+	    })
+	  }
 
     if (selections.selectedHSA) {
       var hsa = Boolean;
@@ -282,12 +297,12 @@ javascript:
                 </div>
                 <div class="row mt-1">
                   <div class="col-sm-2 col-md-2">
-                    Carrier Logo
+                    <img width=80 src="../../assets/logo/carrier/${result.product.issuer_name.toLowerCase().split(' ').join('_')}.jpg" >
                   </div>
                   <div class="col-md-7" id="plans">
                     <h3 class="no-buffer"><a data-remote="true">${result.product.title}</a>
                       <br>
-                      <small>Carrier Name</small>
+                      <small>${result.product.issuer_name}</small>
                     </h3>
                   </div>
                   <div class="col-md-3">

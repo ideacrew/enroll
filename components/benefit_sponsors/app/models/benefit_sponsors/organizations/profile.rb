@@ -24,7 +24,7 @@ module BenefitSponsors
       delegate :entity_kind,              to: :organization, allow_nil: true
 
       embeds_many :office_locations,
-                  class_name:"BenefitSponsors::Locations::OfficeLocation"
+                  class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
 
       embeds_one  :inbox, as: :recipient, cascade_callbacks: true,
                   class_name:"BenefitSponsors::Inboxes::Inbox"
@@ -59,6 +59,14 @@ module BenefitSponsors
 
       def is_new_employer?
         !latest_benefit_sponsorship.renewal_benefit_application.present?
+      end
+
+      def fetch_sponsorship_source_kind
+        organization.active_benefit_sponsorship.source_kind
+      end
+
+      def is_a_conversion_employer?
+        [:conversion, :mid_plan_year_conversion].include?(fetch_sponsorship_source_kind)
       end
 
       def primary_office_location

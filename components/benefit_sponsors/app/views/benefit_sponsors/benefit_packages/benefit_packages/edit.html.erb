@@ -9,8 +9,3 @@
   <% end %>
   <%= render 'form', f:f %>
 <% end %>
-
-<script type="text/javascript">
-  var sponsored_benefit_id = '<%= @benefit_package_form.sponsored_benefits[0].id.to_s %>';
-  calculateEmployerContributions(null, null, sponsored_benefit_id)
-</script>

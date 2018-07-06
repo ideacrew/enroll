@@ -38,7 +38,7 @@ module Effective
 
         if attributes["renewal"]
           table_column :renewal_benefit_package, :label => 'Renewal Benefit Package', :proc => Proc.new { |row|
-            row.renewal_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
+            row.renewal_benefit_group_assignment.benefit_package.title.capitalize if row.renewal_benefit_group_assignment.present?
           }, :filter => false, :sortable => false
         end
 
@@ -46,7 +46,7 @@ module Effective
             enrollment_state(row)
         }, :sortable => false, :filter => false
 
-        if attributes["renewal_status"]
+        if attributes["renewal"]
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
           }, :filter => false, :sortable => false

@@ -156,8 +156,9 @@ module Notifier
       enrollment_errors = []
       benefit_application = (renewal_benefit_application || current_benefit_application)
       if benefit_application.present?
-        unless enrollment_policy.business_policies[:passes_open_enrollment_period_policy].is_satisfied?(benefit_application)
-          enrollment_policy.business_policies[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
+        policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+        unless policy.is_satisfied?(benefit_application)
+          policy.fail_results.each do |k, _|
             case k.to_s
             when "minimum_participation_rule"
               enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
@@ -183,8 +184,9 @@ module Notifier
     def benefit_application_warnings
       benefit_application_warnings = []
       if current_benefit_application.present?
-        unless eligibility_policy.business_policies[:passes_open_enrollment_period_policy].is_satisfied?(current_benefit_application)
-          eligibility_policy.business_policies[:passes_open_enrollment_period_policy].fail_results.each do |k, _|
+        policy = eligibility_policy.business_policies_for(benefit_application, :submit_benefit_application)
+        unless policy.is_satisfied?(current_benefit_application)
+          policy.fail_results.each do |k, _|
             case k.to_s
             when "benefit_application_fte_count"
               benefit_application_warnings << "Full Time Equivalent must be 1-50"

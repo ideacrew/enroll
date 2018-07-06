@@ -27,7 +27,6 @@ module BenefitSponsors
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
-      delegate :predecessor_application, to: :benefit_application
       delegate :recorded_sic_code, to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
@@ -78,16 +77,15 @@ module BenefitSponsors
         end
       end
 
+      def predecessor_application
+        return nil unless benefit_application
+        benefit_application.predecessor
+      end
+
       def successor
-        successor_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
-          :"benefit_applications.benefit_packages.predecessor_id" => predecessor_id
-        ).first
-
-        return nil if successor_application.blank?
-
-        successor_application.benefit_packages.where(
-          :"predecessor_id" => predecessor_id
-        ).first
+        self.benefit_application.benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).detect do |bp|
+          bp.predecessor_id.to_s == self.id.to_s
+        end
       end
 
       def package_for_date(coverage_start_date)
@@ -226,13 +224,17 @@ module BenefitSponsors
       end
 
       def renew_member_benefits
-        census_employees_assigned_on(effective_period.min, false).each { |member| renew_member_benefit(member) }
+        # FIXME: There is no reason to assume that the renewal benefit package assignment
+        #        will have is_active == false, I think this may always return an empty set.
+        #        Because of this, I have removed the 'false' constraint.
+        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
       end
 
       def renew_member_benefit(census_employee)
         predecessor_benefit_package = predecessor
 
         employee_role = census_employee.employee_role
+        return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
 
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?

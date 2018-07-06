@@ -26,12 +26,12 @@ module BenefitSponsors
             case @tab
             when 'benefits'
               @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_applications = @employer_profile.benefit_applications
+              @benefit_applications = @employer_profile.benefit_applications.desc(:"start_on").asc(:predecessor_id)
             when 'documents'
               @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
               load_documents
             when 'employees'
-              @datatable = ::Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+              @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'inbox'
@@ -128,6 +128,16 @@ module BenefitSponsors
           @organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(id)).first
           @employer_profile = @organization.employer_profile
           render file: 'public/404.html', status: 404 if @employer_profile.blank?
+        end
+
+        def employee_datatable_params
+          data_table_params = { id: params[:id], scopes: params[:scopes] }
+
+          data_table_params.merge!({
+            renewal: true
+          }) if @employer_profile.renewing_published_benefit_application.present?
+
+          data_table_params
         end
 
         def load_documents

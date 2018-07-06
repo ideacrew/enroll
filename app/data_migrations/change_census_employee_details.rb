@@ -65,7 +65,7 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
   end
 
   def link_or_construct_employee_role
-    census_employee = census_employee_by_ssn
+    census_employee = census_employee(ENV['ssn'], ENV['employer_fein'])
         
 # After 14163 deployed we can just do census_employee.save
     if census_employee.active_benefit_group_assignment.present?

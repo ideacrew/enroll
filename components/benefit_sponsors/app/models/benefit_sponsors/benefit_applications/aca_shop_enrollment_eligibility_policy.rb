@@ -31,12 +31,23 @@ module BenefitSponsors
             fail:     ->(benefit_application){"at least #{(ENROLLMENT_RATIO_MINIMUM*100).to_i}% non-owner employee must enroll" }
 
     business_policy :passes_open_enrollment_period_policy,
-            rules: [:minimum_participation_rule,
-                    :non_business_owner_enrollment_count]
+            rules: [:minimum_participation_rule]
 
 
     # business_policy :loosely_passes_open_enrollment_period_policy,
     #         rules: [:period_begin_before_end_rule]
+
+    def business_policies_for(model_instance, event_name)
+      if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+
+        case event_name
+        when :end_open_enrollment
+          business_policies[:passes_open_enrollment_period_policy]
+        else
+          business_policies[:passes_open_enrollment_period_policy]
+        end
+      end
+    end
 
   end
 end

@@ -61,8 +61,16 @@ module BenefitSponsors
       end
 
       def product_package
-        return @product_package if defined? @product_package
-        @product_package = benefit_sponsor_catalog.product_package_for(self)
+        return nil if self.product_package_kind.blank?
+        @product_package ||= benefit_sponsor_catalog.product_package_for(self)
+      end
+
+      # Changing the package kind should clear the package
+      def product_package_kind=(pp_kind)
+        if pp_kind != self.product_package_kind
+          @product_package = nil
+          write_attribute(:product_package_kind, pp_kind)
+        end
       end
 
       def issuers_offered

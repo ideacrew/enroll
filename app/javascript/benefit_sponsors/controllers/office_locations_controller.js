@@ -32,6 +32,8 @@ export default class extends Controller {
       input.value = ''
     })
 
+    newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "")
+
     newLocation.querySelectorAll('select').forEach(function(input) {
       var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`)
       input.setAttribute('name', name)

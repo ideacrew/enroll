@@ -119,10 +119,10 @@ module Eligibility
     end
 
     def possible_benefit_package
-      if active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
-        active_benefit_group_assignment.benefit_package
-      elsif renewal_benefit_group_assignment.present?
+      if renewal_benefit_group_assignment.present?
         renewal_benefit_group_assignment.benefit_package
+      elsif active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+        active_benefit_group_assignment.benefit_package
       end
     end
 

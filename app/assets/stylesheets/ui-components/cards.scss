@@ -282,13 +282,20 @@
     font-size: 16px;
   }
   input {
+    &[type=number] {
+      margin-top: 7px !important;
+    }
+    &.contribution_handler {
+      height: 15px;
+    }
+
     border: 1px solid #b7b7b7;
     border-radius: 0;
     box-shadow: none;
     display: inline-block;
     font-weight: bold;
     line-height: normal;
-    width:40px;
+    width:45px;
     height:40px;
     margin-top:10px;
   }
@@ -305,6 +312,7 @@
       -webkit-appearance: none;
       -moz-apperance:none;
       width: 100%;
+      margin-top: 16px;
       height: 0px;
       border-radius: 5px;
       background: #d3d3d3;

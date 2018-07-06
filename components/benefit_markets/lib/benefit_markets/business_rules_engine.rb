@@ -117,6 +117,24 @@ module BenefitMarkets
       def is_satisfied?(model_instance)
         reset_results
         process_rules(model_instance)
+
+        begin
+            File.open("business_rules_engine_errors.txt", "a+") { |f|
+            f << "\n---------" + "\n"
+            f << Time.now.getutc.to_s + "\n"
+            f << model_instance.class.to_s + "\n"
+            f << model_instance.id.to_s + "\n"
+            f << "Current state: #{model_instance.aasm_state}" + "\n"
+            f << "Non Biz Owner Count: " + model_instance.enrolled_non_business_owner_count.to_s + "\n"
+            f << "Members Eligible to Enroll: " + model_instance.members_eligible_to_enroll_count.to_s + "\n"
+            f << @fail_results.to_s + "\n"
+            f << model_instance.benefit_sponsorship.organization.legal_name + "\n"
+            f << "---------" + "\n"
+          }
+        rescue
+
+        end
+
         @fail_results.empty?
       end
 

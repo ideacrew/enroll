@@ -6,6 +6,7 @@ module BenefitSponsors
       include Mongoid::Document
       include Mongoid::Timestamps
       include BenefitSponsors::Concerns::Observable
+      include BenefitSponsors::ModelEvents::Organization
 
       ENTITY_KINDS =[
         :tax_exempt_organization,
@@ -89,7 +90,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Site"
 
       embeds_many :profiles,
-                  class_name: "BenefitSponsors::Organizations::Profile"
+                  class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true
 
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
       has_many    :benefit_sponsorships,
@@ -97,13 +98,14 @@ module BenefitSponsors
 
 
       accepts_nested_attributes_for :profiles
-      add_observer BenefitSponsors::Observers::OrganizationObserver.new
+      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update, :notifications_send]
 
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?
 
       before_save  :generate_hbx_id
       after_update :notify_observers
+      after_create :notify_on_create
 
 
       index({ legal_name: 1 })

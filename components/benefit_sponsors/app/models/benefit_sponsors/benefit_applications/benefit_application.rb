@@ -84,8 +84,7 @@ module BenefitSponsors
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
-
-    add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:on_update]
+    add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send]
 
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
@@ -179,6 +178,17 @@ module BenefitSponsors
     scope :renewing, -> {
       where("$exists" => {:predecessor_id => true} )
     }
+
+    scope :published_or_renewing_published, -> {
+      warn "[Deprecated in the future]" unless Rails.env.test?
+      where(
+        "$or" => [
+          {:aasm_state.in => APPROVED_STATES },
+          {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
+
 
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
@@ -343,6 +353,18 @@ module BenefitSponsors
       start_on
     end
 
+    def last_day_to_publish
+      (start_on - 1.month).beginning_of_month + publish_due_day_of_month
+    end
+
+    def publish_due_day_of_month
+      is_renewing? ? benefit_market.configuration.renewal_application_configuration.pub_due_dom.days : benefit_market.configuration.initial_application_configuration.pub_due_dom.days
+    end
+
+    def may_publish?
+      last_day_to_publish >= TimeKeeper.date_of_record
+    end
+
     def default_benefit_group
       benefit_packages.detect(&:is_default)
     end
@@ -409,6 +431,12 @@ module BenefitSponsors
     def hbx_enrollments
       @hbx_enrollments = [] if benefit_packages.size == 0
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
+    def cancel_enrollments
+      hbx_enrollments.each do |enrollment|
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      end
     end
 
     def enrolled_non_business_owner_members
@@ -673,7 +701,7 @@ module BenefitSponsors
           :enrollment_eligible, :enrollment_ineligible,
           :active
         ] + APPLICATION_EXCEPTION_STATES,
-          to:     :draft
+          to:     :draft, :after => [:cancel_enrollments]
       end
 
       event :activate_enrollment do
@@ -683,7 +711,7 @@ module BenefitSponsors
           to:     :canceled
       end
 
-      event :simulate_provisional_renewal do 
+      event :simulate_provisional_renewal do
         transitions from: [:draft, :approved], to: :enrollment_open
       end
 

@@ -10,7 +10,7 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
-  include Concerns::Observable
+  include BenefitSponsors::Concerns::Observable
   include ModelEvents::CensusEmployee
 
   require 'roo'
@@ -77,6 +77,8 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+
+  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -302,8 +304,9 @@ class CensusEmployee < CensusMember
   end
 
   def employee_role
-    return @employee_role if defined? @employee_role
-    @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
+    return nil if self.employee_role_id.nil?
+    return @employee_role if @employee_role
+    @employee_role = EmployeeRole.find(self.employee_role_id)
   end
 
   def benefit_sponsorship=(benefit_sponsorship)
@@ -587,6 +590,8 @@ class CensusEmployee < CensusMember
 
     if active_benefit_group_assignment.present?
       # send_invite! if _id_changed? && !self.employer_profile.is_conversion?
+      # we do not want to create employer role durig census employee saving for conversion
+      return if self.employer_profile.is_a_conversion_employer?
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?

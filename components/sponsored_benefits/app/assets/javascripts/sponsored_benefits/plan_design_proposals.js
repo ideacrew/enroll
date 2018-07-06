@@ -30,7 +30,9 @@ function pageInit() {
     calcPlanDesignContributions();
   } else {
     disableActionButtons();
-    $('li.sole-source-tab').find('label').trigger('click');
+    setTimeout(function() {
+      $('li.sole-source-tab').find('label').trigger('click');
+    },600)
   }
   initSlider();
   $('.loading-plans-button').hide();
@@ -290,12 +292,33 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  $('.fa-circle-o').each(function() {
+  $('.fa-circle').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
       input.prop('checked', true)
     });
   })
+}
+
+function setRadioBtn(element) {
+  dotIcons = document.querySelectorAll('.fa-dot-circle');
+  icons = document.querySelectorAll('.fa-circle');
+  iconId = element.target.dataset.tempId;
+  
+  dotIcons.forEach(function(icon) {
+    icon.classList.add('fa-circle')
+  });
+  
+  icons.forEach(function(icon) {
+    if (icon.dataset.tempId == iconId) {
+      icon.classList.add('fa-dot-circle')
+    }
+  });
+}
+
+
+function removeRadioSelectors() {
+  
 }
 
 function preventSubmitPlanDesignProposal(event) {
@@ -578,4 +601,40 @@ function sortPlans() {
       plan.parent().addClass('hidden');
     }
   });
+}
+
+function setCarrierRadio(element) {
+  elementId = element.getElementsByTagName('svg')[0].dataset.tempId;
+  var carriers = document.querySelectorAll('.carriers');
+  carriers.forEach(function(carrier) {
+    carrier.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = carrier.getElementsByTagName('svg')[0].dataset.tempId;
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  });
+}
+
+function setMetalRadio(element) {
+  elementId = element.getElementsByTagName('svg')[0].dataset.tempId;
+  var metals = document.querySelectorAll('.metals');
+  metals.forEach(function(metal) {
+    metal.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = metal.getElementsByTagName('svg')[0].dataset.tempId;
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  });
+}
+
+function setTopLevelRadios(element) {
+  elementId = element.getElementsByTagName('svg')[0].closest('label').dataset.tempid;
+  var tabs = document.querySelectorAll('.elected_plan');
+  tabs.forEach(function(tab) {
+    tab.getElementsByTagName('svg')[0].classList.add('fa-circle')
+    var iconId = tab.dataset.tempid
+    if (elementId == iconId) {
+      element.getElementsByTagName('svg')[0].classList.add('fa-dot-circle')
+    }
+  })
 }

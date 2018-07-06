@@ -15,7 +15,7 @@ module BenefitSponsors
       field :primary, type: Boolean
       field :full_phone_number, type: String, default: ""
 
-      before_validation :save_phone_components
+      after_save :save_phone_components
 
       before_save :set_full_phone_number
 

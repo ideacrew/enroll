@@ -238,7 +238,7 @@ class HbxEnrollment
                 message: "%{value} is not a valid coverage type"
             }
 
-  add_observer ::BenefitSponsors::Observers::HbxEnrollmentObserver.new, [:on_update]
+  add_observer ::BenefitSponsors::Observers::HbxEnrollmentObserver.new, [:notifications_send]
 
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber
   after_save :check_created_at
@@ -433,7 +433,7 @@ class HbxEnrollment
   end
 
   def is_cobra_status?
-    kind == 'employer_sponsored_cobra'
+    kind.to_s == 'employer_sponsored_cobra'
   end
 
   def future_enrollment_termination_date
@@ -1662,7 +1662,8 @@ class HbxEnrollment
       coverage_start_on: effective_on,
       member_enrollments: group_enrollment_members,
       rate_schedule_date: sponsored_benefit.rate_schedule_date,
-      rating_area: rating_area.exchange_provided_code
+      rating_area: rating_area.exchange_provided_code,
+      sponsor_contribution_prohibited: is_cobra_status?
     )
     BenefitSponsors::Members::MemberGroup.new(
       roster_members,

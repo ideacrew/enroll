@@ -33,7 +33,7 @@ module BenefitSponsors
       end
 
       def update
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params[:id]}))
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params.require(:id)}))
         authorize @benefit_package_form, :updateable?
 
         if @benefit_package_form.update
@@ -52,6 +52,11 @@ module BenefitSponsors
       def calculate_employer_contributions
         @employer_contributions = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(employer_contribution_params)
         render json: @employer_contributions
+      end
+
+      def calculate_employee_cost_details
+        @employee_cost_details = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employee_cost_details(employer_contribution_params)
+        render json: @employee_cost_details.to_json
       end
 
       def destroy
@@ -82,7 +87,7 @@ module BenefitSponsors
           :title, :description, :probation_period_kind, :benefit_application_id,
           :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
-              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor]
+              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
             ]
           ]
         )
@@ -92,12 +97,8 @@ module BenefitSponsors
         params.permit(:benefit_application_id).merge({:sponsored_benefits_attributes => {"0" => {:reference_plan_id => params[:reference_plan_id]} }})
       end
 
-      def sponsored_benefit_params
-        {:sponsored_benefits_attributes => {"0" => {:id => params[:sponsored_benefit_id], :product_package_kind => params[:product_package_kind], :reference_plan_id => params[:reference_plan_id]}}}
-      end
-
       def employer_contribution_params
-        params.permit(:benefit_application_id, :id).merge(sponsored_benefit_params)
+        params.permit(:benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id])
       end
     end
   end
