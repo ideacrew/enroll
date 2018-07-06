@@ -54,7 +54,7 @@ module BenefitSponsors
             is_application_submitted = true
           end
 
-          if is_transition_matching?(to: :enrollment_open, from: :enrollment_open, event: :end_open_enrollment)
+          if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
             is_renewal_enrollment_confirmation = true
           end
 
@@ -88,10 +88,14 @@ module BenefitSponsors
 
           # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
           REGISTERED_EVENTS.each do |event|
-            if event_fired = instance_eval("is_" + event.to_s)
-              # event_name = ("on_" + event.to_s).to_sym
-              event_options = {} # instance_eval(event.to_s + "_options") || {}
-              notify_observers(ModelEvent.new(event, self, event_options))
+            begin
+              if event_fired = instance_eval("is_" + event.to_s)
+                # event_name = ("on_" + event.to_s).to_sym
+                event_options = {} # instance_eval(event.to_s + "_options") || {}
+                notify_observers(ModelEvent.new(event, self, event_options))
+              end
+            rescue Exception => e
+              Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
             end
           end
         end
@@ -130,22 +134,26 @@ module BenefitSponsors
             is_renewal_plan_year_publish_dead_line = true
           end
 
-          if new_date.day == benefit_application.benefit_market.configuration.oe_end_month - 2
+          if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
             is_low_enrollment_notice_for_employer = true
           end
 
-          if new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 2
+          if new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 2 # 2 days prior to advertised deadline of month i.e., 8th of the month
             is_initial_employer_first_reminder_to_publish_plan_year = true
-          elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.adv_pub_due_dom - 1
+          elsif new_date.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month - 1 # 1 day prior to advertised deadline of month i.e., 9th of the month
             is_initial_employer_second_reminder_to_publish_plan_year = true
-          elsif new_date.day == benefit_application.benefit_market.configuration.initial_application_configuration.pub_due_dom - 2
+          elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
             is_initial_employer_final_reminder_to_publish_plan_year = true
           end
 
           DATA_CHANGE_EVENTS.each do |event|
-            if event_fired = instance_eval("is_" + event.to_s)
-              event_options = {}
-              notify_observers(ModelEvent.new(event, self, event_options))
+            begin
+              if event_fired = instance_eval("is_" + event.to_s)
+                event_options = {}
+                self.new.notify_observers(ModelEvent.new(event, self, event_options))
+              end
+            rescue Exception => e
+              Rails.logger.error { "Benefit Application DATA_CHANGE_EVENTS: #{event} - unable to notify observers" }
             end
           end
         end
