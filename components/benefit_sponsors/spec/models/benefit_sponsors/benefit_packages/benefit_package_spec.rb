@@ -1,49 +1,49 @@
 require 'rails_helper'
-
-# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
-# require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitPackages::BenefitPackage, type: :model, :dbclean => :after_each do
 
-  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_market)          { site.benefit_markets.first }
-  let(:effective_period)        { Date.today.end_of_month.next_day..Date.today.end_of_month.next_year }
-  let(:effective_period_begin)  { effective_period.min }
+  # let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  # let(:benefit_market)          { site.benefit_markets.first }
+  # let(:effective_period)        { Date.today.end_of_month.next_day..Date.today.end_of_month.next_year }
+  # let(:effective_period_begin)  { effective_period.min }
 
-  let!(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-    benefit_market: benefit_market,
-    title: "SHOP Benefits for #{effective_period_begin.year}",
-    application_period: (effective_period_begin.beginning_of_year..effective_period_begin.end_of_year))
-  }
+  # let!(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  #   benefit_market: benefit_market,
+  #   title: "SHOP Benefits for #{effective_period_begin.year}",
+  #   application_period: (effective_period_begin.beginning_of_year..effective_period_begin.end_of_year))
+  # }
 
-  let(:employer_organization)   { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
-  let(:open_enrollment_period)  { (effective_period_begin - 1.month)..(effective_period_begin - 1.month + 10.days) }
-  let(:initial_benefit_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
-                                      benefit_sponsorship: benefit_sponsorship,
-                                      # benefit_sponsor_catalog: benefit_sponsor_catalog,
-                                      effective_period: effective_period,
-                                      open_enrollment_period: open_enrollment_period,
-                                      fte_count: 5,
-                                      pte_count: 0,
-                                      msp_count: 0
-                                  ) }
-
-
-  let!(:rating_area)            { create_default(:benefit_markets_locations_rating_area) }
-  let(:service_areas)           { initial_benefit_application.recorded_service_areas }
-  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period_begin) }
-
-  let(:current_benefit_package) { build(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_benefit_application) }
-  let(:product_package)         { build(:benefit_markets_products_product_package) }
-  let(:sponsor_contribution)    { build(:benefit_sponsors_sponsored_benefits_sponsor_contribution) }
-  let(:pricing_determinations)  { BenefitSponsors::SponsoredBenefits::PricingDetermination.new.to_a }
+  # let(:employer_organization)   { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  # let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+  # let(:open_enrollment_period)  { (effective_period_begin - 1.month)..(effective_period_begin - 1.month + 10.days) }
+  # let(:initial_benefit_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
+  #                                     benefit_sponsorship: benefit_sponsorship,
+  #                                     # benefit_sponsor_catalog: benefit_sponsor_catalog,
+  #                                     effective_period: effective_period,
+  #                                     open_enrollment_period: open_enrollment_period,
+  #                                     fte_count: 5,
+  #                                     pte_count: 0,
+  #                                     msp_count: 0
+  #                                 ) }
 
 
+  # let!(:rating_area)            { create_default(:benefit_markets_locations_rating_area) }
+  # let(:service_areas)           { initial_benefit_application.recorded_service_areas }
+  # let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period_begin) }
 
-    # include_context "setup benefit market with market catalogs and product packages"
-    # include_context "setup initial benefit application"
+  # let(:current_benefit_package) { build(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_benefit_application) }
+  # let(:product_package)         { build(:benefit_markets_products_product_package) }
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:sponsor_contribution)    { build(:benefit_sponsors_sponsored_benefits_sponsor_contribution) }
+    let(:pricing_determinations)  { BenefitSponsors::SponsoredBenefits::PricingDetermination.new.to_a }
+
+
 
     let(:title)                 { "Generous BenefitPackage - 2018"}
     let(:probation_period_kind) { :first_of_month_after_30_days }
@@ -112,7 +112,7 @@ module BenefitSponsors
         let!(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
         let!(:update_product){
           reference_product = current_benefit_package.sponsored_benefits.first.reference_product
-          reference_product.renewal_product= product
+          reference_product.renewal_product = product
           reference_product.save!
         }
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
