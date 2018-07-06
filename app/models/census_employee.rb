@@ -590,6 +590,8 @@ class CensusEmployee < CensusMember
 
     if active_benefit_group_assignment.present?
       # send_invite! if _id_changed? && !self.employer_profile.is_conversion?
+      # we do not want to create employer role durig census employee saving for conversion
+      return if self.employer_profile.is_a_conversion_employer?
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?

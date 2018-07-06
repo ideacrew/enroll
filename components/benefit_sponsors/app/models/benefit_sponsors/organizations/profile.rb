@@ -61,6 +61,14 @@ module BenefitSponsors
         !latest_benefit_sponsorship.renewal_benefit_application.present?
       end
 
+      def fetch_sponsorship_source_kind
+        organization.active_benefit_sponsorship.source_kind
+      end
+
+      def is_a_conversion_employer?
+        [:conversion, :mid_plan_year_conversion].include?(fetch_sponsorship_source_kind)
+      end
+
       def primary_office_location
         office_locations.detect(&:is_primary?)
       end
