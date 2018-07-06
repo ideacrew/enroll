@@ -91,13 +91,13 @@ module BenefitSponsors
         @coverage_start = c_start
       end
 
-      def calculate(sponsored_benefit, reference_product, p_package)
+      def calculate(sponsored_benefit, reference_product, p_package, rebuild_sponsor_contribution: false)
         pricing_model = p_package.pricing_model
         contribution_model = p_package.contribution_model
         p_calculator = pricing_model.pricing_calculator
         c_calculator = contribution_model.contribution_calculator
         p_determination_builder = p_calculator.pricing_determination_builder
-        sponsor_contribution = construct_sponsor_contribution_if_needed(sponsored_benefit, p_package)
+        sponsor_contribution = construct_sponsor_contribution_if_needed(sponsored_benefit, p_package, rebuild_sponsor_contribution)
         roster_eligibility_optimizer = RosterEligibilityOptimizer.new(contribution_model)
         price = 0.00
         contribution = 0.00
@@ -139,9 +139,13 @@ module BenefitSponsors
 
       protected
 
-      def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package)
+      def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package, rebuild_sponsor_contribution)
         if sponsored_benefit.sponsor_contribution.present?
-          return sponsored_benefit.sponsor_contribution
+          if rebuild_sponsor_contribution
+            sponsored_benefit.sponsor_contribution = nil
+          else
+            return sponsored_benefit.sponsor_contribution
+          end
         end
         cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
         sponsor_contribution = cm_builder.build_sponsor_contribution(product_package)

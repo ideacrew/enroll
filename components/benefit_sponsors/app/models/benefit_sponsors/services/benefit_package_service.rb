@@ -229,6 +229,7 @@ module BenefitSponsors
           cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
           sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
           sbenefit.save!
+          sb.save!
         end
         [true, benefit_package]
       end
@@ -287,7 +288,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           })
         end
         Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
