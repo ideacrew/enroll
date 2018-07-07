@@ -102,7 +102,7 @@ module BenefitSponsors
 
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
-        sponsored_benefits << new_sponsored_benefit
+        new_sponsored_benefit
       end
 
       def effective_on_kind
