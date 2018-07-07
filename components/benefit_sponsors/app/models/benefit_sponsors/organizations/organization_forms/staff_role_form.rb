@@ -48,8 +48,7 @@ module BenefitSponsors
       def dob=(val)
         #TODO refactor according to the date format
         begin
-          @dob = Date.strptime(val,"%m/%d/%Y") if val.split('/').first.size == 2
-          @dob = Date.strptime(val,"%Y-%m-%d") if val.split('-').first.size == 4
+          (val.split('-').first.size == 4) ? @dob = Date.strptime(val,"%Y-%m-%d") : @dob = Date.strptime(val,"%m/%d/%Y")
           return @dob
         rescue
           return nil
