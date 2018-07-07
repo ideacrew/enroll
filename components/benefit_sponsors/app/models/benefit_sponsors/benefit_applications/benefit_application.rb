@@ -354,7 +354,7 @@ module BenefitSponsors
     end
 
     def last_day_to_publish
-      (start_on - 1.month).beginning_of_month + publish_due_day_of_month
+      (start_on - 1.month).beginning_of_month + publish_due_day_of_month - 1.day
     end
 
     def publish_due_day_of_month
