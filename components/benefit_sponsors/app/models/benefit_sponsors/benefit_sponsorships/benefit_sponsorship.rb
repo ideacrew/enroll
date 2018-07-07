@@ -528,9 +528,22 @@ module BenefitSponsors
 
     # Notify BenefitApplication that
     def publish_binder_event
-      benefit_applications.each do |benefit_application|
-        benefit_application.benefit_sponsorship_event_subscriber(aasm)
+      begin
+        File.open("publish_binder_event.txt", "a+") do |f|
+          f << "\n---------" + "\n"
+          f << Time.now.getutc.to_s + "\n"
+          f << self.id.to_s + "\n"
+          f << self.organization.legal_name + "\n"
+          benefit_applications.each do |benefit_application|
+            f << "  ----> #{benefit_application.id.to_s}"
+            benefit_application.benefit_sponsorship_event_subscriber(aasm)
+          end
+          f << "---------" + "\n"
+        end
+      rescue
+
       end
+
     end
 
     # BenefitApplication        BenefitSponsorship
