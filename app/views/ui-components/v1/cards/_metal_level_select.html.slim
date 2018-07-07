@@ -247,12 +247,13 @@ javascript:
     }
   }
 
-  function displayReferencePlanDetails(element) {
-    planTitle = element.dataset.planTitle;
-    metalLevel = element.dataset.planMetalLevel;
-    carrierName = element.dataset.planCarrier;
-    planType = element.dataset.planType;
-    referencePlanID = element.id;
+  function displayReferencePlanDetails(element, options) {
+    options = options || {};
+    planTitle = options.planTitle || element.dataset.planTitle;
+    metalLevel = options.metalLevel || element.dataset.planMetalLevel;
+    carrierName = options.carrierName || element.dataset.planCarrier;
+    planType = options.planType || element.dataset.planType;
+    referencePlanID = options.referencePlanID || element.id;
     calculateEmployerContributions(productOptionKind, referencePlanID)
     calculateEmployeeCosts(productOptionKind, referencePlanID)
     showFormButtons();
@@ -433,3 +434,17 @@ javascript:
 			location.reload()
 		}
 	})
+
+-unless @benefit_package_form.new_record?
+  javascript:
+    $(document).ready(function() {
+      document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+      productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}"
+      displayReferencePlanDetails(null, {
+        planTitle: "#{@benefit_package_form.sponsored_benefits.first.reference_product.title}",
+        metalLevel: "#{@benefit_package_form.sponsored_benefits.first.reference_product.metal_level_kind}",
+        carrierName: "#{@benefit_package_form.sponsored_benefits.first.reference_product.issuer_name}",
+        planType: "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}",
+        referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
+      });
+    });
