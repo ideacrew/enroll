@@ -129,8 +129,10 @@ module BenefitSponsors
                 :renewal_plan_year_first_reminder_before_soft_dead_line,
                 :renewal_plan_year_publish_dead_line].include?(new_model_event.event_key)
               BenefitSponsors::Queries::NoticeQueries.organizations_for_force_publish(current_date).each do |benefit_sponsorship|
-                benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).first.is_renewing?
-                deliver(recipient: benefit_sponsorship.profile, event_object: benefit_application, notice_event: new_model_event.event_key.to_s)
+                benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).detect { |ba| ba.is_renewing? }
+                if benefit_application.present? && benefit_application.is_renewing?
+                  deliver(recipient: benefit_sponsorship.profile, event_object: benefit_application, notice_event: new_model_event.event_key.to_s)
+                end
               end
             end
 
@@ -141,7 +143,9 @@ module BenefitSponsors
               benefit_sponsorships = BenefitSponsors::Queries::NoticeQueries.initial_employers_by_effective_on_and_state(start_on: start_on, aasm_state: :draft)
               benefit_sponsorships.each do|benefit_sponsorship|
                 benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).sort_by(&:created_at).last
-                deliver(recipient: benefit_sponsorship.profile, event_object: benefit_application, notice_event: new_model_event.event_key.to_s)
+                unless benefit_application.is_renewing?
+                  deliver(recipient: benefit_sponsorship.profile, event_object: benefit_application, notice_event: new_model_event.event_key.to_s)
+                end
               end
             end
 
@@ -150,11 +154,13 @@ module BenefitSponsors
                 if !benefit_sponsorship.initial_enrollment_eligible?
                   eligible_states = BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLMENT_ELIGIBLE_STATES + BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES
                   benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => eligible_states).first
-                  deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
-                  #Notice to employee that there employer misses binder payment
-                  benefit_sponsorship.census_employees.active.each do |ce|
-                    begin
-                      deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notice_to_ee_that_er_plan_year_will_not_be_written")
+                  unless benefit_application.is_renewing?
+                    deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
+                    #Notice to employee that there employer misses binder payment
+                    benefit_sponsorship.census_employees.active.each do |ce|
+                      begin
+                        deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notice_to_ee_that_er_plan_year_will_not_be_written")
+                      end
                     end
                   end
                 end

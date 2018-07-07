@@ -176,7 +176,7 @@ module BenefitSponsors
     }
 
     scope :renewing, -> {
-      where("$exists" => {:predecessor_id => true} )
+      where(:predecessor_id => {:$exists => true} )
     }
 
     scope :published_or_renewing_published, -> {
@@ -750,6 +750,23 @@ module BenefitSponsors
 
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
+
+      begin
+        File.open("benefit_sponsorship_event_subscriber.txt", "a+") do |f|
+          f << "\n---------" + "\n"
+          f << Time.now.getutc.to_s + "\n"
+          f << self.id.to_s + "\n"
+          f << "#{aasm.to_state.to_s}\n"
+          f << "#{aasm.from_state.to_s}\n"
+          f << "#{aasm.current_event.to_s}\n"
+          f << may_approve_enrollment_eligiblity?.to_s + "\n"
+          f << "---------" + "\n"
+        end
+      rescue
+
+      end
+
+
       if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
         approve_enrollment_eligiblity!
       end
