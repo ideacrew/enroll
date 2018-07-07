@@ -91,7 +91,7 @@ module BenefitSponsors
         @coverage_start = c_start
       end
 
-      def calculate(sponsored_benefit, reference_product, p_package, rebuild_sponsor_contribution: false, build_new_pricing_determination: true)
+      def calculate(sponsored_benefit, reference_product, p_package, rebuild_sponsor_contribution: false, build_new_pricing_determination: false)
         pricing_model = p_package.pricing_model
         contribution_model = p_package.contribution_model
         p_calculator = pricing_model.pricing_calculator
