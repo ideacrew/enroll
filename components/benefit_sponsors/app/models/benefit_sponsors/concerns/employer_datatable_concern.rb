@@ -42,6 +42,14 @@ module BenefitSponsors
           where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, :"benefit_applications.predecessor" => {:$exists => true})
         }
 
+        scope :benefit_application_enrolling_initial_oe, -> () {
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor" => {:$exists => false})
+        }
+
+        scope :benefit_application_enrolling_renewing_oe, -> () {
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor" => {:$exists => true})
+        }
+
         scope :benefit_application_initial_binder_paid, -> () {
           where(:"benefit_applications.aasm_state".in => [:enrollment_eligible], :"benefit_applications.predecessor" => {:$exists => false})
         }

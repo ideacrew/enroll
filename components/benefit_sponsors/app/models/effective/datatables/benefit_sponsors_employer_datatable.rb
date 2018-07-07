@@ -186,13 +186,14 @@ module Effective
           [
             {scope:'all', label: 'All'},
             #{scope: 'employer_profiles_renewing_application_pending', label: 'Application Pending'},
+            {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'},
             {scope: 'benefit_application_renewing_binder_paid', label: 'Binder Paid'},
           ],
         enrolling_initial:
           [
             {scope:'all', label: 'All'},
             #{scope: 'employer_profiles_initial_application_pending', label: 'Application Pending'},
-            #{scope: 'benefit_application_enrolling_initial', label: 'Open Enrollment'},
+            {scope: 'benefit_application_enrolling_initial_oe', label: 'Open Enrollment'},
             #{scope: 'employer_profiles_binder_pending', label: 'Binder Pending'},
             {scope: 'benefit_application_initial_binder_paid', label: 'Binder Paid'},
           ],
@@ -216,7 +217,7 @@ module Effective
             {scope: 'benefit_application_enrolling_renewing', label: 'Renewing', subfilter: :enrolling_renewing},
             # {scope: 'employer_profiles_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
             {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
-            {scope: 'benefit_application_imported', label: 'Converting'}
+            #{scope: 'benefit_application_imported', label: 'Converting'}
           ],
          attestations:
           [
