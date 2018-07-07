@@ -338,7 +338,7 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def get_benefit_group(benefit_group, employee_role, qle)
-		if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
+		if benefit_group.present? && (employee_role.employer_profile == benefit_group.sponsor_profile )
 			benefit_group
 		else
 			select_benefit_group_from_qle_and_employee_role(qle, possible_employee_role)

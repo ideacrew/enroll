@@ -32,7 +32,7 @@ module BenefitSponsors
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
       delegate :recorded_rating_area, to: :benefit_application
-      delegate :benefit_sponsorship, to: :benefit_application
+      delegate :benefit_sponsorship, :sponsor_profile, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
