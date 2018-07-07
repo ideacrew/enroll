@@ -176,7 +176,7 @@ module BenefitSponsors
     }
 
     scope :renewing, -> {
-      where("$exists" => {:predecessor_id => true} )
+      where(:predecessor_id => {:$exists => true} )
     }
 
     scope :published_or_renewing_published, -> {
