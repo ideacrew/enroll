@@ -161,13 +161,23 @@ module BenefitSponsors
       end
 
       def calculate_estimates_for_package_design(benefit_application, sponsored_benefit, reference_product, package)
+        calculate_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects: true)
+      end
+
+      def calculate_estimates_for_package_edit(benefit_application, sponsored_benefit, reference_product, package)
+        calculate_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects: false)
+      end
+
+      protected
+
+      def calculate_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects = false)
         cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
         sponsor_contribution, total, employer_costs = cost_estimator.calculate(
           sponsored_benefit,
           reference_product,
           package,
-          rebuild_sponsor_contribution: true,
-          build_new_pricing_determination: true)
+          rebuild_sponsor_contribution: build_objects,
+          build_new_pricing_determination: build_objects)
         if sponsor_contribution.sponsored_benefit.pricing_determinations.any?
           pd = sponsor_contribution.sponsored_benefit.latest_pricing_determination
           sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
@@ -205,8 +215,6 @@ module BenefitSponsors
           }
         end
       end
-
-      protected
 
       def employee_cost_from_group_enrollment(group_enrollment)
 

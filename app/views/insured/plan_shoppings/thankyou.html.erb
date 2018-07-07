@@ -37,7 +37,7 @@
           <% end %>
         </div>
 
-        <%= render :partial => "ui-components/v1/modals/waive_confirmation", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
+        <%= render :partial => "ui-components/v1/modals/waive_confirmation_during_shopping", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>

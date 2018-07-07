@@ -83,9 +83,17 @@ RSpec.describe "an MA ACA Employer" do
       }]
     }
     benefit_package = factory.call(benefit_application, benefit_package_attributes)
-    cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+    cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(
+      benefit_application.benefit_sponsorship,
+      benefit_application.effective_period.min
+    )
     sb = benefit_package.sponsored_benefits.first
-    sbc, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+    sbc, _price, _cont = cost_estimator.calculate(
+      sb,
+      sb.reference_product,
+      sb.product_package,
+      build_new_pricing_determination: true
+    )
     sbc.save!
   end
 

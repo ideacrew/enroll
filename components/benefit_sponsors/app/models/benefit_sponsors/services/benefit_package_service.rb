@@ -27,10 +27,14 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            costs = calculate_premiums(form) rescue nil
-            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_sponsor_exposure] : "0.00"
-            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minium] : "0.00"
-            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : "0.00"
+            costs = nil
+            if sponsored_benefit && !sponsored_benefit.new_record?
+              estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+              costs = estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+            end
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_total_cost] : 0.00
+            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minimum] : 0.00
+            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : 0.00
           end
         end
       end
