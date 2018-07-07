@@ -168,14 +168,14 @@ module BenefitSponsors
       def rating_area
         recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
       end
-      
+
       def drop_sponsored_benefit(sponsored_benefit)
         sponsored_benefits.delete(sponsored_benefit)
       end
 
       def predecessor
-        return @predecessor if @predecessor
         return nil if predecessor_id.blank?
+        return @predecessor if @predecessor
         @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 
