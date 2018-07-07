@@ -17,6 +17,8 @@ module BenefitSponsors
               if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
                 if is_valid_employer_py_oe
                   deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
+                elsif !is_valid_employer_py_oe && (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
+                  deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employee_mid_year_plan_change_notice_to_employer") #MAG043 - notice to employer - renewal case
                 end
               end
 
