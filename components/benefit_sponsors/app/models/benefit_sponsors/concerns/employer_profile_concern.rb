@@ -259,7 +259,7 @@ module BenefitSponsors
       end
 
       def invoices
-        documents.select{ |document| document.subject == 'invoice' }
+        documents.select{ |document| ["invoice", "initial_invoice"].include?(document.subject) }
       end
 
       def current_month_invoice
@@ -309,7 +309,7 @@ module BenefitSponsors
         end
 
         def invoice_exist?(invoice_date,org)
-          docs = org.employer_profile.documents.where(:subject => 'invoice', "date" => invoice_date)
+          docs = org.employer_profile.documents.where("date" => invoice_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
           return true if matching_documents.count > 0
         end
@@ -320,7 +320,7 @@ module BenefitSponsors
         end
 
         def commission_statement_exist?(statement_date,org)
-          docs = org.employer_profile.documents.where(:subject => 'invoice', "date" => statement_date)
+          docs = org.employer_profile.documents.where("date" => statement_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
           return true if matching_documents.count > 0
         end

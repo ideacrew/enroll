@@ -98,7 +98,7 @@ module Notifier
     end
 
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(active_benefit_sponsorship.benefit_applications.where(:aasm_state => "enrollment_closed").first.hbx_enrollments.map(&:total_premium).sum)
+      merge_model.total_amount_due = number_to_currency(active_benefit_sponsorship.benefit_applications.where(:"aasm_state".in => ["enrollment_closed", "enrollment_eligible", "enrollment_open"]).first.hbx_enrollments.map(&:total_premium).sum)
     end
 
     def date_due
