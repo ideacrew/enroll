@@ -97,14 +97,13 @@ module Effective
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
 
-
           if attributes[:enrolling].present?
             if attributes[:enrolling_initial].present? || attributes[:enrolling_renewing].present?
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] != 'all'
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] != 'all'
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] == 'all' || attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] == 'all'
             else
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling]
+              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling])
             end
           end
 
