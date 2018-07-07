@@ -109,13 +109,15 @@ module BenefitSponsors
 
       context "renewal application in draft state" do
 
-        let!(:renewal_application)  { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application).renew_application.save! }
+        let(:scheduled_event)  {BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents}
+
+        let!(:renewal_application)  { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application).renew_application[1] }
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(renewal_application) }
 
         context "today is prior to date for force publish" do
           before(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 15))
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 15))
           end
 
           after(:each) do
@@ -123,7 +125,7 @@ module BenefitSponsors
           end
 
           it "should not change the benefit application" do
-            subject.force_submit_application
+            scheduled_event.advance_day(TimeKeeper.date_of_record)
             expect(renewal_application.aasm_state).to eq :draft
           end
 
@@ -132,7 +134,7 @@ module BenefitSponsors
         context "today is date for force publish" do
 
           before(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 16))
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 16))
           end
 
           after(:each) do
@@ -140,7 +142,8 @@ module BenefitSponsors
           end
 
           it "should transition the benefit_application into :enrollment_open" do
-            subject.force_submit_application
+            scheduled_event.advance_day(TimeKeeper.date_of_record)
+            renewal_application.reload
             expect(renewal_application.aasm_state).to eq :enrollment_open
           end
 

@@ -22,7 +22,7 @@ module BenefitSponsors
           end
         end
 
-        [true, benefit_application, business_policy.success_results]
+        [true, new_benefit_application, business_policy.success_results]
       else
         [false, benefit_application, business_policy.fail_results]
       end
@@ -66,8 +66,7 @@ module BenefitSponsors
       if is_application_valid? && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.approve_application! 
-
-          if benefit_application.open_enrollment_period.begin >= today
+          if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment! 
           end
         end

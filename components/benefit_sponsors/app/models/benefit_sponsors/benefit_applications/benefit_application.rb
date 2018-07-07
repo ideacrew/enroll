@@ -92,6 +92,7 @@ module BenefitSponsors
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+    scope :draft_state,         ->{ where(aasm_state: :draft) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
 
     scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
@@ -211,8 +212,12 @@ module BenefitSponsors
 
     # Set the benefit_application instance that preceded this one
     def predecessor=(benefit_application)
-      raise ArgumentError.new("expected BenefitApplication") unless benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
-      write_attribute(:predecessor_id, benefit_application._id)
+      if benefit_application.nil?
+        write_attribute(:predecessor_id, nil)
+      else
+        raise ArgumentError.new("expected BenefitApplication") unless benefit_application.is_a? BenefitSponsors::BenefitApplications::BenefitApplication
+        write_attribute(:predecessor_id, benefit_application._id)
+      end
       @predecessor = benefit_application
     end
 
