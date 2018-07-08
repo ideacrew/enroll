@@ -293,12 +293,24 @@ javascript:
   function disablePlanYearButton() {
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
-		preventEnterAndSpaceKeySubmissions()
+    disableAddBenefitPackageButton()
+		preventSubmissionOnEnter()
   }
 	
   function enablePlanYearButton() {
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.remove('disabled')
+    savePlanYearButton.classList.remove('disabled');
+    enableAddBenefitPackageButton()
+  }
+
+  function disableAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.add('disabled')
+  }
+
+  function enableAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.remove('disabled')
   }
 	
 	function preventSubmissionOnEnter() {
@@ -309,8 +321,6 @@ javascript:
 			  }
 		}
 	}
-	
-	preventSubmissionOnEnter()
 	  
   function disableEmployeeContributionLevel(){
     document.querySelectorAll(".contribution_handler").forEach(function(element) {
