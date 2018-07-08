@@ -1101,7 +1101,7 @@ def self.to_csv
   def enrollments_for_display
     # temp fix
     enrollments = []
-    enrollments = (active_benefit_group_enrollments+renewal_benefit_group_enrollments).compact.uniq if active_benefit_group_enrollments.count > 0
+    enrollments = (active_benefit_group_enrollments.compact+renewal_benefit_group_enrollments.compact).uniq if active_benefit_group_enrollments.count > 0
     return enrollments
 
 
@@ -1159,7 +1159,7 @@ def self.to_csv
     family = Family.where({
       "households.hbx_enrollments" => {:"$elemMatch" => {
         :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-        :"employee_role_id" => self.employee_role_id }
+        :"employee_role_id" => self.employee_role_id}
       }
     }).first
 
@@ -1167,7 +1167,8 @@ def self.to_csv
 
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
     )
   end
 
@@ -1184,7 +1185,8 @@ def self.to_csv
 
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
     )
   end
 
