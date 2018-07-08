@@ -112,6 +112,28 @@
           a.btn.btn-default.btn-sm.btn-more-details#btnMoreDetails onclick="showMoreDetails()" More Details
           button.btn.btn-default.btn-sm data-dismiss="modal" style="margin-top:-1px" Close
 
+// Employee Cost Detail Modal
+.modal.fade#eeCostModal tabindex="-1" role="dialog" aria-labelledby="eeCostModal"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times
+        h3.heading-text Employee Costs
+      .modal-body
+        | Plan Offerings
+        .row.header
+          .col-xs-4.name
+            | Name
+          .col-xs-2.dependents
+            | Dependents
+          .col-xs-2.min
+            | Min
+          .col-xs-2.reference
+            | Reference
+          .col-xs-2.max
+            | Max
+
 javascript:
   var productOptionKind = String;
   var selectedRadio = String;
@@ -254,8 +276,9 @@ javascript:
     carrierName = options.carrierName || element.dataset.planCarrier;
     planType = options.planType || element.dataset.planType;
     referencePlanID = options.referencePlanID || element.id;
-    calculateEmployerContributions(productOptionKind, referencePlanID)
-    calculateEmployeeCosts(productOptionKind, referencePlanID)
+    sponsoredBenefitId = options.sponsoredBenefitId;
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
@@ -462,6 +485,7 @@ javascript:
       document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
       productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}"
       displayReferencePlanDetails(null, {
+        sponsoredBenefitId: "#{@benefit_package_form.sponsored_benefits.first.id}",
         planTitle: "#{@benefit_package_form.sponsored_benefits.first.reference_product.title}",
         metalLevel: "#{@benefit_package_form.sponsored_benefits.first.reference_product.metal_level_kind}",
         carrierName: "#{@benefit_package_form.sponsored_benefits.first.reference_product.issuer_name}",

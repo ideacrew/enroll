@@ -98,7 +98,7 @@ module BenefitSponsors
       end
 
       def employer_contribution_params
-        params.permit(:benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id])
+        params.permit(:id, :benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id, :id])
       end
     end
   end

@@ -23,10 +23,10 @@ function showEmployeeCostDetails(employees_cost) {
 }
 
 
-function calculateEmployeeCosts(productOptionKind,referencePlanID)  {
+function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID } } },
+    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
     url: "calculate_employee_cost_details",
     success: function (d) {
       showEmployeeCostDetails(d);
@@ -34,10 +34,10 @@ function calculateEmployeeCosts(productOptionKind,referencePlanID)  {
   });
 }
 
-function calculateEmployerContributions(productOptionKind,referencePlanID)  {
+function calculateEmployerContributions(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID } } },
+    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
     url: "calculate_employer_contributions",
     success: function (d) {
       var eeMin = parseFloat(d["estimated_enrollee_minimum"]).toFixed(2);
