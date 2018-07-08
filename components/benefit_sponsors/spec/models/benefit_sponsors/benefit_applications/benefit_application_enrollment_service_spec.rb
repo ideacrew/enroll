@@ -60,16 +60,16 @@ module BenefitSponsors
 
       context "when initial employer present with valid application" do
 
-        let(:open_enrollment_begin) { TimeKeeper.date_of_record - 5.days }
+        let(:open_enrollment_begin) { Date.new(TimeKeeper.date_of_record.year, 7, 3) }
 
         include_context "setup initial benefit application" do
-        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-        let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
-        let(:aasm_state) { :draft }
+          let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
+          let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+          let(:aasm_state) { :draft }
         end
 
-        before(:all) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 4))
         end
 
         after(:all) do
@@ -89,7 +89,7 @@ module BenefitSponsors
         end
 
         context "open enrollment start date in the future" do
-          let(:open_enrollment_begin) { TimeKeeper.date_of_record + 5.days }
+          let(:open_enrollment_begin) { Date.new(TimeKeeper.date_of_record.year, 7, 5) }
 
           it "should submit application with approved status" do
             subject.submit_application
@@ -134,7 +134,7 @@ module BenefitSponsors
         context "today is date for force publish" do
 
           before(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 16))
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 11))
           end
 
           after(:each) do
