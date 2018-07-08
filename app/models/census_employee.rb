@@ -1099,16 +1099,6 @@ def self.to_csv
   end
 
   def enrollments_for_display
-    # temp fix
-    enrollments = []
-
-    active_enrollments = active_benefit_group_enrollments || []
-    renewal_enrollments = renewal_benefit_group_enrollments || []
-
-    enrollments = (active_enrollments.compact+renewal_enrollments.compact).uniq
-    return enrollments
-
-
 
     enrollments = []
 
