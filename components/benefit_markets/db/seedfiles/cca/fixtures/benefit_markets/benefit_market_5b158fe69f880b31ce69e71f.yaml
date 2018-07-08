@@ -50,7 +50,8 @@ attributes: !ruby/hash:BSON::Document
       _id: !ruby/object:BSON::ObjectId
         raw_data: !binary |-
           WxWP5p+ICzHOaech
-      pub_due_dom: 5
+      pub_due_dom: 15
+      adv_pub_due_dom: 10
       erlst_strt_prior_eff_months: -3
       appeal_per_aft_app_denial_dys: 30
       quiet_per_end: 28
@@ -61,7 +62,8 @@ attributes: !ruby/hash:BSON::Document
           WxWP5p+ICzHOaeci
       erlst_strt_prior_eff_months: -3
       montly_oe_end: 13
-      pub_due_dom: 10
+      pub_due_dom: 15
+      adv_pub_due_dom: 10
       force_pub_dom: 11
       oe_min_dys: 3
       quiet_per_end: 15

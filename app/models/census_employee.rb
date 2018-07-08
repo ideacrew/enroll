@@ -211,7 +211,8 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.create(
       start_on: assignment_on,
       end_on:   benefit_package.effective_period.max,
-      benefit_package: benefit_package
+      benefit_package: benefit_package,
+      is_active: false
     )
   end
 

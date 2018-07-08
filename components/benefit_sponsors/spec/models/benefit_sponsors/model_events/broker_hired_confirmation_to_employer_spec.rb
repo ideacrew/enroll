@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'BenefitSponsors::ModelEvents::BrokerHiredConfirmationToEmployer', :dbclean => :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::BrokerHiredConfirmationToEmployer', :dbclean => :after_each do
   let(:notice_event)  { "broker_hired_confirmation_to_employer" }
 
   let!(:person) { create :person }

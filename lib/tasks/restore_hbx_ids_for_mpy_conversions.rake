@@ -101,11 +101,11 @@ namespace :cca do
 
     (2..sheet.last_row).each do |key|
       row = Hash[[columns, sheet.row(key)].transpose]
-      primary_ssn = parse_ssn(row["Subscriber SSN"])
-      primary_last_name = parse_text(row["Subscriber Last Name"])
-      primary_first_name = parse_text(row["Subscriber First Name"])
-      primary_dob = parse_date(row["Subscriber DOB"])
-      restorable_hbx_id = parse_text(row["Employee Hbx ID"])
+      primary_ssn = parse_ssn(row["census_employee_ssn"])
+      primary_last_name = parse_text(row["census_employee_last_name"])
+      primary_first_name = parse_text(row["census_employee_first_name"])
+      primary_dob = parse_date(row["census_employee_dob"])
+      restorable_hbx_id = parse_text(row["census_employee_hbx_id"])
 
       people = find_people(primary_ssn, primary_dob, primary_last_name)
 
@@ -142,7 +142,7 @@ namespace :cca do
       end
 
       begin
-        policy_restorable_hbx_id = parse_text(row["Employee_policy_id"])
+        policy_restorable_hbx_id = parse_text(row["census_employee_policy_id"])
         
         next if policy_restorable_hbx_id.blank?
 
@@ -157,7 +157,7 @@ namespace :cca do
           # MPYC should only have 1 enrollment in their account. You should never hit this.
           # puts "MPYC EE account should not have more than one enrollment.  <Remove 'next' in the code below to process this if valid case>"
           # next
-          policy = pluck_mpyc_policy(policies, row["HIOS Id"], primary_person.hbx_id, row["Sponsor Name"])
+          policy = pluck_mpyc_policy(policies, row["hios_id"], primary_person.hbx_id, row["legal_name"])
           if policy.present?
             restore_policy_hbx_id(policy, policy_restorable_hbx_id, primary_person)
           end

@@ -40,7 +40,7 @@ module BenefitSponsors
             is_initial_employer_open_enrollment_completed = true
           end
 
-          if is_transition_matching?(to: :pending, from: :draft, event: [:review_application, :request_eligibility_review])
+          if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
             is_ineligible_application_submitted = true
           end
 

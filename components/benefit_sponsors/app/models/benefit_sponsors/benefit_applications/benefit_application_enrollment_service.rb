@@ -71,7 +71,9 @@ module BenefitSponsors
           end
         end
       else
-        benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
+        benefit_application.submit_for_review if benefit_application.may_submit_for_review?
+        errors = application_errors.merge(open_enrollment_date_errors)
+        [false, benefit_application, errors]
       end
     end
 
@@ -105,24 +107,8 @@ module BenefitSponsors
           calculate_pricing_determinations(benefit_application)
         end
       else
-        if benefit_application.may_deny_enrollment_eligiblity?
-          benefit_application.deny_enrollment_eligiblity!
-        else
-
-          begin
-              File.open("end_open_enrollment.txt", "a+") { |f|
-              f << "\n---------" + "\n"
-              f << Time.now.getutc.to_s + "\n"
-              f << benefit_application.id.to_s + "\n"
-              f << "Current state: #{benefit_application.aasm_state}" + "\n"
-              f << "---------" + "\n\n"
-            }
-          rescue
-
-          end
-
-        end
-
+        benefit_application.end_open_enrollment! if benefit_application.may_end_open_enrollment?
+        benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
         [false, benefit_application, business_policy.fail_results]
       end
     end

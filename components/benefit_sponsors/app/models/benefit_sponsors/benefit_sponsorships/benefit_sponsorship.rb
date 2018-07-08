@@ -568,7 +568,7 @@ module BenefitSponsors
         open_initial_enrollment! if may_open_initial_enrollment?
       when :enrollment_closed
         close_initial_enrollment! if may_close_initial_enrollment?
-      when :application_ineligible
+      when :enrollment_ineligible
         deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
       when :active
         begin_coverage! if may_begin_coverage?

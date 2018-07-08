@@ -289,17 +289,39 @@ javascript:
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
-  
+	
   function disablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
+		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
+    disableAddBenefitPackageButton()
+		preventSubmissionOnEnter()
   }
-  
+	
   function enablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.remove('disabled')
+		var savePlanYearButton = document.getElementById('submitBenefitPackage');
+    savePlanYearButton.classList.remove('disabled');
+    enableAddBenefitPackageButton()
   }
 
+  function disableAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.add('disabled')
+  }
+
+  function enableAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.remove('disabled')
+  }
+	
+	function preventSubmissionOnEnter() {
+		document.getElementById('new_benefit_package').onkeypress = function(e) {
+			var key = e.charCode || e.keyCode || 0;
+			if (key == 13) {
+			    e.preventDefault();
+			  }
+		}
+	}
+	  
   function disableEmployeeContributionLevel(){
     document.querySelectorAll(".contribution_handler").forEach(function(element) {
       if(element.dataset.displayname == 'Employee' || element.dataset.displayname == "Employee Only" ) {
@@ -456,8 +478,9 @@ javascript:
 			location.reload()
 		}
 	})
-
--unless @benefit_package_form.new_record?
+	
+	
+- unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
       document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
@@ -471,3 +494,4 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
+
