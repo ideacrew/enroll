@@ -195,6 +195,16 @@ module BenefitSponsors
         probation_period_display_texts[probation_period_kind]
       end
 
+      def activate_benefit_group_assignments
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.each do |ce|
+          ce.benefit_group_assignments.each do |bga|
+            if bga.benefit_package_id == self.id
+              bga.make_active
+            end
+          end
+        end
+      end
+
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
           title: title,
