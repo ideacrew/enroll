@@ -3,7 +3,7 @@ require 'csv'
 namespace :generate_reports do
   desc "export conversion employer attributes"
   task conversions_employers: :environment do
-    attributes = %w(fein legal_name hbx_id)
+    attributes = %w(FEIN legal_name hbx_id)
     file_name = File.expand_path("#{Rails.root}/public/results_conversion_employers.csv")
 
     organizations = find_organizations
@@ -30,9 +30,11 @@ namespace :generate_reports do
     person = census_employee.employee_role.person
     hbx_id = person.hbx_id
     family = person.primary_family
-    policy_id = family.active_household.hbx_enrollments.first.hbx_id
+    hbx_enrollment = family.active_household.hbx_enrollments.first
+    policy_id = hbx_enrollment.hbx_id
+    hios_id = hbx_enrollment.product.hios_id
     dependents_info = find_dependents_hbx_ids(family)
-    [person.first_name, person.last_name, person.ssn, person.dob.to_s, hbx_id, policy_id] + dependents_info
+    [person.first_name, person.last_name, person.ssn, person.dob.to_s, hbx_id, policy_id, hios_id] + dependents_info
   end
 
   def find_dependents_hbx_ids(family)
@@ -52,10 +54,10 @@ namespace :generate_reports do
 
   desc "export conversion census employee details"
   task conversion_employees: :environment do
-    attributes = %w(fein legal_name census_employee_first_name census_employee_last_name census_employee_ssn census_employee_dob census_employee_hbx_id census_employee_policy_id)
+    attributes = %w(fein legal_name census_employee_first_name census_employee_last_name census_employee_ssn census_employee_dob census_employee_hbx_id census_employee_policy_id hios_id)
     (1..6).each do |i|
-      ["first name", "last name", "ssn", "dob", "hbx_id"].each do |h|
-        attributes.push "Dep_#{i}_#{h}"
+      ["first name", "Last Name", "SSN", "DOB", "HBX ID"].each do |h|
+        attributes.push "Dep#{i} #{h}"
       end
     end
 

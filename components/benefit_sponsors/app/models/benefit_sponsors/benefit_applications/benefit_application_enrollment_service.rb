@@ -43,7 +43,7 @@ module BenefitSponsors
           if business_policy_satisfied_for?(:submit_benefit_application)
             benefit_application.approve_application!
             oe_period = benefit_application.open_enrollment_period
-            
+
             if today >= oe_period.begin
               benefit_application.begin_open_enrollment!
               benefit_application.update(open_enrollment_period: (today..oe_period.end))
@@ -68,19 +68,21 @@ module BenefitSponsors
     def force_submit_application
       if is_application_valid? && is_application_eligible?
         if benefit_application.may_approve_application?
-          benefit_application.approve_application! 
+          benefit_application.approve_application!
           if today >= benefit_application.open_enrollment_period.begin
-            benefit_application.begin_open_enrollment! 
+            benefit_application.begin_open_enrollment!
           end
         end
       else
-        benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
+        benefit_application.submit_for_review if benefit_application.may_submit_for_review?
+        errors = application_errors.merge(open_enrollment_date_errors)
+        [false, benefit_application, errors]
       end
     end
 
     def begin_open_enrollment
       open_enrollment_begin = benefit_application.open_enrollment_period.begin
-      
+
       if business_policy_satisfied_for?(:begin_open_enrollment)
         if today >= open_enrollment_begin
           # benefit_application.validate_sponsor_market_policy
@@ -108,6 +110,8 @@ module BenefitSponsors
           calculate_pricing_determinations(benefit_application)
         end
       else
+        benefit_application.end_open_enrollment! if benefit_application.may_end_open_enrollment?
+        benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
         [false, benefit_application, business_policy.fail_results]
       end
     end
@@ -185,7 +189,7 @@ module BenefitSponsors
 
     def application_warnings
       unless non_owner_employee_present?
-        { 
+        {
           base: "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
         }
       end
@@ -308,8 +312,8 @@ module BenefitSponsors
 
     #TODO: FIX this
     def non_owner_employee_present?
-      benefit_application.benefit_packages.any?{ |benefit_package| 
-        benefit_package.census_employees_assigned_on(benefit_application.start_on).active.non_business_owner.present? 
+      benefit_application.benefit_packages.any?{ |benefit_package|
+        benefit_package.census_employees_assigned_on(benefit_application.start_on).active.non_business_owner.present?
       }
     end
   end

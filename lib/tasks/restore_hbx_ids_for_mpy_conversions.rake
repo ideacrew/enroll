@@ -32,24 +32,31 @@ namespace :cca do
 
     def initiate_dependent_restore(dependents, hbx_id, last_name)
       if dependents.size != 1
-        puts "Found No primary person/More than 1 on record with last_name: #{last_name}. HbxId: #{hbx_id} failed"
+        puts "FAILURE: Found No primary person/More than 1 on record with last_name: #{last_name}. HbxId: #{hbx_id} failed"
         puts "Moving on to other dependents..."
       else
         dependent = dependents.first
-        restore_person_hbx_id(dependent, hbx_id)
+        restore_person_hbx_id(dependent, hbx_id, false)
       end
     end
 
-    def restore_person_hbx_id(person, hbx_id)
+    def restore_person_hbx_id(person, hbx_id, is_primary)
+      prev_hbx_id = person.hbx_id
+      type = is_primary ? "Subscriber" : "Dependent"
       person.assign_attributes(hbx_id: hbx_id)
-      unless person.save
-        puts "Hbx Id not updated on #{person.full_name} with errors: #{person.errors.full_messages}. HbxId: #{hbx_id} failed"
+      if person.save
+        puts "SUCCESS: HbxId updated for #{type} #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
+      else
+        puts "FAILURE: Hbx Id not updated for #{type} #{person.full_name} with errors: #{person.errors.full_messages}. HbxId: #{hbx_id} failed"
       end
     end
 
     def restore_policy_hbx_id(policy, hbx_id, person)
+      prev_hbx_id = policy.hbx_id
       policy.assign_attributes(hbx_id: hbx_id)
-      unless policy.save
+      if policy.save
+        puts "SUCCESS: Policy HbxId updated for #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
+      else
         puts "Policy Hbx Id not updated on #{person.full_name} with errors: #{policy.errors.full_messages}. Enrollment HbxId: #{hbx_id} failed"
       end
     end
@@ -61,7 +68,7 @@ namespace :cca do
         organizations = ::BenefitSponsors::Organizations::Organization.all.where(legal_name: legal_name)
 
         if organizations.size != 1
-          puts "Found More than 1 organization with legal_name: #{legal_name}. Policy HBX ID Restore failed. Subscriber hbx_id: #{primary_hbx_id}"
+          puts "FAILURE: Found More than 1 organization with legal_name: #{legal_name}. Policy HBX ID Restore failed. Subscriber hbx_id: #{primary_hbx_id}"
           return
         end
 
@@ -69,7 +76,7 @@ namespace :cca do
 
         application = applications.where(:"effective_period.min".in => MPY_EFFECTIVE_DATES).first
         if application.nil?
-          puts "Policy restore failed on Subscriber: #{primary_hbx_id} because of no MPY"
+          puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} because of no MPY"
           return
         end
         pacakge_ids = application.benefit_packages.map(&:id)
@@ -77,12 +84,12 @@ namespace :cca do
         policies = policies.select {|policy| pacakge_ids.include?(policy.sponsored_benefit_package_id) && policy.product.present? && policy.product.hios_id == hios_id }
 
         if policies.blank?
-          puts "Policy restore failed on Subscriber: #{primary_hbx_id} because no policy Found for MPY"
+          puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} because no policy Found for MPY"
           return
         end
 
         if policies.size > 1
-          puts "Policy restore failed on Subscriber: #{primary_hbx_id} found multiple Policies found for MPY"
+          puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} found multiple Policies found for MPY"
           return
         end
 
@@ -94,22 +101,22 @@ namespace :cca do
 
     (2..sheet.last_row).each do |key|
       row = Hash[[columns, sheet.row(key)].transpose]
-      primary_ssn = parse_ssn(row["Subscriber SSN"])
-      primary_last_name = parse_text(row["Subscriber Last Name"])
-      primary_first_name = parse_text(row["Subscriber First Name"])
-      primary_dob = parse_date(row["Subscriber DOB"])
-      restorable_hbx_id = parse_text(row["Employee Hbx ID"])
+      primary_ssn = parse_ssn(row["census_employee_ssn"])
+      primary_last_name = parse_text(row["census_employee_last_name"])
+      primary_first_name = parse_text(row["census_employee_first_name"])
+      primary_dob = parse_date(row["census_employee_dob"])
+      restorable_hbx_id = parse_text(row["census_employee_hbx_id"])
 
       people = find_people(primary_ssn, primary_dob, primary_last_name)
 
       if people.blank?
-        puts "Found No person record with #{primary_first_name} #{primary_last_name}"
+        puts "FAILURE: Found No person record with #{primary_first_name} #{primary_last_name}"
         puts "Skipping dependents information for this person if any..."
         next
       end
 
       if people.size != 1
-        puts "Found More than 1 person record with #{primary_first_name} #{primary_last_name}"
+        puts "FAILURE: Found More than 1 person record with #{primary_first_name} #{primary_last_name}"
         puts "Skipping dependents information for this person if any..."
         next
       end
@@ -117,7 +124,7 @@ namespace :cca do
       primary_person = people.first
 
       if restorable_hbx_id.present?
-        restore_person_hbx_id(primary_person, restorable_hbx_id)
+        restore_person_hbx_id(primary_person, restorable_hbx_id, true)
       end
 
       Array(1..6).each do |i|
@@ -135,14 +142,14 @@ namespace :cca do
       end
 
       begin
-        policy_restorable_hbx_id = parse_text(row["Employee_policy_id"])
+        policy_restorable_hbx_id = parse_text(row["census_employee_policy_id"])
         
         next if policy_restorable_hbx_id.blank?
 
         policies = primary_person.primary_family.active_household.hbx_enrollments
 
         if policies.blank?
-          puts "Spreadsheet has policy Hbx Id. But no Enrollment present in Subscriber account. Person HbxId: #{primary_person.hbx_id} "
+          puts "FAILURE: Spreadsheet has policy Hbx Id. But no Enrollment present in Subscriber account. Person HbxId: #{primary_person.hbx_id} "
           next
         end
 
@@ -150,7 +157,7 @@ namespace :cca do
           # MPYC should only have 1 enrollment in their account. You should never hit this.
           # puts "MPYC EE account should not have more than one enrollment.  <Remove 'next' in the code below to process this if valid case>"
           # next
-          policy = pluck_mpyc_policy(policies, row["HIOS Id"], primary_person.hbx_id, row["Sponsor Name"])
+          policy = pluck_mpyc_policy(policies, row["hios_id"], primary_person.hbx_id, row["legal_name"])
           if policy.present?
             restore_policy_hbx_id(policy, policy_restorable_hbx_id, primary_person)
           end
@@ -158,7 +165,7 @@ namespace :cca do
           restore_policy_hbx_id(policies.first, policy_restorable_hbx_id, primary_person)
         end
       rescue Exception => e
-        puts "Error while updating policy #{policy_restorable_hbx_id}: #{e}"
+        puts "FAILURE: Error while updating policy #{policy_restorable_hbx_id}: #{e}"
       end
     end
 
