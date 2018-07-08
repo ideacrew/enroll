@@ -54,7 +54,7 @@ module BenefitSponsors
             is_application_submitted = true
           end
 
-          if is_transition_matching?(to: :enrollment_open, from: :enrollment_open, event: :end_open_enrollment)
+          if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
             is_renewal_enrollment_confirmation = true
           end
 
