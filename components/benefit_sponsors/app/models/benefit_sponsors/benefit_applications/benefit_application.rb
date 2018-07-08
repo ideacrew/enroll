@@ -379,7 +379,7 @@ module BenefitSponsors
     end
 
     def is_renewing?
-      predecessor.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
     end
 
     def is_renewal_enrolling?
