@@ -51,9 +51,6 @@ module BenefitSponsors
 
             [true, benefit_application, application_warnings]
           else
-            if (business_policy.fail_results.include?(:employer_primary_office_location) || business_policy.fail_results.include?(:benefit_application_fte_count))
-              benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
-            end
             [false, benefit_application, business_policy.fail_results]
           end
         else
