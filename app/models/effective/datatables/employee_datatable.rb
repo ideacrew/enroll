@@ -43,7 +43,8 @@ module Effective
         end
 
         table_column :enrollment_status, :proc => Proc.new { |row|
-            enrollment_state(row)
+            #enrollment_state(row)
+            simple_enrollment_state(row)
         }, :sortable => false, :filter => false
 
         if attributes["renewal"]
