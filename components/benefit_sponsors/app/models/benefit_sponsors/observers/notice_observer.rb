@@ -151,8 +151,8 @@ module BenefitSponsors
         end
 
         if BenefitSponsors::ModelEvents::Profile::OTHER_EVENTS.include?(new_model_event.event_key)
-          if new_model_event.event_key == :broker_hired_confirmation_to_employer
-            deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+          if new_model_event.event_key == :welcome_notice_to_employer
+            deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
           end
         end
       end

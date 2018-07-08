@@ -11,7 +11,7 @@ namespace :cca do
 
     def sanitize(val)
       return nil if val.blank?
-      val.split(".")[0].strip.rjust(9, '0')
+      val.to_s.split(".")[0].strip.rjust(9, '0')
     end
 
     (2..sheet.last_row).each do |key|
@@ -21,15 +21,18 @@ namespace :cca do
       next if restorable_hbx_id.blank?
       sponsors = ::BenefitSponsors::Organizations::Organization.all.employer_profiles.where(fein: fein)
       if sponsors.blank? || sponsors.size != 1
-        puts "Found No/More than 1 organization with FEIN: #{fein}."
+        puts "FAILURE: Found No/More than 1 organization with FEIN: #{fein}."
         next
       end
 
       sponsor = sponsors.first
+      prev_hbx_id = sponsor.hbx_id
 
       sponsor.assign_attributes(hbx_id: restorable_hbx_id)
-      unless sponsor.save
-        puts "HBX ID Restore failed for ER FEIN - #{fein}"
+      if sponsor.save
+        puts "SUCCESS: Restored ER Hbx Id from #{prev_hbx_id} to #{restorable_hbx_id} for ER with FEIN - #{fein}, legal name - #{sponsor.legal_name}"
+      else
+        puts "FAILURE: HBX ID Restore failed for ER FEIN - #{fein}"
       end
     end
 
