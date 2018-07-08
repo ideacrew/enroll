@@ -27,10 +27,10 @@ module BenefitSponsors
     rule  :non_business_owner_enrollment_count,
             validate: ->(benefit_application){
                             benefit_application.enrolled_non_business_owner_count >= benefit_application.members_eligible_to_enroll_count &&
-                            benefit_application.enrolled_non_business_owner_count >= benefit_application.non_owner_participation_count_minimum
+                            benefit_application.enrolled_non_business_owner_count >= Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
                           },
             success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"At least #{benefit_application.non_owner_participation_count_minimum} non-owner employee must enroll" }
+            fail:     ->(benefit_application){"At least #{Settings.aca.shop_market.employee_participation_ratio_minimum.to_f} non-owner employee must enroll" }
 
     rule :minimum_eligible_member_count,
             validate: ->(benefit_application){ benefit_application.members_eligible_to_enroll_count > 0 },
