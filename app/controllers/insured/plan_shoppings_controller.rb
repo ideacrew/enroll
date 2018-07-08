@@ -59,7 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    employee_mid_year_plan_change(@person, @change_plan)
+    # employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
 
