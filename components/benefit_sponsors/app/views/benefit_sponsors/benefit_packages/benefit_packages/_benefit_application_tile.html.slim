@@ -44,10 +44,10 @@ div.alert.alert-info.hidden#effectiveDateError role="alert" This effective date 
 
 - if show_benefit_application_tile == "true"
 	javascript:
-		var effectiveDate = "#{f.catalog[:effective_date].to_date}"
-		var effectiveMaxDate = "#{f.catalog[:effective_period][:max]}"
+		var effectiveDate = "#{f.parent.start_on}"
+		var availableMaxStartDate = "#{f.parent.start_on_options.keys.max}"
 		function checkPlanYearStartDates() {
-			if (effectiveDate != effectiveMaxDate) {
+			if (effectiveDate != availableMaxStartDate) {
 				document.getElementById('editPlanYearButton').classList.add('disabled');
 				document.getElementById('effectiveDateError').classList.remove('hidden');
 			}
