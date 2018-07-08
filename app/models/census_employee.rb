@@ -975,7 +975,7 @@ def self.to_csv
             census_member.ssn,
             census_member.dob.strftime("%m/%d/%Y"),
             census_member.gender
-          ] 
+          ]
 
         data = [
             "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
@@ -1099,6 +1099,13 @@ def self.to_csv
   end
 
   def enrollments_for_display
+    # temp fix
+    enrollments = []
+    enrollments = active_benefit_group_enrollments.compact.uniq if active_benefit_group_enrollments.count > 0
+    return enrollments
+
+
+
     enrollments = []
 
     coverages_selected = lambda do |enrollments|
