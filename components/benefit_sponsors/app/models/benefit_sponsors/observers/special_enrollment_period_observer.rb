@@ -8,9 +8,10 @@ module BenefitSponsors
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
           special_enrollment_period = new_model_event.klass_instance
-          if special_enrollment_period.is_shop?
-            primary_applicant = special_enrollment_period.family.primary_applicant
-            if employee_role = primary_applicant.person.active_employee_roles[0]
+          if (new_model_event.event_key == :employee_sep_request_accepted) && special_enrollment_period.is_shop?
+            person = special_enrollment_period.family.primary_applicant.person
+            unless person.has_multiple_active_employers?
+              employee_role = person.active_employee_roles[0]
               deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
             end
           end
