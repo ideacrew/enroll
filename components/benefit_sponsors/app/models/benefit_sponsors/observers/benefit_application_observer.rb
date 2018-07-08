@@ -29,7 +29,7 @@ module BenefitSponsors
 
             if new_model_event.event_key == :application_submitted
               trigger_zero_employees_on_roster_notice(benefit_application)
-              if benefit_application.is_renewing?
+              if benefit_application.predecessor.present? #unable to use is_renewing? because at this stage the aasm_state of ba is still approved for some reason.
                 deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_published")
               else
                 deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_application_submitted")
