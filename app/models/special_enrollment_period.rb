@@ -5,7 +5,7 @@ class SpecialEnrollmentPeriod
   include ScheduledEventService
   include TimeHelper
   include BenefitSponsors::Concerns::Observable
-  include ModelEvents::SpecialEnrollmentPeriod
+  include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
   after_save :notify_on_save
   
