@@ -18,9 +18,9 @@ function showEmployeeCostDetails(employees_cost) {
     `
       <td class="text-center">${estimate.name}</td>
       <td class="text-center">${estimate.dependent_count}</td>
-      <td class="text-center">${estimate.lowest_cost_estimate}</td>
-      <td class="text-center">${estimate.reference_estimate}</td>
-      <td class="text-center">${estimate.highest_cost_estimate}</td>
+      <td class="text-center">$ ${estimate.lowest_cost_estimate}</td>
+      <td class="text-center">$ ${estimate.reference_estimate}</td>
+      <td class="text-center">$ ${estimate.highest_cost_estimate}</td>
     `
     table.appendChild(tr)
   }
