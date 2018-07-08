@@ -11,9 +11,8 @@
 
   - if !is_new_package && !is_new_package.nil?
     .col-xs-3.pull-right
-      span.pull-right
-        #edit_employer_cost_info_btn style="padding-top:12px" data-toggle="modal" data-target="#eeCostModal"
-          .btn.btn-default Employee Detail Costs
+      .btn.btn-default.pull-right.mt-3 data-toggle="modal" data-target="#eeCostModal" Employee Details Costs
+
   br
   .col-md-12.col-sm-12.col-xs-12.top-pd
     .reference_plan_info style='clear: both;'
@@ -46,3 +45,25 @@
     window.onload = function() {
       document.getElementById('planSelection').classList.add('hidden')
     }
+
+// Employee Cost Detail Modal
+.modal.fade#eeCostModal tabindex="-1" role="dialog" aria-labelledby="eeCostModal"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times
+        h3.heading-text Employee Costs
+      .modal-body
+        | Plan Offerings
+        .row.header
+          .col-xs-4.name
+            | Name
+          .col-xs-2.dependents
+            | Dependents
+          .col-xs-2.min
+            | Min
+          .col-xs-2.reference
+            | Reference
+          .col-xs-2.max
+            | Max

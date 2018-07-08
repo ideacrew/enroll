@@ -66,12 +66,11 @@ module BenefitSponsors
             price: 0.00
           )
         end 
-        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(
+        price_determination = sponsored_benefit.pricing_determinations.build(
           pricing_determination_tiers: price_determination_tiers,
           group_size: 1,
           participation_rate: 0.01
         )
-        sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations + [price_determination]
       end
 
       def create_pricing_determinations(sponsored_benefit, product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)
@@ -83,12 +82,11 @@ module BenefitSponsors
             price: v
           )
         end 
-        price_determination = ::BenefitSponsors::SponsoredBenefits::PricingDetermination.new(
+        price_determination = sponsored_benefit.pricing_determinations.build(
           pricing_determination_tiers: price_determination_tiers,
           group_size: group_size,
           participation_rate: (participation_percent * 0.01)
         )
-        sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations + [price_determination]
       end
 
       def calculate_composite_base_rates(product, pricing_model, coverage_benefit_roster, group_size, participation_percent, sic_code)

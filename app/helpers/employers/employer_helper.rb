@@ -15,6 +15,11 @@ module Employers::EmployerHelper
     end
   end
 
+  def simple_enrollment_state(census_employee=nil)
+    hbx = census_employee.active_benefit_group_enrollments.try(:first)
+    hbx.present? ? "#{hbx.coverage_kind.titleize} - #{hbx.aasm_state.titleize}" : ""
+  end
+
   def enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee, census_employee.active_benefit_group_enrollments).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end

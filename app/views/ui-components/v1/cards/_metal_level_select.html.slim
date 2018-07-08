@@ -254,8 +254,9 @@ javascript:
     carrierName = options.carrierName || element.dataset.planCarrier;
     planType = options.planType || element.dataset.planType;
     referencePlanID = options.referencePlanID || element.id;
-    calculateEmployerContributions(productOptionKind, referencePlanID)
-    calculateEmployeeCosts(productOptionKind, referencePlanID)
+    sponsoredBenefitId = options.sponsoredBenefitId;
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
@@ -462,6 +463,7 @@ javascript:
       document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
       productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}"
       displayReferencePlanDetails(null, {
+        sponsoredBenefitId: "#{@benefit_package_form.sponsored_benefits.first.id}",
         planTitle: "#{@benefit_package_form.sponsored_benefits.first.reference_product.title}",
         metalLevel: "#{@benefit_package_form.sponsored_benefits.first.reference_product.metal_level_kind}",
         carrierName: "#{@benefit_package_form.sponsored_benefits.first.reference_product.issuer_name}",
