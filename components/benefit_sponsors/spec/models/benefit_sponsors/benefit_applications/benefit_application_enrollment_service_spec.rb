@@ -52,7 +52,6 @@ module BenefitSponsors
     end
 
     describe '.revert_application' do
-
     end
 
     describe '.submit_application' do
@@ -80,12 +79,29 @@ module BenefitSponsors
 
         context "open enrollment start date in the past" do
 
-          it "should submit application with immediate open enrollment" do
-            subject.submit_application
-            initial_application.reload
-            expect(initial_application.aasm_state).to eq :enrollment_open
-            expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
+          context "and the benefit_application passes business policy validation" do
+
+            it "should submit application with immediate open enrollment" do
+              subject.submit_application
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_open
+              expect(initial_application.open_enrollment_period.begin.to_date).to eq TimeKeeper.date_of_record
+            end
           end
+
+          context "and the benefit_application fails business policy validation" do
+            let(:business_policy) { instance_double("some_policy", fail_results: { business_rule: "failed validation" })}
+
+            it "application should transition into :draft state" do
+              allow(subject).to receive(:business_policy).and_return(business_policy)
+              allow(subject).to receive(:business_policy_satisfied_for?).with(:submit_benefit_application).and_return(false)
+
+              subject.submit_application
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :draft
+            end
+          end
+
         end
 
         context "open enrollment start date in the future" do
@@ -157,8 +173,6 @@ module BenefitSponsors
 
         end
       end
-
-
     end
 
     describe '.begin_open_enrollment' do
@@ -217,6 +231,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:aasm_state) { :enrollment_open }
+          let(:benefit_sponsorship_state) { :initial_enrollment_open }
         end
 
         before(:each) do
@@ -231,14 +246,33 @@ module BenefitSponsors
 
         context "open enrollment close date passed" do
           before :each do
+            initial_application.benefit_sponsorship.update_attributes(aasm_state: :initial_enrollment_open)
             allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
           end
 
-          it "should close open enrollment" do
-            subject.end_open_enrollment
-            initial_application.reload
-            expect(initial_application.aasm_state).to eq :enrollment_closed
+          context "and the benefit_application enrollment passes eligibility policy validation" do
+
+            it "should close open enrollment" do
+              subject.end_open_enrollment
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_closed
+            end
           end
+
+          context "and the benefit_application enrollment fails eligibility policy validation" do
+            let(:business_policy) { instance_double("some_policy", fail_results: { business_rule: "failed validation" })}
+
+            it "should close open enrollment and transition into :enrollment_ineligible state" do
+              allow(subject).to receive(:business_policy).and_return(business_policy)
+              allow(subject).to receive(:business_policy_satisfied_for?).with(:end_open_enrollment).and_return(false)
+
+              subject.end_open_enrollment
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_ineligible
+              expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
+            end
+          end
+
 
           it "invokes pricing determination calculation" do
             expect(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
@@ -266,11 +300,11 @@ module BenefitSponsors
 
       context "when initial employer completed open enrollment and ready to begin benefit" do
 
-        let(:applcation_state) { :enrollment_closed }
+        let(:application_state) { :enrollment_closed }
 
         include_context "setup initial benefit application" do
           let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:aasm_state) {  applcation_state }
+          let(:aasm_state) {  application_state }
         end
 
         before(:all) do
@@ -284,7 +318,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         context "made binder payment" do
-          let(:applcation_state) { :enrollment_eligible }
+          let(:application_state) { :enrollment_eligible }
 
           before do
             allow(initial_application).to receive(:transition_benefit_package_members).and_return(true)
