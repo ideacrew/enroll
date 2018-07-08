@@ -207,6 +207,7 @@ module BenefitSponsors
     index({ profile_id: 1 })
 
     index({"benefit_application._id" => 1})
+    index({"benefit_application.predecessor_id" => 1})
     index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
             { name: "effective_period" })
 
@@ -243,7 +244,7 @@ module BenefitSponsors
     end
 
     def application_may_auto_submit(effective_date)
-      benefit_applications.effective_date_begin_on(effective_date).renewing.draft.first
+      benefit_applications.effective_date_begin_on(effective_date).renewing.draft_state.first
     end
 
     def primary_office_address
@@ -528,9 +529,22 @@ module BenefitSponsors
 
     # Notify BenefitApplication that
     def publish_binder_event
-      benefit_applications.each do |benefit_application|
-        benefit_application.benefit_sponsorship_event_subscriber(aasm)
+      begin
+        File.open("publish_binder_event.txt", "a+") do |f|
+          f << "\n---------" + "\n"
+          f << Time.now.getutc.to_s + "\n"
+          f << self.id.to_s + "\n"
+          f << self.organization.legal_name + "\n"
+          benefit_applications.each do |benefit_application|
+            f << "  ----> #{benefit_application.id.to_s}"
+            benefit_application.benefit_sponsorship_event_subscriber(aasm)
+          end
+          f << "---------" + "\n"
+        end
+      rescue
+
       end
+
     end
 
     # BenefitApplication        BenefitSponsorship

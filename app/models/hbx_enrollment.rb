@@ -688,8 +688,8 @@ class HbxEnrollment
   def employer_profile
     if self.employee_role.present?
       self.employee_role.employer_profile
-    elsif !self.benefit_group_id.blank?
-      self.benefit_group.employer_profile
+    elsif !self.sponsored_benefit_package_id.blank?
+      self.sponsored_benefit_package.sponsor_profile
     else
       nil
     end

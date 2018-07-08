@@ -6,7 +6,7 @@ module BenefitSponsors
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :'benefit_applications' => {
             :$elemMatch => {
-               :effective_period.min => new_date.next_month.beginning_of_month,
+               :"effective_period.min" => start_on,
                :aasm_state => aasm_state
             }
           }
@@ -17,7 +17,7 @@ module BenefitSponsors
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :'benefit_applications' =>
           { :$elemMatch => {
-            :effective_period.min => new_date.next_month.beginning_of_month,
+            :"effective_period.min" => new_date.next_month.beginning_of_month,
             :aasm_state => :draft
           }}
         })
@@ -39,7 +39,6 @@ module BenefitSponsors
           :"benefit_applications" => { 
             :$elemMatch => {
               :"aasm_state" => :enrollment_eligible,
-              
             }
           }
         })

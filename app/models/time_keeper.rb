@@ -100,7 +100,11 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    BenefitSponsors::ModelEvents::BenefitApplication.date_change_event(self.date_of_record)
+    begin
+      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(self.date_of_record)
+    rescue Exception => e
+      Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
+    end
   end
 
   def self.with_cache

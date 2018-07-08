@@ -32,7 +32,7 @@ module BenefitSponsors
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
       delegate :recorded_rating_area, to: :benefit_application
-      delegate :benefit_sponsorship, to: :benefit_application
+      delegate :benefit_sponsorship, :sponsor_profile, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
@@ -102,7 +102,7 @@ module BenefitSponsors
 
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
-        sponsored_benefits << new_sponsored_benefit
+        new_sponsored_benefit
       end
 
       def effective_on_kind
@@ -168,14 +168,14 @@ module BenefitSponsors
       def rating_area
         recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
       end
-      
+
       def drop_sponsored_benefit(sponsored_benefit)
         sponsored_benefits.delete(sponsored_benefit)
       end
 
       def predecessor
-        return @predecessor if @predecessor
         return nil if predecessor_id.blank?
+        return @predecessor if @predecessor
         @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 

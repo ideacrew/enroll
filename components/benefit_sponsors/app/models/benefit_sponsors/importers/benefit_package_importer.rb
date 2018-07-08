@@ -94,9 +94,8 @@ module BenefitSponsors
 
         if sponsor_contribution_attrs[0][:final_tier_premium].present?
           new_determination = pricing_determination.dup
-          new_determination.sponsored_benefit = sponsored_benefit
           copy_tier_contributions(new_determination, sponsor_contribution_attrs, :final_tier_premium)
-          sponsored_benefit.pricing_determinations << new_determination
+          sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations +  [new_determination]
         end
       end
 

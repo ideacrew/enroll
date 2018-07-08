@@ -120,7 +120,7 @@ module Importers
         # Future needs to handle one person with 2  different staff roles
         staff_role_id = existing_person.user.id if existing_person.user
         existing_person.unset(:user_id)
-        merge_staff.set(:user_id => staff_role_id)
+        merge_staff.set(:user_id => staff_role_id) if staff_role_id
         existing_person.destroy!
         merge_staff.save!
         return true

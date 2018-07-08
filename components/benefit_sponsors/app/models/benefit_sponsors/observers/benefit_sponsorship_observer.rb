@@ -14,7 +14,7 @@ module BenefitSponsors
               if employer_profile.is_new_employer?
                 census_employees = benefit_sponsorship.census_employees.non_terminated
                 census_employees.each do |ce|
-                  if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_open]).first.start_on
+                  if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_eligible, :enrollment_closed]).first.start_on
                     deliver(recipient: ce.employee_role, event_object: ce.active_benefit_group_assignment.hbx_enrollment, notice_event: "initial_employee_plan_selection_confirmation")
                   end
                 end

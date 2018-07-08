@@ -27,26 +27,15 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            sponsored_benefit_form.employer_estimated_monthly_cost = montly_estimated_cost(sponsored_benefit)
-            costs = set_min_max_costs(sponsored_benefit)
-            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs.min : "0.00"
-            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs.max : "0.00"
+            costs = nil
+            if sponsored_benefit && !sponsored_benefit.new_record?
+              estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+              costs = estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+            end
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_total_cost] : 0.00
+            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minimum] : 0.00
+            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : 0.00
           end
-        end
-      end
-
-      def montly_estimated_cost(sponsored_benefit)
-        estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on)
-        sb, estimated_employer_cost, contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package, build_new_pricing_determination: false)
-        estimated_employer_cost
-      end
-
-      def set_min_max_costs(sponsored_benefit)
-        pd = sponsored_benefit.latest_pricing_determination
-        costs = pd.pricing_determination_tiers.map do |pdt|
-          pdt_total = pdt.price
-          pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-          BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
         end
       end
 
@@ -100,52 +89,47 @@ module BenefitSponsors
 
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
-        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-        lowest_cost_product = selected_package.lowest_cost_product
-        highest_cost_product = selected_package.highest_cost_product
-        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
+        sb_form = form.sponsored_benefits.first
+        
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
 
-        cost_estimator = initialize_cost_estimator
-        group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+        if sb_form.id
+          benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sb_form.id.to_s)).first
+          sponsored_benefit = benefit_package.sponsored_benefits.where(id: sb_form.id).first
+          product_package = sponsored_benefit.product_package
+          estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
+        else
+          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
+        
+          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
+          benefit_package = benefit_application.benefit_packages.build
+          dummy_sponsored_benefit = ::BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new(benefit_package: benefit_package, product_package_kind: form.sponsored_benefits[0].product_package_kind)
+          dummy_sponsored_benefit.reference_product = reference_product
 
-        sponsor_contribution, total, employer_costs = initialize_cost_estimates(cost_estimator, reference_product, selected_package)
-
-        sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, selected_package)
-        sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, selected_package)
-
-        minimum_cost = sponsored_benefit_with_lowest_cost_product.lazy.map do |mg|
-          BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
-        end.min
-
-        maximum_cost = sponsored_benefit_with_highest_cost_product.lazy.map do |mg|
-          BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
-        end.max
-
-        {
-          estimated_total_cost: total,
-          estimated_sponsor_exposure: employer_costs,
-          estimated_enrollee_minium: minimum_cost,
-          estimated_enrollee_maximum: maximum_cost
-        }
+          estimator.calculate_estimates_for_package_design(benefit_application, dummy_sponsored_benefit, reference_product, selected_package)
+        end
       end
 
       def calculate_employee_cost_details(form)
-        selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-        reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
+        sb_form = form.sponsored_benefits.first
+        
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        if sb_form.id
+          benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sb_form.id.to_s)).first
+          sponsored_benefit = benefit_package.sponsored_benefits.where(id: sb_form.id).first
+          product_package = sponsored_benefit.product_package
 
-        group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-        cost_estimator = initialize_cost_estimator
+          estimator.calculate_employee_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
+        else
+          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
 
-        sponsor_contribution, total, employer_costs = initialize_cost_estimates(cost_estimator, reference_product, selected_package)
+          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
+          benefit_package = benefit_application.benefit_packages.build
+          dummy_sponsored_benefit = ::BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new(benefit_package: benefit_package, product_package_kind: form.sponsored_benefits[0].product_package_kind)
+          dummy_sponsored_benefit.reference_product = reference_product
 
-        lowest_cost_product = selected_package.lowest_cost_product
-        highest_cost_product = selected_package.highest_cost_product
-
-        sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, selected_package)
-        sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, selected_package)
-        sponsored_benefit_with_reference_product    = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, reference_product, selected_package)
-
-        [sponsored_benefit_with_lowest_cost_product, sponsored_benefit_with_reference_product, sponsored_benefit_with_highest_cost_product]
+          estimator.calculate_employee_estimates_for_package_design(benefit_application, dummy_sponsored_benefit, reference_product, selected_package)
+        end
       end
 
       def reference_product_details(form, details)
@@ -234,7 +218,7 @@ module BenefitSponsors
         end
         benefit_package.sponsored_benefits.each do |sb|
           cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
         end
         save_successful = benefit_package.save
         unless save_successful
@@ -336,7 +320,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: (contribution_level.contribution_factor * 0.01),
-            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered
+            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           }
         end
 

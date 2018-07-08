@@ -50,7 +50,7 @@ class BenefitApplicationMigration < Mongoid::Migration
         new_organization = new_org(old_org)
 
         benefit_sponsorship = new_organization.first.active_benefit_sponsorship
-        benefit_sponsorship.aasm_state = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[old_org.employer_profile.aasm_state.to_sym]
+        self.set_benefit_sponsorship_state(old_org, benefit_sponsorship)
         benefit_sponsorship.registered_on = old_org.employer_profile.registered_on
         benefit_sponsorship.effective_begin_on = self.get_benefit_sponsorship_effective_on(old_org)
         construct_workflow_state_for_benefit_sponsorship(benefit_sponsorship, old_org)
@@ -293,6 +293,29 @@ class BenefitApplicationMigration < Mongoid::Migration
       attributes[:from_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.from_state.to_sym]
       attributes[:to_state] = benefit_application.send(:plan_year_to_benefit_application_states_map)[wst.to_state.to_sym]
       benefit_application.workflow_state_transitions.build(attributes)
+    end
+  end
+
+
+  def self.set_benefit_sponsorship_state(old_org, benefit_sponsorship)
+
+    if ["conversion", "mid_plan_year_conversion"].include?(benefit_sponsorship.source_kind.to_s)
+       benefit_sponsorship.aasm_state = :active
+      return
+    end
+
+    if benefit_sponsorship.source_kind.to_s == "self_serve"
+
+      if old_org.employer_profile.active_plan_year.present?
+        benefit_sponsorship.aasm_state = :active
+        return
+      end
+
+      if old_org.employer_profile.published_plan_year.present? && old_org.employer_profile.published_plan_year.enrolling?
+        benefit_sponsorship.aasm_state = :initial_enrollment_open
+      else
+        benefit_sponsorship.aasm_state = benefit_sponsorship.send(:employer_profile_to_benefit_sponsor_states_map)[old_org.employer_profile.aasm_state.to_sym]
+      end
     end
   end
 

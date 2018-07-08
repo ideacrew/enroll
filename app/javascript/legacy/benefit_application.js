@@ -11,46 +11,36 @@ function showEmployeeCostDetails(employees_cost) {
   });
 
   for (let employee in employees_cost) {
+    estimate = employees_cost[employee];
     var newRow = document.importNode(modal.querySelector('.row.header'), true)
-    newRow.querySelector('.col-xs-4.name').innerHTML = employee
-    newRow.querySelector('.col-xs-2.dependents').innerHTML = employees_cost[employee].dependents
-    newRow.querySelector('.col-xs-2.min').innerHTML = employees_cost[employee].costs[0]
-    newRow.querySelector('.col-xs-2.reference').innerHTML = employees_cost[employee].costs[1]
-    newRow.querySelector('.col-xs-2.max').innerHTML = employees_cost[employee].costs[2]
+    newRow.querySelector('.col-xs-4.name').innerHTML = estimate.name;
+    newRow.querySelector('.col-xs-2.dependents').innerHTML = estimate.dependent_count;
+    newRow.querySelector('.col-xs-2.min').innerHTML = estimate.lowest_cost_estimate;
+    newRow.querySelector('.col-xs-2.reference').innerHTML = estimate.reference_estimate;
+    newRow.querySelector('.col-xs-2.max').innerHTML = estimate.highest_cost_estimate;
     modal.querySelector('.modal-body').appendChild(newRow);
   }
 }
 
 
-function calculateEmployeeCosts(productOptionKind,referencePlanID)  {
+function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID } } },
+    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
     url: "calculate_employee_cost_details",
     success: function (d) {
-      var employee_structure = { dependents: 0, costs: [] }
-      var employees_cost = {}
-      for (let employees of d) {
-        for (let employee of employees) {
-          var name = `${employee.members[0].census_member.first_name} ${employee.members[0].census_member.last_name}`
-          if (!employees_cost[name])
-            employees_cost[name] = employee_structure;
-          employees_cost[name].costs.push(employee.group_enrollment.product_cost_total)
-          employees_cost[name].dependents = employee.members.length - 1
-        }
-      }
-      showEmployeeCostDetails(employees_cost)
+      showEmployeeCostDetails(d);
     }
   });
 }
 
-function calculateEmployerContributions(productOptionKind,referencePlanID)  {
+function calculateEmployerContributions(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID } } },
+    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
     url: "calculate_employer_contributions",
     success: function (d) {
-      var eeMin = parseFloat(d["estimated_enrollee_minium"]).toFixed(2);
+      var eeMin = parseFloat(d["estimated_enrollee_minimum"]).toFixed(2);
       var eeCost = parseFloat(d["estimated_total_cost"]).toFixed(2);
       var eeMax = parseFloat(d["estimated_enrollee_maximum"]).toFixed(2);
       showCostDetails(eeCost,eeMin,eeMax)

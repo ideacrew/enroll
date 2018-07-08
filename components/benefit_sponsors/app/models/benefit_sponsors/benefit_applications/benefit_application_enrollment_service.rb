@@ -22,7 +22,7 @@ module BenefitSponsors
           end
         end
 
-        [true, benefit_application, business_policy.success_results]
+        [true, new_benefit_application, business_policy.success_results]
       else
         [false, benefit_application, business_policy.fail_results]
       end
@@ -66,8 +66,7 @@ module BenefitSponsors
       if is_application_valid? && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.approve_application! 
-
-          if benefit_application.open_enrollment_period.begin >= today
+          if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment! 
           end
         end
@@ -223,7 +222,18 @@ module BenefitSponsors
     end
 
     def hbx_enrollments_by_month(date)
-      BenefitApplicationEnrollmentsMonthlyQuery.new(self).call(date)
+      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
+      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }
+      enrollments = collection[0].last.map do |col|
+        col["hbx_enrollments"]
+      end
+      enrollments
+    end
+
+    def query(sponsored_benefit, date)
+      query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(benefit_application, sponsored_benefit).call(::Family, date)
+      return nil if query.count > 100
+      query
     end
 
     def application_eligibility_warnings
