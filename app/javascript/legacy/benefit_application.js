@@ -5,20 +5,24 @@ function showCostDetails(cost,min,max) {
 }
 
 function showEmployeeCostDetails(employees_cost) {
-  var modal = document.getElementById('eeCostModal')
-  modal.querySelectorAll('.row:not(.header)').forEach(function(element) {
-    element.remove()
-  });
-
-  for (let employee in employees_cost) {
+  var table = document.getElementById('eeTableBody');
+  //modal = document.getElementById('modalInformation')
+  //row = document.createElement('col-xs-12')
+  //row.innerHTML = `Plan Offerings - <br/>Employer Lowest/Reference/Highest -`
+  //modal.appendChild(row)
+  
+  for (var employee in employees_cost) {
+    var tr = document.createElement('tr')
     estimate = employees_cost[employee];
-    var newRow = document.importNode(modal.querySelector('.row.header'), true)
-    newRow.querySelector('.col-xs-4.name').innerHTML = estimate.name;
-    newRow.querySelector('.col-xs-2.dependents').innerHTML = estimate.dependent_count;
-    newRow.querySelector('.col-xs-2.min').innerHTML = estimate.lowest_cost_estimate;
-    newRow.querySelector('.col-xs-2.reference').innerHTML = estimate.reference_estimate;
-    newRow.querySelector('.col-xs-2.max').innerHTML = estimate.highest_cost_estimate;
-    modal.querySelector('.modal-body').appendChild(newRow);
+    tr.innerHTML =
+    `
+      <td class="text-center">${estimate.name}</td>
+      <td class="text-center">${estimate.dependent_count}</td>
+      <td class="text-center">$ ${estimate.lowest_cost_estimate}</td>
+      <td class="text-center">$ ${estimate.reference_estimate}</td>
+      <td class="text-center">$ ${estimate.highest_cost_estimate}</td>
+    `
+    table.appendChild(tr)
   }
 }
 
@@ -47,7 +51,6 @@ function calculateEmployerContributions(productOptionKind,referencePlanID, spons
     }
   });
 }
-
 
 module.exports = {
   calculateEmployerContributions : calculateEmployerContributions,

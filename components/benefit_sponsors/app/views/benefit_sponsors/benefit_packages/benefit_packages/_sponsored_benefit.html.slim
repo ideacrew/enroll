@@ -48,22 +48,22 @@
 
 // Employee Cost Detail Modal
 .modal.fade#eeCostModal tabindex="-1" role="dialog" aria-labelledby="eeCostModal"
-  .modal-dialog role="document"
+  .modal-dialog.modal-lg role="document"
     .modal-content
       .modal-header
         button.close type="button" data-dismiss="modal" aria-label="Close"
           span aria-hidden="true" &times
-        h3.heading-text Employee Costs
+        h3.heading-text.mb-0.mt-0 Employee Costs
       .modal-body
-        | Plan Offerings
-        .row.header
-          .col-xs-4.name
-            | Name
-          .col-xs-2.dependents
-            | Dependents
-          .col-xs-2.min
-            | Min
-          .col-xs-2.reference
-            | Reference
-          .col-xs-2.max
-            | Max
+        table.table
+					tr
+						td style="border-top:0" Plan Offerings -
+					tr
+						td style="border-top:0" Employer Lowest/Reference/Highest -
+					tr.eeTableHeader
+						td.text-center Employee
+						td.text-center Dependent Count
+						td.text-center Lowest Cost Available Plan
+						td.text-center Reference Plan
+						td.text-center Highest Cost Available Plan
+					tbody#eeTableBody
