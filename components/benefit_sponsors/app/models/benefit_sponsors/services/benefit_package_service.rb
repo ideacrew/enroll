@@ -143,17 +143,17 @@ module BenefitSponsors
         key = product.sbc_document.identifier.split("#")[1]
 
         sbc_url = "/document/download/#{bucket}/#{key}?content_type=application/pdf&filename=#{product.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
+        visit_types = []
 
         qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)
         if details.nil?
           types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
-          visit_types = []
           types.each do |type|
-            visit_types << qhps.first.qhp_service_visits.where(visit_type: type).first
+            visit_types << qhps.first.qhp_service_visits.where(visit_type: type).first if qhps.present?
           end
           visit_types
         else
-          visit_types = qhps.first.qhp_service_visits
+          visit_types = qhps.first.qhp_service_visits if qhps.present?
         end
 
         [qhps, visit_types, sbc_url]
