@@ -135,15 +135,6 @@ class TaxHousehold
     end
   end
 
-  def find_unchecked_eligible_family_mems(unchecked_family_members)
-    unchecked_eligible_fms= []
-    unchecked_family_members.each do |family_member|
-      aptc_member = tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true)
-      unchecked_eligible_fms << family_member if aptc_member.present?
-    end
-    return unchecked_eligible_fms
-  end
-
   def is_member_aptc_eligible?(family_member)
     aptc_members.map(&:family_member).include?(family_member)
   end
