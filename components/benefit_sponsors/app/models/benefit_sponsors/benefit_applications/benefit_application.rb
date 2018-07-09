@@ -116,11 +116,11 @@ module BenefitSponsors
     #                                             }
 
     scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.min" => compare_date )
+                                                                                           :"effective_period.min".lte => compare_date )
                                                                                            }
 
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.max" => compare_date )
+                                                                                           :"effective_period.max".lt => compare_date )
                                                                                            }
 
     scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -135,7 +135,7 @@ module BenefitSponsors
                                                                                            :"opem_enrollment_period.max".gte => compare_date)
                                                                                            }
     scope :open_enrollment_begin_on,        ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.min" => compare_date)
+                                                                                           :"open_enrollment_period.min".lte => compare_date)
                                                                                            }
     scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                            :"open_enrollment_period.max".lt => compare_date)

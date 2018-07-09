@@ -132,7 +132,7 @@ module BenefitSponsors
 
     scope :may_begin_open_enrollment?,  -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.min" => compare_date, :aasm_state => :approved }}
+        :$elemMatch => {:"open_enrollment_period.min".lte => compare_date, :aasm_state => :approved }}
       )
     }
 
@@ -144,13 +144,13 @@ module BenefitSponsors
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }}
+        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state => :enrollment_eligible }}
       )
     }
 
     scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
+        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :active }}
       )
     }
 
