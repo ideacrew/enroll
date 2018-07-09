@@ -164,10 +164,9 @@ module EnrollmentShopping
         end
 				enrollment.enrollment_kind = "special_enrollment"
         enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
-        # TODO: Assign sep
-			else
-				effective_date = earliest_eligible_date_for_shop(@employee_role)
-				enrollment.effective_on = effective_date
+        # TODO: Assign sep        
+      else
+				enrollment.effective_on = previous_enrollment.effective_on
 				enrollment.enrollment_kind = "open_enrollment"
 			end
 

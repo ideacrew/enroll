@@ -42,6 +42,11 @@ class Insured::GroupSelectionController < ApplicationController
     @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
       @new_effective_on = new_effective_date
     end
+
+    @adapter.if_change_plan_selected(params) do |new_effective_date|
+      @new_effective_on = new_effective_date
+    end
+
     @adapter.if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, @hbx_enrollment, @new_effective_on) do |enrollment|
       @hbx_enrollment = enrollment
     end
