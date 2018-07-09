@@ -6,7 +6,7 @@ namespace :cca do
     file = Roo::Spreadsheet.open(file_path)
     sheet = file.sheet(0)
     columns = sheet.row(1)
-    prod_sequence = ENV["employer_sequence"].present? ? ENV["employer_sequence"].to_i : 240000
+    prod_sequence = ENV["employer_sequence"].present? ? ENV["employer_sequence"].to_i : 234500
 
     puts "*** Started restoring HBX ID  for existing MPYC Employers ****"
 
