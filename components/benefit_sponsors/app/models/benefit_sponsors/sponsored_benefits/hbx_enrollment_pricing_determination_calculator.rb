@@ -229,7 +229,7 @@ module BenefitSponsors
 					"$or" => [
 						{ "terminated_on" => nil },
 						{ "terminated_on" => { "$gt" => as_of_date} },
-            { "terminated_on" => { "$lte" => coverage_start }, "aasm_state" => { "$in" => ["cobra_eligible", "cobra_linked", "cobra_termination_pending"] } }
+            { "terminated_on" => { "$lte" => as_of_date }, "aasm_state" => { "$in" => ["cobra_eligible", "cobra_linked", "cobra_termination_pending"] } }
 					]
 				)
 			end
