@@ -11,7 +11,7 @@ class CensusEmployee < CensusMember
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
   include BenefitSponsors::Concerns::Observable
-  include ModelEvents::CensusEmployee
+  include BenefitSponsors::ModelEvents::CensusEmployee
 
   require 'roo'
 
@@ -1211,10 +1211,6 @@ def self.to_csv
 
   def benefit_package_for_open_enrollment(shopping_date)
     active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
-  end
-
-  def benefit_package_for_date(coverage_date)
-    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
   end
 
   def benefit_package_for_date(coverage_date)

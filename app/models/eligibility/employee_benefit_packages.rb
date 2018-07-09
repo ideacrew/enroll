@@ -119,10 +119,14 @@ module Eligibility
     end
 
     def possible_benefit_package
-      if renewal_benefit_group_assignment.present? && (renewal_benefit_group_assignment.benefit_application.is_renewal_enrolling? || renewal_benefit_group_assignment.benefit_application.enrollment_eligible?)
-        renewal_benefit_group_assignment.benefit_package
-      elsif active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
-        active_benefit_group_assignment.benefit_package
+      if under_new_hire_enrollment_period?
+        benefit_package_for_date(earliest_eligible_date)
+      else
+        if renewal_benefit_group_assignment.present? && (renewal_benefit_group_assignment.benefit_application.is_renewal_enrolling? || renewal_benefit_group_assignment.benefit_application.enrollment_eligible?)
+          renewal_benefit_group_assignment.benefit_package
+        elsif active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+          active_benefit_group_assignment.benefit_package
+        end
       end
     end
 
