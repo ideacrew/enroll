@@ -7,6 +7,8 @@ namespace :cca do
     file = Roo::Spreadsheet.open(file_path)
     sheet = file.sheet(0)
     columns = sheet.row(1)
+    @person_prod_sequence = ENV["person_sequence"].present? ? ENV["person_sequence"].to_i : 130000
+    @policy_prod_sequence = ENV["policy_sequence"].present? ? ENV["policy_sequence"].to_i : 130000
 
     puts "*** Started restoring person HBX ID/ Enrollment HBX ID ****"
     puts "**** Note: IF primary person restore failed, we're not restoring corresponding Enrollment's Hbx ID ****"
@@ -43,6 +45,10 @@ namespace :cca do
     def restore_person_hbx_id(person, hbx_id, is_primary)
       prev_hbx_id = person.hbx_id
       type = is_primary ? "Subscriber" : "Dependent"
+      if prev_hbx_id.to_i < @person_prod_sequence
+        puts "Info: This is an existing #{type}. Not restoring HbxId for #{person.full_name} ** HbxId: #{prev_hbx_id}"
+        return true
+      end
       person.assign_attributes(hbx_id: hbx_id)
       if person.save
         puts "SUCCESS: HbxId updated for #{type} #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
@@ -53,6 +59,10 @@ namespace :cca do
 
     def restore_policy_hbx_id(policy, hbx_id, person)
       prev_hbx_id = policy.hbx_id
+      if prev_hbx_id.to_i < @policy_prod_sequence
+        puts "Info: This is an existing Policy. Not restoring HbxId for Policy of #{person.full_name} ** Policy HbxId: #{prev_hbx_id}"
+        return true
+      end
       policy.assign_attributes(hbx_id: hbx_id)
       if policy.save
         puts "SUCCESS: Policy HbxId updated for #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
@@ -106,7 +116,6 @@ namespace :cca do
       primary_first_name = parse_text(row["census_employee_first_name"])
       primary_dob = parse_date(row["census_employee_dob"])
       restorable_hbx_id = parse_text(row["census_employee_hbx_id"])
-
       people = find_people(primary_ssn, primary_dob, primary_last_name)
 
       if people.blank?

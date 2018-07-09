@@ -6,6 +6,7 @@ namespace :cca do
     file = Roo::Spreadsheet.open(file_path)
     sheet = file.sheet(0)
     columns = sheet.row(1)
+    prod_sequence = ENV["employer_sequence"].present? ? ENV["employer_sequence"].to_i : 240000
 
     puts "*** Started restoring HBX ID  for existing MPYC Employers ****"
 
@@ -18,7 +19,11 @@ namespace :cca do
       row = Hash[[columns, sheet.row(key)].transpose]
       fein = sanitize(row["FEIN"])
       restorable_hbx_id = sanitize(row["Organization assigned hbx_id"])
-      next if restorable_hbx_id.blank?
+
+      if restorable_hbx_id.blank?
+        puts "FAILURE: Restorable HbxId not found for #{fein}"
+        next
+      end
       sponsors = ::BenefitSponsors::Organizations::Organization.all.employer_profiles.where(fein: fein)
       if sponsors.blank? || sponsors.size != 1
         puts "FAILURE: Found No/More than 1 organization with FEIN: #{fein}."
@@ -27,6 +32,11 @@ namespace :cca do
 
       sponsor = sponsors.first
       prev_hbx_id = sponsor.hbx_id
+
+      if prev_hbx_id.to_i < prod_sequence
+        puts "Info: This is an Existing Employer. Not restoring HbxId for this Employer: #{sponsor.legal_name} ** HbxId: #{prev_hbx_id}"
+        next
+      end
 
       sponsor.assign_attributes(hbx_id: restorable_hbx_id)
       if sponsor.save
