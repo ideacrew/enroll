@@ -10,7 +10,7 @@ namespace :shop do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << ['ER POC Applicant Name','ER POC Email Address','ER Legal Name','ER FEIN','ER POC Application Date Time']
       pending.each do |role|
-        org = EmployerProfile.find(role.employer_profile_id).organization
+        org =  BenefitSponsors::Organizations::Organization.by_employer_profile(role.benefit_sponsor_employer_profile_id).first
         csv << [role.person.full_name, role.person.work_email_or_best, org.legal_name, org.fein, role.updated_at.to_s]
       end
     end
