@@ -7,8 +7,8 @@ namespace :cca do
     file = Roo::Spreadsheet.open(file_path)
     sheet = file.sheet(0)
     columns = sheet.row(1)
-    @person_prod_sequence = ENV["person_sequence"].present? ? ENV["person_sequence"].to_i : 130000
-    @policy_prod_sequence = ENV["policy_sequence"].present? ? ENV["policy_sequence"].to_i : 130000
+    @person_prod_sequence = ENV["person_sequence"].present? ? ENV["person_sequence"].to_i : 130078
+    @policy_prod_sequence = ENV["policy_sequence"].present? ? ENV["policy_sequence"].to_i : 129000
 
     puts "*** Started restoring person HBX ID/ Enrollment HBX ID ****"
     puts "**** Note: IF primary person restore failed, we're not restoring corresponding Enrollment's Hbx ID ****"
