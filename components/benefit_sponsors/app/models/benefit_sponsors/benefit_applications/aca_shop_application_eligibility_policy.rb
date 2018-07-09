@@ -89,8 +89,8 @@ module BenefitSponsors
           validate: -> (benefit_application) {
             TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
           },
-          success:  -> (benfit_application)  { "PY was bublished before #{benfit_application.last_day_to_publish} on #{TimeKeeper.date_of_record} " },
-          fail:     -> (benefit_application) { "#{benefit_application.last_day_to_publish} was the last day to publish your Plan Year" }
+          success:  -> (benfit_application)  { "Plan year was published before #{benfit_application.last_day_to_publish} on #{TimeKeeper.date_of_record} " },
+          fail:     -> (benefit_application) { "Plan year starting on #{benefit_application.start_on.to_date} must be published by #{benefit_application.last_day_to_publish.to_date}" }
 
     rule  :stubbed_rule_one,
             validate: -> (model_instance) {
@@ -106,29 +106,7 @@ module BenefitSponsors
             fail:     -> (model_instance){ "something went wrong!!" },
             success:  -> (model_instance){ "validated successfully" }
 
-
-    ######## ENROLLMENT Eligibility ############
-    rule  :minimum_participation_rule,
-            # validate: ->(benefit_application){ benefit_application.enrollment_ratio >= ENROLLMENT_RATIO_MINIMUM },
-            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum },
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
-
-    rule  :non_business_owner_enrollment_count,
-            validate: ->(benefit_application){
-                            benefit_application.non_business_owner_enrolled.count >= benefit_application.eligible_to_enroll_count &&
-                            benefit_application.non_business_owner_enrolled.count >= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
-                          },
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"At least #{Settings.aca.shop_market.non_owner_participation_count_minimum.to_f} non-owner employee must enroll" }
-
-    rule :minimum_eligible_member_count,
-            validate: ->(benefit_application){ benefit_application.eligible_to_enroll_count > 0 },
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
-
-    business_policy :passes_open_enrollment_period_policy,
-            rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
+    business_policy :passes_open_enrollment_period_policy, rules: []
 
     business_policy :submit_benefit_application,
             rules: [:open_enrollment_period_minimum,
@@ -141,22 +119,13 @@ module BenefitSponsors
                     :within_last_day_to_publish,
                     :benefit_application_fte_count]
 
-    business_policy :save_benefit_application,
-            rules: [:open_enrollment_period_minimum,
-                    :benefit_application_contains_benefit_packages,
-                    :benefit_packages_contains_reference_plans,
-                    :all_employees_are_assigned_benefit_package,
-                    :employer_profile_eligible,
-                    :employer_primary_office_location,
-                    :all_contribution_levels_min_met,
-                    :benefit_application_fte_count]
-
     business_policy  :stubbed_policy,
             rules: [:stubbed_rule_one, :stubbed_rule_two ]
 
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+
         case event_name
         when :submit_benefit_application
           business_policies[:submit_benefit_application]
@@ -165,7 +134,6 @@ module BenefitSponsors
         end
       end
     end
-
   end
 end
 
