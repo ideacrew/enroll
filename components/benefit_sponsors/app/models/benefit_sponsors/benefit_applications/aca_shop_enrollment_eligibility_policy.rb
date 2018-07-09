@@ -39,7 +39,7 @@ module BenefitSponsors
             fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
 
     business_policy :passes_open_enrollment_period_policy,
-            rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
+            rules: [:minimum_participation_rule, :minimum_eligible_member_count]
 
 
     # business_policy :loosely_passes_open_enrollment_period_policy,
