@@ -57,12 +57,20 @@ class Insured::GroupSelectionController < ApplicationController
     @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
+    if @employee_role.census_employee.present?
+      new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
+      if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
+        raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
+      end
+    end
+
     unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
       family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
+
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @adapter.is_waiving?(params)
       if hbx_enrollment.save
