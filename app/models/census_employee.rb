@@ -1217,10 +1217,6 @@ def self.to_csv
     active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
   end
 
-  def benefit_package_for_date(coverage_date)
-    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
-  end
-
   def earliest_benefit_package_after(coverage_date)
     active_benefit_group_assignment.benefit_package.earliest_benefit_package_after(coverage_date)
   end
