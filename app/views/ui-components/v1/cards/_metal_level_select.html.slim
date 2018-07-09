@@ -109,8 +109,10 @@
             i.far.fa-file-pdf.fa-2x.mr-1
             | Summary of Benefits and Coverage
         .pull-right
-          a.btn.btn-default.btn-sm.btn-more-details#btnMoreDetails onclick="showMoreDetails()" More Details
-          button.btn.btn-default.btn-sm data-dismiss="modal" style="margin-top:-1px" Close
+          button.btn.btn-default.btn-sm#btnMoreDetails type="button" onclick="showMoreDetails()" More Details
+          button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
+
+					
 
 javascript:
   var productOptionKind = String;
@@ -463,23 +465,16 @@ javascript:
 					})
 				})
 				.then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details")
-				// Refreshes page if more details selected die to modal not reopening when trigger more details
-				refreshPage = true;
 				showLess = true;
 				}
 	}
 	
-	
-	$('#viewSummaryModal').on('hide.bs.modal', function (e) {
-	  // Clears data from modal on close
+	$('#viewSummaryModal').on('hidden.bs.modal', function (e) {
+  	// Clears modal data on close
 		document.getElementById('modalSummaryData').innerHTML = '';
-		// Used to reload modal due to bug in code when add more details to modal display
-		if (refreshPage) {
-			location.reload()
-		}
+		document.getElementById('btnMoreDetails').innerHTML = "More Details"
 	})
-	
-	
+		
 - unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
