@@ -308,7 +308,6 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 
   # Benefit Group
   fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
-
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50

@@ -7,6 +7,12 @@ When(/I use unique values/) do
   @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
 end
 
+#Shows page with relevant CSS and javascripts loaded
+def show_page
+  save_page Rails.root.join( 'public', 'capybara.html' )
+  %x(launchy http://localhost:3000/capybara.html)
+end
+
 def people
   return @a if defined?(@a)
   @a = {
@@ -621,7 +627,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
 end
 
 Then(/^.+ should see the dependents page$/) do
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
 
