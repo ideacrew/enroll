@@ -1,5 +1,5 @@
 module BenefitSponsors
-  class BenefitSponsorships::AcaShopBenefitSponsorshipService
+  class BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService
     include ::Acapi::Notifiers
 
     INITIAL_EMPLOYER_TRANSMIT_EVENT     = "acapi.info.events.employer.benefit_coverage_initial_application_eligible"
@@ -34,16 +34,12 @@ module BenefitSponsors
     end
 
     def end_open_enrollment
-      benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
+      benefit_application = @benefit_sponsorship.benefit_applications.first #benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
       if benefit_application.present?
-        policy = business_policy_for(benefit_application, :end_open_enrollment)
-        if policy.is_satisfied?(benefit_application)
-          application_service_for(benefit_application).end_open_enrollment
-        else
-          #log errors - policy.fail_results
-        end
+        application_service_for(benefit_application).end_open_enrollment
       end
+
     end
 
     def begin_sponsor_benefit

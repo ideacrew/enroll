@@ -100,12 +100,15 @@ module BenefitSponsors
     end
 
     def end_open_enrollment
+
       if business_policy_satisfied_for?(:end_open_enrollment)
         if benefit_application.may_end_open_enrollment?
           benefit_application.end_open_enrollment!
           benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
           calculate_pricing_determinations(benefit_application)
+          [true, benefit_application, business_policy.success_results]
         end
+        [false, benefit_application, {:aasm_error => "may_end_open_enrollment? is false"}]
       else
         benefit_application.end_open_enrollment! if benefit_application.may_end_open_enrollment?
         benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
@@ -274,7 +277,11 @@ module BenefitSponsors
     end
 
     def business_policy_for(business_policy_name)
-      eligibility_policy.business_policies_for(benefit_application, business_policy_name)
+      if business_policy_name == :end_open_enrollment
+        enrollment_eligibility_policy.business_policies_for(benefit_application, business_policy_name)
+      else
+        application_eligibility_policy.business_policies_for(benefit_application, business_policy_name)
+      end
     end
 
     def policy_name(event_name)
@@ -290,9 +297,14 @@ module BenefitSponsors
       (errors[msg[0]] ||= []) << msg[1]
     end
 
-    def eligibility_policy
-      return @eligibility_policy if defined?(@eligibility_policy)
-      @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    def application_eligibility_policy
+      return @application_eligibility_policy if defined?(@application_eligibility_policy)
+      @application_eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+    end
+
+    def enrollment_eligibility_policy
+      return @enrollment_eligibility_policy if defined?(@enrollment_eligibility_policy)
+      @enrollment_eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
     end
 
     def due_date_for_publish

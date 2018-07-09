@@ -157,17 +157,15 @@ module BenefitSponsors
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-
         case event_name
         when :submit_benefit_application
           business_policies[:submit_benefit_application]
-        when :end_open_enrollment
-          business_policies[:passes_open_enrollment_period_policy]
         else
           business_policies[:stubbed_policy]
         end
       end
     end
+
   end
 end
 
