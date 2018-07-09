@@ -119,6 +119,10 @@ class CensusEmployee < CensusMember
     :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
     })}
 
+  scope :covered_progressbar,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state.in => ["coverage_selected","coverage_renewing"], :is_active => true }
+    })}
+
   scope :waived,    ->{ where(:"benefit_group_assignments" => {
     :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
     })}
