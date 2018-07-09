@@ -294,7 +294,8 @@ module BenefitSponsors
           title: reference_product.title,
           issuer_name: reference_product.issuer_profile.legal_name,
           plan_kind: reference_product.health_plan_kind,
-          metal_level_kind: reference_product.metal_level_kind
+          metal_level_kind: reference_product.metal_level_kind,
+          network_information: reference_product.network_information,
         })
       end
 
