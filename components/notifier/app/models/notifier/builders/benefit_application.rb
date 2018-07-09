@@ -26,7 +26,7 @@ module Notifier
     end
 
     def benefit_application_next_application_deadline
-      merge_model.benefit_application.next_application_deadline = Date.new(plan_year_next_available_start_date.year, plan_year_next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month)
+      merge_model.benefit_application.next_application_deadline = Date.new(benefit_application_next_available_start_date.year, benefit_application_next_available_start_date.prev_month.month, Settings.aca.shop_market.initial_application.advertised_deadline_of_month)
     end
 
     def benefit_application_renewal_py_end_date

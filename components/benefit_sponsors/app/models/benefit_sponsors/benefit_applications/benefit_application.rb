@@ -756,6 +756,10 @@ module BenefitSponsors
       benefit_sponsorship.application_event_subscriber(aasm)
     end
 
+    def coverage_renewable?
+      (APPROVED_STATES - [:approved]).include?(aasm_state)
+    end
+
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
 

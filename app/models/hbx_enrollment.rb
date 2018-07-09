@@ -604,13 +604,11 @@ class HbxEnrollment
   end
 
   def update_renewal_coverage
-    if is_applicable_for_renewal?
-      employer = benefit_group.plan_year.employer_profile
-      if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
-        begin
-          Factories::ShopEnrollmentRenewalFactory.new({enrollment: self}).update_passive_renewal
-        rescue Exception => e
-          Rails.logger.error { e }
+    if is_shop?
+      if successor_benefit_package = sponsored_benefit_package.successor
+        successor_application = successor_benefit_package.benefit_application
+        if successor_application.coverage_renewable?
+          renew_benefit(successor_benefit_package)
         end
       end
     end
