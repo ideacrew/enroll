@@ -100,12 +100,39 @@ class TaxHousehold
     {}
   end
 
-  def aptc_family_members
-    household.hbx_enrollments.enrolled.select{ |enr| enr.applied_aptc_amount > 0.00 }.flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+  def aptc_family_members_by_tax_household
+    members = household.hbx_enrollments.enrolled.by_submitted_after_datetime(self.created_at).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+    members.select{ |family_member| family_member if is_member_aptc_eligible?(family_member)}
   end
 
   def unwanted_family_members(hbx_enrollment)
-    ((family.active_family_members - hbx_enrollment.hbx_enrollment_members.map(&:family_member)) - aptc_family_members)
+    ((family.active_family_members - hbx_enrollment.hbx_enrollment_members.map(&:family_member)) - aptc_family_members_by_tax_household)
+  end
+
+  def is_all_aptc?(unchecked_family_members)
+    unchecked_eligible_fms= []
+    unchecked_family_members.each do |family_member|
+      aptc_member = tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true)
+      unchecked_eligible_fms << family_member if aptc_member.present?
+    end
+    return unchecked_eligible_fms
+  end
+
+  def is_member_aptc_eligible?(family_member)
+    aptc_members.map(&:family_member).include?(family_member)
+  end
+
+  def is_all_non_aptc?(hbx_enrollment)
+    non_aptc_members = []
+    family_members = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
+    family_members.each do |family_member|
+      non_aptc_members << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
+    end
+    if non_aptc_members.count == family_members.count
+      return true 
+    else
+      return false 
+    end
   end
 
   def find_unchecked_eligible_family_mems(unchecked_family_members)
@@ -124,11 +151,12 @@ class TaxHousehold
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
+    return 0 if is_all_non_aptc?(hbx_enrollment) #to validate if all checked members are medicaid
     total = family.active_family_members.reduce(0) do |sum, member|
       sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
     end
     unchecked_family_members = unwanted_family_members(hbx_enrollment)
-    unchecked_eligible_fms = find_unchecked_eligible_family_mems(unchecked_family_members)
+    unchecked_eligible_fms = is_all_aptc?(unchecked_family_members)
     deduction_amount = total_benchmark_amount(unchecked_eligible_fms) if unchecked_eligible_fms
     total = total - deduction_amount
     (total < 0.00) ? 0.00 : total

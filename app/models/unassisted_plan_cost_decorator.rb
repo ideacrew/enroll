@@ -49,7 +49,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   def aptc_amount(member)
     if @tax_household.present? && @tax_household.is_member_aptc_eligible?(member.family_member)
-      unchecked_eligible_fms = @tax_household.find_unchecked_eligible_family_mems(members.map(&:family_member))
+      unchecked_eligible_fms = @tax_household.is_all_aptc?(members.map(&:family_member))
       aptc_ratio = ((member.family_member.aptc_benchmark_amount)/@tax_household.total_benchmark_amount(unchecked_eligible_fms))
       applicable_aptc_for_member = @elected_aptc * aptc_ratio
       member_premium = premium_for(member)
