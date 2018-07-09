@@ -108,6 +108,19 @@ class TaxHousehold
     ((family.active_family_members - hbx_enrollment.hbx_enrollment_members.map(&:family_member)) - aptc_family_members)
   end
 
+  def find_unchecked_eligible_family_mems(unchecked_family_members)
+    unchecked_eligible_fms= []
+    unchecked_family_members.each do |family_member|
+      aptc_member = tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true)
+      unchecked_eligible_fms << family_member if aptc_member.present?
+    end
+    return unchecked_eligible_fms
+  end
+
+  def is_member_aptc_eligible?(family_member)
+    aptc_members.map(&:family_member).include?(family_member)
+  end
+
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
@@ -115,7 +128,8 @@ class TaxHousehold
       sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
     end
     unchecked_family_members = unwanted_family_members(hbx_enrollment)
-    deduction_amount = total_benchmark_amount(unchecked_family_members)
+    unchecked_eligible_fms = find_unchecked_eligible_family_mems(unchecked_family_members)
+    deduction_amount = total_benchmark_amount(unchecked_eligible_fms) if unchecked_eligible_fms
     total = total - deduction_amount
     (total < 0.00) ? 0.00 : total
   end
