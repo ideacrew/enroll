@@ -1,3 +1,6 @@
+# Generate report for all employer POCs pending for approval
+# To run this rake - RAILS_ENV=production bundle exec rake shop:employer_poc_pending_report
+
 namespace :shop do
   desc "Print out employer pending POCs"
   task :employer_poc_pending_report => :environment do
