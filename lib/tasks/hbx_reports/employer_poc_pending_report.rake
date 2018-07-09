@@ -17,7 +17,10 @@ namespace :shop do
         csv << [role.person.full_name, role.person.work_email_or_best, org.legal_name, org.fein, role.updated_at.to_s]
       end
     end
-    pubber = Publishers::Legacy::EmployerPocPendingReportPublisher.new
-    pubber.publish URI.join("file://", file_name)
+    
+    if Rails.env.production?
+      pubber = Publishers::Legacy::EmployerPocPendingReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
+    end
   end
 end
