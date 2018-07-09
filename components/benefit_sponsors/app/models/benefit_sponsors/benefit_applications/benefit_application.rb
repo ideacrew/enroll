@@ -97,7 +97,9 @@ module BenefitSponsors
 
     scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
     scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
-    scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
+    scope :enrolling,           ->{ any_in(aasm_state: ENROLLING_STATES) }
+    scope :enrolling_state,     ->{ where(aasm_state: :enrollment_open) }
+
     scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
     scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
     scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
@@ -136,7 +138,7 @@ module BenefitSponsors
                                                                                            :"open_enrollment_period.min" => compare_date)
                                                                                            }
     scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.max" => compare_date)
+                                                                                           :"open_enrollment_period.max".lt => compare_date)
                                                                                            }
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
