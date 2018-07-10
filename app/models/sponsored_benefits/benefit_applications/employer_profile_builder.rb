@@ -42,27 +42,31 @@ module SponsoredBenefits
         return true
       end
 
+      def cancel_any_previous_benefit_applications(organization, new_benefit_application)
+        benefit_sponsorship = organization.active_benefit_sponsorship
+        if benefit_sponsorship
+          benefit_sponsorship.benefit_applications.each do |benefit_application|
+            next unless ((new_benefit_application.id != benefit_application.id) && (benefit_application.start_on == new_benefit_application.start_on))
+            benefit_application.cancel! if benefit_application.may_cancel?
+          end
+        end
+      end
+
       def add_employer_profile
         add_census_members unless @organization_exists
       end
 
       def add_benefit_sponsors_benefit_application
         quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
-        if @organization.active_benefit_sponsorship.active_benefit_application.present? || @organization.active_benefit_sponsorship.is_conversion?
-          enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(quote_benefit_application)
-          status, renewed_benefit_application, results = enrollment_service.renew_application
-          if status
-            renewed_benefit_application
-          else
-            Rails.logger.error { "Unable to renew plan year for #{@organization.legal_name} due to #{results.values.to_sentence}" }
-          end
+
+        if quote_benefit_application.valid? && quote_benefit_application.save!
+          cancel_any_previous_benefit_applications(@organization, quote_benefit_application)
         end
 
         @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
           census_employee.save
         end
       end
-
 
       # Output the employer_profile
       def employer_profile
