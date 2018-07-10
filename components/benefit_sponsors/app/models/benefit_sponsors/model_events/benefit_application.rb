@@ -2,6 +2,8 @@ module BenefitSponsors
   module ModelEvents
     module BenefitApplication
 
+      APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
+
       REGISTERED_EVENTS = [
         :application_submitted,
         :ineligible_application_submitted,
