@@ -68,6 +68,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
             new_organization = self.initialize_new_organization(old_org, site)
 
             raise Exception unless new_organization.valid?
+            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
             new_organization.save!
 
             #Roles Migration

@@ -73,6 +73,7 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
             @benefit_sponsorship.save!
 
             raise Exception unless new_organization.valid?
+            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
             new_organization.save!
 
             #employer staff roles migration
