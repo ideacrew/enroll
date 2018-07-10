@@ -486,6 +486,7 @@ javascript:
 - unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
+      productsTotal = "#{@benefit_package_form.products_total}"
       document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
       productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}"
       displayReferencePlanDetails(null, {
