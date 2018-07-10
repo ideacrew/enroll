@@ -1,7 +1,21 @@
+function getCostDetails(min,max,cost) {
+  document.getElementById('employerCostTitle').innerHTML = '';
+  document.getElementById('employerCostTitle').append(`Employer Lowest/Reference/Highest - $${min}/$${cost}/$${max}`);
+}
+
 function showCostDetails(cost,min,max) {
-  document.getElementById('rpEstimatedMonthlyCost').append('$ '+cost);
-  document.getElementById('rpMin').append('$ '+min);
-  document.getElementById('rpMax').append('$ '+max);
+  document.getElementById('rpEstimatedMonthlyCost').innerHTML = ('$ '+cost);
+  document.getElementById('rpMin').innerHTML = ('$ '+ min);
+  document.getElementById('rpMax').innerHTML = ('$ '+ max);
+  if (document.getElementById('estimatedEEMin')) {
+    document.getElementById('estimatedEEMin').innerHTML = '$ '+ min;
+  }
+  if (document.getElementById('estimatedEEMax')) {
+    document.getElementById('estimatedEEMax').innerHTML = '$ '+ max;
+  }
+  if (document.getElementById('estimatedERCost')) {
+    document.getElementById('estimatedERCost').innerHTML = '$ '+ cost;
+  }
   getCostDetails(min,max,cost)
 }
 
@@ -65,7 +79,7 @@ function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, spon
   });
 }
 
-const calculateEmployeeCosts = debounceRequest(calculateEmployeeCosts, 1000);
+const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
 
 function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   var thing = $("input[name^='benefit_package['").serializeArray();
