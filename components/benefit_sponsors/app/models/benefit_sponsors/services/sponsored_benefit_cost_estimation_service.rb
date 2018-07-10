@@ -117,7 +117,7 @@ module BenefitSponsors
           sponsored_benefit,
           reference_product,
           package,
-          rebuild_sponsor_contribution: build_objects,
+          rebuild_sponsor_contribution: false,
           build_new_pricing_determination: build_objects)
         if sponsor_contribution.sponsored_benefit.pricing_determinations.any?
           pd = sponsor_contribution.sponsored_benefit.latest_pricing_determination
@@ -184,7 +184,7 @@ module BenefitSponsors
           sponsored_benefit,
           reference_product,
           package,
-          rebuild_sponsor_contribution: build_objects,
+          rebuild_sponsor_contribution: false,
           build_new_pricing_determination: build_objects)
         if sponsor_contribution.sponsored_benefit.pricing_determinations.any?
           pd = sponsor_contribution.sponsored_benefit.latest_pricing_determination
