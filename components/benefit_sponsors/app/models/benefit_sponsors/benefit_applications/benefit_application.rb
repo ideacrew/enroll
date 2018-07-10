@@ -452,10 +452,10 @@ module BenefitSponsors
       total_enrolled   = enrolled_families
 
       owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
-      filter_enrolled_employees(owner_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(owner_employees, total_enrolled)
 
       waived_employees = active_census_employees.select{|ce| ce.waived?}
-      filter_enrolled_employees(waived_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(waived_employees, total_enrolled)
 
       @enrolled_non_business_owner_members = total_enrolled
     end
@@ -601,6 +601,17 @@ module BenefitSponsors
       transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
     end
 
+    def recalc_pricing_determinations
+      benefit_packages.each do |benefit_package|
+        benefit_package.sponsored_benefits.each do |sb|
+          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_sponsorship, effective_period.min)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
+        end
+      end
+
+      self.save
+    end
+
     class << self
 
       def find(id)
@@ -630,7 +641,7 @@ module BenefitSponsors
       state :appealing            # request reversal of negative determination
       ## End optional states for exception processing
 
-      state :enrollment_open, after_enter: :renew_benefit_package_members # Approved application has entered open enrollment period
+      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members] # Approved application has entered open enrollment period
       state :enrollment_closed
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
