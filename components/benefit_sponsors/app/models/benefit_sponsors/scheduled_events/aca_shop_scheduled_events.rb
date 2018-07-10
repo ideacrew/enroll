@@ -103,8 +103,8 @@ module BenefitSponsors
         start_on = new_date.next_month.beginning_of_month
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
-
-        benefit_sponsors.may_renew_application?(start_on.prev_year).each do |benefit_sponsorship|
+        
+        benefit_sponsors.may_transmit_renewal_enrollment?(start_on).each do |benefit_sponsorship|
           execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
           execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
         end

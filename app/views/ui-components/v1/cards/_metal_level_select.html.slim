@@ -128,7 +128,7 @@ javascript:
 
   function radioSelected(element) {
     setCircle(element)
-    disablePlanYearButton()
+    disableNewPlanYearButton()
   }
 
   function setCircle(element) {
@@ -234,7 +234,7 @@ javascript:
 			      <div class="row sc-container">\
 			        <div class="col-xs-12 ml-2 mt-2">\
 			          <label class="container ml-1">' +contribution.display_name+'\
-			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="contributionAmounts(this)"/>\
+			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="newContributionAmounts(this)"/>\
 			            <span class="checkmark"></span>\
 			          </label>\
 			        </div>\
@@ -246,18 +246,13 @@ javascript:
 			        <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '" onchange="setInputSliderValue(this)" data-displayname="'+contribution.display_name+'" data-contribution-input="true">\
 			      </div>\
 			      <div class="col-xs-9">\
-			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
+			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setNumberInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
 			      </div>\
 			    </div>\
 			</div>'
       element.append(div)
     }
   }
-	
-	function getCostDetails(min,max,cost) {
-		document.getElementById('employerCostTitle').innerHTML = '';
-		document.getElementById('employerCostTitle').append(`Employer Lowest/Reference/Highest - $${min}/$${cost}/$${max}`);
-	}
 
   function displayReferencePlanDetails(element, options) {
     options = options || {};
@@ -282,14 +277,14 @@ javascript:
     calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
   }
 
-  function setInputValue(element) {
+  function setNumberInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
-    contributionAmounts(element)
+    newContributionAmounts(element)
   }
 
   function setInputSliderValue(element) {
     document.querySelector("[data-id='"+element.id+"']").value = element.value
-    contributionAmounts(element)
+    newContributionAmounts(element)
   }
 
   function showFormButtons() {
@@ -304,25 +299,25 @@ javascript:
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
 
-  function disablePlanYearButton() {
+  function disableNewPlanYearButton() {
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
-    disableAddBenefitPackageButton()
+    disableNewAddBenefitPackageButton()
 		preventSubmissionOnEnter()
   }
 
-  function enablePlanYearButton() {
+  function enableNewPlanYearButton() {
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.remove('disabled');
-    enableAddBenefitPackageButton()
+    enableNewAddBenefitPackageButton()
   }
 
-  function disableAddBenefitPackageButton() {
+  function disableNewAddBenefitPackageButton() {
     var addBenefitPackageButton = document.getElementById('addBenefitPackage');
     addBenefitPackageButton.classList.add('disabled')
   }
 
-  function enableAddBenefitPackageButton() {
+  function enableNewAddBenefitPackageButton() {
     var addBenefitPackageButton = document.getElementById('addBenefitPackage');
     addBenefitPackageButton.classList.remove('disabled')
   }
@@ -352,7 +347,7 @@ javascript:
   var familyOnly;
   var contributionInputs;
 
-  function contributionAmounts(element) {
+  function newContributionAmounts(element) {
     contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
     contributionHandlers = document.querySelectorAll(".contribution_handler")
 
@@ -415,12 +410,13 @@ javascript:
     })
 
     if (eeContribution < erCL || employeeOnly < erCL) {
-      disablePlanYearButton()
+      disableNewPlanYearButton()
     } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
-      disablePlanYearButton()
+      disableNewPlanYearButton()
     } else {
-			enablePlanYearButton()
+			enableNewPlanYearButton()
     }
+    displayReferencePlanDetails(document.querySelector("input[name='benefit_package[sponsored_benefits_attributes][0][reference_plan_id]']:checked"));
   }
   var selectedReferencePlanId;
 	var selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
