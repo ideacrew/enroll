@@ -25,8 +25,11 @@ module BenefitSponsors
             # end
 
             if new_model_event.event_key == :employer_open_enrollment_completed
-              notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
+              policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+              if policy.is_satisfied?(benefit_application)
+                notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
+                deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
+              end
             end
 
             if new_model_event.event_key == :renewal_application_created
