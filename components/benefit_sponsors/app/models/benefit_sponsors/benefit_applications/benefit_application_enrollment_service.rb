@@ -65,7 +65,7 @@ module BenefitSponsors
     def force_submit_application
       if is_application_valid? && is_application_eligible?
         if benefit_application.may_approve_application?
-          benefit_application.approve_application!
+          benefit_application.auto_approve_application!
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
           end

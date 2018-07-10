@@ -2,6 +2,7 @@ function showCostDetails(cost,min,max) {
   document.getElementById('rpEstimatedMonthlyCost').append('$ '+cost);
   document.getElementById('rpMin').append('$ '+min);
   document.getElementById('rpMax').append('$ '+max);
+  getCostDetails(min,max,cost)
 }
 
 function showEmployeeCostDetails(employees_cost) {
