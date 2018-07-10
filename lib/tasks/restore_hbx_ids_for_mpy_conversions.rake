@@ -36,7 +36,7 @@ namespace :cca do
       if dependents.size != 1
         puts "FAILURE: Found No primary person/More than 1 on record with last_name: #{last_name}. HbxId: #{hbx_id} failed"
         puts "Moving on to other dependents..."
-        @csv << ["FAILURE", "Dependent", last_name, "", "", "", "", "No Dependent Found for HbxId: #{hbx_id}"]
+        @csv << ["FAILURE", "Dependent", "", last_name, "", "", "", "", "No Dependent Found for HbxId: #{hbx_id}"]
       else
         dependent = dependents.first
         restore_person_hbx_id(dependent, hbx_id, false)
@@ -48,16 +48,16 @@ namespace :cca do
       type = is_primary ? "Subscriber" : "Dependent"
       if prev_hbx_id.to_i < @person_prod_sequence
         puts "Info: This is an existing #{type}. Not restoring HbxId for #{person.full_name} ** HbxId: #{prev_hbx_id}"
-        @csv << ["INFO", type, person.full_name, person.dob, person.ssn, prev_hbx_id, prev_hbx_id, " This is an existing #{type}"]
+        @csv << ["INFO", type, person.first_name, person.last_name, person.dob, person.ssn, prev_hbx_id, prev_hbx_id, " This is an existing #{type}"]
         return true
       end
       person.assign_attributes(hbx_id: hbx_id)
       if person.save
         puts "SUCCESS: HbxId updated for #{type} #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
-        @csv << ["SUCCESS", type, person.full_name, person.dob, person.ssn, prev_hbx_id, person.hbx_id, "SUCCESS"]
+        @csv << ["SUCCESS", type, person.first_name, person.last_name, person.dob, person.ssn, prev_hbx_id, person.hbx_id, "SUCCESS"]
       else
         puts "FAILURE: Hbx Id not updated for #{type} #{person.full_name} with errors: #{person.errors.full_messages}. HbxId: #{hbx_id} failed"
-        @csv << ["FAILURE", type, person.full_name, person.dob, person.ssn, "", "", "Found Errors while updating #{type}: #{policy.errors.full_messages}"]
+        @csv << ["FAILURE", type, person.first_name, person.last_name, person.dob, person.ssn, "", "", "Found Errors while updating #{type}: #{policy.errors.full_messages}"]
       end
     end
 
@@ -65,16 +65,16 @@ namespace :cca do
       prev_hbx_id = policy.hbx_id
       if prev_hbx_id.to_i < @policy_prod_sequence
         puts "Info: This is an existing Policy. Not restoring HbxId for Policy of #{person.full_name} ** Policy HbxId: #{prev_hbx_id}"
-        @csv << ["INFO", "Policy", person.full_name, person.dob, person.ssn, prev_hbx_id, prev_hbx_id, " This is an existing Policy"]
+        @csv << ["INFO", "Policy", person.first_name, person.last_name, person.dob, person.ssn, prev_hbx_id, prev_hbx_id, " This is an existing Policy"]
         return true
       end
       policy.assign_attributes(hbx_id: hbx_id)
       if policy.save
         puts "SUCCESS: Policy HbxId updated for #{person.full_name} from #{prev_hbx_id} to #{hbx_id}"
-        @csv << ["SUCCESS", "Policy", person.full_name, person.dob, person.ssn, prev_hbx_id, policy.hbx_id, "SUCCESS"]
+        @csv << ["SUCCESS", "Policy", person.first_name, person.last_name, person.dob, person.ssn, prev_hbx_id, policy.hbx_id, "SUCCESS"]
       else
         puts "Policy Hbx Id not updated on #{person.full_name} with errors: #{policy.errors.full_messages}. Enrollment HbxId: #{hbx_id} failed"
-        @csv << ["FAILURE", "Policy", person.full_name, person.dob, person.ssn, "", "", "Found Errors while updating policy: #{policy.errors.full_messages}"]
+        @csv << ["FAILURE", "Policy", person.first_name, person.last_name, person.dob, person.ssn, "", "", "Found Errors while updating policy: #{policy.errors.full_messages}"]
       end
     end
 
@@ -86,7 +86,7 @@ namespace :cca do
 
         if organizations.size != 1
           puts "FAILURE: Found More than 1 organization with legal_name: #{legal_name}. Policy HBX ID Restore failed. Subscriber hbx_id: #{primary_hbx_id}"
-          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "","", "", "Found More than 1 Organization with given legal name: #{legal_name}"]
+          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "","", "", "Found More than 1 Organization with given legal name: #{legal_name}"]
           return
         end
 
@@ -95,7 +95,7 @@ namespace :cca do
         application = applications.where(:"effective_period.min".in => MPY_EFFECTIVE_DATES).first
         if application.nil?
           puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} because of no MPY"
-          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "","", "", "No MPY Found"]
+          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "","", "", "No MPY Found"]
           return
         end
         pacakge_ids = application.benefit_packages.map(&:id)
@@ -104,13 +104,13 @@ namespace :cca do
 
         if policies.blank?
           puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} because no policy Found for MPY"
-          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "", "", "No Policy Found"]
+          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "", "", "", "No Policy Found"]
           return
         end
 
         if policies.size > 1
           puts "FAILURE: Policy restore failed on Subscriber: #{primary_hbx_id} found multiple Policies found for MPY"
-          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "", "", "Found multiple Policies"]
+          @csv << ["FAILURE", "Policy", primary_hbx_id, "", "", "", "", "", "Found multiple Policies"]
           return
         end
 
@@ -123,7 +123,8 @@ namespace :cca do
     field_names = %w(
       Status
       Role
-      PersonDetails
+      FirstName
+      LastName
       DOB
       SSN
       PrevHbxId
@@ -148,14 +149,14 @@ namespace :cca do
         if people.blank?
           puts "FAILURE: Found No person record with #{primary_first_name} #{primary_last_name}"
           puts "Skipping dependents information for this person if any..."
-          @csv << ["FAILURE", "Subscriber", (primary_first_name.to_s + primary_last_name.to_s), primary_dob, primary_ssn, "", "", "No Primary Found. So, skipped Dependents"]
+          @csv << ["FAILURE", "Subscriber", primary_first_name.to_s, primary_last_name.to_s, primary_dob, primary_ssn, "", "", "No Primary Found. So, skipped Dependents"]
           next
         end
 
         if people.size != 1
           puts "FAILURE: Found More than 1 person record with #{primary_first_name} #{primary_last_name}"
           puts "Skipping dependents information for this person if any..."
-          @csv << ["FAILURE", "Subscriber", (primary_first_name + primary_last_name), primary_dob, primary_ssn, "", "", "Found More than 1 Primary. So, skipped Dependents"]
+          @csv << ["FAILURE", "Subscriber", primary_first_name, primary_last_name, primary_dob, primary_ssn, "", "", "Found More than 1 Primary. So, skipped Dependents"]
           next
         end
 
@@ -188,7 +189,7 @@ namespace :cca do
 
           if policies.blank?
             puts "FAILURE: Spreadsheet has policy Hbx Id. But no Enrollment present in Subscriber account. Person HbxId: #{primary_person.hbx_id} "
-            @csv << ["FAILURE", "Policy", (primary_person.full_name), primary_person.dob, primary_person.ssn, "", "", "Spreadsheet has policy Hbx Id. But no Enrollment present in Subscriber account"]
+            @csv << ["FAILURE", "Policy", person.first_name, person.last_name, primary_person.dob, primary_person.ssn, "", "", "Spreadsheet has policy Hbx Id. But no Enrollment present in Subscriber account"]
             next
           end
 
@@ -205,7 +206,7 @@ namespace :cca do
           end
         rescue Exception => e
           puts "FAILURE: Error while updating policy #{policy_restorable_hbx_id}: #{e}"
-          @csv << ["FAILURE", "Policy", (primary_person.full_name), primary_person.dob, primary_person.ssn, "", "", "Error while updating policy: #{e}"]
+          @csv << ["FAILURE", "Policy", person.first_name, person.last_name, primary_person.dob, primary_person.ssn, "", "", "Error while updating policy: #{e}"]
         end
       end
     end
