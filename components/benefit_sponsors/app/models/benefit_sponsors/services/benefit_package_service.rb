@@ -86,7 +86,7 @@ module BenefitSponsors
         benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
         if benefit_application.benefit_packages.size > 1
-          if benefit_package.cancel_member_benefits
+          if benefit_package.cancel_member_benefits(delete_benefit_package: true)
             return [true, benefit_package]
           else
             map_errors_for(benefit_package, onto: form)

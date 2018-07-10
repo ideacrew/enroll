@@ -312,7 +312,7 @@ module BenefitSponsors
         end
       end
 
-      def cancel_member_benefits
+      def cancel_member_benefits(delete_benefit_package: false)
         deactivate_benefit_group_assignments
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
@@ -322,7 +322,7 @@ module BenefitSponsors
             hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
           end
         end
-        deactivate
+        deactivate if delete_benefit_package
       end
 
       def deactivate_benefit_group_assignments
