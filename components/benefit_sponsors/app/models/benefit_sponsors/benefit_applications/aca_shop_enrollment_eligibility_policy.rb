@@ -27,7 +27,7 @@ module BenefitSponsors
 
     rule  :non_business_owner_enrollment_count,
             validate: ->(benefit_application){
-                            benefit_application.non_business_owner_enrolled.count >= benefit_application.eligible_to_enroll_count &&
+                            benefit_application.non_business_owner_enrolled.count <= benefit_application.eligible_to_enroll_count &&
                             benefit_application.non_business_owner_enrolled.count >= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
                           },
             success:  ->(benefit_application){"validated successfully"},
