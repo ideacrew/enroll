@@ -213,6 +213,6 @@ describe FamilyMember, "aptc_benchmark_amount" do
   
   it "should error when trying to save duplicate family member" do
     family_member = FamilyMember.new(:person => person) 
-    expect(family_member.aptc_benchmark_amount).to eq 511.62
+    expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
   end
 end

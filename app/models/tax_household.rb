@@ -128,11 +128,7 @@ class TaxHousehold
     family_members.each do |family_member|
       non_aptc_members << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
     end
-    if non_aptc_members.count == family_members.count
-      return true 
-    else
-      return false 
-    end
+    non_aptc_members.count == family_members.count
   end
 
   def is_member_aptc_eligible?(family_member)
