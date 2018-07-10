@@ -452,10 +452,10 @@ module BenefitSponsors
       total_enrolled   = enrolled_families
 
       owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
-      filter_enrolled_employees(owner_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(owner_employees, total_enrolled)
 
       waived_employees = active_census_employees.select{|ce| ce.waived?}
-      filter_enrolled_employees(waived_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(waived_employees, total_enrolled)
 
       @enrolled_non_business_owner_members = total_enrolled
     end
