@@ -333,10 +333,12 @@ module BenefitSponsors
           end
 
           other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
-          if self.benefit_application.is_renewing?
-            ce.add_renew_benefit_group_assignment([other_benefit_package])
-          else
-            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+          if other_benefit_package.present?
+            if self.benefit_application.is_renewing?
+              ce.add_renew_benefit_group_assignment([other_benefit_package])
+            else
+              ce.find_or_create_benefit_group_assignment([other_benefit_package])
+            end
           end
         end
       end
