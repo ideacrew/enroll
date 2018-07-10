@@ -14,7 +14,7 @@ namespace :cca do
     puts "**** Note: IF primary person restore failed, we're not restoring corresponding Enrollment's Hbx ID ****"
 
     def find_people(ssn, dob, last_name)
-      Person.all.matchable(ssn, dob, last_name)
+      Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob, last_name:  /^#{last_name}$/i)
     end
 
     def parse_text(val)
