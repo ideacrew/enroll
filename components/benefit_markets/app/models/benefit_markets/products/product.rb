@@ -150,6 +150,24 @@ module BenefitMarkets
       issuer_profile
     end
 
+    def min_cost_for_application_period(effective_date)
+      p_tables = premium_tables.effective_period_cover(effective_date)
+      if premium_tables.any?
+        p_tables.flat_map(&:premium_tuples).select do |pt|
+          pt.age == premium_ages.min
+        end.min_by { |pt| pt.cost }.cost
+      end
+    end
+
+    def max_cost_for_application_period(effective_date)
+      p_tables = premium_tables.effective_period_cover(effective_date)
+      if premium_tables.any?
+        p_tables.flat_map(&:premium_tuples).select do |pt|
+          pt.age == premium_ages.min
+        end.max_by { |pt| pt.cost }.cost
+      end
+    end
+
     def cost_for_application_period(application_period)
       p_tables = premium_tables.effective_period_cover(application_period.min)
       if premium_tables.any?
