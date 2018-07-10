@@ -26,24 +26,28 @@ namespace :reports do
         invitations.each do |invitation|
           unless BrokerRole.find(invitation.source_id).nil?
             broker=BrokerRole.find(invitation.source_id)
-            unless broker.nil?
-              csv << [
-                broker.broker_agency_profile.try(:legal_name),
-                broker.person.first_name,
-                broker.person.last_name,
-                broker.email_address,
-                broker.npn,
-                invitation.created_at,
-                "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
-              ]
-              processed_count += 1
+            if broker.broker_agency_profile.class == BenefitSponsors::Organizations::BrokerAgencyProfile
+              unless broker.nil?
+                csv << [
+                  broker.broker_agency_profile.try(:legal_name),
+                  broker.person.first_name,
+                  broker.person.last_name,
+                  broker.email_address,
+                  broker.npn,
+                  invitation.created_at,
+                  "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
+                ]
+                processed_count += 1
               end
+            end
           end
         end
       end
 
-      pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
+      if Rails.env.production?
+        pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+      end
 
       puts "#{processed_count} Brokers to output file: #{file_name}"
     end
