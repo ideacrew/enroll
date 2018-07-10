@@ -202,17 +202,25 @@ describe FamilyMember, "given a relationship to update" do
 end
 
 describe FamilyMember, "aptc_benchmark_amount" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
-
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:plan) do
+    FactoryBot.create(
+      :benefit_markets_products_health_products_health_product,
+      benefit_market_kind: :aca_individual,
+      kind: :health, csr_variant_id: '01',
+      metal_level: 'gold',
+      active_year: TimeKeeper.date_of_record.year,
+      hios_id: '11111111122302-01'
+    )
+  end
   before do
     allow_any_instance_of(BenefitCoveragePeriod).to receive(:second_lowest_cost_silver_plan).and_return(plan)
   end
 
   it 'should error when trying to save duplicate family member' do
     family_member = FamilyMember.new(:person => person)
-    expect(family_member.aptc_benchmark_amount).to eq 511.62
+    expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
   end
 end

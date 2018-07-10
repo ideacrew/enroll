@@ -262,6 +262,30 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
+  context 'is_all_non_aptc?' do
+    let!(:family) {create(:family, :with_primary_family_member_and_dependent)}
+    let(:household) {create(:household, family: family)}
+    let!(:tax_household) {create(:tax_household, household: household)}
+    let(:hbx_enrollment) {create(:hbx_enrollment, :with_enrollment_members, household: household)}
+
+    context 'when all family_members are medicaid' do
+      before do
+        allow(tax_household).to receive(:is_all_non_aptc?).and_return false
+      end
+      it 'should return false' do
+        result = tax_household.is_all_non_aptc?(hbx_enrollment)
+        expect(result).to eq(false)
+      end
+    end
+
+    context 'when all family_members are not medicaid' do
+      it 'should return true' do
+        result = tax_household.is_all_non_aptc?(hbx_enrollment)
+        expect(result).to eq(true)
+      end
+    end
+  end
+
   context 'total_aptc_available_amount_for_enrollment' do
     let!(:family) { create(:family, :with_primary_family_member_and_dependent) }
     let(:household) { create(:household, family: family) }
@@ -282,9 +306,22 @@ RSpec.describe TaxHousehold, type: :model do
         allow(tax_household).to receive(:unwanted_family_members).and_return []
       end
 
-      it 'should return all members amount' do
-        result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
-        expect(result).to eq(total_aptc_available_amount)
+      context 'when all family_members are medicaid' do
+        before do
+          allow(tax_household).to receive(:is_all_non_aptc?).and_return false
+        end
+
+        it 'should return all members amount' do
+          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
+          expect(result).to eq(total_aptc_available_amount)
+        end
+      end
+
+      context 'when all family_members are not medicaid' do
+        it 'should return 0' do
+          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
+          expect(result).to eq(0)
+        end
       end
     end
 
@@ -293,6 +330,8 @@ RSpec.describe TaxHousehold, type: :model do
       before do
         allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
         allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
+        allow(tax_household).to receive(:is_all_non_aptc?).and_return false
+        allow(tax_household).to receive(:is_all_aptc?).and_return true
       end
 
       it 'should deduct benchmark cost' do
