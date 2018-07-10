@@ -71,7 +71,7 @@ module BenefitSponsors
           end
         end
       else
-        benefit_application.submit_for_review if benefit_application.may_submit_for_review?
+        benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
         errors = application_errors.merge(open_enrollment_date_errors)
         [false, benefit_application, errors]
       end
@@ -100,7 +100,6 @@ module BenefitSponsors
     end
 
     def end_open_enrollment
-
       if business_policy_satisfied_for?(:end_open_enrollment)
         if benefit_application.may_end_open_enrollment?
           benefit_application.end_open_enrollment!
