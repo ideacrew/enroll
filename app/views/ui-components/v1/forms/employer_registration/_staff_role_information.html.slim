@@ -17,7 +17,7 @@
           Please provide a last name.
     .col-md-4
       label for="inputDob"  Date of Birth *
-      = f.text_field :dob, {pattern:"\d{1,2}/\d{1,2}/\d{4}", :class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10}
+      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10, minlength:10}
       .invalid-feedback
         |
           Please provide a date of birth.
