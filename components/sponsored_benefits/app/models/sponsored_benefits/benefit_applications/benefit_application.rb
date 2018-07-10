@@ -144,9 +144,7 @@ module SponsoredBenefits
         set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
         new_benefit_application.pull_benefit_sponsorship_attributes
         if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
-          cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
           update_benefit_sponsor_catalog(new_benefit_application, new_benefit_sponsorship)
-          new_benefit_application.save!
           add_benefit_packages(new_benefit_application)
         end
 
@@ -166,24 +164,13 @@ module SponsoredBenefits
         end
       end
 
-      def cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
-        new_benefit_sponsorship.benefit_applications.each do |benefit_application|
-          next unless ((new_benefit_application.id != benefit_application.id) && (benefit_application.start_on == new_benefit_application.start_on))
-          benefit_application.cancel! if benefit_application.may_cancel?
-        end
-      end
-
       def add_benefit_packages(new_benefit_application)
         benefit_groups.each do |benefit_group|
-          benefit_package = BenefitSponsors::BenefitPackages::BenefitPackageFactory.call(new_benefit_application, benefit_package_attributes(benefit_group))
-          if benefit_package.valid?
-            benefit_package.sponsored_benefits.each do |sb|
-              cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(new_benefit_application.benefit_sponsorship, new_benefit_application.effective_period.min)
-              sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-              sbenefit.save!
-            end
-            benefit_package.save!
+          importer = BenefitSponsors::Importers::BenefitPackageImporter.call(new_benefit_application, sanitize_benefit_group_attrs(benefit_group))
+          if importer.benefit_package
+            importer.benefit_package.save!
           end
+          set_predecessor_for_benefit_package(new_benefit_application, importer.benefit_package)
         end
       end
 
@@ -196,102 +183,43 @@ module SponsoredBenefits
         end
       end
 
-      def benefit_package_attributes(benefit_group)
-        attributes = {
-          title: benefit_group.title,
-          description: benefit_group.description,
-          probation_period_kind: benefit_group.effective_on_kind,
-          sponsored_benefits_attributes: sponsored_benefits_attributes(benefit_group)
-        }
+      def set_predecessor_for_benefit_package(benefit_application, benefit_package)
+        return unless benefit_application.predecessor_id.present?
+        predecessor_application = benefit_application.predecessor
+        predecessor_benefit_packages = benefit_application.predecessor.benefit_packages
+
+        if predecessor_benefit_packages.count < 2
+          benefit_package.predecessor_id  = benefit_application.predecessor.benefit_packages.first.id
+          return
+        end
+
+        new_package_hios_id = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
+        predecessor_benefit_packages.each do |predecessor_package|
+          predecessor_package_hios_id = predecessor_package.health_sponsored_benefit.products(predecessor_application.effective_period.min).map(&:hios_id)
+          if ((new_package_hios_id.size == predecessor_package_hios_id.size) && ((new_package_hios_id && predecessor_package_hios_id).size == new_package_hios_id.size))
+            benefit_package.predecessor_id  = predecessor_package.id
+          end
+        end
       end
 
-      def sponsored_benefits_attributes(benefit_group)
-        attributes = []
-        sponsored_benefit_kinds(benefit_group).each do |sponsored_benefit_kind|
-          pp_kind = product_package_kind(benefit_group)
+      def sanitize_benefit_group_attrs(benefit_group)
+        attributes = benefit_group.attributes.slice(
+          :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
+          :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
+          )
 
-          attributes << {
-            kind: sponsored_benefit_kind,
-            product_package_kind: pp_kind,
-            product_option_choice: product_option_choice(benefit_group, sponsored_benefit_kind, pp_kind),
-            reference_plan_id: set_reference_product_id(benefit_group, sponsored_benefit_kind),
-            sponsor_contribution_attributes: sponsor_contribution_attributes(benefit_group, sponsored_benefit_kind, pp_kind)
+        attributes[:is_default] = benefit_group.default
+        attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
+        attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+        attributes[:composite_tier_contributions] = benefit_group.composite_tier_contributions.inject([]) do |contributions, tier|
+          contributions << {
+            relationship: tier.composite_rating_tier,
+            offered: tier.offered,
+            premium_pct: tier.employer_contribution_percent,
+            estimated_tier_premium: tier.estimated_tier_premium
           }
         end
         attributes
-      end
-
-      def sponsor_contribution_attributes(benefit_group, kind, pp_kind)
-        rel_benefits = if kind == :health && pp_kind == :single_product
-          benefit_group.composite_tier_contributions
-        elsif kind == :health
-          benefit_group.relationship_benefits
-        elsif kind == :dental
-          benefit_group.dental_relationship_benefits
-        end
-        contribution_levels = rel_benefits.where(:relationship.ne => "child_26_and_over").inject([]) do |contribution_levels, rel_benefit|
-          contribution_levels << {
-            display_name: (rel_benefit.try(:relationship) || rel_benefit.try(:composite_rating_tier)).titleize,
-            contribution_factor: ((rel_benefit.try(:premium_pct) || rel_benefit.try(:employer_contribution_percent)) * 0.01),
-            is_offered: rel_benefit.offered
-          }
-        end
-
-        { contribution_levels_attributes: contribution_levels}
-      end
-
-      def set_reference_product_id(benefit_group, sponsored_benefit_kind)
-        plan = fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
-        product = fetch_product_from_plan(plan)
-        product.id
-      end
-
-      #returns health or dental plan
-      def fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
-        if sponsored_benefit_kind == :health
-          benefit_group.reference_plan
-        elsif sponsored_benefit_kind == :dental
-          benefit_group.dental_reference_plan
-        end
-      end
-
-      def product_option_choice(benefit_group, sponsored_benefit_kind, pp_kind)
-        plan = fetch_desired_reference_plan(benefit_group, sponsored_benefit_kind)
-        product = fetch_product_from_plan(plan)
-        {
-          :single_issuer => product.issuer_profile_id,
-          :single_product => product.issuer_profile_id,
-          :metal_level => product.metal_level_kind
-        }[pp_kind]
-      end
-
-      #returns corresponding product for a plan
-      def fetch_product_from_plan(plan)
-        BenefitMarkets::Products::Product.where({
-          "application_period.min" => {"$lte" => effective_period.min},
-          "application_period.max" => {"$gte" => effective_period.min},
-          "hios_id" => plan.hios_id
-        }).first
-      end
-
-      def product_package_kind(benefit_group)
-        case benefit_group.plan_option_kind
-        when "single_carrier"
-          :single_issuer
-        when "single_plan"
-          :single_product
-        when "metal_level"
-          :metal_level
-        when "sole_source"
-          :single_product
-        end
-      end
-
-      def sponsored_benefit_kinds(benefit_group)
-        sponsored_benefit_kinds = []
-        sponsored_benefit_kinds << benefit_group.reference_plan.coverage_kind.to_sym if benefit_group.reference_plan
-        sponsored_benefit_kinds << benefit_group.dental_reference_plan.coverage_kind.to_sym if benefit_group.dental_reference_plan
-        sponsored_benefit_kinds
       end
 
       class << self
