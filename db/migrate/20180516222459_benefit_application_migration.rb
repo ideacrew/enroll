@@ -54,6 +54,7 @@ class BenefitApplicationMigration < Mongoid::Migration
         benefit_sponsorship.registered_on = old_org.employer_profile.registered_on
         benefit_sponsorship.effective_begin_on = self.get_benefit_sponsorship_effective_on(old_org)
         construct_workflow_state_for_benefit_sponsorship(benefit_sponsorship, old_org)
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save)
         benefit_sponsorship.save
 
         old_org.employer_profile.plan_years.asc(:start_on).each do |plan_year|
@@ -80,6 +81,7 @@ class BenefitApplicationMigration < Mongoid::Migration
             end
 
             if benefit_application.valid? && self.new_benfit_application_product_valid(self.get_plan_hios_ids_of_plan_year(plan_year), self.get_plan_hios_ids_of_benefit_application(benefit_application))
+              BenefitSponsors::BenefitApplications::BenefitApplication.skip_callback(:save, :after, :notify_on_save)
               benefit_application.save!
               assign_employee_benefits(benefit_sponsorship)
               print '.' unless Rails.env.test?
@@ -345,6 +347,7 @@ class BenefitApplicationMigration < Mongoid::Migration
         CensusEmployee.skip_callback(:save, :after, :assign_default_benefit_package)
         CensusEmployee.skip_callback(:save, :after, :assign_benefit_packages)
         CensusEmployee.skip_callback(:save, :after, :construct_employee_role)
+        CensusEmployee.skip_callback(:update, :after, :update_hbx_enrollment_effective_on_by_hired_on)
         census_employee.save(:validate => false)
       end
     end
