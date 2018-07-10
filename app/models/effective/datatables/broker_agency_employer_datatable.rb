@@ -25,7 +25,7 @@
             if active_plan_year_start.nil?
               "No Active Plan"
             else
-              active_plan_year_start
+              active_plan_year_start.strftime("%m/%d/%Y")
             end
 
             }, :sortable => false, :filter => false
