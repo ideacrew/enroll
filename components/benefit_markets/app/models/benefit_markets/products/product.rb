@@ -153,7 +153,9 @@ module BenefitMarkets
     def cost_for_application_period(application_period)
       premium_table = premium_tables.effective_period_cover(application_period.min).first
       if premium_table
-        premium_table.premium_tuples.first.cost
+        premium_table.premium_tuples.select do |pt|
+          pt.age == premium_ages.min
+        end.min_by { |pt| pt.cost }.cost
       end
     end
 
