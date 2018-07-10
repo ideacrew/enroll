@@ -30,8 +30,21 @@ function showEmployeeCostDetails(employees_cost) {
   }
 }
 
+function debounceRequest(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		clearTimeout(timeout);
+		timeout = setTimeout(function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		}, wait);
+		if (immediate && !timeout) func.apply(context, args);
+	};
+}
 
-function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBenefitId)  {
+
+function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   var thing = $("input[name^='benefit_package['").serializeArray();
   var submitData = {};
   for (item in thing) {
@@ -52,7 +65,9 @@ function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBene
   });
 }
 
-function calculateEmployerContributions(productOptionKind,referencePlanID, sponsoredBenefitId)  {
+const calculateEmployeeCosts = debounceRequest(calculateEmployeeCosts, 1000);
+
+function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId)  {
   var thing = $("input[name^='benefit_package['").serializeArray();
   var submitData = { };
   for (item in thing) {
@@ -75,6 +90,8 @@ function calculateEmployerContributions(productOptionKind,referencePlanID, spons
     }
   });
 }
+
+const calculateEmployerContributions = debounceRequest(calculateEmployerContributionsImmediate, 1000);
 
 module.exports = {
   calculateEmployerContributions : calculateEmployerContributions,
