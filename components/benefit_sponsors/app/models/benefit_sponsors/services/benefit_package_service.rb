@@ -47,16 +47,12 @@ module BenefitSponsors
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
             sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
-            costs = nil
+            costs = []
             if sponsored_benefit && !sponsored_benefit.new_record?
               estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
               costs = estimator.calculate_employee_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+              sponsored_benefit_form.employees_cost = costs
             end
-            sponsored_benefit_form.name = costs.present? ? costs[:name] : ""
-            sponsored_benefit_form.dependent_count = costs.present? ? costs[:dependent_count] : ""
-            sponsored_benefit_form.highest_cost_estimate = costs.present? ? costs[:highest_cost_estimate] : 0.00
-            sponsored_benefit_form.lowest_cost_estimate = costs.present? ? costs[:lowest_cost_estimate] : 0.00
-            sponsored_benefit_form.reference_estimate = costs.present? ? costs[:reference_estimate] : 0.00
           end
         end
       end
