@@ -877,6 +877,11 @@ module BenefitSponsors
       enrolled_members
     end
 
+    # Slightly different logic to count covered renewing to support correct progress bar
+    def progressbar_covered_count
+      find_census_employees.covered_progressbar.count
+    end
+
     def covered_count
       warn "[Deprecated] Instead use: enrolled_member_count" unless Rails.env.production?
       enrolled_member_count
