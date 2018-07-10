@@ -113,10 +113,11 @@ class EmployeeRole
       qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
     else
       if census_employee.under_new_hire_enrollment_period?
-        census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
-      else
-        census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+        benefit_package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
+        return benefit_package if benefit_package.present?
       end
+
+      census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
     end
   end
 

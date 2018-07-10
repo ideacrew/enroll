@@ -159,7 +159,9 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
     end
 
     new_broker_agency_account.benefit_sponsors_broker_agency_profile_id = broker_agency_profile_id
+    BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:save, :after, :notify_on_save)
     new_broker_agency_account.save!
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save)
     benefit_sponsorship.save!
     @total_bk_accounts += 1
   end
