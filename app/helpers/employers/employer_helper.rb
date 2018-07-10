@@ -148,10 +148,9 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    benefit_applications = @benefit_sponsorship.benefit_applications.select{|b_app| (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + [:draft]).include?(b_app.aasm_state) && b_app.end_on > TimeKeeper.date_of_record}
-    benefit_packages = benefit_applications.flat_map(&:benefit_packages)
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present?
     renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
-    return benefit_packages, (renewing_benefit_packages || [])
+    return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
   def current_option_for_initial_benefit_package

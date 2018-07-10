@@ -141,6 +141,7 @@ module SponsoredBenefits
           effective_period: effective_period,
           open_enrollment_period: open_enrollment_period
         )
+        set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
         new_benefit_application.pull_benefit_sponsorship_attributes
         if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
           cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
@@ -150,6 +151,19 @@ module SponsoredBenefits
         end
 
         new_benefit_application
+      end
+
+      def set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
+        predecessor_applications = new_benefit_sponsorship.benefit_applications.where(:"effective_period.max" => new_benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
+        if predecessor_applications.present?
+          if predecessor_applications.count < 2
+            new_benefit_application.predecessor_id = predecessor_applications.first.id
+          elsif predecessor_applications.where(:"effective_period.max" => Date.new(2018,7,31)).count == 2  # exception case for 8/1 conversion
+            new_benefit_application.predecessor_id = predecessor_applications.where(aasm_state: :imported).first.id
+          else
+            new_benefit_application.predecessor_id = predecessor_applications.first.id
+          end
+        end
       end
 
       def cancel_any_previous_benefit_applications(new_benefit_sponsorship, new_benefit_application)
@@ -162,12 +176,13 @@ module SponsoredBenefits
       def add_benefit_packages(new_benefit_application)
         benefit_groups.each do |benefit_group|
           benefit_package = BenefitSponsors::BenefitPackages::BenefitPackageFactory.call(new_benefit_application, benefit_package_attributes(benefit_group))
-          if benefit_package.valid? && benefit_package.save!
+          if benefit_package.valid?
             benefit_package.sponsored_benefits.each do |sb|
               cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(new_benefit_application.benefit_sponsorship, new_benefit_application.effective_period.min)
               sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
               sbenefit.save!
             end
+            benefit_package.save!
           end
         end
       end

@@ -381,7 +381,7 @@ module BenefitSponsors
     end
 
     def is_renewing?
-      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
     end
 
     def is_renewal_enrolling?
@@ -886,6 +886,11 @@ module BenefitSponsors
     def covered
       warn "[Deprecated] Instead use: enrolled_members" unless Rails.env.production?
       enrolled_members
+    end
+
+    # Slightly different logic to count covered renewing to support correct progress bar
+    def progressbar_covered_count
+      find_census_employees.covered_progressbar.count
     end
 
     def covered_count

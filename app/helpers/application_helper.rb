@@ -460,7 +460,7 @@ module ApplicationHelper
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
     non_owner = plan_year.non_business_owner_enrolled.count
-    covered = plan_year.covered_count
+    covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
     unless eligible.zero?

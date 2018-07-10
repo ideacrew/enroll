@@ -30,7 +30,7 @@ namespace :generate_reports do
     person = census_employee.employee_role.person
     hbx_id = person.hbx_id
     family = person.primary_family
-    hbx_enrollment = family.active_household.hbx_enrollments.first
+    hbx_enrollment = family.active_household.hbx_enrollments.select{ |enrollment| enrollment.sponsored_benefit_id.present? && enrollment.benefit_sponsorship_id.present? }.first
     policy_id = hbx_enrollment.hbx_id
     hios_id = hbx_enrollment.product.hios_id
     dependents_info = find_dependents_hbx_ids(family)

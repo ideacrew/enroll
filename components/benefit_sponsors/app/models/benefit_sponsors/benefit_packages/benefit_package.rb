@@ -207,7 +207,7 @@ module BenefitSponsors
 
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
-          title: title,
+          title: title + "(#{start_on.year + 1})",
           description: description,
           probation_period_kind: probation_period_kind,
           is_default: is_default
@@ -333,10 +333,12 @@ module BenefitSponsors
           end
 
           other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
-          if self.benefit_application.is_renewing?
-            ce.add_renew_benefit_group_assignment([other_benefit_package])
-          else
-            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+          if other_benefit_package.present?
+            if self.benefit_application.is_renewing?
+              ce.add_renew_benefit_group_assignment([other_benefit_package])
+            else
+              ce.find_or_create_benefit_group_assignment([other_benefit_package])
+            end
           end
         end
       end

@@ -333,6 +333,12 @@ module Factories
     end
 
     def self.find_or_build_employee_role(person, employer_profile, census_employee, hired_on)
+      if person.active_employee_roles.any?
+        person.active_employee_roles.each do |role|
+          role.update_attributes(benefit_sponsors_employer_profile_id: employer_profile.id, census_employee_id: census_employee.id, hired_on: census_employee.hired_on) if role.employer_profile.fein == employer_profile.fein
+        end
+      end
+
       roles = person.employee_roles.where(
           "benefit_sponsors_employer_profile_id" => employer_profile.id.to_s,
           "hired_on" => census_employee.hired_on
