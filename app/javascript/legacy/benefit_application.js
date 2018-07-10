@@ -6,11 +6,14 @@ function showCostDetails(cost,min,max) {
 
 function showEmployeeCostDetails(employees_cost) {
   var table = document.getElementById('eeTableBody');
+  table.querySelectorAll('tr').forEach(function(element) {
+    element.remove()
+  });
   //modal = document.getElementById('modalInformation')
   //row = document.createElement('col-xs-12')
   //row.innerHTML = `Plan Offerings - <br/>Employer Lowest/Reference/Highest -`
   //modal.appendChild(row)
-  
+
   for (var employee in employees_cost) {
     var tr = document.createElement('tr')
     estimate = employees_cost[employee];
