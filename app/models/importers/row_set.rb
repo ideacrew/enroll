@@ -97,7 +97,7 @@ module Importers
     end
 
     def find_hbx_enrollments(person)
-      person.primary_family.active_household.hbx_enrollments.first
+      person.primary_family.active_household.hbx_enrollments.select{ |enrollment| enrollment.sponsored_benefit_id.present? && enrollment.benefit_sponsorship_id.present? }.first
     end
   end
 end
