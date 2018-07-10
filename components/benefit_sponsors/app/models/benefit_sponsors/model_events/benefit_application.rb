@@ -46,7 +46,7 @@ module BenefitSponsors
             is_ineligible_application_submitted = true
           end
 
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES, event: :approve_application)
+          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :approve_application)
             is_application_submitted = true
           end
 
@@ -58,7 +58,7 @@ module BenefitSponsors
             is_group_advance_termination_confirmation = true
           end
 
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
+          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true
           end
 
