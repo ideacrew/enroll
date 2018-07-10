@@ -207,7 +207,7 @@ module BenefitSponsors
 
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
-          title: title,
+          title: title + "(#{start_on.year + 1})",
           description: description,
           probation_period_kind: probation_period_kind,
           is_default: is_default
