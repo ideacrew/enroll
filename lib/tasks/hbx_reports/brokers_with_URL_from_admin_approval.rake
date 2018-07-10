@@ -26,19 +26,17 @@ namespace :reports do
         invitations.each do |invitation|
           unless BrokerRole.find(invitation.source_id).nil?
             broker=BrokerRole.find(invitation.source_id)
-            if broker.broker_agency_profile.class == BenefitSponsors::Organizations::BrokerAgencyProfile
-              unless broker.nil?
-                csv << [
-                  broker.broker_agency_profile.try(:legal_name),
-                  broker.person.first_name,
-                  broker.person.last_name,
-                  broker.email_address,
-                  broker.npn,
-                  invitation.created_at,
-                  "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
-                ]
-                processed_count += 1
-              end
+            unless broker.nil?
+              csv << [
+                broker.broker_agency_profile.try(:legal_name),
+                broker.person.first_name,
+                broker.person.last_name,
+                broker.email_address,
+                broker.npn,
+                invitation.created_at,
+                "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
+              ]
+              processed_count += 1
             end
           end
         end
