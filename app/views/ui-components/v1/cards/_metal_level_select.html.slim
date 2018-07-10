@@ -261,8 +261,6 @@ javascript:
     planType = options.planType || element.dataset.planType;
     referencePlanID = options.referencePlanID || element.id;
     sponsoredBenefitId = options.sponsoredBenefitId;
-    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
-    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
@@ -272,6 +270,8 @@ javascript:
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append('N/A');
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
   }
 
   function setInputValue(element) {

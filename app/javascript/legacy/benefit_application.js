@@ -31,9 +31,19 @@ function showEmployeeCostDetails(employees_cost) {
 
 
 function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBenefitId)  {
+  var thing = $("input[name^='benefit_package['").serializeArray();
+  var submitData = {};
+  for (item in thing) {
+    submitData[thing[item].name] = thing[item].value;
+  }
+  // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
+  // to product package kind.
+  submitData['benefit_package'] = {
+    sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } }
+  };
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
+    data: submitData,
     url: "calculate_employee_cost_details",
     success: function (d) {
       showEmployeeCostDetails(d);
@@ -42,9 +52,19 @@ function calculateEmployeeCosts(productOptionKind,referencePlanID, sponsoredBene
 }
 
 function calculateEmployerContributions(productOptionKind,referencePlanID, sponsoredBenefitId)  {
+  var thing = $("input[name^='benefit_package['").serializeArray();
+  var submitData = { };
+  for (item in thing) {
+    submitData[thing[item].name] = thing[item].value;
+  }
+  // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
+  // to product package kind.
+  submitData['benefit_package'] = {
+    sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } }
+  };
   $.ajax({
     type: "GET",
-    data:{ sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } } },
+    data: submitData,
     url: "calculate_employer_contributions",
     success: function (d) {
       var eeMin = parseFloat(d["estimated_enrollee_minimum"]).toFixed(2);
