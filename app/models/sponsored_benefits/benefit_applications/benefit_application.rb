@@ -168,9 +168,9 @@ module SponsoredBenefits
         benefit_groups.each do |benefit_group|
           importer = BenefitSponsors::Importers::BenefitPackageImporter.call(new_benefit_application, sanitize_benefit_group_attrs(benefit_group))
           if importer.benefit_package
+            set_predecessor_for_benefit_package(new_benefit_application, importer.benefit_package)
             importer.benefit_package.save!
           end
-          set_predecessor_for_benefit_package(new_benefit_application, importer.benefit_package)
         end
       end
 
