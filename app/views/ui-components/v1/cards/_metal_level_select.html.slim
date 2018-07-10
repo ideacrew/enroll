@@ -124,6 +124,7 @@ javascript:
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
   var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
   var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+	var productsTotal;
 
   function radioSelected(element) {
     setCircle(element)
@@ -180,10 +181,10 @@ javascript:
         rplans.remove()
       }
     }
-
+		
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
-      console.log(plan)
+      productsTotal = filteredProducts.length;
       var div = document.createElement('div')
       document.getElementById('yourPlanTotals').innerHTML = `<span class="pull-right mr-3">Displaying: <b>${filteredProducts.length} plans</b></span>`
       div.setAttribute('id', 'yourAvailablePlans')
@@ -252,6 +253,11 @@ javascript:
       element.append(div)
     }
   }
+	
+	function getCostDetails(min,max,cost) {
+		document.getElementById('employerCostTitle').innerHTML = '';
+		document.getElementById('employerCostTitle').append(`Employer Lowest/Reference/Highest - $${min}/$${cost}/$${max}`);
+	}
 
   function displayReferencePlanDetails(element, options) {
     options = options || {};
@@ -272,6 +278,8 @@ javascript:
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append('N/A');
+		document.getElementById('planOfferingsTitle').innerHTML = '';
+		document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
   }
 
   function setInputValue(element) {
