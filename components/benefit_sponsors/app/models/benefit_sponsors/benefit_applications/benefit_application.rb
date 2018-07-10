@@ -679,6 +679,10 @@ module BenefitSponsors
         transitions from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES,  to: :approved
       end
 
+      event :auto_approve_application do
+        transitions from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES,  to: :approved
+      end
+
       event :submit_for_review do
         transitions from: :draft, to: :pending
       end

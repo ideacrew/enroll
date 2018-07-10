@@ -110,44 +110,26 @@ module BenefitSponsors
         sb_form = form.sponsored_benefits.first
         
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        benefit_application = find_benefit_application(form)
+        model_attributes = form_params_to_attributes(form)
+        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
+        sponsored_benefit = benefit_package.sponsored_benefits.first
+        product_package = sponsored_benefit.product_package
 
-        if sb_form.id
-          benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sb_form.id.to_s)).first
-          sponsored_benefit = benefit_package.sponsored_benefits.where(id: sb_form.id).first
-          product_package = sponsored_benefit.product_package
-          estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
-        else
-          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-        
-          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
-          benefit_package = benefit_application.benefit_packages.build
-          dummy_sponsored_benefit = ::BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new(benefit_package: benefit_package, product_package_kind: form.sponsored_benefits[0].product_package_kind)
-          dummy_sponsored_benefit.reference_product = reference_product
-
-          estimator.calculate_estimates_for_package_design(benefit_application, dummy_sponsored_benefit, reference_product, selected_package)
-        end
+        estimator.calculate_estimates_for_package_design(benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
       end
 
       def calculate_employee_cost_details(form)
         sb_form = form.sponsored_benefits.first
         
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
-        if sb_form.id
-          benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sb_form.id.to_s)).first
-          sponsored_benefit = benefit_package.sponsored_benefits.where(id: sb_form.id).first
-          product_package = sponsored_benefit.product_package
+        benefit_application = find_benefit_application(form)
+        model_attributes = form_params_to_attributes(form)
+        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
+        sponsored_benefit = benefit_package.sponsored_benefits.first
+        product_package = sponsored_benefit.product_package
 
-          estimator.calculate_employee_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
-        else
-          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-
-          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
-          benefit_package = benefit_application.benefit_packages.build
-          dummy_sponsored_benefit = ::BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new(benefit_package: benefit_package, product_package_kind: form.sponsored_benefits[0].product_package_kind)
-          dummy_sponsored_benefit.reference_product = reference_product
-
-          estimator.calculate_employee_estimates_for_package_design(benefit_application, dummy_sponsored_benefit, reference_product, selected_package)
-        end
+        estimator.calculate_employee_estimates_for_package_design(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
       end
 
       def reference_product_details(form, details)
