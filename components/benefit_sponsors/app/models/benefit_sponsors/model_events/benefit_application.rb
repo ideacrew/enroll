@@ -4,12 +4,12 @@ module BenefitSponsors
 
       REGISTERED_EVENTS = [
         :application_submitted,
-        :renewal_enrollment_confirmation,
         :ineligible_application_submitted,
-        :initial_employer_open_enrollment_completed,
+        :employer_open_enrollment_completed,
         :application_denied,
         :group_advance_termination_confirmation,
 
+        # :renewal_enrollment_confirmation,
         # :renewal_application_created,
         # :renewal_application_submitted,
         # :ineligible_renewal_application_submitted,
@@ -37,19 +37,15 @@ module BenefitSponsors
         if aasm_state_changed?
 
           if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
-            is_initial_employer_open_enrollment_completed = true
+            is_employer_open_enrollment_completed = true
           end
 
           if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
             is_ineligible_application_submitted = true
           end
 
-          if is_transition_matching?(to: :approved, from: :draft, event: :approve_application)
+          if is_transition_matching?(to: :approved, from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES, event: :approve_application)
             is_application_submitted = true
-          end
-
-          if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
-            is_renewal_enrollment_confirmation = true
           end
 
           if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
@@ -60,16 +56,20 @@ module BenefitSponsors
             is_group_advance_termination_confirmation = true
           end
 
+          if is_transition_matching?(to: :approved, from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
+            is_renewal_application_autosubmitted = true
+          end
+
+          # if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
+          #   is_renewal_enrollment_confirmation = true
+          # end
+
           # if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
           #   is_renewal_application_created = true
           # end
 
           # if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :publish)
           #   is_renewal_application_submitted = true
-          # end
-
-          # if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :force_publish)
-          #   is_renewal_application_autosubmitted = true
           # end
 
           # if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: [:publish, :force_publish])
