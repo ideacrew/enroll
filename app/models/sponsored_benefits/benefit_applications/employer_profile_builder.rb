@@ -33,7 +33,7 @@ module SponsoredBenefits
           if (benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?) || benefit_sponsorship.is_conversion?
             base_benefit_application = benefit_sponsorship.active_benefit_application || benefit_sponsorship.published_benefit_application
 
-            if base_benefit_application.start_on.next_year != plan_design_proposal.effective_date
+            if base_benefit_application.end_on.to_date.next_day != plan_design_proposal.effective_date
               raise "Quote effective date is invalid"
             end
           end
