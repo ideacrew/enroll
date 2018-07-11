@@ -26,7 +26,9 @@ module BenefitMarkets
     end
 
     def match?(rel_hash)
-      type_count = rel_hash[self.relationship_name.to_s] || 0
+      rel_hash.symbolize_keys!
+      type_count = rel_hash[self.relationship_name] || 0
+      
       case operator
       when :<
         type_count < count
