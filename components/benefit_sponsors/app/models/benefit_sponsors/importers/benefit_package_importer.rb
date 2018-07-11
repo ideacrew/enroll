@@ -88,12 +88,11 @@ module BenefitSponsors
         sponsored_benefit.pricing_determinations.build(pricing_determination_tiers: price_determination_tiers)
 
         pricing_determination = sponsored_benefit.pricing_determinations.first
-        copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
 
         if sponsor_contribution_attrs[0][:final_tier_premium].present?
-          new_determination = pricing_determination.dup
-          copy_tier_contributions(new_determination, sponsor_contribution_attrs, :final_tier_premium)
-          sponsored_benefit.pricing_determinations = sponsored_benefit.pricing_determinations +  [new_determination]
+          copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :final_tier_premium)
+        else
+          copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
         end
       end
 
