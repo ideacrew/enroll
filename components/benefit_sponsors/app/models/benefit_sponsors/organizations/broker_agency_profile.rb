@@ -179,8 +179,6 @@ module BenefitSponsors
           else
             Rails.logger.warn("Unable to associate commission statement #{file_path}")
           end
-        else
-          Rails.logger.warn("Unable to associate commission statement #{file_path}")
         end
       end
 
