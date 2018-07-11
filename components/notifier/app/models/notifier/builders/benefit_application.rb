@@ -218,8 +218,8 @@ module Notifier
       return @current_benefit_application if defined? @current_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? || benefit_application.enrollment_ineligible? || benefit_application.canceled?
-          @current_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_published? && ba.start_on == benefit_application.start_on.prev_year}
+        if benefit_application.is_renewing? && (benefit_application.is_submitted? || benefit_application.canceled?)
+          @current_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted? && ba.start_on == benefit_application.start_on.prev_year}
         else
           @current_benefit_application = benefit_application
         end
@@ -230,10 +230,10 @@ module Notifier
       return @renewal_benefit_application if defined? @renewal_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? || benefit_application.enrollment_ineligible? || benefit_application.canceled?
+        if benefit_application.is_renewing? && (benefit_application.is_submitted? || benefit_application.canceled?)
           @renewal_benefit_application = benefit_application
         else
-          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_published? && ba.start_on == benefit_application.start_on.prev_year}
+          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted?? && ba.start_on == benefit_application.start_on.prev_year}
         end
       end
     end
