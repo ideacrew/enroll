@@ -81,8 +81,8 @@ module BenefitSponsors
         true
       end
 
-      def force_submit_application
-        save_result, persisted_object = service.force_submit_application(self)
+      def force_submit_initial_application
+        save_result, persisted_object = service.force_submit_initial_application(self)
         @show_page_model = persisted_object
         true
       end
@@ -100,6 +100,10 @@ module BenefitSponsors
         return false unless save_result
         @show_page_model = persisted_object
         true
+      end
+
+      def is_ineligible_to_submit?
+        errors.messages.keys.include?(:attestation_ineligible) || errors.messages.keys.include?(:employer_primary_office_location) || errors.messages.keys.include?(:benefit_application_fte_count)
       end
 
       def save

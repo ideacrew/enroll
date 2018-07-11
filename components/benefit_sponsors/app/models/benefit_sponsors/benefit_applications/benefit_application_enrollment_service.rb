@@ -62,6 +62,14 @@ module BenefitSponsors
       end
     end
 
+    def force_submit_initial_application
+      unless business_policy_satisfied_for?(:submit_benefit_application)
+        if business_policy.fail_results.keys.include?(:employer_primary_office_location) || business_policy.fail_results.keys.include?(:benefit_application_fte_count)
+          benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
+        end
+      end
+    end
+
     def force_submit_application
       if is_application_valid? && is_application_eligible?
         if benefit_application.may_approve_application?
