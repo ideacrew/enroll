@@ -9,7 +9,7 @@ namespace :nfp do
       Dir.entries(absolute_folder_path).each do |file|
         next if File.directory?(file) #skipping directories
         puts "uploading file #{absolute_folder_path}/#{file}"
-        Organization.upload_commission_statement(absolute_folder_path+"/"+file,file)
+        BenefitSponsors::Organizations::BrokerAgencyProfile.upload_commission_statement(absolute_folder_path+"/"+file,file)
       end
     else
       puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake"
