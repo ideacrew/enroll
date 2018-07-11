@@ -283,7 +283,8 @@ class BenefitApplicationMigration < Mongoid::Migration
           relationship: tier.composite_rating_tier,
           offered: tier.offered,
           premium_pct: tier.employer_contribution_percent,
-          estimated_tier_premium: tier.estimated_tier_premium
+          estimated_tier_premium: tier.estimated_tier_premium,
+          final_tier_premium: tier.final_tier_premium
       }
     end
     attributes
