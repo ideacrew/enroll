@@ -102,8 +102,9 @@ end
 
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
-    find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
-    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    find(:xpath, '//label[@for="person_us_citizen_false"]').click
+    wait_for_ajax
+    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
     find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
@@ -143,6 +144,11 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
   expect(page).to have_content('Authorization and Consent')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
+end
+
+Then(/^Individual checks to not apply for assistance$/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.btn', text: 'CONTINUE').click
 end
 
 When /^Individual clicks on Individual and Family link should be on verification page/ do
