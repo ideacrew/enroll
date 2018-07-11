@@ -43,7 +43,6 @@ module BenefitSponsors
             sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
             raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
             sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
-
             if sole_source?
               sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
             else
@@ -66,8 +65,7 @@ module BenefitSponsors
         end
 
         sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
-          contribution_match = sponsor_contribution_attrs.detect{|contribution| contribution[:relationship] == new_contribution_level.contribution_unit.name}
-
+          contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
           if contribution_match.present?
             new_contribution_level.is_offered = contribution_match[:offered]
             new_contribution_level.contribution_factor = (contribution_match[:premium_pct].to_f / 100)
