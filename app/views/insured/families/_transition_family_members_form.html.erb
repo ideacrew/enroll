@@ -37,7 +37,7 @@
           <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
           <%= hidden_field_tag :family, params[:family] %>
           <%= hidden_field_tag :qle_id, @qle.id.to_s %>
-          <%= submit_tag "Submit", class: 'btn btn-primary', id: 'tansition_family_submit' %>
+          <%= submit_tag "Submit", class: 'btn btn-primary', id: 'tansition_family_submit', data: {confirm: "Submitting this will send a notice to this consumer. Have you checked that everyone in the household who needs to transition is included and that the you are transitioning the correct people?"} %>
         </td>
       </tr>
     </table>

@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :citizen_status, String
     attribute :tax_household, PdfTemplates::TaxHousehold
     attribute :documents_due_date, Date
+    attribute :past_due_text, String
     # attribute :household_size, String
     attribute :projected_amount, String
     attribute :actual_income, String
