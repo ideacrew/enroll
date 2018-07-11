@@ -1,7 +1,7 @@
 <div class="module hbx-enrollment-panel waived-coverage panel panel-default">
   <div class="panel-heading vertically-aligned-row">
-    <h3 class="no-buffer">
-      <%= hbx_enrollment.coverage_kind %> <%= l10n("coverage") %>
+    <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
+      <%= hbx_enrollment.coverage_year %> <%= hbx_enrollment.coverage_kind %> <%= l10n("coverage") %>
       <span class="separator"><%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %></span>
     </h3>
     <div class="text-right">

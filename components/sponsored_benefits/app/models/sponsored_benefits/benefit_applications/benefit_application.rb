@@ -10,7 +10,7 @@ module SponsoredBenefits
       delegate :rating_area, to: :benefit_sponsorship
       delegate :census_employees, to: :benefit_sponsorship
       delegate :plan_design_organization, to: :benefit_sponsorship
-      
+
      ### Deprecate -- use effective_period attribute
       # field :start_on, type: Date
       # field :end_on, type: Date
@@ -131,27 +131,95 @@ module SponsoredBenefits
         end
       end
 
-      def to_plan_year
-        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
+      def to_benefit_sponsors_benefit_application(organization)
+        return unless(benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?)
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
-        # CCA-specific attributes (move to subclass)
-        recorded_sic_code               = ""
-        recorded_rating_area            = ""
+        new_benefit_sponsorship = build_benefit_sponsors_benefit_sponsorship_if_needed(organization, benefit_sponsorship)
 
-        copied_benefit_groups = []
-        benefit_groups.each do |benefit_group|
-          benefit_group.attributes.delete("_type")
-          copied_benefit_groups << ::BenefitGroup.new(benefit_group.attributes)
+        new_benefit_application = new_benefit_sponsorship.benefit_applications.new(
+          effective_period: effective_period,
+          open_enrollment_period: open_enrollment_period
+        )
+        set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
+        new_benefit_application.pull_benefit_sponsorship_attributes
+        if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
+          update_benefit_sponsor_catalog(new_benefit_application, new_benefit_sponsorship)
+          add_benefit_packages(new_benefit_application)
         end
 
-        ::PlanYear.new(
-          start_on: effective_period.begin,
-          end_on: effective_period.end,
-          open_enrollment_start_on: open_enrollment_period.begin,
-          open_enrollment_end_on: open_enrollment_period.end,
-          benefit_groups: copied_benefit_groups
-        )
+        new_benefit_application
+      end
+
+      def set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
+        predecessor_applications = new_benefit_sponsorship.benefit_applications.where(:"effective_period.max" => new_benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
+        if predecessor_applications.present?
+          if predecessor_applications.count < 2
+            new_benefit_application.predecessor_id = predecessor_applications.first.id
+          elsif predecessor_applications.where(:"effective_period.max" => Date.new(2018,7,31)).count == 2  # exception case for 8/1 conversion
+            new_benefit_application.predecessor_id = predecessor_applications.where(aasm_state: :imported).first.id
+          else
+            new_benefit_application.predecessor_id = predecessor_applications.first.id
+          end
+        end
+      end
+
+      def add_benefit_packages(new_benefit_application)
+        benefit_groups.each do |benefit_group|
+          importer = BenefitSponsors::Importers::BenefitPackageImporter.call(new_benefit_application, sanitize_benefit_group_attrs(benefit_group))
+          if importer.benefit_package
+            set_predecessor_for_benefit_package(new_benefit_application, importer.benefit_package)
+            importer.benefit_package.save!
+          end
+        end
+      end
+
+      def build_benefit_sponsors_benefit_sponsorship_if_needed(organization, old_benefit_sponsorship)
+        if organization.active_benefit_sponsorship.present?
+          organization.active_benefit_sponsorship
+        else
+          organization.benefit_sponsorships.new
+          #TODO: Update data from sponsored_benefit benefit sponsorship model.
+        end
+      end
+
+      def set_predecessor_for_benefit_package(benefit_application, benefit_package)
+        return unless benefit_application.predecessor_id.present?
+        predecessor_application = benefit_application.predecessor
+        predecessor_benefit_packages = benefit_application.predecessor.benefit_packages
+
+        if predecessor_benefit_packages.count < 2
+          benefit_package.predecessor_id  = benefit_application.predecessor.benefit_packages.first.id
+          return
+        end
+
+        new_package_hios_id = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
+        predecessor_benefit_packages.each do |predecessor_package|
+          predecessor_package_hios_id = predecessor_package.health_sponsored_benefit.products(predecessor_application.effective_period.min).map(&:hios_id)
+          if ((new_package_hios_id.size == predecessor_package_hios_id.size) && ((new_package_hios_id && predecessor_package_hios_id).size == new_package_hios_id.size))
+            benefit_package.predecessor_id  = predecessor_package.id
+          end
+        end
+      end
+
+      def sanitize_benefit_group_attrs(benefit_group)
+        attributes = benefit_group.attributes.slice(
+          :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
+          :plan_option_kind, :relationship_benefits, :dental_relationship_benefits
+          )
+
+        attributes[:is_default] = benefit_group.default
+        attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
+        attributes[:dental_reference_plan_hios_id] = benefit_group.dental_reference_plan.hios_id if benefit_group.is_offering_dental?
+        attributes[:composite_tier_contributions] = benefit_group.composite_tier_contributions.inject([]) do |contributions, tier|
+          contributions << {
+            relationship: tier.composite_rating_tier,
+            offered: tier.offered,
+            premium_pct: tier.employer_contribution_percent,
+            estimated_tier_premium: tier.estimated_tier_premium
+          }
+        end
+        attributes
       end
 
       class << self
@@ -198,6 +266,13 @@ module SponsoredBenefits
 
           open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
           open_enrollment_end_on_day - minimum_length
+
+          minimum_day = open_enrollment_end_on_day - minimum_length
+           if minimum_day > 0
+             minimum_day
+           else
+             1
+           end
         end
 
 
@@ -246,8 +321,6 @@ module SponsoredBenefits
         end
       end
 
-
-
       def open_enrollment_date_checks
         return if effective_period.blank? || open_enrollment_period.blank?
 
@@ -286,6 +359,16 @@ module SponsoredBenefits
         # end
       end
 
+      private
+
+
+      def update_benefit_sponsor_catalog(benefit_application, benefit_sponsorship)
+        #update benefit sponsor catalog details
+        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+        catalog = benefit_application.benefit_sponsor_catalog
+        catalog.benefit_application = benefit_application
+        catalog.save
+      end
 
     end
   end

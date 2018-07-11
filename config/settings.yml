@@ -1,5 +1,5 @@
 site:
-  key: :mhc
+  key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
   home_url: "https://business.mahealthconnector.org/"
@@ -131,7 +131,7 @@ aca:
   minimum_family_contribution_percentage: 30
   address_query_county: true
   broker_routing_information: true
-  recaptcha_enabled: true
+  recaptcha_enabled: false
   security_questions: true
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]

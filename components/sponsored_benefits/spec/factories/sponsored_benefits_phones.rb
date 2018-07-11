@@ -18,7 +18,6 @@ FactoryGirl.define do
       number ' '
     end
 
-    factory :invalid_phone, traits: [:without_kind, :without_area_code, :without_number]
-
+    factory :sponsored_benefits_invalid_phone, traits: [:without_kind, :without_area_code, :without_number]
   end
 end

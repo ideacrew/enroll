@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
@@ -61,4 +62,5 @@ RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
       expect(response).to have_http_status(:success)
     end
   end
+end
 end

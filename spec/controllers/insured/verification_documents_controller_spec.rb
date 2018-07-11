@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
@@ -121,4 +122,5 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
     end
 
   end
+end
 end

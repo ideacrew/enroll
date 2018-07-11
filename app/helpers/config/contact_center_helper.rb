@@ -43,10 +43,6 @@ module Config::ContactCenterHelper
     Settings.contact_center.mailing_address.zip_code
   end
 
-  def contact_center_mailing_address_name
-    Settings.contact_center.mailing_address.name
-  end
-
   def contact_center_name
     Settings.contact_center.name
   end

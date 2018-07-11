@@ -158,7 +158,7 @@ module Effective
     end
 
     def table_html_class
-      @table_html_class.presence || 'table table-bordered table-striped'
+      @table_html_class.presence || 'table table-striped table-hover'
     end
 
     # When simple only a table will be rendered with

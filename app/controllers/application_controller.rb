@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
+  helper BenefitSponsors::Engine.helpers
 
   def format_js?
    request.format.js?
@@ -18,9 +19,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   ## Devise filters
-  ##before_filter :require_login, unless: :authentication_not_required?
-  ##before_filter :authenticate_user_from_token!
-  ##before_filter :authenticate_me!
   before_filter :require_login, unless: :authentication_not_required?
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
@@ -154,10 +152,10 @@ class ApplicationController < ActionController::Base
 
     def check_for_special_path
       if site_sign_in_routes.include? request.path
-        redirect_to new_user_session_path
+        redirect_to main_app.new_user_session_path
         return
       elsif site_create_routes.include? request.path
-        redirect_to new_user_registration_path
+        redirect_to main_app.new_user_registration_path
         return
       else
         return
@@ -171,9 +169,9 @@ class ApplicationController < ActionController::Base
         end
         if site_uses_default_devise_path?
           check_for_special_path
-          redirect_to new_user_session_path
+          redirect_to main_app.new_user_session_path
         else
-          redirect_to new_user_registration_path
+          redirect_to main_app.new_user_registration_path
         end
       end
     rescue Exception => e

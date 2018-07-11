@@ -13,7 +13,7 @@
             if row.broker_relationship_inactive?
               row.legal_name
             else
-              (link_to row.legal_name, main_app.employers_employer_profile_path(id: row.sponsor_profile_id, :tab=>'home'))
+              (link_to row.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home'))
             end
             }, :sortable => false, :filter => false
           table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
@@ -25,7 +25,7 @@
             if active_plan_year_start.nil?
               "No Active Plan"
             else
-              active_plan_year_start
+              active_plan_year_start.strftime("%m/%d/%Y")
             end
 
             }, :sortable => false, :filter => false
@@ -97,7 +97,7 @@
         def er_state(row)
           return 'N/A' if row.is_prospect?
           return 'Former Client' if row.broker_relationship_inactive?
-          row.employer_profile.aasm_state.capitalize
+          row.employer_profile.organization.active_benefit_sponsorship.aasm_state.capitalize
         end
 
         def er_fein(row)

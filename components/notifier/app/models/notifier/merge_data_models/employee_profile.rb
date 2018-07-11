@@ -25,7 +25,7 @@ module Notifier
     attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Enrollment
-    attribute :plan_year, MergeDataModels::PlanYear
+    attribute :benefit_application, MergeDataModels::BenefitApplication
     attribute :census_employee, MergeDataModels::CensusEmployee
     attribute :special_enrollment_period, MergeDataModels::SpecialEnrollmentPeriod
 
@@ -48,7 +48,7 @@ module Notifier
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
       notice.addresses = [ notice.mailing_address ]
       notice.enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object
-      notice.plan_year = Notifier::MergeDataModels::PlanYear.stubbed_object
+      notice.benefit_application = Notifier::MergeDataModels::BenefitApplication.stubbed_object
       notice.census_employee = Notifier::MergeDataModels::CensusEmployee.stubbed_object
       notice.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.stubbed_object
       notice

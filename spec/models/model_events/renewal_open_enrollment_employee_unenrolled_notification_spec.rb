@@ -31,7 +31,7 @@ describe 'ModelEvents::RenewalOpenEnrollmentEmployeeUnenrolledNotification' do
     benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year, reference_plan_id: plan.id
     employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
-    employee.add_renew_benefit_group_assignment renewal_benefit_group
+    employee.add_renew_benefit_group_assignment [renewal_benefit_group]
   }
 
   let(:open_enrollment_start_on) { TimeKeeper.date_of_record }

@@ -12,6 +12,7 @@ class Person
   include Notify
   include UnsetableSparseFields
   include FullStrippedNames
+  include ::BenefitSponsors::Concerns::Observable
 
   # verification history tracking
   include Mongoid::History::Trackable
@@ -153,6 +154,8 @@ class Person
   #after_save :generate_family_search
   after_create :create_inbox
 
+  add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
+
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
 
@@ -220,7 +223,8 @@ class Person
   scope :active,   ->{ where(is_active: true) }
   scope :inactive, ->{ where(is_active: false) }
 
-  scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
+  #scope :broker_role_having_agency, -> { where("broker_role.broker_agency_profile_id" => { "$ne" => nil }) }
+  scope :broker_role_having_agency, -> { where("broker_role.benefit_sponsors_broker_agency_profile_id" => { "$ne" => nil }) }
   scope :broker_role_applicant,     -> { where("broker_role.aasm_state" => { "$eq" => :applicant })}
   scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active]})}
@@ -531,7 +535,7 @@ class Person
 
     def search_hash(s_str)
       clean_str = s_str.strip
-      s_rex = Regexp.new(Regexp.escape(clean_str), true)
+      s_rex = ::Regexp.new(::Regexp.escape(clean_str), true)
       {
         "$or" => ([
           {"first_name" => s_rex},
@@ -546,8 +550,8 @@ class Person
       additional_exprs = []
       if clean_str.include?(" ")
         parts = clean_str.split(" ").compact
-        first_re = Regexp.new(Regexp.escape(parts.first), true)
-        last_re = Regexp.new(Regexp.escape(parts.last), true)
+        first_re = ::Regexp.new(::Regexp.escape(parts.first), true)
+        last_re = ::Regexp.new(::Regexp.escape(parts.last), true)
         additional_exprs << {:first_name => first_re, :last_name => last_re}
       end
       additional_exprs
@@ -555,7 +559,7 @@ class Person
 
     def search_first_name_last_name_npn(s_str, query=self)
       clean_str = s_str.strip
-      s_rex = Regexp.new(Regexp.escape(s_str.strip), true)
+      s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
       query.where({
         "$or" => ([
           {"first_name" => s_rex},
@@ -657,20 +661,37 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      self.where(:employer_staff_roles => {
-          '$elemMatch' => {
-              employer_profile_id: employer_profile.id,
-              aasm_state: :is_active}
-          }).to_a
+      if employer_profile.is_a? (EmployerProfile)
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                employer_profile_id: employer_profile.id,
+                aasm_state: :is_active}
+        }).to_a
+      else
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                benefit_sponsor_employer_profile_id: employer_profile.id,
+                aasm_state: :is_active}
+        }).to_a
+      end
     end
 
     def staff_for_employer_including_pending(employer_profile)
-      self.where(:employer_staff_roles => {
-        '$elemMatch' => {
-            employer_profile_id: employer_profile.id,
-            :aasm_state.ne => :is_closed
-        }
+      if employer_profile.is_a? (EmployerProfile)
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                employer_profile_id: employer_profile.id,
+                :aasm_state.ne => :is_closed
+            }
         })
+      else
+        self.where(:employer_staff_roles => {
+            '$elemMatch' => {
+                benefit_sponsor_employer_profile_id: employer_profile.id,
+                :aasm_state.ne => :is_closed
+            }
+        })
+      end
     end
 
     # Adds employer staff role to person
@@ -682,8 +703,14 @@ class Person
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
-      employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      if employer_profile.is_a? (EmployerProfile)
+        employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      else
+        employer_staff_role = EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
+      end
+
       employer_staff_role.save
+
       return true, person.first
     end
 
@@ -698,7 +725,7 @@ class Person
       rescue
         return false, 'Person not found'
       end
-      if role = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile_id.to_s && !role.is_closed?}
+      if role = person.employer_staff_roles.detect{|role| (role.benefit_sponsor_employer_profile_id.to_s == employer_profile_id.to_s || role.employer_profile_id.to_s == employer_profile_id.to_s) && !role.is_closed?}
         role.update_attributes!(:aasm_state => :is_closed)
         return true, 'Employee Staff Role is inactive'
       else

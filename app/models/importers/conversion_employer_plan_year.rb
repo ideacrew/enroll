@@ -57,7 +57,7 @@ module Importers
 
     def calculated_coverage_start
       return @calculated_coverage_start if @calculated_coverage_start
-      default_plan_year_start
+      @calculated_coverage_start = default_plan_year_start
     end
 
     def new_coverage_policy=(val)
@@ -89,11 +89,11 @@ module Importers
       end
     end
 
-    def plan_years_are_active?(plan_years)
-      return false if plan_years.empty?
-      plan_years.any? do |py|
-        PlanYear::PUBLISHED.include?(py.aasm_state) ||
-          PlanYear::RENEWING.include?(py.aasm_state)
+    def plan_years_are_active?(benefit_applications)
+      return false if benefit_applications.empty?
+      benefit_applications.any? do |benefit_application|
+        PlanYear::PUBLISHED.include?(benefit_application.aasm_state) ||
+            PlanYear::RENEWING.include?(benefit_application.aasm_state)
       end
     end
 
@@ -101,7 +101,7 @@ module Importers
       found_employer = find_employer
       return true unless found_employer
       return true if action.to_s.downcase == 'update'
-      if plan_years_are_active?(found_employer.plan_years) 
+      if plan_years_are_active?(found_employer.benefit_applications)
         errors.add(:fein, "already has active plan years")
       end
     end
@@ -167,11 +167,11 @@ module Importers
       number
     end
 
-    def propagate_errors(plan_year)
-      plan_year.errors.each do |attr, err|
+    def propagate_errors(benefit_application)
+      benefit_application.errors.each do |attr, err|
         errors.add("plan_year_" + attr.to_s, err)
       end
-      plan_year.benefit_groups.first.errors.each do |attr, err|
+      benefit_application.benefit_packages.first.errors.each do |attr, err|
         errors.add("plan_year_benefit_group_" + attr.to_s, err)
       end
     end

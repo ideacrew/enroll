@@ -1,4 +1,7 @@
 Rails.application.configure do
+  # Verifies that versions and hashed value of the package contents in the project's package.json
+  config.webpacker.check_yarn_integrity = true
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
@@ -19,6 +22,7 @@ Rails.application.configure do
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
+  config.webpacker.check_yarn_integrity = false
 
   # Raise an error on page load if there are pending migrations.
   # config.active_record.migration_error = :page_load

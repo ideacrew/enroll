@@ -1,12 +1,13 @@
 Rails.application.routes.draw do
-
+  require 'resque/server'
+#  mount Resque::Server, at: '/jobs'
+  mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
+  mount BenefitMarkets::Engine,       at: "/benefit_markets"
   mount TransportGateway::Engine,       at: "/transport_gateway"
   mount TransportProfiles::Engine,      at: "/transport_profiles"
   mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
   mount Notifier::Engine, at: "/notifier"
 
-  require 'resque/server'
-  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
   namespace :uis do
@@ -93,6 +94,7 @@ Rails.application.routes.draw do
         get :employer_poc
         post :employer_poc_datatable
         get :employer_invoice
+        get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
@@ -178,7 +180,7 @@ Rails.application.routes.draw do
         get 'print_waiver'
         post 'checkout'
         get 'thankyou'
-        post 'waive'
+        get 'waive'
         post 'terminate'
         post 'set_elected_aptc'
       end

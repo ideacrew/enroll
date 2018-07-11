@@ -12,7 +12,7 @@
           <%= link_to(sponsored_benefits.employers_organizations_broker_agency_profile_path(@broker_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "employers", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("employers")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Employers"></span>
-          <% end %>
+          <%# end %>
         </li>
         </li>
         <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
@@ -73,7 +73,8 @@
         -->
 
         <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-          <%= link_to(main_app.messages_broker_agencies_profiles_path(id: @provider, profile_id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+          <%= link_to(messages_broker_agencies_profiles_path(id: @provider, profile_id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+          <!--TODO: Will have to implement code related to Inbox/Messages-->
             <span class="badge message-unread"><%=begin; @provider.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
             <%= l10n("broker_mail")%>
           <% end %>
@@ -86,7 +87,7 @@
             <% end %>
           </li>
         <% end %>
-        <% if current_user.has_hbx_staff_role? %>
+        <% if current_user.present? && current_user.has_hbx_staff_role? %>
         <% else %>
           <% if individual_market_is_enabled? %>
           <li role="presentation" class="multi-line">
@@ -101,4 +102,5 @@
       </ul>
     </div>
   </div>
+<% end %>
 <% end %>

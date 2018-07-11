@@ -1,43 +1,31 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
-  before_action :updateable?, except: [:edit, :show, :benefit_group]
+  before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
   layout "two_column"
   def new
     @census_employee = build_census_employee
-    if params[:modal].present?
-      respond_to do |format|
-        format.js { render "employers/employer_profiles/upload_employees" }
-      end
-
-    end
   end
 
   def create
-    @census_employee = CensusEmployee.new(census_employee_params)
-    @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
-    @census_employee.employer_profile = @employer_profile
+    @census_employee = CensusEmployee.new(census_employee_params.merge!({
+      benefit_sponsorship_id: @benefit_sponsorship.id,
+      benefit_sponsors_employer_profile_id: @employer_profile.id,
+      active_benefit_group_assignment: benefit_group_id,
+      renewal_benefit_group_assignment: renewal_benefit_group_id
+    }))
+    # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
 
     if @census_employee.save
       flash[:notice] = "Census Employee is successfully created."
       if @census_employee.active_benefit_group_assignment.blank?
         flash[:notice] = "Your employee was successfully added to your roster."
       end
-      redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
+      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
-      begin
-        missing_kind = census_employee_params['email_attributes']['kind']==''
-        @census_employee.errors['Email']='Kind must be selected' if missing_kind
-      rescue
-      end
       @reload = true
       render action: "new"
     end
-    #else
-      #@census_employee.benefit_group_assignments.build if @census_employee.benefit_group_assignments.blank?
-      #flash[:error] = "Please select Benefit Group."
-      #render action: "new"
-    #end
   end
 
   def edit
@@ -47,11 +35,14 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def update
-    authorize EmployerProfile, :updateable?
+    authorize @employer_profile, :updateable?
     @status = params[:status]
 
-    @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
-    @census_employee.attributes = census_employee_params
+    # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
+    @census_employee.attributes = census_employee_params.merge!({
+      active_benefit_group_assignment: benefit_group_id,
+      renewal_benefit_group_assignment: renewal_benefit_group_id
+    })
 
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
     authorize @census_employee, :update?
@@ -189,12 +180,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
-        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
-    } if @census_employee.employee_role.present?
-
-    @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
   end
 
@@ -283,18 +268,19 @@ class Employers::CensusEmployeesController < ApplicationController
     end
 =end
 
-    params.require(:census_employee).permit(:id, :employer_profile_id,
-        :id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
-        :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
-        :email_attributes => [:id, :kind, :address],
+    params.require(:census_employee).permit(:id,
+      :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
+      :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
+      :email_attributes => [:id, :kind, :address],
       :census_dependents_attributes => [
-          :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-        ]
-      )
+        :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
+      ]
+    )
   end
 
   def find_employer
-    @employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    @employer_profile = BenefitSponsors::Organizations::Organization.all.where(:"profiles._id" => BSON::ObjectId.from_string(params[:employer_profile_id])).first.employer_profile
+    @benefit_sponsorship = @employer_profile.parent.active_benefit_sponsorship
   end
 
   def find_census_employee

@@ -11,8 +11,8 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
   end
   describe "partial content" do
     context "General Agencies can be toggled by settings" do
+      if ExchangeTestingConfigurationHelper.general_agency_enabled?
       context "when enabled" do
-        Settings.aca.general_agency_enabled = true
         let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
         before do
           assign :general_agency_profiles, [general_agency_profile]
@@ -23,11 +23,13 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
           expect(rendered).to have_selector('h3', text: 'General Agencies')
         end
       end
+      else
       context "when disabled" do
         let(:general_agency_enabled) { false }
         it "does not show General Agency in the title" do
           expect(rendered).to_not have_selector('h3', text: 'General Agencies')
         end
+      end
       end
     end
 

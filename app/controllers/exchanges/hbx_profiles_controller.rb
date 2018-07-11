@@ -1,9 +1,9 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  include DataTablesAdapter
-  include DataTablesSearch
-  include Pundit
-  include SepAll
-  include Config::AcaHelper
+  include ::DataTablesAdapter
+  include ::DataTablesSearch
+  include ::Pundit
+  include ::SepAll
+  include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -24,7 +24,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     if params[:ids]
       begin
-        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
       rescue => e
@@ -62,16 +62,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-
-    @organizations = Organization.where(:id.in => params[:ids]).all
-
-    @organizations.each do |org|
-      if aca_state_abbreviation == "MA"
-        org.employer_profile.trigger_model_event(:generate_initial_employer_invoice)
-      else
-        @employer_invoice = EmployerInvoice.new(org)
-        @employer_invoice.save_and_notify_with_clean_up
-      end
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @organizations = @benfit_sponsorships.map(&:organization)
+    @employer_profiles = @organizations.flat_map(&:employer_profile)
+    @employer_profiles.each do |employer_profile|
+      employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
@@ -88,13 +83,19 @@ class Exchanges::HbxProfilesController < ApplicationController
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-    @datatable = Effective::Datatables::EmployerDatatable.new
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
 
     respond_to do |format|
       format.js
     end
   end
 
+  def employer_datatable
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+    respond_to do |format|
+      format.js
+    end
+  end
 
 def employer_poc
 

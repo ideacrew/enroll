@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+=begin
 describe EmployerProfile, dbclean: :after_each do
 
   let(:entity_kind)     { "partnership" }
@@ -1497,3 +1498,4 @@ end
 #     end
 #   end
 # end
+=end

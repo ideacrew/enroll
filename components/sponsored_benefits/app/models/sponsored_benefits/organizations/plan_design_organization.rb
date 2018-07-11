@@ -23,11 +23,17 @@ module SponsoredBenefits
 
       # Plan design owner profile type & ID
       field :owner_profile_id,    type: BSON::ObjectId
-      field :owner_profile_class_name,  type: String, default: "::BrokerAgencyProfile"
+      field :owner_profile_class_name,  type: String, default: "::BenefitSponsors::Organizations::Profile"
 
       # Plan design sponsor profile type & ID
       field :sponsor_profile_id,         type: BSON::ObjectId
-      field :sponsor_profile_class_name, type: String, default: "::EmployerProfile"
+      field :sponsor_profile_class_name, type: String, default: "::BenefitSponsors::Organizations::Profile"
+
+      #temporary fields to store old model profile data as history while migrating
+      field :past_owner_profile_id,type: BSON::ObjectId
+      field :past_owner_profile_class_name,type: String
+      field :past_sponsor_profile_id,type: BSON::ObjectId
+      field :past_sponsor_profile_class_name,type: String
 
       field :has_active_broker_relationship, type: Boolean, default: false
 
@@ -58,21 +64,26 @@ module SponsoredBenefits
 
       scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
 
-      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, 
-                                                                      {"fein" => Regexp.compile(Regexp.escape(query), true)}])}) }
+      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)},
+                                                                      {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
 
 
 
       def employer_profile
-        ::EmployerProfile.find(sponsor_profile_id)
+        ::EmployerProfile.find(sponsor_profile_id) || ::BenefitSponsors::Organizations::Profile.find(sponsor_profile_id)
       end
 
       def broker_agency_profile
-        ::BrokerAgencyProfile.find(owner_profile_id)
+        ::BrokerAgencyProfile.find(owner_profile_id) || ::BenefitSponsors::Organizations::Profile.find(owner_profile_id)
       end
 
       def general_agency_profile
         self.try(:employer_profile).try(:active_general_agency_account)
+      end
+
+      def active_employer_benefit_sponsorship
+        bs = employer_profile.active_benefit_sponsorship
+        bs if (bs && bs.is_eligible?)
       end
 
       # TODO Move this method to BenefitMarket Model
@@ -103,7 +114,7 @@ module SponsoredBenefits
 
       def calculate_start_on_dates
         if employer_profile.present? && employer_profile.active_plan_year.present?
-          [employer_profile.active_plan_year.start_on.next_year]
+          [employer_profile.active_plan_year.end_on.to_date.next_day]
         else
           SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates
         end

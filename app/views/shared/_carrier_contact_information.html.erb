@@ -1,16 +1,16 @@
-<div class="modal fade carrier-contact" id="<%= plan.coverage_kind %>-<%= plan.id %>" role="dialog">
+<div class="modal fade carrier-contact" id="<%= plan.kind %>-<%= plan.id %>" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button class="close" data-dismiss="modal" type="button">&times;</button>
-        <h4 class="modal-title"><%= plan.carrier_profile.legal_name %>
+        <h4 class="modal-title"><%= plan.issuer_profile.legal_name %>
           Customer Service Line</h4>
       </div>
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
-        <% if plan.coverage_kind == 'health' %>
+        <% if plan.kind.to_s == "health" %>
           <div class="carrier-numbers">
-            <% case plan.carrier_profile.legal_name %>
+            <% case plan.issuer_profile.legal_name %>
             <% when "BMC HealthNet Plan" %>
               <div>
                 <strong> Call: </strong>
@@ -127,7 +127,7 @@
           </div>
         <% else %>
           <div class="carrier-numbers">
-            <% case plan.carrier_profile.legal_name %>
+            <% case plan.issuer_profile.legal_name %>
             <% when "CareFirst" %>
                 <div>
                   Call:

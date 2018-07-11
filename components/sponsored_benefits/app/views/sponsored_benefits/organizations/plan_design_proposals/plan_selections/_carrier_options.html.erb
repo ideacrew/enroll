@@ -5,9 +5,8 @@
     <% if offer_sole_source? && check_plan_options_title %>
       <li role="presentation" class="col-xs-4 sole-source-tab" data-offering-kind="sole_source" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
-        <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
+        <%= f.label :plan_option_kind_sole_source, class: "elected_plan", onclick:"setTopLevelRadios(this)", data: {tempId: 1} do %>
+          <i class="far fa-circle"></i>
           <div class="pdp_carrier_title">
             <%= fetch_plan_title_for_sole_source %>
           </div>
@@ -17,9 +16,8 @@
     <% if offers_single_plan? %>
       <li role="presentation" class="col-xs-4 single-plan-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-        <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
+        <%= f.label :plan_option_kind_single_plan, class: "elected_plan", onclick:"setTopLevelRadios(this)", data: {tempId: 2}  do %>
+          <i class="far fa-circle"></i>
           <div class="pdp_carrier_title">
             Single plan
           </div>
@@ -29,9 +27,8 @@
     <% if offers_single_carrier? %>
       <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
-        <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
+        <%= f.label :plan_option_kind_single_carrier, class: "elected_plan", onclick:"setTopLevelRadios(this)", data: {tempId: 3}  do %>
+          <i class="far fa-circle"></i>
           <div class="pdp_carrier_title">
             <% if check_plan_options_title %>
                 <%= fetch_plan_title_for_single_carrier %>
@@ -45,9 +42,8 @@
     <% if offers_metal_level? %>
       <li role="presentation" class="col-xs-4 metal-level-tab" data-offering-id="<%= offering_id %>">
         <%= f.radio_button :plan_option_kind, "metal_level" %>
-        <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
-          <i class="fa fa-circle-o"></i>
-          <i class="fa fa-dot-circle-o"></i>
+        <%= f.label :plan_option_kind_metal_level, class: "elected_plan", onclick:"setTopLevelRadios(this)", data: {tempId: 4}  do %>
+          <i class="far fa-circle"></i>
           <div class="pdp_carrier_title">
             <% if check_plan_options_title %>
                 <%= fetch_plan_title_for_metal_level %>

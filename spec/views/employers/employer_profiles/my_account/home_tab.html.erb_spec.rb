@@ -262,7 +262,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
       allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
       assign :employer_profile, employer_profile
-      render partial: "employers/employer_profiles/my_account/home_tab"
+      render partial: "/employers/employer_profiles/my_account/home_tab.html.slim"
     end
 
     it "should not display employee enrollment information" do

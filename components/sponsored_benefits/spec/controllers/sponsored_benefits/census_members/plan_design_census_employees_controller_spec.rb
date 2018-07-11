@@ -33,8 +33,8 @@ module SponsoredBenefits
     let(:current_person) { double(:current_person) }
     let(:broker) { double(:broker, id: 2) }
     let(:broker_role) { double(:broker_role, id: 3) }
-    let(:broker_agency_profile_id) { "216735" }
-    let!(:organization) { create(:plan_design_organization, :with_profile, sic_code: '0197') }
+    let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
+    let!(:organization) { create(:sponsored_benefits_plan_design_organization, :with_profile, sic_code: '0197') }
 
     let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
                                     legal_name: "ba-name", dba: "alternate", is_active: true, organization: organization) }
@@ -62,6 +62,7 @@ module SponsoredBenefits
       allow(subject).to receive(:active_user).and_return(active_user)
       allow(current_person).to receive(:broker_role).and_return(broker_role)
       allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
+      allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
     end
 
     describe "GET #index" do
@@ -86,7 +87,7 @@ module SponsoredBenefits
         expect(response).to render_template('new')
       end
 
-      context "upload" do 
+      context "upload" do
         it "returns a success response" do
           xhr :get, :new, plan_design_proposal_id: plan_design_proposal.id, modal: "upload", format: :js
           expect(assigns(:census_employee)).to be_a(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
@@ -112,7 +113,7 @@ module SponsoredBenefits
         request.env["HTTP_REFERER"] = edit_organizations_plan_design_organization_plan_design_proposal_path(organization, plan_design_proposal)
       end
 
-      let(:valid_attributes) { 
+      let(:valid_attributes) {
         {
           "first_name"  => "John",
           "middle_name" => "",
@@ -130,7 +131,7 @@ module SponsoredBenefits
             "0"=>{"first_name"=>"David", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"2002-12-01", "employee_relationship"=>"child_under_26", "_destroy"=>"false", "ssn"=>""},
             "1"=>{"first_name"=>"Lara", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"1979-12-01", "employee_relationship"=>"spouse", "_destroy"=>"false", "ssn"=>""}
           }
-        } 
+        }
       }
 
       context "with valid params" do
@@ -207,7 +208,7 @@ module SponsoredBenefits
           end
         end
 
-        context "when dependent deleted" do 
+        context "when dependent deleted" do
           let(:census_employee) { CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes, benefit_sponsorship: benefit_sponsorship)) }
           let(:spouse) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'spouse' } }
           let(:child) { census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'child_under_26'} }
@@ -248,7 +249,7 @@ module SponsoredBenefits
           it "should update employee and dependents information" do
             xhr :put, :update, plan_design_proposal_id: plan_design_proposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => updated_attributes, format: :js
             census_employee.reload
-            expect((census_employee.email.attributes.to_a & updated_attributes["email_attributes"].to_a).to_h).to eq updated_attributes["email_attributes"]            
+            expect((census_employee.email.attributes.to_a & updated_attributes["email_attributes"].to_a).to_h).to eq updated_attributes["email_attributes"]
             expect((census_employee.address.attributes.to_a & updated_attributes["address_attributes"].to_a).to_h).to eq updated_attributes["address_attributes"]
             expect(census_employee.ssn).to eq updated_attributes["ssn"]
             expect(census_employee.census_dependents.detect{|cd| cd.employee_relationship == 'spouse' }.dob.strftime("%Y-%m-%d")).to eq "1980-12-01"
@@ -274,11 +275,11 @@ module SponsoredBenefits
     end
 
     describe ".bulk_employe_upload" do
-   
+
     end
 
     describe ".expected_selection" do
-   
+
     end
   end
 end

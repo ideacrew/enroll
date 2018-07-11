@@ -12,7 +12,8 @@ module Notifier
     }
 
     RESOURCE_MAP = {
-      "EmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
+      "BenefitSponsors::Organizations::BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
+      "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile" => Resource.new(:employer, :hbx_id, :employer_id, :by_hbx_id),
       "BrokerAgencyProfile" => Resource.new(:broker_agency, :id, :broker_agency_id, :find),
       "ConsumerRole" => Resource.new(:consumer_role, :id, :consumer_role_id, :find),
       "CensusEmployee" => Resource.new(:census_employee, :id, :census_employee_id, :find),

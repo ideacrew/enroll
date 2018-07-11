@@ -3,7 +3,7 @@ module Notifier
 
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
-    include Notifier::Builders::PlanYear
+    include Notifier::Builders::BenefitApplication
     include Notifier::Builders::Broker
     include Notifier::Builders::Enrollment
 
@@ -15,7 +15,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
-      data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.benefit_application = Notifier::MergeDataModels::BenefitApplication.new
       data_object.census_employee = Notifier::MergeDataModels::CensusEmployee.new
       data_object.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
       @merge_model = data_object
@@ -51,11 +51,11 @@ module Notifier
     end
 
     def ivl_oe_start_date
-      merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on
+      merge_model.ivl_oe_start_date = format_date(Settings.aca.individual_market.upcoming_open_enrollment.start_on)
     end
 
     def ivl_oe_end_date
-      merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on
+      merge_model.ivl_oe_end_date = format_date(Settings.aca.individual_market.upcoming_open_enrollment.end_on)
     end
 
     def email
@@ -91,7 +91,7 @@ module Notifier
 
     def enrollment_plan_name
       if enrollment.present?
-        merge_model.enrollment.plan_name = enrollment.plan.name
+        merge_model.enrollment.plan_name = enrollment.product.name
       end
     end
 
@@ -155,13 +155,13 @@ module Notifier
 
     def census_employee_latest_terminated_health_enrollment_plan_name
       if latest_terminated_health_enrollment.present?
-        merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.plan.name
+        merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.product.name
       end
     end
 
     def census_employee_latest_terminated_dental_enrollment_plan_name
       if latest_terminated_dental_enrollment.present?
-        merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.plan.name
+        merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.product.name
       end
     end
 

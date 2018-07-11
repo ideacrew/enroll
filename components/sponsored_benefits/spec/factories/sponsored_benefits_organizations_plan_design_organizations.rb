@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
+  factory :sponsored_benefits_plan_design_organization, class: 'SponsoredBenefits::Organizations::PlanDesignOrganization' do
     legal_name  "Turner Agency, Inc"
     dba         "Turner Brokers"
 
@@ -10,7 +10,7 @@ FactoryGirl.define do
     sequence :owner_profile_id do |n|
       "52345#{n}"
     end
-    
+
     fein do
       Forgery('basic').text(:allow_lower   => false,
         :allow_upper   => false,

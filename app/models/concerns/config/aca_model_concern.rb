@@ -22,10 +22,14 @@ module Config::AcaModelConcern
     delegate :employee_participation_ratio_minimum, to: :class
     delegate :non_owner_participation_count_minimum, to: :class
     delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
+    delegate :standard_industrial_classification_enabled?, to: :class
+    delegate :offer_sole_source?, to: :class
+    delegate :carrier_filters_enabled?, to: :class
     delegate :enrollment_shopping_start_day_offset, to: :class
     delegate :sic_field_exists_for_employer?, to: :class
     delegate :employer_attestation_is_enabled?, to: :class
     delegate :plan_match_tool_is_enabled?, to: :class
+    delegate :dental_market_enabled?, to: :class
     delegate :enabled_metal_levels, to: :class
     delegate :offerings_constrained_to_service_areas?, to: :class
   end
@@ -115,6 +119,18 @@ module Config::AcaModelConcern
       @@non_owner_participation_count_minimum ||= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
     end
 
+    def standard_industrial_classification_enabled?
+      @@standard_industrial_classification_enabled ||= Settings.aca.shop_market.standard_industrial_classification
+    end
+
+    def offer_sole_source?
+      @@offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
+    end
+
+    def carrier_filters_enabled?
+      @@carrier_filters_enabled ||= Settings.aca.shop_market.carrier_filters_enabled
+    end
+
     def employer_attestation_is_enabled?
       @@employer_attestation ||= Settings.aca.employer_attestation
     end
@@ -123,6 +139,9 @@ module Config::AcaModelConcern
       @@plan_match_tool ||= Settings.aca.plan_match_tool
     end
 
+    def dental_market_enabled?
+      @dental_market_enabled ||= Settings.aca.dental_market_enabled
+    end
 
     def enrollment_shopping_start_day_offset
       @@enrollment_shopping_start_day_offset ||= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days

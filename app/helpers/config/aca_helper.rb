@@ -67,6 +67,7 @@ module Config::AcaHelper
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
+
   def metal_levels_explained
     response = ""
     metal_level_contributions = {

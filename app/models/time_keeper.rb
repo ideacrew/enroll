@@ -90,8 +90,9 @@ class TimeKeeper
   end
 
   def push_date_of_record
+    BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     BenefitSponsorship.advance_day(self.date_of_record)
-    EmployerProfile.advance_day(self.date_of_record)
+    # EmployerProfile.advance_day(self.date_of_record)
     Family.advance_day(self.date_of_record) if individual_market_is_enabled?
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
@@ -99,7 +100,11 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    PlanYear.date_change_event(self.date_of_record)
+    begin
+      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(self.date_of_record)
+    rescue Exception => e
+      Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
+    end
   end
 
   def self.with_cache

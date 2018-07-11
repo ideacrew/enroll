@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+gem "benefit_markets", path: "components/benefit_markets"
+gem "benefit_sponsors", path: "components/benefit_sponsors"
+
 gem 'aasm', '~> 4.8.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 gem 'addressable', '2.3.8'
@@ -8,7 +11,7 @@ gem 'aws-sdk', '2.2.4'
 gem 'bcrypt', '~> 3.1'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'bootstrap-slider-rails', '6.0.17'
-gem 'bson', '3.2.6'
+gem 'bson', '~> 4.3.0'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'chosen-rails'
 gem 'ckeditor'
@@ -34,9 +37,9 @@ gem 'less-rails-bootstrap', '~> 3.3.1.0'
 gem 'mail', '2.6.3'
 gem 'maskedinput-rails'
 gem 'money-rails', '~> 1.3.0'
-gem 'mongo', '2.1.2'
+gem 'mongo', '2.5.1'
 gem 'mongo_session_store-rails4', '~> 6.0.0'
-gem 'mongoid', '5.0.1'
+gem 'mongoid', '~> 5.4.0'
 gem 'mongoid-autoinc'
 gem 'mongoid-enum'
 gem 'mongoid-history'
@@ -59,20 +62,22 @@ gem 'resque'
 gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
-gem 'slim', '3.0.8'
+gem 'slim', '~> 3.0.8'
 gem 'slim-rails'
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
 gem "sponsored_benefits", path: "components/sponsored_benefits"
-gem 'sprockets' , '~> 2.12.3'
+gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
-gem 'turbolinks','2.5.3'
+gem 'turbolinks', '2.5.3'
 gem 'uglifier', '>= 1.3.0', require: 'uglifier'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
+gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
+gem 'webpacker'
 
 #######################################################
 # Removed gems
@@ -97,18 +102,20 @@ group :doc do
 end
 
 group :development do
-  gem 'web-console', '2.3.0'
   gem "certified"
+  gem 'overcommit'
+  gem 'rubocop', require: false
+  gem 'web-console', '2.3.0'
 end
 
 group :development, :test do
+  gem 'parallel_tests'
   gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
-  gem "parallel_tests"
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
@@ -119,11 +126,12 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.4.2'
   gem 'rspec_junit_formatter', '0.2.3'
   gem 'spring', '1.6.3'
-  gem 'yard', '~> 0.9.5'
-  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'yard', '~> 0.9.5', require: false
+  gem 'yard-mongoid', '~> 0.1.0', require: false
 end
 
 group :test do
+  gem 'test-prof', '0.5.0'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'capybara-screenshot'

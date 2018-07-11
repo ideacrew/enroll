@@ -36,7 +36,7 @@
         <tr>
           <th><%= l10n("office_locations") %>:</th>
           <td>
-            <% broker_or_staff_role.broker_agency_profile.organization.office_locations.each do |office_location| %>
+            <% broker_or_staff_role.broker_agency_profile.office_locations.each do |office_location| %>
             <%= office_location.address.to_html %>
             <% end %>
           </td>
@@ -66,8 +66,8 @@
                   <label>
                     <%= broker_role_fields.check_box :license, class: "form-control" %>
                     <%= broker_role_fields.label :license do %>
-                    <i class="fa fa-check-square-o fa-2x"></i>
-                    <i class="fa fa-square-o fa-2x"></i>
+                    <i class="far fa-check-square fa-2x"></i>
+                    <i class="far fa-square fa-2x"></i>
                     <% end %>
                   </label>
                 </div>
@@ -82,8 +82,8 @@
                   <label>
                     <%= broker_role_fields.check_box :training, class: "form-control" %>
                     <%= broker_role_fields.label :training do %>
-                    <i class="fa fa-check-square-o fa-2x"></i>
-                    <i class="fa fa-square-o fa-2x"></i>
+                    <i class="far fa-check-square fa-2x"></i>
+                    <i class="far fa-square fa-2x"></i>
                     <% end %>
                   </label>
                 </div>
@@ -105,8 +105,8 @@
                           <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", true, disabled: true %>
                         <%end%>
                           <%= label_tag "person[broker_role_attributes][carrier_appointments][#{name}]" do %>
-                            <i class="fa fa-check-square-o fa-2x"></i>
-                            <i class="fa fa-square-o fa-2x"></i>
+                            <i class="far fa-check-square fa-2x"></i>
+                            <i class="far fa-square fa-2x"></i>
                             <% if name == "united_health_care" %>
                               <span>
                                 UnitedHealthcare

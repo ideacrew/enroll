@@ -110,9 +110,9 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidated = false;
           return false;
         }
-
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+
+    if ( $('#plan_year_start_on').val() !== undefined && $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       editvalidatedbgemployeepremiums = true;
       editvalidatedbgfamilypremiums = true;
       editValidatedbgSpousePremiums = true;
@@ -407,7 +407,7 @@ var EmployerProfile = ( function( window, undefined ) {
         return false;
       }
     });
-    if ( $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
+    if ( $('#plan_year_start_on').val() !== undefined && $('#plan_year_start_on').val().substring($('#plan_year_start_on').val().length - 5) == "01-01" ) {
       validatedbgemployeepremiums = true;
       validatedbgfamilypremiums = true;
       validatedbgSpousePremiums = true;
@@ -723,7 +723,7 @@ $(document).on('click', "a.interaction-click-control-terminate", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
-$(document).on('click', '.cobra_confirm', function(){
+$(document).on('click', '.cobra_confirm', function(event){
   event.preventDefault();
   var datepicker = $(this).prev();
   var cobra_date = datepicker.val();
@@ -883,13 +883,14 @@ function checkZip(textbox) {
         url: '/employers/employer_profiles/counties_for_zip_code',
         data: { zip_code: textbox.value },
         success: function (response) {
+          /*
           $('#county-select-' + child_index + " select").html(response);
           $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
           if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() &&
                   $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
           {
               $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
-          }
+          }*/
         }
       });
     }

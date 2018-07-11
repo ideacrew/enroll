@@ -34,8 +34,9 @@ class UserMailer < ApplicationMailer
 
   #Email will sent to census employees as soon as they are added to the roster
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
-    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_effective_date)}
-    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
+    # TODO - Move logic to model
+    benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
+    if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       if (census_employee.hired_on > TimeKeeper.date_of_record)
         mail({to: email, subject: "You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the #{Settings.site.long_name}"}) do |format|
           format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
@@ -50,8 +51,8 @@ class UserMailer < ApplicationMailer
 
   #Email will be sent to census employees when they reach the DOH.
   def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
-    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_effective_date)}
-    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
+    benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
+    if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
       mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
         format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
       end

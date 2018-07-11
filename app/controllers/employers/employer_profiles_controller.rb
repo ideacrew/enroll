@@ -1,5 +1,5 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
-  include Config::AcaConcern
+  include ::Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
@@ -326,19 +326,19 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
-  def new_document
+  def new_document # Should be in ER attestations controller
     @document = @employer_profile.documents.new
     respond_to do |format|
       format.js #{ render "new_document" }
     end
   end
 
-  def upload_document
+  def upload_document # Should be in ER attestations controller
     @employer_profile.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
     redirect_to employers_employer_profile_path(:id => @employer_profile) + '?tab=documents'
   end
 
-  def download_documents
+  def download_documents # Should be in ER attestations controller
     @employer_profile = EmployerProfile.find(params[:id])
     #begin
       doc = @employer_profile.documents.find(params[:ids][0])
@@ -515,7 +515,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def find_employer
     id_params = params.permit(:id, :employer_profile_id)
     id = id_params[:id] || id_params[:employer_profile_id]
-    @employer_profile = EmployerProfile.find(id)
+    # Deprecate this after moving attestation actions to ER attestations controller
+    @employer_profile = EmployerProfile.find(id) || BenefitSponsors::Organizations::Profile.find(id)
     render file: 'public/404.html', status: 404 if @employer_profile.blank?
   end
 

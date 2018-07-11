@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe Employers::EmployerProfilesController do
+RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
-  describe "GET index" do
+  describe "GET index", dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
     let(:employer_profile1) { FactoryGirl.create(:employer_profile) }
     let(:employer_profile2) { FactoryGirl.create(:employer_profile) }
 
-    context 'when broker agency id present' do
+    context 'when broker agency id present', dbclean: :after_each do
       it 'should return employers for the broker agency', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
@@ -27,7 +27,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context 'when broker agency id not present' do
+    context 'when broker agency id not present', dbclean: :after_each do
       it 'should return all the employers in the system', dbclean: :after_each do
         allow(user).to receive(:person).and_return(person)
         allow(controller).to receive(:find_mailbox_provider).and_return(true)
@@ -41,7 +41,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET new" do
+  describe "GET new", dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
 
@@ -56,7 +56,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET#counties_for_zip_code" do
+  describe "GET#counties_for_zip_code", dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
     let(:zip_code) { '21208' }
@@ -71,7 +71,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(response).to render_template(:'employers/employer_profiles/_county_field')
       expect(assigns(:counties)).to match_array(%W(Baltimore))
     end
-    context "with a nonmatched zip" do
+    context "with a nonmatched zip", dbclean: :after_each do
       let(:zip_code) { '21224' }
       it "should return an unsupported zip string" do
 
@@ -81,7 +81,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   end
 
-  describe "REDIRECT to my account if employer staff role present" do
+  describe "REDIRECT to my account if employer staff role present", dbclean: :after_each do
     let(:user) { double("user")}
     let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
 
@@ -97,7 +97,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET show" do
+  describe "GET show", dbclean: :after_each do
     let(:user) { double(
       "user",
       :person => person,
@@ -231,7 +231,7 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
 
-  describe "GET show" do
+  describe "GET show", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:person){ FactoryGirl.create(:person) }
     let(:employer_profile) {instance_double("EmployerProfile", id: double("id"))}
@@ -251,7 +251,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:policy) {double("policy")}
 
-    context "it should return published plan year " do
+    context "it should return published plan year ", dbclean: :after_each do
       let(:broker_agency_account) { FactoryGirl.build_stubbed(:broker_agency_account) }
       let(:invoice) { instance_double("Document", id: double("id"), subject: 'invoice', date: Time.now) }
       let(:initial_invoice) { instance_double("Document", id: double("id"), subject: 'initial_invoice', date: Time.now) }
@@ -298,7 +298,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET show_profile" do
+  describe "GET show_profile", dbclean: :after_each do
     let(:user) do
       double("user",
              :person => person,
@@ -318,7 +318,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:employer_profile) { employee_role.employer_profile }
     let(:policy) { double("policy") }
 
-    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then' do
+    context 'When employee_roles not in EMPLOYMENT_ACTIVE_STATES then', dbclean: :after_each do
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:is_broker_for_employer?).and_return(false)
@@ -339,7 +339,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then' do
+    context 'When employee_roles in EMPLOYMENT_ACTIVE_STATES then', dbclean: :after_each do
       before do
         allow(::AccessPolicies::EmployerProfile).to receive(:new).and_return(policy)
         allow(policy).to receive(:is_broker_for_employer?).and_return(false)
@@ -360,7 +360,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET welcome" do
+  describe "GET welcome", dbclean: :after_each do
     let(:user) { double("user")}
     let(:person) { double("Person")}
 
@@ -375,7 +375,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET search" do
+  describe "GET search", dbclean: :after_each do
     let(:user) { double("user")}
     let(:person) { double("Person")}
     before(:each) do
@@ -391,7 +391,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET index" do
+  describe "GET index", dbclean: :after_each do
     let(:organization_search_criteria) { double }
     let(:organization_employer_criteria) { double }
     let(:found_organization) { double(:employer_profile => employer) }
@@ -428,7 +428,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET index search" do
+  describe "GET index search", dbclean: :after_each do
     let(:organization_search_criteria) { double }
     let(:criteria_page_results) { [double(:employer_profile => employer)] }
     let(:employer) { double }
@@ -462,7 +462,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   end
 
-  describe "POST create" do
+  describe "POST create", dbclean: :after_each do
     let(:user){ double("User", :idp_verified? => true) }
     let(:person){ double("Person", :id => "some person id") }
     let(:phone_attributes) { {
@@ -513,13 +513,13 @@ RSpec.describe Employers::EmployerProfilesController do
 
     end
 
-    describe 'updateable organization' do
+    describe 'updateable organization', dbclean: :after_each do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in @user
         post :create, :organization => organization_params
       end
-      describe "given an invalid employer profile" do
+      describe "given an invalid employer profile", dbclean: :after_each do
         it "assigns the organization" do
           expect(assigns(:organization)).to eq organization
         end
@@ -533,7 +533,7 @@ RSpec.describe Employers::EmployerProfilesController do
         end
       end
 
-      describe "given a valid employer profile" do
+      describe "given a valid employer profile", dbclean: :after_each do
         let(:save_result) { true }
 
         it "assigns the organization" do
@@ -546,7 +546,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    describe 'update organization not allowed' do
+    describe 'update organization not allowed', dbclean: :after_each do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: false))
         sign_in @user
@@ -554,7 +554,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
 
 
-      describe "given a valid employer profile" do
+      describe "given a valid employer profile", dbclean: :after_each do
         let(:save_result) { true }
 
         it "has an error message" do
@@ -569,7 +569,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
   end
 
-  describe "POST create" do
+  describe "POST create", dbclean: :after_each do
     let(:user) { double("User", :idp_verified? => true) }
     let(:person) { double("Person", :id => "SOME PERSON ID") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
@@ -589,7 +589,7 @@ RSpec.describe Employers::EmployerProfilesController do
       post :create, :organization => employer_parameters
     end
 
-    context "given invalid parameters" do
+    context "given invalid parameters", dbclean: :after_each do
       let(:validation_result) { true }
 
       it "renders the 'edit' template" do
@@ -607,7 +607,7 @@ RSpec.describe Employers::EmployerProfilesController do
     # end
   end
 
-  describe "POST match" do
+  describe "POST match", dbclean: :after_each do
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:found_employer) { [] }
     let(:user) { double("User")}
@@ -623,7 +623,7 @@ RSpec.describe Employers::EmployerProfilesController do
       post :match, :employer_profile => employer_parameters, :create_employer => create_employer_params
     end
 
-    context "given invalid parameters" do
+    context "given invalid parameters", dbclean: :after_each do
       let(:validation_result) { false }
 
       it "renders the 'search' template" do
@@ -633,7 +633,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context "given valid parameters render 'no_match' template" do
+    context "given valid parameters render 'no_match' template", dbclean: :after_each do
       let(:validation_result) { true }
 
       it "renders the 'no_match' template" do
@@ -643,7 +643,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context "given valid parameters render 'match' template" do
+    context "given valid parameters render 'match' template", dbclean: :after_each do
       let(:validation_result) { true }
       let(:found_employer) { FactoryGirl.create(:employer_profile) }
 
@@ -656,7 +656,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-    context "given valid parameters and create_employer" do
+    context "given valid parameters and create_employer", dbclean: :after_each do
       let(:employer_parameters) { { :sic_code => "SOMDFINKETHING" } }
       let(:validation_result) { true }
       let(:create_employer_params) { true }
@@ -668,7 +668,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "PUT update" do
+  describe "PUT update", dbclean: :after_each do
     let(:user) { double("user")}
     let(:employer_profile) { double("EmployerProfile") }
     let(:organization) { double("Organization", id: "test") }
@@ -730,7 +730,7 @@ RSpec.describe Employers::EmployerProfilesController do
       expect(flash[:error]).to match "Can't have multiple primary addresses"
     end
 
-    context "given current user is invalid" do
+    context "given current user is invalid", dbclean: :after_each do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(false)
         allow(organization).to receive(:notify_address_change).and_return(true)
@@ -741,7 +741,7 @@ RSpec.describe Employers::EmployerProfilesController do
       end
     end
 
-     context "given the company have managing staff" do
+     context "given the company have managing staff", dbclean: :after_each do
       it "should render edit template" do
         allow(user).to receive(:save).and_return(true)
         allow(organization).to receive(:notify_address_change).and_return(true)
@@ -751,7 +751,7 @@ RSpec.describe Employers::EmployerProfilesController do
         expect(response).to be_redirect
       end
 
-    context "notify address change" do
+    context "notify address change", dbclean: :after_each do
       let(:employer_profile1) { FactoryGirl.build(:employer_profile) }
       let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
       let(:office_location) { OfficeLocation.new(
@@ -827,7 +827,7 @@ RSpec.describe Employers::EmployerProfilesController do
   #  end
   #end
 
-  describe "GET export_census_employees" do
+  describe "GET export_census_employees", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
@@ -838,7 +838,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "GET new Document" do
+  describe "GET new Document", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     it "should load upload Page" do
@@ -849,7 +849,7 @@ RSpec.describe Employers::EmployerProfilesController do
   end
 
 
-  describe "POST Upload Document" do
+  describe "POST Upload Document", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     #let(:params) { { id: employer_profile.id, file:'test/JavaScript.pdf', subject: 'JavaScript.pdf' } }
@@ -869,7 +869,7 @@ RSpec.describe Employers::EmployerProfilesController do
       #allow(@controller).to receive(:file_content_type).and_return("application/pdf")
     end
 
-    context "upload document" do
+    context "upload document", dbclean: :after_each do
       it "redirects to document list page" do
         sign_in user
         post :upload_document, {:id => employer_profile.id, :file => file, :subject=> subject}
@@ -878,7 +878,7 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
-  describe "Delete Document" do
+  describe "Delete Document", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 

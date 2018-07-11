@@ -4,8 +4,8 @@ class SpecialEnrollmentPeriod
   include Mongoid::Timestamps
   include ScheduledEventService
   include TimeHelper
-  include Concerns::Observable
-  include ModelEvents::SpecialEnrollmentPeriod
+  include BenefitSponsors::Concerns::Observable
+  include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
   after_save :notify_on_save
   
@@ -83,6 +83,8 @@ class SpecialEnrollmentPeriod
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
   after_initialize :set_submitted_at
+
+  add_observer ::BenefitSponsors::Observers::SpecialEnrollmentPeriodObserver.new, [:notifications_send]
 
   def start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String
@@ -201,19 +203,7 @@ private
     when "fixed_first_of_next_month"
       fixed_first_of_next_month_effective_date
     end
-    validate_and_set_effective_on if is_shop?
   end
-
-  def validate_and_set_effective_on
-    person = self.family.primary_applicant.person if self.family
-    employee_role = person.active_employee_roles.first if person.present?
-    employer_profile = employee_role.employer_profile if employee_role.present?
-    if employee_role && employer_profile.plan_years.published_plan_years_by_date(effective_on).blank? && employer_profile.show_plan_year.present? && employee_role.employer_profile.find_plan_year_by_effective_date(self.effective_on).blank?
-      plan_year_start_on = employer_profile.show_plan_year.start_on
-      self.effective_on = plan_year_start_on if effective_on < plan_year_start_on
-    end
-  end
-
 
   def first_of_month_effective_date
     if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on

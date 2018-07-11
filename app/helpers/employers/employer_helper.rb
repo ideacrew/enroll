@@ -15,6 +15,11 @@ module Employers::EmployerHelper
     end
   end
 
+  def simple_enrollment_state(census_employee=nil)
+    hbx = census_employee.active_benefit_group_enrollments.try(:first)
+    hbx.present? ? "#{hbx.coverage_kind.titleize} - #{hbx.aasm_state.titleize}" : ""
+  end
+
   def enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
@@ -38,7 +43,6 @@ module Employers::EmployerHelper
     end
 
     "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
-
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -133,11 +137,36 @@ module Employers::EmployerHelper
     end
   end
 
+  # deprecated
   def get_benefit_groups_for_census_employee
+    # TODO
     plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
     benefit_groups = plan_years.flat_map(&:benefit_groups)
-    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year.present?
     return benefit_groups, (renewing_benefit_groups || [])
+  end
+
+  def get_benefit_packages_for_census_employee
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present?
+    renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
+    return (initial_benefit_packages || []), (renewing_benefit_packages || [])
+  end
+
+  def current_option_for_initial_benefit_package
+    bga = @census_employee.active_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.current_benefit_application
+    return nil if application.blank?
+    return nil if application.benefit_packages.empty?
+    application.benefit_packages[0].id
+  end
+
+  def current_option_for_renewal_benefit_package
+    bga = @census_employee.renewal_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.renewal_benefit_application
+    return nil if application.blank?
+    application.default_benefit_group || application.benefit_packages[0].id
   end
 
   def cobra_effective_date(census_employee)
@@ -175,6 +204,7 @@ module Employers::EmployerHelper
     return true if user && user.has_hbx_staff_role?
     return false if employer_profile.blank?
 
+    # TODO
     plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
 
     return false if plan_year.blank?
@@ -238,9 +268,9 @@ module Employers::EmployerHelper
 
   def selected_benefit_plan(plan)
     case plan
-      when 'single_carrier' then fetch_plan_title_for_single_carrier
+      when 'single_carrier', 'single_issuer' then fetch_plan_title_for_single_carrier
       when 'metal_level' then fetch_plan_title_for_metal_level
-      when 'single_plan','sole_source' then 'A Single Plan'
+      when 'single_plan', 'sole_source', 'single_product' then 'A Single Plan'
     end
   end
 

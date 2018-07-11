@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each do
   let(:general_agency_profile) {FactoryGirl.create(:general_agency_profile)}
   let(:user) {FactoryGirl.create(:user, :general_agency_staff)}
@@ -21,4 +22,5 @@ RSpec.describe "general_agencies/profiles/_show.html.erb", dbclean: :after_each 
   it "should have status bar" do
     expect(rendered).to have_content('Edit General Agency')
   end
+end
 end

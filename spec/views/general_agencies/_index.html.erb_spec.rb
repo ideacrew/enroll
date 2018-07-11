@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   before :each do
@@ -38,4 +39,5 @@ RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_e
       expect(rendered).to have_selector('input[value="all"]')
     end
   end
+end
 end

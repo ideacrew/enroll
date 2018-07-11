@@ -19,10 +19,6 @@ module Config::SiteHelper
   def site_privacy_policy
     Settings.site.privacy_policy
   end
-  
-  def site_website_link
-    link_to site_website_name, site_website_name
-  end
 
   def site_website_link
     link_to site_website_name, site_website_name
@@ -159,6 +155,7 @@ module Config::SiteHelper
   def site_employer_application_deadline_link
     Settings.site.employer_application_deadline_link
   end
+
 
   def site_guidance_for_business_owners_url
     Settings.site.guidance_for_business_owners_url

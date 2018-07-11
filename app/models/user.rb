@@ -135,6 +135,11 @@ class User
     person == employer_profile.active_broker if employer_profile.active_broker
   end
 
+  def is_benefit_sponsor_active_broker?(profile_id)
+    profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(profile_id)).first
+    person == profile_organization.employer_profile.active_broker if (profile_organization && profile_organization.employer_profile && profile_organization.employer_profile.active_broker)
+  end
+
   def handle_headless_records
     headless_with_email = User.where(email: /^#{::Regexp.quote(email)}$/i)
     headless_with_oim_id = User.where(oim_id: /^#{::Regexp.quote(oim_id)}$/i)
