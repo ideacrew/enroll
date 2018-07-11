@@ -1,6 +1,6 @@
 $(document).ready(function() {
-  $(document).on('click', 'a[href]:not(.disabled).nav-stacked', function(e) {
-    //Leave without saving for all side nav items
+  $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
+    //Leave without saving for all side nav items - this gathers all items 
     $('.btn.btn-primary').click(function() {
         window.location.href = e.target.href;
       });
