@@ -40,15 +40,17 @@ namespace :reports do
               benefit_application.effective_period.begin,
               benefit_application.open_enrollment_period.max,
               clean_JSON_dump(JSON.dump(enrollment_errors)),
-              benefit_application.is_renewing? ? "renewing" : "initial"),
+              (benefit_application.is_renewing? ? "renewing" : "initial"),
               employer_profile.is_conversion?
             ]
           end
         end
       end
 
-      pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
+      unless Rails.env.development?
+        pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+      end
     end
 
     def clean_JSON_dump(json_errors)
