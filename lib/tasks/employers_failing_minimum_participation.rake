@@ -37,8 +37,8 @@ namespace :reports do
               employer_profile.fein,
               employer_profile.legal_name,
               employer_profile.dba,
-              benefit_application.effective_period.begin,
-              benefit_application.open_enrollment_period.max,
+              benefit_application.start_on.to_date.to_s,
+              benefit_application.open_enrollment_end_on.to_date.to_s,
               clean_JSON_dump(JSON.dump(enrollment_errors)),
               (benefit_application.is_renewing? ? "renewing" : "initial"),
               employer_profile.is_conversion?
