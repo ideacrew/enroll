@@ -27,12 +27,12 @@ module Notifier
 
     def enrollment_coverage_end_on_minus_60_days
       return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on_minus_60_days = format_date(census_employee_record.employment_terminated_on.end_of_month - 60.days)
+      merge_model.enrollment.coverage_end_on_minus_60_days = format_date(census_employee_record.coverage_terminated_on - 60.days)
     end
 
     def enrollment_coverage_end_on_plus_60_days
       return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on_plus_60_days = format_date(census_employee_record.employment_terminated_on.end_of_month + 60.days)
+      merge_model.enrollment.coverage_end_on_plus_60_days = format_date(census_employee_record.coverage_terminated_on + 60.days)
     end
 
     def enrollment_plan_name
