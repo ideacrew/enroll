@@ -2,6 +2,7 @@ module BenefitSponsors
   class BenefitApplications::BenefitApplication
     include Mongoid::Document
     include Mongoid::Timestamps
+    include Acapi::Notifiers
     include BenefitSponsors::Concerns::RecordTransition
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
@@ -594,6 +595,35 @@ module BenefitSponsors
       end
 
       self
+    end
+
+    def send_employee_renewal_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_renewal_employee!(ce)
+      end
+    end
+
+    def send_employee_initial_enrollment_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_initial_employee!(ce)
+      end
+    end
+
+    def send_active_employee_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_employee!(ce)
+      end
+    end
+
+    def send_employee_invites
+      return true if benefit_groups.any?{|bg| bg.is_congress?}
+      if is_renewing?
+        notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+      elsif enrollment_open?
+        notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+      else
+        notify("acapi.info.events.plan_year.employee_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+      end
     end
 
     def accept_application
