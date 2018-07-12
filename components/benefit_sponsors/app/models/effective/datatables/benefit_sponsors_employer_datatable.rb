@@ -51,13 +51,7 @@ module Effective
 
         if employer_attestation_is_enabled?
           table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
-            #TODO fix this after employer attestation is fixed, this is only temporary fix
-            #used below condition, as employer_attestation is embedded from both employer profile and benefit sponsorship
-            if row.employer_attestation.present?
-              row.employer_attestation.aasm_state.titleize
-            elsif @employer_profile.employer_attestation.present?
-              @employer_profile.employer_attestation.aasm_state.titleize
-            end
+            @employer_profile.employer_attestation.present? ? @employer_profile.employer_attestation.aasm_state.titleize : ""
           }, :filter => false, :sortable => false
         end
 
