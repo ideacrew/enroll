@@ -88,6 +88,10 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     hbx_enrollments << dental_enrollments
     hbx_enrollments.flatten!
     hbx_enrollments.compact!
+
+    hbx_enrollments.each do |enrollment|
+      notice.enrollments << append_enrollment_information(enrollment)
+    end
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
   end
 
@@ -108,6 +112,36 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
         end
       end
     end
+  end
+
+  def append_enrollment_information(enrollment)
+    plan = PdfTemplates::Plan.new({
+        plan_name: enrollment.plan.name,
+        is_csr: enrollment.plan.is_csr?,
+        coverage_kind: enrollment.plan.coverage_kind,
+        plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
+        family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
+        deductible: enrollment.plan.deductible
+    })
+    PdfTemplates::Enrollment.new({
+     created_at: enrollment.created_at,
+     premium: enrollment.total_premium.round(2),
+     aptc_amount: enrollment.applied_aptc_amount.round(2),
+     responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+     phone: phone_number(enrollment.plan.carrier_profile.legal_name),
+     is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
+     coverage_kind: enrollment.coverage_kind,
+     kind: enrollment.kind,
+     effective_on: enrollment.effective_on,
+     plan: plan,
+     enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+       enrollee = PdfTemplates::Individual.new({
+                                                   full_name: member.person.full_name.titleize,
+                                                   age: member.person.age_on(TimeKeeper.date_of_record)
+                                               })
+       enrollees << enrollee
+     end
+                                 })
   end
 
 

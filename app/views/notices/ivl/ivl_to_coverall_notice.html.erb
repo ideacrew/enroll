@@ -62,16 +62,16 @@
     contents: [""],
     heading: "What's Different About Cover All DC Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 
-<% if notice.assisted_enrollments.present? %>
+<% if notice.assisted_enrollments.present? && notice.csr_enrollments.present?  %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "The Cover All DC plan is the same plan the people listed enrolled in through DC Health Link. It offers the same covered services."} %>
   <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "Some things are different:",
-      listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
-<% elsif notice.csr_enrollments.present? %>
+      listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>Your annual deductible, copayments and coinsurance will be higher.</strong> Cost-sharing reductions are not available to people enrolled in coverage through Cover All DC. The people listed must now pay full price for out-of-pocket costs when they get covered services.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+<% elsif  notice.assisted_enrollments.present? %>
   <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "",
-      listings: ["<strong>Your annual deductible, copayments and coinsurance will be higher.</strong> Cost-sharing reductions are not available to people enrolled in coverage through Cover All DC. The people listed must now pay full price for out-of-pocket costs when they get covered services.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+      previous: "Some things are different:",
+      listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "The Cover All DC plan is the same plan the people listed enrolled in through DC Health Link. It offers the same covered services."} %>
@@ -95,14 +95,14 @@
     listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>. to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "Get expert help choosing a new plan (at no cost to you) from a DC Health Link registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>. to search for a Broker near you. You can also call DC Health Link if you have questions or need help."} %>
+    listing: "Get expert help choosing a new plan (at no cost to you) from a DC Health Link registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call DC Health Link if you have questions or need help."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
     contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
     heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+    listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
