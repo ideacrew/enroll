@@ -583,6 +583,11 @@ class PlanYear
     @census_employees ||= CensusEmployee.by_benefit_group_ids(benefit_group_ids)
   end
 
+  # Backward compatibilty in case of PlanYear reference
+  def progressbar_covered_count
+    covered_count
+  end
+
   def covered_count
     covered.count
   end
