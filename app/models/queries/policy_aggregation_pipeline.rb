@@ -39,7 +39,7 @@ module Queries
     end
 
     def filter_to_employers_hbx_ids(hbx_id_list)
-      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) # check
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
@@ -50,7 +50,7 @@ module Queries
     end
 
     def exclude_employers_by_hbx_ids(hbx_id_list)
-      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) # cehck
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
@@ -61,7 +61,7 @@ module Queries
     end
 
     def filter_to_employers_feins(fein_list)
-      orgs = BenefitSponsors::Organizations::Organization.where(:fein => {"$in" => fein_list}) # check
+      orgs = BenefitSponsors::Organizations::Organization.where(:fein => {"$in" => fein_list}) 
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
