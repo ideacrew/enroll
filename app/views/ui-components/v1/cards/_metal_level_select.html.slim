@@ -214,6 +214,7 @@ javascript:
     setTimeout(function() {
       buildSponsorContributions(sponsorContribution)
       disableEmployeeContributionLevel();
+      newContributionAmounts();
     },400);
   }
 
@@ -255,6 +256,9 @@ javascript:
   }
 
   function displayReferencePlanDetails(element, options) {
+    if(!(element || options)) {
+      return
+    }
     options = options || {};
     planTitle = options.planTitle || element.dataset.planTitle;
     metalLevel = options.metalLevel || element.dataset.planMetalLevel;
