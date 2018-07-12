@@ -1,4 +1,3 @@
-@individual_enabled
 Feature: Create Primary Broker and Broker Agency
   In order for Brokers to help SHOP employees only
   The Primary Broker must create and manage an account on the HBX for their organization.
@@ -11,10 +10,20 @@ Feature: Create Primary Broker and Broker Agency
   The Broker should be able to select a family covered by that Employer
   The Broker should be able to purchase insurance for that family
 
+  Scenario: Broker can enter ACH information
+    When Primary Broker visits the HBX Broker Registration form
+    Given a valid ach record exists
+    Given Primary Broker has not signed up as an HBX user
+    Then Primary Broker should see the New Broker Agency form
+    When Primary Broker enters personal information
+    And Primary Broker enters broker agency information for SHOP markets
+    And Primary Broker enters office location for default_office_location
+    Then Primary Broker should see bank information
+
   @more_than_sole_source
   Scenario: Primary Broker has not signed up on the HBX
     When Primary Broker visits the HBX Broker Registration form
-
+    Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information
@@ -22,10 +31,12 @@ Feature: Create Primary Broker and Broker Agency
     And Primary Broker enters office location for default_office_location
     And Primary Broker clicks on Create Broker Agency
     Then Primary Broker should see broker registration successful message
-
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
-    And Hbx Admin clicks on the Brokers tab
+    And I select the all security question and give the answer
+    When I have submit the security questions
+    And Hbx Admin clicks on the Brokers dropdown
+    And Hbx Admin clicks on the Broker Applications option
     Then Hbx Admin should see the list of broker applicants
     When Hbx Admin clicks on the current broker applicant show button
     Then Hbx Admin should see the broker application with carrier appointments
@@ -38,11 +49,14 @@ Feature: Create Primary Broker and Broker Agency
     Then Primary Broker should see the create account page
     When Primary Broker registers with valid information
     Then Primary Broker should see successful message with broker agency home page
+    And Primary Broker select the all security question and give the answer
+    When Primary Broker have submit the security questions    
     And Primary Broker logs out
 
     Given Employer has not signed up as an HBX user
     When I visit the Employer portal
     Then Tim Wood creates an HBX account
+    When Tim Wood has already provided security question responses
     Then Tim Wood should see a successful sign up message
     Then I should click on employer portal
     And Tim Wood creates a new employer profile with default_office_location
@@ -86,6 +100,8 @@ Feature: Create Primary Broker and Broker Agency
 
     When I go to the employee account creation page
     When Broker Assisted creates an HBX account
+    And Broker Assisted select the all security question and give the answer
+    When Broker Assisted have submit the security questions
     #Then Broker Assisted should be logged on as an unlinked employee
     When Broker Assisted goes to register as an employee
     Then Broker Assisted should see the employee search page
