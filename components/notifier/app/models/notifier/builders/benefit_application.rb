@@ -233,7 +233,7 @@ module Notifier
         if benefit_application.is_renewing? && (benefit_application.is_submitted? || benefit_application.canceled?)
           @renewal_benefit_application = benefit_application
         else
-          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted?? && ba.start_on == benefit_application.start_on.prev_year}
+          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted? && ba.start_on == benefit_application.start_on.prev_year}
         end
       end
     end
