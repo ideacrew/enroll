@@ -38,7 +38,7 @@ module BenefitSponsors
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :"benefit_applications" => { 
             :$elemMatch => {
-              :"aasm_state" => :enrollment_eligible,
+              :"aasm_state" => :enrollment_closed,
             }
           }
         })
