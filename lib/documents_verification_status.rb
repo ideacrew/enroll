@@ -3,7 +3,7 @@ module DocumentsVerificationStatus
     applicant_in_context = @f_member.applicant_for_verification if @f_member
     consumer = member.consumer_role
     if (consumer.vlp_authority == "curam" && consumer.fully_verified?)
-      admin ? "curam" : "External source"
+      admin ? "External Source" : "verified"
     else
       case type
         when 'Social Security Number'

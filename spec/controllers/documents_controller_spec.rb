@@ -14,8 +14,11 @@ RSpec.describe DocumentsController, :type => :controller do
 
   describe "destroy" do
     before :each do
+      family_member = FactoryGirl.build(:family_member, person: person, family: family)
+      person.families.first.family_members << family_member
+      allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       person.consumer_role.vlp_documents = [document]
-      delete :destroy, person_id: person.id, id: document.id
+      delete :destroy, person_id: person.id, id: document.id, family_member_id: family_member.id
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path

@@ -621,6 +621,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           allow(person).to receive(:consumer_role).and_return nil
           allow(person).to receive(:employee_roles).and_return []
+          allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
           get :show, family_member_ids: [], id: "hbx_id", market_kind: 'individual'
         end
 

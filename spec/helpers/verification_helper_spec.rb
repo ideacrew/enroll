@@ -70,9 +70,9 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     context "admin role" do
-      it_behaves_like "verification type status", "valid", "Immigration status", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "valid", "Immigration status", true, "External Source", "curam", "admin"
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
-      it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "valid", "Citizenbship", true, "External Source", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
     end
 
