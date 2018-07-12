@@ -9,7 +9,7 @@ namespace :nfp do
       Dir.entries(absolute_folder_path).each do |file|
         next if File.directory?(file) #skipping directories
         puts "uploading file #{absolute_folder_path}/#{file}"
-        service = BenefitSponsors::Services::CommissionStatementService.new
+        service = BenefitSponsors::Services::UploadDocumentsToProfilesService.new
         service.upload_commission_statement(absolute_folder_path+"/"+file,file)
       end
     else
