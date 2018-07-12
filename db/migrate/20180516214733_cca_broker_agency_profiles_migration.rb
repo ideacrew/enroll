@@ -68,6 +68,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
             new_organization = self.initialize_new_organization(old_org, site)
 
             raise Exception unless new_organization.valid?
+            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
             new_organization.save!
 
             #Roles Migration
@@ -119,12 +120,14 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
+      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
     end
 
     old_org.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
+      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
     end
   end

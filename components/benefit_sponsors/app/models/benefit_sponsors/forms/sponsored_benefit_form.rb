@@ -9,6 +9,10 @@ module BenefitSponsors
       attribute :kind, String
       attribute :product_option_choice, String
       attribute :product_package_kind, String
+
+      # for employee cost details
+      attribute :employees_cost, Array[EmployeeCostForm]
+
       attribute :employer_estimated_monthly_cost, String
       attribute :employer_estimated_min_monthly_cost, String
       attribute :employer_estimated_max_monthly_cost, String

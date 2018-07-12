@@ -97,7 +97,9 @@ module BenefitSponsors
 
     scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
     scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
-    scope :enrolling,                       ->{ any_in(aasm_state: ENROLLING_STATES) }
+    scope :enrolling,           ->{ any_in(aasm_state: ENROLLING_STATES) }
+    scope :enrolling_state,     ->{ where(aasm_state: :enrollment_open) }
+
     scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
     scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
     scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
@@ -114,11 +116,11 @@ module BenefitSponsors
     #                                             }
 
     scope :effective_date_begin_on,         ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.min" => compare_date )
+                                                                                           :"effective_period.min".lte => compare_date )
                                                                                            }
 
     scope :effective_date_end_on,           ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"effective_period.max" => compare_date )
+                                                                                           :"effective_period.max".lt => compare_date )
                                                                                            }
 
     scope :effective_period_cover,          ->(compare_date = TimeKeeper.date_of_record) { where(
@@ -133,10 +135,10 @@ module BenefitSponsors
                                                                                            :"opem_enrollment_period.max".gte => compare_date)
                                                                                            }
     scope :open_enrollment_begin_on,        ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.min" => compare_date)
+                                                                                           :"open_enrollment_period.min".lte => compare_date)
                                                                                            }
     scope :open_enrollment_end_on,          ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                                           :"open_enrollment_period.max" => compare_date)
+                                                                                           :"open_enrollment_period.max".lt => compare_date)
                                                                                            }
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
@@ -379,7 +381,7 @@ module BenefitSponsors
     end
 
     def is_renewing?
-      predecessor.present? && (APPLICATION_DRAFT_STATES + ENROLLING_STATES).include?(aasm_state)
+      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
     end
 
     def is_renewal_enrolling?
@@ -450,10 +452,10 @@ module BenefitSponsors
       total_enrolled   = enrolled_families
 
       owner_employees  = active_census_employees.select{|ce| ce.is_business_owner}
-      filter_enrolled_employees(owner_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(owner_employees, total_enrolled)
 
       waived_employees = active_census_employees.select{|ce| ce.waived?}
-      filter_enrolled_employees(waived_employees, total_enrolled)
+      total_enrolled = filter_enrolled_employees(waived_employees, total_enrolled)
 
       @enrolled_non_business_owner_members = total_enrolled
     end
@@ -564,6 +566,7 @@ module BenefitSponsors
     end
 
     def renew_benefit_package_members
+      benefit_packages.each { |benefit_package| benefit_package.activate_benefit_group_assignments }
       benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
     end
 
@@ -598,6 +601,17 @@ module BenefitSponsors
       transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
     end
 
+    def recalc_pricing_determinations
+      benefit_packages.each do |benefit_package|
+        benefit_package.sponsored_benefits.each do |sb|
+          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_sponsorship, effective_period.min)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
+        end
+      end
+
+      self.save
+    end
+
     class << self
 
       def find(id)
@@ -627,7 +641,7 @@ module BenefitSponsors
       state :appealing            # request reversal of negative determination
       ## End optional states for exception processing
 
-      state :enrollment_open, after_enter: :renew_benefit_package_members # Approved application has entered open enrollment period
+      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members] # Approved application has entered open enrollment period
       state :enrollment_closed
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
@@ -662,6 +676,10 @@ module BenefitSponsors
 
       # Upon review, application ineligible status overturned and deemed eligible
       event :approve_application do
+        transitions from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES,  to: :approved
+      end
+
+      event :auto_approve_application do
         transitions from: [:draft, :imported] + APPLICATION_EXCEPTION_STATES,  to: :approved
       end
 
@@ -751,6 +769,10 @@ module BenefitSponsors
     def publish_state_transition
       return unless benefit_sponsorship.present?
       benefit_sponsorship.application_event_subscriber(aasm)
+    end
+
+    def coverage_renewable?
+      (APPROVED_STATES - [:approved]).include?(aasm_state)
     end
 
     # Listen for BenefitSponsorship state changes
@@ -868,6 +890,11 @@ module BenefitSponsors
     def covered
       warn "[Deprecated] Instead use: enrolled_members" unless Rails.env.production?
       enrolled_members
+    end
+
+    # Slightly different logic to count covered renewing to support correct progress bar
+    def progressbar_covered_count
+      find_census_employees.covered_progressbar.count
     end
 
     def covered_count

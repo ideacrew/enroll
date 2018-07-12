@@ -46,7 +46,16 @@ module BenefitSponsors
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
-    let!(:product) { product_package.products.first }
+    
+    let(:product) { product_package.products.first }
+
+    let(:sbc_document) {
+      ::Document.new({
+        title: 'sbc_file_name', subject: "SBC",
+        :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-test#7816ce0f-a138-42d5-89c5-25c5a3408b82"
+        })
+    }
+
     let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
 
     let(:benefit_package_params) {
@@ -205,6 +214,11 @@ module BenefitSponsors
       def sign_in_and_get_ref_prod
         sign_in user
         get :reference_product_summary, :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id
+      end
+
+      before do
+        allow(product).to receive(:sbc_document).and_return(sbc_document)
+        allow_any_instance_of(BenefitSponsors::Services::BenefitPackageService).to receive(:find_product).and_return(product)
       end
 
       it "should be a success" do

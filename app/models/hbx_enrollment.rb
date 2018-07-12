@@ -562,24 +562,25 @@ class HbxEnrollment
     end
   end
 
+  def terminate_coverage_with(termination_date)
+    if termination_date >= TimeKeeper.datetime_of_record
+      schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
+    else
+      if may_terminate_coverage?
+        update_current(terminated_on: termination_date)
+        terminate_coverage!
+      end
+    end
+  end
+
   def update_existing_shop_coverage
     return if parent_enrollment.blank?
 
-    if parent_enrollment.currently_active? && self.effective_on == parent_enrollment.effective_on
+    if parent_enrollment.effective_on >= effective_on
       parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
-    elsif parent_enrollment.currently_active? && parent_enrollment.may_terminate_coverage? && !parent_enrollment.coverage_termination_pending?
-      parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-      parent_enrollment.terminate_coverage!
-    elsif parent_enrollment.future_active?
-      if parent_enrollment.effective_on >= self.effective_on
-        parent_enrollment.cancel_coverage! if parent_enrollment.may_cancel_coverage?
-      elsif parent_enrollment.may_terminate_coverage? and !parent_enrollment.coverage_termination_pending?
-        parent_enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-        parent_enrollment.terminate_coverage!
-      end
+    else
+      parent_enrollment.terminate_coverage_with(effective_on.prev_day)
     end
-
-    # TODO: gereate or update passive renewal
   end
 
   def propagate_selection
@@ -599,21 +600,35 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
-  def is_applicable_for_renewal?
-    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
-  end
-
   def update_renewal_coverage
-    if is_applicable_for_renewal?
-      employer = benefit_group.plan_year.employer_profile
-      if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
-        begin
-          Factories::ShopEnrollmentRenewalFactory.new({enrollment: self}).update_passive_renewal
-        rescue Exception => e
-          Rails.logger.error { e }
+    if is_shop?
+      if successor_benefit_package = sponsored_benefit_package.successor
+        successor_application = successor_benefit_package.benefit_application
+        passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
+        if active_renewals_under(successor_application).blank?
+          if successor_application.coverage_renewable?
+            renew_benefit(successor_benefit_package)
+          end
         end
       end
     end
+  end
+
+  def renewal_enrollments(successor_application)
+    family.active_household.hbx_enrollments.where({
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
+      :coverage_kind => coverage_kind,
+      :kind => kind,
+      :effective_on => successor_application.start_on
+    })
+  end
+
+  def active_renewals_under(successor_application)
+    renewal_enrollments(successor_application).where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['inactive'])
+  end
+
+  def passive_renewals_under(successor_application)
+    renewal_enrollments(successor_application).where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'])
   end
 
   def should_transmit_update?

@@ -21,29 +21,28 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee, census_employee.active_benefit_group_enrollments).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee, census_employee.renewal_benefit_group_enrollments).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
-  def humanize_enrollment_states(census_employee, enrollments)
+  def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
-    if enrollments.present?
-      enrollments = enrollments.show_enrollments_sans_canceled
+    if benefit_group_assignment
+      enrollments = benefit_group_assignment.hbx_enrollments
 
       %W(health dental).each do |coverage_kind|
         if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-          enrollment_states << "#{employee_benefit_group_assignment_status(census_employee, coverage.aasm_state)} (#{coverage_kind})"
+          enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
         end
       end
       enrollment_states << '' if enrollment_states.compact.empty?
     end
 
     "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
-
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -148,10 +147,9 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    benefit_applications = @benefit_sponsorship.benefit_applications.select{|b_app| (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + [:draft]).include?(b_app.aasm_state) && b_app.end_on > TimeKeeper.date_of_record}
-    benefit_packages = benefit_applications.flat_map(&:benefit_packages)
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present?
     renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
-    return benefit_packages, (renewing_benefit_packages || [])
+    return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
   def current_option_for_initial_benefit_package

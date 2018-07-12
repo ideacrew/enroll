@@ -61,7 +61,7 @@
   <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
   <% if broker.present? %>
-    <% location = broker.organization.primary_office_location %>
+    <% location = broker.primary_office_location %>
     <% if broker.primary_broker_role.person.present? && location.present? %>
       <table style="width: 100%">
         <tr>

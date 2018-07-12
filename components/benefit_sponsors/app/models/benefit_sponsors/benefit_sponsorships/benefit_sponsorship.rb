@@ -132,25 +132,25 @@ module BenefitSponsors
 
     scope :may_begin_open_enrollment?,  -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.min" => compare_date, :aasm_state => :approved }}
+        :$elemMatch => {:"open_enrollment_period.min".lte => compare_date, :aasm_state => :approved }}
       )
     }
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max" => compare_date, :aasm_state => :enrollment_open }}
+        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state => :enrollment_open }}
       )
     }
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }}
+        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state => :enrollment_eligible }}
       )
     }
 
     scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
+        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :active }}
       )
     }
 
@@ -179,8 +179,15 @@ module BenefitSponsors
 
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, "aasm_state" => :enrollment_eligible}},
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible}},
         :aasm_state => :initial_enrollment_eligible
+      )
+    }
+
+    scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+        :aasm_state => :active
       )
     }
 
@@ -228,7 +235,7 @@ module BenefitSponsors
     end
 
     def application_may_end_open_enrollment_on(new_date)
-      benefit_applications.open_enrollment_end_on(new_date).enrolling.first
+      benefit_applications.open_enrollment_end_on(new_date).enrolling_state.first
     end
 
     def application_may_begin_benefit_on(new_date)
@@ -568,7 +575,7 @@ module BenefitSponsors
         open_initial_enrollment! if may_open_initial_enrollment?
       when :enrollment_closed
         close_initial_enrollment! if may_close_initial_enrollment?
-      when :application_ineligible
+      when :enrollment_ineligible
         deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
       when :active
         begin_coverage! if may_begin_coverage?

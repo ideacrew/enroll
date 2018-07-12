@@ -43,35 +43,35 @@
             - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
                 .col-xs-12 style="min-height:130px"
-                  label.container 
+                  label.container
                     = issuer_name
                     = f.hidden_field :kind, value: "health"
                     = f.radio_button :product_option_choice, "#{issuer_id}", class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: issuer_name}
                     span.checkmark
-              
+
           .tab-pane.fade#level role="tabpanel"
             h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Silver means the plan is expected to pay 70% of expenses for an average population of consumers, and Gold 80%.
             br
             - @benefit_package_form.catalog.metal_levels.each do |kind|
               .col-xs-3.metals
                 .col-xs-12
-                  label.container 
+                  label.container
                     = kind
                     = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: kind}
                     span.checkmark
-                    
+
           .tab-pane.fade#plan role="tabpanel"
             h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.
             br
             - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
                 .col-xs-12
-                  label.container 
+                  label.container
                     = carrier_name
                     = f.radio_button :product_option_choice, carrier_id, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: carrier_name}
                     span.checkmark
-                
-        
+
+
         #referencePlans.hidden
           h2.heading-text.pt-1.float-left Select Your Reference Plan
 
@@ -80,12 +80,12 @@
             .float-right.mb-2
               #yourPlanTotals
               br
-          
+
           #yourSponsorContributions
-          
+
           #yourReferencePlanDetails
 
-// Shows view summary modal    
+// Shows view summary modal
 .modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
   .modal-dialog role="document"
     .modal-content
@@ -95,22 +95,24 @@
       .modal-body
         table.table.compare-table#modalSummaryData style="font-size:11px"
 					tr
-						td.active 
+						td.active
 							strong PLAN BENEFITS
-						td 
+						td
 							strong CO-PAY
 						td
 							strong COINSURANCE
 					tbody#modalSummaryData
-					
+
       .modal-footer
-        .pull-left 
+        .pull-left
           a href="/" id="sbcLink"
             i.far.fa-file-pdf.fa-2x.mr-1
             | Summary of Benefits and Coverage
         .pull-right
-          a.btn.btn-default.btn-sm.btn-more-details#btnMoreDetails onclick="showMoreDetails()" More Details
-          button.btn.btn-default.btn-sm data-dismiss="modal" style="margin-top:-1px" Close
+          button.btn.btn-default.btn-sm#btnMoreDetails type="button" onclick="showMoreDetails()" More Details
+          button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
+
+
 
 javascript:
   var productOptionKind = String;
@@ -122,23 +124,24 @@ javascript:
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
   var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
   var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
-  
+	var productsTotal;
+
   function radioSelected(element) {
     setCircle(element)
-    disablePlanYearButton()
+    disableNewPlanYearButton()
   }
-  
+
   function setCircle(element) {
     // Adds toggle circle icon to metal level tabs
     var items = document.querySelectorAll('#metal-level-select ul li');
     document.getElementById('referencePlans').classList.add('hidden')
-    
+
     for (item of items) {
       if (item.querySelector('.fa-dot-circle')) {
         item.querySelector('.fa-dot-circle').classList.toggle('fa-circle')
         item.querySelector('a').classList.remove('active')
       }
-    
+
       if (item.innerText == element.innerText) {
         element.querySelector('.fa-circle').classList.toggle('fa-dot-circle')
         // Gets product option info
@@ -149,7 +152,7 @@ javascript:
       }
     }
   }
-  
+
   function getPlanInfo(element) {
     var selectedRadio = element.value;
     var selectedName = element.dataset.name;
@@ -162,28 +165,32 @@ javascript:
     })
     populateReferencePlans(filteredProducts)
   }
-  
+
   function populateReferencePlans(plans) {
     sponsorContribution = sponsorContributions[productOptionKind]['contribution_levels'];
-    
+
     document.getElementById('yourSponsorContributions').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/sponsor_contributions_shell")}'
-    
+
     // Makes reference plans visible
     document.getElementById('referencePlans').classList.remove('hidden');
     // Removes reference plans if metal level changes
     var populatedReferencePlans = document.querySelectorAll("#yourAvailablePlans");
-    
+
     if (populatedReferencePlans) {
       for(rplans of populatedReferencePlans) {
         rplans.remove()
       }
     }
-
+		
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
+      productsTotal = filteredProducts.length;
       var div = document.createElement('div')
       document.getElementById('yourPlanTotals').innerHTML = `<span class="pull-right mr-3">Displaying: <b>${filteredProducts.length} plans</b></span>`
       div.setAttribute('id', 'yourAvailablePlans')
+        var network = "";
+        if (plan.network_information)
+          network = `NETWORK NOTES <a data-toggle="tooltip" title='${plan.network_information}'><i class="fas fa-question-circle"></i></a>`
         div.innerHTML =
         `<div class="col-xs-4 reference-plans">
           <div class="col-xs-12 p0 mb-1">
@@ -192,7 +199,7 @@ javascript:
               <span class="plan-label">Type:</span> <span class="rp-plan-info">${plan.health_plan_kind}</span><br>
               <span class="plan-label">Carrier:</span> <span class="rp-plan-info">${plan.carrier_name}</span><br>
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
-              <span class="plan-label">Network:</span> <span class="rp-plan-info">Nationwide</span><br>
+              <span class="plan-label">Network:</span> <span class="rp-plan-info">${network}</span><br>
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
               <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
               <span class="checkmark"></span>
@@ -203,17 +210,17 @@ javascript:
 
         document.getElementById('yourPlans').append(div);
     }
-    
+
     setTimeout(function() {
       buildSponsorContributions(sponsorContribution)
       disableEmployeeContributionLevel();
     },400);
   }
-  
+
   function buildSponsorContributions(contributions) {
     var element = document.getElementById('benefitFields');
     index = 0;
-    
+
     for (contribution of contributions) {
       index += 1;
       var attrPrefix = 'benefit_package[sponsored_benefits_attributes][0][sponsor_contribution_attributes][contribution_levels_attributes][' + index + ']';
@@ -227,7 +234,7 @@ javascript:
 			      <div class="row sc-container">\
 			        <div class="col-xs-12 ml-2 mt-2">\
 			          <label class="container ml-1">' +contribution.display_name+'\
-			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="contributionAmounts(this)"/>\
+			            <input type="checkbox" checked="checked" id="' + attrPrefix + '[is_offered]" class="contribution_handler" name="' + attrPrefix +'[is_offered]" value="' + contribution["is_offered"] +'" data-displayname="'+contribution.display_name+'" onchange="newContributionAmounts(this)"/>\
 			            <span class="checkmark"></span>\
 			          </label>\
 			        </div>\
@@ -239,7 +246,7 @@ javascript:
 			        <input type="number" id="'+contribution.id+'" name="'+ attrPrefix +'[contribution_factor]" value="' + (contribution["contribution_factor"] * 100) + '" onchange="setInputSliderValue(this)" data-displayname="'+contribution.display_name+'" data-contribution-input="true">\
 			      </div>\
 			      <div class="col-xs-9">\
-			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
+			        <input type="range" min="0" max="100" value="' + (contribution["contribution_factor"] * 100) + '" step="5" class="slider" id="'+contribution.id+'" onchange="setNumberInputValue(this)" data-id="'+contribution.id+'" data-displayname="'+contribution.display_name+'">\
 			      </div>\
 			    </div>\
 			</div>'
@@ -255,50 +262,74 @@ javascript:
     planType = options.planType || element.dataset.planType;
     referencePlanID = options.referencePlanID || element.id;
     sponsoredBenefitId = options.sponsoredBenefitId;
-    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
-    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
     showFormButtons();
 
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
-    
+
     document.getElementById('referencePlanTitle').append(planTitle);
     document.getElementById('rpType').append(planType);
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append('N/A');
+    document.getElementById('planOfferingsTitle').innerHTML = '';
+    document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
   }
-  
-  function setInputValue(element) {
+
+  function setNumberInputValue(element) {
     document.getElementById(element.dataset.id).value = element.value;
-    contributionAmounts(element)
+    newContributionAmounts(element)
   }
 
   function setInputSliderValue(element) {
     document.querySelector("[data-id='"+element.id+"']").value = element.value
-    contributionAmounts(element)
+    newContributionAmounts(element)
   }
-  
+
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
     document.getElementById('submitBenefitPackage').classList.remove('hidden')
     document.getElementById('cancelBenefitPackage').classList.remove('hidden')
   }
-  
+
   function hideFormButtons() {
     document.getElementById('addBenefitPackage').classList.add('hidden')
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
-  
-  function disablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
+
+  function disableNewPlanYearButton() {
+		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
+    disableNewAddBenefitPackageButton()
+		preventSubmissionOnEnter()
   }
-  
-  function enablePlanYearButton() {
-    var savePlanYearButton = document.getElementById('submitBenefitPackage');
-    savePlanYearButton.classList.remove('disabled')
+
+  function enableNewPlanYearButton() {
+		var savePlanYearButton = document.getElementById('submitBenefitPackage');
+    savePlanYearButton.classList.remove('disabled');
+    enableNewAddBenefitPackageButton()
   }
+
+  function disableNewAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.add('disabled')
+  }
+
+  function enableNewAddBenefitPackageButton() {
+    var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.remove('disabled')
+  }
+
+	function preventSubmissionOnEnter() {
+		document.getElementById('new_benefit_package').onkeypress = function(e) {
+			var key = e.charCode || e.keyCode || 0;
+			if (key == 13) {
+			    e.preventDefault();
+			  }
+		}
+	}
 
   function disableEmployeeContributionLevel(){
     document.querySelectorAll(".contribution_handler").forEach(function(element) {
@@ -307,7 +338,7 @@ javascript:
       }
     })
   }
-  
+
   var eeContribution;
   var spouse;
   var domesticPartner;
@@ -315,11 +346,11 @@ javascript:
   var employeeOnly;
   var familyOnly;
   var contributionInputs;
-  
-  function contributionAmounts(element) {
+
+  function newContributionAmounts(element) {
     contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
     contributionHandlers = document.querySelectorAll(".contribution_handler")
-		
+
     contributionInputs.forEach(function(element) {
       switch (element.dataset.displayname) {
         case 'Employee':
@@ -379,20 +410,21 @@ javascript:
     })
 
     if (eeContribution < erCL || employeeOnly < erCL) {
-      disablePlanYearButton()
+      disableNewPlanYearButton()
     } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
-      disablePlanYearButton()
+      disableNewPlanYearButton()
     } else {
-			enablePlanYearButton()
+			enableNewPlanYearButton()
     }
-  }	
+    displayReferencePlanDetails(document.querySelector("input[name='benefit_package[sponsored_benefits_attributes][0][reference_plan_id]']:checked"));
+  }
   var selectedReferencePlanId;
 	var selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
 	var selectedBenefitApplicationID = "#{params[:benefit_application_id]}";
 	var selectedSummaryTitle;
 	var refreshPage = false;
 	var showLess = false;
-	
+
   function viewSummary(element) {
     selectedSummaryTitle = element.dataset.planTitle;
 		selectedReferencePlanID = element.dataset.planId;
@@ -412,7 +444,7 @@ javascript:
 			.then($('#viewSummaryModal').modal('show'))
 			showLess = false
   }
-	
+
 	function showMoreDetails() {
 		if (showLess) {
 			document.getElementById('modalSummaryData').innerHTML = '';
@@ -441,25 +473,20 @@ javascript:
 					})
 				})
 				.then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details")
-				// Refreshes page if more details selected die to modal not reopening when trigger more details
-				refreshPage = true;
 				showLess = true;
 				}
 	}
-	
-	
-	$('#viewSummaryModal').on('hide.bs.modal', function (e) {
-	  // Clears data from modal on close
+
+	$('#viewSummaryModal').on('hidden.bs.modal', function (e) {
+  	// Clears modal data on close
 		document.getElementById('modalSummaryData').innerHTML = '';
-		// Used to reload modal due to bug in code when add more details to modal display
-		if (refreshPage) {
-			location.reload()
-		}
+		document.getElementById('btnMoreDetails').innerHTML = "More Details"
 	})
 
--unless @benefit_package_form.new_record?
+- unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
+      productsTotal = "#{@benefit_package_form.products_total}"
       document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
       productOptionKind = "#{@benefit_package_form.sponsored_benefits.first.product_package_kind}"
       displayReferencePlanDetails(null, {
@@ -471,3 +498,4 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
+

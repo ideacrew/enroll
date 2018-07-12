@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'BenefitSponsors::ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
+RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyFiredConfirmation', dbclean: :around_each  do
   let(:notice_event) { "broker_agency_fired_confirmation" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
   

@@ -17,7 +17,7 @@ module BenefitSponsors
         
         return if new_benefit_group_assignment.blank?
 
-        if @base_enrollment.product.renewal_product.blank?
+        if !@base_enrollment.is_coverage_waived? && @base_enrollment.product.renewal_product.blank?
           raise "Unable to map to renewal product"
         end
 
@@ -31,16 +31,16 @@ module BenefitSponsors
           builder.set_kind(base_enrollment.kind)
           builder.set_coverage_kind(base_enrollment.coverage_kind)
           builder.set_employee_role(base_enrollment.employee_role)
-          builder.set_product(base_enrollment.product.renewal_product)
+          builder.set_product(base_enrollment.product.renewal_product) unless base_enrollment.is_coverage_waived?
 
           builder.set_sponsored_benefit_package(new_benefit_group_assignment.benefit_package)
           builder.set_benefit_group_assignment(new_benefit_group_assignment)
           builder.set_benefit_sponsorship(new_benefit_package.benefit_sponsorship)
           builder.set_sponsored_benefit(@sponsored_benefit)
           builder.set_rating_area(new_benefit_package.recorded_rating_area)
-
+          
           if base_enrollment.is_coverage_waived?
-            builder.set_waiver_reason
+            builder.set_waiver_reason(base_enrollment.waiver_reason)
             builder.set_as_renew_waiver
           else
             builder.set_as_renew_enrollment

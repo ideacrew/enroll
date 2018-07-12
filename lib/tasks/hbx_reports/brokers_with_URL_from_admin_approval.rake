@@ -37,13 +37,15 @@ namespace :reports do
                 "https://business.mahealthconnector.org/invitations/#{invitation.id}/claim"
               ]
               processed_count += 1
-              end
+            end
           end
         end
       end
 
-      pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
-      pubber.publish URI.join("file://", file_name)
+      if Rails.env.production?
+        pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
+        pubber.publish URI.join("file://", file_name)
+      end
 
       puts "#{processed_count} Brokers to output file: #{file_name}"
     end

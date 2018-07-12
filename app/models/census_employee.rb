@@ -11,7 +11,7 @@ class CensusEmployee < CensusMember
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
   include BenefitSponsors::Concerns::Observable
-  include ModelEvents::CensusEmployee
+  include BenefitSponsors::ModelEvents::CensusEmployee
 
   require 'roo'
 
@@ -119,6 +119,10 @@ class CensusEmployee < CensusMember
     :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
     })}
 
+  scope :covered_progressbar,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state.in => ["coverage_selected","coverage_renewing"], :is_active => true }
+    })}
+
   scope :waived,    ->{ where(:"benefit_group_assignments" => {
     :$elemMatch => { :aasm_state => "coverage_waived", :is_active => true }
     })}
@@ -211,7 +215,8 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.create(
       start_on: assignment_on,
       end_on:   benefit_package.effective_period.max,
-      benefit_package: benefit_package
+      benefit_package: benefit_package,
+      is_active: false
     )
   end
 
@@ -575,8 +580,8 @@ class CensusEmployee < CensusMember
 
   def send_invite!
     if has_benefit_group_assignment?
-      plan_year = active_benefit_group_assignment.benefit_group.plan_year
-      if plan_year.is_published?
+      benefit_application = active_benefit_group_assignment.benefit_package.benefit_application
+      if benefit_application.is_submitted?
         Invitation.invite_employee_for_open_enrollment!(self)
         return true
       end
@@ -589,7 +594,7 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-      # send_invite! if _id_changed? && !self.employer_profile.is_conversion?
+       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
       # we do not want to create employer role durig census employee saving for conversion
       return if self.employer_profile.is_a_conversion_employer?
 
@@ -1099,12 +1104,6 @@ def self.to_csv
   end
 
   def enrollments_for_display
-    # temp fix
-    enrollments = []
-    enrollments = (active_benefit_group_enrollments.compact+renewal_benefit_group_enrollments.compact).uniq if active_benefit_group_enrollments.count > 0
-    return enrollments
-
-
 
     enrollments = []
 
@@ -1216,10 +1215,6 @@ def self.to_csv
 
   def benefit_package_for_open_enrollment(shopping_date)
     active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
-  end
-
-  def benefit_package_for_date(coverage_date)
-    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
   end
 
   def benefit_package_for_date(coverage_date)

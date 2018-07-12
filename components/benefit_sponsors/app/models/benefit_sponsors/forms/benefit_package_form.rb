@@ -148,6 +148,17 @@ module BenefitSponsors
           self.errors.add(:base, form.errors.full_messages)
         end
       end
+
+      def products_total
+        case sponsored_benefits.first.product_package_kind
+        when "single_issuer"
+          catalog.plan_options[:single_issuer][sponsored_benefits.first.reference_product.issuer_name].count
+        when "single_product"
+          catalog.plan_options[:single_product][sponsored_benefits.first.reference_product.issuer_name].count
+        when "metal_level"
+          catalog.plan_options[:metal_level][sponsored_benefits.first.reference_product.metal_level_kind.to_sym].count
+        end
+      end
     end
   end
 end
