@@ -70,18 +70,12 @@ module Notifier
       return @enrollment if defined? @enrollment
       if payload['event_object_kind'].constantize == HbxEnrollment
         @enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.find(payload['event_object_id'])
-      elsif event_name == "employee_notice_for_employee_terminated_from_roster"
-        @enrollment = latest_terminated_health_enrollment if latest_terminated_health_enrollment.present?
       end
     end
 
     def enrollment_coverage_end_on
       return if enrollment.blank?
-      if event_name == "employee_notice_for_employee_terminated_from_roster"
-        merge_model.enrollment.coverage_end_on = format_date(census_employee_record.employment_terminated_on.end_of_month)
-      else
-        merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
-      end
+      merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
     end
 
     def enrollment_coverage_start_on
