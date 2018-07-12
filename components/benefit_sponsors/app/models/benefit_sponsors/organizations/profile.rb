@@ -105,6 +105,10 @@ module BenefitSponsors
         Person.staff_for_employer(self)
       end
 
+      def invoices
+        documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
+      end
+
       class << self
         def find(id)
           return nil if id.blank?

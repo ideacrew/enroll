@@ -11,20 +11,13 @@ namespace :nfp do
         puts "uploading file #{absolute_folder_path}/#{file}" unless Rails.env.test?
         file_join_path = File.join(absolute_folder_path, file)
         # It will upload file to s3
-        Organization.upload_invoice(file_join_path,file)
+        service = BenefitSponsors::Services::UploadDocumentsToProfilesService.new
+        service.upload_invoice_to_employer_profile(file_join_path,file)
         # It will fetch organization
-        organization = Organization.by_invoice_filename(file_join_path)
-        # It will trigger notice
-        trigger_notice_for_employer(organization) if organization.present?
+        organization = service.by_invoice_filename(file_join_path)
       end
     else
       puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake"
     end
-  end
-
-  def trigger_notice_for_employer(org)
-    observer = Observers::NoticeObserver.new
-    plan_year = org.employer_profile.active_plan_year
-    observer.deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "employer_invoice_available") if plan_year.present?
   end
 end
