@@ -995,7 +995,7 @@ class Family
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.active.each do |v_type|
-        due_dates << v_type.verif_due_date
+        due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
     due_dates.compact!
