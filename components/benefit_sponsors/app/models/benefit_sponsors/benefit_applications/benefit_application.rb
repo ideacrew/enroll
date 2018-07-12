@@ -616,7 +616,6 @@ module BenefitSponsors
     end
 
     def send_employee_invites
-      return true if benefit_groups.any?{|bg| bg.is_congress?}
       if is_renewing?
         notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
       elsif enrollment_open?
