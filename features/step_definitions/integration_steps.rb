@@ -650,7 +650,7 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
-When(/^.+ clicks? Add Member$/) do
+When(/^.+ clicks? Add New Person$/) do
   click_link "Add New Person"
 end
 
