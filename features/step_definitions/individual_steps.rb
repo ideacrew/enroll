@@ -214,7 +214,23 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
   find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   screenshot("add_member")
-  all(:css, ".mz").last.click
+  find('.mz').click
+end
+
+And(/Individual adds member with incomplete immigration info/) do
+  click_link "Add New Person"
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "dependent[first_name]", :with => @u.first_name
+  fill_in "dependent[last_name]", :with => @u.last_name
+  fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
+  fill_in "dependent[ssn]", :with => @u.ssn
+  find("#dependent_relationship").find(:xpath, 'option[2]').select_option
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
+  find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 end
 
 And(/Individual again clicks on add member button/) do
