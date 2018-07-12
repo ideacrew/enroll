@@ -185,35 +185,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       get :receipt, id: "id"
       expect(assigns(:employer_profile)).to eq employer_profile
     end
-
-    it "should trigger enrollment_notice job in queue" do
-      allow(enrollment).to receive(:is_shop?).and_return(false)
-      allow(enrollment).to receive(:coverage_kind).and_return('health')
-      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
-      sign_in(user)
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      get :receipt, id: "id"
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == IvlNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq [user.person.id.to_s, 'enrollment_notice']
-    end
-
-    it "should not trigger enrollment_notice job" do
-      allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:coverage_kind).and_return('health')
-      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
-      sign_in(user)
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      get :receipt, id: "id"
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == IvlNoticesNotifierJob
-      end
-      expect(queued_job).to eq nil
-    end
-
   end
 
   context "GET thankyou" do
