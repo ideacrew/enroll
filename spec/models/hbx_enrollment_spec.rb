@@ -484,6 +484,7 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
       let(:plan) { FactoryGirl.create(:plan) }
       let(:plan2) { FactoryGirl.create(:plan) }
+      let(:plan1) { FactoryGirl.create(:plan) }
 
       context "when in open enrollment" do
         before :each do
@@ -514,6 +515,15 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
           expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
+        end
+
+        it "should return decoratored plans with coverall type market" do
+          allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
+          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
+          allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan1]
+          expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
+          expect(enrollment.decorated_elected_plans('health').count).to eq 1
+          expect(enrollment.decorated_elected_plans('health').first.id).to eq plan1.id
         end
       end
 
