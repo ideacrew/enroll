@@ -161,9 +161,9 @@ module Notifier
           policy.fail_results.each do |k, _|
             case k.to_s
             when "minimum_participation_rule"
-              enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+              enrollment_errors << "At least seventy-five (75) percent of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
             when "non_business_owner_enrollment_count"
-              enrollment_errors << "One non-owner employee enrolled in health coverage"
+              enrollment_errors << "At least one non-owner employee enrolled in health coverage."
             end
           end
         end
