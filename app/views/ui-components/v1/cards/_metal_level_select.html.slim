@@ -498,4 +498,16 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
+		
+- if show_benefit_application_tile == "true"
+	javascript:
+		(function() {
+		setTimeout(function() {
+			document.getElementById('submitBenefitPackage').innerHTML = "Save Plan Year";
+		},200)
+		})();
+
+			
+
+		
 
