@@ -27,22 +27,26 @@ namespace :reports do
             (benefit_application.open_enrollment_period.include?(window_date)) && (valid_states.include?(benefit_application.aasm_state))
           end
 
-          enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
-          policy = enrollment_policy.business_policies_for(benefit_application, :passes_open_enrollment_period_policy)
-          policy.is_satisfied?(benefit_application)
-          enrollment_errors = policy.fail_results
+          if benefit_application.present?
+            enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
+            policy = enrollment_policy.business_policies_for(benefit_application, :passes_open_enrollment_period_policy)
+            if policy.present?
+              policy.is_satisfied?(benefit_application)
+              enrollment_errors = policy.fail_results
 
-          if enrollment_errors.any?
-            csv << [
-              employer_profile.fein,
-              employer_profile.legal_name,
-              employer_profile.dba,
-              benefit_application.start_on.to_date.to_s,
-              benefit_application.open_enrollment_end_on.to_date.to_s,
-              clean_JSON_dump(JSON.dump(enrollment_errors)),
-              (benefit_application.is_renewing? ? "renewing" : "initial"),
-              employer_profile.is_conversion?
-            ]
+              if enrollment_errors.any?
+                csv << [
+                  employer_profile.fein,
+                  employer_profile.legal_name,
+                  employer_profile.dba,
+                  benefit_application.start_on.to_date.to_s,
+                  benefit_application.open_enrollment_end_on.to_date.to_s,
+                  clean_JSON_dump(JSON.dump(enrollment_errors)),
+                  (benefit_application.is_renewing? ? "renewing" : "initial"),
+                  employer_profile.is_conversion?
+                ]
+              end
+            end
           end
         end
       end
