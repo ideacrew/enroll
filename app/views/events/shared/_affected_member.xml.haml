@@ -5,7 +5,7 @@
     - if subscriber
       %primary_family_id
         %id=subscriber.person.primary_family.hbx_assigned_id
-    - if hbx_enrollment_member.person.primary_family.present? && hbx_enrollment_member.person.primary_family.active_household.latest_active_tax_household.present?
+    - if hbx_enrollment_member.is_subscriber? && subscriber.person.primary_family.present? && subscriber.person.primary_family.active_household.latest_active_tax_household.present?
       %tax_household_id
         %id=subscriber.person.primary_family.active_household.latest_active_tax_household.hbx_assigned_id
     = render :partial=> "events/individuals/person", :object => hbx_enrollment_member.person, as: :person
