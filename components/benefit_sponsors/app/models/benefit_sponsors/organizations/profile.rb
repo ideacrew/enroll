@@ -89,6 +89,10 @@ module BenefitSponsors
         organization.latest_benefit_sponsorship_for(self)
       end
 
+      def ban_benefit_sponsorship
+        most_recent_benefit_sponsorship.ban! if most_recent_benefit_sponsorship.may_ban?
+      end
+
       def latest_benefit_sponsorship
         most_recent_benefit_sponsorship
       end
