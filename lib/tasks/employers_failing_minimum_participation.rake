@@ -51,7 +51,7 @@ namespace :reports do
         end
       end
 
-      unless Rails.env.development?
+      if Rails.env.production?
         pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
         pubber.publish URI.join("file://", file_name)
       end
