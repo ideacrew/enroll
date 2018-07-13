@@ -13,7 +13,7 @@ namespace :reports do
       employer_profiles = benefit_sponsorships.flat_map(&:benefit_applications).inject([]) do |array, benefit_application|
         array << benefit_application if benefit_application.open_enrollment_period.include?(window_date)
         array.flatten
-      end.map(&:sponsor_profile)
+      end.map(&:sponsor_profile).uniq
 
       file_name = fetch_file_format('employers_failing_minimum_participation', 'EMPLOYERSFAILINGMINIMUMPARTICIPATION')
 
