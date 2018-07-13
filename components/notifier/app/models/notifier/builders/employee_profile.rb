@@ -62,41 +62,12 @@ module Notifier
       merge_model.email = employee_role.person.work_email_or_best if employee_role.present?
     end
 
+    def employer_profile
+      employee_role.employer_profile
+    end
+
     def employer_name
-      merge_model.employer_name = employee_role.employer_profile.legal_name
-    end
-
-    def enrollment
-      return @enrollment if defined? @enrollment
-      if payload['event_object_kind'].constantize == HbxEnrollment
-        @enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.find(payload['event_object_id'])
-      end
-    end
-
-    def enrollment_coverage_end_on
-      return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
-    end
-
-    def enrollment_coverage_start_on
-      return if enrollment.blank?
-      merge_model.enrollment.coverage_start_on = format_date(enrollment.effective_on)
-    end
-
-    def enrollment_plan_name
-      if enrollment.present?
-        merge_model.enrollment.plan_name = enrollment.product.name
-      end
-    end
-
-    def enrollment_employee_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)
-    end
-
-    def enrollment_employer_responsible_amount
-      return if enrollment.blank?
-      merge_model.enrollment.employer_responsible_amount = number_to_currency(enrollment.total_employer_contribution, precision: 2)
+      merge_model.employer_name = employer_profile.legal_name
     end
 
     def census_employee_record
@@ -139,12 +110,19 @@ module Notifier
       census_employee_health_enrollment? && census_employee_dental_enrollment?
     end
 
+    def latest_terminated_enrollment(coverage_kind)
+      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
+        census_employee_record.employment_terminated_on <= hbx.terminated_on
+      end
+      enrollment
+    end
+
     def latest_terminated_health_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "health" }.first
+      latest_terminated_enrollment("health")
     end
 
     def latest_terminated_dental_enrollment
-      census_employee_record.active_benefit_group_assignment.hbx_enrollments.select{ |en| en.coverage_kind == "dental" }.first
+      latest_terminated_enrollment("dental")
     end
 
     def census_employee_latest_terminated_health_enrollment_plan_name
@@ -157,10 +135,6 @@ module Notifier
       if latest_terminated_dental_enrollment.present?
         merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.product.name
       end
-    end
-
-    def employer_profile
-      employee_role.employer_profile
     end
 
     def dependents_name

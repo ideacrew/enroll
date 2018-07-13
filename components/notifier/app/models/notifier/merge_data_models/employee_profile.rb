@@ -7,7 +7,7 @@ module Notifier
     attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
-    attribute :enrollment_plan_name, String
+    # attribute :enrollment_plan_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :employer_name, String
     # attribute :coverage_begin_date, Date
