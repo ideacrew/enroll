@@ -11,6 +11,7 @@ module BenefitSponsors
         rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
         before_action :set_current_person, only: [:staff_index]
+        before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
         layout 'single_column'
 
@@ -84,10 +85,10 @@ module BenefitSponsors
           elsif current_user.has_hbx_staff_role?
             find_broker_agency_profile(BSON::ObjectId.from_string(@id))
           else
-            redirect_to new_broker_agencies_profile_path
+            redirect_to new_profiles_registration_path
             return
           end
-          documents = @broker_agency_profile.organization.documents
+          documents = @broker_agency_profile.documents
           if documents
             @statements = get_commission_statements(documents)
           end
@@ -168,6 +169,12 @@ module BenefitSponsors
         end
 
         private
+
+        def check_and_download_commission_statement
+          @broker_agency_profile = BenefitSponsors::Organizations::Profile.find(params[:id])
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          @commission_statement = @broker_agency_profile.documents.find(params[:statement_id])
+        end
 
         def find_broker_agency_profile(broker_agency_profile_id = nil)
           id = broker_agency_profile_id || BSON::ObjectId(params[:id])

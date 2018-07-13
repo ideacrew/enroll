@@ -6,14 +6,19 @@ module BenefitSponsors
       attr_accessor :notifier
 
       def notifications_send(model_instance, new_model_event)
-        if new_model_event.present? &&  new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+        if new_model_event.present? && new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
           if BenefitSponsors::ModelEvents::Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
             document = new_model_event.klass_instance
-            if new_model_event.event_key == :initial_employer_invoice_available
-              employer_profile = document.documentable
-              eligible_states = BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLMENT_ELIGIBLE_STATES + BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES
-              benefit_application = employer_profile.latest_benefit_sponsorship.benefit_applications.where(:aasm_state.in => eligible_states).first
+            employer_profile = document.documentable
+            eligible_states = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES
+            benefit_application = employer_profile.latest_benefit_sponsorship.benefit_applications.where(:aasm_state.in => eligible_states).first
+
+            if (new_model_event.event_key == :initial_employer_invoice_available) && benefit_application
               deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "initial_employer_invoice_available")
+            end
+
+            if (new_model_event.event_key == :employer_invoice_available) && benefit_application
+              deliver(recipient: employer_profile, event_object: benefit_application, notice_event: "employer_invoice_available")
             end
           end
         end
