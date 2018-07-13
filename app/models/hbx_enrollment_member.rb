@@ -29,6 +29,10 @@ class HbxEnrollmentMember
     hbx_enrollment.family if hbx_enrollment.present?
   end
 
+  def enrollment_family
+    family_member.family
+  end
+
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
   end
