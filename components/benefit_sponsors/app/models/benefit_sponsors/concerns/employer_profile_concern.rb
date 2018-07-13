@@ -314,12 +314,12 @@ module BenefitSponsors
           return true if matching_documents.count > 0
         end
 
-        def commission_statement_date(file_path)
+        def self.commission_statement_date(file_path)
           date_string = File.basename(file_path).split("_")[1]
           Date.strptime(date_string, "%m%d%Y")
         end
 
-        def commission_statement_exist?(statement_date,org)
+        def self.commission_statement_exist?(statement_date,org)
           docs = org.employer_profile.documents.where("date" => statement_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
           return true if matching_documents.count > 0
@@ -348,7 +348,7 @@ module BenefitSponsors
           end
         end
 
-        def upload_commission_statement(file_path,file_name)
+        def self.upload_commission_statement(file_path,file_name)
           statement_date = commission_statement_date(file_path) rescue nil
           org = by_commission_statement_filename(file_path) rescue nil
           if statement_date && org && !commission_statement_exist?(statement_date,org)
@@ -369,12 +369,13 @@ module BenefitSponsors
           end
         end
 
-        def by_commission_statement_filename(file_path)
+        def self.by_commission_statement_filename(file_path)
           npn = File.basename(file_path).split("_")[0]
-          BrokerRole.find_by_npn(npn).broker_agency_profile.organization
+          #TODO Fix this
+          BenefitSponsors::Organizations::Organization.where(:'profiles.corporate_npn'.in => npn)
         end
 
-        def find_by_broker_agency_profile(broker_agency_profile)
+        def self.find_by_broker_agency_profile(broker_agency_profile)
           raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile") unless broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
           orgs = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_agency_profile(broker_agency_profile.id).map(&:organization)
           orgs.collect(&:employer_profile)
