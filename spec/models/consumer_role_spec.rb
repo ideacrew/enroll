@@ -290,6 +290,24 @@ context "Verification process and notices" do
     end
   end
 
+  describe "#is_type_expired?" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+
+    before do
+      person.consumer_role.ssn_validation = "expired"
+      person.consumer_role.local_residency_validation = "expired"
+      person.consumer_role.residency_rejected = true
+    end
+
+    it "returns true for SSN verification type" do
+      expect(person.consumer_role.is_type_expired?("Social Security Number")).to be_truthy
+    end
+
+    it "returns true for Residency verification type" do
+      expect(person.consumer_role.is_type_expired?("DC Residency")).to be_truthy
+    end
+  end
+
   describe "#all_types_verified? private" do
     context "only one type is verified" do
       it "returns false if Citizenship/Immigration status unverified" do
