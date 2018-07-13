@@ -42,14 +42,29 @@ describe EmployerAttestation, dbclean: :after_each do
         end
 
         context "and the document is denied" do
+
           before do
             employer_profile.employer_attestation.employer_attestation_documents.first.reject!
             employer_profile.reload
           end
+
           it "should transition to :rejected state" do
             expect(employer_profile.employer_attestation.employer_attestation_documents.first.aasm_state).to eq "rejected"
             expect(employer_profile.employer_attestation.aasm_state).to eq "denied"
           end
+
+          context "and the document is reverted" do
+            before do
+              employer_profile.employer_attestation.employer_attestation_documents.first.revert!
+              employer_profile.reload
+            end
+            it "should transition to submitted state" do
+              expect(employer_profile.employer_attestation.employer_attestation_documents.first.aasm_state).to eq "submitted"
+              expect(employer_profile.employer_attestation.aasm_state).to eq "denied"
+            end
+          end
+
+
         end
 
       end
