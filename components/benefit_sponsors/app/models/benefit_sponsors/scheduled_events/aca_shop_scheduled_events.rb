@@ -15,6 +15,7 @@ module BenefitSponsors
         @new_date = new_date
         shop_daily_events
         auto_submit_renewal_applications
+        auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
       end
@@ -76,6 +77,16 @@ module BenefitSponsors
           benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
           benefit_sponsorships.each do |benefit_sponsorship|
             execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
+          end
+        end
+      end
+
+      def auto_cancel_ineligible_applications
+        if new_date.mday == 1
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_cancel_ineligible_application?(new_date)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :auto_cancel_ineligible)
           end
         end
       end

@@ -197,6 +197,12 @@ module BenefitSponsors
       )
     }
 
+    scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_ineligible }}
+      )
+    }
+
     scope :benefit_application_find,     ->(ids) {
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
@@ -529,8 +535,14 @@ module BenefitSponsors
         transitions from: [:active, :suspend, :terminated,:binder_reversed], to: :ineligible
       end
 
-      event :cancel do
-        transitions from: [:initial_application_approved, :initial_enrollment_closed, :binder_reversed], to: :applicant
+      event :cancel, :after_commit => :publish_cancel do
+        transitions from: [:initial_application_approved, :initial_enrollment_closed, :binder_reversed, :initial_enrollment_ineligible, :active], to: :applicant
+      end
+    end
+
+    def publish_cancel
+      benefit_applications.each do |benefit_application|
+        benefit_application.cancel! if benefit_application.enrollment_ineligible? && benefit_application.may_cancel?
       end
     end
 
