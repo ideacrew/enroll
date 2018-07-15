@@ -259,7 +259,14 @@ module BenefitSponsors
             hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              hbx_enrollment.renew_benefit(self)
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)
+              if renewed_enrollment.is_coverage_waived?
+                census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: self.benefit_application}) unless (renewed_enrollment.coverage_kind == "dental")
+              else
+                census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: self.benefit_application}) unless (renewed_enrollment.coverage_kind == "dental")
+              end
+            else
+              census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: self.benefit_application}) unless (renewed_enrollment.coverage_kind == "dental")
             end
           end
         end
