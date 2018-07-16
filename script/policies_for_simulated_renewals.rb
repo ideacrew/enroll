@@ -45,8 +45,13 @@ end
 
 def initial_or_renewal(enrollment,plan_cache,predecessor_id)
   renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_package_id == predecessor_id}
-  renewal_plans = renewal_enrollments.map(&:plan).compact.map(&:renewal_plan_id)
-  if renewal_enrollments.present? && renewal_plans.include?(enrollment.plan_id)
+  reject_statuses = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::WAIVED_STATUSES
+  renewal_enrollments_no_cancels_waives = renewal_enrollments.reject{|ren| reject_statuses.include?(ren.aasm_state)}
+  renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated unverified void).include?(ren.aasm_state) && 
+                                                                                    ren.terminated_on.present? && 
+                                                                                    ren.terminated_on < enrollment.effective_on}
+  renewal_plans = renewal_enrollments_no_terms.map(&:plan).compact.map(&:renewal_plan_id)
+  if renewal_enrollments_no_terms.present? && renewal_plans.include?(enrollment.plan_id)
     return "renewal"
   else
     return "initial"
@@ -68,7 +73,7 @@ renewed_sponsorships.each do |bs|
 
 initial_file = File.open("policies_to_pull_ies.txt","w")
 
-renewal_file = Fil.eopen("policies_to_pull_renewals.txt","w")
+renewal_file = File.open("policies_to_pull_renewals.txt","w")
 
   employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(selected_application.sponsored_benefits, start_on_date)
 
