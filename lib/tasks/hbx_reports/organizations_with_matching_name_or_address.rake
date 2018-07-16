@@ -11,7 +11,7 @@ namespace :reports do
         LegalName
         DBA
         Address1
-        MatchedField
+        SimilarField
         )
 
       processed_count = 0
@@ -19,7 +19,7 @@ namespace :reports do
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        (field_names - ["MatchedField"]).each do |attribute|
+        (field_names - ["SimilarField"]).each do |attribute|
           begin
             organizations = find_organizations_by_attribute(attribute)
             organizations.each do |organization|
