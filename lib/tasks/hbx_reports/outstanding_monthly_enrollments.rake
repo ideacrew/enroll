@@ -22,25 +22,26 @@ namespace :reports do
                    'Subscriber First Name','Subscriber Last Name','Policy in Glue?', 'Quiet Period?']
     CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
-      feins = Organization.where(:"employer_profile.plan_years" => { :$elemMatch => {:start_on => effective_on} }).map(&:fein)
+      benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({"benefit_applications" => {"$elemMatch" => {"effective_period.min" => effective_on}}})
+      feins = benefit_sponsorships.map(&:organization).map(&:fein)
       enrollment_ids_regular = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
       enrollment_ids_quiet_period = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on,["coverage_selected"])
       enrollment_ids = enrollment_ids_regular + enrollment_ids_quiet_period
       enrollment_ids.each do |id|
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
-        employer_profile = hbx_enrollment.employer_profile
-        employer_id = employer_profile.hbx_id
-        fein = employer_profile.fein
-        legal_name = employer_profile.legal_name
-        plan_year = hbx_enrollment.benefit_group.plan_year
-        oe_start = plan_year.open_enrollment_start_on
-        oe_end = plan_year.open_enrollment_end_on
-        plan_year_start = plan_year.start_on.to_s
-        plan_year_state = plan_year.aasm_state
-        employer_profile_aasm = employer_profile.aasm_state
+        benefit_sponsorship = hbx_enrollment.benefit_sponsorship
+        employer_id = benefit_sponsorship.hbx_id
+        fein = benefit_sponsorship.organization.fein
+        legal_name = benefit_sponsorship.organization.legal_name
+        benefit_application = hbx_enrollment.benefit_package.benefit_application
+        oe_start = benefit_application.open_enrollment_period.min
+        oe_end = benefit_application.open_enrollment_period.max
+        benefit_application_start = benefit_application.effective_period.min.to_s
+        benefit_application_state = benefit_application.aasm_state
+        benefit_sponsorship = benefit_sponsorship.aasm_state
         eg_id = id
-        plan = hbx_enrollment.plan.name rescue ""
-        carrier = CarrierProfile.find(hbx_enrollment.carrier_profile_id).legal_name rescue ""
+        product = hbx_enrollment.product.title rescue ""
+        carrier = product.issuer_profile.legal_name rescue ""
         purchase_time = hbx_enrollment.created_at
         coverage_start = hbx_enrollment.effective_on
         enrollment_state = hbx_enrollment.aasm_state 
@@ -52,7 +53,7 @@ namespace :reports do
         end
         in_glue = glue_list.include?(id)
         quiet_period_boolean = enrollment_ids_quiet_period.include?(id)
-        csv << [employer_id,fein,legal_name,oe_start,oe_end,plan_year_start,plan_year_state,employer_profile_aasm,eg_id,carrier,plan,purchase_time,coverage_start,
+        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship,eg_id,carrier,product,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
       end
     end
