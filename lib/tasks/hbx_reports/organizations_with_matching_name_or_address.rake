@@ -11,15 +11,18 @@ namespace :reports do
         LegalName
         DBA
         Address1
+        Fein
         SimilarField
         )
+
+      attributes_to_look_for = ["legal_name", "dba", "address_1"]
 
       processed_count = 0
       file_name = "#{Rails.root}/list_of_orgs_with_matching_field_values_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        (field_names - ["SimilarField"]).each do |attribute|
+        attributes_to_look_for.each do |attribute|
           begin
             organizations = find_organizations_by_attribute(attribute)
             organizations.each do |organization|
@@ -28,6 +31,7 @@ namespace :reports do
                 organization.legal_name,
                 organization.dba,
                 primary_address_1,
+                organization.fein,
                 attribute
               ]
               processed_count += 1
@@ -43,7 +47,7 @@ namespace :reports do
 
     def find_organizations_by_attribute(attribute)
       case attribute
-      when "LegalName"
+      when "legal_name"
         organization_legal_names = BenefitSponsors::Organizations::Organization.all.map(&:legal_name).uniq
         organization_legal_names.compact!
         organization_legal_names.delete("")
@@ -54,7 +58,7 @@ namespace :reports do
           array.flatten
         end
         organizations.uniq
-      when "DBA"
+      when "dba"
         organization_dbas = BenefitSponsors::Organizations::Organization.all.map(&:dba).uniq
         organization_dbas.compact!
         organization_dbas.delete("")
@@ -65,7 +69,7 @@ namespace :reports do
           array.flatten
         end
         organizations.uniq
-      when "Address1"
+      when "address_1"
         organization_primary_address1s = BenefitSponsors::Organizations::Organization.all.flat_map(&:profiles).map(&:primary_office_location).map(&:address).map(&:address_1).uniq
         organization_primary_address1s.compact!
         organization_primary_address1s.delete("")
