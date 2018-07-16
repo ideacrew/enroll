@@ -15,6 +15,7 @@ module BenefitSponsors
         @new_date = new_date
         shop_daily_events
         auto_submit_renewal_applications
+        process_applications_missing_binder_payment
         auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
@@ -77,6 +78,20 @@ module BenefitSponsors
           benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
           benefit_sponsorships.each do |benefit_sponsorship|
             execute_sponsor_event(benefit_sponsorship, :renew_sponsor_benefit)
+          end
+        end
+      end
+
+      def process_applications_missing_binder_payment
+        application_effective_date = new_date.next_month.beginning_of_month
+        scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        binder_next_day = scheduler.calculate_open_enrollment_date(application_effective_date)[:binder_payment_due_date].next_day
+
+        if new_date == binder_next_day
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_set_initial_ineligible?(application_effective_date)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :mark_initial_ineligible)
           end
         end
       end

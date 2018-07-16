@@ -197,6 +197,12 @@ module BenefitSponsors
       )
     }
 
+    scope :mark_initial_ineligible?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {:predecessor_id => { :$exists => false }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_closed }}
+      )
+    }
+
     scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_ineligible }}
@@ -455,12 +461,14 @@ module BenefitSponsors
       state :initial_enrollment_open          # Sponsor members are under first open enrollment period
       state :initial_enrollment_closed        # Sponsor members' have successfully completed first open enrollment
       state :initial_enrollment_ineligible    # Sponsor members' first open enrollment has failed to meet eligibility policies
-      state :initial_enrollment_eligible,   after_enter: :publish_binder_event   # Sponsor has paid first premium in-full and authorized to offer benefits
-      state :binder_reversed,               after_enter: :publish_binder_event   # Spnosor's initial payment is returned
+      state :initial_enrollment_eligible      # Sponsor has paid first premium in-full and authorized to offer benefits
+      state :binder_reversed                  # Spnosor's initial payment is returned
       state :active                           # Sponsor's members are actively enrolled in coverage
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
+      
+      after_all_transitions :publish_state_transition
 
       event :approve_initial_application do
         transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
@@ -540,30 +548,20 @@ module BenefitSponsors
       end
     end
 
-    def publish_cancel
-      benefit_applications.each do |benefit_application|
-        benefit_application.cancel! if benefit_application.enrollment_ineligible? && benefit_application.may_cancel?
-      end
-    end
-
     # Notify BenefitApplication that
-    def publish_binder_event
+    def publish_state_transition
+      return unless [:initial_enrollment_eligible,
+        :binder_reversed,
+        :initial_enrollment_ineligible,
+        :applicant
+      ].include?(aasm.to_state)
+      
       begin
-        File.open("publish_binder_event.txt", "a+") do |f|
-          f << "\n---------" + "\n"
-          f << Time.now.getutc.to_s + "\n"
-          f << self.id.to_s + "\n"
-          f << self.organization.legal_name + "\n"
-          benefit_applications.each do |benefit_application|
-            f << "  ----> #{benefit_application.id.to_s}"
-            benefit_application.benefit_sponsorship_event_subscriber(aasm)
-          end
-          f << "---------" + "\n"
+        benefit_applications.each do |benefit_application|
+          benefit_application.benefit_sponsorship_event_subscriber(aasm)
         end
       rescue
-
       end
-
     end
 
     # BenefitApplication        BenefitSponsorship

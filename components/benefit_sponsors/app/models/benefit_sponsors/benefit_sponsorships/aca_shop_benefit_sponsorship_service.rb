@@ -86,6 +86,10 @@ module BenefitSponsors
       end
     end
 
+    def mark_initial_ineligible
+      benefit_sponsorship.deny_initial_enrollment_eligibility! if benefit_sponsorship.may_deny_initial_enrollment_eligibility?
+    end
+
     def auto_cancel_ineligible
       benefit_sponsorship.cancel! if benefit_sponsorship.may_cancel?      
     end
