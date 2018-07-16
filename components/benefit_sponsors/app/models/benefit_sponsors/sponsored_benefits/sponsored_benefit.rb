@@ -61,8 +61,16 @@ module BenefitSponsors
       end
 
       def product_package
-        return @product_package if defined? @product_package
-        @product_package = benefit_sponsor_catalog.product_package_for(self)
+        return nil if self.product_package_kind.blank?
+        @product_package ||= benefit_sponsor_catalog.product_package_for(self)
+      end
+
+      # Changing the package kind should clear the package
+      def product_package_kind=(pp_kind)
+        if pp_kind != self.product_package_kind
+          @product_package = nil
+          write_attribute(:product_package_kind, pp_kind)
+        end
       end
 
       def issuers_offered
@@ -80,18 +88,23 @@ module BenefitSponsors
 
         if new_product_package.present? && reference_product.present?
           if reference_product.renewal_product.present? && new_product_package.active_products.include?(reference_product.renewal_product)
-            self.class.new(
+            new_sponsored_benefit = self.class.new(
               product_package_kind: product_package_kind,
               product_option_choice: product_option_choice,
               reference_product: reference_product.renewal_product,
-              sponsor_contribution: sponsor_contribution.renew(new_product_package)
+              sponsor_contribution: sponsor_contribution.renew(new_product_package),
+              benefit_package: new_benefit_package
               # pricing_determinations: renew_pricing_determinations(new_product_package)
             )
+            renew_pricing_determinations(new_sponsored_benefit)
+            new_sponsored_benefit
           end
         end
       end
 
-      def renew_pricing_determinations(new_product_package)
+      def renew_pricing_determinations(new_sponsored_benefit)
+        cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(new_sponsored_benefit.benefit_sponsorship, new_sponsored_benefit.benefit_package.benefit_application.effective_period.min)
+        _sbenefit, _price, _cont = cost_estimator.calculate(new_sponsored_benefit, new_sponsored_benefit.reference_product, new_sponsored_benefit.product_package, build_new_pricing_determination: true)
       end
 
       def reference_plan_id=(product_id)

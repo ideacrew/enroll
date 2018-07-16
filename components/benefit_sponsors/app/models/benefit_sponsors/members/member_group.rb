@@ -72,6 +72,14 @@ module BenefitSponsors
       )
     end
 
+    def as_json(params = {})
+      {
+        members: members.as_json,
+        group_id: group_id,
+        group_enrollment: group_enrollment.as_json,
+      }
+    end
+
     private
 
     def discard_member_enrollments(removed_members)

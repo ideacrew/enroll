@@ -27,13 +27,12 @@ module BenefitSponsors
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
-      delegate :predecessor_application, to: :benefit_application
       delegate :recorded_sic_code, to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
       delegate :recorded_rating_area, to: :benefit_application
-      delegate :benefit_sponsorship, to: :benefit_application
+      delegate :benefit_sponsorship, :sponsor_profile, to: :benefit_application
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
@@ -78,16 +77,15 @@ module BenefitSponsors
         end
       end
 
+      def predecessor_application
+        return nil unless benefit_application
+        benefit_application.predecessor
+      end
+
       def successor
-        successor_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
-          :"benefit_applications.benefit_packages.predecessor_id" => predecessor_id
-        ).first
-
-        return nil if successor_application.blank?
-
-        successor_application.benefit_packages.where(
-          :"predecessor_id" => predecessor_id
-        ).first
+        self.benefit_application.benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).detect do |bp|
+          bp.predecessor_id.to_s == self.id.to_s
+        end
       end
 
       def package_for_date(coverage_start_date)
@@ -104,7 +102,7 @@ module BenefitSponsors
 
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
-        sponsored_benefits << new_sponsored_benefit
+        new_sponsored_benefit
       end
 
       def effective_on_kind
@@ -170,14 +168,14 @@ module BenefitSponsors
       def rating_area
         recorded_rating_area.blank? ? benefit_group.benefit_sponsorship.rating_area : recorded_rating_area
       end
-      
+
       def drop_sponsored_benefit(sponsored_benefit)
         sponsored_benefits.delete(sponsored_benefit)
       end
 
       def predecessor
-        return @predecessor if @predecessor
         return nil if predecessor_id.blank?
+        return @predecessor if @predecessor
         @predecessor = predecessor_application.benefit_packages.find(self.predecessor_id)
       end
 
@@ -197,9 +195,19 @@ module BenefitSponsors
         probation_period_display_texts[probation_period_kind]
       end
 
+      def activate_benefit_group_assignments
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.each do |ce|
+          ce.benefit_group_assignments.each do |bga|
+            if bga.benefit_package_id == self.id
+              bga.make_active
+            end
+          end
+        end
+      end
+
       def renew(new_benefit_package)
         new_benefit_package.assign_attributes({
-          title: title,
+          title: title + "(#{start_on.year + 1})",
           description: description,
           probation_period_kind: probation_period_kind,
           is_default: is_default
@@ -226,13 +234,17 @@ module BenefitSponsors
       end
 
       def renew_member_benefits
-        census_employees_assigned_on(effective_period.min, false).each { |member| renew_member_benefit(member) }
+        # FIXME: There is no reason to assume that the renewal benefit package assignment
+        #        will have is_active == false, I think this may always return an empty set.
+        #        Because of this, I have removed the 'false' constraint.
+        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
       end
 
       def renew_member_benefit(census_employee)
         predecessor_benefit_package = predecessor
 
         employee_role = census_employee.employee_role
+        return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
 
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
@@ -300,7 +312,7 @@ module BenefitSponsors
         end
       end
 
-      def cancel_member_benefits
+      def cancel_member_benefits(delete_benefit_package: false)
         deactivate_benefit_group_assignments
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
@@ -310,7 +322,7 @@ module BenefitSponsors
             hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
           end
         end
-        deactivate
+        deactivate if delete_benefit_package
       end
 
       def deactivate_benefit_group_assignments
@@ -321,10 +333,12 @@ module BenefitSponsors
           end
 
           other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
-          if self.benefit_application.is_renewing?
-            ce.add_renew_benefit_group_assignment([other_benefit_package])
-          else
-            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+          if other_benefit_package.present?
+            if self.benefit_application.is_renewing?
+              ce.add_renew_benefit_group_assignment([other_benefit_package])
+            else
+              ce.find_or_create_benefit_group_assignment([other_benefit_package])
+            end
           end
         end
       end

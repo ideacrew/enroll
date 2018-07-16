@@ -50,19 +50,19 @@ module Importers
             organization = find_organization(record.fein)
           end
            # need research here not returning the record after immediate save
-          # if /conversion_employee_policy_results/.match(@out_csv.path)
-          #   benefit_sponsor = find_organization(record.fein)
-          #   census_employee = find_census_employee(benefit_sponsor.employer_profile, benefit_sponsor.active_benefit_sponsorship, record.subscriber_ssn)
-          #   person = census_employee.first.employee_role.person
-          #   hbx_enroll_ment = find_hbx_enrollments(person)
-          #   census_employee_info << hbx_enroll_ment.hbx_id
-          #   census_employee_info << person.hbx_id
-          #   family_dependents = person.primary_family.family_members.find_all {|family_member| !family_member.is_primary_applicant?}
-          #
-          #   family_dependents.each do |family_member|
-          #     census_employee_info.push family_member.person.hbx_id
-          #   end
-          # end
+          if /conversion_employee_policy_results/.match(@out_csv.path)
+            benefit_sponsor = find_organization(record.fein)
+            census_employee = find_census_employee(benefit_sponsor.employer_profile, benefit_sponsor.active_benefit_sponsorship, record.subscriber_ssn)
+            person = census_employee.first.employee_role.person
+            hbx_enroll_ment = find_hbx_enrollments(person)
+            census_employee_info << hbx_enroll_ment.hbx_id
+            census_employee_info << person.hbx_id
+            family_dependents = person.primary_family.family_members.find_all {|family_member| !family_member.is_primary_applicant?}
+
+            family_dependents.each do |family_member|
+              census_employee_info.push family_member.person.hbx_id
+            end
+          end
 
           if record.warnings.any?
             import_details = ["imported with warnings", JSON.dump(record.warnings.to_hash)]
@@ -97,7 +97,7 @@ module Importers
     end
 
     def find_hbx_enrollments(person)
-      person.primary_family.active_household.hbx_enrollments.first
+      person.primary_family.active_household.hbx_enrollments.select{ |enrollment| enrollment.sponsored_benefit_id.present? && enrollment.benefit_sponsorship_id.present? }.first
     end
   end
 end

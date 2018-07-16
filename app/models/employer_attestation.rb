@@ -22,7 +22,7 @@ class EmployerAttestation
     state :denied
 
     event :submit, :after => :record_transition do 
-      transitions from: :unsubmitted, to: :submitted
+      transitions from: [:submitted, :pending, :unsubmitted], to: :submitted
     end
 
     event :set_pending, :after => :record_transition do
@@ -34,7 +34,7 @@ class EmployerAttestation
     end
 
     event :deny, :after => :record_transition do
-      transitions from: [:submitted, :pending], to: :denied, :after => :terminate_employer
+      transitions from: [:submitted, :pending], to: :denied#, :after => :ban_profile
     end
 
     event :revert, :after => :record_transition do
@@ -54,9 +54,8 @@ class EmployerAttestation
     self.employer_attestation_documents
   end
 
-  def terminate_employer
-    #TODO refactor while working on employer attestation
-    # employer_profile.terminate(TimeKeeper.date_of_record.end_of_month)
+  def ban_profile
+    profile.ban_benefit_sponsorship
   end
 
   def editable?

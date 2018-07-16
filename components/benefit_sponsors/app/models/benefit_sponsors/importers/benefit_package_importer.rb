@@ -43,7 +43,6 @@ module BenefitSponsors
             sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
             raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
             sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
-
             if sole_source?
               sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
             else
@@ -66,8 +65,7 @@ module BenefitSponsors
         end
 
         sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
-          contribution_match = sponsor_contribution_attrs.detect{|contribution| contribution[:relationship] == new_contribution_level.contribution_unit.name}
-
+          contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
           if contribution_match.present?
             new_contribution_level.is_offered = contribution_match[:offered]
             new_contribution_level.contribution_factor = (contribution_match[:premium_pct].to_f / 100)
@@ -90,13 +88,13 @@ module BenefitSponsors
         sponsored_benefit.pricing_determinations.build(pricing_determination_tiers: price_determination_tiers)
 
         pricing_determination = sponsored_benefit.pricing_determinations.first
-        copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
 
-        if sponsor_contribution_attrs[0][:final_tier_premium].present?
-          new_determination = pricing_determination.dup
-          new_determination.sponsored_benefit = sponsored_benefit
-          copy_tier_contributions(new_determination, sponsor_contribution_attrs, :final_tier_premium)
-          sponsored_benefit.pricing_determinations << new_determination
+        if sponsor_contribution_attrs[0].present?
+          if sponsor_contribution_attrs[0][:final_tier_premium].present?
+            copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :final_tier_premium)
+          else
+            copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, :estimated_tier_premium)
+          end
         end
       end
 

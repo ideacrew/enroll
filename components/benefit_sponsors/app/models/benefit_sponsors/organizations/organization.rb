@@ -90,7 +90,7 @@ module BenefitSponsors
                   class_name: "BenefitSponsors::Site"
 
       embeds_many :profiles,
-                  class_name: "BenefitSponsors::Organizations::Profile"
+                  class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true
 
       # Only one benefit_sponsorship may be active at a time.  Enable many to support history tracking
       has_many    :benefit_sponsorships,
@@ -98,7 +98,7 @@ module BenefitSponsors
 
 
       accepts_nested_attributes_for :profiles
-      add_observer BenefitSponsors::Observers::OrganizationObserver.new
+      add_observer BenefitSponsors::Observers::OrganizationObserver.new, [:update, :notifications_send]
 
       validates_presence_of :legal_name, :site_id, :profiles
       # validates_presence_of :benefit_sponsorships, if: :is_benefit_sponsor?

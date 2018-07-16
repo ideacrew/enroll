@@ -67,7 +67,7 @@ module BenefitSponsors
         @hbx_enrollment.waiver_reason = waiver_reason
       end
 
-      def set_as_renew_waived
+      def set_as_renew_waiver
         @hbx_enrollment.renew_waived
       end
 

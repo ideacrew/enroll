@@ -129,9 +129,9 @@
           <div class="col-xs-4">
             <div class="row">
               <span>Employer Estimated Maximum Monthly Cost</span>
-	      <% estimator = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(sponsored_benefit.benefit_sponsorship, sponsored_benefit.benefit_package.start_on) %>
-	      <% _sb, estimated_employer_cost, _contribution_amount = estimator.calculate(sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package) %>
-              <h2><%= number_to_currency(estimated_employer_cost) %></h2>
+              <% estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new %>
+	            <% estimate = estimator.calculate_estimates_for_benefit_display(sponsored_benefit) %>
+              <h2><%= number_to_currency(estimate[:estimated_total_cost]) %></h2>
             </div>
           </div>
           <div class="col-xs-8">
@@ -144,27 +144,13 @@
                 </tr>
                 <tr>
                   <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
-                  <% pd = sponsored_benefit.latest_pricing_determination %>
-                  <% if pd.present? %>
-                    <% costs = pd.pricing_determination_tiers.map do |pdt| %>
-                      <% pdt_total = pdt.price %>
-                      <% pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2) %>
-                      <% BigDecimal.new((pdt_total - pdt_employer).to_s).round(2) %>
-                    <% end %>
-                    <td><%= number_to_currency(costs.min) %></td>
-                    <td><%= number_to_currency(costs.max) %></td>
-                  <% end %>
+                    <td><%= number_to_currency(estimate[:estimated_enrollee_minimum]) %></td>
+                    <td><%= number_to_currency(estimate[:estimated_enrollee_maximum]) %></td>
                 </tr>
               </table>
             </div>
           </div>
         </div>
-        <%# else %>
-<!--           <div class="row">
-            <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-              <%#= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
-            </div>
-        <%# end %> -->
       </div>
     </div>
   </div>

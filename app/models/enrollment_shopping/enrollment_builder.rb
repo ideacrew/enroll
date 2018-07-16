@@ -8,10 +8,7 @@ module EnrollmentShopping
 		end
 
     def build_change_waiver_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil, waiver_reason: nil)
-			enrollment = @household.hbx_enrollments.build
-			enrollment.coverage_household_id = @coverage_household.id
-			enrollment.kind = "employer_sponsored"
-			enrollment.employee_role = @employee_role
+			enrollment = build_common_enrollment_information("employer_sponsored")
       enrollment.predecessor_enrollment_id = previous_enrollment.id
       enrollment.waiver_reason = waiver_reason
 
@@ -48,22 +45,15 @@ module EnrollmentShopping
 			end
 
       benefit_package ||= previous_enrollment.sponsored_benefit_package
-      sponsored_benefit = previous_enrollment.sponsored_benefit
-      enrollment.sponsored_benefit_package_id = benefit_package.id
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
-      enrollment.sponsored_benefit_id = sponsored_benefit.id
-      enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-      enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
+			set_benefit_information(enrollment, sponsored_benefit, benefit_package)
 
       copy_member_coverage_dates(previous_enrollment, enrollment)
       enrollment
     end
 
     def build_new_waiver_enrollment(is_qle: false, optional_effective_on: nil, waiver_reason: nil)
-			enrollment = @household.hbx_enrollments.build
-			enrollment.coverage_household_id = @coverage_household.id
-			enrollment.kind = "employer_sponsored"
-			enrollment.employee_role = @employee_role
+			enrollment = build_common_enrollment_information("employer_sponsored")
       enrollment.waiver_reason = waiver_reason
 			benefit_package = nil
 
@@ -101,11 +91,8 @@ module EnrollmentShopping
 				member.is_subscriber?
 			end
 
-			enrollment.sponsored_benefit_package_id = benefit_package.id
 			sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
-			enrollment.sponsored_benefit_id = sponsored_benefit.id
-			enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-			enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
+			set_benefit_information(enrollment, sponsored_benefit, benefit_package)
 
       check_for_affected_enrollment(enrollment, sponsored_benefit)
 
@@ -113,10 +100,7 @@ module EnrollmentShopping
     end
 
 		def build_new_enrollment(family_member_ids: [], is_qle: false, optional_effective_on: nil)
-			enrollment = @household.hbx_enrollments.build
-			enrollment.coverage_household_id = @coverage_household.id
-			enrollment.kind = "employer_sponsored"
-			enrollment.employee_role = @employee_role
+			enrollment = build_common_enrollment_information("employer_sponsored")
 			benefit_package = nil
 
 			if is_qle && enrollment.family.is_under_special_enrollment_period?
@@ -147,28 +131,18 @@ module EnrollmentShopping
 				benefit_package = benefit_package_for_date(@employee_role, effective_date)
 			end
 
-			enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
+			build_enrollment_members(enrollment, family_member_ids)
 
-			enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
-				family_member_ids.include? member.applicant_id
-			end
-
-			enrollment.sponsored_benefit_package_id = benefit_package.id
 			sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
-			enrollment.sponsored_benefit_id = sponsored_benefit.id
-			enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-			enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
+			set_benefit_information(enrollment, sponsored_benefit, benefit_package)
 
       check_for_affected_enrollment(enrollment, sponsored_benefit)
 
 			enrollment
 		end
 
-    def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil, family_member_ids: [])
-			enrollment = @household.hbx_enrollments.build
-			enrollment.coverage_household_id = @coverage_household.id
-			enrollment.kind = "employer_sponsored"
-			enrollment.employee_role = @employee_role
+		def build_change_enrollment(previous_enrollment:, is_qle: false, optional_effective_on: nil, family_member_ids: [])
+			enrollment = build_common_enrollment_information("employer_sponsored")
       enrollment.predecessor_enrollment_id = previous_enrollment.id
 
 			if is_qle && enrollment.family.is_under_special_enrollment_period?
@@ -190,30 +164,43 @@ module EnrollmentShopping
         end
 				enrollment.enrollment_kind = "special_enrollment"
         enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
-        # TODO: Assign sep
-			else
-				effective_date = earliest_eligible_date_for_shop(@employee_role)
-				enrollment.effective_on = effective_date
+        # TODO: Assign sep        
+      else
+				enrollment.effective_on = previous_enrollment.effective_on
 				enrollment.enrollment_kind = "open_enrollment"
 			end
 
+			build_enrollment_members(enrollment, family_member_ids)
+
+			benefit_package ||= previous_enrollment.sponsored_benefit_package
+			sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
+			set_benefit_information(enrollment, sponsored_benefit, benefit_package)
+      copy_member_coverage_dates(previous_enrollment, enrollment)
+      enrollment
+		end
+		
+		def build_common_enrollment_information(enrollment_kind)
+			enrollment = @household.hbx_enrollments.build
+			enrollment.coverage_household_id = @coverage_household.id
+			enrollment.kind = enrollment_kind
+			enrollment.employee_role = @employee_role
+			enrollment
+		end
+
+		def set_benefit_information(enrollment, sponsored_benefit, benefit_package)
+      enrollment.sponsored_benefit_package_id = benefit_package.id
+      enrollment.sponsored_benefit_id = sponsored_benefit.id
+      enrollment.rating_area_id = benefit_package.recorded_rating_area.id
+      enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
+		end
+
+		def build_enrollment_members(enrollment, family_member_ids)
 			enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
 
 			enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
 				family_member_ids.include? member.applicant_id
 			end
-
-      benefit_package ||= previous_enrollment.sponsored_benefit_package
-      sponsored_benefit = previous_enrollment.sponsored_benefit
-      enrollment.sponsored_benefit_package_id = benefit_package.id
-      sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
-      enrollment.sponsored_benefit_id = sponsored_benefit.id
-      enrollment.rating_area_id = benefit_package.recorded_rating_area.id
-      enrollment.benefit_sponsorship_id = benefit_package.benefit_sponsorship.id
-
-      copy_member_coverage_dates(previous_enrollment, enrollment)
-      enrollment
-    end
+		end
 
     def check_for_affected_enrollment(enrollment, sponsored_benefit)
       aef = AffectedEnrollmentFinder.new

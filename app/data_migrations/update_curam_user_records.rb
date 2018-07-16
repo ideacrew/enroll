@@ -2,7 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCuramUserRecords < MongoidMigrationTask
   def migrate
-    puts "Should be used ONLY when confirmed that an user in IAM is already been removed" unless Rails.env.test?
+    puts "Should be used ONLY when confirmed that an user in IAM is already been removed/needs an update after the approval." unless Rails.env.test?
 
     begin
       action = ENV['action'].to_s
@@ -25,6 +25,10 @@ class UpdateCuramUserRecords < MongoidMigrationTask
         update_username(record)
       elsif action.casecmp("update_email") == 0
         update_email(record)
+      elsif action.eql?("update_dob")
+        update_dob(record)
+      elsif action.eql?("update_ssn")
+        update_ssn(record)
       end
     rescue => e
       puts "#{e.message}"
@@ -37,6 +41,24 @@ class UpdateCuramUserRecords < MongoidMigrationTask
     if ENV['new_user_name'].present?
       user.update_attributes!(username: ENV['new_user_name'].to_s)
       puts "Succesfully updated username" unless Rails.env.test?
+    else
+      puts "new_user_name not found" unless Rails.env.test?
+    end
+  end
+
+  def update_dob(user)
+    if ENV['new_dob'].present?
+      user.update_attributes!(dob: Date.parse(ENV['new_dob']))
+      puts "Succesfully updated dob" unless Rails.env.test?
+    else
+      puts "new_user_name not found" unless Rails.env.test?
+    end
+  end
+
+  def update_ssn(user)
+    if ENV['new_ssn'].present?
+      user.update_attributes!(ssn: ENV['new_ssn'].to_s)
+      puts "Succesfully updated ssn" unless Rails.env.test?
     else
       puts "new_user_name not found" unless Rails.env.test?
     end

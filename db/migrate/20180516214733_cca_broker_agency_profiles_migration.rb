@@ -6,7 +6,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
 
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/cca_broker_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( organization_id hbx_id status)
+      field_names = %w( legal_name hbx_id new_organization_id  total_roles status)
 
       logger = Logger.new("#{Rails.root}/log/cca_broker_profile_migration_data.log") unless Rails.env.test?
       logger.info "Script Start for broker_profile_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -68,6 +68,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
             new_organization = self.initialize_new_organization(old_org, site)
 
             raise Exception unless new_organization.valid?
+            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
             new_organization.save!
 
             #Roles Migration
@@ -76,16 +77,16 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
 
 
             print '.' unless Rails.env.test?
-            csv << [old_org.id, new_organization.id, "Migration Success"]
+            csv << [old_org.legal_name, old_org.hbx_id, new_organization.id, person_records_with_old_staff_roles.count , "Migration Success"]
             success = success + 1
           else
             existing_organization = existing_organization + 1
-            csv << [old_org.id, existing_new_organizations.first.id, "Already Migrated to new model, no action taken"]
+            csv << [old_org.legal_name, old_org.hbx_id, existing_new_organizations.first.id, "-" , "Already Migrated to new model, no action taken"]
           end
         rescue Exception => e
           failed = failed + 1
           print 'F' unless Rails.env.test?
-          csv << [old_org.id, "0", "Migration Failed"]
+          csv << [old_org.legal_name, old_org.hbx_id, "0", "-","Migration Failed"]
           logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
           validation_errors:
           organization - #{new_organization.errors.messages}
@@ -119,12 +120,14 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
+      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
     end
 
     old_org.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
+      BenefitSponsors::Documents::Document.skip_callback(:save, :after, :notify_on_save)
       doc.save!
     end
   end

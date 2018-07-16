@@ -64,7 +64,7 @@ module BenefitSponsors
 
     rule :all_employees_are_assigned_benefit_package,
             validate: -> (benefit_application){
-              benefit_application.benefit_sponsorship.census_employees.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
+              benefit_application.benefit_sponsorship.census_employees.active.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:renewal_benefit_group_assignment).try(:benefit_package_id) || e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
             },
             success:  -> (benfit_application) { "validated successfully" },
             fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
@@ -87,10 +87,10 @@ module BenefitSponsors
 
     rule :within_last_day_to_publish,
           validate: -> (benefit_application) {
-            TimeKeeper.date_of_record < benefit_application.last_day_to_publish
+            TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
           },
-          success:  -> (benfit_application)  { "validated successfully" },
-          fail:     -> (benefit_application) { "#{benefit_application.last_day_to_publish} was the last day to publish your Plan Year" }
+          success:  -> (benfit_application)  { "Plan year was published before #{benfit_application.last_day_to_publish} on #{TimeKeeper.date_of_record} " },
+          fail:     -> (benefit_application) { "Plan year starting on #{benefit_application.start_on.to_date} must be published by #{benefit_application.last_day_to_publish.to_date}" }
 
     rule  :stubbed_rule_one,
             validate: -> (model_instance) {

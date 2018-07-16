@@ -4,8 +4,8 @@ class SpecialEnrollmentPeriod
   include Mongoid::Timestamps
   include ScheduledEventService
   include TimeHelper
-  include Concerns::Observable
-  include ModelEvents::SpecialEnrollmentPeriod
+  include BenefitSponsors::Concerns::Observable
+  include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
   after_save :notify_on_save
   
@@ -83,6 +83,8 @@ class SpecialEnrollmentPeriod
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
   after_initialize :set_submitted_at
+
+  add_observer ::BenefitSponsors::Observers::SpecialEnrollmentPeriodObserver.new, [:notifications_send]
 
   def start_on=(new_date)
     new_date = Date.parse(new_date) if new_date.is_a? String

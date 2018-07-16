@@ -149,6 +149,12 @@ class GroupSelectionPrevaricationAdapter
 		end
 	end
 
+  def if_change_plan_selected(params)
+    if @change_plan == 'change_plan' && @previous_hbx_enrollment.present?
+      yield @previous_hbx_enrollment.effective_on
+    end
+  end
+
 	def if_should_generate_coverage_family_members_for_cobra(params)
 		if (select_market(params) == 'shop') && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
 			hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
@@ -191,12 +197,14 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def select_benefit_group(params)
-		if (select_market(params) == "shop") && possible_employee_role.present?
-			possible_employee_role.benefit_package(qle: is_qle?)
-		else
-			nil
-		end
-	end
+    if @change_plan.present? && @previous_hbx_enrollment.present?
+      @previous_hbx_enrollment.sponsored_benefit_package 
+    else
+      if (select_market(params) == "shop") && possible_employee_role.present?
+        possible_employee_role.benefit_package(qle: is_qle?)
+      end
+    end
+  end
 
 	def selected_enrollment(family, employee_role)
 		employer_profile = employee_role.employer_profile
@@ -338,7 +346,7 @@ class GroupSelectionPrevaricationAdapter
 	end
 
 	def get_benefit_group(benefit_group, employee_role, qle)
-		if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
+		if benefit_group.present? && (employee_role.employer_profile == benefit_group.sponsor_profile )
 			benefit_group
 		else
 			select_benefit_group_from_qle_and_employee_role(qle, possible_employee_role)

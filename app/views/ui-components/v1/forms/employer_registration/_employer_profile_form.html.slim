@@ -57,7 +57,7 @@ fieldset.mt-2
       br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
-      = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method), {}, class:'form-control'
+      = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
       = f.submit "Submit", class: "btn btn-primary pull-right mt-2"
       
       input type="hidden" name="employer_id" id="employer_id"

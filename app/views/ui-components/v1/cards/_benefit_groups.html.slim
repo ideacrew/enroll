@@ -49,10 +49,9 @@
               .col-xs-4
                 .row
                   span Employer Estimated Maximum Monthly Cost
-                  - query = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsQuery.new(sb.benefit_package.benefit_application, sb).call(::Family, TimeKeeper.date_of_record).lazy.map { |rec| rec["hbx_enrollment_id"] }
-                  - calculator = HbxEnrollmentListSponsorCostCalculator.new(sb.benefit_sponsorship)
-                  - _s_contribution, total_price, contribution = calculator.calculate(sb, query) 
-                  h2 = number_to_currency(total_price)
+                  - estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+                  - estimate = estimator.calculate_estimates_for_home_display(sb)
+                  h2 = number_to_currency(estimate[:estimated_total_cost])
               .col-xs-8
                 .row
                   table
@@ -62,17 +61,8 @@
                       th Max
                     tr
                       td colspan="2" Total Estimated Monthly Cost for Plan Participants
-                      - pd = sb.latest_pricing_determination
-                      - if pd.present?
-                        - costs = pd.pricing_determination_tiers.map do |pdt|
-                          - pdt_total = pdt.price
-                          - pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-                          - BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
-                        td= number_to_currency(costs.min)
-                        td= number_to_currency(costs.max)
-                      - else
-                      / td = number_to_currency(bg.monthly_min_employee_cost)
-                      / td = number_to_currency(bg.monthly_max_employee_cost)
+                      td= number_to_currency(estimate[:estimated_enrollee_minimum])
+                      td= number_to_currency(estimate[:estimated_enrollee_maximum])
 
 javascript:
   $('#collapseHealth').on('hide.bs.collapse', function () {

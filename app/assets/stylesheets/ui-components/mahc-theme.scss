@@ -451,3 +451,85 @@ thead {
     border:none;
   }
 }
+
+.employer-invoices {
+    max-width: 660px;
+    thead th {
+      height: 34px;
+    }
+    tbody {
+      height: 220px;
+      overflow-y: auto;
+      tr {
+        a {
+          color: $primary-black;
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        &:hover {
+          .fa {
+            color: $brand-primary;
+          }
+        }
+        .fa {
+          color: $primary-gray;
+        }
+      }
+    }
+    thead {
+        /* fallback */
+    }
+    tbody td, thead th {
+      width: 50%;
+      float: left;
+    }
+    table {
+      width: 100%;
+    }
+    thead, tbody, tr { display: block; }
+    tr {
+      width: 100%;
+    }
+    tr:after {
+      content: ' ';
+      display: block;
+      visibility: hidden;
+      clear: both;
+    }
+    .sorter {
+      a {
+        color: $primary-white;
+
+      }
+      &:hover {
+        .fa-stack-1x {
+          color: $brand-primary;
+        }
+      }
+      .fa {
+        color: $primary-gray;
+      }
+      .fa-stack {
+        position: relative;
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        line-height: 1em;
+        vertical-align: middle;
+        font-size: 1.15em;
+      }
+      .fa-stack-1x:first-of-type {
+        margin-top: -6px;
+      }
+      .fa-stack-1x:last-of-type {
+        padding-top: 3px;
+      }
+    }
+  }
+
+  .eeTableHeader {
+    font-size: 12px;
+    padding: 8px;
+  }
+ 

@@ -36,7 +36,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   # let(:recorded_service_areas)         { benefit_sponsorship.service_areas_for(effective_period.min) }
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, product_package: product_package, benefit_application: initial_application) }
+  let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
 
   # before { binding.pry; benefit_sponsorship.save!; initial_application.save! }
 

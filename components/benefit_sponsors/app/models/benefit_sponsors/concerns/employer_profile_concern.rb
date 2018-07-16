@@ -58,11 +58,11 @@ module BenefitSponsors
       end
 
       def draft_benefit_applications
-        benefit_applications.select{ |benefit_application| benefit_application.aasm_state.to_s == "draft" }
+        benefit_applications.draft_state
       end
 
       def benefit_applications_with_drafts_statuses
-        benefit_applications.draft.size > 0
+        draft_benefit_applications.size > 0
       end
 
       def is_converting?
@@ -259,7 +259,7 @@ module BenefitSponsors
       end
 
       def invoices
-        documents.select{ |document| document.subject == 'invoice' }
+        documents.select{ |document| ["invoice", "initial_invoice"].include?(document.subject) }
       end
 
       def current_month_invoice
@@ -309,19 +309,8 @@ module BenefitSponsors
         end
 
         def invoice_exist?(invoice_date,org)
-          docs = org.employer_profile.documents.where(:subject => 'invoice', "date" => invoice_date)
+          docs = org.employer_profile.documents.where("date" => invoice_date)
           matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}"))}
-          return true if matching_documents.count > 0
-        end
-
-        def commission_statement_date(file_path)
-          date_string = File.basename(file_path).split("_")[1]
-          Date.strptime(date_string, "%m%d%Y")
-        end
-
-        def commission_statement_exist?(statement_date,org)
-          docs = org.employer_profile.documents.where(:subject => 'invoice', "date" => statement_date)
-          matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
           return true if matching_documents.count > 0
         end
 
@@ -346,32 +335,6 @@ module BenefitSponsors
           else
             Rails.logger.warn("Unable to associate invoice #{file_path}")
           end
-        end
-
-        def upload_commission_statement(file_path,file_name)
-          statement_date = commission_statement_date(file_path) rescue nil
-          org = by_commission_statement_filename(file_path) rescue nil
-          if statement_date && org && !commission_statement_exist?(statement_date,org)
-            doc_uri = Aws::S3Storage.save(file_path, "commission-statements", file_name)
-            if doc_uri
-              document = BenefitSponsors::Documents::Document.new
-              document.identifier = doc_uri
-              document.date = statement_date
-              document.format = 'application/pdf'
-              document.subject = 'commission-statement'
-              document.title = File.basename(file_path)
-              org.employer_profile.documents << document
-              logger.debug "associated commission statement #{file_path} with the Organization"
-              return document
-            end
-          else
-            Rails.logger.warn("Unable to associate commission statement #{file_path}")
-          end
-        end
-
-        def by_commission_statement_filename(file_path)
-          npn = File.basename(file_path).split("_")[0]
-          BrokerRole.find_by_npn(npn).broker_agency_profile.organization
         end
 
         def find_by_broker_agency_profile(broker_agency_profile)

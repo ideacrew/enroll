@@ -59,7 +59,7 @@ module SponsoredBenefits
     describe "Organization with customer" do
 
       let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month}
-      let(:plan_year) { double(start_on: start_on)}
+      let(:plan_year) { double(start_on: start_on, end_on: start_on.next_year.prev_day)}
       let(:census_employees) { double(non_terminated: [])}
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
 

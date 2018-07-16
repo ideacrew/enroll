@@ -5,31 +5,31 @@ module BenefitSponsors
           def is_disabled?
             is_disabled
           end
-  
+
           def is_primary_member?
             is_primary_member
           end
         end
-  
+
         class CensusEmployeeMemberGroupMapper
           include Enumerable
-  
+
           attr_reader :reference_product
           attr_reader :coverage_start, :census_employees
-  
+
           def initialize(census_employees, r_product, c_start, s_benefit)
             @reference_product = r_product
             @coverage_start = c_start
             @census_employees = census_employees
             @sponsored_benefit = s_benefit
           end
-  
+
           def each
             census_employees.each do |ce|
               yield rosterize_census_employee(ce)
             end
           end
-  
+
           def map_ce_relationship(rel)
             {
               "spouse" => "spouse",
@@ -38,11 +38,11 @@ module BenefitSponsors
               "disabled_child_26_and_over" => "disabled child"
             }[rel]
           end
-  
+
           def map_ce_disabled(rel)
             rel == "disabled_child_26_and_over"
           end
-  
+
           def rosterize_census_employee(census_employee)
             member_entries = [EnrollmentMemberAdapter.new(
               census_employee.id,
@@ -81,18 +81,18 @@ module BenefitSponsors
               })
             ::BenefitSponsors::Members::MemberGroup.new(
               member_entries,
-              {group_enrollment: group_enrollment}
+              {group_enrollment: group_enrollment, group_id: census_employee.id}
             )
           end
         end
-  
+
         attr_reader :benefit_sponsorship, :coverage_start
-  
+
         def initialize(b_sponsorship, c_start)
           @benefit_sponsorship = b_sponsorship
           @coverage_start = c_start
         end
-  
+
         def calculate(sponsored_benefit, product, p_package)
           pricing_model = p_package.pricing_model
           contribution_model = p_package.contribution_model
@@ -107,16 +107,17 @@ module BenefitSponsors
             sponsor_contribution,
             p_calculator,
             c_calculator,
-            roster_eligibility_optimizer  
+            roster_eligibility_optimizer,
+            sponsored_benefit
           )
         end
-  
+
         protected
-  
+
         def calculate_employee_groups(
           pricing_model,
           contribution_model,
-          reference_product,
+          product,
           sponsor_contribution,
           p_calculator,
           c_calculator,
@@ -130,7 +131,7 @@ module BenefitSponsors
             c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)
           end
         end
-  
+
         def eligible_employee_criteria
           ::CensusEmployee.where(
             :benefit_sponsorship_id => benefit_sponsorship.id,
@@ -145,4 +146,4 @@ module BenefitSponsors
       end
     end
   end
-  
+

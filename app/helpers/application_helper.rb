@@ -392,9 +392,15 @@ module ApplicationHelper
   end
 
   def carrier_logo(plan)
-    return "" if !plan.issuer_profile.legal_name.extract_value.present?
-    issuer_hios_id = plan.hios_id[0..4].extract_value
-    Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
+    if plan.extract_value.class.to_s == "Plan"
+      return "" if !plan.carrier_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
+    else
+      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
+    end
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
@@ -454,7 +460,7 @@ module ApplicationHelper
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
     non_owner = plan_year.non_business_owner_enrolled.count
-    covered = plan_year.covered_count
+    covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
     unless eligible.zero?
@@ -577,7 +583,7 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.class == Plan
+    if (plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == "Plan"))
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == "health"
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
     else
@@ -706,7 +712,7 @@ module ApplicationHelper
       :approved => :published
     }
 
-    renewing = benefit_application.is_renewing? ? "Renewing" : ""
+    renewing = benefit_application.predecessor_id.present? && benefit_application.aasm_state != :active ? "Renewing" : ""
     summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
     summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
     return summary_text.strip

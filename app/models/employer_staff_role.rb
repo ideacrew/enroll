@@ -5,6 +5,8 @@ class EmployerStaffRole
   include ::BenefitSponsors::Concerns::Observable
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
+  after_create :notify_observers
+  after_update :notify_observers
 
   embedded_in :person
 

@@ -154,8 +154,6 @@ class Insured::FamiliesController < FamiliesController
       plan_year = @person.active_employee_roles.first.employer_profile.active_plan_year
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
-    elsif is_ee_sep_request_accepted?
-      ee_sep_request_accepted_notice
     end
   end
 
@@ -240,30 +238,6 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
-    end
-  end
-
-  def sep_request_denial_notice
-    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.hbx_id}")
-    end
-  end
-
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
-
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
     end
   end
 

@@ -67,7 +67,9 @@ module BenefitMarkets
 
     routes { BenefitMarkets::Engine.routes }
 
-    let!(:site) { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, kind: 'aca_shop') }
+    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+
+    # let!(:site) { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, kind: 'aca_shop') }
 
     describe "GET new", dbclean: :after_each do
       before do

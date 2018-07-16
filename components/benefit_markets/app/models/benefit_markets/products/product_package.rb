@@ -46,14 +46,18 @@ module BenefitMarkets
         ]
     end
 
-    def lowest_cost_product
+    def lowest_cost_product(effective_date)
       return @lowest_cost_product if defined? @lowest_cost_product
-      @lowest_cost_product = products_sorted_by_cost.min
+      @lowest_cost_product = load_base_products.min_by { |product|
+          product.min_cost_for_application_period(effective_date)
+      }
     end
 
-    def highest_cost_product
+    def highest_cost_product(effective_date)
       return @highest_cost_product if defined? @highest_cost_product
-      @highest_cost_product = products_sorted_by_cost.max
+      @highest_cost_product ||= load_base_products.max_by { |product|
+        product.max_cost_for_application_period(effective_date)
+      }
     end
 
     def products_sorted_by_cost
@@ -66,7 +70,7 @@ module BenefitMarkets
 
     def load_base_products
       return [] if products.empty?
-      BenefitMarkets::Products::Product.find(products.pluck(:_id))
+      @loaded_base_products ||= BenefitMarkets::Products::Product.find(products.pluck(:_id))
     end
 
     # Define Comparable operator

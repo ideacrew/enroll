@@ -140,46 +140,12 @@ module BenefitSponsors
         [open_enrollment_start_on, open_enrollment_end_on]
       end
 
+      #TODO: Implement the binder payment due dates using BankHolidaysHelper
+      #TODO: Logic around binder payment due dates is not clear at this point. Hence hard-coding the due dates for now.
       def map_binder_payment_due_date_by_start_on(start_on)
         dates_map = {}
 
         {
-          "2015-01-01" => '2014,12,12',
-          "2015-02-01" => '2015,1,13',
-          "2015-03-01" => '2015,2,12',
-          "2015-04-01" => '2015,3,12',
-          "2015-05-01" => '2015,4,14',
-          "2015-06-01" => '2015,5,12',
-          "2015-07-01" => '2015,6,12',
-          "2015-08-01" => '2015,7,14',
-          "2015-09-01" => '2015,8,12',
-          "2015-10-01" => '2015,9,14',
-          "2015-11-01" => '2015,10,14',
-          "2015-12-01" => '2015,11,12',
-          "2016-01-01" => '2015,12,14',
-          "2016-02-01" => '2016,1,12',
-          "2016-03-01" => '2016,2,12',
-          "2016-04-01" => '2016,3,14',
-          "2016-05-01" => '2016,4,12',
-          "2016-06-01" => '2016,5,12',
-          "2016-07-01" => '2016,6,14',
-          "2016-08-01" => '2016,7,12',
-          "2016-09-01" => '2016,8,12',
-          "2016-10-01" => '2016,9,13',
-          "2016-11-01" => '2016,10,12',
-          "2016-12-01" => '2016,11,14',
-          "2017-01-01" => '2016,12,13',
-          "2017-02-01" => '2017,1,12',
-          "2017-03-01" => '2017,2,14',
-          "2017-04-01" => '2017,3,14',
-          "2017-05-01" => '2017,4,12',
-          "2017-06-01" => '2017,5,12',
-          "2017-07-01" => '2017,6,13',
-          "2017-08-01" => '2017,7,12',
-          "2017-09-01" => '2017,8,14',
-          "2017-10-01" => '2017,9,12',
-          "2017-11-01" => '2017,10,12',
-          "2017-12-01" => '2017,11,14',
           "2018-01-01" => '2017,12,12',
           "2018-02-01" => '2018,1,12',
           "2018-03-01" => '2018,2,13',
@@ -187,9 +153,9 @@ module BenefitSponsors
           "2018-05-01" => '2018,4,12',
           "2018-06-01" => '2018,5,14',
           "2018-07-01" => '2018,6,12',
-          "2018-08-01" => '2018,7,12',
-          "2018-09-01" => '2018,8,14',
-          "2018-10-01" => '2018,9,12',
+          "2018-08-01" => '2018,7,24',
+          "2018-09-01" => '2018,8,23',
+          "2018-10-01" => '2018,9,24',
           "2018-11-01" => '2018,10,12',
           "2018-12-01" => '2018,11,13',
           "2019-01-01" => '2018,12,12',
@@ -207,7 +173,7 @@ module BenefitSponsors
         plan_year_end_on = effective_date + 1.year - 1.day
         employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
         employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
-        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
+        employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}").to_date
         open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
         open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date

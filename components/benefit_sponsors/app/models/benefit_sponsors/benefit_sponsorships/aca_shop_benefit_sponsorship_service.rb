@@ -37,13 +37,9 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
       if benefit_application.present?
-        policy = business_policy_for(benefit_application, :end_open_enrollment)
-        if policy.is_satisfied?(benefit_application)
-          application_service_for(benefit_application).end_open_enrollment
-        else
-          #log errors - policy.fail_results
-        end
+        application_service_for(benefit_application).end_open_enrollment
       end
+
     end
 
     def begin_sponsor_benefit
@@ -74,7 +70,7 @@ module BenefitSponsors
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       renewal_application_begin = (new_date + months_prior_to_effective.months)
 
-      benefit_application = benefit_sponsorship.application_may_renew_effective_on(renewal_application_begin.prev_day)
+      benefit_application = benefit_sponsorship.application_may_renew_effective_on(renewal_application_begin)
 
       if benefit_application.present?
         application_service_for(benefit_application).renew_application

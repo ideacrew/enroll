@@ -17,7 +17,7 @@
           Please provide a last name.
     .col-md-4
       label for="inputDob"  Date of Birth *
-      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB' , required: true, readonly: defined?(readonly)}
+      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10, minlength:10}
       .invalid-feedback
         |
           Please provide a date of birth.
@@ -46,4 +46,18 @@
       = f.text_field :extension, id:'inputExtension', class:'form-control', maxlength:'10'
 - else
   = f.hidden_field :person_id, value: current_user.person_id
+
+javascript:
+	(function() {
+	if (window.location.pathname == "/benefit_sponsors/profiles/registrations/new") {
+		// Hides extension field on page load
+		document.getElementsByTagName('label')[6].remove()
+		document.getElementById('inputExtension').remove()
+	}
+	})();
+	
+	var cleave = new Cleave('#inputDOB', {
+	    date: true,
+	    datePattern: ['m', 'd', 'Y']
+	});
 

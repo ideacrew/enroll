@@ -10,8 +10,8 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
-  include Concerns::Observable
-  include ModelEvents::CensusEmployee
+  include BenefitSponsors::Concerns::Observable
+  include BenefitSponsors::ModelEvents::CensusEmployee
 
   require 'roo'
 
@@ -78,6 +78,8 @@ class CensusEmployee < CensusMember
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
 
+  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
+
   index({aasm_state: 1})
   index({last_name: 1})
   index({dob: 1})
@@ -115,6 +117,10 @@ class CensusEmployee < CensusMember
 
   scope :covered,    ->{ where(:"benefit_group_assignments" => {
     :$elemMatch => { :aasm_state => "coverage_selected", :is_active => true }
+    })}
+
+  scope :covered_progressbar,    ->{ where(:"benefit_group_assignments" => {
+    :$elemMatch => { :aasm_state.in => ["coverage_selected","coverage_renewing"], :is_active => true }
     })}
 
   scope :waived,    ->{ where(:"benefit_group_assignments" => {
@@ -209,7 +215,8 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.create(
       start_on: assignment_on,
       end_on:   benefit_package.effective_period.max,
-      benefit_package: benefit_package
+      benefit_package: benefit_package,
+      is_active: false
     )
   end
 
@@ -302,8 +309,9 @@ class CensusEmployee < CensusMember
   end
 
   def employee_role
-    return @employee_role if defined? @employee_role
-    @employee_role = EmployeeRole.find(self.employee_role_id) unless self.employee_role_id.blank?
+    return nil if self.employee_role_id.nil?
+    return @employee_role if @employee_role
+    @employee_role = EmployeeRole.find(self.employee_role_id)
   end
 
   def benefit_sponsorship=(benefit_sponsorship)
@@ -572,8 +580,8 @@ class CensusEmployee < CensusMember
 
   def send_invite!
     if has_benefit_group_assignment?
-      plan_year = active_benefit_group_assignment.benefit_group.plan_year
-      if plan_year.is_published?
+      benefit_application = active_benefit_group_assignment.benefit_package.benefit_application
+      if benefit_application.is_submitted?
         Invitation.invite_employee_for_open_enrollment!(self)
         return true
       end
@@ -586,7 +594,9 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-      # send_invite! if _id_changed? && !self.employer_profile.is_conversion?
+       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+      # we do not want to create employer role durig census employee saving for conversion
+      return if self.employer_profile.is_a_conversion_employer?
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role?
@@ -970,7 +980,7 @@ def self.to_csv
             census_member.ssn,
             census_member.dob.strftime("%m/%d/%Y"),
             census_member.gender
-          ] 
+          ]
 
         data = [
             "#{census_employee.first_name} #{census_employee.middle_name} #{census_employee.last_name} ",
@@ -1094,6 +1104,7 @@ def self.to_csv
   end
 
   def enrollments_for_display
+
     enrollments = []
 
     coverages_selected = lambda do |enrollments|
@@ -1147,7 +1158,7 @@ def self.to_csv
     family = Family.where({
       "households.hbx_enrollments" => {:"$elemMatch" => {
         :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-        :"employee_role_id" => self.employee_role_id }
+        :"employee_role_id" => self.employee_role_id}
       }
     }).first
 
@@ -1155,7 +1166,8 @@ def self.to_csv
 
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [active_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
     )
   end
 
@@ -1172,7 +1184,8 @@ def self.to_csv
 
     family.active_household.hbx_enrollments.where(
       :"sponsored_benefit_package_id".in => [renewal_published_benefit_group.try(:id)].compact,
-      :"employee_role_id" => self.employee_role_id
+      :"employee_role_id" => self.employee_role_id,
+      :"aasm_state".ne => "shopping"
     )
   end
 
@@ -1202,10 +1215,6 @@ def self.to_csv
 
   def benefit_package_for_open_enrollment(shopping_date)
     active_benefit_group_assignment.benefit_package.package_for_open_enrollment(shopping_date)
-  end
-
-  def benefit_package_for_date(coverage_date)
-    active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
   end
 
   def benefit_package_for_date(coverage_date)

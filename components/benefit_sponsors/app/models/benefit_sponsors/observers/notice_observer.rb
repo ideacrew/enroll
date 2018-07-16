@@ -1,3 +1,5 @@
+#deprecated - not using anymore. added individual observers.
+
 module BenefitSponsors
   module Observers
     class NoticeObserver
@@ -140,6 +142,7 @@ module BenefitSponsors
         end
       end
 
+      #check this later
       def profile_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
         employer_profile = new_model_event.klass_instance
@@ -148,8 +151,8 @@ module BenefitSponsors
         end
 
         if BenefitSponsors::ModelEvents::Profile::OTHER_EVENTS.include?(new_model_event.event_key)
-          if new_model_event.event_key == :broker_hired_confirmation_to_employer
-            deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
+          if new_model_event.event_key == :welcome_notice_to_employer
+            deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
           end
         end
       end
@@ -157,7 +160,7 @@ module BenefitSponsors
       def benefit_sponsorship_update(new_model_event)
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
         benefit_sponsorship = new_model_event.klass_instance
-        employer_profile = new_model_event.klass_instance.profile
+        employer_profile = benefit_sponsorship.profile
         if BenefitSponsors::ModelEvents::BenefitSponsorship::REGISTERED_EVENTS.include?(new_model_event.event_key)
           if new_model_event.event_key == :initial_employee_plan_selection_confirmation
             if employer_profile.is_new_employer?

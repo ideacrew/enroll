@@ -2,8 +2,8 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorCatalogDecorator < SimpleDelegator
 
-      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :health_plan_kind)
-      ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered)
+      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :health_plan_kind, :network_information)
+      ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered, :contribution_unit_id)
 
       def sponsor_contributions(benefit_package_id = nil)
         return @contributions if defined? @contributions
@@ -29,7 +29,7 @@ module BenefitSponsors
           contributions[product_package.package_kind.to_s] = {
             id: nil,
             contribution_levels: sponsor_contribution.contribution_levels.collect{|cl| 
-                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true)
+                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
                     }
           }
 
@@ -75,7 +75,7 @@ module BenefitSponsors
 
         product_packages.each do |product_package|
           package_products = product_package.products.collect do |product|
-            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental", product.health_plan_kind)
+            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental", product.health_plan_kind, product.network_information)
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :single_issuer

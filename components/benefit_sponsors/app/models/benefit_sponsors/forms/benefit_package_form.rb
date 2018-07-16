@@ -72,6 +72,12 @@ module BenefitSponsors
         form.service.calculate_premiums(form)
       end
 
+      def self.for_calculating_employee_cost_details(params)
+        form = self.new(params)
+        form.service.load_form_metadata(form)
+        form.service.calculate_employee_cost_details(form)
+      end
+
       def self.for_reference_product_summary(params, details)
         form = self.new(params)
         form.service.reference_product_details(form, details)
@@ -140,6 +146,17 @@ module BenefitSponsors
       def validate_form(form)
         unless form.valid?
           self.errors.add(:base, form.errors.full_messages)
+        end
+      end
+
+      def products_total
+        case sponsored_benefits.first.product_package_kind
+        when "single_issuer"
+          catalog.plan_options[:single_issuer][sponsored_benefits.first.reference_product.issuer_name].count
+        when "single_product"
+          catalog.plan_options[:single_product][sponsored_benefits.first.reference_product.issuer_name].count
+        when "metal_level"
+          catalog.plan_options[:metal_level][sponsored_benefits.first.reference_product.metal_level_kind.to_sym].count
         end
       end
     end

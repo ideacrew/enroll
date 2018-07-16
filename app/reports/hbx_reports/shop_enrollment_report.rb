@@ -21,14 +21,10 @@ class ShopEnrollmentReport < MongoidMigrationTask
     qs.add({ "$match" => {"policy_purchased_at" => {"$gte" => purchase_date_start, "$lte" => purchase_date_end}}})
     glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip) if File.exists?("all_glue_policies.txt")
 
-    enrollment_ids = []
-
-    qs.evaluate.each do |r|
-      enrollment_ids << r['hbx_id']
+    enrollment_ids_final = qs.evaluate.inject([]) do |result, r|
+      result << r['hbx_id']
+      result
     end
-
-    enrollment_ids_final = []
-    enrollment_ids.each{|id| (enrollment_ids_final << id)}
 
     field_names = ['Employer ID', 'Employer FEIN', 'Employer Name', 'Employer Plan Year Start Date', 'Plan Year State', 'Employer State', 'Enrollment Group ID', 
                'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 'Subscriber First Name','Subscriber Last Name', 'Subscriber SSN', 'Plan HIOS Id', 'Covered lives on the enrollment', 'Enrollment Reason', 'In Glue']
@@ -49,22 +45,23 @@ class ShopEnrollmentReport < MongoidMigrationTask
           employer_id = employer_profile.hbx_id
           fein = employer_profile.fein
           legal_name = employer_profile.legal_name
-          plan_year = hbx_enrollment.benefit_group.plan_year
+          plan_year = hbx_enrollment.sponsored_benefit_package.benefit_application
           plan_year_start = plan_year.start_on.to_s
           plan_year_state = plan_year.aasm_state
-          employer_profile_aasm = employer_profile.aasm_state
+          employer_profile_aasm = plan_year.benefit_sponsorship.aasm_state
           eg_id = id
           purchase_time = hbx_enrollment.created_at
           coverage_start = hbx_enrollment.effective_on
           enrollment_state = hbx_enrollment.aasm_state 
           subscriber = hbx_enrollment.subscriber
           covered_lives = hbx_enrollment.hbx_enrollment_members.size
-          plan_hios_id = hbx_enrollment.plan.hios_id
+          plan_hios_id = hbx_enrollment.product.hios_id
           if subscriber.present? && subscriber.person.present?
+            person = subscriber.person
             subscriber_hbx_id = subscriber.hbx_id
-            first_name = subscriber.person.first_name
-            last_name = subscriber.person.last_name
-            subscriber_ssn = subscriber.person.ssn
+            first_name = person.first_name
+            last_name = person.last_name
+            subscriber_ssn = person.ssn
           end
           in_glue = glue_list.include?(id) if glue_list.present?
           csv << [employer_id,fein,legal_name,plan_year_start,plan_year_state,employer_profile_aasm,eg_id,purchase_time,coverage_start,enrollment_state,subscriber_hbx_id,first_name,last_name,subscriber_ssn,plan_hios_id,covered_lives,enrollment_reason,in_glue]

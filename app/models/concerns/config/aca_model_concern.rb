@@ -29,6 +29,7 @@ module Config::AcaModelConcern
     delegate :sic_field_exists_for_employer?, to: :class
     delegate :employer_attestation_is_enabled?, to: :class
     delegate :plan_match_tool_is_enabled?, to: :class
+    delegate :dental_market_enabled?, to: :class
     delegate :enabled_metal_levels, to: :class
     delegate :offerings_constrained_to_service_areas?, to: :class
   end
@@ -138,6 +139,9 @@ module Config::AcaModelConcern
       @@plan_match_tool ||= Settings.aca.plan_match_tool
     end
 
+    def dental_market_enabled?
+      @dental_market_enabled ||= Settings.aca.dental_market_enabled
+    end
 
     def enrollment_shopping_start_day_offset
       @@enrollment_shopping_start_day_offset ||= Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days

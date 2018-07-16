@@ -1,6 +1,6 @@
-cz_pattern = File.join(File.dirname(__FILE__), "fixtures", "factors", "actuarial_factor_*.yaml")
+def load_cca_factors_seed
+  cz_pattern = File.join(File.dirname(__FILE__), "fixtures", "factors", "actuarial_factor_*.yaml")
 
-Mongoid::Migration.say_with_time("Load MA Actuarial Factors") do
   Dir.glob(cz_pattern).each do |f_name|
     loaded_class_1 = ::BenefitMarkets::Products::ActuarialFactors::CompositeRatingTierActuarialFactor
     loaded_class_2 = ::BenefitMarkets::Products::ActuarialFactors::GroupSizeActuarialFactor

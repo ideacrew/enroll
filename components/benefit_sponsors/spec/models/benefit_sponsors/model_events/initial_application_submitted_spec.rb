@@ -3,8 +3,8 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe 'ModelEvents::InitialApplicationSubmitted', db_clean: :after_each do
 
-    let(:model_event) { "initial_application_submitted" }
-    let(:notice_event) { "initial_application_submitted" }
+    let(:model_event) { "application_submitted" }
+    let(:notice_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
@@ -35,9 +35,9 @@ module BenefitSponsors
 
         it "should trigger model event" do
           model_instance.class.observer_peers.keys.each do |observer|
-            expect(observer).to receive(:on_update) do |model_event|
+            expect(observer).to receive(:notifications_send) do |instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
-              expect(model_event).to have_attributes(:event_key => :initial_application_submitted, :klass_instance => model_instance, :options => {})
+              expect(model_event).to have_attributes(:event_key => :application_submitted, :klass_instance => model_instance, :options => {})
             end
           end
           model_instance.approve_application!
@@ -45,25 +45,25 @@ module BenefitSponsors
       end
 
       context "Notice Trigger", db_clean: :after_each do
-        subject { BenefitSponsors::Observers::NoticeObserver.new }
+        subject { BenefitSponsors::Observers::BenefitApplicationObserver.new }
 
-        let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_application_submitted, model_instance, {}) }
+        let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:application_submitted, model_instance, {}) }
 
         it "should trigger notice event" do
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employer.zero_employees_on_roster_notice"
+            expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
+            expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+            expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          end
+
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employer.initial_application_submitted"
             expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
             expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
           end
-
-          # expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          #   expect(event_name).to eq "acapi.info.events.employer.zero_employees_on_roster_notice"
-          #   expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
-          #   expect(payload[:event_object_kind]).to eq 'PlanYear'
-          #   expect(payload[:event_object_id]).to eq model_instance.id.to_s
-          # end
-          subject.benefit_application_update(model_event)
+          subject.notifications_send(model_instance, model_event)
         end
       end
 

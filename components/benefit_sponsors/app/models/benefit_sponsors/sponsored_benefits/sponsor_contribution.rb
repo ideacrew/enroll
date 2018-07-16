@@ -44,6 +44,7 @@ module BenefitSponsors
       new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(new_product_package)
       new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
         current_contribution_level = contribution_levels.detect{|cl| cl.display_name == new_contribution_level.display_name}
+        # TODO: Fix this so that this copies all relevent attributes.
         if current_contribution_level.present?
           new_contribution_level.is_offered = current_contribution_level.is_offered
           new_contribution_level.contribution_factor = current_contribution_level.contribution_factor

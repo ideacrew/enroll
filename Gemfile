@@ -44,6 +44,7 @@ gem 'mongoid-autoinc'
 gem 'mongoid-enum'
 gem 'mongoid-history'
 gem 'mongoid-versioning'
+gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
 gem 'mongoid_userstamp'
 gem 'nokogiri', '1.6.7.2'
 gem 'nokogiri-happymapper', :require => 'happymapper'
@@ -76,7 +77,6 @@ gem 'uglifier', '>= 1.3.0', require: 'uglifier'
 gem 'virtus'
 gem 'wicked_pdf', '1.0.6'
 gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
-gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
 gem 'webpacker'
 
 #######################################################
@@ -109,13 +109,13 @@ group :development do
 end
 
 group :development, :test do
-  gem 'parallel_tests'
   gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
+  gem 'parallel_tests'
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
@@ -131,7 +131,6 @@ group :development, :test do
 end
 
 group :test do
-  gem 'test-prof', '0.5.0'
   gem 'action_mailer_cache_delivery', '~> 0.3.7'
   gem 'capybara', '2.6.2'
   gem 'capybara-screenshot'
@@ -145,6 +144,7 @@ group :test do
   gem 'ruby-progressbar', '1.6.0'
   gem 'shoulda-matchers', '3.1.1'
   gem 'simplecov', '0.14.1', :require => false
+  gem 'test-prof', '0.5.0'
   gem 'warden'
   gem 'watir'
   gem 'webmock'

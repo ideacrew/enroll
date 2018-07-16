@@ -70,7 +70,7 @@ class BenefitGroupAssignment
   end
 
   def benefit_application
-    benefit_package.benefit_application
+    benefit_package.benefit_application if benefit_package.present?
   end
 
   def belongs_to_offexchange_planyear?
@@ -103,6 +103,7 @@ class BenefitGroupAssignment
   end
 
   def benefit_package
+    return if benefit_package_id.nil?
     return @benefit_package if defined? @benefit_package
     @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
   end

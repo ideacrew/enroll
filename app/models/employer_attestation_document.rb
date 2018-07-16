@@ -17,6 +17,8 @@ class EmployerAttestationDocument < Document
   embedded_in :employer_attestation
   embeds_many :workflow_state_transitions, as: :transitional
 
+  after_create :mark_as_submitted
+
   aasm do
     state :submitted, initial: true
     state :accepted, :after_enter => :approve_attestation
@@ -43,7 +45,8 @@ class EmployerAttestationDocument < Document
       transitions from: :rejected, to: :submitted
     end
   end
- 
+
+
   def employer_profile
     org = ::BenefitSponsors::Organizations::Organization.where(:"profiles.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first
     org ||= Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first # Deprecate this
@@ -95,5 +98,9 @@ class EmployerAttestationDocument < Document
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def mark_as_submitted
+    employer_attestation.submit! if employer_attestation.may_submit?
   end
 end

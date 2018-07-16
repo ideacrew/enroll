@@ -39,6 +39,7 @@ module BenefitSponsors
           puts "OLD DO NOT USE #{fein} #{employer_name}"
         end
 
+
         proxy = found_employee.nil? ? BenefitSponsors::Importers::ConversionEmployeeCreate.new(@original_attributes) : ::Importers::ConversionEmployeeUpdate.new(@original_attributes)
         result = proxy.save
         propagate_warnings(proxy)
@@ -61,7 +62,6 @@ module BenefitSponsors
         candidate_employees = CensusEmployee.where({
                                                        benefit_sponsors_employer_profile_id: found_employer.id,
                                                        benefit_sponsorship_id: benefit_sponsorship.id,
-                                                       # hired_on: {"$lte" => start_date},
                                                        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                    })
         non_terminated_employees = candidate_employees.reject do |ce|

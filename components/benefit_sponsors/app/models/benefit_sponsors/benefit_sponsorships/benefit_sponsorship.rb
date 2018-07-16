@@ -20,6 +20,8 @@ module BenefitSponsors
     include Mongoid::Timestamps
     include BenefitSponsors::Concerns::RecordTransition
     include BenefitSponsors::Concerns::EmployerDatatableConcern
+    include BenefitSponsors::Concerns::Observable
+    include BenefitSponsors::ModelEvents::BenefitSponsorship
 
     # include Config::AcaModelConcern
     # include Concerns::Observable
@@ -130,25 +132,25 @@ module BenefitSponsors
 
     scope :may_begin_open_enrollment?,  -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.min" => compare_date, :aasm_state => :approved }}
+        :$elemMatch => {:"open_enrollment_period.min".lte => compare_date, :aasm_state => :approved }}
       )
     }
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max" => compare_date, :aasm_state => :enrollment_open }}
+        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state => :enrollment_open }}
       )
     }
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }}
+        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state => :enrollment_eligible }}
       )
     }
 
     scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
+        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :active }}
       )
     }
 
@@ -177,8 +179,15 @@ module BenefitSponsors
 
     scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, "aasm_state" => :enrollment_eligible}},
+        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible}},
         :aasm_state => :initial_enrollment_eligible
+      )
+    }
+
+    scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+        :aasm_state => :active
       )
     }
 
@@ -205,13 +214,15 @@ module BenefitSponsors
     index({ profile_id: 1 })
 
     index({"benefit_application._id" => 1})
+    index({"benefit_application.predecessor_id" => 1})
     index({ "benefit_application.aasm_state" => 1, "effective_period.min" => 1, "effective_period.max" => 1},
             { name: "effective_period" })
 
     index({ "benefit_application.aasm_state" => 1, "open_enrollment_period.min" => 1, "open_enrollment_period.max" => 1},
             { name: "open_enrollment_period" })
 
-
+    add_observer ::BenefitSponsors::Observers::BenefitSponsorshipObserver.new, [:notifications_send]
+    after_save :notify_on_save
     before_create :generate_hbx_id
     before_validation :pull_profile_attributes, :pull_organization_attributes, :validate_profile_organization
 
@@ -224,7 +235,7 @@ module BenefitSponsors
     end
 
     def application_may_end_open_enrollment_on(new_date)
-      benefit_applications.open_enrollment_end_on(new_date).enrolling.first
+      benefit_applications.open_enrollment_end_on(new_date).enrolling_state.first
     end
 
     def application_may_begin_benefit_on(new_date)
@@ -240,7 +251,7 @@ module BenefitSponsors
     end
 
     def application_may_auto_submit(effective_date)
-      benefit_applications.effective_date_begin_on(effective_date).renewing.draft.first
+      benefit_applications.effective_date_begin_on(effective_date).renewing.draft_state.first
     end
 
     def primary_office_address
@@ -515,7 +526,7 @@ module BenefitSponsors
       end
 
       event :ban do
-        transitions from: [:active, :suspend, :terminated,:binder_reversed], to: :ineligible
+        transitions to: :ineligible
       end
 
       event :cancel do
@@ -525,9 +536,22 @@ module BenefitSponsors
 
     # Notify BenefitApplication that
     def publish_binder_event
-      benefit_applications.each do |benefit_application|
-        benefit_application.benefit_sponsorship_event_subscriber(aasm)
+      begin
+        File.open("publish_binder_event.txt", "a+") do |f|
+          f << "\n---------" + "\n"
+          f << Time.now.getutc.to_s + "\n"
+          f << self.id.to_s + "\n"
+          f << self.organization.legal_name + "\n"
+          benefit_applications.each do |benefit_application|
+            f << "  ----> #{benefit_application.id.to_s}"
+            benefit_application.benefit_sponsorship_event_subscriber(aasm)
+          end
+          f << "---------" + "\n"
+        end
+      rescue
+
       end
+
     end
 
     # BenefitApplication        BenefitSponsorship
@@ -551,7 +575,7 @@ module BenefitSponsors
         open_initial_enrollment! if may_open_initial_enrollment?
       when :enrollment_closed
         close_initial_enrollment! if may_close_initial_enrollment?
-      when :application_ineligible
+      when :enrollment_ineligible
         deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
       when :active
         begin_coverage! if may_begin_coverage?

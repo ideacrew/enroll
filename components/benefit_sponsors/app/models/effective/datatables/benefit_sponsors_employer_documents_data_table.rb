@@ -15,7 +15,7 @@ module Effective
           raw(icon) + row.aasm_state.humanize
         }, :filter => false, :sortable => false
         table_column :name, :label => 'Doc Name', :proc => Proc.new { |row|
-          link_to raw('<i class="fa fa-file-text-o pull-left"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", "class" => "word-break-attestation"
+          link_to raw('<i class="far fa-file-alt pull-left mr-1"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", "class" => "word-break-attestation"
         }, :filter => false, :sortable => false
         table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
            'Employer Attestation'

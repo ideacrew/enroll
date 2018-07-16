@@ -19,6 +19,42 @@ module BenefitSponsors
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
         form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
+        if form.sponsored_benefits.present?
+          load_employer_estimates(form)
+          load_employees_cost_estimates(form)
+        end
+      end
+
+      def load_employer_estimates(form)
+        form.sponsored_benefits.each do |sponsored_benefit_form|
+          if sponsored_benefit_form.id
+            benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
+            sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
+            costs = nil
+            if sponsored_benefit && !sponsored_benefit.new_record?
+              estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+              costs = estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+            end
+            sponsored_benefit_form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_total_cost] : 0.00
+            sponsored_benefit_form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minimum] : 0.00
+            sponsored_benefit_form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : 0.00
+          end
+        end
+      end
+
+      def load_employees_cost_estimates(form)
+        form.sponsored_benefits.each do |sponsored_benefit_form|
+          if sponsored_benefit_form.id
+            benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
+            sponsored_benefit = benefit_package.sponsored_benefits.where(id: sponsored_benefit_form.id).first
+            costs = []
+            if sponsored_benefit && !sponsored_benefit.new_record?
+              estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+              costs = estimator.calculate_employee_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+              sponsored_benefit_form.employees_cost = costs
+            end
+          end
+        end
       end
 
       def load_form_params_from_resource(form, load_benefit_application_form)
@@ -50,7 +86,7 @@ module BenefitSponsors
         benefit_application = find_benefit_application(form)
         benefit_package = find_model_by_id(form.id)
         if benefit_application.benefit_packages.size > 1
-          if benefit_package.cancel_member_benefits
+          if benefit_package.cancel_member_benefits(delete_benefit_package: true)
             return [true, benefit_package]
           else
             map_errors_for(benefit_package, onto: form)
@@ -71,25 +107,29 @@ module BenefitSponsors
 
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
+        sb_form = form.sponsored_benefits.first
+        
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
         benefit_application = find_benefit_application(form)
-        if form.sponsored_benefits[0].id.present?
-          benefit_package = find_model_by_id(form.id)
-          sponsored_benefit = benefit_package.sponsored_benefits.find(form.sponsored_benefits[0].id)
-          selected_package = sponsored_benefit.product_package
-          reference_product = sponsored_benefit.reference_product
-        else
-          sponsored_benefit = nil
-          reference_product = BenefitMarkets::Products::Product.where(id: form.sponsored_benefits[0].reference_plan_id).first
-          selected_package = form.catalog.product_packages.where(:package_kind => form.sponsored_benefits[0].product_package_kind).first
-        end
-        lowest_cost_product = selected_package.lowest_cost_product
-        highest_cost_product = selected_package.highest_cost_product
+        model_attributes = form_params_to_attributes(form)
+        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
+        sponsored_benefit = benefit_package.sponsored_benefits.first
+        product_package = sponsored_benefit.product_package
 
-        sponsored_benefit_with_lowest_cost_product  = decorated_sponsored_benefit(sponsored_benefit, lowest_cost_product, selected_package)
-        sponsored_benefit_with_highest_cost_product = decorated_sponsored_benefit(sponsored_benefit, highest_cost_product, selected_package)
-        sponsored_benefit_with_reference_product    = decorated_sponsored_benefit(sponsored_benefit, reference_product, selected_package)
+        estimator.calculate_estimates_for_package_design(benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
+      end
 
-        [sponsored_benefit_with_lowest_cost_product, sponsored_benefit_with_reference_product, sponsored_benefit_with_highest_cost_product]
+      def calculate_employee_cost_details(form)
+        sb_form = form.sponsored_benefits.first
+        
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        benefit_application = find_benefit_application(form)
+        model_attributes = form_params_to_attributes(form)
+        benefit_package = benefit_package_factory.call(benefit_application, model_attributes)
+        sponsored_benefit = benefit_package.sponsored_benefits.first
+        product_package = sponsored_benefit.product_package
+
+        estimator.calculate_employee_estimates_for_package_design(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, product_package)
       end
 
       def reference_product_details(form, details)
@@ -98,14 +138,25 @@ module BenefitSponsors
         hios_id = [] << product.hios_id
         year = benefit_application.start_on.year
         coverage_kind = product.kind.to_s
+
+        bucket = product.sbc_document.identifier.split("#")[0].split(":")[-1]
+        key = product.sbc_document.identifier.split("#")[1]
+
+        sbc_url = "/document/download/#{bucket}/#{key}?content_type=application/pdf&filename=#{product.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
+        visit_types = []
+
         qhps = Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)
         if details.nil?
-          visit_types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+          types = coverage_kind == "health" ? Products::Qhp::VISIT_TYPES : Products::Qhp::DENTAL_VISIT_TYPES
+          types.each do |type|
+            visit_types << qhps.first.qhp_service_visits.where(visit_type: type).first if qhps.present?
+          end
+          visit_types
         else
-          visit_types = qhps.first.qhp_service_visits.map(&:visit_type)
+          visit_types = qhps.first.qhp_service_visits if qhps.present?
         end
 
-        [qhps, visit_types]
+        [qhps, visit_types, sbc_url]
       end
 
       def find_product(form)
@@ -113,17 +164,19 @@ module BenefitSponsors
         BenefitMarkets::Products::Product.find product_id
       end
 
-      def decorated_sponsored_benefit(sponsored_benefit, product, package)
-        selected_sponsored_benefit = if sponsored_benefit.present?
-          sponsored_benefit
-        else
-          dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
-          dummy_sponsored_benefit.reference_product = product
-          dummy_sponsored_benefit
-        end
+      def decorated_sponsored_benefit(product, package)
+        dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
+        dummy_sponsored_benefit.reference_product = product
 
         cost_estimator = initialize_cost_estimator
-        cost_estimator.calculate(selected_sponsored_benefit, product, package)
+        cost_estimator.calculate(dummy_sponsored_benefit, product, package)
+      end
+
+      def initialize_cost_estimates(cost_estimator, reference_product, package)
+        dummy_sponsored_benefit = create_dummy_sponsored_benefit(benefit_application)
+        dummy_sponsored_benefit.reference_product = reference_product
+
+        cost_estimator.calculate(dummy_sponsored_benefit, reference_product, package)
       end
 
       # Creating dummy sponsored benefit as estimator expects one.
@@ -163,15 +216,14 @@ module BenefitSponsors
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
         end
+        benefit_package.sponsored_benefits.each do |sb|
+          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
+        end
         save_successful = benefit_package.save
         unless save_successful
           map_errors_for(benefit_package, onto: form)
           return [false, nil]
-        end
-        benefit_package.sponsored_benefits.each do |sb|
-          cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
-          sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package)
-          sbenefit.save!
         end
         [true, benefit_package]
       end
@@ -220,7 +272,8 @@ module BenefitSponsors
           title: reference_product.title,
           issuer_name: reference_product.issuer_profile.legal_name,
           plan_kind: reference_product.health_plan_kind,
-          metal_level_kind: reference_product.metal_level_kind
+          metal_level_kind: reference_product.metal_level_kind,
+          network_information: reference_product.network_information,
         })
       end
 
@@ -230,7 +283,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           })
         end
         Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})
@@ -267,7 +321,8 @@ module BenefitSponsors
             id: contribution_level.id,
             display_name: contribution_level.display_name,
             contribution_factor: (contribution_level.contribution_factor * 0.01),
-            is_offered: contribution_level.is_offered
+            is_offered: contribution_level.is_employee_cl ? true : contribution_level.is_offered,
+            contribution_unit_id: contribution_level.contribution_unit_id
           }
         end
 

@@ -8,7 +8,7 @@ module BenefitSponsors
     let(:benefit_market)          { site.benefit_markets.first }
     let(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
 
-    let(:organization)          { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+    let(:organization)          { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { organization.employer_profile }
     let(:employer_attestation)  { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship)   { employer_profile.add_benefit_sponsorship }
