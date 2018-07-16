@@ -51,8 +51,7 @@ def initial_or_renewal(enrollment,plan_cache,predecessor_id)
   renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated coverage_termination_pending).include?(ren.aasm_state.to_s) && 
                                                                                     ren.terminated_on.present? && 
                                                                                     ren.terminated_on < (enrollment.effective_on - 1.day})
-  renewal_plans = renewal_enrollments_no_terms.map(&:plan).compact.map(&:renewal_plan_id)
-  if renewal_enrollments_no_terms.present? && renewal_plans.include?(enrollment.plan_id)
+  if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,plan_cache)}
     return "renewal"
   else
     return "initial"
