@@ -52,6 +52,9 @@ RSpec.describe Employers::EmployerAttestationsController do
       let(:doc_uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket" }
 
       it 'should return success' do
+        employer_profile.reload
+        expect(employer_profile.employer_attestation.aasm_state).to eq "submitted"
+        expect(employer_profile.employer_attestation.employer_attestation_documents.first.aasm_state).to eq "submitted"
         expect(flash[:notice]).to eq "File Saved"
         expect(response).to have_http_status(:redirect)
       end

@@ -89,6 +89,10 @@ module BenefitSponsors
         organization.latest_benefit_sponsorship_for(self)
       end
 
+      def ban_benefit_sponsorship
+        most_recent_benefit_sponsorship.ban! if most_recent_benefit_sponsorship.may_ban?
+      end
+
       def latest_benefit_sponsorship
         most_recent_benefit_sponsorship
       end
@@ -103,6 +107,10 @@ module BenefitSponsors
 
       def staff_roles #managing profile staff
         Person.staff_for_employer(self)
+      end
+
+      def invoices
+        documents.select{ |document| ["invoice", "initial_invoice"].include? document.subject }
       end
 
       class << self
