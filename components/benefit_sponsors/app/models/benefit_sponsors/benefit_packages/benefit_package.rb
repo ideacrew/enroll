@@ -275,7 +275,7 @@ module BenefitSponsors
       def is_renewal_benefit_available?(enrollment)
         return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
         sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
-        sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
+        sponsored_benefit.products(start_on).include?(enrollment.product.renewal_product)
       end
 
       def enrolled_families
