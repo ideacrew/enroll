@@ -150,7 +150,7 @@ class InsuredEligibleForBenefitRule
 
   def is_incarceration_status_satisfied?
     return true if @benefit_package.incarceration_status.include?("any")
-    @benefit_package.incarceration_status.include?("unincarcerated") && !@role.is_incarcerated?
+    @benefit_package.incarceration_status.include?("unincarcerated") && (@role.is_incarcerated == false)
   end
 
   def is_age_range_satisfied?
