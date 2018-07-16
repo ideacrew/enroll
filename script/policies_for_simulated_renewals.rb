@@ -44,7 +44,7 @@ def matching_plan_details(enrollment, other_hbx_enrollment, plan_cache)
 end
 
 def initial_or_renewal(enrollment,plan_cache,predecessor_id)
-  renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_id == predecessor_id}
+  renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_package_id == predecessor_id}
   renewal_plans = renewal_enrollments.map(&:plan).compact.map(&:renewal_plan_id)
   if renewal_enrollments.present? && renewal_plans.include?(enrollment.plan_id)
     return "renewal"
@@ -75,9 +75,9 @@ renewal_file = Fil.eopen("policies_to_pull_renewals.txt","w")
 
   employer_enrollment_query.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
-    if initial_or_renewal(enrollment,plan_cache,benefit_application.predecessor_id) == 'initial'
+    if initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'initial'
       initial_file.puts(enrollment_hbx_id)
-    elsif initial_or_renewal(enrollment,plan_cache,benefit_application.predecessor_id) == 'renewal'
+    elsif initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'renewal'
       renewal_file.puts(enrollment_hbx_id)
   end
 end
