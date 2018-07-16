@@ -81,8 +81,8 @@ module BenefitSponsors
         true
       end
 
-      def force_submit_initial_application
-        save_result, persisted_object = service.force_submit_initial_application(self)
+      def force_submit_application_with_eligibility_errors
+        save_result, persisted_object = service.force_submit_application_with_eligibility_errors(self)
         @show_page_model = persisted_object
         true
       end
