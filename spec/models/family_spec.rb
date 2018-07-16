@@ -443,33 +443,6 @@ describe Family do
     end
   end
 
-  context "contingent_enrolled_family_members_due_dates" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, us_citizen: false) }
-    let(:person2) { FactoryGirl.create(:person, :with_consumer_role, us_citizen: false) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
-    let(:family_member) { FactoryGirl.create(:family_member, :family => family, :person => person2) }
-    let(:primary_family_member) { family.primary_family_member }
-    before do 
-      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([primary_family_member, family_member])
-    end
-    it "should return uniq family members duedate" do
-      allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
-    end
-    it "should return sorted due dates" do
-      person.verification_types.by_name("DC Residency").first.due_date=TimeKeeper.date_of_record
-      person2.verification_types.by_name("DC Residency").first.due_date=TimeKeeper.date_of_record+30
-      person.verification_types.by_name("Immigration status").first.due_date=TimeKeeper.date_of_record
-      person2.verification_types.by_name("Immigration status").first.due_date=TimeKeeper.date_of_record+30
-      # allow(family).to receive(:document_due_date).with("DC Residency").and_return(TimeKeeper.date_of_record)
-      # allow(family).to receive(:document_due_date).with("DC Residency").and_return(TimeKeeper.date_of_record+30)
-      # allow(family).to receive(:document_due_date).with("Immigration status").and_return(TimeKeeper.date_of_record)
-      # allow(family).to receive(:document_due_date).with("Immigration status").and_return(TimeKeeper.date_of_record+30)
-
-      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
-    end
-  end
-
   context "best_verification_due_date" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
 

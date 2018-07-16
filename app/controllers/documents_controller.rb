@@ -122,16 +122,13 @@ class DocumentsController < ApplicationController
     @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
-      add_type_history_element
-      if @verification_type.due_date
-        new_date = @verification_type.due_date + 30.days
-        flash[:success] = "Special verification period was extended for 30 days."
-      else
-        new_date = TimeKeeper.date_of_record + 30.days
-        flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
+      new_date = @verification_type.verif_due_date + 30.days
+      updated = @verification_type.update_attributes(:due_date => new_date)
+      if updated
+        flash[:success] = "#{@verification_type.type_name} verification due date was extended for 30 days."
+        set_min_due_date_on_family
+        add_type_history_element
       end
-      @verification_type.update_attributes(:due_date => new_date)
-      set_min_due_date_on_family
     else
       flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
     end

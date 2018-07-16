@@ -1003,8 +1003,8 @@ class Family
   def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
-      family_member.person.consumer_role.verification_types.each do |v_type|
-        due_dates << document_due_date(v_type)
+      family_member.person.consumer_role.verification_types.active.each do |v_type|
+        due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
     due_dates.compact!
