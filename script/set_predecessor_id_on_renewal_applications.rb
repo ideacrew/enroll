@@ -1,7 +1,7 @@
 benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
   :"benefit_applications" => { :"$elemMatch" =>
     { 
-      :"effective_period.min".gte => Date.new(2017, 8, 1),
+      :"effective_period.min".gt => Date.new(2017, 8, 1),
       :"effective_period.max" => Date.new(2018, 7, 31)
     }
   }
@@ -13,7 +13,7 @@ benefit_sponsorships.each do |benefit_sponsorship|
   ).first
 
   myc_application = benefit_sponsorship.benefit_applications.where(
-    :"effective_period.min".gte => Date.new(2017, 8, 1),
+    :"effective_period.min".gt => Date.new(2017, 8, 1),
     :"effective_period.max" => Date.new(2018, 7, 31)
   ).first
 
@@ -38,4 +38,3 @@ benefit_sponsorships.each do |benefit_sponsorship|
     puts "Failure: BenefitPackage update failed. errors: #{renewal_package.errors.full_messages}"
   end
 end
-      
