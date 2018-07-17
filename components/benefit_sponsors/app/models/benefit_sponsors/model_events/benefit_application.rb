@@ -10,9 +10,9 @@ module BenefitSponsors
         :employer_open_enrollment_completed,
         :application_denied,
         :group_advance_termination_confirmation,
+        :renewal_application_created,
 
         # :renewal_enrollment_confirmation,
-        # :renewal_application_created,
         # :renewal_application_submitted,
         # :ineligible_renewal_application_submitted,
         # :renewal_application_autosubmitted,
@@ -102,6 +102,23 @@ module BenefitSponsors
             end
           end
 
+        end
+      end
+
+      def notify_on_create
+        if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
+          is_renewal_application_created = true
+        end
+
+        REGISTERED_EVENTS.each do |event|
+          begin
+            if event_fired = instance_eval("is_" + event.to_s)
+              event_options = {}
+              notify_observers(ModelEvent.new(event, self, event_options))
+            end
+          rescue Exception => e
+            Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
+          end
         end
       end
 
