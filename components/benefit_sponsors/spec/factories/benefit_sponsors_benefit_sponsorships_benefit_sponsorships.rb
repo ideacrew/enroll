@@ -119,6 +119,20 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_imported_and_renewal_benefit_application do
+      after :build do |benefit_sponsorship, evaluator|
+        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+          :with_benefit_package,
+          :with_predecessor_imported_application,
+          :benefit_sponsorship => benefit_sponsorship,
+          :aasm_state => evaluator.renewal_application_state,
+          :predecessor_application_state => evaluator.initial_application_state,
+          :default_effective_period => evaluator.default_effective_period,
+          :default_open_enrollment_period => evaluator.default_open_enrollment_period
+        )
+      end
+    end
+
     trait :with_broker_agency_account do
       transient do
         broker_agency_profile nil
