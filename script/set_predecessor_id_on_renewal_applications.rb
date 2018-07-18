@@ -1,7 +1,7 @@
 benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
   :"benefit_applications" => { :"$elemMatch" =>
     { 
-      :"effective_period.min".gt => Date.new(2017, 8, 1),
+      :"effective_period.min" => Date.new(2018, 4, 1),
       :"effective_period.max" => Date.new(2018, 7, 31)
     }
   }, :source_kind.in => [:mid_plan_year_conversion]
@@ -13,7 +13,7 @@ benefit_sponsorships.each do |benefit_sponsorship|
   ).first
 
   myc_application = benefit_sponsorship.benefit_applications.where(
-    :"effective_period.min".gt => Date.new(2017, 8, 1),
+    :"effective_period.min" => Date.new(2018, 4, 1),
     :"effective_period.max" => Date.new(2018, 7, 31)
   ).first
 
