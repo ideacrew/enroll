@@ -34,12 +34,12 @@ people.each do |person|
 
       profile_id = organizations.first.employer_profile.id
       if role.update_attributes(benefit_sponsor_employer_profile_id: profile_id)
-        puts "Successfully updated ER staff role on #{person.full_name}"
+        puts "Successfully updated ER staff role on #{person.full_name} for employer with fein #{fein} & user_name#{person.try(:user).try(:email)}"
       else
-        puts "Staff Role update failed for #{person.full_name}"
+        puts "Staff Role update failed for #{person.full_name} for employer with fein #{fein}"
       end
     else
-      puts "Fein Not included in the list"
+      puts "Fein Not included in the list, employer with this fein #{fein} not fixed in the script need to check and verify employer staff role"
     end
   end
 end
