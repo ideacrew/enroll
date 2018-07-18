@@ -52,7 +52,7 @@ QualifyingLifeEventKind.create!(
 
 QualifyingLifeEventKind.create!(
     title: "Entered into a legal domestic partnership",
-    tool_tip: "Entering a domestic partnership as permitted or recognized by the District of Columbia",
+    tool_tip: "Entering a domestic partnership as permitted or recognized by the Massachussets",
     action_kind: "add_benefit",
     reason: "domestic_partnership",
     edi_code: "33-ENTERING DOMESTIC PARTNERSHIP", 
