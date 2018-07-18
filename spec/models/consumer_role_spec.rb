@@ -311,7 +311,6 @@ context "Verification process and notices" do
     end
   end
 
-
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }

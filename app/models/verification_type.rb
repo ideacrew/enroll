@@ -48,6 +48,10 @@ class VerificationType
     validation_status == "outstanding"
   end
 
+  def is_type_expired?
+    validation_status == "expired"
+  end
+
   def outstanding_no_docs?
     is_type_outstanding? && vlp_documents.empty?
   end

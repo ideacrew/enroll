@@ -1989,6 +1989,28 @@ ivl_notice_triggers = [
           }
       ]
   },
+
+  {
+      hbx_id: 'IVL_CDC',
+      title: 'YOUR INSURANCE THROUGH DC HEALTH LINK HAS CHANGED TO COVER ALL DC',
+      description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_to_coverall_transition_notice',
+      notice_triggers: [
+          {
+              name: 'Ivl to Coverall Transition Notice',
+              notice_template: 'notices/ivl/ivl_to_coverall_notice',
+              notice_builder: 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+              mpi_indicator: 'IVL_CDC',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
