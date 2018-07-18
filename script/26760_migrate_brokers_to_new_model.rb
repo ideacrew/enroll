@@ -1,35 +1,4 @@
 
-site = BenefitSponsors::Site.all.where(site_key: :cca).first
-
-old_organizations = Organization.where(:"created_at".gte => Date.new(2018, 7, 12), :"broker_agency_profile" => {:"$exists" => true })
-
-old_organizations.each do |old_org|
-  begin
-    existing_new_organizations = BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id)
-    unless existing_new_organizations.blank?
-      puts "New Model Organization already exists"
-      next
-    end
-
-    @old_profile = old_org.broker_agency_profile
-
-    json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :inbox, :documents])
-    old_profile_params = JSON.parse(json_data)
-
-    @new_profile = initialize_new_profile(old_org, old_profile_params)
-    new_organization = initialize_new_organization(old_org, site)
-
-    raise Exception unless new_organization.valid?
-    BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
-    new_organization.save!
-
-    person_records_with_old_staff_roles = find_staff_roles
-    link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
-  rescue Exception => e
-    puts "Error: #{e.inspect}"
-  end
-end
-
 def initialize_new_profile(old_org, old_profile_params)
   new_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(old_profile_params)
 
@@ -110,5 +79,36 @@ def link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles
 
     old_broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id)
     old_broker_agency_staff_role.update_attributes(benefit_sponsors_broker_agency_profile_id: @new_profile.id) if old_broker_agency_staff_role.present?
+  end
+end
+
+site = BenefitSponsors::Site.all.where(site_key: :cca).first
+
+old_organizations = Organization.where(:"created_at".gte => Date.new(2018, 7, 12), :"broker_agency_profile" => {:"$exists" => true })
+
+old_organizations.each do |old_org|
+  begin
+    existing_new_organizations = BenefitSponsors::Organizations::Organization.where(hbx_id: old_org.hbx_id)
+    unless existing_new_organizations.blank?
+      puts "New Model Organization already exists"
+      next
+    end
+
+    @old_profile = old_org.broker_agency_profile
+
+    json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :inbox, :documents])
+    old_profile_params = JSON.parse(json_data)
+
+    @new_profile = initialize_new_profile(old_org, old_profile_params)
+    new_organization = initialize_new_organization(old_org, site)
+
+    raise Exception unless new_organization.valid?
+    BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
+    new_organization.save!
+
+    person_records_with_old_staff_roles = find_staff_roles
+    link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
+  rescue Exception => e
+    puts "Error: #{e.inspect}"
   end
 end
