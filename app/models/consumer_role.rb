@@ -227,6 +227,25 @@ class ConsumerRole
     end
   end
 
+  def expired_verification_types
+    self.person.verification_types.find_all do |type|
+      self.is_type_expired?(type)
+    end
+  end
+
+  def is_type_expired?(type)
+    case type
+    when "DC Residency"
+      residency_expired?
+    when 'Social Security Number'
+      ssn_expired?
+    when 'American Indian Status'
+      native_expired?
+    else
+      lawful_presence_expired?
+    end
+  end
+
   def all_types_verified?
     person.verification_types.all?{ |type| is_type_verified?(type) }
   end

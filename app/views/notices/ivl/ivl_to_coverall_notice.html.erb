@@ -1,0 +1,109 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td><h3>YOUR INSURANCE THROUGH DC HEALTH LINK HAS CHANGED TO COVER ALL DC</h3></td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "We're sending you this letter because enrollment for the people listed below, who enrolled in private insurance through DC Health Link, will now be moved to a program called Cover All DC. This letter tells you who this impacts, why the change occurred, and what's different. "} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: ["The people listed below still have the same insurance plan they enrolled in through DC Health Link. The enrollment has moved from DC Health Link to a program called Cover All DC."],
+    heading: "Who's Impacted", sub_heading: '',top_margin: '10px', bottom_margin: '5px'} %>
+
+<% notice.individuals.each do |member| %>
+  <ul><li><%= member.first_name %> <%= member.last_name %>, Age <%= member.age %></li></ul>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If someone else in your household has private insurance through DC Health Link, and their name is not listed above, they're still enrolled through DC Health Link - not Cover All DC."} %>
+
+<% if notice.assisted_enrollments.present? %>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+      contents: ["DC Health Link is required by federal law to be sure that people who enroll in health insurance through our system are eligible. We're also required to be sure that people who receive help paying for insurance are eligible for the help they're receiving."],
+      heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+      contents: ["DC Health Link is required by federal law to be sure that people who enroll in health insurance through our system are eligible."],
+      heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+<% end %>
+
+
+<% notice.individuals.each do |member| %>
+  <%= render partial: 'notices/shared/unordered_list', :locals => {listings: [
+      ["#{member.first_name} #{member.last_name}, Age #{member.age} is not eligible for private insurance through DC Health Link because of one of these reasons:",
+         ["This person does not have an eligible immigration status.",
+          "This person's immigration documents have expired.",
+          "You did not submit the documents we requested to verify this person's eligibility by the deadline.  "]]]} %>
+<% end %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "We moved the enrollment for the people listed above to a program called Cover All DC."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: [""],
+    heading: "What's Different About Cover All DC Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+
+<% if notice.assisted_enrollments.present? && notice.csr_enrollments.present?  %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+      content: "The Cover All DC plan is the same plan the people listed enrolled in through DC Health Link. It offers the same covered services."} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "Some things are different:",
+      listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>Your annual deductible, copayments and coinsurance will be higher.</strong> Cost-sharing reductions are not available to people enrolled in coverage through Cover All DC. The people listed must now pay full price for out-of-pocket costs when they get covered services.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+<% elsif  notice.assisted_enrollments.present? %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "Some things are different:",
+      listings: ["<strong>Your premium may be higher.</strong> The people listed are no longer eligible for cost savings like the advance premium tax credit, and must pay full price for coverage.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+      content: "The Cover All DC plan is the same plan the people listed enrolled in through DC Health Link. It offers the same covered services."} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+      previous: "Some things are different:",
+      listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed now enrolled through Cover All DC had a birthday since their DC Health Link plan started, the premium may increase to reflect the age change.", "<strong>You'll no longer get a Form 1095-A at tax time for those listed.</strong> Form 1095-A is the IRS form we send to show that you had health insurance."]} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: [""],
+    heading: 'Here’s What You Need to Do Now',sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
+
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "The people listed may be eligible to enroll in a plan through DC Health Link again if they submit the documents needed to verify eligibility. The list of documents we would need is included in this letter."} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time.  "} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>. to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}."} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "Get expert help choosing a new plan (at no cost to you) from a DC Health Link registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call DC Health Link if you have questions or need help."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+    contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+    heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+    content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>

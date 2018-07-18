@@ -31,6 +31,7 @@ module PdfTemplates
     attribute :first_name, String
     attribute :notice_subject, String
     attribute :due_date, Date
+    attribute :past_due_text, String
     attribute :application_date, Date
     attribute :last_name, String
     attribute :documents_needed, Boolean
