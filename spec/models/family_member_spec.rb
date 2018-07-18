@@ -211,7 +211,7 @@ describe FamilyMember, "aptc_benchmark_amount" do
     hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
   end
   
-  it "should error when trying to save duplicate family member" do
+  it "should return valid benchmark value" do
     family_member = FamilyMember.new(:person => person) 
     expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
   end

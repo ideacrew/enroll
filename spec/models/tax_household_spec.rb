@@ -309,7 +309,7 @@ RSpec.describe TaxHousehold, type: :model do
         allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
         allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
         allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-        allow(tax_household).to receive(:find_aptc_fms).and_return true
+        allow(tax_household).to receive(:find_aptc_family_members).and_return true
       end
 
       it 'should deduct benchmark cost' do
