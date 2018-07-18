@@ -216,7 +216,7 @@ describe FamilyMember, "aptc_benchmark_amount" do
     )
   end
   before do
-    allow_any_instance_of(BenefitCoveragePeriod).to receive(:second_lowest_cost_silver_plan).and_return(plan)
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
   end
 
   it 'should error when trying to save duplicate family member' do
