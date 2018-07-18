@@ -309,13 +309,143 @@ RSpec.describe TaxHousehold, type: :model do
         allow(tax_household).to receive(:unwanted_family_members).and_return [member_ids.first.to_s]
         allow(tax_household).to receive(:total_benchmark_amount).and_return total_benchmark_amount
         allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-        allow(tax_household).to receive(:is_all_aptc?).and_return true
+        allow(tax_household).to receive(:find_aptc_fms).and_return true
       end
 
       it 'should deduct benchmark cost' do
         result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
         expect(result).not_to eq(total_aptc_available_amount)
         expect(result).to eq(total_aptc_available_amount - total_benchmark_amount)
+      end
+    end
+  end
+
+  describe "total_aptc_available_amount_for_enrollment", dbclean: :after_each do
+
+    context 'for family_members with two aptc eligible and one medicaid' do
+
+      let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+      let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "94506DC0390014-01") }
+      
+      let!(:person) { FactoryGirl.create(:person, :with_family) }
+      let!(:family) { person.primary_family }
+      let!(:family_member1) {FactoryGirl.create(:family_member, family: person.primary_family )}
+      let!(:family_member2) {FactoryGirl.create(:family_member, family: person.primary_family )}
+      
+      let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
+      let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
+      let!(:hbx_enrollment_member3) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
+      let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil,kind: "individual", enrollment_kind: "special_enrollment", coverage_kind: "health", submitted_at: TimeKeeper.date_of_record - 6.months, household:family.active_household)}
+      
+      let!(:tax_household) {FactoryGirl.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
+      let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
+      let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[1].id)}
+      let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, applicant_id: person.primary_family.family_members[2].id)}
+      let!(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, max_aptc: 500 ,  tax_household: tax_household)}
+
+      before do
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+        person.update_attributes!(dob: TimeKeeper.date_of_record - 38.years)
+        person.primary_family.family_members[1].person.update_attributes!(dob: TimeKeeper.date_of_record - 28.years)
+        person.primary_family.family_members[2].person.update_attributes!(dob: TimeKeeper.date_of_record - 18.years)
+      end
+
+      context 'having only one previous non aptc enrollment' do
+        context 'when one family_member in plan shopping' do
+
+          let(:shopping_hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member], household:family.active_household)}
+         
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
+            expect(result.round(2)).to eq(221.32)
+          end
+        end
+
+        context 'when two family_members in plan shopping' do
+
+          let(:shopping_hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record+1.month, applicant_id: family.family_members.first.id) }
+          let(:shopping_hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, eligibility_date: TimeKeeper.date_of_record+1.month , applicant_id: family.family_members.second.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1], household:family.active_household)}
+          
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
+            expect(result.round(2)).to eq(500.00)
+          end
+        end
+
+        context 'when all family_members in plan shopping' do
+
+          let(:shopping_hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id) }
+          let(:shopping_hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id) }
+          let(:shopping_hbx_enrollment_member2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household:family.active_household)}
+         
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
+            expect(result.round(2)).to eq(500.00)
+          end
+        end
+      
+
+        context 'having only one previous aptc enrollment & one non aptc enrollment' do
+
+          let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 278.68)}
+          let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 221.32 )}
+          let!(:hbx_enrollment_member3) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.last.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1 )}
+          let!(:aptc_enrollment1) {FactoryGirl.create(:hbx_enrollment, submitted_at: TimeKeeper.date_of_record + 1.months, household: family.active_household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), kind: "individual", applied_aptc_amount: 500.00)}
+          
+          let(:shopping_hbx_enrollment_member1) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record+1.month) }
+          let(:shopping_hbx_enrollment_member2) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id ,eligibility_date: TimeKeeper.date_of_record+1.month) }
+          let(:shopping_hbx_enrollment_member3) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id ,eligibility_date: TimeKeeper.date_of_record+1.month) }
+          let(:shopping_hbx_enrollment1) {FactoryGirl.build(:hbx_enrollment, coverage_kind: "health", aasm_state: "shopping", household:family.active_household, hbx_enrollment_members: [shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2,shopping_hbx_enrollment_member3])}
+          
+          before do
+            eligibility_determination.update_attributes(max_aptc: 1000.00)
+            aptc_enrollment1.household.reload
+            hbx_enrollment.household.reload
+            family.reload
+          end
+
+          it 'should have two enrollments in enrolled state for a family' do
+            expect(family.active_household.hbx_enrollments.count).to eq(2)
+          end
+
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
+            expect(result.round(2)).to eq(500.00)
+          end
+        end
+
+        context 'having two previous aptc enrollment with one enrolled member each and third member in shopping' do
+
+          let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 32.21)}
+          let!(:aptc_enrollment1) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil, kind: "individual", enrollment_kind: "special_enrollment", coverage_kind: "health", submitted_at: TimeKeeper.date_of_record - 2.months, aasm_state: 'coverage_selected', household:family.active_household, applied_aptc_amount: 32.21)}
+      
+          let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment2, applied_aptc_amount: 278.68 )}
+          let!(:aptc_enrollment2) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil, submitted_at: TimeKeeper.date_of_record - 1.months, household: family.active_household,enrollment_kind: "special_enrollment", is_active: true, aasm_state: 'coverage_selected', changing: false, kind: "individual", applied_aptc_amount: 278.68)}
+        
+          let(:shopping_hbx_enrollment_member1) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id ,eligibility_date: TimeKeeper.date_of_record+1.month) }
+          let(:shopping_hbx_enrollment1) {FactoryGirl.build(:hbx_enrollment, coverage_kind: "health", aasm_state: "shopping", household:family.active_household, hbx_enrollment_members: [shopping_hbx_enrollment_member1])}
+        
+          before do
+            tax_household_member3.update_attributes(is_ia_eligible: true)
+            eligibility_determination.update_attributes(max_aptc: 500.00)
+            aptc_enrollment2.household.reload
+            aptc_enrollment1.household.reload
+            hbx_enrollment.household.reload
+            family.reload
+          end
+
+          it 'should have two enrollments in enrolled state for a family' do
+            expect(family.active_household.hbx_enrollments.count).to eq(3)
+          end
+
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
+            expect(result.round(2)).to eq(189.11)
+          end
+        end
       end
     end
   end
