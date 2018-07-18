@@ -4,7 +4,7 @@ benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.
       :"effective_period.min".gt => Date.new(2017, 8, 1),
       :"effective_period.max" => Date.new(2018, 7, 31)
     }
-  }
+  }, :source_kind.in => [:mid_plan_year_conversion]
 )
 
 benefit_sponsorships.each do |benefit_sponsorship|
