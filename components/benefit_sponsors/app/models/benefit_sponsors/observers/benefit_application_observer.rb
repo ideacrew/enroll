@@ -29,6 +29,16 @@ module BenefitSponsors
               if policy.is_satisfied?(benefit_application)
                 notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
                 deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
+                
+                if benefit_application.is_renewing?
+                  benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                    enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+                    enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+                    if enrollment.employee_role.present?
+                      deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+                    end
+                  end
+                end
               end
             end
 

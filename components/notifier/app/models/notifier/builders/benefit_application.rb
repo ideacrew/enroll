@@ -161,9 +161,9 @@ module Notifier
           policy.fail_results.each do |k, _|
             case k.to_s
             when "minimum_participation_rule"
-              enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+              enrollment_errors << "At least seventy-five (75) percent of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
             when "non_business_owner_enrollment_count"
-              enrollment_errors << "One non-owner employee enrolled in health coverage"
+              enrollment_errors << "At least one non-owner employee enrolled in health coverage."
             end
           end
         end
@@ -218,8 +218,8 @@ module Notifier
       return @current_benefit_application if defined? @current_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? || benefit_application.enrollment_ineligible? || benefit_application.canceled?
-          @current_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_published? && ba.start_on == benefit_application.start_on.prev_year}
+        if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
+          @current_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted? && ba.end_on == benefit_application.start_on.to_date.prev_day}
         else
           @current_benefit_application = benefit_application
         end
@@ -230,10 +230,10 @@ module Notifier
       return @renewal_benefit_application if defined? @renewal_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? || benefit_application.enrollment_ineligible? || benefit_application.canceled?
+        if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
           @renewal_benefit_application = benefit_application
         else
-          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_published? && ba.start_on == benefit_application.start_on.prev_year}
+          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| (ba.is_submitted? || ba.draft?) && (ba.end_on == benefit_application.start_on.to_date.prev_day)}
         end
       end
     end

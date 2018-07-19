@@ -47,6 +47,10 @@ module BenefitSponsors
         # do nothing
       end
 
+      def health?
+        product_kind == :health
+      end
+
       def single_plan_type?
         product_package_kind == :single_product
       end

@@ -37,7 +37,7 @@ module BenefitSponsors
         possible_dates = Hash.new
         calculate_start_on_dates.each do |date|
           next unless is_start_on_valid?(date)
-          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
+          possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(date))
         end
         possible_dates
       end
