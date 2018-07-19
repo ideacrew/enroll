@@ -38,31 +38,26 @@ module BenefitSponsors
     end
 
     def submit_application
-      unless overlapping_published_benefit_application_present?
-        if benefit_application.may_approve_application?
-          if is_application_eligible?
-            if business_policy_satisfied_for?(:submit_benefit_application)
-              benefit_application.approve_application!
-              oe_period = benefit_application.open_enrollment_period
+      if benefit_application.may_approve_application?
+        if is_application_eligible?
+          if business_policy_satisfied_for?(:submit_benefit_application)
+            benefit_application.approve_application!
+            oe_period = benefit_application.open_enrollment_period
 
-              if today >= oe_period.begin
-                benefit_application.begin_open_enrollment!
-                benefit_application.update(open_enrollment_period: (today..oe_period.end))
-              end
-
-              [true, benefit_application, application_warnings]
-            else
-              [false, benefit_application, business_policy.fail_results]
+            if today >= oe_period.begin
+              benefit_application.begin_open_enrollment!
+              benefit_application.update(open_enrollment_period: (today..oe_period.end))
             end
+
+            [true, benefit_application, application_warnings]
           else
-            [false, benefit_application, application_eligibility_warnings]
+            [false, benefit_application, business_policy.fail_results]
           end
         else
-          errors = application_errors.merge(open_enrollment_date_errors)
-          [false, benefit_application, errors]
+          [false, benefit_application, application_eligibility_warnings]
         end
       else
-        errors = { base: "Published benefit application is already present. Cannot publish the current benefit application." }
+        errors = application_errors.merge(open_enrollment_date_errors)
         [false, benefit_application, errors]
       end
     end
@@ -80,11 +75,6 @@ module BenefitSponsors
         errors = application_errors.merge(open_enrollment_date_errors)
         [false, benefit_application, errors]
       end
-    end
-
-    def overlapping_published_benefit_application_present?
-      benefit_sponsorship = benefit_application.benefit_sponsorship
-      benefit_sponsorship.benefit_applications.published.any? { |ba| ba.effective_period.cover?(benefit_application.start_on) || ba.effective_period.cover?(benefit_application.end_on) }
     end
 
     def begin_open_enrollment
