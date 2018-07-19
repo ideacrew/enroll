@@ -60,31 +60,33 @@ end
 
 renewed_sponsorships = find_renewed_sponsorships(start_on_date)
 
-renewed_sponsorships.each do |bs|
-  fein = bs.profile.organization.fein
-  selected_application = bs.benefit_applications.detect do |ba|
-    (!ba.predecessor_id.blank?) &&
-      (ba.start_on == start_on_date) &&
-      [:enrollment_open,
-        :enrollment_closed,
-        :enrollment_eligible,
-        :active].include?(ba.aasm_state)
-  end
-end
-
 initial_file = File.open("policies_to_pull_ies.txt","w")
-
 renewal_file = File.open("policies_to_pull_renewals.txt","w")
 
-  employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(selected_application.sponsored_benefits, start_on_date)
+renewed_sponsorships.each do |bs|
+  fein = fein = bs.profile.organization.fein
+  selected_application = bs.sponsored_benefits.detect do |ba|
+    (!ba.predecessor_id.blank?) && 
+    (ba.start_on == start_on_date) && 
+    [:enrollment_open,:enrollment_closed,:enrollment_eligible,:active].include?(ba.aasm_state)
+  end
 
+  benefit_packages = selected_application.benefit_packages
 
-  employer_enrollment_query.each do |enrollment_hbx_id|
+  enrollment_ids = []
+
+  benefit_packages.each do |benefit_package|
+    employer_enrollment_query = ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(benefit_package.sponsored_benefits, start_on_date)
+    employer_enrollment_query.each{|id| enrollment_ids << id}
+  end
+
+  enrollment_ids.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
     if initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'initial'
       initial_file.puts(enrollment_hbx_id)
     elsif initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'renewal'
       renewal_file.puts(enrollment_hbx_id)
+    end
   end
 end
 
