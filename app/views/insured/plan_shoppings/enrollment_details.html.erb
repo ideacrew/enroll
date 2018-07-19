@@ -1,0 +1,24 @@
+<div class="table-border table-responsive">
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Market Indicator</th>
+      <th class="text-right" width="50">Premium Amount Total</th>
+      <th class="text-right" width="50">APTC Amount</th>
+      <th class="text-right" width="50">Proposed Coverage Effective Date</th>
+    </tr>
+    </thead
+    <tbody>
+    <tr>
+      <td><%= @response.attributes["First Name"] %></td>
+      <td><%= @response.attributes["Last Name"] %></td>
+      <td><%= @response.attributes["Market Indicator"] %></td>
+      <td class="text-right"><%= @response.attributes["Premium Amount Total"]  %></td>
+      <td class="text-right"><%= @response.attributes["APTC Amount"] %></td>
+      <td class="text-right"><%= @response.attributes["Proposed Coverage Effective Date"] %></td>
+    </tr>
+    </tbody>
+  </table>
+</div><br>

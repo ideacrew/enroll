@@ -11,13 +11,14 @@ class SamlIdpController < SamlIdp::IdpController
     hbx_enrollment.payment_transactions << ::PaymentTransaction.new
     hbx_enrollment.save
     @saml_response = idp_make_saml_response(hbx_enrollment)
-    puts @saml_response
-    puts decode_request(@saml_response)
-    render xml: SamlIdp.metadata.signed
+    render json: {k: @saml_response}
   end
 
   def other_service
-    render xml: SamlIdp.metadata.signed
+    @response   = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
+    respond_to do |format|
+      format.html { render 'insured/plan_shoppings/enrollment_details'}
+    end
   end
 
 
