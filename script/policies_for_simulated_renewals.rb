@@ -48,9 +48,9 @@ def initial_or_renewal(enrollment,plan_cache,predecessor_id)
   renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_package_id == predecessor_id}
   reject_statuses = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::WAIVED_STATUSES + %w(unverified void)
   renewal_enrollments_no_cancels_waives = renewal_enrollments.reject{|ren| reject_statuses.include?(ren.aasm_state.to_s)}
-  renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated coverage_termination_pending).include?(ren.aasm_state.to_s) && 
-                                                                                    ren.terminated_on.present? && 
-                                                                                    ren.terminated_on < (enrollment.effective_on - 1.day})
+  renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated coverage_termination_pending).include?(ren.aasm_state.to_s) &&
+                                                                                    ren.terminated_on.present? &&
+                                                                                    ren.terminated_on < (enrollment.effective_on - 1.day)}
   if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,plan_cache)}
     return "renewal"
   else
