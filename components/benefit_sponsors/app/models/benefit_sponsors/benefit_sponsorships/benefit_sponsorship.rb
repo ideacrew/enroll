@@ -402,7 +402,7 @@ module BenefitSponsors
     end
 
     def draft_benefit_application
-      benefit_applications.order_by(:"created_at".desc).detect {|application| application.draft?}
+      benefit_applications.order_by(:"created_at".desc).draft_state.first
     end
 
     def most_recent_benefit_application

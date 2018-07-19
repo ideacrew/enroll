@@ -448,7 +448,6 @@ module BenefitSponsors
       end
     end
 
-
     describe "most_recent_benefit_application", :dbclean => :after_each do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
 
@@ -467,7 +466,7 @@ module BenefitSponsors
 
         let!(:submitted_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
                                                                 benefit_sponsorship: benefit_sponsorship,
-                                                                recorded_service_areas: benefit_sponsorship.service_areas,aasm_state: :approved) }
+                                                                recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :approved) }
 
         it "should return submitted_benefit_application" do
           expect(benefit_sponsorship.most_recent_benefit_application).to eq submitted_benefit_application
