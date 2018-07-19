@@ -451,18 +451,18 @@ module BenefitSponsors
     describe "most_recent_benefit_application", :dbclean => :after_each do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
 
-      let!(:draft_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
+      let!(:imported_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
                                                         benefit_sponsorship: benefit_sponsorship,
-                                                        recorded_service_areas: benefit_sponsorship.service_areas) }
+                                                        recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :imported) }
 
-      context "when employer with draft benefit application" do
+      context "when employer with imported benefit application" do
 
-        it "should return draft_benefit_application" do
-          expect(benefit_sponsorship.most_recent_benefit_application).to eq draft_benefit_application
+        it "should not return benefit_application" do
+          expect(benefit_sponsorship.most_recent_benefit_application).to eq nil
         end
       end
 
-      context "when employer with draft & submitted benefit application" do
+      context "when employer with imported & submitted benefit application" do
 
         let!(:submitted_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
                                                                 benefit_sponsorship: benefit_sponsorship,

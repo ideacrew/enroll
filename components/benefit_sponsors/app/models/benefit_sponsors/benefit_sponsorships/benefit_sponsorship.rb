@@ -401,12 +401,8 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
     end
 
-    def draft_benefit_application
-      benefit_applications.order_by(:"created_at".desc).draft_state.first
-    end
-
     def most_recent_benefit_application
-      published_benefit_application || draft_benefit_application
+      published_benefit_application || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck
