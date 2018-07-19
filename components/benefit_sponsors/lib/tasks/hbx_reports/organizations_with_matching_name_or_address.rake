@@ -71,12 +71,12 @@ namespace :reports do
           if dba.present?
             dba = /#{dba}/i rescue ""
             next if dba.blank?
-            orgs = BenefitSponsors::Organizations::Organization.all.where(dba: dba)
+            orgs = BenefitSponsors::Organizations::Organization.all.where(dba: dba).to_a
             organizations << orgs if orgs.count > 1
-            organizations.compact
-            organizations.flatten
           end
         end
+        organizations.flatten!
+        organizations.compact!
         organizations.uniq
       when "address_1"
         organization_primary_address1s = BenefitSponsors::Organizations::Organization.all.flat_map(&:profiles).map(&:primary_office_location).map(&:address).map(&:address_1).uniq
