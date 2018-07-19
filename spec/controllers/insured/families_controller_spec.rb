@@ -596,7 +596,6 @@ RSpec.describe Insured::FamiliesController do
     before(:each) do
       sign_in(user)
       allow(person).to receive(:resident_role?).and_return(false)
-      allow(controller).to receive(:is_ee_sep_request_accepted?).and_return false
     end
 
     it "renders the 'check_qle_date' template" do

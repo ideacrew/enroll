@@ -4,7 +4,6 @@ module BenefitSponsors
   RSpec.describe 'ModelEvents::InitialApplicationSubmitted', db_clean: :after_each do
 
     let(:model_event) { "application_submitted" }
-    let(:notice_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }

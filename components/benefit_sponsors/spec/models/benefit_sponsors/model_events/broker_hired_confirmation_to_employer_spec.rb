@@ -19,7 +19,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerHiredConfirmationToEmployer'
 
   describe "NoticeTrigger" do
     context "when ER hires a broker" do
-      subject { BenefitSponsors::Observers::NoticeObserver.new }
+      subject { BenefitSponsors::Observers::BrokerAgencyAccountObserver.new }
       
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -27,7 +27,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerHiredConfirmationToEmployer'
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        subject.deliver(recipient: employer_profile, event_object: employer_profile, notice_event: notice_event)
+        subject.notifier.deliver(recipient: employer_profile, event_object: employer_profile, notice_event: notice_event)
       end
     end
   end
