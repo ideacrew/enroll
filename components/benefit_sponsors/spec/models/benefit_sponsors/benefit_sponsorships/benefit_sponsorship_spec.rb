@@ -448,6 +448,33 @@ module BenefitSponsors
       end
     end
 
+
+    describe "most_recent_benefit_application", :dbclean => :after_each do
+      let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
+
+      let!(:draft_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                                        benefit_sponsorship: benefit_sponsorship,
+                                                        recorded_service_areas: benefit_sponsorship.service_areas) }
+
+      context "when employer with draft benefit application" do
+
+        it "should return draft_benefit_application" do
+          expect(benefit_sponsorship.most_recent_benefit_application).to eq draft_benefit_application
+        end
+      end
+
+      context "when employer with draft & submitted benefit application" do
+
+        let!(:submitted_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                                                benefit_sponsorship: benefit_sponsorship,
+                                                                recorded_service_areas: benefit_sponsorship.service_areas,aasm_state: :approved) }
+
+        it "should return submitted_benefit_application" do
+          expect(benefit_sponsorship.most_recent_benefit_application).to eq submitted_benefit_application
+        end
+      end
+    end
+
     describe "Scopes", :dbclean => :after_each do
       let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
       let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
