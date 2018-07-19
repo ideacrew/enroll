@@ -37,8 +37,9 @@ module BenefitSponsors
 
         save_result, persisted_object = store(form, benefit_application)
         if save_result
-          cancel_other_draft_applications(benefit_application)
+          cancel_other_draft_applications(persisted_object)
         end
+        [save_result, persisted_object]
       end
 
       def cancel_other_draft_applications(benefit_application)
