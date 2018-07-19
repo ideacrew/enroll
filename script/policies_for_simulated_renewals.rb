@@ -70,6 +70,7 @@ renewed_sponsorships.each do |bs|
         :enrollment_eligible,
         :active].include?(ba.aasm_state)
   end
+end
 
 initial_file = File.open("policies_to_pull_ies.txt","w")
 
