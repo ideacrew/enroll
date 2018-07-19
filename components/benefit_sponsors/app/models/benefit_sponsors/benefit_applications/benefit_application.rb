@@ -568,15 +568,17 @@ module BenefitSponsors
     end
 
     def renew_benefit_package_members
-      benefit_packages.each { |benefit_package| benefit_package.activate_benefit_group_assignments }
       benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
     end
 
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
-      return unless transition_kind.present?
+      return if transition_kind.blank?
 
-      # :effectuate, :expire, :terminate, :cancel
+      if predecessor.present? && transition_kind == :effectuate
+        benefit_packages.each { |benefit_package| benefit_package.activate_benefit_group_assignments }
+      end
+
       benefit_packages.each { |benefit_package| benefit_package.send("#{transition_kind}_member_benefits".to_sym) }
     end
 

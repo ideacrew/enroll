@@ -36,6 +36,7 @@ module BenefitSponsors
       delegate :recorded_service_area_ids, to: :benefit_application
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
+      delegate :is_renewing?,   to: :benefit_application
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
@@ -237,7 +238,10 @@ module BenefitSponsors
         # FIXME: There is no reason to assume that the renewal benefit package assignment
         #        will have is_active == false, I think this may always return an empty set.
         #        Because of this, I have removed the 'false' constraint.
-        census_employees_assigned_on(effective_period.min).each { |member| renew_member_benefit(member) }
+
+        census_employees_assigned_on(effective_period.min, false).each do |member| 
+          renew_member_benefit(member)
+        end
       end
 
       def renew_member_benefit(census_employee)
@@ -337,12 +341,12 @@ module BenefitSponsors
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
-            benefit_group_assignment.update(is_active: false) unless self.benefit_application.is_renewing?
+            benefit_group_assignment.update(is_active: false) unless is_renewing?
           end
 
           other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
           if other_benefit_package.present?
-            if self.benefit_application.is_renewing?
+            if is_renewing?
               ce.add_renew_benefit_group_assignment([other_benefit_package])
             else
               ce.find_or_create_benefit_group_assignment([other_benefit_package])
