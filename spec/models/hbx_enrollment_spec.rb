@@ -463,6 +463,42 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    context "when maket type is individual" do
+      let(:benefit_package) { BenefitPackage.new }
+      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
+      let(:person) { FactoryGirl.create(:person, family:family)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:enrollment) {
+        enrollment = household.new_hbx_enrollment_from(
+          consumer_role: consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+        )
+        enrollment.save
+        enrollment
+      }
+      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
+      let(:plan) { FactoryGirl.create(:plan) }
+      let(:plan2) { FactoryGirl.create(:plan) }
+      let(:plan1) { FactoryGirl.create(:plan) }
+      let(:active_year) {TimeKeeper.date_of_record.year}
+
+      before :each do
+          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+        end
+
+      it "should return plans without csr kind when coverall market is selected" do
+          decorated_plans = enrollment.decorated_elected_plans('health', 'coverall')
+          expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', nil))
+        end
+    end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
@@ -515,15 +551,6 @@ describe HbxEnrollment, dbclean: :after_all do
           expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
           expect(enrollment.decorated_elected_plans('health').count).to eq 1
           expect(enrollment.decorated_elected_plans('health').first.id).to eq plan2.id
-        end
-
-        it "should return decoratored plans with coverall type market" do
-          allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
-          allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan1]
-          expect(enrollment.decorated_elected_plans('health').first.class).to eq UnassistedPlanCostDecorator
-          expect(enrollment.decorated_elected_plans('health').count).to eq 1
-          expect(enrollment.decorated_elected_plans('health').first.id).to eq plan1.id
         end
       end
 
