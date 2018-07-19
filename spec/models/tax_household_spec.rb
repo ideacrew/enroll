@@ -331,6 +331,7 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:family) { person.primary_family }
       let!(:family_member1) {FactoryGirl.create(:family_member, family: person.primary_family )}
       let!(:family_member2) {FactoryGirl.create(:family_member, family: person.primary_family )}
+      let(:member_ids) { family.active_family_members.collect(&:id) }
       
       let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
       let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
@@ -444,6 +445,52 @@ RSpec.describe TaxHousehold, type: :model do
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
             expect(result.round(2)).to eq(189.11)
+          end
+        end
+
+        context 'when all checked family_members in plan shopping ' do
+          let(:shopping_hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id) }
+          let(:shopping_hbx_enrollment_member1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.second.id) }
+          let(:shopping_hbx_enrollment_member2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household:family.active_household)}
+
+          it 'should return all checked members' do
+            expect(tax_household.find_enrolling_fms(shopping_hbx_enrollment).count).to eq(3)
+          end
+        end
+
+        context 'having one member is enrolled and one member is unchecked and third member in shopping' do
+          let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 32.21)}
+          let!(:aptc_enrollment1) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil, kind: "individual", enrollment_kind: "special_enrollment", coverage_kind: "health", submitted_at: TimeKeeper.date_of_record - 2.months, aasm_state: 'coverage_selected', household:family.active_household, applied_aptc_amount: 32.21)}
+          let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment )}
+          let(:shopping_hbx_enrollment_member3){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member3], household:family.active_household)}
+
+          it 'should return only unwanted_family_members' do
+            expect(tax_household.unwanted_family_members(shopping_hbx_enrollment).count).to eq(1)
+          end
+        end
+
+        context 'having two previous aptc enrollment and third member in shopping' do
+          let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment1, applied_aptc_amount: 32.21)}
+          let!(:aptc_enrollment1) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil, kind: "individual", enrollment_kind: "special_enrollment", coverage_kind: "health", submitted_at: TimeKeeper.date_of_record - 2.months, aasm_state: 'coverage_selected', household:family.active_household, applied_aptc_amount: 32.21)}
+      
+          let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: aptc_enrollment2, applied_aptc_amount: 278.68 )}
+          let!(:aptc_enrollment2) {FactoryGirl.create(:hbx_enrollment,waiver_reason: nil, submitted_at: TimeKeeper.date_of_record - 1.months, household: family.active_household,enrollment_kind: "special_enrollment", is_active: true, aasm_state: 'coverage_selected', changing: false, kind: "individual", applied_aptc_amount: 278.68)}
+
+          let(:shopping_hbx_enrollment_member1) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id ,eligibility_date: TimeKeeper.date_of_record+1.month) }
+          let(:shopping_hbx_enrollment1) {FactoryGirl.build(:hbx_enrollment, coverage_kind: "health", aasm_state: "shopping", household:family.active_household, hbx_enrollment_members: [shopping_hbx_enrollment_member1])}
+
+          it 'should return enrolled family_members' do
+            expect(tax_household.aptc_family_members_by_tax_household.count).to eq(2)
+          end
+        end
+        context 'first two family_members are in is_ia_eligible and third is medicaid ' do
+          let(:shopping_hbx_enrollment_member2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.last.id) }
+          let(:shopping_hbx_enrollment){FactoryGirl.build(:hbx_enrollment, aasm_state: "shopping",hbx_enrollment_members:[shopping_hbx_enrollment_member2], household:family.active_household)}
+
+          it 'should return medicaid family_members only' do
+            expect(tax_household.find_non_aptc_fms(shopping_hbx_enrollment.hbx_enrollment_members.map(&:family_member)).count).to eq(1)
           end
         end
       end
