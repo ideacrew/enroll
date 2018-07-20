@@ -11,11 +11,11 @@ module BenefitSponsors
         :application_denied,
         :group_advance_termination_confirmation,
         :renewal_application_created,
+        :renewal_application_autosubmitted,
 
         # :renewal_enrollment_confirmation,
         # :renewal_application_submitted,
         # :ineligible_renewal_application_submitted,
-        # :renewal_application_autosubmitted,
         # :open_enrollment_began, #not being used
         # :renewal_application_denied,
         # :zero_employees_on_roster,
