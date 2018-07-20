@@ -18,9 +18,9 @@ class AddingEmployeeRole < MongoidMigrationTask
   private
 
   def add_employee_role
-    raise 'Please provide ce id.' if ENV['ce_id'].nil?
-    census_employee = CensusEmployee.where(_id: ENV['ce_id']).first
-    raise "No Census Employee found by #{ENV['ce_id']}" if census_employee.nil?
+    raise 'Please provide census_employee_id.' if ENV['census_employee_id'].nil?
+    census_employee = CensusEmployee.where(_id: ENV['census_employee_id']).first
+    raise "No Census Employee found by #{ENV['census_employee_id']}" if census_employee.nil?
     raise 'Please provide person_id.' if ENV['person_id'].nil?
     person = Person.where(_id: ENV['person_id']).first
     raise "Person not found by #{ENV['person_id']}" if person.nil?
@@ -33,8 +33,8 @@ class AddingEmployeeRole < MongoidMigrationTask
   end
 
   def link_employee_role
-    raise 'Please provide ce ids.' if ENV['ce'].nil?
-    ce_ids = ENV['ce'].split(",").map(&:strip)
+    raise 'Please provide census_employee_ids.' if ENV['census_employee_ids'].nil?
+    ce_ids = ENV['census_employee_ids'].split(",").map(&:strip)
     census_employees = CensusEmployee.where(:id.in => ce_ids)
     raise "No Census Employee found with #{ce_ids.join(', ')}" if census_employees.blank?
     census_employees.each { |ce| ce.link_employee_role! }

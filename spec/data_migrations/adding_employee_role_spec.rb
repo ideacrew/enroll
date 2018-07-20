@@ -18,9 +18,9 @@ describe AddingEmployeeRole, dbclean: :after_each do
   let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
   let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
   let(:benefit_group_assignment3) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
-  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
-  let(:census_employee2) { FactoryGirl.create :census_employee_with_active_assignment, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship }
-  let(:census_employee3) { FactoryGirl.create :census_employee_with_active_assignment, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship }
+  let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
+  let(:census_employee2) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
+  let(:census_employee3) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
 
   let(:given_task_name) { "adding_employee_role" }
   subject { AddingEmployeeRole.new(given_task_name, double(:current_scope => nil)) }
@@ -35,19 +35,19 @@ describe AddingEmployeeRole, dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person, ssn: "009998887") }
 
     context 'When params are missing/invalid' do
-      context 'when ce_id not provided then' do
+      context 'when census_employee_id not provided then' do
         before(:each) do
           ENV['action'] = 'Add'
         end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Please provide ce id.')
+          expect(subject.migrate).to eq('Please provide census_employee_id.')
         end
       end
 
       context 'when census employee id is invalid then' do
         before(:each) do
           allow(ENV).to receive(:[]).with('action').and_return('Add')
-          allow(ENV).to receive(:[]).with('ce_id').and_return '123abc987pqr'
+          allow(ENV).to receive(:[]).with('census_employee_id').and_return '123abc987pqr'
         end
         it 'should raise an error' do
           expect(subject.migrate).to eq('No Census Employee found by 123abc987pqr')
@@ -57,7 +57,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
       context 'when person_id not provided then' do
         before(:each) do
           ENV['action'] = 'Add'
-          ENV['ce_id'] = census_employee.id
+          ENV['census_employee_id'] = census_employee.id
         end
         it 'should raise an error' do
           expect(subject.migrate).to eq('Please provide person_id.')
@@ -67,7 +67,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
       context 'when census person_id is invalid then' do
         before(:each) do
           allow(ENV).to receive(:[]).with('action').and_return('Add')
-          allow(ENV).to receive(:[]).with('ce_id').and_return census_employee.id
+          allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
           allow(ENV).to receive(:[]).with('person_id').and_return '123abc987pqr'
         end
         it 'should raise an error' do
@@ -80,7 +80,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
       before(:each) do
         census_employee.update_attribute(:employer_profile_id, employer_profile.id)
         allow(ENV).to receive(:[]).with('action').and_return('Add')
-        allow(ENV).to receive(:[]).with('ce_id').and_return(census_employee.id)
+        allow(ENV).to receive(:[]).with('census_employee_id').and_return(census_employee.id)
         allow(ENV).to receive(:[]).with('person_id').and_return(person.id)
         census_employee.benefit_group_assignments << benefit_group_assignment
         census_employee.save!
@@ -112,14 +112,14 @@ describe AddingEmployeeRole, dbclean: :after_each do
           ENV['action'] = 'Link'
         end
         it 'should raise an error' do
-          expect(subject.migrate).to eq('Please provide ce ids.')
+          expect(subject.migrate).to eq('Please provide census_employee_ids.')
         end
       end
 
       context 'when census employee id is invalid then' do
         before(:each) do
           allow(ENV).to receive(:[]).with('action').and_return('Link')
-          allow(ENV).to receive(:[]).with('ce').and_return '123abc987pqr'
+          allow(ENV).to receive(:[]).with('census_employee_ids').and_return '123abc987pqr'
         end
         it 'should raise an error' do
           expect(subject.migrate).to eq('No Census Employee found with 123abc987pqr')
@@ -131,7 +131,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
       let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
       before(:each) do
         allow(ENV).to receive(:[]).with('action').and_return('Link')
-        allow(ENV).to receive(:[]).with('ce').and_return "#{census_employee.id}"
+        allow(ENV).to receive(:[]).with('census_employee_ids').and_return "#{census_employee.id}"
         census_employee.benefit_group_assignments << benefit_group_assignment
         census_employee.save!
         benefit_group_assignment.save!
@@ -147,7 +147,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
     context 'when census employee ids are valid' do
       before(:each) do
         allow(ENV).to receive(:[]).with('action').and_return('Link')
-        allow(ENV).to receive(:[]).with('ce').and_return "#{census_employee.id}, #{census_employee2.id}, #{census_employee3.id}"
+        allow(ENV).to receive(:[]).with('census_employee_ids').and_return "#{census_employee.id}, #{census_employee2.id}, #{census_employee3.id}"
         census_employee.benefit_group_assignments << benefit_group_assignment
         census_employee.save!
         benefit_group_assignment.save!
