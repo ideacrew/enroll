@@ -65,7 +65,7 @@ renewal_file = File.open("policies_to_pull_renewals.txt","w")
 
 renewed_sponsorships.each do |bs|
   fein = fein = bs.profile.organization.fein
-  selected_application = bs.sponsored_benefits.detect do |ba|
+  selected_application = bs.benefit_applications.detect do |ba|
     (!ba.predecessor_id.blank?) && 
     (ba.start_on == start_on_date) && 
     [:enrollment_open,:enrollment_closed,:enrollment_eligible,:active].include?(ba.aasm_state)
@@ -82,9 +82,9 @@ renewed_sponsorships.each do |bs|
 
   enrollment_ids.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
-    if initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'initial'
+    if initial_or_renewal(enrollment,plan_cache,selected_application.benefit_packages.first.predecessor_id) == 'initial'
       initial_file.puts(enrollment_hbx_id)
-    elsif initial_or_renewal(enrollment,plan_cache,benefit_application.benefit_packages.first.predecessor_id) == 'renewal'
+    elsif initial_or_renewal(enrollment,plan_cache,selected_application.benefit_packages.first.predecessor_id) == 'renewal'
       renewal_file.puts(enrollment_hbx_id)
     end
   end
