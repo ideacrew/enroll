@@ -777,12 +777,16 @@ module BenefitSponsors
 
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
+      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
+        reverse_enrollment_eligibility!
+      end
+
       if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
         approve_enrollment_eligiblity!
       end
 
-      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
-        reverse_enrollment_eligibility!
+      if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
+        deny_enrollment_eligiblity!
       end
 
       if (aasm.to_state == :applicant && aasm.current_event == :cancel!)

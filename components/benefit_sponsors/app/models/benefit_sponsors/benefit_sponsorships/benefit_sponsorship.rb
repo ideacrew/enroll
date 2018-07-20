@@ -454,22 +454,20 @@ module BenefitSponsors
 
     # Workflow for self service
     aasm do
-      state :applicant, initial: true
+      state :applicant, initial: true, :after_enter => :publish_benefit_sponsor_event
       state :initial_application_under_review # Sponsor's first application is submitted invalid and under HBX review
       state :initial_application_denied       # Sponsor's first application is rejected
       state :initial_application_approved     # Sponsor's first application is submitted and approved
       state :initial_enrollment_open          # Sponsor members are under first open enrollment period
       state :initial_enrollment_closed        # Sponsor members' have successfully completed first open enrollment
-      state :initial_enrollment_ineligible    # Sponsor members' first open enrollment has failed to meet eligibility policies
-      state :initial_enrollment_eligible      # Sponsor has paid first premium in-full and authorized to offer benefits
-      state :binder_reversed                  # Spnosor's initial payment is returned
+      state :initial_enrollment_ineligible, :after_enter => :publish_benefit_sponsor_event  # Sponsor members' first open enrollment has failed to meet eligibility policies
+      state :initial_enrollment_eligible, :after_enter => :publish_benefit_sponsor_event    # Sponsor has paid first premium in-full and authorized to offer benefits
+      state :binder_reversed, :after_enter => :publish_benefit_sponsor_event                # Spnosor's initial payment is returned
       state :active                           # Sponsor's members are actively enrolled in coverage
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
       
-      after_all_transitions :publish_state_transition
-
       event :approve_initial_application do
         transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
       end
@@ -543,13 +541,13 @@ module BenefitSponsors
         transitions to: :ineligible
       end
 
-      event :cancel, :after_commit => :publish_cancel do
+      event :cancel do
         transitions from: [:initial_application_approved, :initial_enrollment_closed, :binder_reversed, :initial_enrollment_ineligible, :active], to: :applicant
       end
     end
 
     # Notify BenefitApplication that
-    def publish_state_transition
+    def publish_benefit_sponsor_event
       return unless [:initial_enrollment_eligible,
         :binder_reversed,
         :initial_enrollment_ineligible,
