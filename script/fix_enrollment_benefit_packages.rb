@@ -15,7 +15,6 @@ sponsorships.each do |sponsorship|
 
   benefit_package_ids = application.benefit_packages.pluck(:_id)
   families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => {
-    :sponsored_benefit_package_id.in => benefit_package_ids,
     :created_at.gt => Date.new(2018,7,11)
     }})
 
@@ -52,7 +51,12 @@ sponsorships.each do |sponsorship|
             benefit_group_assignment = census_employee.assign_to_benefit_package(valid_application.benefit_packages.first, valid_application.effective_period.min)
           end
 
-          enrollment.update_attributes(sponsored_benefit_package_id: benefit_group_assignment.benefit_package_id,
+          benefit_package = benefit_group_assignment.benefit_package
+          sponsored_benefit = benefit_package.sponsored_benefit_for(enrollment.sponsored_benefit.kind)
+
+          enrollment.update_attributes(
+            sponsored_benefit_package_id: benefit_package.id,
+            sponsored_benefit_id: sponsored_benefit.id,
             benefit_group_assignment_id: benefit_group_assignment.id)
 
           puts "Fixed enrollment.....#{enrollment.hbx_id}"
