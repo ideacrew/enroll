@@ -29,6 +29,16 @@ module BenefitSponsors
               if policy.is_satisfied?(benefit_application)
                 notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
                 deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
+                
+                if benefit_application.is_renewing?
+                  benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                    enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+                    enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+                    if enrollment.employee_role.present?
+                      deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+                    end
+                  end
+                end
               end
             end
 
@@ -44,7 +54,7 @@ module BenefitSponsors
             if new_model_event.event_key == :group_advance_termination_confirmation
               deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
 
-              benefit_application.active_benefit_sponsorship.census_employees.active.each do |ce|
+              benefit_application.benefit_sponsorship.census_employees.active.each do |ce|
                 deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination")
               end
             end
@@ -55,7 +65,7 @@ module BenefitSponsors
                 if benefit_application.is_renewing?
                   if policy.fail_results.include?(:employer_primary_office_location)
                     deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
-                    benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                    benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
                       if ce.employee_role.present?
                         deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
                       end
