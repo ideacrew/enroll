@@ -65,20 +65,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def trigger_advance_termination_request_notice(benefit_application)
-    sponsorship = benefit_application.benefit_sponsorship
-    deliver(recipient: sponsorship.profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
-    sponsorship.census_employees.non_terminated.each do |census_employee|
-      deliver(recipient: census_employee.employee_role, event_object: benefit_application, notice_event: "notify_employee_when_employer_requests_advance_termination") if census_employee.employee_role
-    end
+    benefit_application.trigger_model_event(:group_advance_termination_confirmation)
   end
-
-  def notifier
-    BenefitSponsors::Services::NoticeService.new
-  end
-
-  def deliver(recipient:, event_object:, notice_event:, notice_params: {})
-    notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
-  end
-
 end
 

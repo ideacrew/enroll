@@ -32,7 +32,7 @@ describe ModifyBenefitApplication do
     let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: 457637456) }
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
       FactoryGirl.create(
