@@ -17,7 +17,7 @@
           Please provide a last name.
     .col-md-4
       label for="inputDob"  Date of Birth *
-      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10, minlength:10}
+      = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', required: true, readonly: defined?(readonly), maxlength:10, minlength:10, onblur:'validDob(this)'}
       .invalid-feedback
         |
           Please provide a date of birth.
@@ -60,4 +60,15 @@ javascript:
 	    date: true,
 	    datePattern: ['m', 'd', 'Y']
 	});
+	
+	function validDob(element) {
+		if (element.value && element.value.length < 10) {
+			swal({
+				title: "Invalid DOB Format",
+				text: "DOB must be entered as MM/DD/YYYY",
+				icon: "warning"
+			}),
+			element.value = ''
+		}
+	}
 
