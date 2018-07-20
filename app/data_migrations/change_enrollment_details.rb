@@ -157,7 +157,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def transfer_enrollment_from_glue_to_enroll
-    ts = TranscriptGenerator.new('shop')
-    ts.display_enrollment_transcripts
+    if ENV['market'].to_s = "shop"
+      ts = TranscriptGenerator.new('shop') 
+    else
+      ts = TranscriptGenerator.new
+    end
   end
 end
