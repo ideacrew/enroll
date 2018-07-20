@@ -1,5 +1,5 @@
 class TranscriptGenerator
-
+  load 'app/models/parsers/xml/cv/importers/enrollment_parser.rb'
   attr_accessor :cv_path, :identifier
 
   # TRANSCRIPT_PATH = "#{Rails.root}/xml_files_10_27/ivl_policy_transcript_files/"
@@ -55,6 +55,7 @@ class TranscriptGenerator
 
     CSV.open("#{@market}_enrollment_change_sets_#{Time.now.strftime("%m_%d_%Y_%H_%M")}.csv", "w") do |csv|
       if @market == 'individual'
+        
         csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Action', 'Section:Attribute', 'Value']
       else
         csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Employer FEIN', 'Employer Legalname', 'Action', 'Section:Attribute', 'Value']
