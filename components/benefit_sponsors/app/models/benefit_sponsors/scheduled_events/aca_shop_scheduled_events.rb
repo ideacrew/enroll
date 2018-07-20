@@ -88,7 +88,7 @@ module BenefitSponsors
         binder_next_day = scheduler.calculate_open_enrollment_date(application_effective_date)[:binder_payment_due_date].next_day
 
         if new_date == binder_next_day
-          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_set_initial_ineligible?(application_effective_date)
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_transition_as_initial_ineligible?(application_effective_date)
 
           benefit_sponsorships.each do |benefit_sponsorship|
             execute_sponsor_event(benefit_sponsorship, :mark_initial_ineligible)

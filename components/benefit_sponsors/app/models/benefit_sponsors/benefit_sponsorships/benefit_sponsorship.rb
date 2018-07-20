@@ -197,7 +197,7 @@ module BenefitSponsors
       )
     }
 
-    scope :mark_initial_ineligible?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_transition_as_initial_ineligible?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:predecessor_id => { :$exists => false }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_closed }}
       )
