@@ -113,5 +113,32 @@ describe ModifyBenefitApplication do
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
       end
     end
+
+    context "should trigger termination notice", db_clean: :after_each do
+
+      let(:termination_date) { start_on.next_month.next_day }
+      let(:end_on)           { start_on.next_month.end_of_month }
+
+      before do
+        allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
+        allow(ENV).to receive(:[]).with("action").and_return("terminate")
+        allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.to_s)
+        allow(ENV).to receive(:[]).with("end_on").and_return(end_on.to_s)
+      end
+
+      let(:model_instance) { benefit_application }
+
+      context "should trigger termination notice to employer and employees" do
+        it "should trigger model event" do
+          model_instance.class.observer_peers.keys.each do |observer|
+            expect(observer).to receive(:notifications_send) do |instance, model_event|
+              expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
+              expect(model_event).to have_attributes(:event_key => :group_advance_termination_confirmation, :klass_instance => model_instance, :options => {})
+            end
+          end
+          subject.migrate
+        end
+      end
+    end
   end
 end
