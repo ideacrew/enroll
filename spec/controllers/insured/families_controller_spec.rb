@@ -919,9 +919,12 @@ RSpec.describe Insured::FamiliesController do
         ActiveJob::Base.queue_adapter = :test
         ActiveJob::Base.queue_adapter.enqueued_jobs = []
         xhr :post, "transition_family_members_update", resident_params, format: :js
-        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|job_info[:job] == IvlNoticesNotifierJobend
-        expect(queued_job[:args]).to eq [resident_person.id.to_s, 'coverall_to_ivl_transition_notice']
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == IvlNoticesNotifierJob
         end
+        expect(queued_job[:args]).not_to be_empty
+        expect(queued_job[:args].include?(resident_person.id.to_s)).to be_truthy
+        expect(queued_job[:args].include?('coverall_to_ivl_transition_notice')).to be_truthy
       end
     end
   end
