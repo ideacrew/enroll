@@ -12,10 +12,10 @@ end
 
 start_on_date = window.end.next_month.beginning_of_month.to_time.utc.beginning_of_day
 
-plan_cache = {}
+product_cache = {}
 
-Plan.all.each do |plan|
-  plan_cache[plan.id] = plan
+BenefitMarkets::Products::Product.all.each do |product|
+  product_cache[product.id] = product
 end
 
 def find_renewed_sponsorships(start_date)
@@ -35,15 +35,15 @@ def find_renewed_sponsorships(start_date)
   })
 end
 
-def matching_plan_details(enrollment, other_hbx_enrollment, plan_cache)
-  return false if other_hbx_enrollment.plan_id.blank?
-  new_plan = plan_cache[enrollment.plan_id]
-  old_plan = plan_cache[other_hbx_enrollment.plan_id]
-  (old_plan.carrier_profile_id == new_plan.carrier_profile_id) &&
+def matching_plan_details(enrollment, other_hbx_enrollment, product_cache)
+  return false if other_hbx_enrollment.product_id.blank?
+  new_plan = product_cache[enrollment.product_id]
+  old_plan = product_cache[other_hbx_enrollment.product_id]
+  (old_plan.issuer_profile_id == new_plan.issuer_profile_id) &&
     (old_plan.active_year == new_plan.active_year - 1)
 end
 
-def initial_or_renewal(enrollment,plan_cache,predecessor_id)
+def initial_or_renewal(enrollment,product_cache,predecessor_id)
   return "initial" if predecessor_id.blank?
   renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select{|hbx_enrollment| hbx_enrollment.sponsored_benefit_package_id == predecessor_id}
   reject_statuses = HbxEnrollment::CANCELED_STATUSES + HbxEnrollment::WAIVED_STATUSES + %w(unverified void)
@@ -51,8 +51,10 @@ def initial_or_renewal(enrollment,plan_cache,predecessor_id)
   renewal_enrollments_no_terms = renewal_enrollments_no_cancels_waives.reject{|ren| %w(coverage_terminated coverage_termination_pending).include?(ren.aasm_state.to_s) &&
                                                                                     ren.terminated_on.present? &&
                                                                                     ren.terminated_on < (enrollment.effective_on - 1.day)}
-  if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,plan_cache)}
+  if renewal_enrollments_no_terms.any?{|ren| matching_plan_details(enrollment,ren,product_cache)}
     return "renewal"
+  elsif renewal_enrollments_no_terms.empty?
+    return "initial"
   else
     return "initial"
   end
@@ -82,9 +84,10 @@ renewed_sponsorships.each do |bs|
 
   enrollment_ids.each do |enrollment_hbx_id|
     enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
-    if initial_or_renewal(enrollment,plan_cache,selected_application.benefit_packages.first.predecessor_id) == 'initial'
+    puts "#{enrollment.hbx_id} has no plan" if enrollment.product.blank?
+    if initial_or_renewal(enrollment,product_cache,selected_application.benefit_packages.first.predecessor_id) == 'initial'
       initial_file.puts(enrollment_hbx_id)
-    elsif initial_or_renewal(enrollment,plan_cache,selected_application.benefit_packages.first.predecessor_id) == 'renewal'
+    elsif initial_or_renewal(enrollment,product_cache,selected_application.benefit_packages.first.predecessor_id) == 'renewal'
       renewal_file.puts(enrollment_hbx_id)
     end
   end
