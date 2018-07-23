@@ -575,10 +575,6 @@ module BenefitSponsors
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
       return if transition_kind.blank?
 
-      if predecessor.present? && transition_kind == :effectuate
-        benefit_packages.each { |benefit_package| benefit_package.activate_benefit_group_assignments }
-      end
-
       benefit_packages.each { |benefit_package| benefit_package.send("#{transition_kind}_member_benefits".to_sym) }
     end
 
