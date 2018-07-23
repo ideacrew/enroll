@@ -18,7 +18,7 @@ RSpec.describe IvlNotices::IvlToCoverallTransitionNoticeBuilder, dbclean: :after
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
-      :options => {family: family, result: [person]}
+      :options => {family: family.id.to_s, result: {people: [person.id.to_s]}}
   }}
 
   describe "New" do

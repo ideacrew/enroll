@@ -285,8 +285,8 @@ class Insured::FamiliesController < FamiliesController
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
-      @resident_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
-      @consumer_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
+      @resident_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
+      @consumer_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
     end
     trigger_ivl_to_cdc_transition_notice if @resident_people.present?
     respond_to do |format|
@@ -299,7 +299,7 @@ class Insured::FamiliesController < FamiliesController
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
     begin
-      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family:  @family, result: @resident_people} )
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}} )
     rescue Exception => e
       Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
     end
