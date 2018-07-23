@@ -78,7 +78,7 @@
 javascript:
 	
 	function comparePlan(element) {
-		plansToCompare = [];
+    plansToCompareArray = [];
 		checkboxes = document.querySelectorAll('#compare_plan_checkbox')
 		count = 0;
 		checkboxes.forEach(function(checkbox) {
@@ -87,10 +87,11 @@ javascript:
 				count++;
 				hios = checkbox.dataset.hiosId;
 				planYear = checkbox.dataset.planYear;
-				plan = {
-					hios:hios,
-					planYear:planYear
-				};
+        hbxId = checkbox.dataset.hbxId;
+        enrollmentKind = checkbox.dataset.planEnrollmentKind;
+        changePlan = checkbox.dataset.planChangePlan;
+        uri = checkbox
+        
 				var compareBtn = document.getElementById('compareBtn')
         
 				if (count > 1) {
@@ -109,19 +110,24 @@ javascript:
 				}
 				
 				if (count <= 2) {
-					plansToCompare.push(plan)
+          plansToCompareArray.push(hios)
+          console.log(plansToCompareArray)
 				}
 			}
 		})
 	}
   
   function compareResults() {
-    console.log(plansToCompare)
-    
-    fetch('controller action here')
-      .then(function(res) {
-        return res.json()
-      })
+    uri = document.getElementById('compareBtn').dataset.uri;
+  	$.ajax({
+  		type: "GET",
+  	url: uri,
+  	dataType: 'script',
+  	data: {
+  		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id": hbxId, "active_year": planYear, "enrollment_kind": enrollmentKind,
+      "change_plan": changePlan
+  	}
+  	});
   }
 
           
