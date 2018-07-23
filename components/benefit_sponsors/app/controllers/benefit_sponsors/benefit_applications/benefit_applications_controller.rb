@@ -50,12 +50,12 @@ module BenefitSponsors
           flash[:notice] = "Benefit Application successfully published."
           flash[:error] = error_messages(@benefit_application_form)
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
-        elsif @benefit_application_form.errors.messages.keys.include?(:attestation_ineligible)
+        elsif @benefit_application_form.is_ineligible_to_submit?
           respond_to do |format|
             format.js
           end
         else
-          flash[:error] = "Benefit Application failed to submit. #{error_messages(@benefit_application_form)}"
+          flash[:error] = "Benefit Application failed to submit. #{@benefit_application_form.errors.messages.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         end
       end
@@ -63,7 +63,7 @@ module BenefitSponsors
       def force_submit_application
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.require(:benefit_application_id))
         authorize @benefit_application_form, :updateable?
-        if @benefit_application_form.force_submit_application
+        if @benefit_application_form.force_submit_application_with_eligibility_errors
           flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
           redirect_to profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits')
         end

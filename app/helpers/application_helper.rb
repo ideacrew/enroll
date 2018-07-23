@@ -709,7 +709,8 @@ module ApplicationHelper
       :draft => :draft,
       :enrollment_open => :enrolling,
       :enrollment_eligible => :enrolled,
-      :approved => :published
+      :approved => :published,
+      :pending => :publish_pending
     }
 
     renewing = benefit_application.predecessor_id.present? && benefit_application.aasm_state != :active ? "Renewing" : ""

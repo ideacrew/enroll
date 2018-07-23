@@ -526,7 +526,7 @@ module BenefitSponsors
       end
 
       event :ban do
-        transitions from: [:active, :suspend, :terminated,:binder_reversed], to: :ineligible
+        transitions to: :ineligible
       end
 
       event :cancel do

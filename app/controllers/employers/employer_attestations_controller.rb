@@ -24,20 +24,22 @@ class Employers::EmployerAttestationsController < ApplicationController
   def create
     @errors = []
     if params[:file]
-      #@employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
-      @employer_profile.build_employer_attestation unless @employer_profile.employer_attestation.present?
+      @employer_profile.create_employer_attestation unless @employer_profile.employer_attestation.present?
       if doc_uri.present?
-        attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
-        success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size, :format => "application/pdf"})
-        errors = attestation_document.errors.full_messages unless success
+        @employer_profile.employer_attestation.employer_attestation_documents.create(
+          :identifier => doc_uri,
+          :subject => file.original_filename,
+          :title => file.original_filename,
+          :size => file.size,
+          :format => "application/pdf"
+        )
 
-        if errors.blank? && @employer_profile.save
-          @employer_profile.employer_attestation.submit! if @employer_profile.employer_attestation.may_submit?
+        if @employer_profile.save
           flash[:notice] = "File Saved"
         else
-          flash[:error] = "Could not save file. " + errors.join(". ")
+          flash[:error] = "Could not save file. "# + errors.join(". ")
         end
       else
         flash[:error] = "Could not save the file in S3 storage"
