@@ -485,13 +485,33 @@ module BenefitSponsors
           end
         end
 
+
+        context "when renewal application moved to enrollment_open state" do
+
+          before do
+            renewal_application.aasm_state = :enrollment_open
+            renewal_application.save!
+          end
+
+          it "should not update benefit group assignments" do
+            census_employee.reload
+            expect(renewal_application.aasm_state).to eq :enrollment_open
+
+            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
+            expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
+
+            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+          end
+        end
+
         context "when renewal application moved to active state" do
 
           before do
             renewal_application.aasm_state = :enrollment_eligible
             renewal_application.save!
           end
-          
+
           it "should activate renewal benefit group assignment & set is_active to true" do
             renewal_application.activate_enrollment!
             census_employee.reload
@@ -502,7 +522,6 @@ module BenefitSponsors
             expect(census_employee.renewal_benefit_group_assignment).to eq nil
 
             expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
-
           end
         end
       end
