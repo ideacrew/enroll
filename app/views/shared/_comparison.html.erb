@@ -7,20 +7,20 @@
       <tr>
         <th class="row-title">Plans</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(Maybe.new(qhp.plan), {width: 80}) %></th>
+          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(Maybe.new(qhp.product), {width: 80}) %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan.name %></th>
+          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.product.name %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
-          <%= qhp.plan.plan_type.upcase %>
+          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
+          <%= qhp.product.health_plan_kind.upcase %>
           </th>
         <% end %>
       </tr>
@@ -34,7 +34,7 @@
         <th></th>
         <% qhps.each do |qhp|%>
           <th colspan="2" style="text-align: center; verticle-align: center; border: none; padding: 15px 0 25px;">
-            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product } %>
           </th>
         <% end %>
       </tr>
@@ -42,7 +42,7 @@
         <th>Provider Network</th>
         <% qhps.each do |qhp|%>
           <th colspan="2">
-            <%= render partial: "shared/network_data", locals: {plan: qhp.plan} %>
+            <%= render partial: "shared/network_data", locals: {plan: qhp.product} %>
           </th>
         <% end %>
       </tr>
@@ -54,7 +54,7 @@
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
-              <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
+              <% if qhp.product.kind == "health" && qhp.product.rx_formulary_url.present? %>
                 <%= link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank" %>
               <% end %>
             </th>
