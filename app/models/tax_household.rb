@@ -100,29 +100,63 @@ class TaxHousehold
     {}
   end
 
-  def aptc_family_members
-    household.hbx_enrollments.enrolled.select{ |enr| enr.applied_aptc_amount > 0.00 }.flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+  def aptc_family_members_by_tax_household
+    members = household.hbx_enrollments.enrolled.by_submitted_after_datetime(self.created_at).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+    members.select{ |family_member| family_member if is_member_aptc_eligible?(family_member)}
   end
 
   def unwanted_family_members(hbx_enrollment)
-    ((family.active_family_members - hbx_enrollment.hbx_enrollment_members.map(&:family_member)) - aptc_family_members)
+    ((family.active_family_members - find_enrolling_fms(hbx_enrollment)) - aptc_family_members_by_tax_household)
+  end
+
+  # to get aptc family members from given family members
+  def find_aptc_family_members(family_members)
+    family_members.inject([]) do |array, family_member|
+      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true).present?
+      array.flatten
+    end
+  end
+
+  # to get non aptc fms from given family members
+  def find_non_aptc_fms(family_members)
+    family_members.inject([]) do |array, family_member|
+      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
+      array.flatten
+    end
+  end
+
+  # to get family members from given enrollment
+  def find_enrolling_fms hbx_enrollment
+    hbx_enrollment.hbx_enrollment_members.map(&:family_member)
+  end
+
+  # to check if all the enrolling family members are not aptc
+  def is_all_non_aptc?(hbx_enrollment)
+    enrolling_family_members = find_enrolling_fms(hbx_enrollment)
+    find_non_aptc_fms(enrolling_family_members).count == enrolling_family_members.count
+  end
+
+  def is_member_aptc_eligible?(family_member)
+    aptc_members.map(&:family_member).include?(family_member)
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
+    return 0 if is_all_non_aptc?(hbx_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
       sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
     end
-    unchecked_family_members = unwanted_family_members(hbx_enrollment)
-    deduction_amount = total_benchmark_amount(unchecked_family_members)
+    family_members = unwanted_family_members(hbx_enrollment)
+    unchecked_aptc_fms = find_aptc_family_members(family_members)
+    deduction_amount = total_benchmark_amount(unchecked_aptc_fms) if unchecked_aptc_fms
     total = total - deduction_amount
     (total < 0.00) ? 0.00 : total
   end
 
-  def total_benchmark_amount(unchecked_family_members)
+  def total_benchmark_amount(family_members)
     total_sum = 0
-    unchecked_family_members.each do |family_member|
+    family_members.each do |family_member|
       total_sum += family_member.aptc_benchmark_amount
     end
     total_sum
@@ -140,7 +174,6 @@ class TaxHousehold
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
-        aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
     aptc_available_amount_hash

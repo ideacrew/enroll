@@ -208,11 +208,11 @@ describe FamilyMember, "aptc_benchmark_amount" do
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
 
   before do
-    allow_any_instance_of(BenefitCoveragePeriod).to receive(:second_lowest_cost_silver_plan).and_return(plan)
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
   end
   
-  it "should error when trying to save duplicate family member" do
+  it "should return valid benchmark value" do
     family_member = FamilyMember.new(:person => person) 
-    expect(family_member.aptc_benchmark_amount).to eq 511.62
+    expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
   end
 end

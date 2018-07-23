@@ -91,7 +91,9 @@ class FamilyMember
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-    slcsp.premium_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+    ehb = benefit_coverage_period.second_lowest_cost_silver_plan.ehb
+    cost = slcsp.premium_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+    cost * ehb
   end
 
   def broker=(new_broker)
