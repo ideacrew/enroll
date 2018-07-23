@@ -133,7 +133,8 @@ module Eligibility
 
     def reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
-        benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
+        end_on = benefit_group_assignment.end_on? ? benefit_group_assignment.end_on : [new_benefit_group.start_on - 1.day, benefit_group_assignment.benefit_application.try(:end_on)].min
+        benefit_group_assignment.end_on = end_on
         benefit_group_assignment.update_attributes(is_active: false)
       end
     end
