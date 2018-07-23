@@ -67,7 +67,7 @@
       .col-xs-3
         .checkbox.no-buffer
           label
-            input#compare_plan_checkbox.checkbox-custom.select-plan-for-comparison type="checkbox" data-hbx-id="#{@hbx_enrollment.id}" data-hios-id="#{plan.hios_id}" data-plan-year="#{plan.active_year}" data-plan-enrollment-kind="#{@enrollment_kind}" data-plan-change-plan="#{@change_plan}"
+            input#compare_plan_checkbox.checkbox-custom.select-plan-for-comparison type="checkbox" data-hbx-id="#{@hbx_enrollment.id}" data-hios-id="#{plan.hios_id}" data-plan-year="#{plan.active_year}" data-plan-enrollment-kind="#{@enrollment_kind}" data-plan-change-plan="#{@change_plan}" onclick="comparePlan(this)"
             span.checkbox-custom-label for="compare_plan_checkbox" style="font-weight: bold" Compare
       .col-xs-4
         = render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan }
@@ -75,4 +75,53 @@
         = link_to("Select Plan", thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-default btn-right plan-select select')
         = link_to "See Details", summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default ml-1", :remote => true}
             
+javascript:
+	
+	function comparePlan(element) {
+		plansToCompare = [];
+		checkboxes = document.querySelectorAll('#compare_plan_checkbox')
+		count = 0;
+		checkboxes.forEach(function(checkbox) {
+			//
+			if (checkbox.checked) {
+				count++;
+				hios = checkbox.dataset.hiosId;
+				planYear = checkbox.dataset.planYear;
+				plan = {
+					hios:hios,
+					planYear:planYear
+				};
+				var compareBtn = document.getElementById('compareBtn')
+        
+				if (count > 1) {
+					compareBtn.classList.remove('hidden')
+				} else {
+          compareBtn.classList.add('hidden')
+        }
+				
+				if (count > 2) {
+					checkbox.checked = false;
+					swal({
+						title: "Plan count exceeded",
+						text: "You may only compare up to 3 plans at a time",
+						icon: "warning"
+					});
+				}
+				
+				if (count <= 2) {
+					plansToCompare.push(plan)
+				}
+			}
+		})
+	}
+  
+  function compareResults() {
+    console.log(plansToCompare)
+    
+    fetch('controller action here')
+      .then(function(res) {
+        return res.json()
+      })
+  }
+
           

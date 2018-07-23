@@ -22,8 +22,10 @@
             #plan-summary
             #all-plans.all-filters-row
               = render partial: './ui-components/v1/filters/plan_filters'
-              .col-lg-9.col-md-9.co-sm-9.col-xs-12#planContainer style="padding-right: 0"
-                .sort-area style="margin:10px 0"
+              .col-lg-9.col-md-9.co-sm-9.col-xs-12#planContainer style="padding-right:0"
+                button.btn.btn-default.pull-right.hidden#compareBtn onclick="compareResults()" Compare Plans
+                br
+                .sort-area.mt-1.mb-1
                   span.mr-1
                     strong = l10n("sort_by")
                   .btn-group#sort_by role="group"
@@ -115,8 +117,6 @@ javascript:
 
   function getEnrollments() {
     enrollments = JSON.parse(enrollments)
-		console.log(enrollments)
-
     // Formats enrollment to proper JSON format for filters
     for(enrollment of enrollments) {
       enrollment = enrollment
