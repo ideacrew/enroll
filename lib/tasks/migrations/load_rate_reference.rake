@@ -3,7 +3,7 @@ namespace :load_rate_reference do
   task :update_rating_areas => :environment do
     begin
       files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_areas/2019", "**", "*.xlsx"))
-      binding.pry
+
       files.each do |file_path|
         puts "processing file : #{file_path}"
         year = file_path.split("/")[-2].to_i
