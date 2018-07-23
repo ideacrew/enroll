@@ -47,6 +47,7 @@ class CensusEmployee < CensusMember
   scope :non_terminated,     ->{ where(:aasm_state.nin => EMPLOYMENT_TERMINATED_STATES) }
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
   def initialize(*args)
     super(*args)
@@ -120,5 +121,28 @@ class CensusEmployee < CensusMember
       transitions from: :cobra_terminated, to: :cobra_eligible
     end
 
+  end
+
+  def benefit_package_assignment_on(effective_date)
+    benefit_group_assignments.effective_on(effective_date).active.first
+  end
+
+  def assign_to_benefit_package(benefit_package, assignment_on)
+    return if benefit_package.blank?
+
+    benefit_group_assignments.create(
+        start_on: assignment_on,
+        end_on:   benefit_package.effective_period.max,
+        benefit_package: benefit_package,
+        is_active: false
+    )
+  end
+
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
   end
 end
