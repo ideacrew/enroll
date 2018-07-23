@@ -326,6 +326,7 @@ module BenefitSponsors
 
       def cancel_member_benefits(delete_benefit_package: false)
         deactivate_benefit_group_assignments
+
         enrolled_families.each do |family|
           enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
 
@@ -334,23 +335,29 @@ module BenefitSponsors
             hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
           end
         end
-        deactivate if delete_benefit_package
+
+        if delete_benefit_package
+          other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
+          assign_other_benefit_package(other_benefit_package) if other_benefit_package.present?
+          deactivate
+        end
+      end
+
+      def assign_other_benefit_package(other_benefit_package)
+        self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
+          if is_renewing?
+            ce.add_renew_benefit_group_assignment([other_benefit_package])
+          else
+            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+          end
+        end
       end
 
       def deactivate_benefit_group_assignments
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
-          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
+          benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
             benefit_group_assignment.update(is_active: false) unless is_renewing?
-          end
-
-          other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
-          if other_benefit_package.present?
-            if is_renewing?
-              ce.add_renew_benefit_group_assignment([other_benefit_package])
-            else
-              ce.find_or_create_benefit_group_assignment([other_benefit_package])
-            end
           end
         end
       end
