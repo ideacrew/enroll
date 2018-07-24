@@ -15,6 +15,16 @@ namespace :reports do
 
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
 
+    def quiet_period_range(benefit_application,effective_on)
+      start_on = benefit_application.open_enrollment_period.max.to_date
+      if benefit_application.predecessor.present?
+        end_on = renewal_quiet_period_end(effective_on)
+      else
+        end_on = initial_quiet_period_end(effective_on)
+      end 
+      return start_on..end_on
+    end
+
     glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
 
     field_names = ['Employer ID', 'Employer FEIN', 'Employer Name','Open Enrollment Start', 'Open Enrollment End', 'Employer Plan Year Start Date', 'Plan Year State', 
@@ -23,17 +33,16 @@ namespace :reports do
     CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
       benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({"benefit_applications" => {"$elemMatch" => {"effective_period.min" => effective_on}}})
-      feins = benefit_sponsorships.map(&:organization).map(&:fein)
-      enrollment_ids_regular = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      enrollment_ids_quiet_period = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on,["coverage_selected"])
-      enrollment_ids = enrollment_ids_regular + enrollment_ids_quiet_period
+      benefit_applications = benefit_sponsorships.to_a.flat_map(&:benefit_applications).to_a.select{|ba| ba.effective_period.min == effective_on}
+      enrollment_ids = benefit_applications.flat_map(&:hbx_enrollments).map(&:hbx_id).compact.uniq
       enrollment_ids.each do |id|
+        begin
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
         benefit_sponsorship = hbx_enrollment.benefit_sponsorship
         employer_id = benefit_sponsorship.hbx_id
         fein = benefit_sponsorship.organization.fein
         legal_name = benefit_sponsorship.organization.legal_name
-        benefit_application = hbx_enrollment.benefit_package.benefit_application
+        benefit_application = hbx_enrollment.sponsored_benefit_package.benefit_application
         oe_start = benefit_application.open_enrollment_period.min
         oe_end = benefit_application.open_enrollment_period.max
         benefit_application_start = benefit_application.effective_period.min.to_s
@@ -52,9 +61,13 @@ namespace :reports do
           last_name = subscriber.person.last_name
         end
         in_glue = glue_list.include?(id)
-        quiet_period_boolean = enrollment_ids_quiet_period.include?(id)
+        qp = quiet_period_range(benefit_application)
+        quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
         csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship,eg_id,carrier,product,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
+        rescue Exception => e
+          puts "#{id} - #{e.inspect}"
+        end
       end
     end
   end
