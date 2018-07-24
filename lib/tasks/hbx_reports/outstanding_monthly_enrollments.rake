@@ -65,7 +65,7 @@ namespace :reports do
         in_glue = glue_list.include?(id)
         qp = quiet_period_range(benefit_application,effective_on)
         quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
-        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship_aasm,initial_renewal,eg_id,carrier,product,purchase_time,coverage_start,
+        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship_aasm,initial_renewal,binder_paid,eg_id,carrier,product,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
         rescue Exception => e
           puts "#{id} - #{e.inspect}"
