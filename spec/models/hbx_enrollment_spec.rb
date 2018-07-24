@@ -464,13 +464,18 @@ describe HbxEnrollment, dbclean: :after_all do
     end
 
     context "when maket type is individual" do
-      let(:benefit_package) { BenefitPackage.new }
-      let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-      let(:person) { FactoryGirl.create(:person, family:family)}
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+      let!(:tax_household) {FactoryGirl.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
+      let!(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_87", determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
+      let(:coverage_household) { family.households.first.coverage_households.first }
+      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
-          consumer_role: consumer_role,
+          consumer_role: person.consumer_role,
           coverage_household: coverage_household,
           benefit_package: benefit_package,
           qle: true
@@ -478,25 +483,19 @@ describe HbxEnrollment, dbclean: :after_all do
         enrollment.save
         enrollment
       }
-      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
-      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
-      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
-      let(:plan) { FactoryGirl.create(:plan) }
-      let(:plan2) { FactoryGirl.create(:plan) }
-      let(:plan1) { FactoryGirl.create(:plan) }
       let(:active_year) {TimeKeeper.date_of_record.year}
 
       before :each do
-          allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-          allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-          allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-        end
+        allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      end
 
-      it "should return plans without csr kind when coverall market is selected" do
-          decorated_plans = enrollment.decorated_elected_plans('health', 'coverall')
-          expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', nil))
-        end
+      it "should return plans with csr kind when individual market is selected" do
+        decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
+        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household))
+      end
     end
 
     context "decorated_elected_plans" do
