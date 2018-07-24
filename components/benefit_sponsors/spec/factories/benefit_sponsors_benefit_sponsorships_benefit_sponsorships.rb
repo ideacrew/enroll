@@ -6,6 +6,7 @@ FactoryGirl.define do
     transient do
       initial_application_state :active
       renewal_application_state :enrollment_open
+      draft_application_state :draft
       default_effective_period nil
       default_open_enrollment_period nil
       service_area_list []
@@ -116,6 +117,20 @@ FactoryGirl.define do
         benefit_sponsorship.benefit_applications = [
           benefit_application, benefit_application.predecessor_application
         ]
+      end
+    end
+
+    trait :with_renewal_draft_benefit_application do
+      after :build do |benefit_sponsorship, evaluator|
+        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+          :with_benefit_package,
+          :with_predecessor_application,
+          :benefit_sponsorship => benefit_sponsorship,
+          :aasm_state => evaluator.draft_application_state,
+          :predecessor_application_state => evaluator.initial_application_state,
+          :default_effective_period => evaluator.default_effective_period,
+          :default_open_enrollment_period => evaluator.default_open_enrollment_period
+        )
       end
     end
 
