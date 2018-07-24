@@ -2,8 +2,8 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   include ApplicationHelper
 
   def initialize(consumer_role, args = {})
-    @family = args[:options][:family]
-    @people = args[:options][:result]
+    @family = Family.find(args[:options][:family])
+    find_transition_people(args[:options][:result][:people])
     args[:recipient] = @family.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
@@ -61,8 +61,16 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     end
   end
 
+  def find_transition_people(people_ids)
+    @transition_people = []
+    people_ids.each do |person_id|
+      @transition_people << Person.find(person_id)
+    end
+
+  end
+
   def check_for_transitioned_individuals
-    @people.each do |person|
+    @transition_people.each do |person|
       notice.individuals << PdfTemplates::Individual.new({
                                                              :first_name => person.first_name.titleize,
                                                              :last_name => person.last_name.titleize,
@@ -96,7 +104,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   end
 
   def append_unverified_individuals
-    @people.each do |person|
+    @transition_people.each do |person|
       person.consumer_role.expired_verification_types.each do |verification_type|
         case verification_type
         when "Social Security Number"

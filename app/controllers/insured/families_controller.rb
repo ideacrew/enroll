@@ -130,6 +130,7 @@ class Insured::FamiliesController < FamiliesController
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
     @provider = @person
+    @family_members = @family.active_family_members
   end
 
   def verification
@@ -317,10 +318,12 @@ class Insured::FamiliesController < FamiliesController
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
-      @resident_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
-      @consumer_people << person if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
+      @resident_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
+      @consumer_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
     end
     trigger_ivl_to_cdc_transition_notice if @resident_people.present?
+    trigger_cdc_to_ivl_transition_notice  if @consumer_people.present?
+
     respond_to do |format|
       format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
     end
@@ -331,7 +334,16 @@ class Insured::FamiliesController < FamiliesController
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
     begin
-      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family:  @family, result: @resident_people} )
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
+
+  def trigger_cdc_to_ivl_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family: @family.id.to_s, result: {:people => @consumer_people}} )
     rescue Exception => e
       Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
     end
