@@ -49,7 +49,7 @@ namespace :reports do
         benefit_application_state = benefit_application.aasm_state
         benefit_sponsorship_aasm = benefit_sponsorship.aasm_state
         initial_renewal = benefit_application.predecessor.present? ? "renewal" : "initial"
-        binder_paid = %w(initial_enrollment_eligible active).include?(benefit_sponsorship_aasm)
+        binder_paid = %w(initial_enrollment_eligible active).include?(benefit_sponsorship_aasm.to_s)
         eg_id = id
         product = hbx_enrollment.product.title rescue ""
         carrier = product.issuer_profile.legal_name rescue ""
