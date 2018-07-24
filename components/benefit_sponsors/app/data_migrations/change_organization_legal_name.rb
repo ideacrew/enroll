@@ -7,10 +7,10 @@ class ChangeOrganizationLegalName < MongoidMigrationTask
     organizations = ::BenefitSponsors::Organizations::Organization.where(fein:fein)
 
     if organizations.size == 0
-      puts "No organization was found with the given fein" unless Rails.env.test?
+      puts "No organization was found with the given fein: #{fein}" unless Rails.env.test?
       return
     elsif organizations.size > 1
-      puts "More than one organization was found with the given fein" unless Rails.env.test?
+      puts "More than one organization was found with the given fein: #{fein}" unless Rails.env.test?
       return
     end
 
