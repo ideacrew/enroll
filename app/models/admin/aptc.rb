@@ -24,42 +24,57 @@ class Admin::Aptc < ApplicationController
         aptc_applied_vals_for_enrollment = build_aptc_applied_values_for_enrollment(year, family, hbx, applied_aptc_array)
         total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes.
       end
+      if max_aptc.present?
+        # NOTE:
+        calculate_new_max_aptc(max_aptc_vals, max_aptc, total_aptc_applied_vals_for_household)
+      else
+        #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
+        max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
+      end
+    end
+
+    def calculate_new_max_aptc(max_aptc_vals, max_aptc, total_aptc_applied_vals_for_household)
+      previous_available_aptc_hash, current_available_aptc_hash = build_previous_and_current_available_aptc_hash(max_aptc_vals, max_aptc)
+      max_aptc_vals_array = (max_aptc_vals.values - ["0.00"]).uniq
+      previous_available_aptc_value = previous_available_aptc_hash.values.first.to_f * previous_available_aptc_hash.count
+      current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
+      available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
+      max_aptc_vals.each do |key, value|
+        # NOTE: Should not apply calculated MAX APTC unless and until we update
+        if find_months_effective_on_date.include?(key) || max_aptc_vals_array.count == 1
+          max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
+        else
+          # NOTE: Should not deduct consumed MAX APTC when we update current MAX APTC less than  previously given MAX APTC
+          if previous_available_aptc_hash.values.first.to_f < value.to_f && total_aptc_applied_vals_for_household[key].to_f > value.to_f
+            remaining_available_aptc = available_aptc_value.to_f - total_aptc_applied_vals_for_household[key].to_f
+          else
+            remaining_available_aptc = available_aptc_value.to_f
+          end
+          remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
+          max_aptc_vals[key] = '%.2f' % (remaining_available_aptc) if value.to_f == max_aptc
+        end
+      end
+    end
+
+    def build_previous_and_current_available_aptc_hash(max_aptc_vals, max_aptc)
       previous_available_aptc_hash = {}
       current_available_aptc_hash = {}
+      max_aptc_vals.each do |key, value|
+        if value.to_f == max_aptc
+          current_available_aptc_hash[key] = value
+        elsif value.to_i > 0
+          previous_available_aptc_hash[key] = value
+        end
+      end
+      [previous_available_aptc_hash, current_available_aptc_hash]
+    end
+
+    def find_months_effective_on_date
       months = []
       date = find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date
       month_value = date.month - 1
       (1..month_value).to_a.each do |month|
-      months << Date.new(date.year, month, 1).strftime('%b')
-      end
-      max_aptc_vals_array = (max_aptc_vals.values - ["0.00"]).uniq
-      if max_aptc.present?  
-        max_aptc_vals.each do |key, value|
-          if value.to_f == max_aptc
-            current_available_aptc_hash[key] = value
-          elsif value.to_i > 0
-            previous_available_aptc_hash[key] = value
-          end
-        end
-        previous_available_aptc_value = previous_available_aptc_hash.values.first.to_f * previous_available_aptc_hash.count
-        current_available_aptc_value = current_available_aptc_hash.values.first.to_f * 12
-        available_aptc_value = (current_available_aptc_value - previous_available_aptc_value) / current_available_aptc_hash.count
-        max_aptc_vals.each do |key, value|
-          if months.include?(key) || max_aptc_vals_array.count == 1
-            max_aptc_vals[key] = '%.2f' % (value.to_f - total_aptc_applied_vals_for_household[key].to_f)
-          else
-            if previous_available_aptc_hash.values.first.to_f < value.to_f && total_aptc_applied_vals_for_household[key].to_f > value.to_f
-              remaining_available_aptc = available_aptc_value.to_f - total_aptc_applied_vals_for_household[key].to_f
-            else
-              remaining_available_aptc = available_aptc_value.to_f
-            end
-            remaining_available_aptc = remaining_available_aptc > 0 ? remaining_available_aptc : 0
-            max_aptc_vals[key] = '%.2f' % (remaining_available_aptc) if value.to_f == max_aptc
-          end
-        end
-      else
-        #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
-        max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
+        months << Date.new(date.year, month, 1).strftime('%b')
       end
     end
 
