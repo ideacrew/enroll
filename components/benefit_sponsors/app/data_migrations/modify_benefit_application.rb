@@ -18,9 +18,11 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def update_aasm_state(benefit_applications)
+
   end
 
   def reinstate_benefit_application(benefit_applications)
+
   end
 
   def terminate_benefit_application(benefit_applications)
@@ -35,12 +37,18 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def cancel_benefit_application(benefit_applications)
+    benefit_applications.each do |benefit_application|
+      service = initialize_service(benefit_application)
+      service.cancel
+    end
   end
 
   def benefit_applications_for_aasm_state_update
+
   end
 
   def benefit_applications_for_reinstate
+
   end
 
   def benefit_applications_for_terminate
@@ -49,6 +57,9 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def benefit_applications_for_cancel
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_application_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
+    benefit_sponsorship.benefit_applications.effective_date_begin_on(benefit_application_start_on)
   end
 
   def get_benefit_sponsorship
