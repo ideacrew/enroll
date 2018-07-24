@@ -135,7 +135,7 @@ module BenefitSponsors
 
           data_table_params.merge!({
             renewal: true
-          }) if @employer_profile.renewing_published_benefit_application.present?
+          }) if @employer_profile.renewal_benefit_application.present?
 
           data_table_params
         end
