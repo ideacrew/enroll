@@ -7,8 +7,10 @@ class FixOrganization< MongoidMigrationTask
     case action
       when "update_fein"
         update_fein(organization) if organization.present?
+      when "approve_attestation"
+        approve_attestation_for_employer(organization) if organization.present?
       else
-        puts"The Action defined is not performed in the rake task"
+        puts"The Action defined is not performed in the rake task" unless Rails.env.test?
     end
   end
 
@@ -33,5 +35,27 @@ class FixOrganization< MongoidMigrationTask
         organization.save!
         puts "Changed fein to #{correct_fein}" unless Rails.env.test?
       end
+  end
+  def approve_attestation_for_employer(organization)
+    employer= organization.employer_profile    
+      attestation = employer.employer_attestation.blank?  ? employer.build_employer_attestation : employer.employer_attestation
+      if attestation.present? && attestation.denied?      
+        attestation.revert! if attestation.may_revert?
+      end
+        documents = attestation.employer_attestation_documents
+      if documents.present?
+        documents.each do |document|
+        document.revert! if document.present? && document.may_revert?
+        document.employer_attestation.submit! if document.submitted? && document.employer_attestation.may_submit?
+        document.accept if document.submitted?
+        document.approve_attestation if document.accepted?
+      end
+      else
+        puts "Employer attestation document not found" unless Rails.env.test?
+      end
+      attestation.submit! if attestation.may_submit?
+      attestation.approve! if attestation.may_approve?
+      attestation.save
+      puts "Employer Attestation approved" unless Rails.env.test?
   end
 end
