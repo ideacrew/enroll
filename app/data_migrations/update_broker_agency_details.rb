@@ -30,7 +30,7 @@ class UpdateBrokerAgencyProfile < MongoidMigrationTask
       @logger.info "Updated person broker agency staff roles"
 
     else
-      @logger.warn "I am here"
+      @logger.warn "Unknown Action found"
     end
   end
 end
