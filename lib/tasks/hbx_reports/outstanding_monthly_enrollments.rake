@@ -47,7 +47,7 @@ namespace :reports do
         oe_end = benefit_application.open_enrollment_period.max
         benefit_application_start = benefit_application.effective_period.min.to_s
         benefit_application_state = benefit_application.aasm_state
-        benefit_sponsorship = benefit_sponsorship.aasm_state
+        benefit_sponsorship_aasm = benefit_sponsorship.aasm_state
         eg_id = id
         product = hbx_enrollment.product.title rescue ""
         carrier = product.issuer_profile.legal_name rescue ""
@@ -63,7 +63,7 @@ namespace :reports do
         in_glue = glue_list.include?(id)
         qp = quiet_period_range(benefit_application,effective_on)
         quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
-        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship,eg_id,carrier,product,purchase_time,coverage_start,
+        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship_aasm,eg_id,carrier,product,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
         rescue Exception => e
           puts "#{id} - #{e.inspect}"
