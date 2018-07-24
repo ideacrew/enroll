@@ -54,24 +54,24 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def change_plan(enrollments)
-    if ENV['new_plan_id'].blank?
+    if ENV['new_product_id'].blank?
       raise "Input required: plan id" unless Rails.env.test?
     end
-    new_plan_id = ENV['new_plan_id']
+    new_product_id = ENV['new_product_id']
     enrollments.each do |enrollment|
-      enrollment.update_attributes!(:plan_id => new_plan_id)
-      puts "Changed Enrollment's plan to #{new_plan_id}" unless Rails.env.test?
+      enrollment.update_attributes!(:product_id => new_product_id)
+      puts "Changed Enrollment's plan to #{new_product_id}" unless Rails.env.test?
     end
   end
 
   def change_benefit_group(enrollments)
-    if ENV['new_benefit_group_id'].blank?
+    if ENV['new_sponsored_benefit_package_id'].blank?
       raise "Input required: benefit group id" unless Rails.env.test?
     end
-    new_benefit_group_id = ENV['new_benefit_group_id']
+    new_sponsored_benefit_package_id = ENV['new_sponsored_benefit_package_id']
     enrollments.each do |enrollment|
-      enrollment.update_attributes!(:benefit_group_id => new_benefit_group_id)
-      puts "Changed Enrollment's benefit group to #{new_benefit_group_id}" unless Rails.env.test?
+      enrollment.update_attributes!(:sponsored_benefit_package_id => new_sponsored_benefit_package_id)
+      puts "Changed Enrollment's benefit group to #{new_sponsored_benefit_package_id}" unless Rails.env.test?
     end
   end
 
@@ -157,6 +157,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def transfer_enrollment_from_glue_to_enroll
+    # This method needs to be updated to new model
     ts = TranscriptGenerator.new
     ts.display_enrollment_transcripts
   end
