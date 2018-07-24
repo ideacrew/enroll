@@ -67,6 +67,7 @@ namespace :reports do
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
         rescue Exception => e
           puts "#{id} - #{e.inspect}"
+          next
         end
       end
     end
