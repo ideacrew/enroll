@@ -66,6 +66,10 @@ class BrokerRole
     self.benefit_sponsors_broker_agency_profile_id.present?
   end
 
+  def parent
+    self.person
+  end
+  
   class << self
     def find(id)
       return nil if id.blank?

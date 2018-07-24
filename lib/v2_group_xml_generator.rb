@@ -161,7 +161,7 @@ class V2GroupXmlGenerator
 
 # return previous active plan year
   def predecessor_application(benefit_application)
-    benefit_application.predecessor_application
+    benefit_application.predecessor
   end
 
   def benefit_application_carriers(benefit_application)

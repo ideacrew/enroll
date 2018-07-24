@@ -26,11 +26,13 @@ Gem::Specification.new do |s|
   s.add_dependency "wicked_pdf", "1.0.6"
   s.add_dependency "combine_pdf"
   s.add_dependency "curl"
-  s.add_dependency "ckeditor"
+  s.add_dependency "ckeditor", '4.2.4'
   s.add_dependency "non-stupid-digest-assets"
   s.add_dependency "roo", "~> 2.1.0"
   s.add_dependency 'aasm', '~> 4.8.0'
   s.add_dependency 'acapi'
+  s.add_dependency 'config'
+  s.add_dependency 'money-rails', '~> 1.3.0'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'

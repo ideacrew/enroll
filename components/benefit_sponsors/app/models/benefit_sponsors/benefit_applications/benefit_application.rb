@@ -2,6 +2,7 @@ module BenefitSponsors
   class BenefitApplications::BenefitApplication
     include Mongoid::Document
     include Mongoid::Timestamps
+    include Acapi::Notifiers
     include BenefitSponsors::Concerns::RecordTransition
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
@@ -89,6 +90,7 @@ module BenefitSponsors
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
     after_save        :notify_on_save
+    after_create      :notify_on_create
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -596,6 +598,34 @@ module BenefitSponsors
       self
     end
 
+    def send_employee_renewal_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_renewal_employee!(ce)
+      end
+    end
+
+    def send_employee_initial_enrollment_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_initial_employee!(ce)
+      end
+    end
+
+    def send_active_employee_invites
+      benefit_sponsorship.census_employees.non_terminated.each do |ce|
+        ::Invitation.invite_employee!(ce)
+      end
+    end
+
+    def send_employee_invites
+      if is_renewing?
+        notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+      elsif enrollment_open?
+        notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+      else
+        notify("acapi.info.events.plan_year.employee_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+      end
+    end
+
     def accept_application
       adjust_open_enrollment_date
       transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
@@ -641,7 +671,8 @@ module BenefitSponsors
       state :appealing            # request reversal of negative determination
       ## End optional states for exception processing
 
-      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members] # Approved application has entered open enrollment period
+      # TODO: send_employee_invites - needs to be moved to observer pattern.
+      state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
       state :enrollment_closed
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
@@ -818,15 +849,30 @@ module BenefitSponsors
             end
 
             def enrollment_quiet_period
-              if open_enrollment_end_on.blank?
-                prev_month = start_on.prev_month
-                quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+              if predecessor_id.present?
+                # Weird things can happen when you extend open enrollment past
+                # what would 'normally' be the quiet period end.  Can really
+                # only happen on renewals.
+                expected_renewal_transmission_deadline = renewal_quiet_period_end(start_on)
+                deadline_because_of_open_enrollment_end = nil
+                if open_enrollment_end_on.blank?
+                  deadline_because_of_open_enrollment_end = expected_renewal_transmission_deadline
+                else
+                  deadline_because_of_open_enrollment_end = open_enrollment_end_on
+                end
+                quiet_period_start = open_enrollment_start_on
+                quiet_period_end = [expected_renewal_transmission_deadline, deadline_because_of_open_enrollment_end].max
+                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
               else
-                quiet_period_start = open_enrollment_end_on + 1.day
+                if open_enrollment_end_on.blank?
+                  prev_month = start_on.prev_month
+                  quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+                else
+                  quiet_period_start = open_enrollment_end_on + 1.day
+                end
+                quiet_period_end = initial_quiet_period_end(start_on)
+                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
               end
-
-              quiet_period_end = predecessor_id.present? ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
-              TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
             end
 
             def initial_quiet_period_end(start_on)
