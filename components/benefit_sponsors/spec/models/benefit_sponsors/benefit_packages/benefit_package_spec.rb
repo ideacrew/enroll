@@ -140,6 +140,65 @@ module BenefitSponsors
     end
 
     describe '.is_renewal_benefit_available?' do
+
+      let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+      let(:product) { renewal_product_package.products[0] }
+
+      let!(:update_product){
+        reference_product = current_benefit_package.sponsored_benefits.first.reference_product
+        reference_product.renewal_product = product
+        reference_product.save!
+      }
+      
+      let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
+      let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+      let(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
+
+
+      context "when renewal product missing" do 
+        let(:hbx_enrollment) { double(product: product_package.products[2]) }
+
+        it 'should return false' do
+          expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "when renewal product offered by employer" do
+
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health) }
+        let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
+            product_package_kind: :single_issuer
+          ) 
+        }
+
+        before do
+          allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+        end
+
+        it 'should return true' do
+          expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_truthy
+        end
+      end
+
+      context "when renewal product not offered by employer" do
+        let(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health) }
+        let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
+            product_package_kind: :single_issuer
+          ) 
+        }
+
+        before do
+          allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+        end
+
+        it "should return false" do 
+          expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_falsey
+        end
+      end
     end
 
     describe '.sponsored_benefit_for' do

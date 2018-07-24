@@ -184,7 +184,7 @@ module Notifier
     def benefit_application_warnings
       benefit_application_warnings = []
       if current_benefit_application.present?
-        policy = eligibility_policy.business_policies_for(benefit_application, :submit_benefit_application)
+        policy = eligibility_policy.business_policies_for(current_benefit_application, :submit_benefit_application)
         unless policy.is_satisfied?(current_benefit_application)
           policy.fail_results.each do |k, _|
             case k.to_s

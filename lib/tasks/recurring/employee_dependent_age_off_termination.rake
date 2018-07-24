@@ -33,7 +33,6 @@ namespace :recurring do
     employee_roles = person.active_employee_roles
     employee_roles.each do |employee_role|
       next if (employee_role.benefit_group.nil?)
-      ben_grp = employee_role.benefit_group.is_congress
       hbx_enrollments = employee_role.census_employee.active_benefit_group_assignment.hbx_enrollments
       enrollments = hbx_enrollments.select{|e| (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).include?(e.aasm_state)}
       if enrollments.present?
@@ -46,7 +45,7 @@ namespace :recurring do
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
           next if aged_off_dependents.empty?
           dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
-          event_name = ben_grp ? "employee_notice_dependent_age_off_termination_congressional" : "employee_notice_dependent_age_off_termination_non_congressional"
+          event_name ="employee_notice_dependent_age_off_termination_non_congressional"
           observer = Observers::NoticeObserver.new
           observer.deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: event_name,  notice_params: {dep_hbx_ids: dep_hbx_ids})
           puts "Delivered employee_dependent_age_off_termination notice to #{employee_role.census_employee.full_name}" unless Rails.env.test?
@@ -55,3 +54,10 @@ namespace :recurring do
     end
   end
 end
+
+
+# RAILS_ENV=production bundle exec rake recurring:dependent_age_off_termination_notification_manual[1243512]
+# RAILS_ENV=production bundle exec rake recurring:dependent_age_off_termination_notification_manual[1243512]
+
+
+
