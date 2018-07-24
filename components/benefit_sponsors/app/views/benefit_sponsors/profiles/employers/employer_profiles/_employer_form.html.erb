@@ -63,12 +63,15 @@
               <%= staff.phone %>
             </td>
             <td>
-              <%= staff.status %>
-              <% if staff.status == "is_applicant" %>
+              <% status = staff.status.split(" ") %>
+              <%= status[1] %>
+              <% if staff.status.match(/Is Applicant/i) %>
                   <%=  link_to(approve_profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id)) do %>
                       approve
                   <% end %>
               <% end %>
+              </br>
+              <%= status[2] %>
             </td>
             <td>
               <%= link_to(profiles_employers_employer_staff_role_path(id: @agency.profile_id, person_id: staff.person_id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
