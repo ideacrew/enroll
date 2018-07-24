@@ -18,9 +18,9 @@ namespace :reports do
     def quiet_period_range(benefit_application,effective_on)
       start_on = benefit_application.open_enrollment_period.max.to_date
       if benefit_application.predecessor.present?
-        end_on = renewal_quiet_period_end(effective_on)
+        end_on = benefit_application.renewal_quiet_period_end(effective_on)
       else
-        end_on = initial_quiet_period_end(effective_on)
+        end_on = benefit_application.initial_quiet_period_end(effective_on)
       end 
       return start_on..end_on
     end
@@ -61,7 +61,7 @@ namespace :reports do
           last_name = subscriber.person.last_name
         end
         in_glue = glue_list.include?(id)
-        qp = quiet_period_range(benefit_application)
+        qp = quiet_period_range(benefit_application,effective_on)
         quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
         csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship,eg_id,carrier,product,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
