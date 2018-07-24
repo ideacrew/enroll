@@ -43,6 +43,16 @@ module BenefitSponsors
           }
         })
       end
+
+      def self.initial_employers_in_ineligible_state
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
+          :"benefit_applications" => { 
+            :$elemMatch => {
+              :"aasm_state" => :enrollment_ineligible,
+            }
+          }
+        })
+      end
     end
   end
 end
