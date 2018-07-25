@@ -579,6 +579,22 @@ context "Verification process and notices" do
   end
 end
 
+describe "#revert_lawful_presence" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:consumer) { person.consumer_role }
+  let(:verification_types) { consumer.verification_types }
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+
+  it "should move Citizenship verification type to pending state" do
+    consumer.lawful_presence_determination.authorize!(verification_attr)
+    consumer.revert_lawful_presence(verification_attr)
+    expect(consumer.lawful_presence_determination.aasm_state). to eq "verification_pending"
+    expect(consumer.verification_types.by_name("DC Residency").first.validation_status). to eq "unverified"
+    expect(consumer.verification_types.by_name("Social Security Number").first.validation_status). to eq "unverified"
+    expect(consumer.verification_types.by_name("Citizenship").first.validation_status). to eq "pending"
+  end
+end
+
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
   context "consumer role does not have any vlp_documents" do
