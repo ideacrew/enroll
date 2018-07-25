@@ -530,7 +530,7 @@ module BenefitSponsors
       end
 
       event :cancel do
-        transitions from: [:initial_application_approved, :initial_enrollment_closed, :binder_reversed], to: :applicant
+        transitions from: [:initial_application_approved, :initial_enrollment_closed, :binder_reversed, :initial_enrollment_ineligible], to: :applicant
       end
     end
 
@@ -582,11 +582,12 @@ module BenefitSponsors
       when :expired
         cancel! if may_cancel?
       when :canceled
-        cancel! if (may_cancel? && aasm.current_event == :activate_enrollment!)
+        if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
+          cancel! if may_cancel?
+        end
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       end
-
     end
 
     def is_conversion?

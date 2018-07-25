@@ -37,16 +37,17 @@ module BenefitSponsors
 
         save_result, persisted_object = store(form, benefit_application)
         if save_result
-          cancel_other_draft_applications(persisted_object)
+          cancel_draft_and_ineligible_applications(persisted_object)
         end
         [save_result, persisted_object]
       end
 
-      def cancel_other_draft_applications(benefit_application)
-        draft_benefit_applications = benefit_sponsorship.benefit_applications.draft
-        draft_benefit_applications.each do |draft_ba|
-          next if draft_ba.id == benefit_application.id
-          draft_ba.cancel! if draft_ba.may_cancel?
+      def cancel_draft_and_ineligible_applications(benefit_application)
+        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft.select{|existing_application| existing_application != benefit_application}
+        applications_for_cancel += benefit_application.benefit_applications.enrollment_ineligible.to_a
+
+        applications_for_cancel.each do |application|
+          application.cancel! if application.may_cancel?
         end
       end
 
