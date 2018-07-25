@@ -44,7 +44,7 @@ module BenefitSponsors
 
       def cancel_draft_and_ineligible_applications(benefit_application)
         applications_for_cancel  = benefit_sponsorship.benefit_applications.draft.select{|existing_application| existing_application != benefit_application}
-        applications_for_cancel += benefit_application.benefit_applications.enrollment_ineligible.to_a
+        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
 
         applications_for_cancel.each do |application|
           application.cancel! if application.may_cancel?
