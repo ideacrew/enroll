@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
-  let(:model_event)  { "broker_agency_hired_confirmation" }
   let(:notice_event) { "broker_agency_hired_confirmation" }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
   
@@ -19,8 +18,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:broker_agency_account) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
   let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
 
-  describe "NoticeTrigger" do
-    context "when ER successfully hires a broker" do
+  describe "when ER successfully hires a broker" do
+
+    context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::BrokerAgencyAccountObserver.new }
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -28,7 +28,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifier.deliver(recipient: broker_agency_profile, event_object: model_instance, notice_event: "broker_agency_hired_confirmation")
+        subject.notifier.deliver(recipient: broker_agency_profile, event_object: model_instance, notice_event: notice_event)
       end
     end
   end
@@ -37,16 +37,16 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
 
     let(:data_elements) {
       [
-          "broker_agency_profile.notice_date",
-          "broker_agency_profile.employer_name",
-          "broker_agency_profile.first_name",
-          "broker_agency_profile.last_name",
-          "broker_agency_profile.assignment_date",
-          "broker_agency_profile.broker_agency_name",
-          "broker_agency_profile.employer_poc_firstname",
-          "broker_agency_profile.employer_poc_lastname",
-          "broker_agency_profile.employer_poc_phone",
-          "broker_agency_profile.employer_poc_email"
+        "broker_agency_profile.notice_date",
+        "broker_agency_profile.employer_name",
+        "broker_agency_profile.first_name",
+        "broker_agency_profile.last_name",
+        "broker_agency_profile.assignment_date",
+        "broker_agency_profile.broker_agency_name",
+        "broker_agency_profile.employer_poc_firstname",
+        "broker_agency_profile.employer_poc_lastname",
+        "broker_agency_profile.employer_poc_phone",
+        "broker_agency_profile.employer_poc_email"
       ]
     }
 
