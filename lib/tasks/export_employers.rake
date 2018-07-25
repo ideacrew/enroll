@@ -17,7 +17,7 @@ namespace :employers do
 
     def published_on(application)
       return nil if application.blank? || application.workflow_state_transitions.blank?
-      application.workflow_state_transitions.where(:event => "approve_application").first.try(:transition_at)
+      application.workflow_state_transitions.where(:event => :approve_application).first.try(:transition_at)
     end
 
     def import_to_csv(csv, profile, package=nil)
@@ -92,7 +92,7 @@ namespace :employers do
         0, # child_over_26_cl.contribution_pct
         package.try(:title),
         package.try(:plan_option_kind),
-        reference_product.try(:issuer_profile_id),
+        reference_product.try(:issuer_profile).try(:abbrev),
         reference_product.try(:metal_level),
         single_product?(package),
         reference_product.try(:title),
