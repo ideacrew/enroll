@@ -484,7 +484,9 @@ module BenefitSponsors
                                                           aasm_state: :active)
                                               }
 
-      before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+      let(:current_date)                    { Date.today }
+
+      before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
       subject { BenefitSponsors::BenefitSponsorships::BenefitSponsorship }
 
@@ -604,6 +606,48 @@ module BenefitSponsors
 
 
       context '.may_auto_submit_application?' do
+
+      end
+
+      context '.may_transition_as_initial_ineligible?' do 
+        let(:initial_application_state) { :enrollment_closed }
+        let(:renewal_application_state) { :enrollment_closed }
+        let(:april_enrollment_elgible_sponsor) { april_sponsors[0] }
+        let(:april_ineligible_sponsors) { april_sponsors.select{|sponsor| sponsor != april_enrollment_elgible_sponsor } }
+        let(:sponsorship_state) { :initial_enrollment_closed }
+
+        before do
+          april_enrollment_elgible_sponsor.approve_initial_enrollment_eligibility!
+        end
+
+        it "should find initial sponsorships with applications in enrollment_closed state and matching effective date" do
+          expect(subject.may_transition_as_initial_ineligible?(march_effective_date).size).to eq (march_sponsors.size)
+          expect(subject.may_transition_as_initial_ineligible?(march_effective_date).to_a).to eq (march_sponsors)
+
+          expect(subject.may_transition_as_initial_ineligible?(april_effective_date).size).to eq (april_ineligible_sponsors.size)
+          expect(subject.may_transition_as_initial_ineligible?(april_effective_date).to_a).to eq (april_ineligible_sponsors)
+        end
+      end
+
+      context '.may_cancel_ineligible_application?' do
+        let(:initial_application_state) { :enrollment_ineligible }
+        let(:renewal_application_state) { :enrollment_ineligible }
+        let(:april_enrollment_elgible_sponsor) { april_sponsors[0] }
+        let(:april_ineligible_sponsors) { april_sponsors.select{|sponsor| sponsor != april_enrollment_elgible_sponsor } }
+        let(:sponsorship_state) { :initial_enrollment_closed }
+
+        before do
+          april_enrollment_elgible_sponsor.approve_initial_enrollment_eligibility!
+          april_enrollment_elgible_sponsor.benefit_applications.first.update(aasm_state: :enrollment_eligible)
+        end
+
+        it "should find sponsorships with application in enrollment_eligible state and matching effective period begin date" do
+          expect(subject.may_cancel_ineligible_application?(march_effective_date).size).to eq (march_sponsors.size)
+          expect(subject.may_cancel_ineligible_application?(march_effective_date).to_a).to eq (march_sponsors)
+
+          expect(subject.may_cancel_ineligible_application?(april_effective_date).size).to eq (april_ineligible_sponsors.size + april_renewal_sponsors.size)
+          expect(subject.may_cancel_ineligible_application?(april_effective_date).to_a).to eq (april_ineligible_sponsors + april_renewal_sponsors)
+        end
       end
     end
 
