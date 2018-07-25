@@ -58,35 +58,89 @@ RSpec.describe Admin::Aptc, :type => :model do
     # BUILD AVAILABLE APTC VALUES
     describe 'build avalaible_aptc values' do
       context 'when current aptc 1000' do
-        let!(:max_aptc__hash) do
-          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-           "Jul"=>"1000.00", "Aug"=>"1000.00", "Sep"=>"1000.00", "Oct"=>"1000.00", "Nov"=>"1000.00", "Dec"=>"1000.00"}
+        let!(:max_aptc_hash) do
+          { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+            "May" => "0.00", "Jun" => "300.00", "Jul" => "1000.00", "Aug" => "1000.00",
+            "Sep" => "1000.00", "Oct" => "1000.00", "Nov" => "1000.00", "Dec" => "1000.00"
+          }
         end
         let(:expected_available_hash) do
-          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-           "Jul"=>"1950.00", "Aug"=>"1950.00", "Sep"=>"1950.00", "Oct"=>"1950.00", "Nov"=>"1950.00", "Dec"=>"1950.00"}
+          { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+            "May" => "0.00", "Jun" => "300.00", "Jul" => "1950.00", "Aug" => "1950.00",
+            "Sep" => "1950.00", "Oct" => "1950.00", "Nov" => "1950.00", "Dec" => "1950.00"
+          }
         end
+
         before do
-          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc__hash
+          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc_hash
         end
 
         it "should return a hash that reflects max_aptc change on a monthly basis based on the new formula" do
           available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, [], nil, 1000)
           expect(available_aptc_hash).to eq expected_available_hash
         end
+
+        context 'when max aptc applied and applied max aptc greater than supplied max_aptc' do
+          let(:aptc_applied_values_for_enrollment_hash) do
+            { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+              "May" => "0.00", "Jun" => "0.00", "Jul" => "550.00", "Aug" => "550.00",
+              "Sep"=> "550.00", "Oct" => "550.00", "Nov" => "550.00", "Dec" => "550.00"
+            }
+          end
+          let(:expected_available_hash) do
+            { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+              "May" => "0.00", "Jun" => "300.00", "Jul" => "850.00", "Aug" => "850.00",
+              "Sep" => "850.00", "Oct" => "850.00", "Nov" => "850.00", "Dec" => "850.00"
+            }
+          end
+
+          before do
+            allow(Admin::Aptc).to receive(:build_aptc_applied_values_for_enrollment).and_return(
+              aptc_applied_values_for_enrollment_hash)
+          end
+
+          it "should deduct applied aptc from newly calculated max_aptc hash" do
+            available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, hbx_enrollments, nil, 1000)
+            expect(available_aptc_hash).to eq expected_available_hash
+          end
+        end
+
+        context 'when max aptc applied and applied max aptc less than supplied max_aptc' do
+          let(:aptc_applied_values_for_enrollment_hash) do
+            { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+              "May" => "0.00", "Jun" => "0.00", "Jul" => "300.00", "Aug" => "300.00",
+              "Sep"=> "300.00", "Oct" => "300.00", "Nov" => "300.00", "Dec" => "300.00"
+            }
+          end
+
+          before do
+            allow(Admin::Aptc).to receive(:build_aptc_applied_values_for_enrollment).and_return(
+              aptc_applied_values_for_enrollment_hash)
+          end
+
+          it "should not deduct applied aptc from newly calculated max_aptc hash" do
+            available_aptc_hash = Admin::Aptc.build_avalaible_aptc_values(year, family, hbx_enrollments, nil, 1000)
+            expect(available_aptc_hash).to eq expected_available_hash
+          end
+        end
       end
 
       context 'when current apt' do
-        let!(:max_aptc__hash) do
-          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-           "Jul"=>".00", "Aug"=>"0.00", "Sep"=>"0.00", "Oct"=>"0.00", "Nov"=>"0.00", "Dec"=>"0.00"}
+        let!(:max_aptc_hash) do
+          { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+            "May" => "0.00", "Jun" => "300.00", "Jul" => "0.00", "Aug" => "0.00",
+            "Sep" => "0.00", "Oct" => "0.00", "Nov" => "0.00", "Dec" => "0.00"
+          }
         end
         let(:expected_available_hash) do
-          {"Jan"=>"0.00", "Feb"=>"0.00", "Mar"=>"0.00", "Apr"=>"0.00", "May"=>"0.00", "Jun"=>"300.00",
-           "Jul"=>"0.00", "Aug"=>"0.00", "Sep"=>"0.00", "Oct"=>"0.00", "Nov"=>"0.00", "Dec"=>"0.00"}
+          { "Jan" => "0.00", "Feb" => "0.00", "Mar" => "0.00", "Apr" => "0.00",
+            "May" => "0.00", "Jun" => "300.00", "Jul" => "0.00", "Aug" => "0.00",
+            "Sep" => "0.00", "Oct" => "0.00", "Nov" => "0.00", "Dec" => "0.00"
+          }
         end
+        
         before do
-          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc__hash
+          allow(Admin::Aptc).to receive(:build_max_aptc_values).and_return max_aptc_hash
         end
 
         it "should return a hash that reflects max_aptc change on a monthly basis based on the new formula" do
@@ -133,7 +187,7 @@ RSpec.describe Admin::Aptc, :type => :model do
       end
 
       it "should save a new determination when the Max APTC / CSR is updated" do
-        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year)).to eq true
+        expect(Admin::Aptc.redetermine_eligibility_with_updated_values(family, params, [], year, nil, false)).to eq true
       end
     end
   end

@@ -76,6 +76,7 @@ class Admin::Aptc < ApplicationController
       (1..month_value).to_a.each do |month|
         months << Date.new(date.year, month, 1).strftime('%b')
       end
+      months
     end
 
     # def negative_aptc(k, a_value, b_value, total_aptc_applied_vals_for_household, hbxs)
