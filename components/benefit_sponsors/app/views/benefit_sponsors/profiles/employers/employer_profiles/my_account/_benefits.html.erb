@@ -262,26 +262,26 @@
 <%= render "benefit_sponsors/profiles/employers/benefit_applications/claim_quote_modal" %>
 
 <script>
-	function checkForDraftPlans(element) {
-		if (true) {
-			event.preventDefault()
-			swal({
-				title: "Draft Plans detected",
-				text: "If you choose to continue your previous draft plans will be terminated",
-				icon: "warning",
-				buttons: true,
-				dangerMode: true
-			})
-			.then((willDelete) => {
-			  if (willDelete) {
-			    // Perform actions to delete draft plan years here
-			  } else {
-			    // Do nothing user clicked cancel resets Add Plan Year button back to default state
-					element.innerHTML = "Add Plan Year";
-					element.classList.remove('disabled');
-					element.removeAttribute('disabled')
-			  }
-			});
-		}
-	}
+  function checkForDraftPlans(element) {
+    if (true) {
+      event.preventDefault()
+      swal({
+        title: "Warning",
+        text: "If you choose to continue any previous draft plan years will be canceled",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          window.location.href = "<%= new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship) %>"
+        } else {
+          // Do nothing user clicked cancel resets Add Plan Year button back to default state
+          element.innerHTML = "Add Plan Year";
+          element.classList.remove('disabled');
+          element.removeAttribute('disabled')
+        }
+      });
+    }
+  }
 </script>
