@@ -146,7 +146,7 @@ module Notifier
     def upload_and_send_secure_message
       doc_uri = upload_to_amazonS3
       notice  = create_recipient_document(doc_uri)
-      create_secure_inbox_message(notice)
+      create_secure_inbox_message(notice) unless self.event_name == 'generate_initial_employer_invoice'
     end
 
     def upload_to_amazonS3
@@ -253,13 +253,10 @@ module Notifier
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
 
-      if self.event_name == 'generate_initial_employer_invoice'
-        body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
-      else
         body = "<br>You can download the notice by clicking this link " +
                "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s,
         receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
-      end
+
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end
