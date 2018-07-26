@@ -14,6 +14,14 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
+  
+  resources :users do
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :edit
+      put :confirm_reset_password, :update
+      post :unlock, :change_password
+    end
+  end
 
   resources :saml, only: [] do
     collection do
@@ -80,6 +88,7 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :get_user_info
+        get :user_account_index
       end
 
       member do

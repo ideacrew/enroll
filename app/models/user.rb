@@ -6,6 +6,8 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
+  include AuthorizationConcern
+  include PermissionsConcern
 
   attr_accessor :login
 
@@ -296,11 +298,20 @@ class User
   def has_agent_role?
     has_role?(:csr) || has_role?(:assister)
   end
-
+  
   def can_change_broker?
     if has_employer_staff_role? || has_hbx_staff_role?
       true
     elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+      false
+    end
+  end
+  
+  def can_view_user_accounts?
+    hbx_staff_role = self.try(:person).try(:hbx_staff_role)
+    if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+      true
+    else
       false
     end
   end
