@@ -241,8 +241,6 @@ module BenefitSponsors
       end
 
       def renew_member_benefit(census_employee)
-        predecessor_benefit_package = predecessor
-
         employee_role = census_employee.employee_role
         return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
@@ -252,7 +250,7 @@ module BenefitSponsors
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
           enrollments = family.enrollments.by_benefit_sponsorship(benefit_sponsorship)
-          .by_effective_period(predecessor_benefit_package.effective_period)
+          .by_effective_period(predecessor_application.effective_period)
           .enrolled_and_waived
 
           sponsored_benefits.each do |sponsored_benefit|
