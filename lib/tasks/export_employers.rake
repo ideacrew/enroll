@@ -17,7 +17,7 @@ namespace :employers do
 
     def published_on(application)
       return nil if application.blank? || application.workflow_state_transitions.blank?
-      application.workflow_state_transitions.where(:event => :approve_application).first.try(:transition_at)
+      application.workflow_state_transitions.where(:"event".in => ["approve_application", "approve_application!", "publish", "force_publish", "publish!", "force_publish!"]).first.try(:transition_at)
     end
 
     def import_to_csv(csv, profile, package=nil)
