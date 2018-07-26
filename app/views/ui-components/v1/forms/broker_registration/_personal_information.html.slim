@@ -18,7 +18,7 @@ fieldset
 
     .col-md-4.mb-2
         label for="inputDOB"  Date of Birth *
-        = f.text_field :dob, placeholder:'MM/DD/YYYY', required:'true', id:'inputDOB', class:'form-control'
+        = f.text_field :dob, placeholder:'MM/DD/YYYY', required:'true', id:'inputDOB', class:'form-control', onblur:'validDob(this)'
         .invalid-feedback
           |
             Please provide a date of birth.
@@ -36,3 +36,21 @@ fieldset
         .invalid-feedback
           |
             Please provide a NPN.
+
+javascript:
+
+	var cleave = new Cleave('#inputDOB', {
+	    date: true,
+	    datePattern: ['m', 'd', 'Y']
+	});
+	
+	function validDob(element) {
+		if (element.value && element.value.length < 10) {
+			swal({
+				title: "Invalid DOB Format",
+				text: "DOB must be entered as MM/DD/YYYY",
+				icon: "warning"
+			}),
+			element.value = ''
+		}
+	}
