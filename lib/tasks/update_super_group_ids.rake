@@ -20,8 +20,15 @@ namespace :supergroup do
             begin
               row_data = sheet_data.row(row_number)
               row_data[@headers["group_number"]] = row_data[@headers["group_number"]].to_i.to_s if sheet_name == "Altus"
-              fetch_record = Plan.where(hios_id: row_data[@headers["hios_issuer_id"]], active_year: row_data[@headers["plan year"]]).first
-              fetch_record.update_attributes(carrier_special_plan_identifier: row_data[@headers["group_number"]]) if fetch_record.present?
+              # old model
+              fetch_old_model_record = Plan.where(hios_id: row_data[@headers["hios_issuer_id"]], active_year: row_data[@headers["plan year"]]).first
+              fetch_old_model_record.update_attributes(carrier_special_plan_identifier: row_data[@headers["group_number"]]) if fetch_record.present?
+              # end old model
+
+              # new model
+              fetch_new_model_record = Plan.where(hios_id: row_data[@headers["hios_issuer_id"]], active_year: row_data[@headers["plan year"]]).first
+              fetch_new_model_record.update_attributes(issuer_assigned_id: row_data[@headers["group_number"]]) if fetch_record.present?
+              # end new model
             rescue Exception => e
               puts "#{e.message}"
               puts "Raised Error because of #{$!.class}"
