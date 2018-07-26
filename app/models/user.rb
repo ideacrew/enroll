@@ -307,7 +307,7 @@ class User
     end
   end
   
-  def can_view_user_accounts?
+  def has_tier3_subrole?
     hbx_staff_role = self.try(:person).try(:hbx_staff_role)
     if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
       true
