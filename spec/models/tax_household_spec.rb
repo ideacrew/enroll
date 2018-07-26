@@ -145,18 +145,42 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member1) { double(applicant_id: 'member1', applied_aptc_amount: 20) }
     let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 10) }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    let(:household) { double }
+    let!(:household) { FactoryGirl.create(:household, family: family) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:tax_household) do
+      FactoryGirl.create(:tax_household, household: household,
+                                         effective_ending_on: TimeKeeper.date_of_record)
+    end
 
-    it "can return result" do
-      tax_household = TaxHousehold.new()
+    before do
+      FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
       allow(tax_household).to receive(:household).and_return household
       allow(tax_household).to receive(:aptc_ratio_by_member).and_return aptc_ratio_by_member
       allow(tax_household).to receive(:current_max_aptc).and_return 100
       allow(tax_household).to receive(:effective_starting_on).and_return TimeKeeper.date_of_record
       allow(household).to receive(:hbx_enrollments_with_aptc_by_year).and_return([hbx_enrollment])
+    end
+
+    it "can return result" do
       expect(tax_household.aptc_available_amount_by_member.class).to eq Hash
-      result = {'member1'=>40, 'member2'=>30}
+      result = { 'member1' => 40, 'member2' => 30 }
       expect(tax_household.aptc_available_amount_by_member).to eq result
+    end
+
+    context 'when current max_aptc less than previous eligibility max_aptc' do
+      let!(:eligibility_determination_1) do
+        FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
+      end
+      let!(:eligibility_determination_2) do
+        FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
+      end
+      let(:hbx_member1) { double(applicant_id: 'member1', applied_aptc_amount: 120) }
+      let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 120) }
+
+      it "should return result" do
+        result = { 'member1' => 60, 'member2' => 80 }
+        expect(tax_household.aptc_available_amount_by_member).to eq result
+      end
     end
   end
 
