@@ -183,19 +183,21 @@ module BenefitSponsors
       def billing_benefit_application(billing_date=nil)
         billing_report_date = billing_date.is_a?(Date) ? billing_date : TimeKeeper.date_of_record.next_month
         valid_applications = benefit_applications.non_draft.non_imported
-        application = valid_applications.effective_period_cover(billing_report_date).first
-        if billing_date.blank? && application.blank?
 
-          application = valid_applications.future_effective_date(billing_report_date).open_enrollment_period_cover.first
-          return application, application.start_on if application.present?
-
-          application = valid_applications.effective_period_cover.first
-          return application, TimeKeeper.date_of_record if application.present?
-
-          application = valid_applications.future_effective_date(billing_report_date).first
-          return application, application.start_on if application.present?
+        if billing_date.present?
+          application = valid_applications.effective_period_cover(billing_date).first
+          return application, billing_date
         end
-        return application, billing_report_date
+
+        application = valid_applications.future_effective_date(billing_report_date).first
+        return application, application.start_on.to_date if application.present?
+
+        application = valid_applications.effective_period_cover(billing_report_date).first
+        return application, billing_report_date if application.present?
+
+        application = valid_applications.effective_period_cover.first
+        return application, TimeKeeper.date_of_record if application.present?
+        return nil, nil
       end
 
       # Deprecate below methods in future

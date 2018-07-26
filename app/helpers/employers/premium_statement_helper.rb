@@ -10,7 +10,7 @@ module Employers::PremiumStatementHelper
     earliest_effective_plan_date = @employer_profile.earliest_plan_year_start_on_date
 
     upcoming_billing_date = @employer_profile.billing_plan_year.first.present? ? [TimeKeeper.date_of_record.next_month.beginning_of_month, @employer_profile.billing_plan_year.first.start_on.beginning_of_month].max : TimeKeeper.date_of_record.next_month.beginning_of_month
-    if @employer_profile.renewing_plan_year.present?
+    if @employer_profile.renewing_plan_year.present? && !@employer_profile.renewing_plan_year.draft?
       renewal_billing_date = @employer_profile.renewing_plan_year.start_on
 
       3.times do |i|
