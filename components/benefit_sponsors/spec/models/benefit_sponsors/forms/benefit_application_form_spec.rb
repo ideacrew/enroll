@@ -103,7 +103,7 @@ module BenefitSponsors
       end
     end
 
-    describe ".force_submit_application" do
+    describe ".force_submit_application_with_eligibility_errors" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
@@ -111,8 +111,8 @@ module BenefitSponsors
       context "has to force submit application and" do
         it "should return true" do
           allow(BenefitSponsors::Services::BenefitApplicationService).to receive(:new).and_return(service_object)
-          allow(service_object).to receive(:force_submit_application).with(benefit_application_form).and_return([true, benefit_application])
-          expect(benefit_application_form.force_submit_application).to be_truthy
+          allow(service_object).to receive(:force_submit_application_with_eligibility_errors).with(benefit_application_form).and_return([true, benefit_application])
+          expect(benefit_application_form.force_submit_application_with_eligibility_errors).to be_truthy
         end
       end
     end

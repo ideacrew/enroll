@@ -64,10 +64,10 @@ module BenefitSponsors
         [saved_result, benefit_application]
       end
 
-      def force_submit_application(form)
+      def force_submit_application_with_eligibility_errors(form)
         benefit_application = find_model_by_id(form.id)
         enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-        enrollment_service.force_submit_application
+        enrollment_service.force_submit_application_with_eligibility_errors
         [true, benefit_application]
       end
 

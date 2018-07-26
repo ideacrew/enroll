@@ -39,33 +39,33 @@ module Queries
     end
 
     def filter_to_employers_hbx_ids(hbx_id_list)
-      orgs = Organization.where(:hbx_id => {"$in" => hbx_id_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$in" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
     end
 
     def exclude_employers_by_hbx_ids(hbx_id_list)
-      orgs = Organization.where(:hbx_id => {"$in" => hbx_id_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:_id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$nin" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$nin" => benefit_group_ids }
           }
       })
       self
     end
 
     def filter_to_employers_feins(fein_list)
-      orgs = Organization.where(:fein => {"$in" => fein_list})
-      benefit_group_ids = orgs.map(&:employer_profile).flat_map(&:plan_years).flat_map(&:benefit_groups).map(&:id)
+      orgs = BenefitSponsors::Organizations::Organization.where(:fein => {"$in" => fein_list}) 
+      benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       add({
           "$match" => {
-                "households.hbx_enrollments.benefit_group_id" => { "$in" => benefit_group_ids }
+                "households.hbx_enrollments.sponsored_benefit_package_id" => { "$in" => benefit_group_ids }
                   }
       })
       self
@@ -276,7 +276,7 @@ module Queries
         project_property("_id", "$households.hbx_enrollments._id")  +
         project_property("hbx_id", "$households.hbx_enrollments.hbx_id")  +
         project_property("consumer_role_id", "$households.hbx_enrollments.consumer_role_id") +
-        project_property("benefit_group_id", "$households.hbx_enrollments.benefit_group_id") +
+        project_property("benefit_group_id", "$households.hbx_enrollments.sponsored_benefit_package_id") +
         project_property("benefit_group_assignment_id", "$households.hbx_enrollments.benefit_group_assignment_id")
     end
 

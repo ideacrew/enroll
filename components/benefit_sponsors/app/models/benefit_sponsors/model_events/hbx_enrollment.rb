@@ -4,7 +4,6 @@ module BenefitSponsors
 
       REGISTERED_EVENTS = [
         :application_coverage_selected,
-        :notify_employee_of_plan_selection_in_open_enrollment,
         :employee_waiver_confirmation,
         :employee_coverage_termination
       ]
@@ -13,12 +12,8 @@ module BenefitSponsors
 
         if aasm_state_changed?
 
-          if is_transition_matching?(to: :coverage_selected, from: :shopping, event: :select_coverage)
+          if is_transition_matching?(to: [:coverage_selected, :renewing_coverage_selected],  from: [:shopping, :auto_renewing], event: :select_coverage)
             @is_application_coverage_selected = true
-          end
-
-          if is_transition_matching?(to: :renewing_coverage_selected, from: :auto_renewing, event: :select_coverage)
-            @is_notify_employee_of_plan_selection_in_open_enrollment = true
           end
 
           if is_transition_matching?(to: :inactive, from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected], event: :waive_coverage)

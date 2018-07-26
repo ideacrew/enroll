@@ -4,6 +4,7 @@ module BenefitSponsors
       attributes :first_name, :last_name, :email, :dob, :status, :phone, :person_id
 
       attribute :npn, if: :is_broker_profile?
+      attribute :status, if: :is_employer_profile?
 
       def email
         object.work_email_or_best
@@ -19,9 +20,8 @@ module BenefitSponsors
       end
 
       def status
-        if @instance_options[:profile_type] == "benefit_sponsor"
-          object.employer_staff_roles.detect{|staff_role| staff_role.benefit_sponsor_employer_profile_id.to_s == @instance_options[:profile_id]  &&['is_active','is_applicant'].include?("#{staff_role.aasm_state}")}.aasm_state
-        end
+        state = object.user_id.present? ? " Linked" : " Unlinked"
+        (staff_role.aasm_state.to_s).titleize + state
       end
 
       def dob
@@ -34,6 +34,17 @@ module BenefitSponsors
 
       def npn
         object.broker_role.npn
+      end
+
+      def staff_role
+        object.employer_staff_roles.where(
+          :"benefit_sponsor_employer_profile_id" => instance_options[:profile_id],
+          :"aasm_state".in => ['is_active','is_applicant']
+        ).first
+      end
+
+      def is_employer_profile?
+        instance_options[:profile_type] == "benefit_sponsor" || staff_role.present?
       end
 
       # provide defaults(if any needed) that were not set on Model
