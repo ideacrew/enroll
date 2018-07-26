@@ -37,7 +37,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       allow(person).to receive_message_chain("primary_family").and_return(family)
       allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
     end
-    it "returns true if any family members has outstanding verification state" do
+    it "returns true if any family members have verification types state as outstanding" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
@@ -46,13 +46,48 @@ RSpec.describe VerificationHelper, :type => :helper do
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
-    it "returns false if all family members are fully verified or pending" do
+    it "returns false if all family members have verification types state as verified or pending " do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
         member.save
       end
       expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+
+    it "returns false if all family members have verification type state as curam" do
+      family.family_members.each do |member|
+        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "curam" }
+        member.save
+      end
+      expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+  end
+
+  describe "#can_show_due_date?" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    before do
+      allow(person).to receive_message_chain("primary_family").and_return(family)
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
+    end
+    it "returns true if any family members have verification types state as outstanding or pending " do
+      family.family_members.each do |member|
+        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
+        member.save
+      end
+      expect(helper.can_show_due_date?(person)).to eq true
+    end
+
+    it "returns false if all family members have verification types state as verified " do
+      family.family_members.each do |member|
+        member.person = FactoryGirl.create(:person, :with_consumer_role)
+        member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
+        member.save
+      end
+      expect(helper.can_show_due_date?(person)).to eq false
     end
   end
 

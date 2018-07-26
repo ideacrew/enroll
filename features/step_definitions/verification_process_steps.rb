@@ -75,6 +75,7 @@ end
 
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
+  user.person.verification_types.first.fail_type
   enr = FactoryGirl.create(:hbx_enrollment,
                            household: family.active_household,
                            coverage_kind: "health",
