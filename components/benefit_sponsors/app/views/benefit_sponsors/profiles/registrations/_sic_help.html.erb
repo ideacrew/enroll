@@ -31,9 +31,6 @@
     event.preventDefault();
     var sicId = "<%= sicFieldId %>";
     $("#sicHelperWrapper").toggleClass('hidden');
-    $('html, body').animate({
-      scrollTop: $("#" + sicId).offset().top
-    }, 500);
   }
   function createJSTrees(jsonData) {
     var $searchableTree = $("#sictree").treeview({
@@ -45,6 +42,7 @@
       $("#sicHelperWrapper").toggleClass('hidden');
       $('#<%=sicFieldId%>').val(data.sic_code);
       $('#<%=sicFieldId%>').trigger('chosen:updated');
+			document.getElementById('agency_organization_profile_attributes_sic_code').value = data.sic_code;
     }
     var search = function(e) {
       var pattern = $('#sic_search').val();

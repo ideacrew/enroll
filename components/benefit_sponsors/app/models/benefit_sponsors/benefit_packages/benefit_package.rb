@@ -255,20 +255,28 @@ module BenefitSponsors
           .by_effective_period(predecessor_benefit_package.effective_period)
           .enrolled_and_waived
 
-          sponsored_benefits.map(&:product_kind).each do |product_kind|
-            hbx_enrollment = enrollments.by_coverage_kind(product_kind).first
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              hbx_enrollment.renew_benefit(self)
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)
+              if renewed_enrollment.is_coverage_waived?
+                census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: self.benefit_application}) if sponsored_benefit.health?
+              else
+                census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: self.benefit_application}) if sponsored_benefit.health?
+              end
+            else
+              census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: self.benefit_application}) if sponsored_benefit.health?
             end
           end
         end
       end
 
       def is_renewal_benefit_available?(enrollment)
+        return true if (enrollment.present? && enrollment.is_coverage_waived?)
         return false if enrollment.blank? || enrollment.product.blank? || enrollment.product.renewal_product.blank?
         sponsored_benefit = sponsored_benefit_for(enrollment.coverage_kind)
-        sponsored_benefit.product_package.products.include?(enrollment.product.renewal_product)
+        sponsored_benefit.products(start_on).include?(enrollment.product.renewal_product)
       end
 
       def enrolled_families

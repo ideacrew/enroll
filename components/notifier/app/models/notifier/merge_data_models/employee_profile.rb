@@ -7,7 +7,7 @@ module Notifier
     attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
-    attribute :enrollment_plan_name, String
+    # attribute :enrollment_plan_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :employer_name, String
     # attribute :coverage_begin_date, Date
@@ -42,7 +42,7 @@ module Notifier
         date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         earliest_coverage_begin_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
         new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
-        new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%,/%d/%Y')
+        new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%m,/%d/%Y')
       })
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object

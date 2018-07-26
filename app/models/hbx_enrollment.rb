@@ -282,6 +282,7 @@ class HbxEnrollment
         assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       end
+      enrollment
     rescue Exception => e
     end
   end

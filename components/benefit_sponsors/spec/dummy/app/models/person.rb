@@ -192,6 +192,29 @@ class Person
     (email && email.address) || (user && user.email)
   end
 
+  def work_phone
+    phones.detect { |phone| phone.kind == "work" } || main_phone
+  end
+
+  def main_phone
+    phones.detect { |phone| phone.kind == "phone main" }
+  end
+
+  def home_phone
+    phones.detect { |phone| phone.kind == "home" }
+  end
+
+  def mobile_phone
+    phones.detect { |phone| phone.kind == "mobile" }
+  end
+
+
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
+
+
   class << self
 
     def additional_exprs(clean_str)

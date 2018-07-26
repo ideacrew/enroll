@@ -38,6 +38,7 @@ FactoryGirl.define do
 
     transient do
       predecessor_application_state :active
+      imported_application_state :imported
       default_effective_period nil
       default_open_enrollment_period nil
     end
@@ -89,6 +90,20 @@ FactoryGirl.define do
           successor_applications: [benefit_application],
           aasm_state: :expired
         )
+      end
+    end
+
+    trait :with_predecessor_imported_application do
+      after(:build) do |benefit_application, evaluator|
+        predecessor_application = FactoryGirl.create(:benefit_sponsors_benefit_application,
+          :with_benefit_package,
+          benefit_sponsorship: benefit_application.benefit_sponsorship,
+          effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
+          open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
+          aasm_state: evaluator.imported_application_state
+        )
+        benefit_application.predecessor = predecessor_application
+        benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
       end
     end
 

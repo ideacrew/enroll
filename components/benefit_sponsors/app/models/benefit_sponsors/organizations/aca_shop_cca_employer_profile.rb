@@ -12,7 +12,7 @@ module BenefitSponsors
 
       embeds_one  :employer_attestation
 
-      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new
+      add_observer BenefitSponsors::Observers::EmployerProfileObserver.new, [:update, :notifications_send]
 
       after_update :notify_observers
 

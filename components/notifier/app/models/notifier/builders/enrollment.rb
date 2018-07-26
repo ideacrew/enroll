@@ -8,13 +8,6 @@ module Notifier
       end
     end
 
-    def latest_terminated_health_enrollment
-      enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
-        census_employee_record.employment_terminated_on < hbx.terminated_on
-      end
-      enrollment
-    end
-
     def enrollment_coverage_start_on
       return if enrollment.blank?
       merge_model.enrollment.coverage_start_on = format_date(enrollment.effective_on)
@@ -26,13 +19,13 @@ module Notifier
     end
 
     def enrollment_coverage_end_on_minus_60_days
-      return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on_minus_60_days = format_date(census_employee_record.employment_terminated_on.end_of_month - 60.days)
+      return if census_employee_record.blank?
+      merge_model.enrollment.coverage_end_on_minus_60_days = format_date(census_employee_record.coverage_terminated_on - 60.days)
     end
 
     def enrollment_coverage_end_on_plus_60_days
-      return if enrollment.blank?
-      merge_model.enrollment.coverage_end_on_plus_60_days = format_date(census_employee_record.employment_terminated_on.end_of_month + 60.days)
+      return if census_employee_record.blank?
+      merge_model.enrollment.coverage_end_on_plus_60_days = format_date(census_employee_record.coverage_terminated_on + 60.days)
     end
 
     def enrollment_plan_name
