@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     member do
       get :reset_password, :lockable, :confirm_lock, :login_history, :edit
       put :confirm_reset_password, :update
-      post :unlock, :change_password
+      post :unlock, :change_password, :change_username, :change_email
     end
   end
 
