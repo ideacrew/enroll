@@ -38,7 +38,7 @@ org = Organization.new(fein: "046143185", legal_name: "Delta Dental", office_loc
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000081", abbrev: "DDA", hbx_carrier_id: 20004, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: true, issuer_hios_ids: ['80538', '11821'])
 
 org = Organization.new(fein: "362739571", legal_name: "UnitedHealthcare", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000093", abbrev: "UHIC", hbx_carrier_id: 20012, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['31779'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000093", abbrev: "UHIC", hbx_carrier_id: 20014, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['31779'])
 
 puts "::: Generated MA Carriers :::"
 puts "*"*80
