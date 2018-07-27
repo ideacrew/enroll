@@ -131,12 +131,18 @@ module BenefitSponsors
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
         
         benefit_sponsors.may_transmit_renewal_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          rescue Exception => e 
+          end
         end
 
         benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          rescue Exception => e 
+          end
         end
       end
 
