@@ -101,6 +101,8 @@ class UsersController < ApplicationController
   
   private
 
+  helper_method :user
+
   def email_update_params
     params.require(:user).permit(:email)
   end
@@ -115,6 +117,10 @@ class UsersController < ApplicationController
              elsif params[:user].present? && !@user.update_attributes(email_update_params)
                 @user.errors.full_messages.join.gsub('(optional) ', '')
               end
+  end
+
+  def user
+    @user ||= User.find(params[:id])
   end
 
   def set_user
