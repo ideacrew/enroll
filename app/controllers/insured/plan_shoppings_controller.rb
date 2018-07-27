@@ -249,8 +249,6 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
