@@ -77,6 +77,8 @@ namespace :import do
             row_info = sheet_data.row(row_number)
             hios_id = row_info[@headers["hios/standard component id"]].squish
             provider_directory_url = row_info[@headers["provider directory url"]].strip
+
+            # old model
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
@@ -91,6 +93,25 @@ namespace :import do
                 plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
                 plan.save
             end
+            # end of old model
+
+            # new model
+            products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
+            products.each do |plan|
+              product.provider_directory_url = provider_directory_url
+              if sheet_name != "2018_QDP"
+                rx_formulary_url = row_info[@headers["rx formulary url"]].strip
+                product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+              end
+              product.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
+              product.network_information = row_info[@headers["network notes"]]
+                product.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+                product.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+                product.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+                product.save
+            end
+            # end of new model
+
           end
         end
       end
