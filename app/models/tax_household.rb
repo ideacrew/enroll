@@ -187,8 +187,6 @@ class TaxHousehold
     end
   end
 
-
-
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
     tax_household_members.detect do |tax_household_member|

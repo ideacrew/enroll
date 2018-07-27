@@ -137,6 +137,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -153,7 +154,7 @@ class EmployerProfile
   end
 
   def broker_fired_confirmation_to_broker
-      trigger_notices('broker_fired_confirmation_to_broker')   
+      trigger_notices('broker_fired_confirmation_to_broker')
   end
 
   def employer_broker_fired
@@ -232,6 +233,7 @@ class EmployerProfile
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
+    self.trigger_notices("general_agency_terminated")
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
@@ -846,10 +848,10 @@ class EmployerProfile
 
       employer_profile = org.employer_profile
       employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
-      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? 
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
     end
 
-    employer_collection.where(:"employer_profile.plan_years" => { 
+    employer_collection.where(:"employer_profile.plan_years" => {
       :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}
       }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
@@ -1048,15 +1050,15 @@ class EmployerProfile
   end
 
   def transmit_initial_eligible_event
-    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_eligible_event
-    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_carrier_drop_event
-    notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
   end
 
   def conversion_employer?
@@ -1087,7 +1089,7 @@ class EmployerProfile
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{event} notice #{self.legal_name} due to #{e}" }
+      Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
     end
   end
 
