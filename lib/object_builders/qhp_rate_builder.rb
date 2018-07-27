@@ -5,10 +5,21 @@ class QhpRateBuilder
 
   def initialize
     @rates_array = []
+    @rating_area_id_cache = {}
+    @rating_area_cache = {}
+    @premium_table_cache = Hash.new {|h, k| h[k] = Hash.new}
     @action = "new"
   end
 
+  def set_rating_area_cache
+    ::BenefitMarkets::Locations::RatingArea.all.each do |ra|
+      @rating_area_id_cache[[ra.active_year, ra.exchange_provided_code]] = ra.id
+      @rating_area_cache[ra.id] = ra
+    end
+  end
+
   def add(rates_hash, action, year)
+    set_rating_area_cache
     if year < 2018
       @rates_array = @rates_array + rates_hash[:items]
       @action = action
@@ -25,9 +36,11 @@ class QhpRateBuilder
     @rates_array.each do |rate|
       @rate = rate
       build_premium_tables
+      build_product_premium_tables
     end
     if @action == "new"
       find_plan_and_create_premium_tables
+      find_product_and_create_premium_tables
     else
       find_plan_and_update_premium_tables
     end
@@ -71,6 +84,45 @@ class QhpRateBuilder
         rating_area: rating_area
       }
     end
+  end
+
+  def find_product_and_create_premium_tables
+    premium_tables = []
+    @premium_table_cache.each_pair do |k, v|
+      product_hios_id, rating_area_id, applicable_range = k
+      premium_tuples = []
+
+      v.each_pair do |pt_age, pt_cost|
+        premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(
+          age: pt_age,
+          cost: pt_cost
+        )
+      end
+
+      premium_tables << ::BenefitMarkets::Products::PremiumTable.new(
+        effective_period: applicable_range,
+        rating_area: @rating_area_cache[rating_area_id],
+        rating_area_id: rating_area_id,
+        premium_tuples: premium_tuples
+      )
+
+      year = applicable_range.first.year
+      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == year}
+      products.each do |product|
+        product.premium_tables = nil
+        product.premium_tables = premium_tables
+        product.premium_ages = premium_tuples.map(&:age).minmax
+        product.save
+      end
+    end
+  end
+
+  def build_product_premium_tables
+    active_year = @rate[:effective_date].to_date.year
+    applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
+    rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
+    rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
+    @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = @rate[:primary_enrollee]
   end
 
   def assign_age
