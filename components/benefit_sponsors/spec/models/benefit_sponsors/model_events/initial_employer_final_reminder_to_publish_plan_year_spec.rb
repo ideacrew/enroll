@@ -83,7 +83,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
       before do
         allow(subject).to receive(:resource).and_return(employer_profile)
         allow(subject).to receive(:payload).and_return(payload)
-        PlanYear.date_change_event(date_mock_object)
+        BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(date_mock_object)
       end
 
       it "should retrun merge mdoel" do

@@ -149,7 +149,7 @@ aca:
     employer_family_contribution_percent_minimum: 33
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 12
+    binder_payment_due_on: 23
     new_employee_paper_application: true
 
     earliest_enroll_prior_to_effective_on:
@@ -182,10 +182,10 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
         day_of_month: 0
-      monthly_open_enrollment_end_on: 13
-      publish_due_day_of_month: 10
+      monthly_open_enrollment_end_on: 20
+      publish_due_day_of_month: 15
       application_submission_soft_deadline: 10
-      force_publish_day_of_month: 11
+      force_publish_day_of_month: 16
       open_enrollment:
         minimum_length:
           days: 3
