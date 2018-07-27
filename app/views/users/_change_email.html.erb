@@ -1,0 +1,136 @@
+<div class="modal fade" id="user-email-change-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Update Email</h4>
+      </div>
+      <div class="modal-body">
+			<%= form_tag(confirm_change_email_user_path, method: :put, id: "changeEmailForm", class:"form-horizontal") do %>
+				<% if user.email.present? %>
+				<%= hidden_field_tag :current_email, user.email %>
+				<div class="form-group">
+					<%= label_tag(:current_email, "Current Email", class:"col-sm-4 control-label") %>
+					<div class="col-sm-6">
+						<input class="form-control" id="disabledInput" type="text" disabled>
+					</div>
+				</div>
+				<br />
+				<% end %>
+				<div class="form-group">
+					<%= label_tag(:new_email, "New Email", class:"col-sm-4 control-label") %>
+					<div class="col-sm-6">
+						<%= text_field_tag :new_email, nil, {class:"form-control", onblur:'validateFields()', id:'inputNewEmail'} %>
+						<span id="helpBlock2" class="help-block email-block hidden"></span>
+					</div>
+				</div>
+				<br />
+				<div class="form-group">
+					<%= label_tag(:redmine_ticket_number, "Redmine Ticket Number", class:"col-sm-4 control-label") %>
+					<div class="col-sm-6">
+						<%= text_field_tag :redmine_ticket_number, nil, {class:"form-control", onblur:'validateFields()', id:'inputTicketNumber'} %>
+					</div>
+				</div>
+				<br />
+				<div class="form-group">
+					<%= label_tag(:reason, "Reason For Change", class:"col-sm-4 control-label") %>
+					<div class="col-sm-6">
+						<%= text_area_tag :reason, nil, {class:"form-control", rows:"3", onblur:'validateFields()', id:'inputReason'} %>
+					</div>
+				</div>
+			<% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" id="submitEmailChange" onclick="submitMe()">Submit</button>
+      </div>
+			
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+	var validEmailAddress = false;
+	
+	(function() {
+		document.getElementById('submitEmailChange').classList.add('blocking');
+		if ("<%= user.email.present? %>") {
+			document.getElementById('disabledInput').setAttribute('placeholder', "<%= user.email %>")
+		}
+	})();
+	
+	var currentOptions = {
+		email:String,
+		reason:String,
+		ticketNumber:String
+	}
+	
+	function validateFields() {
+		redmineTicketNumber = document.getElementById('inputTicketNumber');
+		email = document.getElementById('inputNewEmail');
+		reason = document.getElementById('inputReason');
+		
+		currentOptions.email = email.value;
+		currentOptions.reason = reason.value;
+		currentOptions.ticketNumber = redmineTicketNumber.value;
+	
+		if (email.value.length) {
+			validateEmail(email.value)
+		}
+		
+		if (currentOptions.email.length && currentOptions.reason.length && currentOptions.ticketNumber.length) {
+			enableSubmit()
+		} else {
+			disableSubmit()
+		}
+	}
+	
+	function validateEmail(email) {
+		var properFormat = /\S+@\S+\.\S+/;
+		if (!properFormat.test(email)) {
+			invalidEmail();
+			document.getElementsByClassName('email-block')[0].innerHTML = "Email is invalid";
+		} else {
+			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?email='+email,{
+				mode: "no-cors",
+				method: 'GET',
+				credentials: "same-origin"
+			})
+			.then((resp) => resp.json())
+			.then(function(data) {
+				if (data.available) {
+					invalidEmail()
+					disableSubmit()
+					document.getElementsByClassName('email-block')[0].innerHTML = "Email is currently taken"
+				} else {
+					validEmail()
+					enableSubmit()
+				}
+			})
+		}
+	}
+	
+	function enableSubmit() {
+		document.getElementById('submitEmailChange').classList.remove('blocking');
+	}
+	
+	function disableSubmit() {
+		document.getElementById('submitEmailChange').classList.add('blocking');
+	}
+	
+	function invalidEmail() {
+		document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
+		document.getElementsByClassName('email-block')[0].classList.remove('hidden')
+		validEmailAddress = false;
+	}
+	
+	function validEmail() {
+		document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
+		document.getElementsByClassName('email-block')[0].classList.add('hidden');
+		validEmailAddress = true;
+	}
+	
+	function submitMe() {
+		document.getElementById('changeEmailForm').submit();
+	}
+</script>

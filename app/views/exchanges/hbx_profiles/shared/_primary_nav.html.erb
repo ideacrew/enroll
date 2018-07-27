@@ -41,14 +41,12 @@
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
-				<% if current_user.has_tier3_subrole? %>
         <li role="presentation"<%= menu_tab_class(active_tab, "user-accounts") %>>
           <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "user-accounts", "role" => "tab" ) do  %>
               <span class="hidden-xs">User Accounts</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Account"></span>
           <% end %>
         </li>
-				<% end %>
         <li role="presentation"<%= menu_tab_class(active_tab, "broker-agencies-tab") %>>
          <%= link_to(broker_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "broker_agencies", "role" => "tab" ) do  %>
             <span class="hidden-xs">Broker Agencies</span>

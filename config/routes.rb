@@ -17,9 +17,9 @@ Rails.application.routes.draw do
   
   resources :users do
     member do
-      get :reset_password, :lockable, :confirm_lock, :login_history, :edit
-      put :confirm_reset_password, :update
-      post :unlock, :change_password, :change_username, :change_email
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username, :change_email, :check_for_existing_username_or_email, :edit
+      put :confirm_reset_password, :confirm_change_username, :confirm_change_email, :update
+      post :unlock, :change_password
     end
   end
 

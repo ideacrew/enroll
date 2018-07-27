@@ -1,0 +1,2 @@
+$('.tab-content').append("<%= escape_javascript render(:partial => 'users/change_email', :locals => { :user => @user }) %>");
+$('#user-email-change-modal').modal('show');
