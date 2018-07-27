@@ -26,7 +26,7 @@ namespace :supergroup do
               # end old model
 
               # new model
-              fetch_new_model_record = Plan.where(hios_id: row_data[@headers["hios_issuer_id"]], active_year: row_data[@headers["plan year"]]).first
+              fetch_new_model_record = ::BenefitMarkets::Products::Product.where(hios_id: row_data[@headers["hios_issuer_id"]]).select{|a| a.active_year == row_data[@headers["plan year"]].to_i}.first
               fetch_new_model_record.update_attributes(issuer_assigned_id: row_data[@headers["group_number"]]) if fetch_record.present?
               # end new model
             rescue Exception => e
