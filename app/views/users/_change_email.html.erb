@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Update Email</h4>
+        <h4 class="modal-title"><strong>Update Email</strong></h4>
       </div>
       <div class="modal-body">
 			<%= form_tag(confirm_change_email_user_path, method: :put, id: "changeEmailForm", class:"form-horizontal") do %>
@@ -62,7 +62,8 @@
 	var currentOptions = {
 		email:String,
 		reason:String,
-		ticketNumber:String
+		ticketNumber:String,
+		validEmailPresent:Boolean
 	}
 	
 	function validateFields() {
@@ -78,7 +79,7 @@
 			validateEmail(email.value)
 		}
 		
-		if (currentOptions.email.length && currentOptions.reason.length && currentOptions.ticketNumber.length) {
+		if (currentOptions.reason.length && currentOptions.ticketNumber.length && currentOptions.validEmailPresent == true) {
 			enableSubmit()
 		} else {
 			disableSubmit()
@@ -90,8 +91,9 @@
 		if (!properFormat.test(email)) {
 			invalidEmail();
 			document.getElementsByClassName('email-block')[0].innerHTML = "Email is invalid";
+			currentOptions.validEmailPresent = false;
 		} else {
-			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?email='+email,{
+			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?email='+email.toLowerCase(),{
 				mode: "no-cors",
 				method: 'GET',
 				credentials: "same-origin"
@@ -99,12 +101,12 @@
 			.then((resp) => resp.json())
 			.then(function(data) {
 				if (data.available) {
+					currentOptions.validEmailPresent = false;
+					document.getElementsByClassName('email-block')[0].innerHTML = "Email is currently taken";
 					invalidEmail()
-					disableSubmit()
-					document.getElementsByClassName('email-block')[0].innerHTML = "Email is currently taken"
 				} else {
-					validEmail()
-					enableSubmit()
+					validEmail();
+					currentOptions.validEmailPresent = true;
 				}
 			})
 		}
@@ -133,4 +135,11 @@
 	function submitMe() {
 		document.getElementById('changeEmailForm').submit();
 	}
+	
+	$('#user-email-change-modal').on('hidden.bs.modal', function (e) {
+	  document.getElementById('changeEmailForm').reset();
+		document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
+		document.getElementsByClassName('email-block')[0].innerHTML = "";
+	})
+	
 </script>
