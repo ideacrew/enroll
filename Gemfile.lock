@@ -96,9 +96,11 @@ PATH
     notifier (0.0.1)
       aasm (~> 4.8.0)
       acapi
-      ckeditor
+      ckeditor (= 4.2.4)
       combine_pdf
+      config
       curl
+      money-rails (~> 1.3.0)
       mongoid (~> 5.4.0)
       non-stupid-digest-assets
       rails (~> 4.2.3)
@@ -917,4 +919,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
