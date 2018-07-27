@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
   let(:model_event) { "low_enrollment_notice_for_employer" }
-  let(:notice_event) { "low_enrollment_notice_for_employer" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }

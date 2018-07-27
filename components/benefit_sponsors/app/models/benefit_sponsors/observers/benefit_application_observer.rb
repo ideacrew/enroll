@@ -51,21 +51,13 @@ module BenefitSponsors
               trigger_zero_employees_on_roster_notice(benefit_application)
             end
 
-            if new_model_event.event_key == :group_advance_termination_confirmation
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
-
-              benefit_application.active_benefit_sponsorship.census_employees.active.each do |ce|
-                deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination")
-              end
-            end
-
             if new_model_event.event_key == :ineligible_application_submitted
               policy = eligibility_policy.business_policies_for(benefit_application, :submit_benefit_application)
               unless policy.is_satisfied?(benefit_application)
                 if benefit_application.is_renewing?
                   if policy.fail_results.include?(:employer_primary_office_location)
                     deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "employer_renewal_eligibility_denial_notice")
-                    benefit_application.active_benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                    benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
                       if ce.employee_role.present?
                         deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "termination_of_employers_health_coverage")
                       end
@@ -147,6 +139,17 @@ module BenefitSponsors
                     end
                   end
                 end
+              end
+            end
+          end
+
+          if BenefitSponsors::ModelEvents::BenefitApplication::OTHER_EVENTS.include?(new_model_event.event_key)
+            benefit_application = new_model_event.klass_instance
+            if new_model_event.event_key == :group_advance_termination_confirmation
+              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
+
+              benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
+                deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination") if ce.employee_role
               end
             end
           end

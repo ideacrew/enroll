@@ -849,15 +849,30 @@ module BenefitSponsors
             end
 
             def enrollment_quiet_period
-              if open_enrollment_end_on.blank?
-                prev_month = start_on.prev_month
-                quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+              if predecessor_id.present?
+                # Weird things can happen when you extend open enrollment past
+                # what would 'normally' be the quiet period end.  Can really
+                # only happen on renewals.
+                expected_renewal_transmission_deadline = renewal_quiet_period_end(start_on)
+                deadline_because_of_open_enrollment_end = nil
+                if open_enrollment_end_on.blank?
+                  deadline_because_of_open_enrollment_end = expected_renewal_transmission_deadline
+                else
+                  deadline_because_of_open_enrollment_end = open_enrollment_end_on
+                end
+                quiet_period_start = open_enrollment_start_on
+                quiet_period_end = [expected_renewal_transmission_deadline, deadline_because_of_open_enrollment_end].max
+                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
               else
-                quiet_period_start = open_enrollment_end_on + 1.day
+                if open_enrollment_end_on.blank?
+                  prev_month = start_on.prev_month
+                  quiet_period_start = Date.new(prev_month.year, prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+                else
+                  quiet_period_start = open_enrollment_end_on + 1.day
+                end
+                quiet_period_end = initial_quiet_period_end(start_on)
+                TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
               end
-
-              quiet_period_end = predecessor_id.present? ? renewal_quiet_period_end(start_on) : initial_quiet_period_end(start_on)
-              TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
             end
 
             def initial_quiet_period_end(start_on)

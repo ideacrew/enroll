@@ -14,7 +14,7 @@
         <% end %>
       </li>
       <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
-        <%= link_to(main_app.family_index_broker_agencies_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
+        <%= link_to(benefit_sponsors.family_index_profiles_broker_agencies_broker_agency_profiles_path(id: @broker_agency_profile.id), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
           <span class="hidden-xs">Families</span>
           <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
         <% end %>
@@ -59,7 +59,7 @@
       <% end %>
 
       <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-        <%= link_to(main_app.messages_broker_agencies_profiles_path(id: @provider), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+        <%= link_to(benefit_sponsors.messages_profiles_broker_agencies_broker_agency_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
           <span class="badge message-unread"><%=begin; current_user.person.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
           Broker Mail
         <% end %>
