@@ -1,22 +1,139 @@
 <div class="modal fade" id="user-username-change-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Update <%= user.try(:person).full_name %>'s Username</h4>
-      </div>
-      <div class="modal-body">
-			  <%= form_for(user, url: confirm_change_username_user_path, method: :put, remote: true, html: {class: 'form-group'}) do |f| %>
-			    <% if @error.present? %>
-			      <div class="reset-password-error"><%= @error %></div>
-			    <% end %>
-			    <%= f.text_field :oim_id, class: 'form-control' %>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<%= f.submit "Submit", class:'btn btn-default' %>
-      </div>
-			<% end %>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title"><strong>Update Username</strong></h4>
+	      </div>
+	      <div class="modal-body">
+				<%= form_tag(confirm_change_username_user_path, method: :put, id: "changeUsernameForm", class:"form-horizontal") do %>
+					<% if user.oim_id.present? %>
+					<%= hidden_field_tag :current_oim_id, user.oim_id %>
+					<div class="form-group">
+						<%= label_tag(:current_oim_id, "Current Username", class:"col-sm-4 control-label") %>
+						<div class="col-sm-6">
+							<input class="form-control" id="disabledInput" type="text" disabled>
+						</div>
+					</div>
+					<br />
+					<% end %>
+					<div class="form-group">
+						<%= label_tag(:oim_id, "New Username", class:"col-sm-4 control-label") %>
+						<div class="col-sm-6">
+							<%= text_field_tag :oim_id, nil, {class:"form-control", onblur:'validateFields()', id:'inputNewUsername'} %>
+							<span id="helpBlock2" class="help-block username-block hidden"></span>
+						</div>
+					</div>
+					<br />
+					<div class="form-group">
+						<%= label_tag(:redmine_ticket_number, "Redmine Ticket Number", class:"col-sm-4 control-label") %>
+						<div class="col-sm-6">
+							<%= text_field_tag :redmine_ticket_number, nil, {class:"form-control", onblur:'validateFields()', id:'inputTicketNumber'} %>
+						</div>
+					</div>
+					<br />
+					<div class="form-group">
+						<%= label_tag(:reason, "Reason For Change", class:"col-sm-4 control-label") %>
+						<div class="col-sm-6">
+							<%= text_area_tag :reason, nil, {class:"form-control", rows:"3", onblur:'validateFields()', id:'inputReason'} %>
+						</div>
+					</div>
+				<% end %>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" id="submitUsernameChange" onclick="submitMe()">Submit</button>
+	      </div>
+			
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+  
+
+<script>
+	var validUsername = false;
+	
+	(function() {
+		document.getElementById('submitUsernameChange').classList.add('blocking');
+		if ("<%= user.oim_id.present? %>") {
+			document.getElementById('disabledInput').setAttribute('placeholder', "<%= user.oim_id %>")
+		}
+	})();
+	
+	var currentOptions = {
+		username:String,
+		reason:String,
+		ticketNumber:String,
+		validUsernamePresent:Boolean
+	}
+	
+	function validateFields() {
+		redmineTicketNumber = document.getElementById('inputTicketNumber');
+		username = document.getElementById('inputNewUsername');
+		reason = document.getElementById('inputReason');
+		
+		currentOptions.username = username.value;
+		currentOptions.reason = reason.value;
+		currentOptions.ticketNumber = redmineTicketNumber.value;
+	
+		if (username.value.length) {
+			validateUsername(username.value)
+		}
+		
+		if (currentOptions.reason.length && currentOptions.ticketNumber.length && currentOptions.validUsernamePresent == true) {
+			enableSubmit()
+		} else {
+			disableSubmit()
+		}
+	}
+	
+	function validateUsername(username) {
+			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?oim_id='+username.toLowerCase(),{
+				mode: "no-cors",
+				method: 'GET',
+				credentials: "same-origin"
+			})
+			.then((resp) => resp.json())
+			.then(function(data) {
+				if (data.available) {
+					currentOptions.validUsernamePresent = false;
+					document.getElementsByClassName('username-block')[0].innerHTML = "Username is currently taken";
+					invalidUsername()
+				} else {
+					validUn();
+					currentOptions.validUsernamePresent = true;
+				}
+			})
+	}
+	
+	function enableSubmit() {
+		document.getElementById('submitUsernameChange').classList.remove('blocking');
+	}
+	
+	function disableSubmit() {
+		document.getElementById('submitUsernameChange').classList.add('blocking');
+	}
+	
+	function invalidUsername() {
+		document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
+		document.getElementsByClassName('username-block')[0].classList.remove('hidden')
+		validUsername = false;
+	}
+	
+	function validUn() {
+		document.getElementById('inputNewUsername').closest('.form-group').classList.remove('has-error');
+		document.getElementsByClassName('username-block')[0].classList.add('hidden');
+		validUsername = true;
+	}
+	
+	function submitMe() {
+		document.getElementById('changeUsernameForm').submit();
+	}
+	
+	$('#user-username-change-modal').on('hidden.bs.modal', function (e) {
+	  document.getElementById('changeUsernameForm').reset();
+		document.getElementById('inputNewUsername').closest('.form-group').classList.remove('has-error');
+		document.getElementsByClassName('username-block')[0].innerHTML = "";
+	})
+	
+</script>
