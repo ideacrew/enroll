@@ -90,7 +90,7 @@ module BenefitSponsors
             TimeKeeper.date_of_record <= benefit_application.last_day_to_publish
           },
           success:  -> (benfit_application)  { "Plan year was published before #{benfit_application.last_day_to_publish} on #{TimeKeeper.date_of_record} " },
-          fail:     -> (benefit_application) { "Plan year starting on #{benefit_application.start_on.to_date} must be published by #{benefit_application.last_day_to_publish.to_date}" }
+          fail:     -> (benefit_application) { "Plan year failed to published, Plan year starting on #{benefit_application.start_on.to_date} must be published by #{benefit_application.last_day_to_publish.to_date}" }
 
     rule  :stubbed_rule_one,
             validate: -> (model_instance) {
