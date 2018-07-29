@@ -19,8 +19,8 @@ module Effective
                                    end,
                                    ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
                                    ['View Login History',login_history_user_path(id: row.id), 'ajax'],
-                                   ['Change Username', change_username_user_path(row), current_user.has_tier3_subrole? ? 'ajax' : 'hidden'],
-                                   ['Change Email', change_email_user_path(row), current_user.has_tier3_subrole? ? 'ajax' : 'hidden']
+                                   ['Change Username', change_username_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), current_user.has_tier3_subrole? ? 'ajax' : 'hidden'],
+                                   ['Change Email', change_email_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), current_user.has_tier3_subrole? ? 'ajax' : 'hidden']
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
                              }, :filter => false, :sortable => false
