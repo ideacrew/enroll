@@ -1,0 +1,114 @@
+<%= form_tag(confirm_change_username_user_path, method: :put, id: "changeUsernameForm", class:"form-horizontal", remote: true) do %>
+<%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+<% if user.oim_id.present? %>
+<%= hidden_field_tag :current_oim_id, user.oim_id %>
+<% end %>
+<div class="form-group">
+	<%= label_tag(:oim_id, "New Username", class:"col-sm-5 control-label") %>
+	<div class="col-sm-6">
+		<%= text_field_tag :oim_id, nil, {class:"form-control", onblur:'validateFields()', id:'inputNewUsername'} %>
+		<span id="helpBlock2" class="help-block username-block hidden"></span>
+	</div>
+</div>
+<br />
+<br />
+<div class="form-group">
+	<%= label_tag(:redmine_ticket_number, "Redmine Ticket Number", class:"col-sm-5 control-label") %>
+	<div class="col-sm-6">
+		<%= text_field_tag :redmine_ticket_number, nil, {class:"form-control", onblur:'validateFields()', id:'inputTicketNumber'} %>
+	</div>
+</div>
+<br />
+<br />
+<div class="form-group">
+	<%= label_tag(:reason, "Reason For Change", class:"col-sm-5 control-label") %>
+	<div class="col-sm-6">
+		<%= text_area_tag :reason, nil, {class:"form-control", rows:"3", onblur:'validateFields()', id:'inputReason'} %>
+	</div>
+</div>
+<br />
+<br />
+<div class="form-group">
+	<div class="row">
+		<%= submit_tag "Submit", class:'btn btn-primary', id:'submitUsernameChange' %>
+		<% end %>
+	</div>
+</div>
+
+<script>
+	var validUsername = false;
+	
+	(function() {
+		document.getElementById('submitUsernameChange').classList.add('blocking');
+	})();
+	
+	var currentOptions = {
+		username:String,
+		reason:String,
+		ticketNumber:String,
+		validUsernamePresent:Boolean
+	}
+	
+	function validateFields() {
+		redmineTicketNumber = document.getElementById('inputTicketNumber');
+		username = document.getElementById('inputNewUsername');
+		reason = document.getElementById('inputReason');
+		
+		currentOptions.username = username.value;
+		currentOptions.reason = reason.value;
+		currentOptions.ticketNumber = redmineTicketNumber.value;
+	
+		if (username.value.length && username.value.length >= 8) {
+			validateUsername(username.value)
+		} else {
+			document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
+			document.getElementsByClassName('username-block')[0].classList.remove('hidden');
+			document.getElementsByClassName('username-block')[0].innerHTML = "Username must be at least 8 characters";
+		}
+		
+		if (currentOptions.reason.length && currentOptions.ticketNumber.length && currentOptions.validUsernamePresent == true) {
+			enableSubmit()
+		} else {
+			disableSubmit()
+		}
+	}
+	
+	function validateUsername(username) {
+			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?oim_id='+username.toLowerCase(),{
+				mode: "no-cors",
+				method: 'GET',
+				credentials: "same-origin"
+			})
+			.then((resp) => resp.json())
+			.then(function(data) {
+				if (data.available) {
+					currentOptions.validUsernamePresent = false;
+					document.getElementsByClassName('username-block')[0].innerHTML = "Username is currently taken";
+					invalidUsername()
+				} else {
+					validUn();
+					currentOptions.validUsernamePresent = true;
+				}
+			})
+	}
+	
+	function enableSubmit() {
+		document.getElementById('submitUsernameChange').classList.remove('blocking');
+	}
+	
+	function disableSubmit() {
+		document.getElementById('submitUsernameChange').classList.add('blocking');
+	}
+	
+	function invalidUsername() {
+		document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
+		document.getElementsByClassName('username-block')[0].classList.remove('hidden')
+		validUsername = false;
+	}
+	
+	function validUn() {
+		document.getElementById('inputNewUsername').closest('.form-group').classList.remove('has-error');
+		document.getElementsByClassName('username-block')[0].classList.add('hidden');
+		validUsername = true;
+	}
+</script>
