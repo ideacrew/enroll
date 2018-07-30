@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :confirm_existing_password, only: [:change_password]
+  before_filter :set_user, except: [:confirm_lock, :change_username, :change_email]
 
   def confirm_lock
     params.permit!
@@ -9,7 +10,6 @@ class UsersController < ApplicationController
 
   def lockable
     authorize User, :lockable?
-    @user = User.find(params[:id])
     @user.lock!
     redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User #{user.email} is successfully #{user.lockable_notice}."
   rescue Pundit::NotAuthorizedError
@@ -23,7 +23,6 @@ class UsersController < ApplicationController
   end
 
   def confirm_reset_password
-    @user = User.find(params[:id])
     authorize User, :reset_password?
     @error = nil
     validate_email if params[:user].present?
@@ -49,13 +48,12 @@ class UsersController < ApplicationController
   end
   
   def change_username
+    authorize User, :change_username_and_email?
     @user_id = params[:user_action_id]
   end
   
   def confirm_change_username
-    params.permit!
     authorize User, :change_username_and_email?
-    @user = User.find(params[:id])
     @user.oim_id = params[:oim_id]
     if @user.save!
       redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Username was changed to #{user.oim_id}."
@@ -65,13 +63,12 @@ class UsersController < ApplicationController
   end
   
   def change_email
+    authorize User, :change_username_and_email?
     @user_id = params[:user_action_id]
   end
   
   def confirm_change_email
-    params.permit!
     authorize User, :change_username_and_email?
-    @user = User.find(params[:id])
     @user.email = params[:new_email]
     if @user.save!
       redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Successfully updated the email address"
@@ -85,7 +82,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find(params[:id])
     @user.update_attributes(email_update_params)
   end
 
@@ -94,6 +90,7 @@ class UsersController < ApplicationController
   end
   
   def check_for_existing_username_or_email
+    authorize User, :change_username_and_email?
     if params[:email]
       user = User.where(email:params[:email]).first
     elsif params[:oim_id]
@@ -114,10 +111,6 @@ class UsersController < ApplicationController
     params.require(:user).permit(:email)
   end
   
-  def email_or_username_params
-    params.require(:user).permit(:email, :oim_id, :redmine_ticket_number, :request_reason)
-  end
-
   def validate_email
      @error = if params[:user][:email].blank?
                'Please enter a valid email'
@@ -128,6 +121,10 @@ class UsersController < ApplicationController
   
   def user
     @user ||= User.find(params[:id])
+  end
+  
+  def set_user
+     @user = User.find(params[:id])
   end
   
   def confirm_existing_password
