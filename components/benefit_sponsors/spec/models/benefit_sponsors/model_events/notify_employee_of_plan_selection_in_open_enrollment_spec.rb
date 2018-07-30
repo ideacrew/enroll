@@ -45,8 +45,20 @@ module BenefitSponsors
       employee_role.update_attributes(census_employee_id: census_employee.id)
     end
 
-    describe "NoticeTrigger" do
-      context "when employee selects coverage in Open Enrollment" do
+    describe "when employee selects coverage in Open Enrollment" do
+      context "ModelEvent" do
+        it "should trigger model event" do
+          model_instance.class.observer_peers.keys.each do |observer|
+            expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+              expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
+              expect(model_event).to have_attributes(:event_key => :application_coverage_selected, :klass_instance => model_instance, :options => {})
+            end
+          end
+          model_instance.select_coverage!
+        end
+      end
+
+      context "NoticeTrigger" do
         subject { BenefitSponsors::Observers::HbxEnrollmentObserver.new }
         let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:application_coverage_selected, model_instance, {}) }
 

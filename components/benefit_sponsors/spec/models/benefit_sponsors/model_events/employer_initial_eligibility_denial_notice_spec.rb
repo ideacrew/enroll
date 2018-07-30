@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice', dbclean: :after_each  do
+RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice', dbclean: :after_each  do
   let(:notice_event) { "employer_initial_eligibility_denial_notice" }
 
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
@@ -45,7 +45,7 @@ describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice',
             expect(model_event).to have_attributes(:event_key => :ineligible_application_submitted, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.submit_for_review
+        model_instance.submit_for_review!
       end
     end
 

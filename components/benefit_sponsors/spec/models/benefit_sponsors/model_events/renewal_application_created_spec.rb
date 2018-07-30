@@ -5,36 +5,15 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:current_effective_date)  { TimeKeeper.date_of_record }
 
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization_with_hbx_profile)  { site.owner_organization }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:employer_profile)    { organization.employer_profile }
-  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_market) { site.benefit_markets.first }
-  let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                  benefit_market: benefit_market,
-                                  title: "SHOP Benefits for #{current_effective_date.year}",
-                                  application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                }
-  let!(:model_instance) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, 
-      aasm_state: "draft", 
-      benefit_sponsorship: benefit_sponsorship
-      )
-    application.benefit_sponsor_catalog.save!
-    application
-  }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_renewal_draft_application, site: site) }
+  let(:employer_profile) { organization.employer_profile }
+  let(:benefit_sponsorship) { employer_profile.active_benefit_sponsorship }
+  let!(:model_instance) { benefit_sponsorship.renewal_benefit_application }
 
-  # let!(:renewing_benefit_application) {
-  #   application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, 
-  #     aasm_state: "draft", 
-  #     benefit_sponsorship: benefit_sponsorship
-  #     )
-  #   application.predecessor = model_instance
-  #   application.benefit_packages.first.predecessor = model_instance.benefit_packages.first
-  #   application.benefit_sponsor_catalog.save!
-  #   application
-  # }
+  before do
+    model_instance.update_attributes(:effective_period =>  start_on..(start_on + 1.year) - 1.day)
+  end
 
   describe "when renewal application created" do
     context "ModelEvent" do
@@ -85,6 +64,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
       ]
     }
 
+    let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
@@ -95,8 +75,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
 
     let(:soft_dead_line) { Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.application_submission_soft_deadline) }
 
-    context "when notice event received" do
-
+    context "when notice event delivered" do
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
 
       before do
@@ -106,19 +85,37 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
         model_instance.save
       end
 
-      it "should build the data elements for the notice" do
-        merge_model = subject.construct_notice_object
-
+      it "should retrun merge mdoel" do
         expect(merge_model).to be_a(recipient.constantize)
+      end
+
+      it "should return the date of the notice" do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      end
+
+      it "should return employer name" do
         expect(merge_model.employer_name).to eq employer_profile.legal_name
-        expect(merge_model.benefit_application.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-        expect(merge_model.benefit_application.renewal_py_submit_soft_due_date).to eq soft_dead_line.strftime('%m/%d/%Y')
-        expect(merge_model.benefit_application.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
-        expect(merge_model.broker_present?).to be_falsey
+      end
+
+      it "should return current plan year start_date" do
         expect(merge_model.benefit_application.current_py_start_on).to eq model_instance.start_on.prev_year
-        expect(merge_model.benefit_application.renewal_py_start_on).to eq model_instance.start_on
       end 
+
+      it "should return renewal plan_year start_date" do
+        expect(merge_model.benefit_application.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
+      end
+
+      it "should return renewal plan_year soft_dead_line" do
+        expect(merge_model.benefit_application.renewal_py_submit_soft_due_date).to eq soft_dead_line.strftime('%m/%d/%Y')
+      end
+
+      it "should return renewal plan_year open_enrollment_end_date" do
+        expect(merge_model.benefit_application.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
+      end
+
+      it "should return false when there is no broker linked to employer" do
+        expect(merge_model.broker_present?).to be_falsey
+      end
     end
   end
 end

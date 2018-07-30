@@ -3,20 +3,34 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
   let(:notice_event)  { "welcome_notice_to_employer" }
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:model_instance)    { organization.employer_profile }
+  let!(:model_instance)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:employer_profile)    { model_instance.employer_profile }
   let(:person){ create :person}
 
-  describe "NoticeTrigger" do
-    context "when ER successfully creates account" do
+  describe "when ER successfully creates account" do
+    context "ModelEvent" do
+      it "should trigger model event" do
+        model_instance.class.observer_peers.keys.each do |observer|
+          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+            expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
+            expect(model_event).to have_attributes(:event_key => :welcome_notice_to_employer, :klass_instance => model_instance, :options => {})
+          end
+        end
+        model_instance.notify_on_create
+      end
+    end
+
+    context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::OrganizationObserver.new }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:welcome_notice_to_employer, model_instance, {}) }
+
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.welcome_notice_to_employer"
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        subject.notifier.deliver(recipient: model_instance, event_object: model_instance, notice_event: notice_event)
+        subject.notifications_send(model_instance, model_event)
       end
     end
   end
@@ -33,13 +47,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {
         "event_object_kind" => "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile",
-        "event_object_id" => model_instance.id
+        "event_object_id" => employer_profile.id
     } }
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
 
     before do
-      allow(subject).to receive(:resource).and_return(model_instance)
+      allow(subject).to receive(:resource).and_return(employer_profile)
       allow(subject).to receive(:payload).and_return(payload)
     end
 
@@ -52,7 +66,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     end
 
     it "should return employer name" do
-      expect(merge_model.employer_name).to eq model_instance.legal_name
+      expect(merge_model.employer_name).to eq employer_profile.legal_name
     end
   end
 end

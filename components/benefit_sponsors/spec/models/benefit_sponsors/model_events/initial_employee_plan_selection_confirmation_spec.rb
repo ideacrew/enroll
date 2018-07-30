@@ -57,22 +57,23 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
   }
 
   before do
-    employee_role.update_attributes(census_employee_id: census_employee.id)
-    benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id, benefit_group_id: benefit_group.id)
+    benefit_sponsorship.update_attributes!(aasm_state: 'initial_enrollment_closed')
+    employee_role.update_attributes!(census_employee_id: census_employee.id)
+    benefit_group_assignment.update_attributes!(hbx_enrollment_id: hbx_enrollment.id, benefit_group_id: benefit_group.id)
   end
 
   describe "Plan selection confirmation when ER made binder payment" do
-    # context "ModelEvent" do
-    #   it "should trigger model event" do
-    #     hbx_enrollment.class.observer_peers.keys.each do |observer|
-    #       expect(observer).to receive(:notifications_send) do |instance, model_event|
-    #         expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
-    #         expect(model_event).to have_attributes(:event_key => :application_coverage_selected, :klass_instance => hbx_enrollment, :options => {})
-    #       end
-    #     end
-    #     hbx_enrollment.select_coverage!
-    #   end
-    # end
+    context "ModelEvent" do
+      it "should set to true after transition" do
+        benefit_sponsorship.class.observer_peers.keys.each do |observer|
+          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+            expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
+            expect(model_event).to have_attributes(:event_key => :initial_employee_plan_selection_confirmation, :klass_instance => benefit_sponsorship, :options => {})
+          end
+        end
+        benefit_sponsorship.credit_binder!
+      end
+    end
 
     context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::BenefitSponsorshipObserver.new }
