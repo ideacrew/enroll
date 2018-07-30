@@ -263,7 +263,7 @@ module BenefitSponsors
       end
 
       def current_month_invoice
-        documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+        documents.select{ |document| ["invoice", "initial_invoice"].include?(document.subject) && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
       end
 
       def find_plan_year_by_effective_date(target_date)
