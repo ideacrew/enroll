@@ -50,7 +50,34 @@ module BenefitSponsors
      it "should fail rule validation" do
       expect(policy.is_satisfied?(benefit_application)).to eq false
     end
- end
+  end
+
+  context 'rule within_last_day_to_publish' do
+    let!(:benefit_application) { double('BenefitApplication', last_day_to_publish: last_day_to_publish, start_on: last_day_to_publish) }
+    let!(:rule) { subject.business_policies.values[1].rules[7] }
+
+    context 'fail' do
+      let!(:last_day_to_publish) { Time.now - 1.day }
+      before do
+        TimeKeeper.any_instance.stub(:date_of_record).and_return(Time.now)
+      end
+
+      it "should fail rule validation" do
+        expect(rule.fail.call(benefit_application)).to eq "Plan year failed to published, Plan year starting on #{last_day_to_publish.to_date} must be published by #{last_day_to_publish.to_date}"
+      end
+    end
+
+    context 'success' do
+      let!(:last_day_to_publish) { Time.now + 1.day }
+      before do
+        TimeKeeper.any_instance.stub(:date_of_record).and_return(Time.now)
+      end
+
+      it "should validate successfully" do
+        expect(rule.success.call(benefit_application)).to eq("Plan year was published before #{benefit_application.last_day_to_publish} on #{Time.now} ")
+      end
+    end
+  end
 
   end
 end
