@@ -8,20 +8,36 @@ RSpec.shared_examples "a carrier service area" do |attributes|
   end
 end
 
-RSpec.describe 'Carrier Service Area Imports', :type => :task do
+RSpec.describe 'Service Area Imports', :type => :task do
+
+  before :all do
+
+    glob_pattern = Dir.glob(File.join(Rails.root, "db/seedfiles/cca/fixtures/issuer_profile_*.yaml"))
+    Dir.glob(glob_pattern).each do |f_name|
+      loaded_class = ::BenefitSponsors::Organizations::ExemptOrganization
+      loaded_class_2 = ::BenefitSponsors::Organizations::IssuerProfile
+      yaml_str = File.read(f_name)
+      data = YAML.load(yaml_str)
+      data.new_record = true
+      data.save!
+    end
+
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/cca/fixtures/locations/county_zips", "**", "*.yaml"))
+    files.each do |f_name|
+      loaded_class = ::BenefitMarkets::Locations::CountyZip
+      yaml_str = File.read(f_name)
+      data = YAML.load(yaml_str)
+      data.new_record = true
+      data.save!
+    end
+
+    Rake.application.rake_require 'tasks/migrations/load_service_area_data'
+    Rake::Task.define_task(:environment)
+    create(:rating_area, county_name: 'Suffolk', zip_code: '10010')
+    invoke_task
+  end
 
   context "service_area:update_service_area" do
-
-    before :all do
-      DatabaseCleaner.clean
-      Rake.application.rake_require 'tasks/migrations/load_service_area_data'
-      Rake::Task.define_task(:environment)
-      create(:rating_area, county_name: 'Suffolk', zip_code: '10010')
-      invoke_task
-    end
-    after :all do
-      DatabaseCleaner.clean
-    end
 
     let!(:imported_areas) { CarrierServiceArea.all }    
 
@@ -84,11 +100,50 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
         expect(subject.count).to eq 51
       end
     end
+  end
 
-    private
+  context "service_area:update_service_areas_new_model" do
 
-    def invoke_task
-      Rake.application.invoke_task("load_service_reference:update_service_areas[#{Rails.root}/spec/test_data/plan_data/service_areas/2017/SHOP_SA_BMCHP.xlsx]")
+    let!(:imported_areas) { BenefitMarkets::Locations::ServiceArea.all }
+
+    context "it creates ServiceArea elements correctly, for the elements that server entire state" do
+      subject { imported_areas.where(:covered_states => "MA").first }
+
+      it_should_behave_like "a carrier service area", {
+                                                        active_year: 2017,
+                                                        issuer_provided_title: 'BMC HealthNet Plan Select Network',
+                                                        covered_states: ["MA"],
+                                                        county_zip_ids: nil,
+                                                        issuer_provided_code: "MAS001",
+                                                      }
+    end
+
+    context "for elements that serve partial state but total county" do
+      let!(:county_zip) {BenefitMarkets::Locations::CountyZip.all.where(county_name: "Worcester", zip: "01517", state: "MA")}
+      subject { imported_areas.where(:county_zip_ids.in => [county_zip.first.id]).first }
+      it_should_behave_like "a carrier service area", {
+                                                        active_year: 2017,
+                                                        issuer_provided_title: 'BMC HealthNet Plan Silver Network',
+                                                        issuer_provided_code: 'MAS002'
+                                                      }
+    end
+
+    context "it created the correct number of service areas" do
+      it "created many service areas for each imported zip code" do
+        expect( imported_areas.count ).to eq 19
+      end
     end
   end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
+end
+
+private
+
+def invoke_task
+  file = "#{Rails.root}/spec/test_data/plan_data/service_areas/2017/SHOP_SA_BMCHP.xlsx"
+  Rake.application.invoke_task("load_service_reference:update_service_areas[#{file}]")
+  Rake.application.invoke_task("load_service_reference:update_service_areas_new_model[#{file}]")
 end
