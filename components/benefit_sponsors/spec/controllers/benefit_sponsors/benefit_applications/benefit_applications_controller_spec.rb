@@ -283,7 +283,7 @@ module BenefitSponsors
         it "should redirect with errors" do
           sign_in user
           xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
-          expect(flash[:error]).to match(/Benefit Application failed to submit/)
+          expect(flash[:error]).to match(/Plan Year failed to published/)
         end
       end
     end

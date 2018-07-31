@@ -63,7 +63,7 @@ module BenefitSponsors
       end
 
       it "should fail rule validation" do
-        expect(rule.fail.call(benefit_application)).to eq "Plan year failed to published, Plan year starting on #{last_day_to_publish.to_date} must be published by #{last_day_to_publish.to_date}"
+        expect(rule.fail.call(benefit_application)).to eq "Plan year starting on #{last_day_to_publish.to_date} must be published by #{last_day_to_publish.to_date}"
       end
     end
 
