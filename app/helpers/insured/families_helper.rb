@@ -75,7 +75,7 @@ module Insured::FamiliesHelper
     }
 
     if qle.tool_tip.present?
-      data.merge!(toggle: 'tooltip', placement: index > 1 ? 'top' : 'bottom')
+      data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom')
       options.merge!(data: data, title: qle.tool_tip)
     else
       options.merge!(data: data)
