@@ -40,7 +40,7 @@
             td.benefit-group-heading Plans By
           tr
             td = sb.reference_product.metal_level.titleize
-            td = sb.product_package_kind.to_s.humanize.capitalize
+            td = selected_benefit_plan(sb.product_package_kind)
             / Health plan collapsible: start
         .collapse id="collapse#{sb.product_kind.downcase}"
           = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }
