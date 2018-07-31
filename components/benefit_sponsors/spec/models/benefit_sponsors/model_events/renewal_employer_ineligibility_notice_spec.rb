@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied', dbclean: :after_each do
+RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice', dbclean: :after_each do
 
   let(:model_event) { "application_denied" }
-  let(:notice_event) { "initial_employer_application_denied" }
+  let(:notice_event) { "renewal_employer_ineligibility_notice" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -12,10 +12,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
   let!(:model_instance) { FactoryGirl.create(:benefit_sponsors_benefit_application,
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_closed',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
+    :aasm_state => 'enrollment_closed'
   )}
 
+  before do
+    allow(model_instance).to receive(:is_renewing?).and_return(true)
+  end
 
   describe "ModelEvent" do
     context "when initial employer application is denied" do
@@ -39,12 +41,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
 
       it "should trigger model event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
+          expect(event_name).to eq "acapi.info.events.employer.renewal_employer_ineligibility_notice"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-
         subject.notifications_send(model_instance,model_event)
       end
     end
@@ -56,8 +57,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
       [
           "employer_profile.notice_date",
           "employer_profile.employer_name",
-          "employer_profile.benefit_application.current_py_oe_start_date",
-          "employer_profile.benefit_application.current_py_start_date",
+          "employer_profile.benefit_application.renewal_py_start_date",
+          "employer_profile.benefit_application.current_py_end_date",
+          "employer_profile.benefit_application.renewal_py_oe_end_date",
           "employer_profile.benefit_application.enrollment_errors",
           "employer_profile.broker_present?"
       ]
@@ -85,21 +87,27 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
       it "should return merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end
+
       it "should return notice date" do
         expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
+
       it "should return employer name" do
         expect(merge_model.employer_name).to eq employer_profile.legal_name
       end
-      it "should build return plan year open enrollment start date" do
-        expect(merge_model.benefit_application.current_py_oe_start_date).to eq model_instance.open_enrollment_start_on.strftime('%m/%d/%Y')
+
+       it "should return renewal plan_year open_enrollment_end_date" do
+        expect(merge_model.benefit_application.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
+
       it "should return plan year start date" do
-        expect(merge_model.benefit_application.current_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
+        expect(merge_model.benefit_application.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
       end
+
       it "should return broker status" do
         expect(merge_model.broker_present?).to be_falsey
       end
+
       it "should return enrollment errors" do
         enrollment_errors = []
       enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new

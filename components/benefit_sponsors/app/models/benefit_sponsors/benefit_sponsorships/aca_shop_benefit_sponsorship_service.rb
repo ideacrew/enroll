@@ -86,6 +86,14 @@ module BenefitSponsors
       end
     end
 
+    def mark_initial_ineligible
+      benefit_sponsorship.deny_initial_enrollment_eligibility! if benefit_sponsorship.may_deny_initial_enrollment_eligibility?
+    end
+
+    def auto_cancel_ineligible
+      benefit_sponsorship.cancel! if benefit_sponsorship.may_cancel?      
+    end
+
     def transmit_initial_eligible_event
       notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
     end

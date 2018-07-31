@@ -776,7 +776,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
-        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
+        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES + [:enrollment_ineligible],
           to:     :canceled
       end
 
@@ -808,29 +808,20 @@ module BenefitSponsors
 
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
-
-      begin
-        File.open("benefit_sponsorship_event_subscriber.txt", "a+") do |f|
-          f << "\n---------" + "\n"
-          f << Time.now.getutc.to_s + "\n"
-          f << self.id.to_s + "\n"
-          f << "#{aasm.to_state.to_s}\n"
-          f << "#{aasm.from_state.to_s}\n"
-          f << "#{aasm.current_event.to_s}\n"
-          f << may_approve_enrollment_eligiblity?.to_s + "\n"
-          f << "---------" + "\n"
-        end
-      rescue
-
+      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
+        reverse_enrollment_eligibility!
       end
-
 
       if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
         approve_enrollment_eligiblity!
       end
 
-      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
-        reverse_enrollment_eligibility!
+      if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
+        deny_enrollment_eligiblity!
+      end
+
+      if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
+        cancel! if enrollment_ineligible? && may_cancel?
       end
     end
 

@@ -26,8 +26,8 @@ namespace :employers do
 
       mailing_address = profile.office_locations.where(:"address.kind" => "mailing").first.try(:address)
 
-      if package.present?
-        sb = package.sponsored_benefits[0] # Only Health in CCA
+      if package.present? && package.health_sponsored_benefit.present?
+        sb = package.health_sponsored_benefit # Only Health in CCA
         health_contribution_levels = sb.sponsor_contribution.contribution_levels
         reference_product = sb.reference_product
         application = package.benefit_application
@@ -146,7 +146,7 @@ namespace :employers do
             import_to_csv(csv, profile)
           end
         rescue Exception => e
-          puts "ERROR: #{employer.legal_name} " + e.message
+          puts "ERROR: #{organization.legal_name} " + e.message
         end
       end
 
