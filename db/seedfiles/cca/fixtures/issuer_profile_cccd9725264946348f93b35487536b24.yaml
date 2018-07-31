@@ -1,0 +1,201 @@
+--- &8 !ruby/object:BenefitSponsors::Organizations::ExemptOrganization
+__selected_fields: 
+attributes: &9 !ruby/hash:BSON::Document
+  _id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      W1d/98CdB9xzNUX4
+  _type: BenefitSponsors::Organizations::ExemptOrganization
+  fein: '050513223'
+  site_id: !ruby/object:BSON::ObjectId
+    raw_data: !binary |-
+      WxWP5J+ICzHOaeVu
+  legal_name: Altus
+  hbx_id: cccd9725264946348f93b35487536b24
+  updated_at: 2018-07-24 19:37:27.430000000 Z
+  created_at: 2018-07-24 19:37:27.430000000 Z
+  profiles:
+  - &1 !ruby/hash:BSON::Document
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        W1d/98CdB9xzNUX3
+    contact_method: :paper_and_electronic
+    _type: BenefitSponsors::Organizations::IssuerProfile
+    issuer_hios_ids:
+    - '18076'
+    issuer_state: MA
+    market_coverage: shop (small group)
+    hbx_carrier_id: 20001
+    abbrev: ALT
+    ivl_health: false
+    ivl_dental: false
+    shop_health: false
+    shop_dental: true
+    is_benefit_sponsorship_eligible: false
+    offers_sole_source: false
+    dental_only_plan: false
+    updated_at: 2018-07-24 19:37:27.430000000 Z
+    created_at: 2018-07-24 19:37:27.430000000 Z
+    office_locations:
+    - &2 !ruby/hash:BSON::Document
+      _id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          W1d/98CdB9xzNUX0
+      is_primary: true
+      address: &11 !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            W1d/98CdB9xzNUX1
+        address_1: address_placeholder
+        address_2: address_2
+        address_3: ''
+        county: ''
+        country_name: ''
+        kind: work
+        city: City
+        state: St
+        zip: '10001'
+        updated_at: 2018-07-24 19:37:27.429000000 Z
+        created_at: 2018-07-24 19:37:27.429000000 Z
+      phone: &18 !ruby/hash:BSON::Document
+        _id: !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            W1d/98CdB9xzNUX2
+        kind: main
+        country_code: ''
+        area_code: '111'
+        number: '1111111'
+        extension: ''
+        full_phone_number: '1111111111'
+        updated_at: 2018-07-24 19:37:27.429000000 Z
+        created_at: 2018-07-24 19:37:27.429000000 Z
+new_record: false
+destroyed: false
+embedded: false
+_profiles: &10
+- &3 !ruby/object:BenefitSponsors::Organizations::IssuerProfile
+  __selected_fields: 
+  attributes: *1
+  delayed_atomic_pulls: &4 {}
+  delayed_atomic_unsets: &5 {}
+  new_record: false
+  destroyed: false
+  embedded: true
+  _office_locations: &6
+  - &12 !ruby/object:BenefitSponsors::Locations::OfficeLocation
+    __selected_fields: 
+    attributes: *2
+    __metadata: &13 !ruby/hash:Mongoid::Relations::Metadata
+      :relation: &7 !ruby/class 'Mongoid::Relations::Embedded::Many'
+      :extend: 
+      :inverse_class_name: BenefitSponsors::Organizations::Profile
+      :name: :office_locations
+      :class_name: BenefitSponsors::Locations::OfficeLocation
+      :cascade_callbacks: true
+      :validate: true
+      :autosave: true
+    __parent: *3
+    _profile: &14 !ruby/object:BenefitSponsors::Organizations::IssuerProfile
+      __selected_fields: 
+      attributes: *1
+      delayed_atomic_pulls: *4
+      delayed_atomic_unsets: *5
+      new_record: false
+      destroyed: false
+      embedded: true
+      _office_locations: *6
+      __children: 
+      _inbox: 
+      attributes_before_type_cast: &21
+        is_benefit_sponsorship_eligible: false
+      is_benefit_sponsorship_eligible: false
+      __metadata: &22 !ruby/hash:Mongoid::Relations::Metadata
+        :relation: *7
+        :extend: 
+        :inverse_class_name: BenefitSponsors::Organizations::Organization
+        :name: :profiles
+        :class_name: BenefitSponsors::Organizations::Profile
+        :cascade_callbacks: true
+        :validate: true
+        :autosave: true
+      __parent: *8
+      _organization: &23 !ruby/object:BenefitSponsors::Organizations::ExemptOrganization
+        __selected_fields: 
+        attributes: *9
+        new_record: false
+        destroyed: false
+        embedded: false
+        _profiles: *10
+        persistence_options: 
+      _index: 0
+    _index: 0
+    delayed_atomic_pulls: &15 {}
+    delayed_atomic_unsets: &16 {}
+    new_record: false
+    destroyed: false
+    embedded: true
+    __children: 
+    _address: &17 !ruby/object:BenefitSponsors::Locations::Address
+      __selected_fields: 
+      attributes: *11
+      __metadata: !ruby/hash:Mongoid::Relations::Metadata
+        :relation: &19 !ruby/class 'Mongoid::Relations::Embedded::One'
+        :extend: 
+        :inverse_class_name: BenefitSponsors::Locations::OfficeLocation
+        :name: :address
+        :class_name: BenefitSponsors::Locations::Address
+        :cascade_callbacks: true
+        :validate: true
+        :autosave: true
+      __parent: *12
+      _office_location: !ruby/object:BenefitSponsors::Locations::OfficeLocation
+        __selected_fields: 
+        attributes: *2
+        __metadata: *13
+        __parent: *3
+        _profile: *14
+        _index: 0
+        delayed_atomic_pulls: *15
+        delayed_atomic_unsets: *16
+        new_record: false
+        destroyed: false
+        embedded: true
+        __children: 
+        _address: *17
+        _phone: &20 !ruby/object:BenefitSponsors::Locations::Phone
+          __selected_fields: 
+          attributes: *18
+          __metadata: !ruby/hash:Mongoid::Relations::Metadata
+            :relation: *19
+            :extend: 
+            :inverse_class_name: BenefitSponsors::Locations::OfficeLocation
+            :name: :phone
+            :class_name: BenefitSponsors::Locations::Phone
+            :cascade_callbacks: true
+            :validate: true
+            :autosave: true
+          __parent: *12
+          _office_location: !ruby/object:BenefitSponsors::Locations::OfficeLocation
+            __selected_fields: 
+            attributes: *2
+            __metadata: *13
+            __parent: *3
+            _profile: *14
+            _index: 0
+            delayed_atomic_pulls: *15
+            delayed_atomic_unsets: *16
+            new_record: false
+            destroyed: false
+            embedded: true
+            __children: 
+            _address: *17
+            _phone: *20
+    _phone: *20
+  __children: 
+  _inbox: 
+  attributes_before_type_cast: *21
+  is_benefit_sponsorship_eligible: false
+  __metadata: *22
+  __parent: *8
+  _organization: *23
+  _index: 0
+persistence_options: 
