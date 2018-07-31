@@ -532,4 +532,19 @@ thead {
     font-size: 12px;
     padding: 8px;
   }
- 
+
+  .module {
+    &.broker {
+      .panel-body, .panel-footer {
+        .fa {
+          color: $brand-primary;
+        }
+        .vertically-aligned-row {
+          table-layout: fixed;
+          > * {
+            vertical-align: top;
+          }
+        }
+      }
+    }
+  }
