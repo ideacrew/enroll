@@ -96,8 +96,9 @@ namespace :import do
             # end of old model
 
             # new model
+            product_package_kinds = []
             products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
-            products.each do |plan|
+            products.each do |product|
               product.provider_directory_url = provider_directory_url
               if sheet_name != "2018_QDP"
                 rx_formulary_url = row_info[@headers["rx formulary url"]].strip
@@ -105,10 +106,25 @@ namespace :import do
               end
               product.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               product.network_information = row_info[@headers["network notes"]]
-                product.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
-                product.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
-                product.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
-                product.save
+
+              sole_source_offering = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+              horizontal_offering = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+              vertical_offering = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+
+              if product.product_kind.to_s == "health"
+                if horizontal_offering == true
+                  product_package_kinds << :metal_level
+                end
+                if vertical_offering == true
+                  product_package_kinds << :single_issuer
+                end
+                if sole_source_offering == true
+                  product_package_kinds << :single_product
+                end
+                product.product_package_kinds = product_package_kinds
+              end
+
+              # product.save
             end
             # end of new model
 
