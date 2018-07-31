@@ -26,8 +26,19 @@ namespace :sbc do
         counter += 1
       end
     end
-    puts "Total #{counter} plans exported"
-    puts "CSV written #{file_path} with schema plan.name, plan.hios_id, plan.active_year, plan.sbc_document.identifier key, plan.sbc_document.title"
+
+    file_path = "products-sbcs.csv"
+    products = ::BenefitMarkets::Products::Product.all
+    csv = CSV.open(file_path, "w") do |csv|
+      products.each do |product|
+        next unless product.sbc_document
+        next unless product.sbc_document.identifier
+        csv << [product.title, product.hios_id, product.active_year, product.sbc_document.identifier.split('#').last, product.sbc_document.title]
+        counter += 1
+      end
+    end
+    puts "Total #{counter} products exported"
+    puts "CSV written #{file_path} with schema product.name, product.hios_id, product.active_year, product.sbc_document.identifier key, product.sbc_document.title"
   end
 
   # USAGE rake sbc:export

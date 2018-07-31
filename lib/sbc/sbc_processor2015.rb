@@ -47,6 +47,15 @@ class SbcProcessor2015
         puts "Plan #{plan.name} #{plan.hios_id}updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
       end
     end
-    puts "Total #{counter} plans updated."
+
+    ::BenefitMarkets::Products::Product.all.each do |product|
+      plan = Plan.where(active_year: year, hios_id: product.hios_id).first
+
+      product.sbc_document = plan.sbc_document
+      product.save
+    end
+
+    puts "Total #{counter} plans/products updated."
+
   end
 end
