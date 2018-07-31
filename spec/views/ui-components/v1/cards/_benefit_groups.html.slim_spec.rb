@@ -6,7 +6,7 @@ RSpec.describe "_benefit_groups.html.slim", :type => :view, dbclean: :after_each
 
     let!(:sponsorship) {FactoryGirl.build :benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:benefit_group) {sponsorship.benefit_applications.first.benefit_packages.first}
-    let!(:service) { instance_double("BenefitSponsors::Services::SponsoredBenefitCostEstimationService")}
+    let!(:service) {instance_double("BenefitSponsors::Services::SponsoredBenefitCostEstimationService")}
     let(:estimator) {
       {
           :estimated_total_cost => 619.00,
@@ -14,7 +14,7 @@ RSpec.describe "_benefit_groups.html.slim", :type => :view, dbclean: :after_each
           :estimated_enrollee_maximum => 60.00
       }
     }
-    let!(:issuer_profile ) { BenefitSponsors::Organizations::IssuerProfile.new}
+    let!(:issuer_profile) {BenefitSponsors::Organizations::IssuerProfile.new}
 
     before :each do
       allow(BenefitSponsors::Organizations::IssuerProfile).to receive(:find).and_return issuer_profile
