@@ -171,7 +171,7 @@ module BenefitSponsors
         prior_month = effective_date - 1.month
         plan_year_start_on = effective_date
         plan_year_end_on = effective_date + 1.year - 1.day
-        employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
+        employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
         employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
         employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}").to_date
         open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
