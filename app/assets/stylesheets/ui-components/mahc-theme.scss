@@ -533,3 +533,6 @@ thead {
     padding: 8px;
   }
  
+.pagination > .active > a {
+  background:$mhc-blue;
+}
