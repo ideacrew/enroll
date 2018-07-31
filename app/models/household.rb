@@ -50,10 +50,6 @@ class Household
     active_hbx_enrollments.reject { |en| !HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) }
   end
 
-  def latest_created_hbx_enrollment
-    hbx_enrollments.sort_by(&:created_at).last
-  end
-
   def renewing_individual_market_hbx_enrollments
     renewing_hbx_enrollments.reject { |en| en.enrollment_kind != 'individual' }
   end
