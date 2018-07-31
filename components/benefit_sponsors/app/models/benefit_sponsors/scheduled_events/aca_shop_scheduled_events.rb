@@ -15,6 +15,8 @@ module BenefitSponsors
         @new_date = new_date
         shop_daily_events
         auto_submit_renewal_applications
+        process_applications_missing_binder_payment
+        auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
       end
@@ -80,6 +82,30 @@ module BenefitSponsors
         end
       end
 
+      def process_applications_missing_binder_payment
+        application_effective_date = new_date.next_month.beginning_of_month
+        scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        binder_next_day = scheduler.calculate_open_enrollment_date(application_effective_date)[:binder_payment_due_date].next_day
+
+        if new_date == binder_next_day
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_transition_as_initial_ineligible?(application_effective_date)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :mark_initial_ineligible)
+          end
+        end
+      end
+
+      def auto_cancel_ineligible_applications
+        if new_date.mday == 1
+          benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_cancel_ineligible_application?(new_date)
+
+          benefit_sponsorships.each do |benefit_sponsorship|
+            execute_sponsor_event(benefit_sponsorship, :auto_cancel_ineligible)
+          end
+        end
+      end
+
       def auto_submit_renewal_applications
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           effective_on = new_date.next_month.beginning_of_month
@@ -105,12 +131,18 @@ module BenefitSponsors
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
         
         benefit_sponsors.may_transmit_renewal_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          rescue Exception => e 
+          end
         end
 
         benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          rescue Exception => e 
+          end
         end
       end
 

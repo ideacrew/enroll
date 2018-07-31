@@ -11,7 +11,6 @@
 //= require ./datepicker
 //= require ./sliders
 //= require ./validators
-//= require ./fontawesome
 //= require ./mask_inputs
 //= require ./datepickerForInputs
 
