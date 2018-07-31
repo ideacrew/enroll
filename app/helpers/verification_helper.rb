@@ -75,7 +75,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.unverified_no_docs?}.any?
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
   end
 
   def verification_needed?(person)
@@ -93,7 +93,7 @@ module VerificationHelper
   end
 
   def can_show_due_date?(person)
-    enrollment_group_unverified?(person)
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| VerificationType::DUE_DATE_STATES.include?(type.validation_status)}.any?
   end
 
   def documents_uploaded

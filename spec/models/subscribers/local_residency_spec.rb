@@ -13,40 +13,32 @@ describe Subscribers::LocalResidency do
     let(:xml_hash2) { {residency_verification_response: 'ADDRESS_IN_AREA'} }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
+    let(:history_elements_DC) {consumer_role.verification_types.by_name("DC Residency").first.type_history_elements}
 
     let(:response_data) { Parsers::Xml::Cv::ResidencyVerificationResponse.parse(xml).to_hash }
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
     context "stores Local Hub response in verification history" do
       it "stores verification history element" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.count).to be > 0
+        expect(history_elements_DC.count).to be > 0
       end
 
       it "stores verification history element for right verification type" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(consumer_role.verification_type_history_elements.first.verification_type).to eq "DC Residency"
+        expect(history_elements_DC.first.action).to eq "Local Hub Response"
       end
 
       it "stores reference to EventResponse in verification history element" do
-        consumer_role.verification_type_history_elements.delete_all
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
         expect(BSON::ObjectId.from_string(
-            consumer_role.verification_type_history_elements.first.event_response_record_id
-        )).to eq consumer_role.local_residency_responses.first.id
-      end
-
-      it "stores details as string in verification history element" do
-        consumer_role.verification_type_history_elements.delete_all
-        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
-        subject.call(nil, nil, nil, nil, payload)
-        expect(BSON::ObjectId.from_string(
-            consumer_role.verification_type_history_elements.first.event_response_record_id
+            history_elements_DC.first.event_response_record_id
         )).to eq consumer_role.local_residency_responses.first.id
       end
     end

@@ -22,11 +22,10 @@ module Subscribers
         consumer_role = person.consumer_role
         event_response_record = EventResponse.new({received_at: Time.now, body: xml})
         consumer_role.local_residency_responses << event_response_record
-        consumer_role.add_type_history_element(verification_type: "DC Residency",
-                                               action: "Local Hub response",
-                                               modifier: "external Hub",
-                                               update_reason: "Hub response",
-                                               event_response_record_id: event_response_record.id)
+        person.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Response",
+                                                                                         modifier: "external Hub",
+                                                                                         update_reason: "Hub response",
+                                                                                         event_response_record_id: event_response_record.id)
 
         if "503" == return_status.to_s
           consumer_role.deny_residency!
