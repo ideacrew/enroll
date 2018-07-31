@@ -68,6 +68,10 @@ module BenefitSponsors
       "Employers offering coverage through #{site_short_name} for the first time must have an open enrollment period of no less than 14 days. Employers renewing their #{site_short_name} coverage must have an open enrollment period of at least 30 days."
     end
 
+    def plan_shop_coverage_tip_helper
+      "Employers can begin shopping for coverage on #{site_short_name} up to #{site_initial_earliest_start_prior_to_effective_on} months prior to the desired coverage effective date."
+    end
+
     def find_and_sort_inbox_messages(provider, folder)
       provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
     end
