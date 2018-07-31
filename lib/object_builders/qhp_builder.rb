@@ -260,22 +260,16 @@ class QhpBuilder
               csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
               application_period: (Date.new(@plan_year, 1, 1)..Date.new(@plan_year, 12, 31)),
               service_area_id: mapped_service_area_id,
-              # provider_directory_url: plan.provider_directory_url, # pending will be done in common rake task
               # sbc_document: plan.sbc_document, # pending
               deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
               family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
               is_reference_plan_eligible: true,
-              # premium_ages: (plan.minimum_age..plan.maximum_age), # pending, will be done in rate_builder.rb
-              # premium_tables: premium_tables,# pending, will be done in rate_builder.rb
-              # issuer_assigned_id: plan.carrier_special_plan_identifier # pending will be done in common rake task
             }
             if is_health_product?
               new_product = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
                 health_plan_kind: @qhp.plan_type.downcase,
                 metal_level_kind: parse_metal_level.to_sym,
-                # product_package_kinds: product_package_kinds, pending, will be done in common rake task
                 ehb: set_ehb,
-                # is_standard_plan: plan.is_standard_plan, pending will be done in common rake task
               }.merge(shared_attributes))
             else
               new_product = ::BenefitMarkets::Products::DentalProducts::DentalProduct.new({
