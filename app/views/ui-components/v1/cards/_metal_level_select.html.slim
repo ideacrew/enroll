@@ -105,7 +105,7 @@
 
       .modal-footer
         .pull-left
-          a href="/" id="sbcLink"
+          a href="/" id="sbcLink" target="_blank"
             i.far.fa-file-pdf.fa-2x.mr-1
             | Summary of Benefits and Coverage
         .pull-right
@@ -201,7 +201,7 @@ javascript:
               <span class="plan-label">Level:</span> <span class="rp-plan-info">${plan.metal_level_kind}</span><br>
               <span class="plan-label">Network:</span> <span class="rp-plan-info">${network}</span><br>
               <span class="plan-label mt-1 rp-view-summary" onclick="viewSummary(this)" data-plan-title="${plan.title}" data-plan-id="${plan.id}">View Summary</span><br>
-              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="displayReferencePlanDetails(this)" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
+              <input type="radio" name="benefit_package[sponsored_benefits_attributes][0][reference_plan_id]" id="${plan.id}" onclick="newContributionAmounts()" value="${plan.id}" data-plan-title="${plan.title}" data-plan-carrier="${plan.carrier_name}" data-plan-id="${plan.id}" data-plan-metal-level="${plan.metal_level_kind}" data-plan-type="${plan.health_plan_kind}">
               <span class="checkmark"></span>
             </label>
           </div>
@@ -214,6 +214,7 @@ javascript:
     setTimeout(function() {
       buildSponsorContributions(sponsorContribution)
       disableEmployeeContributionLevel();
+      newContributionAmounts();
     },400);
   }
 
@@ -255,6 +256,9 @@ javascript:
   }
 
   function displayReferencePlanDetails(element, options) {
+    if(!(element || options)) {
+      return
+    }
     options = options || {};
     planTitle = options.planTitle || element.dataset.planTitle;
     metalLevel = options.metalLevel || element.dataset.planMetalLevel;
@@ -413,8 +417,10 @@ javascript:
       disableNewPlanYearButton()
     } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
       disableNewPlanYearButton()
+    } else if (!(document.querySelectorAll(".reference-plans input[type='radio']:checked").length)) {
+			disableNewPlanYearButton()
     } else {
-			enableNewPlanYearButton()
+      enableNewPlanYearButton()
     }
     displayReferencePlanDetails(document.querySelector("input[name='benefit_package[sponsored_benefits_attributes][0][reference_plan_id]']:checked"));
   }
@@ -498,4 +504,16 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
+		
+- if show_benefit_application_tile == "true"
+	javascript:
+		(function() {
+		setTimeout(function() {
+			document.getElementById('submitBenefitPackage').innerHTML = "Save Plan Year";
+		},200)
+		})();
+
+			
+
+		
 

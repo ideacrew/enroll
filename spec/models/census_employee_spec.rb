@@ -2126,4 +2126,104 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       expect(census_employee.send(:has_no_hbx_enrollments?)).to eq false
     end
   end
+
+  describe "#benefit_package_for_date", dbclean: :after_each do
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:employer_profile) { organization.employer_profile }
+    let(:benefit_sponsorship) { organization.active_benefit_sponsorship }
+    let(:imported_application) { benefit_sponsorship.benefit_applications.where(:"aasm_state" => :imported).first }
+    let(:active_application) { benefit_sponsorship.benefit_applications.where(:"aasm_state" => :active).first }
+    let(:renewal_application) { benefit_sponsorship.benefit_applications.where(:"aasm_state".ne => :imported).first }
+    let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
+      employer_profile: employer_profile,
+      benefit_sponsorship: benefit_sponsorship
+    }
+
+    before do
+      census_employee.save
+    end
+
+    context "when ER has imported and renewal benefit applications" do
+
+      let(:organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_cca_employer_profile_imported_and_renewal_application,
+        site: site
+      )}
+
+      it "should return nil if given effective_on date is in imported benefit application" do
+        coverage_date = imported_application.end_on - 1.month
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
+      end
+
+      it "should return renewal benefit_packages if given effective_on date is in renewal benefit application" do
+        coverage_date = renewal_application.start_on
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
+      end
+    end
+
+    context "when ER has active and renewal benefit applications" do
+
+      let(:organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_cca_employer_profile_renewal_application,
+        site: site
+      )}
+
+      it "should return active benefit_package if given effective_on date is in active benefit application" do
+        coverage_date = active_application.end_on - 1.month
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq active_application.benefit_packages.first
+      end
+
+      it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
+        coverage_date = renewal_application.start_on
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
+      end
+    end
+
+    context "when ER has imported, mid year conversion and renewal benefit applications" do
+
+      let(:organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_cca_employer_profile_imported_and_renewal_application,
+        site: site
+      )}
+
+      let(:myc_application) { FactoryGirl.build(:benefit_sponsors_benefit_application,
+        :with_benefit_package,
+        benefit_sponsorship: benefit_sponsorship,
+        aasm_state: :active,
+        default_effective_period: ((imported_application.end_on - 2.months).next_day..imported_application.end_on),
+        default_open_enrollment_period: ((imported_application.end_on - 1.year).next_day - 1.month..(imported_application.end_on - 1.year).next_day - 15.days)
+      )}
+
+      before do
+        benefit_sponsorship.benefit_applications << myc_application
+        benefit_sponsorship.save
+      end
+
+      it "should return nil if given effective_on date is in imported benefit application" do
+        coverage_date = imported_application.start_on + 1.month
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
+      end
+
+      it "should return mid year benefit_package if given effective_on date is in both imported & mid year benefit application" do
+        coverage_date = myc_application.start_on
+        census_employee.benefit_group_assignments.build(
+          benefit_package_id: myc_application.benefit_packages.first.id,
+          is_active: true,
+          start_on: myc_application.start_on
+        )
+        census_employee.save
+        census_employee.benefit_group_assignments.where(:"benefit_package_id".in => imported_application.benefit_packages.map(&:id)).each do |bga|
+          # when there is both MYC & Imported Plan years, is_active for imported plan year's bga's should be false
+          # to allow plan shop through myc plan years
+          bga.update_attributes(is_active: false)
+        end
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq myc_application.benefit_packages.first
+      end
+
+      it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
+        coverage_date = renewal_application.start_on
+        expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
+      end
+    end
+  end
 end

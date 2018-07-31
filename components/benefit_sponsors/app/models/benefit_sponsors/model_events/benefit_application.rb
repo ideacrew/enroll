@@ -9,13 +9,12 @@ module BenefitSponsors
         :ineligible_application_submitted,
         :employer_open_enrollment_completed,
         :application_denied,
-        :group_advance_termination_confirmation,
+        :renewal_application_created,
+        :renewal_application_autosubmitted,
 
         # :renewal_enrollment_confirmation,
-        # :renewal_application_created,
         # :renewal_application_submitted,
         # :ineligible_renewal_application_submitted,
-        # :renewal_application_autosubmitted,
         # :open_enrollment_began, #not being used
         # :renewal_application_denied,
         # :zero_employees_on_roster,
@@ -31,6 +30,10 @@ module BenefitSponsors
           :initial_employer_first_reminder_to_publish_plan_year,
           :initial_employer_second_reminder_to_publish_plan_year,
           :initial_employer_final_reminder_to_publish_plan_year
+      ]
+
+      OTHER_EVENTS = [
+        :group_advance_termination_confirmation
       ]
 
       # Events triggered by state changes on individual instances
@@ -102,6 +105,30 @@ module BenefitSponsors
             end
           end
 
+        end
+      end
+
+      def notify_on_create
+        if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
+          is_renewal_application_created = true
+        end
+
+        REGISTERED_EVENTS.each do |event|
+          begin
+            if event_fired = instance_eval("is_" + event.to_s)
+              event_options = {}
+              notify_observers(ModelEvent.new(event, self, event_options))
+            end
+          rescue Exception => e
+            Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
+          end
+        end
+      end
+
+      def trigger_model_event(event_name, event_options = {})
+        if OTHER_EVENTS.include?(event_name)
+          BenefitSponsors::BenefitApplications::BenefitApplication.add_observer(BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send])
+          notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end
 

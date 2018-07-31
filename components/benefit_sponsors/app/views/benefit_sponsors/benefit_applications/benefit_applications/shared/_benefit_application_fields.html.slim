@@ -12,14 +12,14 @@ h1.heading-text Add Benefit Package
       .col-md-6.col-sm-12
         = f.text_field :end_on, class: "form-control", required: true, placeholder: 'END ON', readonly: true
 .row.pl-1
-  h3 Select your open enrollment dates
+  h3.mr-1 Select your open enrollment dates
   h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_tool_tip_helper
   .col-md-12.col-sm-12.col-xs-12.p0
     .row.row-form-wrapper#uic-wrapper
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control interaction-field-control-plan_year-open_enrollment_start_on", required: true, :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "" , placeholder: 'OPEN ENROLLMENT START DATE'
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : ""
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE'
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')"
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -47,8 +47,7 @@ javascript:
   }
   
   function setDueDates(id,newvalue) {
-    var s = document.getElementById(id);
-    s.innerHTML = newvalue;
+		document.getElementById(id).innerText = newvalue;
   }
   
   function resetInputOptions() {
@@ -85,6 +84,8 @@ javascript:
     setDueDates('benefit_application_latest_submitted_on_month', monthName[submitByMonth-1]);
     setDueDates('binder_payment_deadline_day', new Date(binder_payment_deadline).getDate()+1);
     setDueDates('binder_payment_deadline_month', monthName[deadlineMonth-1]);
+		dateOptions.oeStartOn = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
+		dateOptions.oeEndOn = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
   }
   
   var employeeCounts = {
@@ -92,6 +93,11 @@ javascript:
     pte: Number,
     msp: Number
   }
+	
+	var dateOptions = {
+		oeStartOn:String,
+		oeEndOn:String
+	}
   
   function checkEmployeeCount(element) {
     if (element.id == "fteEmployee") {
@@ -110,4 +116,7 @@ javascript:
     }
   }
   
+	function showDatepicker(id) {
+		initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
+	}
   
