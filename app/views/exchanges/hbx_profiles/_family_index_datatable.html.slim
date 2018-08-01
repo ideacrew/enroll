@@ -18,9 +18,10 @@ div
       - if individual_market_is_enabled? && policy(:family).hbx_super_admin_visible?
         li
           = link_to 'New DC Resident Application', begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper')
-
+br
+br
 div
-  p.pull-right After working on an enrollment return to this page via the person icon in the header
+  p After working on an enrollment return to this page via the person icon in the header
 
 javascript:
   initializeDataTables();
