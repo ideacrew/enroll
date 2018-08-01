@@ -128,16 +128,16 @@ h1,h2,h3,h4,h5,h6 {
 
 #uic-primary-nav {
   background:$mhc-dark-blue;
-  
+
   ul {
     margin: 20px 0;
     text-align: left;
   }
-  
+
   ul li {
- 
+
   }
-  
+
   ul li a {
     color:$primary-white;
     font-size: 16px;
@@ -150,29 +150,29 @@ h1,h2,h3,h4,h5,h6 {
     transition: all 0.3s ease 0s;
     color:$mhc-orange;
   }
-  
+
   a:visited {
     text-decoration:none;
   }
-  
+
   a:active {
     text-decoration:none;
   }
   .fa-caret-down {
     color:$primary-white;
   }
-  
+
   ul.dropdown-menu li a {
     color:$primary-black;
     padding: 3px 20px;
     margin-bottom:5px;
   }
-  
+
   ul.dropdown-menu li a:hover {
     color:$mhc-orange;
     transition: all 0.3s ease 0s;
   }
-  
+
   .badge {
     background-color: $primary-orange;
   }
@@ -222,11 +222,11 @@ h1,h2,h3,h4,h5,h6 {
   bottom: 0;
   left: 0;
   width: 100%;
-  
+
   a {
     color:$primary-white;
   }
-  
+
   .fa-envelope {
     color:$primary-white;
   }
@@ -336,7 +336,7 @@ thead {
     width:45px;
     height:60px;
   }
-  
+
 }
 
 .right-section {
@@ -423,7 +423,7 @@ thead {
 
 .horizontal-status {
   padding: 3.75% 0 1.25%;
-  
+
   .arrow {
       padding-top: 1.25%;
   }
@@ -445,7 +445,7 @@ thead {
 #uic-wrapper {
   width:97%;
   margin-left:20px;
-  
+
   input {
     height: 48px;
     border:none;
@@ -527,7 +527,7 @@ thead {
       }
     }
   }
-  
+
   .broker-information {
     word-wrap: break-word;
   }
@@ -536,6 +536,20 @@ thead {
     font-size: 12px;
     padding: 8px;
   }
-  
-  
- 
+
+  .module {
+    &.broker {
+      .panel-body, .panel-footer {
+        .fa {
+          color: $brand-primary;
+        }
+        .vertically-aligned-row {
+          table-layout: fixed;
+          > * {
+            vertical-align: top;
+          }
+        }
+      }
+    }
+  }
+>>>>>>> origin/bug-25264
