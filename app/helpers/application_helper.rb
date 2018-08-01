@@ -1,5 +1,4 @@
 module ApplicationHelper
-  require 'json'
 
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
@@ -414,7 +413,7 @@ module ApplicationHelper
     carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     carriers.each do |car|
       if Rails.env == "production"
-        image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
         carrier_logo_hash[car.legal_name] = Rails.application.assets.find_asset(image).digest_path
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
