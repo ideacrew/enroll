@@ -71,10 +71,10 @@
               <% end %>
 
               <div class="row">
-                <% if verif_type.vlp_documents.any? %>
+                <% if verif_type.type_documents.any? %>
 
                   <div class="v-doc-list col-md-12">
-                    <% verif_type.vlp_documents.each do |vlp_doc|%>
+                    <% verif_type.type_documents.each do |vlp_doc|%>
                       <div class="row" id="doc_table_row_<%=vlp_doc.id%>">
                         <div class="v-doc-elem col-md-12">
                           <div class="v-doc col-md-11">
