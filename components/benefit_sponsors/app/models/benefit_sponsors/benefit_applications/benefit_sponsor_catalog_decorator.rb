@@ -13,7 +13,7 @@ module BenefitSponsors
         end
 
 
-        @contributions = product_packages.inject({}) do |contributions, product_package|
+        @contributions = product_packages.by_product_kind(:health).inject({}) do |contributions, product_package|
           
           if benefit_package.present?
             if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
@@ -73,7 +73,7 @@ module BenefitSponsors
         return @products if defined? @products
         @products = {}
 
-        product_packages.each do |product_package|
+        product_packages.by_product_kind(:health).each do |product_package|
           package_products = product_package.products.collect do |product|
             Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.is_a?(BenefitMarkets::Products::HealthProducts::HealthProduct) ? "health" : "dental", product.health_plan_kind, product.network_information)
           end
