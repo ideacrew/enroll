@@ -16,8 +16,11 @@ module BenefitSponsors
         authorize @benefit_package_form, :updateable?
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
+          # TODO get redirection url from service
           if params[:add_new_benefit_package] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, add_new_benefit_package: true)
+          elsif params[:add_dental_benefits] == "true"
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, @benefit_package_form.show_page_model, sponsored_benefit_kind: "dental")
           else
             redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
           end
@@ -99,6 +102,12 @@ module BenefitSponsors
 
       def employer_contribution_params
         params.permit(:id, :benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id, :id])
+      end
+
+      def new_package_url
+      end
+
+      def dental_benefits_url
       end
     end
   end

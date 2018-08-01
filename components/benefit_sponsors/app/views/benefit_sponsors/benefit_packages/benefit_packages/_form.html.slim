@@ -18,6 +18,7 @@ h1.heading-text Benefit Package - Set Up
       = render "sponsored_benefit", f: sb
 
   button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-default#addDentalBenefits type="submit" name="add_dental_benefits" value="true" Add Dental Benefits
   button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
   
 
@@ -30,5 +31,6 @@ javascript:
   javascript:
     window.onload = function(){
       document.getElementById("addBenefitPackage").classList.add("hidden")
+      document.getElementById("addDentalBenefits").classList.add("hidden")
     }
 

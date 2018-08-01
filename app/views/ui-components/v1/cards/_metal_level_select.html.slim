@@ -293,12 +293,14 @@ javascript:
 
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
+    document.getElementById('addDentalBenefits').classList.remove('hidden')
     document.getElementById('submitBenefitPackage').classList.remove('hidden')
     document.getElementById('cancelBenefitPackage').classList.remove('hidden')
   }
 
   function hideFormButtons() {
     document.getElementById('addBenefitPackage').classList.add('hidden')
+    document.getElementById('addDentalBenefits').classList.add('hidden')
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
@@ -307,6 +309,7 @@ javascript:
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.add('disabled');
     disableNewAddBenefitPackageButton()
+    disableDentalBenefitPackage()
 		preventSubmissionOnEnter()
   }
 
@@ -314,6 +317,7 @@ javascript:
 		var savePlanYearButton = document.getElementById('submitBenefitPackage');
     savePlanYearButton.classList.remove('disabled');
     enableNewAddBenefitPackageButton()
+    enableDentalBenefitPackage()
   }
 
   function disableNewAddBenefitPackageButton() {
@@ -323,6 +327,16 @@ javascript:
 
   function enableNewAddBenefitPackageButton() {
     var addBenefitPackageButton = document.getElementById('addBenefitPackage');
+    addBenefitPackageButton.classList.remove('disabled')
+  }
+
+  function disableDentalBenefitPackage() {
+    var addBenefitPackageButton = document.getElementById('addDentalBenefits');
+    addBenefitPackageButton.classList.add('disabled')
+  }
+
+  function enableDentalBenefitPackage() {
+    var addBenefitPackageButton = document.getElementById('addDentalBenefits');
     addBenefitPackageButton.classList.remove('disabled')
   }
 
