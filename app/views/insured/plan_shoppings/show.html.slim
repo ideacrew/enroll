@@ -96,6 +96,13 @@ javascript:
     $(".plan-metal-level-selection-filter").attr("disabled", true);
   }
 
+  function resetAllFilters() {
+    clearAll()
+    clearSelections()
+    total_plans = $('#plans .plan-row').length
+    $("#plans-count").text(total_plans);
+  }
+
   function clearSelections() {
     Array.from(selectedPlans).forEach(function(plan) {
       if (plan) {
