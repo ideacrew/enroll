@@ -41,7 +41,7 @@ class VerificationType
   end
 
   def type_verified?
-    ["verified", "attested", "valid"].include? validation_status
+    ["verified", "attested", "valid", "curam"].include? validation_status
   end
 
   def is_type_outstanding?
@@ -82,5 +82,9 @@ class VerificationType
 
   def expire_type
     update_attributes(:validation_status => "expired", :update_reason => "Moved to Coverall")
+  end
+
+  def type_documents
+    vlp_documents.select{|doc| doc.identifier.present?}
   end
 end

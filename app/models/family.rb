@@ -1051,8 +1051,8 @@ class Family
     self.active_family_members.each do |member|
       outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-    fully_uploaded = outstanding_types.all?{ |type| (type.vlp_documents.any? && !type.rejected) }
-    partially_uploaded = outstanding_types.any?{ |type| (type.vlp_documents.any? && !type.rejected)}
+    fully_uploaded = outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) }
+    partially_uploaded = outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)}
     if fully_uploaded
       "Fully Uploaded"
     elsif partially_uploaded
