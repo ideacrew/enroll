@@ -87,21 +87,6 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
-  context "latest_created_hbx_enrollment" do
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:household) {FactoryGirl.create(:household, family: family)}
-    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-    let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: false)}
-    let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
-    let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
-
-    it "should return right hbx_enrollment" do
-      household.reload
-      expect(household.latest_created_hbx_enrollment).to eq hbx4
-    end
-  end
-
-
   context "enrolled_including_waived_hbx_enrollments" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:household) {FactoryGirl.create(:household, family: family)}

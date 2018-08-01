@@ -54,36 +54,32 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
     end
 
-  end
+    describe "Eligibility determined and not_csr_100 user" do
+      let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+      let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household)}
 
-  describe "Eligibility determined and not_csr_100 user" do
-    let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-    let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-    let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
-    let(:person) { FactoryGirl.build_stubbed(:person) }
-    let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
-    let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
-    let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household)}
+      context "GET plans" do
+        before :each do
+          allow(hbx_enrollment_one).to receive(:is_shop?).and_return(false)
+          allow(hbx_enrollment_one).to receive(:decorated_elected_plans).and_return([])
+          allow(person).to receive(:primary_family).and_return(family)
+          allow(family).to receive(:active_household).and_return(household)
+          allow(family).to receive(:currently_enrolled_plans).and_return([])
+          allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
+          allow(household).to receive(:latest_active_tax_household).and_return tax_household
+          sign_in user
+        end
 
-    context "GET plans" do
-      before :each do
-        allow(hbx_enrollment_one).to receive(:is_shop?).and_return(false)
-        allow(hbx_enrollment_one).to receive(:decorated_elected_plans).and_return([])
-        allow(person).to receive(:primary_family).and_return(family)
-        allow(family).to receive(:active_household).and_return(household)
-        allow(family).to receive(:currently_enrolled_plans).and_return([])
-        allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
-        allow(household).to receive(:latest_active_tax_household).and_return tax_household
-        sign_in user
+        it "returns http success" do
+          tax_household.eligibility_determinations = [eligibility_determination]
+          person.primary_family.latest_household.tax_households << tax_household
+          xhr :get, :plans, id: "hbx_id", format: :js
+          expect(response).to have_http_status(:success)
+        end
       end
 
-      it "returns http success" do
-        tax_household.eligibility_determinations = [eligibility_determination]
-        person.primary_family.latest_household.tax_households << tax_household
-        xhr :get, :plans, id: "hbx_id", format: :js
-        expect(response).to have_http_status(:success)
-      end
     end
+
 
   end
 
