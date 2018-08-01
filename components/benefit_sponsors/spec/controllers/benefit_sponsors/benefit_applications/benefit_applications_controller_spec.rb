@@ -246,7 +246,7 @@ module BenefitSponsors
       context "benefit application published sucessfully" do
         it "should redirect with success message" do
           sign_in_and_submit_application
-          expect(flash[:notice]).to eq "Benefit Application successfully published."
+          expect(flash[:notice]).to eq "Plan Year successfully published."
         end
       end
 
@@ -259,7 +259,7 @@ module BenefitSponsors
         it "should redirect with success message" do
           sign_in user
           xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
-          expect(flash[:notice]).to eq "Benefit Application successfully published."
+          expect(flash[:notice]).to eq "Plan Year successfully published."
           expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
         end
       end
