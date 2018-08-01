@@ -170,6 +170,10 @@ class Person
     write_attribute(:gender, new_gender.to_s.downcase)
   end
 
+  def primary_family
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
+  end
+
   def update_full_name
     full_name
   end
