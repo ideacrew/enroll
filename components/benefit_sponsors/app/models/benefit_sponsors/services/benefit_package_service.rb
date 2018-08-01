@@ -18,7 +18,7 @@ module BenefitSponsors
       def load_form_metadata(form)
         application  = find_benefit_application(form)
         @employer_profile = benefit_application.benefit_sponsorship.profile
-        form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorCatalogDecorator.new(application.benefit_sponsor_catalog)
+        form.catalog = BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator.new(application.benefit_sponsor_catalog)
         if form.sponsored_benefits.present?
           load_employer_estimates(form)
           load_employees_cost_estimates(form)
