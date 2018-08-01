@@ -461,6 +461,15 @@
   }
 }
 
+#employer-broker-card {
+  .panel-heading {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size:18px;
+    color:$mhc-orange;
+  }
+}
+
 .employer-broker-widget {
   .panel-heading {
     background-color:transparent;
