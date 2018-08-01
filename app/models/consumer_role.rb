@@ -712,23 +712,20 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
-  def native_with_ssn?
-    is_native? && ssn_applied?
+  def sensitive_information_changed?(person_params)
+    person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
   end
 
-  def check_for_critical_changes(person_params, family)
-    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
-    end
-
-    trigger_residency! if can_trigger_residency?(person_params["no_dc_address"], family)
+  def check_for_critical_changes(family, opts)
+    redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person) && opts[:info_changed]
+    trigger_residency! if can_trigger_residency?(family, opts)
   end
 
-  def can_trigger_residency?(no_dc_address, family) # trigger for change in address
+  def can_trigger_residency?(family, opts) # trigger for change in address
     person.age_on(TimeKeeper.date_of_record) > 18 &&
-    person.no_dc_address &&
-    no_dc_address == "false" &&
-    family.person_has_an_active_enrollment?(person)
+        opts[:dc_status] &&
+        opts[:no_dc_address] == "false" &&
+        family.person_has_an_active_enrollment?(person)
   end
 
   def add_type_history_element(params)
@@ -966,10 +963,6 @@ class ConsumerRole
     dhs_pending? || ssa_pending?
   end
 
-  def processing_residency_24h?
-    return false if self.residency_determined_at.nil?
-    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
-  end
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"

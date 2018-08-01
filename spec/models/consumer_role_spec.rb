@@ -599,7 +599,7 @@ context "Verification process and notices" do
         else
           expect(subject).to_not receive(:redetermine_verification!)
         end
-        subject.check_for_critical_changes(params, family)
+        subject.check_for_critical_changes(family, info_changed: subject.sensitive_information_changed?(params))
       end
     end
     mask_hash.each do |field, action|
@@ -715,27 +715,6 @@ describe "Indian tribe member" do
 
 end
 
-describe "#processing_residency_24h?" do
-  let(:consumer_role) {ConsumerRole.new}
-
-  it "returns false if residency determined at attribute is nil" do
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq false
-  end
-
-  it "returns true if called residency hub today and state resident is nil" do
-    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now)
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq true
-  end
-
-  it "returns false if residency is already determined in past and state resident is nil" do
-    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now - 2.day)
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq false
-  end
-end
-
 describe "#find_vlp_document_by_key" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
@@ -804,62 +783,56 @@ describe "can_trigger_residency?" do
     end
 
     it "should return true if there is a change in address from non-dc to dc" do
-      person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if there is a change in address from dc to non-dc" do
-      person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from dc to dc" do
-      person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from non-dc to non-dc" do
-      person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
     end
   end
 
   context "when has an active coverage & address change from non-dc to dc", dbclean: :after_each do
 
     before do
-      person.update_attributes(no_dc_address: true)
       allow(family).to receive(:person_has_an_active_enrollment?).and_return true
     end
 
     it "should return true if age > 18" do
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if age = 18" do
       person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
 
     it "should return false if age < 18" do
       consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
   end
 
   context "when age > 18 & address change from non-dc to dc" do
     before do
-      person.update_attributes(no_dc_address: true)
       allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
     end
 
     it "should return true if has an active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
     end
 
     it "should return false if no active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
-      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
   end
 end
