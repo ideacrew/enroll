@@ -1085,8 +1085,8 @@ def self.to_csv
   end
 
   def has_cobra_hbx_enrollment?
-    return false if active_benefit_group_assignment.blank? || renewal_benefit_group_assignment.blank?
-    enrollments_for_display.detect{|enrollment| enrollment.is_cobra_status? && HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES.include?(enrollment.aasm_state)}
+    return false if active_benefit_group_assignment.blank?
+    enrollments_for_display.detect{|enrollment| enrollment.is_cobra_status? && (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES).include?(enrollment.aasm_state)}
   end
 
   def need_update_hbx_enrollment_effective_on?
