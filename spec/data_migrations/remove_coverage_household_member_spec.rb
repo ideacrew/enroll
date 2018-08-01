@@ -86,32 +86,4 @@ describe RemoveCoverageHouseholdMember, dbclean: :after_each do
       expect(family.households.first.coverage_households.first.coverage_household_members.size).to eq 1
     end
   end
-
-  describe "remove invalid coverage household member from coverage household", dbclean: :after_each do
-
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member){ FactoryGirl.create(:family_member,family: family, is_active: true)}
-    let(:action){ "remove_invalid_chms"}
-
-    before do
-      allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
-      allow(ENV).to receive(:[]).with('action').and_return('remove_invalid_chms')
-      chms = family.households.first.coverage_households.first.coverage_household_members << CoverageHouseholdMember.new(family_member_id: family_member.id, is_subscriber: false)
-      chm = chms.where(family_member_id: family_member.id).first
-      allow(ENV).to receive(:[]).with('coverage_household_member_id').and_return chm.id
-      allow(ENV).to receive(:[]).with('family_member_id').and_return family_member.id
-      family.save
-    end
-
-    it "should remove a family member to household" do
-      size = family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.size
-      family.households.first.coverage_households.where(:is_immediate_family => false).first.coverage_household_members.each do |chm|
-        chm.delete
-        subject.migrate
-        family.households.first.reload
-        expect(family.households.first.coverage_households.where(:is_immediate_family => true).first.coverage_household_members.count).not_to eq(size)
-      end
-    end
-  end
 end
