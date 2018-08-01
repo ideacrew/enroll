@@ -54,7 +54,7 @@ module BenefitSponsors
 
   context 'rule within_last_day_to_publish' do
     let!(:benefit_application) { double('BenefitApplication', last_day_to_publish: last_day_to_publish, start_on: last_day_to_publish) }
-    let!(:rule) { subject.business_policies.values[1].rules[7] }
+    let!(:rule) { subject.business_policies[:submit_benefit_application].rules.detect{|x| x.name == :within_last_day_to_publish} }
 
     context 'fail' do
       let!(:last_day_to_publish) { Time.now - 1.day }
