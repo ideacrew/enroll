@@ -605,30 +605,10 @@ function sortPlans() {
 
 function setCarrierRadio(element) {
   elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
-  var carriers = document.querySelectorAll('.carriers');
-  carriers.forEach(function(carrier) {
-    var icon = carrier.querySelectorAll('i')[0];
-    var iconId = carrier.dataset.tempid;
-    if (elementId == iconId) {
-      icon.classList.add('fa-dot-circle');
-    } else {
-      icon.classList.remove('fa-dot-circle');
-    }
-  });
 }
 
 function setMetalRadio(element) {
   elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
-  var metals = document.querySelectorAll('.metals');
-  metals.forEach(function(metal) {
-    var icon = metal.querySelectorAll('i')[0];
-    var iconId = metal.dataset.tempid;
-    if (elementId == iconId) {
-      icon.classList.add('fa-dot-circle');
-    } else {
-      icon.classList.remove('fa-dot-circle');
-    }
-  });
 }
 
 function setTopLevelRadios(element) {
