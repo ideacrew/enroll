@@ -76,7 +76,7 @@
         <% qhps.each do |qhp|%>
           <th colspan="2">
             <div class="plan_comparison">
-              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.plan } %>
+              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.product } %>
             </div>
           </th>
         <% end %>
@@ -86,7 +86,7 @@
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
-              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.plan } %>
+              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product } %>
             </th>
           <% end %>
         </tr>
