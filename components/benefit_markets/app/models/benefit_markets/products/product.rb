@@ -278,5 +278,13 @@ module BenefitMarkets
       new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
       new_product
     end
+
+    def health?
+      kind == :health
+    end
+
+    def dental?
+      kind == :dental
+    end
   end
 end
