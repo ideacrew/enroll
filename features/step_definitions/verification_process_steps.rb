@@ -52,8 +52,8 @@ When(/^the consumer is completely verified$/) do
 end
 
 When(/^the consumer is completely verified from curam$/) do
+  user.person.consumer_role.update_attributes(OpenStruct.new({:determined_at => Time.now, :vlp_authority => 'curam'}))
   user.person.consumer_role.import!
-  user.person.consumer_role.update_attributes(vlp_authority: 'curam', aasm_state: 'fully_verified')
 end
 
 Then(/^verification types have to be visible$/) do
@@ -75,6 +75,7 @@ end
 
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
+  user.person.verification_types.first.fail_type
   enr = FactoryGirl.create(:hbx_enrollment,
                            household: family.active_household,
                            coverage_kind: "health",

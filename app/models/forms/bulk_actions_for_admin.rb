@@ -2,7 +2,6 @@ module Forms
   class BulkActionsForAdmin
     include Acapi::Notifiers
     include Insured::FamiliesHelper
-    include VerificationHelper
 
     attr_reader :result
     attr_reader :row
@@ -72,7 +71,7 @@ module Forms
             @result[:success] << person
             # creation of roles for a person
             @family = Family.find(params[:family])
-            move_types_to_expired(person) if person.consumer_role.present? && person.is_resident_role_active?
+            person.consumer_role.move_to_expired if person.consumer_role.present? && person.is_resident_role_active?
             build_consumer_role(person, @family) if person.is_consumer_role_active? && !person.consumer_role.present?
             build_resident_role(person, @family) if person.is_resident_role_active? && !person.resident_role.present?
 

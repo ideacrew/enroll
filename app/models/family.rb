@@ -994,8 +994,8 @@ class Family
   def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
-      family_member.person.verification_types.each do |v_type|
-        due_dates << document_due_date(family_member, v_type)
+      family_member.person.verification_types.active.each do |v_type|
+        due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
     due_dates.compact!
@@ -1017,10 +1017,8 @@ class Family
     enrolled_family_members
   end
 
-  def document_due_date(family_member, v_type)
-    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
-    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    sv.present? ? sv.due_date : nil
+  def document_due_date(v_type)
+    (["verified", "attested", "valid"].include? v_type.validation_status) ? nil : v_type.due_date
   end
 
   def enrolled_policy(family_member)
@@ -1049,27 +1047,18 @@ class Family
   end
 
   def all_persons_vlp_documents_status
-    documents_list = []
-    document_status_outstanding = []
+    outstanding_types = []
     self.active_family_members.each do |member|
-      member.person.verification_types.each do |type|
-      if member.person.consumer_role && is_document_not_verified(type, member.person)
-        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
-        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
-      end
-      end
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-    case
-    when documents_list.include?(true) && documents_list.include?(false)
-      return "Partially Uploaded"
-    when documents_list.include?(true) && !documents_list.include?(false)
-      if document_status_outstanding.include?("outstanding")
-        return "Partially Uploaded"
-      else
-        return "Fully Uploaded"
-      end
-    when !documents_list.include?(true) && documents_list.include?(false)
-      return "None"
+    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
+    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
+    if fully_uploaded
+      "Fully Uploaded"
+    elsif partially_uploaded
+      "Partially Uploaded"
+    else
+      "None"
     end
   end
 
@@ -1083,10 +1072,6 @@ class Family
 
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
-  end
-
-  def is_document_not_verified(type, person)
-    ["valid", "attested", "verified", "External Source"].include?(verification_type_status(type, person))?  false : true
   end
 
   def has_valid_e_case_id?

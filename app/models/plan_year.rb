@@ -1238,26 +1238,38 @@ class PlanYear
     )
   end
 
+  def send_employee_renewal_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_renewal_employee!(ce)
+      end
+    end
+  end
+
+  def send_employee_initial_enrollment_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_initial_employee!(ce)
+      end
+    end
+  end
+
+  def send_active_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
+
   def send_employee_invites
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if is_renewing?
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_renewal_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:plan_year_id => self.id.to_s})
     elsif enrolling?
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_initial_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:plan_year_id => self.id.to_s})
     else
-      benefit_groups.each do |bg|
-        bg.census_employees.non_terminated.each do |ce|
-          Invitation.invite_employee!(ce)
-        end
-      end
+      notify("acapi.info.events.plan_year.employee_enrollment_invitations_requested", {:plan_year_id => self.id.to_s})
     end
   end
 

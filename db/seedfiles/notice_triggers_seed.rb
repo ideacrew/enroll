@@ -507,6 +507,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+   hbx_id: 'D086',
+   title: 'Genaral Agency Fired',
+   description: "When a General Agency is terminated by an employer/broker, then General Agency receives termination notice",
+   resource_name: 'general_agent_profile',
+   event_name: 'general_agency_terminated',
+   notice_triggers: [
+     {
+       name: 'GA Fired',
+       notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
+       notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
+       mpi_indicator: 'SHOP_D086',
+       notice_trigger_element_group: {
+         market_places: ['shop'],
+         primary_recipients: ["general_agency"],
+         primary_recipient_delivery_method: ["secure_message"],
+         secondary_recipients: []
+       }
+     }
+   ]
+ },
+
   {
     hbx_id: 'SHOP28',
     title: 'Second Reminder to publish Application',
@@ -654,6 +677,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP_D085',
+    title: 'Employer has hired you as a General agency',
+    description: ' GA is hired to a group, a notice is sent to the GAs agency mail inbox alerting them of the hire',
+    resource_name: 'general_agent_profile',
+    event_name: 'general_agency_hired_notice',
+    notice_triggers: [
+      {
+        name: 'General Agency hired notification',
+        notice_template: 'notices/shop_general_agency_notices/general_agency_hired_notice',
+        notice_builder: 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
+        mpi_indicator: 'SHOP_D085',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["general_agent_profile"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
       hbx_id: 'SHOP_D052',
       title: 'Confirmation - Broker Fired',
