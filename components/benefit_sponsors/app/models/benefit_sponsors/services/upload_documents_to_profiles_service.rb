@@ -3,7 +3,8 @@ module BenefitSponsors
     class UploadDocumentsToProfilesService
 
       def fetch_date(file_path)
-        date_string = File.basename(file_path).split("_")[1]
+        actual_file_path = File.basename(file_path)
+        date_string = (actual_file_path.split('_').include?("COMMISSION")) ? actual_file_path.split("_")[2] : actual_file_path.split("_")[1]
         Date.strptime(date_string, "%m%d%Y")
       end
 
