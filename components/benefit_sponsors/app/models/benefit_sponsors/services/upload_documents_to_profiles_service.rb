@@ -9,9 +9,10 @@ module BenefitSponsors
       end
 
       def commission_statement_exist?(statement_date,org)
+        broker = org.broker_agency_profile.primary_broker_role
         docs = org.broker_agency_profile.documents.where("date" => statement_date)
-        matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{org.hbx_id}_\\d{6,8}_COMMISSION"))}
-        return true if matching_documents.count > 0
+        matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{broker.npn}_\\d{1,}_\\d{6,8}_COMMISSION"))} if broker
+        return true if (matching_documents && matching_documents.count > 0)
       end
 
       def by_commission_statement_filename(file_path)
