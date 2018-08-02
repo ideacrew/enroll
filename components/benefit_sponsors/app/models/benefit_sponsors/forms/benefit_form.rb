@@ -6,14 +6,21 @@ module BenefitSponsors
       include ActiveModel::Model
 
       attribute :package_id, String
+      attribute :id, String
       attribute :kind, String
-      attribute :plan_offerings, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+      attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+
+      attr_accessor :service, :catalog
 
 
       def self.for_new(params)
-        service = resolve_service(params)
-        form_params = service.load_form_meta_data
-        new(form_params)
+        form = self.new(
+          kind: params[:sponsored_benefit_kind],
+          package_id: params[:benefit_package_id]
+        )
+        form.sponsored_benefits = BenefitSponsors::Forms::SponsoredBenefitForm.new(kind: params[:kind])
+        form.service = resolve_service(params)
+        form.service.load_form_meta_data(form)
       end
 
       def self.for_create(params)

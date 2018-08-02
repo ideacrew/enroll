@@ -1,0 +1,62 @@
+#yourPlans
+  .float-right.mb-2
+    #yourPlanTotals
+    br
+
+    div#multiProductPlans.hidden
+      - products = @sponsored_benefit_form.catalog.plan_options[:multi_product]
+      span.pull-right.mr-3
+        b Displaying: #{products.length} Plans
+      - products.each do |product|
+        div.col-xs-4.reference-plans
+          div.col-xs-12.p0.mb-1
+            label.container
+              = check_box_tag "reference_product_ids[]", product.id
+              span.checkmark
+              p.heading-text.reference-plan-title.mb-1
+                = product.title
+              span.plan-label Type: 
+              span.rp-plan-info
+                = product.dental_plan_kind
+              br
+              span.plan-label Carrier: 
+              span.rp-plan-info
+                = product.carrier_name
+              br
+              span.plan-label Network: 
+              span.rp-plan-info
+                = "TODO"
+              br
+              span.plan-label.mt-1.rp-view-summary data-plan-title=product.title data-plan-id=product.id View Summary
+              br
+
+    div#singleProductPlans.hidden
+      - carriers_hash = @sponsored_benefit_form.catalog.plan_options[:single_product]
+      - carriers_hash.each do |carrier_arr|
+        - carrier_name = carrier_arr.first
+        - products = carrier_arr.last
+        div id="carrierProducts#{carrier_name}" class="hidden"
+          span.pull-right.mr-3
+            b Displaying: #{products.length} Plans
+          - products.each do |product|
+            div.col-xs-4.reference-plans
+              div.col-xs-12.p0.mb-1
+                label.container
+                  = f.radio_button :reference_plan_id, product.id
+                  span.checkmark
+                  p.heading-text.reference-plan-title.mb-1
+                    = product.title
+                  span.plan-label Type: 
+                  span.rp-plan-info
+                    = product.dental_plan_kind
+                  br
+                  span.plan-label Carrier: 
+                  span.rp-plan-info
+                    = product.carrier_name
+                  br
+                  span.plan-label Network: 
+                  span.rp-plan-info
+                    = "TODO"
+                  br
+                  span.plan-label.mt-1.rp-view-summary data-plan-title=product.title data-plan-id=product.id View Summary
+                  br
