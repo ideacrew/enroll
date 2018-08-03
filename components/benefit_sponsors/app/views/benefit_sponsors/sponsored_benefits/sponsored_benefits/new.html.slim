@@ -6,106 +6,85 @@ h4 Dental - Set up Benefit Package
 h5 Select which plans your employees will choose from
 
 .benefit-package-dental
-  = form_for @sponsored_benefit_form.sponsored_benefits, as: :sponsored_benefits, url: {action: "create"} do |f|
-    ul.nav.nav-tabs.row
-      li.col-md-4.col-sm-4
-        = f.radio_button :product_package_kind, "multi_product", class: 'product_package_kind', :onclick => "loadMultiProductSponsorContribution(this)"
-        = f.label :product_package_kind_custom, class: "elected_plan" do
-          i.far.fa-circle
-          i.far.fa-dot-circle
-          | Custom
-      li.col-md-4.col-sm-4
-        = f.radio_button :product_package_kind, "single_product", class: 'product_package_kind', :onclick => "loadProductPackageInfo(this)"
-        = f.label :product_package_kind_single_product, class: "elected_plan" do
-          i.far.fa-circle
-          i.far.fa-dot-circle
-          | Single Product
+  = form_for @sponsored_benefit_form, as: :benefits, url: {action: "create"} do |benefit_builder|
+    = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
+    = benefit_builder.hidden_field :benefit_package_id, value: benefit_builder.object.benefit_package_id
+    = benefit_builder.hidden_field :benefit_sponsorship_id, value: benefit_builder.object.benefit_sponsorship_id
+    = benefit_builder.fields_for :sponsored_benefits, benefit_builder.object.sponsored_benefits, errors: {}, fieldset: false do |f|
+      ul.nav.nav-tabs.row
+        li.col-md-4.col-sm-4
+          = f.hidden_field :kind, value: f.object.kind
+          = f.radio_button :product_package_kind, "single_product", { checked: true, class: 'product_package_kind'}
+          = f.label :product_package_kind_single_product, class: "elected_plan" do
+            i.far.fa-circle
+            i.far.fa-dot-circle
+            | One Plan
 
-    #singleProductInfo.hidden
-      - single_product_carriers = @sponsored_benefit_form.catalog.plan_options[:single_product].keys
-      h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.
-      br
-      - single_product_carriers.each do |carrier_name|
-        .col-xs-3.plans
-          .col-xs-12
-            label.container
-              = carrier_name
-              = f.radio_button :product_option_choice, carrier_name, onclick:"loadSingleProductSponsorContribution(this)"
-              span.checkmark
-    #multipleProductInfo.hidden
-      h4 Select your preferred plans. You can select multiple plans
-      br
+      #singleProductInfo
+        - single_product_carriers = @sponsored_benefit_form.catalog.single_product_options
+        h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.
+        br
+        - single_product_carriers.each do |issuer_name, issuer_id|
+          .col-xs-3.plans
+            .col-xs-12
+              label.container
+                = f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"loadSingleProductSponsorContribution(this)"
+                span.checkmark
+                = issuer_name
 
-    #referencePlans.hidden
-      h2.heading-text.pt-1.float-left Select Your Reference Plan
+      #referencePlans.hidden
+        h2.heading-text.pt-1.float-left Select Your Reference Plan
 
-      h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+        h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
 
-      = render "products", f: f
-                  
+        = render "products", f: f
+                    
 
-      #yourSponsorContributions
-        #sponsorContributions.mt-1
-          .col-xs-12
-            .col-xs-6.offered-heading
-              .text-uppercase.text-center 
-                | Offered 
-                i.fas.fa-question-circle
-            .col-xs-6.offered-heading
-              .text-uppercase.text-center 
-                | Employer Contribution 
-                i.fas.fa-question-circle
-          .col-xs-12#benefitFields
-            = f.fields_for :sponsor_contribution, @sponsored_benefit_form.catalog.sponsor_contributions, errors: {}, fieldset: false do |sc|
-              div.hidden id="sponsor_contribution_#{sc.object.package_kind}"
-                = sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
-                  fieldset
-                    div.col-xs-6.form-group.form-group-lg
-                      div.checkbox
-                        label
-                          = cl.check_box :is_offered, {class: "contribution_handler"}, "true", "false"
-                          = cl.label :is_offered do
-                            i.fas.fa-check-square.fa-2x
-                            i.fas.fa-square-o.fa-2x
-                          = cl.hidden_field :display_name, value: cl.object.display_name
-                          p
-                            = cl.object.display_name.try(:humanize)
-                    div.col-xs-6.form-group.form-group-lg
-                      div.row.col-xs-12
-                        div.col-xs-3
-                          = cl.number_field :contribution_factor, value: (cl.object.contribution_factor * 100), :onchange => "setSliderInput(this)"
-                        div.col-xs-9
-                          input.slider min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this)"
-                          span.slide-label.pull-right
+        #yourSponsorContributions
+          #sponsorContributions.mt-1
+            .col-xs-12
+              .col-xs-6.offered-heading
+                .text-uppercase.text-center 
+                  | Offered 
+                  i.fas.fa-question-circle
+              .col-xs-6.offered-heading
+                .text-uppercase.text-center 
+                  | Employer Contribution 
+                  i.fas.fa-question-circle
+            .col-xs-12#benefitFields
+              = f.fields_for :sponsor_contribution, @sponsored_benefit_form.catalog.sponsor_contributions.first, errors: {}, fieldset: false do |sc|
+                div
+                  = sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
+                    fieldset
+                      div.col-xs-6.form-group.form-group-lg
+                        div.checkbox
+                          label
+                            = cl.check_box :is_offered, {class: "contribution_handler"}, "true", "false"
+                            = cl.label :is_offered do
+                              i.fas.fa-check-square.fa-2x
+                              i.fas.fa-square-o.fa-2x
+                            = cl.hidden_field :display_name, value: cl.object.display_name
+                            = cl.hidden_field :contribution_unit_id, value: cl.object.contribution_unit_id
+                            p
+                              = cl.object.display_name.try(:humanize)
+                      div.col-xs-6.form-group.form-group-lg
+                        div.row.col-xs-12
+                          div.col-xs-3
+                            = cl.number_field :contribution_factor, value: (cl.object.contribution_factor * 100), :onchange => "setSliderInput(this)"
+                          div.col-xs-9
+                            input.slider min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this)"
+                            span.slide-label.pull-right
 
-      #yourReferencePlanDetails
+        #yourReferencePlanDetails
 
-    = f.submit "Submit Dental Benefits", class: "btn btn-default pull-right"
+      = f.submit "Submit Dental Benefits", class: "btn btn-default pull-right"
 
 javascript:
-  var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
-  
-  function loadMultiProductSponsorContribution(element) {
-    document.querySelectorAll("[id^='sponsor_contribution_']").forEach(function(key) {
-      key.classList.add("hidden")
-    })
-    document.getElementById('sponsor_contribution_multi_product').classList.remove('hidden');
-    document.getElementById('referencePlans').classList.remove('hidden');
-    document.getElementById('multiProductPlans').classList.remove('hidden');
-
-
-    document.getElementById('singleProductInfo').classList.add('hidden');
-    document.getElementById('multipleProductInfo').classList.remove('hidden');
-
-  };
-
   function loadSingleProductSponsorContribution(element) {
     document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {
       key.classList.add("hidden")
     })
-    document.getElementById('sponsor_contribution_single_product').classList.remove('hidden');
-    document.getElementById("carrierProducts"+element.value).classList.remove('hidden')
-    document.getElementById("singleProductPlans").classList.remove('hidden')
+    document.getElementById("carrierProducts"+element.dataset.issuername).classList.remove('hidden')
     document.getElementById("referencePlans").classList.remove('hidden')
   }
 
@@ -116,14 +95,4 @@ javascript:
   function setNumberInput(element) {
 
   }
-
-
-  function loadProductPackageInfo(element) {
-    document.getElementById('sponsor_contribution_multi_product').classList.add('hidden');
-    document.getElementById('referencePlans').classList.add('hidden');
-    document.getElementById('multiProductPlans').classList.add('hidden');
-    document.getElementById('singleProductInfo').classList.remove('hidden');
-    document.getElementById('multipleProductInfo').classList.add('hidden');
-
-  };
 
