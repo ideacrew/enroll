@@ -234,7 +234,7 @@ $brand-primary: $mhc-dark-blue;
   }
   .pdp_carrier_title {
     width:auto;
-    margin-left:30px;
+    margin-left:25px;
     font-size:13px;
   }
   .plan_heading_text {
@@ -474,6 +474,13 @@ $brand-primary: $mhc-dark-blue;
   .benefits-adjustmets {
     margin-left:-30px;
   }
+}
+
+.pdp-titles-class {
+  color:$mhc-orange;
+}
+.pdp-titles-class:hover {
+  cursor:pointer;
 }
 
 .plan-details-export {

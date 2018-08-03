@@ -9,7 +9,7 @@
       <%= radio_button_tag "sole_source", "#{ck}", false %>
     </div>
     <div class="col-xs-9">
-        <label><h3><%= cv %></h3></label>
+        <label><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
     <% end %>
   </div>
@@ -25,7 +25,7 @@
       <%= radio_button_tag "single_carrier", "#{ck}", false %>
     </div>
     <div class="col-xs-9">
-        <label><h3><%= cv %></h3></label>
+        <label><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
     <% end %>
 
@@ -48,7 +48,7 @@
               <%= radio_button_tag :metal_level_for_elected_plan, kind, false %>
             </div>
             <div class="col-xs-9">
-               <label><h3><%= kind.titleize %></h3></label>
+               <label><h3 class="pdp-titles-class"><%= kind.titleize %></h3></label>
             </div>
 
         <% end %>
