@@ -8,13 +8,13 @@
     data-family-deductible="<%= plan.family_deductible %>"
   >
     <div class="col-xs-2">
-      <%= radio_button_tag :reference_plan, "#{plan.id}", false, onclick:"setMyPlans(this)", data:{planId:plan.id} %>			
+      <%= radio_button_tag :reference_plan, "#{plan.id}", false, onclick:"setMyPlans(this)", data:{planId:plan.id} %>
     </div>
 
     <div class="col-xs-10">
       <div class="panel row reference-plan-info">
         <div class="panel-heading">
-          <h3><b><%= plan.name %></b></h3>
+           <label for="reference_plan_<%= plan.id %>"><h3 class="pdp-titles-class"><b><%= plan.name %></b></h3></label>
         </div>
         <div class="panel-body">
           <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
