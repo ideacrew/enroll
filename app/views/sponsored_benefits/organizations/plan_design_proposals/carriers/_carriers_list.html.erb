@@ -37,21 +37,21 @@
   <% end %>
   <% metal_levels.each_with_index do |kind, index| %>
     <div class="col-xs-4 metals">
+
         <%= link_to organizations_plan_design_organization_plans_path(plan_design_organization,
           selected_carrier_level: 'metal_level',
           metal_level: kind,
-          active_year: active_year), remote: true do %>
+          active_year: active_year), remote: true, :onclick => "$(this).find(':radio').prop('checked', true);" do %>
+
             <div class="col-xs-3">
               <%= radio_button_tag :metal_level_for_elected_plan, kind, false %>
-              <%= label_tag "metal_level_for_elected_plan" do %> 
-              <% end %>
             </div>
+            <div class="col-xs-9">
+               <label><h3><%= kind.titleize %></h3></label>
+            </div>
+
         <% end %>
 
-        <div class="col-xs-9">
-           <h3><%= kind.titleize %></h3>
-        </div>
     </div>
   <% end %>
 <% end %>
-
