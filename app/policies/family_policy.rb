@@ -10,13 +10,13 @@ class FamilyPolicy < ApplicationPolicy
       if broker_role
         ivl_broker_account = @record.active_broker_agency_account
         if ivl_broker_account
-          return true if (ivl_broker_account.broker_agency_profile_id == broker_role.broker_agency_profile_id)
+          return true if (ivl_broker_account.benefit_sponsors_broker_agency_profile_id == broker_role.benefit_sponsors_broker_agency_profile_id)
         end
         if employee_roles.any?
           broker_agency_profile_account_ids = employee_roles.map do |er|
             er.employer_profile.active_broker_agency_account
-          end.compact.map(&:broker_agency_profile_id)
-          return true if broker_agency_profile_account_ids.include?(broker_role.broker_agency_profile_id)
+          end.compact.map(&:benefit_sponsors_broker_agency_profile_id)
+          return true if broker_agency_profile_account_ids.include?(broker_role.benefit_sponsors_broker_agency_profile_id)
         end
       end
       ga_roles = user_person.active_general_agency_staff_roles
@@ -50,6 +50,11 @@ class FamilyPolicy < ApplicationPolicy
   def can_update_ssn?
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_update_ssn
+  end
+
+  def can_view_username_and_email?
+    return false unless role = (user.person && user.person.hbx_staff_role) || (user.person.csr_role)
+    role.permission.can_view_username_and_email || user.person.csr_role.present?
   end
 
   def hbx_super_admin_visible?

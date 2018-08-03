@@ -19,7 +19,7 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
       renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
       census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years
       employer_profile.census_employees.each do |census_employee|
-        census_employee.add_renew_benefit_group_assignment(renewing_benefit_group)
+        census_employee.add_renew_benefit_group_assignment([renewing_benefit_group])
         person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
         employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)
         census_employee.update_attributes({:employee_role =>  employee_role })

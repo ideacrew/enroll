@@ -60,7 +60,7 @@ FactoryGirl.define do
 
     trait :with_premium_tables do
       transient do
-        premium_tables_count 48
+        premium_tables_count 6
       end
 
       after(:create) do |plan, evaluator|
@@ -130,7 +130,7 @@ FactoryGirl.define do
 
     trait :premiums_for_2015 do
       transient do
-        premium_tables_count 48
+        premium_tables_count 6
       end
 
       after :create do |plan, evaluator|
@@ -141,7 +141,7 @@ FactoryGirl.define do
 
     trait :with_next_year_premium_tables do
       transient do
-        next_year_premium_tables_count 48
+        next_year_premium_tables_count 6
       end
       active_year {TimeKeeper.date_of_record.next_year.year}
       after(:create) do |plan, evaluator|

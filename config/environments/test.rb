@@ -51,6 +51,12 @@ Rails.application.configure do
     :port => 3000
   }
 
+  #Environment URL stub
+  config.checkbook_services_base_url = Settings.checkbook_services.base_url
+
+  #Queue adapter
+  config.active_job.queue_adapter = :test
+
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR
 end

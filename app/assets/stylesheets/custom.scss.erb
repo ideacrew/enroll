@@ -14,13 +14,13 @@ body {
     padding-bottom: 70px;
 }
 
-h1, h2, h3, h4, h5, h6 
+h1, h2, h3, h4, h5, h6
   {
-    font-family: 'Roboto Slab', serif;    
-    font-weight: 300; 
+    font-family: $primary-header-font;
+    font-weight: 300;
     line-height: 1.6em;
     }
-    
+
   #new_person_wrapper p, .group-selection p {
     font-weight: 300;
   }
@@ -116,10 +116,6 @@ a {
 }
 
 /* Flash Messages */
-.alert {
-  padding-left: 60px;
-  padding-right: 60px;
-}
 
 .alert-error {
     background-color: #f2dede;
@@ -2111,7 +2107,7 @@ input[type="checkbox"] + h4.agree {
 }
 
 .mainmenu {
-    background: $mhc-dark-blue none repeat scroll 0 0;
+    background: $brand-primary none repeat scroll 0 0;
 
     li.dropdown {
       a.dropdown-toggle {
@@ -2163,7 +2159,7 @@ input[type="checkbox"] + h4.agree {
 }
 
 .mainmenu ul li a .badge, .submenu ul li a .badge {
-    background: $primary-orange none repeat scroll 0 0;
+    background: $primary-notification none repeat scroll 0 0;
     border-radius: 50px;
     color: #fff;
     font-size: 10px;
@@ -3163,11 +3159,11 @@ table.table-bordered.table-bordered {
 #employer .emp-info input[type="text"] {
     height: 48px;
 }
-::-webkit-input-placeholder {font-size: 11px;}
-input[placeholder] {font-size: 11px !important;}
-input:-moz-placeholder {font-size: 11px !important;}
+::-webkit-input-placeholder {font-size: 14px;}
+input[placeholder] {font-size: 14px !important;}
+input:-moz-placeholder {font-size: 14px !important;}
 .form-control:-moz-placeholder { /* Firefox 18- */
-    font-size: 11px;
+    font-size: 14px;
 }
 
 .form-control::-moz-placeholder {  /* Firefox 19+ */
@@ -3873,7 +3869,7 @@ ul.list-right-section li a img {
 }
 
 
-.selectric .label {font-weight: normal;font-size: 12px; text-align: left;}
+.selectric .label {font-weight: normal;font-size: 14px; text-align: left;}
 .selectric {background: #fff !important;}
 
 /* Select Plan Page */
@@ -4023,7 +4019,7 @@ h3.text-blue {
 }
 
 span.badge.message-badge {
-    background-color: $primary-orange;
+    background-color: $primary-button;
     color: #fff;
 }
 .form-border {
@@ -4621,7 +4617,7 @@ table.table.table-no-sytle td {
   top: 35%;
   z-index: 5;
   display: inline-block;
- 
+
 }
 
 .carousel-control .icon-prev,
@@ -4650,6 +4646,7 @@ table.table.table-no-sytle td {
 #qle-header .info-wrapper h4{
   margin: 0;
   line-height: 1.4em;
+  color: $qle-header-color;
 }
 
 #qle-menu h5 {
@@ -4905,9 +4902,8 @@ input:required:valid {
   color: #ff0000;
   display: none;
 }
-.lock-confirm-btn
-{
-float: right;
+.lock-confirm-btn {
+  float: right;
 }
 
 /* Employer Attestation */
@@ -4915,5 +4911,3 @@ float: right;
 .employer_attestation_fields .radio{
   background-color: transparent;
 }
-
-

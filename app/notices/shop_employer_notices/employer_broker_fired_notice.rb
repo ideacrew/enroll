@@ -6,8 +6,8 @@ class ShopEmployerNotices::EmployerBrokerFiredNotice < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
-    attach_envelope
     non_discrimination_attachment
+    attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
@@ -21,7 +21,7 @@ class ShopEmployerNotices::EmployerBrokerFiredNotice < ShopEmployerNotice
                        first_name: person.first_name,
                        last_name: person.last_name,
                        terminated_on: last_broker_agency_account.end_on,
-                       agency: broker_profile.legal_name
+                       organization: broker_profile.legal_name
                     })
   end
 

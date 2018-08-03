@@ -15,6 +15,7 @@ Feature: Employer can view their employees
     When they visit the Employee Roster
     # Re-enable this when we figure out how to get column show/hide to work dynamically
     # Then employer should not see termination date column
+    Then employer should see Bulk Actions
     And clicks on terminate employee
     Then employer clicks on terminated filter
     Then employer sees termination date column

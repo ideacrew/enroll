@@ -4,7 +4,8 @@ Then(/^Hbx Admin should see buttons to filter$/) do
   expect(page).to have_content('Employer')
   expect(page).to have_content('All')
   expect(page).to have_content('CSV')
-  expect(page).to have_content('Bulk Actions') 
+  # at present we do not have clear implementation thoughts about bulk action on user account data-table
+  # expect(page).to have_content('Bulk Actions')
 end
 
 Then(/^Hbx Admin should see text Account Updates$/) do
@@ -96,7 +97,7 @@ Then(/^I should only see unlocked user with employee role$/)do
   employee_user = User.where(:'roles'.in => ["employee"], locked_at: nil).first.oim_id
   employer_user = User.where(:'roles'.in => ["employer_staff"], locked_at: nil).first.oim_id
   broker_user = User.where(:'roles'.in => ["broker"], locked_at: nil).first.oim_id
-  expect(page).not_to have_content(employee_user)
+  expect(page).to have_content(employee_user)
   expect(page).not_to have_content(employer_user)
   expect(page).not_to have_content(broker_user)
   expect(page).not_to have_content(locked_employer_user)
@@ -144,4 +145,22 @@ Then(/^I should only see user with broker role$/)do
   expect(page).to have_content(broker_user)
   expect(page).to have_content("Locked")
   expect(page).to have_content("Unlocked")
+end
+
+When(/^a user enters an user name search box$/)do
+  page.find("input[type='search']").set(@user_1.oim_id)
+end
+
+Then(/^a user should see a result with the user name$/) do
+  expect(page).to have_content(@user_1.oim_id)
+  expect(page).to have_no_content(@user_2.oim_id)
+end
+
+When(/^a user enter person hbx id$/)do
+  page.find("input[type='search']").set(@user_1.email)
+end
+
+Then(/^a user should see a result with hbx id$/) do
+  expect(page).to have_content(@user_1.email)
+  expect(page).to have_no_content(@user_2.email)
 end

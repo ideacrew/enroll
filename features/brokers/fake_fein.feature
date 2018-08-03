@@ -1,5 +1,7 @@
 Feature: Fake FEINs
   Broker creates a Broker Agency with FAKE Fein
+  And I select the all security question and give the answer
+  When I have submit the security questions
   The Broker should not see Fake FEIN in his account
   The Hbx Admin should be able to see the Fake FEIN in broker's account
   Brokers with REAL Feins should Fein in their account
@@ -17,11 +19,13 @@ Scenario: Primary Broker should not see FAKE Fein in his account
 
   Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
+  And I select the all security question and give the answer
+  When I have submit the security questions
   And Hbx Admin clicks on the Brokers dropdown
   And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
-  Then Hbx Admin should see the broker application
+  Then Hbx Admin should see the broker application with carrier appointments
   When Hbx Admin clicks on approve broker button
   Then Hbx Admin should see the broker successfully approved message
   And Hbx Admin logs out
@@ -30,6 +34,8 @@ Scenario: Primary Broker should not see FAKE Fein in his account
   When Primary Broker visits invitation url in email
   Then Primary Broker should see the create account page
   When Primary Broker registers with valid information
+  And I select the all security question and give the answer
+  When I have submit the security questions
   Then Primary Broker should see successful message with broker agency home page
   Then Primary Broker should not see fein
   And Primary Broker logs out
@@ -38,6 +44,8 @@ Scenario: Hbx Admin should see broker's actual FEIN
   Given Hbx Admin exists
   And a broker exists
   When Hbx Admin logs on to the Hbx Portal
+  And I select the all security question and give the answer
+  When I have submit the security questions
   And Hbx Admin clicks on the Brokers dropdown
   And Hbx Admin clicks on the Broker Agencies option
   And Hbx Admin clicks on the broker
@@ -53,15 +61,18 @@ Scenario: Hbx Admin should see fake fein in broker's account
   And Primary Broker enters broker agency information for SHOP markets
   And Primary Broker enters office location for default_office_location
   And Primary Broker clicks on Create Broker Agency
+
   Then Primary Broker should see broker registration successful message
 
   Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
+  And I select the all security question and give the answer
+  When I have submit the security questions
   And Hbx Admin clicks on the Brokers dropdown
   And Hbx Admin clicks on the Broker Applications option
   Then Hbx Admin should see the list of broker applicants
   When Hbx Admin clicks on the current broker applicant show button
-  Then Hbx Admin should see the broker application
+  Then Hbx Admin should see the broker application with carrier appointments
   When Hbx Admin clicks on approve broker button
   Then Hbx Admin should see the broker successfully approved message
   And Hbx Admin logs out
@@ -70,6 +81,8 @@ Scenario: Hbx Admin should see fake fein in broker's account
   When Primary Broker visits invitation url in email
   Then Primary Broker should see the create account page
   When Primary Broker registers with valid information
+  And I select the all security question and give the answer
+  When I have submit the security questions
   Then Primary Broker should see successful message with broker agency home page
   Then Primary Broker should not see fein
   And Primary Broker logs out

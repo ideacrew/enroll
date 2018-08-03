@@ -6,8 +6,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
   let(:notice_event) { "employee_plan_selection_confirmation_sep_new_hire" }
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
-  let!(:employer) { FactoryGirl.create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year) }
-  let!(:plan_year) { FactoryGirl.create(:custom_plan_year, employer_profile: employer, aasm_state: "enrolling")}
+  let!(:employer) { FactoryGirl.create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: "active") }
   let!(:census_employee){   FactoryGirl.create(:census_employee, employer_profile: employer)  }
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let!(:role) {  FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer) }
@@ -20,7 +19,6 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
                                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                                           aasm_state: "shopping"
   ) }
-
 
   describe "ModelEvent" do
     context "when employee plan coverage selected" do
@@ -46,7 +44,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(role)
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_plan_selection_confirmation_sep_new_hire"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
@@ -73,7 +71,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
 
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
-    let!(:payload)   { { 
+    let!(:payload)   { {
       "event_object_kind" => "HbxEnrollment",
       "event_object_id" => model_instance.id
     } }
@@ -103,7 +101,7 @@ describe 'ModelEvents::EmployeePlanCoverageSelected' do
         expect(merge_model).to be_a(recipient.constantize)
         expect(merge_model.employer_name).to eq employer.organization.legal_name
         expect(merge_model.broker_present?).to be_falsey
-      end 
+      end
     end
   end
 end

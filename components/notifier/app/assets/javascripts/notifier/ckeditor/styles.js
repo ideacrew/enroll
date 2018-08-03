@@ -108,6 +108,10 @@ CKEDITOR.stylesSet.add( 'default', [
 	},
 
 	{ name: 'Borderless Table',		element: 'table',	styles: { 'border-style': 'hidden', 'background-color': '#E6E6FA' } },
+	{name: 'Background Table Row', element: 'tr', styles: {'background-color': '#E9E9E9'}},
+	{name: 'Top Border Row', element: 'tr', styles: {'border-top': '1px solid #E9E9E9'}},
+	{name: 'Bottom Border Row', element: 'tr', styles: {'border-bottom': '1px solid #E9E9E9'}},
+	{name: 'Borderless Table Data', element: 'td', styles: {'border-style': 'hidden'}},
 	{ name: 'Square Bulleted List',	element: 'ul',		styles: { 'list-style-type': 'square' } },
 
 	/* Widget styles */

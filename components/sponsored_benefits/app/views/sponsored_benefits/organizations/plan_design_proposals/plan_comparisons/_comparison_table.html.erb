@@ -29,7 +29,7 @@
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-            <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
+            <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
             <%= qhp.plan.plan_type.upcase %>
             </th>
           <% end %>

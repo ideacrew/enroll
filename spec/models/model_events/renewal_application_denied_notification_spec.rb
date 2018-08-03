@@ -26,6 +26,9 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
     end
   }
 
+  let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer.id)}
+  let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
+
   describe "ModelEvent" do
 
     before :each do
@@ -60,7 +63,7 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
       let(:model_event) { ModelEvents::ModelEvent.new(:renewal_application_denied, model_instance, {}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_employer_ineligibility_notice"
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
@@ -68,7 +71,7 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
         end
 
         employer.census_employees.non_terminated.each do |ce|
-          expect(subject).to receive(:notify) do |event_name, payload|
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.employee_renewal_employer_ineligibility_notice"
             expect(payload[:employee_role_id]).to eq ce.employee_role_id.to_s
             expect(payload[:event_object_kind]).to eq 'PlanYear'
@@ -184,10 +187,12 @@ describe 'ModelEvents::RenewalApplicationDeniedNotification' do
           expect(merge_model.plan_year.current_py_end_date).to eq current_py.end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
           expect(merge_model.plan_year.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-
-          expect(merge_model.plan_year.enrollment_errors).to include(:non_business_owner_enrollment_count)
+          enrollment_errors = []
+          enrollment_errors << "One non-owner employee enrolled in health coverage"
+          enrollment_errors << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
+          expect(merge_model.plan_year.enrollment_errors).to include(enrollment_errors.join(' AND/OR '))
           if model_instance.start_on.yday != 1
-            expect(merge_model.plan_year.enrollment_errors).to include(:enrollment_ratio)
+            expect(merge_model.plan_year.enrollment_errors).to include(enrollment_errors.join(' AND/OR '))
           end
 
           TimeKeeper.set_date_of_record_unprotected!(current_date)

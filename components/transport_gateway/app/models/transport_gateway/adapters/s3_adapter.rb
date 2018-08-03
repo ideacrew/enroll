@@ -18,6 +18,7 @@ module TransportGateway
       key = message.from.key
 
       tempfile = Tempfile.new(key)
+      tempfile.binmode
       begin
         client = Aws::S3::Client.new({
           :region => region

@@ -11,6 +11,6 @@ FactoryGirl.define do
       kind ' '
     end
 
-    factory :invalid_email, traits: [:without_email_type, :without_email_address]
+    factory :sponsored_benefits_invalid_email, traits: [:without_email_type, :without_email_address]
   end
 end

@@ -6,6 +6,7 @@ require 'csv'
  
      desc "List of all new people registered in enroll"
      task :total_new_people_list => :environment do
+       include Config::AcaHelper
 
       end_date = TimeKeeper.date_of_record + 1.day
  
@@ -39,8 +40,7 @@ require 'csv'
            Ethnicity
          )
        count = 0
-       time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
-       file_name = "#{Rails.root}/public/new_registered_persons_data_report_#{time_stamp}.csv"
+       file_name = fetch_file_format('new_registered_persons_data_report', 'NEWREGISTEREDPERSONSDATA')
  
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names

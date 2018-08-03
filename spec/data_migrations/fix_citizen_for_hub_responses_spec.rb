@@ -1,9 +1,10 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_citizen_for_hub_responses")
 
-ACCEPTABLE_STATES = %w(us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident indian_tribe_member)
-NOT_ACCEPTABLE_STATES = %w(undocumented_immigrant not_lawfully_present_in_us non_native_not_lawfully_present_in_us ssn_pass_citizenship_fails_with_SSA non_native_citizen)
-STATES_TO_FIX = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us ssn_pass_citizenship_fails_with_SSA)
+ACCEPTABLE_STATES = %w(us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident indian_tribe_member not_lawfully_present_in_us)
+NOT_ACCEPTABLE_STATES = %w(undocumented_immigrant non_native_not_lawfully_present_in_us ssn_pass_citizenship_fails_with_SSA non_native_citizen)
+STATES_TO_FIX = ["not_lawfully_present_in_us", "non_native_not_lawfully_present_in_us", "ssn_pass_citizenship_fails_with_SSA", nil]
 
 describe UpdateCitizenStatus, dbclean: :after_each do
   subject { UpdateCitizenStatus.new("fix_citizen_for_hub_responses", double(:current_scope => nil)) }
@@ -29,9 +30,6 @@ describe UpdateCitizenStatus, dbclean: :after_each do
   context "citizen status wasn't changed" do
     it_behaves_like "fixing citizen status for consumer", "us_citizen", "us_citizen", "us_citizen", "ssa"
   end
-  context "citizen status is nil" do
-    it_behaves_like "fixing citizen status for consumer", "us_citizen", nil, nil, "any"
-  end
 
   STATES_TO_FIX.each do |status|
     context "citizen state was valid but has been changed to #{status}" do
@@ -50,4 +48,5 @@ describe UpdateCitizenStatus, dbclean: :after_each do
       it_behaves_like "fixing citizen status for consumer", "us_citizen", status, "us_citizen", "curam"
     end
   end
+end
 end

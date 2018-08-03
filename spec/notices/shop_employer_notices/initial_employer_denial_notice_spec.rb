@@ -10,8 +10,8 @@ RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
                             :name =>'Denial of Initial Employer Application/Request for Clarifying Documentation',
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_denial_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerDenialNotice',
-                            :mpi_indicator => 'MPI_SHOP2B',
                             :event_name => 'initial_employer_denial',
+                            :mpi_indicator => 'MPI_SHOP2B',
                             :title => "Employer Denial Notice"})
                           }
     let(:valid_parmas) {{
@@ -64,7 +64,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
     it "should append necessary information" do
       plan_year = employer_profile.plan_years.first
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.warnings).to eq ["Full Time Equivalent must be 1-50", "primary business address not located in Massachusetts"]
+      expect(@employer_notice.notice.plan_year.warnings).to eq ["Full Time Equivalent must be 1-50"]
     end
   end
 

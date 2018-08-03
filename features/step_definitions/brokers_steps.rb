@@ -63,10 +63,14 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'organization[ach_record][routing_number]', with: '123456789'
   fill_in 'organization[ach_record][routing_number_confirmation]', with: '123456789'
   fill_in 'organization[ach_record][account_number]', with: '9999999999999999'
+  find("#organization_ach_record_routing_number_confirmation").send_keys([:control, "a"])
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency", wait: 10
+  wait_for_ajax
+  page.find('h1', text: 'Broker Registration').click
+  wait_for_ajax
+  click_button "Create Broker Agency", wait: 6
 end
 
 Then(/^.+ should see broker registration successful message$/) do
@@ -81,7 +85,13 @@ Then(/^.+ clicks? on the current broker applicant show button$/) do
   find('.interaction-click-control-broker-show').trigger('click')
 end
 
-And(/^.+ should see the broker application$/) do
+And(/^.+ should see the broker application with carrier appointments$/) do
+  if (Settings.aca.broker_carrier_appointments_enabled)
+    find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox| 
+      checkbox.should be_checked 
+    end
+    expect(page).to have_content("Carrier appointments for broker are not necessary for participation in #{Settings.site.long_name}")
+  end
 end
 
 And(/^.+ clicks? on approve broker button$/) do

@@ -35,6 +35,7 @@ class GeneralAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  embeds_many :documents, as: :documentable
   has_many :general_agency_contacts, class_name: "Person", inverse_of: :general_agency_contact
   accepts_nested_attributes_for :general_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
@@ -50,6 +51,7 @@ class GeneralAgencyProfile
     inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
+  embeds_many :documents, as: :documentable
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   accepts_nested_attributes_for :inbox
   after_initialize :build_nested_models
@@ -108,6 +110,14 @@ class GeneralAgencyProfile
 
   def applicant?
     aasm_state == "is_applicant"
+  end
+
+  def general_agency_hired_notice(employer_profile)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
+    end
   end
 
   class << self

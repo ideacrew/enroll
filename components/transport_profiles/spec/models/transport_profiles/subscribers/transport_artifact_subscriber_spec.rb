@@ -7,11 +7,12 @@ module TransportProfiles
     end
 
     let(:payload) do
+      double(:headers =>
       {
         :file_name => file_name,
         :artifact_key => artifact_key,
         :transport_process => transport_process
-      }
+      })
     end
 
     let(:request_properties) do
@@ -48,7 +49,7 @@ module TransportProfiles
             })
           }
         )
-        subject.call("", nil, nil, nil, payload)
+        subject.work_with_params("", nil, payload)
       end
     end
 
@@ -60,57 +61,9 @@ module TransportProfiles
 
       it "executes the request" do
         expect(request).to receive(:execute)
-        subject.call("", nil, nil, nil, payload)
+        subject.work_with_params("", nil, payload)
       end
     end
 
-    describe "given a valid request, with execution errors" do
-      let(:payload) do
-        {
-          :file_name => file_name,
-          :artifact_key => artifact_key,
-          :transport_process => transport_process
-        }
-      end
-
-      let(:request_properties) do
-        {
-          :file_name => file_name,
-          :artifact_key => artifact_key,
-          :transport_process => transport_process
-        }
-      end
-
-      let(:file_name) { "some_pdf.pdf" }
-      let(:artifact_key) { "the_artifact_key" }
-      let(:transport_process) { "some transport process" }
-      let(:error) { Exception.new("some exception") }
-
-      let(:error_message_body) do
-        JSON.dump({
-          "error" => error.inspect,
-          "error_message" => error.message,
-          "error_backtrace" => []
-        })
-      end
-
-      before :each do
-        allow(ArtifactTransportRequest).to receive(:new).with(request_properties).and_return(request)
-        allow(request).to receive(:valid?).and_return(true)
-        allow(error).to receive(:backtrace).and_return([])
-        allow(request).to receive(:execute).and_raise(error)
-      end
-
-      it "executes the request and logs the error" do
-        expect(subject).to receive(:notify).with(
-          "acapi.error.events.transport_artifact.transport_execution_error",
-          {
-            :return_status => "500",
-            :body => error_message_body
-          }
-        )
-        subject.call("", nil, nil, nil, payload)
-      end
-    end
   end
 end

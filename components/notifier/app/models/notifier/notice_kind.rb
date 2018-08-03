@@ -10,7 +10,9 @@ module Notifier
     RECIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
-      "Broker" => "Notifier::MergeDataModels::BrokerProfile"
+      "Broker" => "Notifier::MergeDataModels::BrokerProfile",
+      "Broker Agency" => "Notifier::MergeDataModels::BrokerAgencyProfile",
+      "GeneralAgency" => "Notifier::MergeDataModels::GeneralAgency"
     }
 
     field :title, type: String
@@ -36,11 +38,37 @@ module Notifier
 
     attr_accessor :resource, :payload
 
+
+    def tokens
+      template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
+    end
+
+    def conditional_tokens
+      template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
+    end
+
     def set_data_elements
       if template.present?
-        tokens = template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
-        conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
-        template.data_elements = tokens + conditional_tokens
+        conditional_token_loops = []
+        iterator_subloop_tokens = []
+        loop_tokens = []
+        loop_iterators = conditional_tokens.inject([]) do |iterators, conditional_token|
+          iterators unless conditional_token.match(/(.+)\.each/i)
+          loop_match = conditional_token.match(/\|(.+)\|/i)
+          if loop_match.present?
+            loop_token = conditional_token.match(/(.+)\.each/i)[1]
+            loop_tokens << loop_token
+            iterator_subloop_tokens << loop_token if iterators.any?{|iterator| loop_token.match(/^#{iterator}\.(.*)$/i).present? }
+            conditional_token_loops << conditional_token
+            iterators << loop_match[1].strip
+          else
+            iterators
+          end
+        end
+
+        filtered_conditional_tokens = conditional_tokens - conditional_token_loops
+        data_elements = (tokens + filtered_conditional_tokens + loop_tokens).reject{|token| loop_iterators.any?{|iterator| token.match(/^#{iterator}\.(.*)$/i).present? && token.match(/(.+)\.each/i).blank?} }
+        template.data_elements = data_elements + iterator_subloop_tokens
       end
     end
 
@@ -49,16 +77,15 @@ module Notifier
       if finder_mapping.nil?
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
       end
-
       @payload = payload
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
       if @resource.blank?
         raise ArgumentError.new("Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}.")
       end
-
       generate_pdf_notice
       upload_and_send_secure_message
       send_generic_notice_alert
+      send_generic_notice_alert_to_broker
     end
 
     def recipient_klass_name

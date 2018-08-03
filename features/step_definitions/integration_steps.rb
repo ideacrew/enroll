@@ -247,10 +247,22 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_add_sep: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+end
+
+Given(/^a Hbx admin with super admin access exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile, :no_open_enrollment_coverage_period
+  user = FactoryGirl.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
@@ -267,7 +279,7 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
 
-Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
+Given(/^(.*)Employer for (.*) exists with a published health plan year$/) do |kind, named_person|
   person = people[named_person]
   FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
@@ -281,11 +293,11 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   carrier_profile = benefit_group.reference_plan.carrier_profile
-  sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+  sic_factors = SicCodeRatingFactorSet.new(active_year: TimeKeeper.date_of_record.year, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
     factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
   end
   sic_factors.save!
-  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: TimeKeeper.date_of_record.year, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
     [0..5].each do |size|
       factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
     end
@@ -310,12 +322,12 @@ Given(/^Employer for (.*) exists with a published plan year offering health and 
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
-  carrier_profile = benefit_group.reference_plan.carrier_profile
-  sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+  carrier_profile = benefit_group.dental_reference_plan.carrier_profile #THIS FIXES empty SicCodeRatingFactorSet from plan shopping show controller but... WHY???
+  sic_factors = SicCodeRatingFactorSet.new(active_year: TimeKeeper.date_of_record.year, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
     factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
   end
   sic_factors.save!
-  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: TimeKeeper.date_of_record.year, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
     [0..5].each do |size|
       factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
     end
@@ -361,9 +373,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
   renewal_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewal_plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment renewal_benefit_group
-
-  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
-  employee.update_attributes!(employee_role_id: employee_role.id)
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
@@ -432,6 +441,8 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
+  wait_for_ajax
+  page.find('h4', text: "#{Settings.site.byline}").click
 end
 
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
@@ -468,6 +479,8 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
 
   find('.interaction-click-control-save').click
 end
@@ -586,6 +599,22 @@ When(/^(.*) creates an HBX account$/) do |named_person|
   click_button "Create account"
 end
 
+And(/^Primary Broker select the all security question and give the answer$/) do
+  step 'I select the all security question and give the answer'
+end
+
+When(/^Primary Broker have submit the security questions$/) do
+  step 'I have submit the security questions'
+end
+
+And(/^Broker Assisted select the all security question and give the answer$/) do
+  step 'I select the all security question and give the answer'
+end
+
+When(/^Broker Assisted have submit the security questions$/) do
+  step 'I have submit the security questions'
+end
+
 When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
   person = people[named_person]
 
@@ -646,7 +675,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # TODO: fix this bombing issue
   wait_for_ajax
   page.evaluate_script("window.location.reload()")
-  wait_for_ajax
+  wait_for_ajax(3,2)
   person = people[named_person]
   screenshot("before modal")
   # find('.interaction-click-control-click-here').click
@@ -726,16 +755,6 @@ end
 
 Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
-end
-
-Then(/^.+ should see the group selection page with health or dental dependents list$/) do
-  expect(page).to have_css('form')
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  find(:xpath, '//label[@for="coverage_kind_dental"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
-  find(:xpath, '//label[@for="coverage_kind_health"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  expect(page).to have_selector('.group-selection-table.health', visible: true)
 end
 
 When(/^.+ clicks? health radio on the group selection page$/) do
@@ -874,7 +893,7 @@ end
 
 When(/^.+ clicks? on the add employee button$/) do
   evaluate_script(<<-JSCODE)
-  $('.interaction-click-control-add-employee')[0].click()
+  $('.interaction-click-control-add-new-employee')[0].click()
   JSCODE
   wait_for_ajax
 end
@@ -897,6 +916,18 @@ When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) option$/) do |
   find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
   wait_for_ajax
   find('#myTabContent').trigger('click')
+end
+
+And(/^clicks on the person in families tab$/) do
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
+  wait_for_ajax(10,2)
+  family_member = page.find('a', :text => "#{user.person.full_name}")
+  family_member.trigger('click')
+  visit verification_insured_families_path
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
@@ -948,6 +979,18 @@ Then(/^I should see confirmation and continue$/) do
   click_button "Continue"
 end
 
+Then(/^I can click on Shop for Plan button$/) do
+  click_button "Shop for Plans"
+end
+
+Then(/^Page should contain existing qle$/) do
+  expect(page).to have_content 'You qualify for a Special Enrollment Period (SEP) because you "Married"'
+end
+
+Then(/^I can click Shop with existing SEP link$/) do
+  click_link "Shop Now"
+end
+
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
   expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
@@ -994,6 +1037,25 @@ Then (/HBX admin start new employee enrollment/) do
   expect(page).to have_content("Personal Information")
 end
 
+Then(/Employee should see the correct employee contribution on plan tile/) do
+  enrollment = Person.all.first.primary_family.active_household.hbx_enrollments.where(:"aasm_state".ne => "shopping").first
+  expect(page).to have_content "$#{enrollment.total_employee_cost.round(2)}"
+end
+
+Then(/Employee should see their current plan/) do
+  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+end
+
+And(/Employee should have a ER sponsored enrollment/) do
+  person = Person.all.first
+  bg = Organization.all.first.employer_profile.plan_years[0].benefit_groups[0]
+  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected",
+                                    plan: Plan.all.first, benefit_group_id: bg.id
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id,
+                                        eligibility_date: TimeKeeper.date_of_record - 1.month, coverage_start_on: TimeKeeper.date_of_record)
+  enrollment.save
+end
+
 Then(/Devops can verify session logs/) do
   log_entries = `tail -n 15 log/test.log`.split("\n")
   #log with a logged out session
@@ -1014,6 +1076,8 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   person = people['Hbx AdminEnrollments']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  @user_1 = FactoryGirl.create :user, :with_family, :employer_staff, oim_id: "Employer1"
+  @user_2 = FactoryGirl.create :user, :with_family, :employer_staff, oim_id: "Employer2"
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   org1 = FactoryGirl.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
   employer_profile = FactoryGirl.create :employer_profile, organization: org1

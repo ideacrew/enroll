@@ -260,9 +260,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+      { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,
@@ -286,12 +286,14 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :is_applying_coverage
     ]
   end
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 

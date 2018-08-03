@@ -29,7 +29,9 @@ plan_tables = %w(
   plans
   products_qhps
 )
-restore_database = Mongoid.default_session.options[:database].to_s
+
+# default_session deprecated in this version
+restore_database = Mongoid.default_client.options[:database].to_s
 dump_location = File.join(File.dirname(__FILE__), 'seedfiles', 'plan_dumps')
 restore_location = File.join(dump_location, restore_database)
 plan_files = plan_tables.collect(){|table| File.join(restore_location, "#{table}.bson")}
@@ -46,22 +48,13 @@ if use_plan_dumps
   puts "::: complete :::"
 end
 
-puts "*"*80
-puts "Creating Indexes"
-system "rake db:mongoid:create_indexes"
-puts "::: complete :::"
 
 if missing_plan_dumps
   puts "Running full seed"
 
   puts "*"*80
-  puts "Creating Indexes"
-  system "rake db:mongoid:create_indexes"
-  puts "::: complete :::"
-
-  puts "*"*80
   puts "Loading carriers and plans"
-  require File.join(File.dirname(__FILE__),'seedfiles', 'carriers_seed')
+  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
   puts "::: complete :::"
 
   puts "*"*80
@@ -70,30 +63,36 @@ if missing_plan_dumps
   system "bundle exec rake update_seed:qualifying_life_event"
   puts "::: complete :::"
 
-  puts "*"*80
-  puts "Loading SIC Codes."
-  system "bundle exec rake load_sic_code:update_sic_codes"
-  puts "::: complete :::"
+  if Settings.aca.employer_has_sic_field
+    puts "*"*80
+    puts "Loading SIC Codes."
+    system "bundle exec rake load_sic_code:update_sic_codes"
+    puts "::: complete :::"
+  end
 
-  puts "*"*80
-  puts "Loading Rating Factors."
-  system "bundle exec rake load_rating_factors:run_all_rating_factors"
-  puts "::: complete :::"
+  unless Settings.aca.use_simple_employer_calculation_model
+    puts "*"*80
+    puts "Loading Rating Factors."
+    system "bundle exec rake load_rating_factors:run_all_rating_factors"
+    puts "::: complete :::"
 
-  puts "*"*80
-  puts "Loading Rating Areas."
-  system "bundle exec rake load_rate_reference:update_rating_areas"
-  puts "::: complete :::"
+    puts "*"*80
+    puts "Loading Rating Areas."
+    system "bundle exec rake load_rate_reference:update_rating_areas"
+    puts "::: complete :::"
+  end
 
-  puts "*"*80
-  puts "Loading Carrier Service Areas."
-  system "bundle exec rake load_service_reference:run_all_service_areas"
-  puts "::: complete :::"
+  if Settings.aca.offerings_constrained_to_service_areas
+    puts "*"*80
+    puts "Loading Carrier Service Areas."
+    system "bundle exec rake load_service_reference:run_all_service_areas"
+    puts "::: complete :::"
 
-  puts "*"*80
-  puts "Updating Carrier Service Areas."
-  system "bundle exec rake update_service_reference:update_service_areas['UPDATED_SHOP_SA_FCHP.xlsx',2017,'88806']"
-  puts "::: complete :::"
+    puts "*"*80
+    puts "Updating Carrier Service Areas."
+    system "bundle exec rake update_service_reference:update_service_areas['UPDATED_SHOP_SA_FCHP.xlsx',2017,'88806']"
+    puts "::: complete :::"
+  end
 
   puts "*"*80
   puts "Loading SERFF Plan data"
@@ -149,6 +148,7 @@ if missing_plan_dumps
   system "bundle exec rake import:network_information"
   puts "::: Updating network info for 2017 plans complete:::"
 
+  # Needs to be a setting catastrophic plans on/off
   # puts "*"*80
   # system "bundle exec rake migrations:cat_age_off_renewal_plan"
   # puts "*"*80
@@ -205,5 +205,15 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
 puts "importing security questions complete"
 puts "*"*80
 
+require File.join(File.dirname(__FILE__),'seedfiles', 'sic_codes_seed')
+
+if Settings.site.key.to_s == "cca"
+  require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
+end
+
+puts "*"*80
+puts "Creating Indexes"
+system "rake db:mongoid:create_indexes"
+puts "::: complete :::"
 
 puts "End of Seed Data"

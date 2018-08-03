@@ -2,7 +2,7 @@
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
      <div class="container plan_design_proposals">
-      <%= render 'shared/engines/horizontal_status', step:2, links: generate_breadcrumb_links(plan_design_proposal, plan_design_organization) %>
+      <%#= render 'shared/engines/horizontal_status', step:2, links: generate_breadcrumb_links(plan_design_proposal, plan_design_organization) %>
       <%= form_for plan_design_form, url: {action: "create", controller: '/sponsored_benefits/organizations/plan_design_proposals'} do |f| %>
         <%= render 'plan_selection_form', f: f %>
           <div class="col-md-6 col-md-offset-6">

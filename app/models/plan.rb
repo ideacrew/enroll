@@ -2,7 +2,7 @@ class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
 #  include Mongoid::Versioning
-
+  include Config::AcaModelConcern
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
@@ -70,9 +70,9 @@ class Plan
   field :frozen_plan_year, type: Boolean
 
   # Fields for checking respective carrier is offering or not
-  field :is_horizontal, type: Boolean, default: true
-  field :is_vertical, type: Boolean, default: true
-  field :is_sole_source, type: Boolean, default: true
+  field :is_horizontal, type: Boolean, default: -> { true }
+  field :is_vertical, type: Boolean, default: -> { true }
+  field :is_sole_source, type: Boolean, default: -> { true }
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -297,13 +297,16 @@ class Plan
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
   scope :by_carrier_profile_for_bqt,            ->(carrier_profile_id) { where(:carrier_profile_id.in => carrier_profile_id) }
-
+  scope :with_enabled_metal_levels,             -> { any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS & enabled_metal_levels)}
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
   scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
 
 
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
+
+  scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
+  scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
 
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
@@ -420,6 +423,18 @@ class Plan
 
   def can_use_aptc?
     metal_level != 'catastrophic'
+  end
+
+  def hsa_eligibility
+    qhp = Products::Qhp.where(standard_component_id: hios_base_id, active_year: active_year).last
+    case qhp.hsa_eligibility.downcase
+    when "" # dental always has empty data for hsa_eligibility in serff templates.
+      return false
+    when "yes"
+      return true
+    when "no"
+      return false
+    end
   end
 
   def ehb
@@ -656,10 +671,10 @@ class MetalLevel
 
   private
 
-    def safe_assign(metal_level)
-      if metal_level.is_a? String
-        metal_level = MetalLevel.new(metal_level)
-      end
-      metal_level
+  def safe_assign(metal_level)
+    if metal_level.is_a? String
+      metal_level = MetalLevel.new(metal_level)
     end
+    metal_level
+  end
 end

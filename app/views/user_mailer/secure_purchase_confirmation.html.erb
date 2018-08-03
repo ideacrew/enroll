@@ -1,16 +1,16 @@
 <div style='width: 400px; margin-left: 50px'>
-  <img src="<%= asset_path( 'health_connector.png' ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
+  <img src="<%= asset_path( Settings.site.mailer_logo_file_name ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
 <p>
 Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
 </p>
 <p>
-You're successfully enrolled in <%= @plan.name %>.
+You're successfully enrolled in <%= @plan.title %>.
 </p>
 
 <% if @market_kind != 'individual' %>
 <p>
-  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @plan.total_employee_cost%>.</b><br>
-  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @plan.total_employer_contribution %></b> towards your monthly premium.<br>
+  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.employee_cost_total %>.</b><br>
+  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.sponsor_contribution_total %></b> towards your monthly premium.<br>
   Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
 </p>
 <p>

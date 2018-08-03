@@ -30,7 +30,7 @@ describe 'ModelEvents::RenewalOeEmployeeAutoRenewalNotification' do
     benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year, reference_plan_id: plan.id
     employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
-    employee.add_renew_benefit_group_assignment renewal_benefit_group
+    employee.add_renew_benefit_group_assignment([renewal_benefit_group])
   }
 
   let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
@@ -104,7 +104,7 @@ describe 'ModelEvents::RenewalOeEmployeeAutoRenewalNotification' do
       let(:model_event_instance) { ModelEvents::ModelEvent.new(model_event.to_sym, model_instance, {event_object:renewing_plan_year}) }
 
       it "should trigger notice event" do
-        expect(subject).to receive(:notify) do |event_name, payload|
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.#{notice_event}"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'

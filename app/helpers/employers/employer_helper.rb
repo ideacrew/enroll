@@ -3,20 +3,31 @@ module Employers::EmployerHelper
     @family.try(:census_employee).try(:address).try(:kind) || 'home'
   end
 
-  def employee_state_format(employee_state=nil, termination_date=nil)
+  def employee_state_format(census_employee=nil, employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
+    elsif employee_state == 'employee_role_linked'
+      return 'Account Linked'
+    elsif employee_state == 'eligible'
+      return 'No Account Linked'
+    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
+      return "Cobra Enrolled"
     else
       return employee_state.humanize
     end
   end
 
+  def simple_enrollment_state(census_employee=nil)
+    hbx = census_employee.active_benefit_group_enrollments.try(:first)
+    hbx.present? ? "#{hbx.coverage_kind.titleize} - #{hbx.aasm_state.titleize}" : ""
+  end
+
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment)
+    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
   end
 
   def humanize_enrollment_states(benefit_group_assignment)
@@ -34,7 +45,6 @@ module Employers::EmployerHelper
     end
 
     "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
-
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -103,7 +113,13 @@ module Employers::EmployerHelper
   end
 
   def render_plan_offerings(benefit_group, coverage_type)
+    start_on = benefit_group.plan_year.start_on.year
     reference_plan = benefit_group.reference_plan
+    carrier_profile = reference_plan.carrier_profile
+    employer_profile = benefit_group.employer_profile
+    profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on)
+    query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
+
     if coverage_type == ".dental" && benefit_group.dental_plan_option_kind == "single_plan"
       plan_count = benefit_group.elected_dental_plan_ids.count
       "#{plan_count} Plans"
@@ -114,20 +130,45 @@ module Employers::EmployerHelper
       return "1 Plan Only" if benefit_group.single_plan_type?
       return "Sole Source Plan" if benefit_group.plan_option_kind == 'sole_source'
       if benefit_group.plan_option_kind == "single_carrier"
-        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
+        plan_count = Plan.for_service_areas_and_carriers(query, start_on).shop_market.check_plan_offerings_for_single_carrier.health_coverage.and(hios_id: /-01/).count
         "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
       else
-        plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level]).count
+        plan_count = Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).count
         "#{reference_plan.metal_level.titleize} Plans (#{plan_count})"
       end
     end
   end
 
+  # deprecated
   def get_benefit_groups_for_census_employee
+    # TODO
     plan_years = @employer_profile.plan_years.select{|py| (PlanYear::PUBLISHED + ['draft']).include?(py.aasm_state) && py.end_on > TimeKeeper.date_of_record}
     benefit_groups = plan_years.flat_map(&:benefit_groups)
-    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year
+    renewing_benefit_groups = @employer_profile.renewing_plan_year.benefit_groups if @employer_profile.renewing_plan_year.present?
     return benefit_groups, (renewing_benefit_groups || [])
+  end
+
+  def get_benefit_packages_for_census_employee
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages if @benefit_sponsorship.current_benefit_application.present?
+    renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
+    return (initial_benefit_packages || []), (renewing_benefit_packages || [])
+  end
+
+  def current_option_for_initial_benefit_package
+    bga = @census_employee.active_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.current_benefit_application
+    return nil if application.blank?
+    return nil if application.benefit_packages.empty?
+    application.benefit_packages[0].id
+  end
+
+  def current_option_for_renewal_benefit_package
+    bga = @census_employee.renewal_benefit_group_assignment
+    return bga.benefit_package_id if bga && bga.benefit_package_id
+    application = @employer_profile.renewal_benefit_application
+    return nil if application.blank?
+    application.default_benefit_group || application.benefit_packages[0].id
   end
 
   def cobra_effective_date(census_employee)
@@ -141,10 +182,13 @@ module Employers::EmployerHelper
   end
 
   def cobra_button(census_employee)
-    disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    if census_employee.employer_profile.present?
-      disabled = true if census_employee.is_disabled_cobra_action?
+    disabled = true
+    if census_employee.is_cobra_coverage_eligible?
+      if current_user.has_hbx_staff_role? || !census_employee.cobra_eligibility_expired?
+        disabled = false
+      end
     end
+
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
     if census_employee.cobra_terminated?
@@ -162,6 +206,7 @@ module Employers::EmployerHelper
     return true if user && user.has_hbx_staff_role?
     return false if employer_profile.blank?
 
+    # TODO
     plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
 
     return false if plan_year.blank?
@@ -224,10 +269,14 @@ module Employers::EmployerHelper
   end
 
   def selected_benefit_plan(plan)
-    case plan 
-      when 'single_carrier' then fetch_plan_title_for_single_carrier
-      when 'metal_level' then fetch_plan_title_for_metal_level
-      when 'single_plan','sole_source' then 'A Single Plan'
+    case plan
+      when :single_issuer then 'One Carrier'
+      when :metal_level then 'One Level'
+      when :single_product then 'A Single Plan'
     end
+  end
+
+  def display_sic_field_for_employer?
+    Settings.aca.employer_has_sic_field
   end
 end

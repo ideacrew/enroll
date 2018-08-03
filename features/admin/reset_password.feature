@@ -5,18 +5,23 @@ Feature: Reset password of user
   Scenario: Admin can reset password of the user if has permission
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then there are 1 preloaded unlocked user accounts
     When Hbx Admin clicks on the User Accounts tab
     Then Hbx Admin should see the list of primary applicants and Action buttons
     When Hbx Admin clicks on the Action button of primary applicant
     Then Hbx Admin should see Reset Password link in action drop down
     When Hbx Admin clicks on Reset Password link in action drop down
+    And Hbx admin confirms password send
     Then the reset password email should be sent to the user
 
 
   Scenario: Admin can add user email address to reset password if email does not exist
     Given Hbx Admin exists
     When Hbx Admin logs on to the Hbx Portal
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then there are 1 preloaded user accounts without email
     When Hbx Admin clicks on the User Accounts tab
     Then Hbx Admin should see the list of primary applicants and Action buttons

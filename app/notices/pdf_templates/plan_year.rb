@@ -9,8 +9,8 @@ module PdfTemplates
     attribute :carrier_name, String
     attribute :warnings, Array[String]
     attribute :binder_payment_due_date, Date
-    attribute :renewing_start_on, Date
-    attribute :terminated_on, Date
-    attribute :binder_payment_total, Money
+    attribute :total_enrolled_count, Integer
+    attribute :eligible_to_enroll_count, Integer
+    
   end
 end

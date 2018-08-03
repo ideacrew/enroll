@@ -4,7 +4,7 @@ include ActiveJob::TestHelper
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'Generate notices to employee by taking hbx_ids, census_ids and event name', :type => :task do
-  let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+  let!(:employer_profile) { census_employee_2.employer_profile}
   let!(:person) { FactoryGirl.create(:person)}
   let!(:employee_role) { emp_role = FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)
                          emp_role.update_attributes(census_employee: census_employee)
@@ -15,7 +15,7 @@ RSpec.describe 'Generate notices to employee by taking hbx_ids, census_ids and e
   let!(:employee_role_2) { emp_role = FactoryGirl.create(:employee_role, person: person2, employer_profile: employer_profile)
                            emp_role.update_attributes(census_employee: census_employee)
                            emp_role}
-  let!(:census_employee_2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let!(:census_employee_2) { FactoryGirl.create(:census_employee) }
 
   before :each do
     $stdout = StringIO.new

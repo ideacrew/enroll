@@ -1,7 +1,6 @@
 <% if @time_left <= 30 %>
 $('.navbar.navbar-default').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
 $('#sessionExpirationWarningModal').show();
-
 // make time left count down
 var countdown_timer = setInterval(session_countdown, 1000);
 

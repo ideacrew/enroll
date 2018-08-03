@@ -37,7 +37,7 @@ FactoryGirl.define do
       zip ' '
     end
 
-    factory :invalid_address, traits: [:without_kind, :without_address_1,
-      :without_city, :without_state, :without_zip]
+    factory :sponsored_benefits_locations_address_invalid_address, traits: [:without_kind, :without_address_1,
+     :without_city, :without_state, :without_zip]
   end
 end

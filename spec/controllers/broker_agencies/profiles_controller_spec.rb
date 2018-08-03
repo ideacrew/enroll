@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencies::ProfilesController do
+RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
   let(:broker_agency_profile_id) { "abecreded" }
   let!(:broker_agency) { FactoryGirl.create(:broker_agency) }
   let(:broker_agency_profile) { broker_agency.broker_agency_profile }
 
-  describe "GET new" do
+  describe "GET new",dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:person) { double("person")}
 
@@ -21,12 +21,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET show" do
+  describe "GET show",dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:person) { FactoryGirl.create(:person) }
 
     before(:each) do
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile, person: person)
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile, person: person)
       allow(user).to receive(:has_broker_agency_staff_role?).and_return(true)
       FactoryGirl.create(:announcement, content: "msg for Broker", audiences: ['Broker'])
       sign_in(user)
@@ -46,11 +46,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET edit" do
+  describe "GET edit",dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:person) { FactoryGirl.create(:person) }
     before :each do
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile, person: person)
+      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile, person: person)
       sign_in user
       get :edit, id: broker_agency_profile.id
     end
@@ -64,11 +64,22 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "patch update" do
+  describe "patch update",dbclean: :after_each do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
     let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile, organization: org) }
+    let(:organization_params) do
+      {
+        id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
+        office_locations_attributes: {
+          "0"=> {
+            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+            "phone_attributes"=> {"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          }
+        }
+      }
+    end
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -76,24 +87,34 @@ RSpec.describe BrokerAgencies::ProfilesController do
       allow(controller).to receive(:authorize).and_return(true)
     end
 
-    it "should update record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+    it "should update person main phone" do
+      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
+      post :update, id: broker_agency_profile.id, organization: organization_params
+       broker_agency_profile.primary_broker_role.person.reload
+       expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
+    end
+
+    it "should update person record" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
 
     it "should update record without a phone extension" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
-      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"999-9999", "extension"=>""}}}}
+      post :update, id: broker_agency_profile.id, organization: organization_params
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
+
+    it "should update record by saving accept new clients" do
+      post :update, id: broker_agency_profile.id, organization: organization_params
+      broker_agency_profile.reload
+      expect(broker_agency_profile.accept_new_clients).to be_truthy
+      expect(broker_agency_profile.working_hours).to be_truthy
+    end
   end
 
-  describe "GET index" do
+  describe "GET index",dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_broker_agency_staff_role? => false)}
     let(:person) { double("person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
@@ -118,7 +139,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "CREATE post" do
+  describe "CREATE post",dbclean: :after_each do
     let(:user){ double(:save => double("user")) }
     let(:person){ double(:broker_agency_contact => double("test")) }
     let(:broker_agency_profile){ double("test") }
@@ -149,7 +170,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
   end
 
-  describe "REDIRECT to my account if broker role present" do
+  describe "REDIRECT to my account if broker role present",dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
@@ -168,14 +189,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "get employers" do
+  describe "get employers",dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'], :person => person)}
     let(:user1) {FactoryGirl.create(:user,:roles=> [], person: broker_role.person)}
     let(:person) {broker_agency_staff_role.person}
     let(:person1) {broker_role.person}
     let(:organization) {FactoryGirl.create(:organization)}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
+    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile: broker_agency_profile)}
     let(:broker_role) { FactoryGirl.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
     it "should get organizations for employers where broker_agency_account is active" do
       allow(person).to receive(:broker_role).and_return(nil)
@@ -196,7 +217,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "family_index" do
+  describe "family_index",dbclean: :after_each do
     before :all do
       org = FactoryGirl.create(:organization)
       @broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org,aasm_state:'active')
@@ -223,9 +244,9 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "eligible_brokers" do
+  describe "eligible_brokers",dbclean: :after_each do
 
-    context "when individual is enabled" do
+    context "when individual is enabled",dbclean: :after_each do
       before :each do
         stub_const("BrokerAgencyProfile::MARKET_KINDS",%W[shop individual both])
         DatabaseCleaner.clean
@@ -241,9 +262,9 @@ RSpec.describe BrokerAgencies::ProfilesController do
         broker_agency_profile3 = FactoryGirl.create(:broker_agency_profile, organization:org3, market_kind:'both')
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
       end
-      context "individual market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+      context "individual market user",dbclean: :after_each do
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
         it "selects only 'individual' and 'both' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
@@ -253,9 +274,9 @@ RSpec.describe BrokerAgencies::ProfilesController do
            expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
           end
         end
-        context "SHOP market user" do
-          let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
-          let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+        context "SHOP market user",dbclean: :after_each do
+          let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+          let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
           it "selects only 'shop' and 'both' market brokers" do
             allow(subject).to receive(:current_user).and_return(user)
@@ -271,7 +292,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
 
-    context "SHOP market user" do
+    context "SHOP market user",dbclean: :after_each do
       let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
       let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
@@ -283,9 +304,9 @@ RSpec.describe BrokerAgencies::ProfilesController do
         broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization:org2, market_kind:'shop')
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
       end
-      context "SHOP market user" do
-        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
-        let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+      context "SHOP market user",dbclean: :after_each do
+        let(:person) {FactoryGirl.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
+        let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
         it "selects only 'shop' market brokers" do
           allow(subject).to receive(:current_user).and_return(user)
@@ -300,12 +321,12 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET assign" do
+  describe "GET assign",dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    context "when general agency is enabled via settings" do
+    context "when general agency is enabled via settings",dbclean: :after_each do
       before :each do
         Settings.aca.general_agency_enabled = true
         sign_in user
@@ -325,7 +346,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "when general agency is disabled via settings" do
+    context "when general agency is disabled via settings",dbclean: :after_each do
       before :each do
         Settings.aca.general_agency_enabled = false
         sign_in user
@@ -350,14 +371,14 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET assign_history" do
+  describe "GET assign_history",dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:hbx) { FactoryGirl.create(:user, person: person, roles: ['hbx_staff']) }
 
-    context "with admin user" do
+    context "with admin user",dbclean: :after_each do
       before :each do
         sign_in hbx
         xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
@@ -372,7 +393,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "with broker user" do
+    context "with broker user",dbclean: :after_each do
       before :each do
         sign_in user
         xhr :get, :assign_history, id: broker_agency_profile.id, format: :js
@@ -388,15 +409,23 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET clear_assign_for_employer" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  describe "GET clear_assign_for_employer",dbclean: :after_each do
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, aasm_state: "is_approved") }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:favorite_general_agency) { FactoryGirl.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+
     before :each do
       sign_in user
+      favorite_general_agency.reload
       xhr :get, :clear_assign_for_employer, id: broker_agency_profile.id, employer_id: employer_profile.id
+    end
+
+    it "should assign general agency profiles" do
+      expect(assigns(:broker_role)).to eq broker_role
+      expect(assigns(:general_agency_profiles)).to eq [general_agency_profile]
     end
 
     it "should http success" do
@@ -406,15 +435,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should get employer_profile" do
       expect(assigns(:employer_profile)).to eq employer_profile
     end
+
   end
 
-  describe "POST update_assign" do
+  describe "POST update_assign",dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when general agency is enabled via settings" do
+    context "when general agency is enabled via settings",dbclean: :after_each do
       before do
         Settings.aca.general_agency_enabled = true
       end
@@ -432,7 +462,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
           expect(flash[:notice]).to eq 'Assign successful.'
         end
       end
-      context "when we Unassign agency" do
+      context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
           post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
@@ -452,7 +482,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "when general agency is enabled via settings" do
+    context "when general agency is enabled via settings",dbclean: :after_each do
       before do
         Settings.aca.general_agency_enabled = true
       end
@@ -470,7 +500,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
           expect(flash[:notice]).to eq 'Assign successful.'
         end
       end
-      context "when we Unassign agency" do
+      context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
           post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
@@ -490,11 +520,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "when general agency is disabled via settings" do
+    context "when general agency is disabled via settings",dbclean: :after_each do
       before do
         Settings.aca.general_agency_enabled = false
       end
-      context "when we Assign agency" do
+      context "when we Assign agency",dbclean: :after_each do
         before :each do
           sign_in user
           xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
@@ -508,7 +538,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
           expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
         end
       end
-      context "when we Unassign agency" do
+      context "when we Unassign agency",dbclean: :after_each do
         before :each do
           sign_in user
           post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
@@ -525,12 +555,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "POST set_default_ga" do
+  describe "POST set_default_ga",dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+    let(:organization) { FactoryGirl.create(:organization) }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, organization: organization) }
+    let!(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile_id: broker_agency_profile.id) }
+
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end
@@ -539,6 +573,20 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq general_agency_profile
+    end
+
+    it "should call general_agency_hired_notice trigger " do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      sign_in user
+      xhr :post, :set_default_ga, id: broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id, format: :js
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
+      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
     end
 
     it "should clear default general_agency_profile" do
@@ -564,7 +612,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET employer_profile datatable" do
+  describe "GET employer_profile datatable",dbclean: :after_each do
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_agency_staff_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker_agency_staff']) }
@@ -593,6 +641,46 @@ RSpec.describe BrokerAgencies::ProfilesController do
     it "should search for employers in BrokerAgencies with empty search string" do
       xhr :get, :employer_datatable, id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}
       expect(assigns(:employer_profiles).count).to   eq(2)
+    end
+  end
+
+  describe "messages action",dbclean: :after_each do
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:person) { broker_role.person }
+    let(:user_broker) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+
+    let(:person1) { FactoryGirl.create(:person)}
+    let(:user_hbx) { FactoryGirl.create(:user, person: person1, roles: ['hbx_staff']) }
+
+    it "should render the messages template and Broker sees all messages in Broker Mail tab" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should render the messages template and Admin should see the messages in Broker Mail tab" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(response).to render_template(:messages)
+    end
+
+    it "should pass broker data to @provider if you login as Broker User" do
+      sign_in user_broker
+      get :messages, id: broker_agency_profile.primary_broker_role.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq broker_agency_profile.primary_broker_role.person
+    end
+
+    it "should pass admin records to @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).to eq user_hbx.person
+    end
+
+    it "should not have broker data in @provider if you login as Admin User" do
+      sign_in user_hbx
+      get :messages, id: user_hbx.person, profile_id: broker_agency_profile.id.to_s, format: :js
+      expect(assigns(:provider)).not_to eq broker_agency_profile.primary_broker_role.person
     end
   end
 end

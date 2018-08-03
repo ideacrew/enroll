@@ -14,11 +14,10 @@ describe Events::EmployersController do
     let(:props) { double(:headers => {:employer_id => employer_hbx_id}, :reply_to => reply_to_key) }
 
     before :each do
-      allow(Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
+      allow(BenefitSponsors::Organizations::Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
       allow(controller).to receive(:render_to_string).with(
         "events/v2/employers/updated", {:formats => ["xml"], :locals => {
-         :employer => employer_profile,
-         :manual_gen => false
+         :employer => employer_profile, manual_gen: false
         }}).and_return(rendered_template)
     end
 

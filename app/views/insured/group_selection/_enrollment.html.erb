@@ -20,8 +20,8 @@
           <div><p><%= render_plan_type_details(plan) %></p></div>
           <div>
             <p>
-              <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/<%= l10n("month").to_s.downcase %>
-              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
+              <label><%= l10n("premium") %>:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/<%= l10n("month").to_s.downcase %>
+              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
             </p>
           </div>
             <% names = hbx_enrollment.covered_members_first_names %>
@@ -64,8 +64,7 @@
             </a>
           </div>
           <div class="col-xs-4">
-
-            <% if hbx_enrollment.may_terminate_coverage? && hbx_enrollment.kind == "individual" %>
+            <% if hbx_enrollment.may_terminate_coverage? && ["individual", 'coverall'].include?(hbx_enrollment.kind) %>
               <%= link_to l10n("terminate_plan"), terminate_confirm_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), {class: 'btn btn-primary btn-md'} %>
               <% elsif hbx_enrollment.may_terminate_coverage? %>
                 <%= link_to l10n("terminate_plan"), '#', data: {toggle: "modal", target: "#terminate_confirm_#{hbx_enrollment.id}"}, class: 'btn btn-primary btn-md' %>

@@ -175,3 +175,11 @@ Scenario: A employer should have an option to select paper or electronic notices
     And I select the all security question and give the answer
     When I have submit the security questions
     Then he should have an option to select paper or electronic notice optioninformation
+
+Scenario: A employer should not see Get Help from Broker
+    Given an employer exists
+    Given the employer has draft plan year
+    Given the employer has broker agency profile
+    Given the employer is logged in
+    When they visit the Employer Home page
+    Then employer should not see the Get Help from Broker

@@ -4,7 +4,7 @@ class Notice
   include Config::SiteHelper
   include Config::ContactCenterHelper
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :state
+  attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :state
 
   Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 
@@ -14,8 +14,8 @@ class Notice
     self.mpi_indicator = params[:mpi_indicator]
     self.template = params[:template]
     self.notice= params[:notice]
+    self.event_name= params[:event_name]
     self.market_kind= params[:market_kind]
-    self.event_name = params[:event_name]
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
@@ -26,7 +26,7 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({
-      :template => template,
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -41,11 +41,15 @@ class Notice
   end
 
   def layout
-    'pdf_notice'
+    if market_kind == 'individual'
+      'ivl_pdf_notice'
+    else
+      'pdf_notice'
+    end
   end
 
   def notice_filename
-    "#{subject.titleize.gsub(/\s*/, '')}"
+    "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
   end
 
   def notice_path
@@ -59,8 +63,8 @@ class Notice
   def pdf_options
     options = {
       margin:  {
-        top: 15,
-        bottom: 28,
+        top: 10,
+        bottom: 20,
         left: 22,
         right: 22
       },
@@ -73,19 +77,18 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-          locals: {notice: notice}
+          locals: {recipient: recipient, notice: notice}
           }),
         }
     }
-    if market_kind == 'individual'
+    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/footer.html.erb"
       options.merge!({footer: {
         content: ApplicationController.new.render_to_string({
-          template: "notices/shared/footer.html.erb",
-          layout: false
+          template: footer,
+          layout: false,
+          locals: {notice: notice}
         })
       }})
-    end
-
     options
   end
 
@@ -100,9 +103,14 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
+    begin
+      File.open(notice_path, 'wb') do |file|
+        file << self.pdf
+      end
+    rescue Exception => e
+      puts "#{e} #{e.backtrace}"
     end
+    # notice_path
     # clear_tmp
   end
 
@@ -153,7 +161,6 @@ class Notice
       identifier: doc_uri,
       format: "application/pdf"
     })
-
     if notice.save
       notice
     else

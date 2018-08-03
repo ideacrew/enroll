@@ -7,23 +7,21 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
     append_data
     generate_pdf_notice
     employee_appeal_rights_attachment
-    attach_envelope
     non_discrimination_attachment
+    attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def append_data
-    hbx = HbxProfile.current_hbx
     enrollments = []
-    en = census_employee.published_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
+    en = census_employee.active_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
     health_enrollment = en.select{ |h| h.coverage_kind == 'health'}.sort_by(&:effective_on).last
     dental_enrollment = en.select{ |h| h.coverage_kind == 'dental'}.sort_by(&:effective_on).last
-
     enrollments << health_enrollment
     enrollments << dental_enrollment
     notice.census_employee = PdfTemplates::CensusEmployee.new({
-      :date_of_termination => census_employee.employment_terminated_on,
+      :employment_terminated_on => census_employee.employment_terminated_on,
       :coverage_terminated_on => census_employee.coverage_terminated_on
       })
 
@@ -31,7 +29,7 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
       notice.census_employee.enrollments << build_enrollment(enr)
     end
   end
-  
+
   def build_enrollment(hbx_enrollment)
     plan = PdfTemplates::Plan.new({
       plan_name: hbx_enrollment.plan.name,
@@ -42,4 +40,5 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
       plan: plan
     })
   end
+
 end

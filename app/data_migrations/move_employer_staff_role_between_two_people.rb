@@ -28,5 +28,3 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
     end
   end
 end
-
-

@@ -61,6 +61,7 @@ class PlanCostDecorator < SimpleDelegator
       "guardian" => nil,
       "court_appointed_guardian" => nil,
       "collateral_dependent" => "child_under_26",
+      "domestic_partner" => "domestic_partner",
       "life_partner" => "domestic_partner",
       "child" => "child_under_26",
       "grandchild" => nil,
@@ -103,7 +104,11 @@ class PlanCostDecorator < SimpleDelegator
       Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age)
     end
     value = if the_plan.health?
-      benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
+      if use_simple_employer_calculation_model?
+        1.0
+      else
+        benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f
+      end
     else
       1.0
     end

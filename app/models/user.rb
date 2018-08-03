@@ -15,7 +15,11 @@ class User
   validate :oim_id_rules
   validates_uniqueness_of :email,:case_sensitive => false
 
-  scope :datatable_search, ->(query) { self.where({"$or" => ([{"name" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
+  scope :datatable_search, ->(query) {
+    search_regex = ::Regexp.compile(/.*#{query}.*/i)
+    person_user_ids = Person.any_of({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
+    User.any_of({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
+  }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -131,9 +135,14 @@ class User
     person == employer_profile.active_broker if employer_profile.active_broker
   end
 
+  def is_benefit_sponsor_active_broker?(profile_id)
+    profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" =>  BSON::ObjectId.from_string(profile_id)).first
+    person == profile_organization.employer_profile.active_broker if (profile_organization && profile_organization.employer_profile && profile_organization.employer_profile.active_broker)
+  end
+
   def handle_headless_records
-    headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
-    headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
+    headless_with_email = User.where(email: /^#{::Regexp.quote(email)}$/i)
+    headless_with_oim_id = User.where(oim_id: /^#{::Regexp.quote(oim_id)}$/i)
     headless_users = headless_with_email + headless_with_oim_id
     headless_users.each do |headless|
       headless.destroy if !headless.person.present?
@@ -194,17 +203,11 @@ class User
   end
 
   class << self
-    def password_invalid?(password)
-      ## TODO: oim_id is an explicit dependency to the User class
-      resource = self.new(oim_id: 'example1', password: password)
-      !resource.valid_attribute?('password')
-    end
-
     def find_for_database_authentication(warden_conditions)
       #TODO: Another explicit oim_id dependency
       conditions = warden_conditions.dup
       if login = conditions.delete(:login).downcase
-        where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+        where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
       else
         where(conditions).first
       end

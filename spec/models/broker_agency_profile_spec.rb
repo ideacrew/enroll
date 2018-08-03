@@ -194,7 +194,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   end
   describe "#families" do
     let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
-    let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+    let(:writing_agent)         { FactoryGirl.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile_id: broker_agency_profile.id) }
     let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
     let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
     let(:person) { FactoryGirl.create(:person)}

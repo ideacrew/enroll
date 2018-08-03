@@ -39,11 +39,12 @@ class BenefitSponsorship
     benefit_coverage_periods.detect { |bcp| bcp.contains?(effective_date) }
   end
 
+
   # def is_under_special_enrollment_period?
   #   benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
   # end
 
-  def is_under_open_enrollment?
+  def is_coverage_period_under_open_enrollment?
     benefit_coverage_periods.any? do |benefit_coverage_period|
       benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
     end
@@ -96,6 +97,12 @@ class BenefitSponsorship
         hbx_sponsor.advance_month   if new_date.day == 1
         hbx_sponsor.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
         hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
+      end
+
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
+        oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+        oe_begin.process_renewals
       end
 
       # # Find families with events today and trigger their respective workflow states

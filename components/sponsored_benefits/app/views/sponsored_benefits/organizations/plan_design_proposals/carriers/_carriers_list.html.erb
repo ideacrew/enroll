@@ -7,9 +7,8 @@
     active_year: active_year), remote: true do %>
     <div class="col-xs-3">
       <%= radio_button_tag :carrier_for_elected_plan, "#{ck}", false %>
-      <%= label_tag "carrier_for_elected_plan_#{ck}" do %>
-      <i class="fa fa-circle-o"></i>
-      <i class="fa fa-dot-circle-o"></i>
+      <%= label_tag "carrier_for_elected_plan_#{ck}", onclick:'setCarrierRadio(this)' do %>
+      <i class="far fa-circle"></i>
       <% end %>
     </div>
     <% end %>
@@ -19,11 +18,11 @@
   </div>
   <% end %>
 <% else %>
-  <% reference_plans = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
+  <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
-      <% reference_plans = reference_plans_for_metal_level - ['dental'] %>
+      <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
   <% end %>
-  <% reference_plans.each do |kind| %>
+  <% metal_levels.each do |kind| %>
     <div class="col-xs-3 metals">
       <div class="col-xs-12 row">
         <%= link_to organizations_plan_design_organization_plans_path(@plan_design_organization,
@@ -32,9 +31,8 @@
           active_year: active_year), remote: true do %>
             <div class="col-xs-3">
               <%= radio_button_tag :metal_level_for_elected_plan, kind %>
-              <%= label_tag "metal_level_for_elected_plan_#{kind}" do %>
-                <i class="fa fa-circle-o"></i>
-                <i class="fa fa-dot-circle-o"></i>
+              <%= label_tag "metal_level_for_elected_plan_#{kind}", onclick:'setMetalRadio(this)' do %>
+                <i class="far fa-circle"></i>
               <% end %>
             </div>
         <% end %>
@@ -50,3 +48,4 @@
     </div>
   <% end %>
 <% end %>
+

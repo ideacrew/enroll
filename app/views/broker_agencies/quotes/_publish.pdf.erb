@@ -92,7 +92,7 @@
                         <% benefit_group.quote_relationship_benefits.each do|rb| %>
                           <% next if rb.relationship == "child_26_and_over" %>
                           <tr>
-                            <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
+                            <td><%=raw("<i class='far fa-check-square fa-lg'></i>")%><%=rb.relationship.humanize %></td>
                             <td>
                               <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
                             </td>
@@ -145,7 +145,7 @@
                         <% benefit_group.quote_dental_relationship_benefits.each do|rb| %>
                           <% next if rb.relationship == "child_26_and_over" %>
                           <tr>
-                            <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
+                            <td><%=raw("<i class='far fa-check-square fa-lg'></i>")%><%=rb.relationship.humanize %></td>
                             <td>
                               <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
                             </td>

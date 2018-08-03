@@ -2,11 +2,6 @@ module Effective
   module Datatables
     class UserAccountDatatable < Effective::MongoidDatatable
       datatable do
-
-        bulk_actions_column do
-          bulk_action 'action 1', nil, data: { confirm: 'Generate Invoices?', no_turbolink: true }
-          bulk_action 'action 2', nil, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
-        end
         table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
@@ -18,7 +13,7 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', user_password_path(user: { email: row.email }), 'post_ajax']
+                                     ['Reset Password', reset_password_user_path(row), 'ajax']
                                    else
                                      ['Reset Password', edit_user_path(row.id), 'ajax']
                                    end,
@@ -27,9 +22,6 @@ module Effective
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
                              }, :filter => false, :sortable => false
-      end
-
-      def reset_password_link(row)
       end
 
       def collection

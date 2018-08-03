@@ -1,4 +1,5 @@
 require "rails_helper"
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "fix_hub_verified_consumer")
 
 describe FixHubVerifiedConsumer, :dbclean => :after_each do
@@ -198,7 +199,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           subject.migrate
           person.reload
         end
-        it_behaves_like "person has correct verification types", ["Social Security Number", "Citizenship"]
+        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
         it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
         it_behaves_like "consumer verification types", "set", "Citizenship", "verification_successful"
         it_behaves_like "consumer verification status", "updates", "verification_outstanding", "fully_verified"
@@ -210,7 +211,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           subject.migrate
           person.reload
         end
-        it_behaves_like "person has correct verification types", ["Social Security Number", "Citizenship"]
+        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
         it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
         it_behaves_like "consumer verification status", "remains", "verification_outstanding", "verification_outstanding"
       end
@@ -221,7 +222,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           subject.migrate
           person.reload
         end
-        it_behaves_like "person has correct verification types", ["Social Security Number", "Citizenship"]
+        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Citizenship"]
         it_behaves_like "consumer verification types", "set", "Social Security Number", "pending"
         it_behaves_like "consumer verification status", "remains", "verification_outstanding", "verification_outstanding"
       end
@@ -236,7 +237,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           subject.migrate
           person.reload
         end
-        it_behaves_like "person has correct verification types", ["Social Security Number", "Immigration status"]
+        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Immigration status"]
         it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
         it_behaves_like "consumer verification types", "set", "Immigration status", "verification_outstanding"
         it_behaves_like "consumer verification status", "remains", "verification_outstanding", "verification_outstanding"
@@ -251,11 +252,12 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
           subject.migrate
           person.reload
         end
-        it_behaves_like "person has correct verification types", ["Social Security Number", "Immigration status"]
+        it_behaves_like "person has correct verification types", ["DC Residency", "Social Security Number", "Immigration status"]
         it_behaves_like "consumer verification types", "set", "Social Security Number", "valid"
         it_behaves_like "consumer verification types", "set", "Immigration status", "verification_successful"
         it_behaves_like "consumer verification status", "updates", "verification_outstanding", "fully_verified"
       end
     end
   end
+end
 end

@@ -15,12 +15,12 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility
   let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
   let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Notification to employees regarding their Employer’s ineligibility',
+                            :name =>'Notification to employees regarding their Employer’s ineligibility.',
                             :notice_template => 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
                             :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
                             :event_name => 'notify_employee_of_initial_employer_ineligibility',
-                            :mpi_indicator => 'SHOP_M038',
-                            :title => "Termination of Employer’s Health Coverage Offered through the Massachusetts Health Connector "})
+                            :mpi_indicator => 'MPI_SHOP10047',
+                            :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
 
     let(:valid_parmas) {{
@@ -64,11 +64,15 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility
 
   describe "append data" do
     before do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
       @employee_notice = ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)
     end
     it "should append data" do
       @employee_notice.append_data
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
+      expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq bcp.open_enrollment_start_on
+      expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq bcp.open_enrollment_end_on
     end
   end
 

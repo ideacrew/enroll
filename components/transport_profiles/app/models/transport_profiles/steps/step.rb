@@ -7,8 +7,7 @@ module TransportProfiles
       @gateway = gateway
     end
 
-    def execute
+    def execute(process_context)
     end
-
   end
 end

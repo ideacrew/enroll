@@ -19,13 +19,13 @@ DT = (function() {
   var clear_button_todojf = function() {          // Need to put this in the base framework
     setTimeout(
       function() {
-        $($('.dataTables_filter label')[0]).append("<div class='btn btn-sm btn-default' style='display:inline'><span class='glyphicon glyphicon-remove'></span> </div>")
-        $('.dataTables_filter .glyphicon-remove').on('click', function(){
+        $($('.dataTables_filter label')[0]).append("<div class='datatable_clear btn btn-sm btn-default' style='display:inline'><i class='fas fa-times'></i></div>")
+        $('.datatable_clear.btn.btn-sm.btn-default').on('click', function(){
           window.dt_search_string = ''
-          $('input[type=search]').val(window.dt_search_string).trigger('keyup');
+          $('input[type=search]').val('').trigger('keyup');
         })
       },
-      50
+      300
     )
   }
   var filters = function(){
@@ -43,6 +43,9 @@ DT = (function() {
       $('.Filter-'+id).removeClass('hide')
       $('.effective-datatable').DataTable().draw();
     })
+    $('#date_range_apply').click(function() {
+      $('.effective-datatable').DataTable().draw()
+    })
     clear_button_todojf();
     extendDatatableServerParams = function(){
       var keys = {}
@@ -59,6 +62,8 @@ DT = (function() {
       } else {
         $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(false)
       }*/
+      keys["custom_datatable_date_from"] = $('#custom_datatable_date_from').val()
+      keys["custom_datatable_date_to"] = $('#custom_datatable_date_to').val()
       return attributes_for_filtering;
     }
   }

@@ -16,8 +16,8 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
   Depending on the plans offered to you by your employer, you may or may not be able to automatically renew your coverage.
   If you are eligible to auto renew into coverage, the enrollment in your account will appear as “Auto Renewing”.
   To review your coverage options through <%= site_short_name %>, you must access your online account to complete your plan selection
-  for enrollment by <%= census_employee.renewal_benefit_group_assignment.plan_year.open_enrollment_end_on.to_formatted_s %>
-  for coverage effective <%= census_employee.renewal_benefit_group_assignment.plan_year.start_on.to_date.to_formatted_s %> .
+  for enrollment by <%= census_employee.renewal_benefit_group_assignment.benefit_application.open_enrollment_period.max.to_formatted_s %>
+  for coverage effective <%= census_employee.renewal_benefit_group_assignment.benefit_application.start_on.to_date.to_formatted_s %> .
   If you no longer wish to receive coverage through <%= census_employee.employer_profile.legal_name %>
   you will need to access your <%= site_short_name %> account and waive coverage for the upcoming plan year.
   Please go to <a href="<%= site_home_url %>"><%=site_short_name %></a> to create an account or login to your existing account to view your plan options and complete the enrollment process.

@@ -7,10 +7,6 @@ class Employers::EmployerAttestationsController < ApplicationController
     @documents = []
     @documents = @employer_profile.employer_attestation.employer_attestation_documents if @employer_profile.employer_attestation.present?
     @element_to_replace_id = params[:employer_actions_id]
-
-    respond_to do |format|
-      format.js { render "edit" }
-    end
   end
 
   def new
@@ -28,20 +24,22 @@ class Employers::EmployerAttestationsController < ApplicationController
   def create
     @errors = []
     if params[:file]
-      #@employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
-      @employer_profile.build_employer_attestation unless @employer_profile.employer_attestation.present?
+      @employer_profile.create_employer_attestation unless @employer_profile.employer_attestation.present?
       if doc_uri.present?
-        attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
-        success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size, :format => "application/pdf"})
-        errors = attestation_document.errors.full_messages unless success
+        @employer_profile.employer_attestation.employer_attestation_documents.create(
+          :identifier => doc_uri,
+          :subject => file.original_filename,
+          :title => file.original_filename,
+          :size => file.size,
+          :format => "application/pdf"
+        )
 
-        if errors.blank? && @employer_profile.save
-          @employer_profile.employer_attestation.submit! if @employer_profile.employer_attestation.may_submit?
+        if @employer_profile.save
           flash[:notice] = "File Saved"
         else
-          flash[:error] = "Could not save file. " + errors.join(". ")
+          flash[:error] = "Could not save file. "# + errors.join(". ")
         end
       else
         flash[:error] = "Could not save the file in S3 storage"
@@ -50,7 +48,7 @@ class Employers::EmployerAttestationsController < ApplicationController
       flash[:error] = "Please upload file"
     end
 
-    redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
+    redirect_to benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
   end
 
   def update
@@ -85,7 +83,7 @@ class Employers::EmployerAttestationsController < ApplicationController
     begin
       @employer_profile.employer_attestation.employer_attestation_documents.where(:id =>params[:employer_attestation_id],:aasm_state => "submitted").destroy_all
       @employer_profile.employer_attestation.revert! if @employer_profile.employer_attestation.may_revert?
-      redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
+      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
     rescue => e
       render json: { status: 500, message: 'An error occured while deleting the employer attestation' }
     end
@@ -107,12 +105,14 @@ class Employers::EmployerAttestationsController < ApplicationController
 
   def find_employer
     if params[:employer_attestation_id].present?
-      org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
+      org = ::BenefitSponsors::Organizations::Organization.where(:"profiles.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
+      org ||= Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
       @employer_profile = org.employer_profile
     elsif params[:id].present?
-      @employer_profile = EmployerProfile.find(params[:id])
+      @employer_profile = EmployerProfile.find(params[:id]) || ::BenefitSponsors::Organizations::Profile.find(params[:id])
     else
       @employer_profile = Organization.where(:legal_name => params["document"]["creator"]).first.try(:employer_profile)
+      @employer_profile ||= ::BenefitSponsors::Organizations::Organization.where(:legal_name => params["document"]["creator"]).first.employer_profile
     end
     render file: 'public/404.html', status: 404 if @employer_profile.blank?
   end

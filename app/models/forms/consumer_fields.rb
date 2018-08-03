@@ -37,7 +37,7 @@ module Forms
         def indian_tribe_member
           return @indian_tribe_member if !@indian_tribe_member.nil?
           return nil if @indian_tribe_member.nil?
-          @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == @citizen_status)
+          @indian_tribe_member ||= (@indian_tribe_member == true)
         end
 
         def eligible_immigration_status
@@ -47,9 +47,7 @@ module Forms
         end
 
         def assign_citizen_status
-          if indian_tribe_member
-            @citizen_status = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS
-          elsif naturalized_citizen
+          if naturalized_citizen
             @citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
           elsif us_citizen
             @citizen_status = ::ConsumerRole::US_CITIZEN_STATUS

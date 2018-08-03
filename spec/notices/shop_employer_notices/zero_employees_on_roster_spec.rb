@@ -10,8 +10,8 @@ RSpec.describe ShopEmployerNotices::ZeroEmployeesOnRoster do
                             :name =>'Zero Employees on Roster',
                             :notice_template => 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
                             :notice_builder => 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-                            :mpi_indicator => 'MPI_SHOP6',
                             :event_name => 'zero_employees_on_roster',
+                            :mpi_indicator => 'MPI_SHOP6',
                             :title => "Action Needed – Add all Eligible Employees to your Roster"})
                           }
     let(:valid_parmas) {{

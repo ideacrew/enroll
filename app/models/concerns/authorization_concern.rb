@@ -43,7 +43,7 @@ module AuthorizationConcern
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
     validates_length_of       :password, within: Devise.password_length, allow_blank: true
-    validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+    validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
 
     scope :locked, ->{ where(:locked_at.ne => nil) }
     scope :unlocked, ->{ where(locked_at: nil) }
@@ -68,6 +68,10 @@ module AuthorizationConcern
       self.locked_at.nil? ? 'unlocked' : 'locked'
     end
 
+    def locked?
+      self.locked_at.present?
+    end
+
     def password_required?
       !persisted? || !password.nil? || !password_confirmation.nil?
     end
@@ -79,7 +83,7 @@ module AuthorizationConcern
     def password_complexity
       if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
         errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-      elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
+      elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
         errors.add :password, "cannot contain username"
       elsif password.present? and password_repeated_chars_limit(password)
         errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
@@ -106,6 +110,12 @@ module AuthorizationConcern
 
   class_methods do
     MAX_SAME_CHAR_LIMIT = 4
+
+    def password_invalid?(password)
+      ## TODO: oim_id is an explicit dependency to the User class
+      resource = self.new(oim_id: 'example1', password: password)
+      !resource.valid_attribute?('password')
+    end
 
     def generate_valid_password
       password = Devise.friendly_token.first(16)

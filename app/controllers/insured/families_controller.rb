@@ -1,19 +1,21 @@
 class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
-  include ApplicationHelper
+  include ::ApplicationHelper
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
     authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_admin_sep = @family.active_admin_seps.last
+    @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -23,10 +25,10 @@ class Insured::FamiliesController < FamiliesController
     valid_display_enrollments = Array.new
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['hbx_enrollment']['_id'] }
 
-    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.plan.blank?}
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
     update_changing_hbxs(@hbx_enrollments)
 
-    @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+    # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
     @employee_role = @person.active_employee_roles.first
     @tab = params['tab']
@@ -75,7 +77,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -89,10 +90,11 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
+
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -125,38 +127,43 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
+    today = TimeKeeper.date_of_record
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
-    start_date = TimeKeeper.date_of_record - 30.days
-    end_date = TimeKeeper.date_of_record + 30.days
+    start_date = today - 30.days
+    end_date = today + 30.days
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
-      end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+      start_date = today - @qle.post_event_sep_in_days.try(:days)
+      end_date = today + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
+      @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > today) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
-    
-    if (@qualified_date) == false && params[:qle_id].present?
-      sep_request_denial_notice
+
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
+      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
+      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+      trigger_notice_observer(@person.active_employee_roles.first, benefit_application, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase
@@ -234,15 +241,6 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def sep_request_denial_notice
-    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.hbx_id}")
-    end
-  end
-
   private
 
   def updateable?
@@ -289,21 +287,25 @@ class Insured::FamiliesController < FamiliesController
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+        if @manually_picked_role == "individual_market_events"
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        end
       end
     else
       if @person.active_employee_roles.present?
          if current_user.has_hbx_staff_role?
-           @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
+           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
          else
            @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
          end
        else @person.consumer_role.present?
          if current_user.has_hbx_staff_role?
-           @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
+           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
          else
            @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-         end		
+         end
        end
     end
   end

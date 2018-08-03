@@ -4,7 +4,7 @@ RSpec.describe ScheduledEvent, type: :model do
   subject { ScheduledEvent.new }
 
   it "has a valid factory" do
-    expect(create(:scheduled_event)).to be_valid
+    expect(build(:scheduled_event)).to be_valid
   end
 
   it { is_expected.to validate_presence_of :type }

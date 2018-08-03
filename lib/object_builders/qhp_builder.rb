@@ -1,5 +1,5 @@
 class QhpBuilder
-  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051", "88806MA0040051", 
+  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051",
   "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
@@ -43,7 +43,7 @@ class QhpBuilder
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")
-      "United Health Care"
+      "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
@@ -231,6 +231,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end

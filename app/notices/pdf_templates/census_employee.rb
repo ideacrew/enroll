@@ -3,6 +3,7 @@ module PdfTemplates
     include Virtus.model
 
     attribute :date_of_termination, Date
+    attribute :employment_terminated_on, Date
     attribute :coverage_terminated_on, Date
     attribute :enrollments, Array[PdfTemplates::Enrollment]
 

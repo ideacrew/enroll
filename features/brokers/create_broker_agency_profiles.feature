@@ -26,7 +26,7 @@ Feature: Create Primary Broker and Broker Agency
     And Hbx Admin clicks on the Brokers tab
     Then Hbx Admin should see the list of broker applicants
     When Hbx Admin clicks on the current broker applicant show button
-    Then Hbx Admin should see the broker application
+    Then Hbx Admin should see the broker application with carrier appointments
     When Hbx Admin clicks on approve broker button
     Then Hbx Admin should see the broker successfully approved message
     And Hbx Admin logs out

@@ -251,7 +251,7 @@ module TransportGateway
     - a valid source
     " do
       let(:from)        { URI::FTP.build({ host: source_host, path: source_path, scheme: "sftp", userinfo: userinfo }) }
-      let(:tempfile) { double }
+      let(:tempfile) { double(:binmode => true) }
       let(:download_file) { double }
 
       before :each do

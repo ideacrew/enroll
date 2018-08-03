@@ -27,5 +27,4 @@ describe QhpRateBuilder do
     expect(plan.premium_tables.first.start_on.to_date).to eq @rates_hash[:items].first[:effective_date].to_date
     expect(plan.premium_tables.first.end_on.to_date).to eq @rates_hash[:items].first[:expiration_date].to_date
   end
-
 end

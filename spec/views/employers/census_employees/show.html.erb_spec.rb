@@ -60,6 +60,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
     allow(SicCodeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
     allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end
 
   it "should show the address of census employee" do
@@ -96,6 +97,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     hbx_enrollment.update_attributes(:aasm_state => 'inactive', )
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     allow(hbx_enrollment).to receive(:plan).and_return(nil)
+    allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Waived Date/i
     expect(rendered).to match /#{hbx_enrollment.waiver_reason}/
@@ -142,6 +144,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       before do
         # to make sure census_employee.active_benefit_group_assignment = nil
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(nil)
+        allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return(nil)
       end
       it "should only have BENIFIT PACKAGE" do
         render template: "employers/census_employees/show.html.erb"
@@ -241,8 +244,11 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       aasm_state: 'coverage_terminated' ) }
 
     before :each do
+      allow(dental_hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(past_enrollments).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
-      assign(:past_enrollments, [past_enrollments])
+      # assign(:past_enrollments, [past_enrollments])
+      allow(census_employee).to receive(:past_enrollments).and_return [past_enrollments]
     end
 
     it "should display past enrollments" do

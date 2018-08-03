@@ -1,4 +1,7 @@
 Rails.application.configure do
+  # Verifies that versions and hashed value of the package contents in the project's package.json
+  config.webpacker.check_yarn_integrity = false
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -88,6 +91,9 @@ Rails.application.configure do
   config.acapi.app_id = "enroll"
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
+
+  #Queue adapter
+  config.active_job.queue_adapter = :resque
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

@@ -34,6 +34,8 @@ module EventsHelper
                   "drop_family_member_due_to_new_eligibility"
                 when "employer_sponsored_coverage_termination"
                   "eligibility_change_employer_ineligible"
+                when "employer_sponsored_cobra"
+                  "cobra"
                 else
                   eligibility_kind
                 end
@@ -69,30 +71,10 @@ module EventsHelper
   end
 
   def employer_plan_years(employer)
-    employer.plan_years.select(&:eligible_for_export?)
+    employer.benefit_applications.select(&:eligible_for_export?)
   end
-
-  def manual_gen_plan_years(employer)
-    employer.plan_years.select{|plan_year| !(PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state)}
-  end
-
-  def is_initial_or_conversion_employer?(employer)
-    (employer.published_plan_year.present? && employer.renewing_published_plan_year.blank?) && (!employer.is_conversion? || (employer.is_conversion? && !employer.published_plan_year.is_conversion))
-  end
-
-  def is_renewal_employer?(employer)
-    employer.published_plan_year.present? && employer.renewing_published_plan_year.present? && !employer.is_conversion?
-  end
-
-  def is_renewing_conversion_employer?(employer)
-    employer.is_conversion? && employer.published_plan_year.present? && !employer.published_plan_year.is_conversion && employer.renewing_published_plan_year.present?
-  end
-
-  def is_new_conversion_employer?(employer)
-    employer.is_conversion? && employer.active_plan_year.present? && employer.active_plan_year.is_conversion && employer.renewing_published_plan_year.present?
-  end
-
-  def is_renewal_or_conversion_employer?(employer)
-    is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
+  
+  def plan_years_for_manual_export(employer)
+    employer.benefit_applications.select {|benefit_application|  benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?}
   end
 end

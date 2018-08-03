@@ -16,7 +16,7 @@
       <% end %>
       <div class="row">
           <a class="remove return_to_broker_applicants" href="#">
-            <span aria-hidden="true" class="glyphicon glyphicon-remove-circle"></span>
+            <i aria-hidden="true" class="far fa-times-circle"></i>
             Cancel
           </a>
       </div>
@@ -42,6 +42,9 @@
               <% end %>
               <% if broker_or_staff_role.may_pending? %>
                 <%= submit_tag 'Pending', name: 'pending', class: "btn btn-primary interaction-click-control-broker-pending" %>
+              <% end %>
+              <% if broker_or_staff_role.can_update_carrier_appointments? %>
+                  <%= submit_tag 'Update', name: 'update', class: "btn btn-primary interaction-click-control-broker-update" %>
               <% end %>
               <% if broker_or_staff_role.may_broker_agency_decline? %>
                 <%= submit_tag 'Deny', name: 'deny', class: "btn btn-primary interaction-click-control-broker-deny" %>

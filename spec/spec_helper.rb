@@ -22,12 +22,16 @@ end
 
 require File.join(File.dirname(__FILE__), "factories", "wrapping_sequence")
 require 'factory_girl_rails'
+require 'test_prof'
+require 'test_prof/recipes/rspec/factory_default'
 require 'ivl_helper'
+require 'aca_test_helper'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
+  config.include AcaTestHelper
   config.include IvlHelper
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
@@ -53,8 +57,8 @@ RSpec.configure do |config|
     request.env['HTTP_ACCEPT_LANGUAGE'] = "en"
   end
 
-# The settings below are suggested to provide a good initial experience
-# with RSpec, but feel free to customize to your heart's content.
+  # The settings below are suggested to provide a good initial experience
+  # with RSpec, but feel free to customize to your heart's content.
 =begin
   # These two settings work together to allow you to limit a spec run
   # to individual examples or groups you care about by tagging them with

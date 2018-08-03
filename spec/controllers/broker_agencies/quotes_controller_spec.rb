@@ -189,6 +189,12 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
       expect(response).to have_http_status(:redirect)
     end
 
+    it "should log this issue when invalid received invalid broker_role_id" do
+      expect(controller).to receive(:log)
+      allow(controller).to receive(:raise).and_return nil
+      post :publish_quote, broker_role_id: "person.broker_role.id", id: quote
+    end
+
   end
 
   describe "Creating New Quote " do

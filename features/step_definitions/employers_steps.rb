@@ -351,8 +351,9 @@ And(/^.+ should see a button to create new plan year$/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.month).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -513,11 +514,29 @@ Given /^an employer exists$/ do
   owner :with_family, :employer, organization: employer
 end
 
+Given /^the employer has draft plan year$/ do
+  create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: 'draft', with_dental: false)
+end
+
+Given /^the employer has broker agency profile$/ do
+  employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.save!
+end
+
+When /^they visit the Employer Home page$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
+end
+
 When /^they visit the Employee Roster$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
 end
 
 When /^click on one of their employees$/ do
+  click_link employees.first.full_name
+end
+
+And /^click on one of their past terminated employee$/ do
+  employees.first.update_attributes(aasm_state: 'employment_terminated', coverage_terminated_on: TimeKeeper.date_of_record - 30.days, employment_terminated_on: TimeKeeper.date_of_record - 30.days)
   click_link employees.first.full_name
 end
 
@@ -528,6 +547,10 @@ end
 
 Given /^the employer is logged in$/ do
   login_as owner, scope: :user
+end
+
+Then /^employer should see Bulk Actions$/ do
+  expect(page).to have_content "Bulk Actions"
 end
 
 And /^clicks on terminate employee$/ do
@@ -550,19 +573,23 @@ Then /^employer clicks on terminated filter$/ do
   wait_for_ajax
 end
 
+Then /^employer should not see the Get Help from Broker$/ do
+  expect(page).not_to have_xpath("//h3", :text => "Get Help From a Broker")
+end
+
 Then /^employer sees termination date column$/ do
   expect(page).to have_content 'Terminated On'
 end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
+  click_link 'Eddie Vedder1'
 end
 
 And /^employer clicks on linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "employee_role_linked")
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
+  click_link employees.first.full_name
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
@@ -607,7 +634,7 @@ end
 And /^employer clicks on linked employee without address$/ do
   employees.first.address.delete
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
+  click_link employees.first.full_name
 end
 
 Then /^employer should see the address on the roster$/ do
@@ -630,18 +657,13 @@ end
 
 And /^employer clicks on non-linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
+  click_link employees.first.full_name
 end
 
 And /^employer clicks on non-linked employee without address$/ do
   employees.first.address.delete
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
-end
-
-And /^employer clicks on back button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-back').click
+  click_link employees.first.full_name
 end
 
 Then /^employer should see employee roaster$/ do
@@ -658,11 +680,6 @@ And /^employer clicks on all employees$/ do
   wait_for_ajax
 end
 
-And /^employer clicks on cancel button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-cancel').click
-end
-
 Then /^employer should not see termination date column$/ do
   wait_for_ajax
   expect(page).not_to have_content "Terminated On"
@@ -672,6 +689,43 @@ Then /^they should see that employee's details$/ do
   wait_for_ajax
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
+
+And /^employer click on pencil symbol next to employee status bar$/ do
+  find('.fa-pencil').click
+end
+
+Then /^employer should see the (.*) button$/ do |status|
+  find_link(status.capitalize).visible?
+end
+
+And /^employer clicks on (.*) button$/ do |status|
+  click_link(status.capitalize)
+end
+
+Then /^employer should see the field to enter (.*) date$/ do |status|
+  status = status == 'termination' ? 'ENTER DATE OF TERMINATION' : 'ENTER DATE OF REHIRE'
+  expect(page).to have_content status
+end
+
+And /^employer clicks on (.*) button with date as (.*)$/ do |status, date|
+  date = date == 'today' ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 3.months
+  find('.date-picker.date-field').set date
+  find('.btn-primary.btn-sm').click
+end
+
+Then /^employer should see the (.*) success flash notice$/ do |status|
+  result = status == 'terminated' ? "Successfully terminated Census Employee." : "Successfully rehired Census Employee."
+  expect(page).to have_content result
+end
+
+Then /^employer should see the error flash notice$/ do
+  expect(page).to have_content /Census Employee could not be terminated: Termination date must be within the past 60 days./
+end
+
+Then /^employer should see the rehired error flash notice$/ do
+  expect(page).to have_content "Rehiring date can't occur before terminated date."
+end
+
 When(/^the employer goes to benefits tab$/) do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=benefits"
 end

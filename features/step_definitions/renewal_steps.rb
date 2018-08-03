@@ -62,7 +62,7 @@ When(/(.*) proceed with continue on the group selection page/) do |named_person|
   end
   group_size_factors.save!
   sleep(1)
-  
+
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
@@ -91,7 +91,7 @@ end
 When(/^.+ submits waiver reason$/) do
   waiver_modal = find('#waive_confirm')
   waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select waive reason')]]").click
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I have coverage through Medicaid')]").click
   waiver_modal.find('#waiver_reason_submit').click
 end
 
@@ -120,6 +120,6 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
 end
 
 When(/^.+ clicks continue on family members page/) do
-  page.find('#dependent_buttons').find('.interaction-click-control-continue').click 
+  page.find('#dependent_buttons').find('.interaction-click-control-continue').click
 end
 

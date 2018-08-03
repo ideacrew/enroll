@@ -30,20 +30,20 @@ RSpec.describe OfficeLocation, :type => :model do
     end
 
     describe "validate address county" do
-      let(:address) { build(:address, kind: office_kind, county: county_name) }
+      let(:address) { build_stubbed(:address, kind: office_kind, county: county_name) }
       let(:county_name) { "" }
       let(:office_kind) { "primary" }
 
       context "for non-employers" do
 
       end
-      
+
       context "for an employer" do
         let(:organization) { create(:employer) }
         context "primary office" do
           context "without a county provided" do
             it "should not be valid" do
-              expect(OfficeLocation.new(**valid_params).save).to be_falsey
+              expect(OfficeLocation.new(**valid_params).save).to be_falsey if Settings.aca.validate_county == "true"
             end
           end
           context "with a county provided" do

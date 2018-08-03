@@ -30,7 +30,9 @@ function pageInit() {
     calcPlanDesignContributions();
   } else {
     disableActionButtons();
-    $('li.sole-source-tab').find('label').trigger('click');
+    setTimeout(function() {
+      $('li.sole-source-tab').find('label').trigger('click');
+    },900)
   }
   initSlider();
   $('.loading-plans-button').hide();
@@ -63,7 +65,7 @@ function fetchCarriers() {
       active_year: active_year,
       selected_carrier_level: selected_carrier_level,
     },
-    success: function() {
+    success: function(data) {
       setTimeout(function() {
         formatRadioButtons()
       },400);
@@ -136,7 +138,7 @@ function hidePlanContainer() {
 
 function carrierSelected() {
   $('.tab-container').hide();
-  var elected_plan_kind = $(this).attr('value');
+  var elected_plan_kind = $('.health-plan-design .nav-tabs li.active input').val();
   selected_rpids = [];
   $('.plan-comparison-container').hide();
 
@@ -290,12 +292,33 @@ function initSlider() {
 }
 
 function formatRadioButtons() {
-  $('.fa-circle-o').each(function() {
+  $('.fa-circle').each(function() {
     $(this).click(function() {
       input = $(this).closest('div').find('input');
       input.prop('checked', true)
     });
   })
+}
+
+function setRadioBtn(element) {
+  dotIcons = document.querySelectorAll('.fa-dot-circle');
+  icons = document.querySelectorAll('.fa-circle');
+  iconId = element.target.dataset.tempId;
+  
+  dotIcons.forEach(function(icon) {
+    icon.classList.add('fa-circle')
+  });
+  
+  icons.forEach(function(icon) {
+    if (icon.dataset.tempId == iconId) {
+      icon.classList.add('fa-dot-circle')
+    }
+  });
+}
+
+
+function removeRadioSelectors() {
+  
 }
 
 function preventSubmitPlanDesignProposal(event) {
@@ -353,9 +376,15 @@ function checkContributionLevels(contributions) {
 
   values_to_check.forEach(function(contribution){
     if(contribution.relationship == 'employee' || contribution.relationship == 'employee_only') {
-      contributions_are_valid.push((contribution.premium_pct >= minimum_employee_contribution));
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_employee_contribution)));
     } else if (contribution.relationship == 'family'){
-      contributions_are_valid.push((contribution.premium_pct >= minimum_family_contribution));
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_family_contribution)));
+    } else if (contribution.relationship == 'spouse'){
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_family_contribution)));
+    } else if (contribution.relationship == 'domestic_partner'){
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_family_contribution)));
+    } else if (contribution.relationship == 'child_under_26'){
+      contributions_are_valid.push((parseInt(contribution.premium_pct) >= parseInt(minimum_family_contribution)));
     }
   });
   return contributions_are_valid.every(function(val) {
@@ -572,4 +601,26 @@ function sortPlans() {
       plan.parent().addClass('hidden');
     }
   });
+}
+
+function setCarrierRadio(element) {
+  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
+}
+
+function setMetalRadio(element) {
+  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
+}
+
+function setTopLevelRadios(element) {
+  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
+  var tabs = document.querySelectorAll('.elected_plan');
+  tabs.forEach(function(tab) {
+    var icon = tab.querySelectorAll('i')[0];
+    var iconId = tab.dataset.tempid;
+    if (elementId == iconId) {
+      icon.classList.add('fa-dot-circle');
+    } else {
+      icon.classList.remove('fa-dot-circle');
+    }
+  })
 }

@@ -11,23 +11,23 @@
     <li >
       <%case line[2]%>
       <%when "disabled"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true%>
+        <%= link_to line[0], line[1], class: "btn btn-xs", disabled: true%>
       <%when "static"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs" %>
+        <%= link_to line[0], line[1], class: "btn btn-xs" %>
 			<% when "post" %>
-				<%= link_to line[0], line[1], method: :post, class: "btn btn-info btn-xs" %>
+				<%= link_to line[0], line[1], method: :post, class: "btn btn-xs" %>
       <%when "post_ajax"%>
-        <%= link_to line[0], line[1], method: :post, class: "btn btn-info btn-xs",remote: true  %>
+        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs",remote: true  %>
       <%when "ajax"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", remote: true %>
       <%when "ajax with confirm"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", remote: true, data: { confirm: line[3] } %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", remote: true, data: { confirm: line[3] } %>
       <%when "delete with confirm"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', data: { confirm: line[3] } %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', data: { confirm: line[3] } %>
 			<% when "delete ajax with confirm"%>
-				<%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method=> 'delete', data: { confirm: line[3] } %>
+				<%= link_to line[0], line[1], class: "btn btn-xs", :method=> 'delete', data: { confirm: line[3] } %>
       <% when "delete ajax with confirm and elementId"%>
-        <%= link_to line[0], line[1], class: "btn btn-info btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4] %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4] %>
       <%end%>
     </li>
   <% end %>

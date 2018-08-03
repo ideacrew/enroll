@@ -1,14 +1,17 @@
 class IvlNotices::IvlRenewalNotice < IvlNotice
-  attr_accessor :family, :data
+  attr_accessor :family, :data, :person, :open_enrollment_start_on, :open_enrollment_end_on
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person
+    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
-    args[:to] = consumer_role.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
+    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    self.person = args[:person]
+    self.open_enrollment_start_on = args[:open_enrollment_start_on]
+    self.open_enrollment_end_on = args[:open_enrollment_end_on]
     self.data = args[:data]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end
 
@@ -16,8 +19,9 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_non_discrimination
+    attach_taglines
     attach_voter_application
-    prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -29,11 +33,14 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     end
   end
 
-  def attach_voter_application
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
-  end
-
   def build
+    append_hbe
+    notice.notification_type = self.event_name
+    notice.mpi_indicator = self.mpi_indicator
+    notice.ivl_open_enrollment_start_on = open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = open_enrollment_end_on
+    notice.coverage_year = TimeKeeper.date_of_record.next_year.year
+    notice.primary_firstname = person.first_name
     family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
@@ -46,45 +53,35 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def append_data
-    notice.individuals=data.collect do |datum|
-        person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
-        PdfTemplates::Individual.new({
-          :full_name => person.full_name,
-          :incarcerated=> datum["ea_incarcerated"].try(:upcase) == "FALSE" ? "No" : "Yes",
-          :citizen_status=> citizen_status(datum["ea_citizenship"]),
-          :residency_verified => datum["ea_dc_resident"].try(:upcase) == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
-        })
-    end
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
+    notice.individuals = data.collect do |datum|
+      person = Person.where(:hbx_id => datum["policy.subscriber.person.hbx_id"]).first
+      PdfTemplates::Individual.new({
+        :first_name => person.first_name,
+        :full_name => person.full_name,
+        :last_name => person.last_name,
+        :age => person.age_on(TimeKeeper.date_of_record),
+        :is_without_assistance => true,
+        :incarcerated=> datum["policy.subscriber.person.is_incarcerated"] == "TRUE" ? "Yes" : "No",#Per Sarah, for blank incarceration, fill in FALSE
+        :citizen_status=> citizen_status(datum["policy.subscriber.person.citizen_status"]),
+        :residency_verified => datum["policy.subscriber.person.is_dc_resident?"].try(:upcase) == "TRUE"  ? "Yes" : "No"
       })
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
+    end
   end
 
   def citizen_status(status)
     case status
     when "us_citizen"
-      "U.S. Citizen"
+      "US Citizen"
     when "alien_lawfully_present"
       "Lawfully Present"
     when "indian_tribe_member"
-      "U.S. Citizen"
+      "US Citizen"
+    when "lawful_permanent_resident"
+      "Lawfully Present"
     when "naturalized_citizen"
-      "U.S. Citizen"
+      "US Citizen"
     else
-      "Not Lawfully Present"
+      "Ineligible Immigration Status"
     end
   end
 

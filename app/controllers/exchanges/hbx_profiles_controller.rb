@@ -1,6 +1,9 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  include DataTablesAdapter
-  include SepAll
+  include ::DataTablesAdapter
+  include ::DataTablesSearch
+  include ::Pundit
+  include ::SepAll
+  include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -21,7 +24,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def binder_paid
     if params[:ids]
       begin
-        EmployerProfile.update_status_to_binder_paid(params[:ids])
+        ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
       rescue => e
@@ -35,7 +38,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
     @employer_profile = EmployerProfile.find(params[:id])
-    @fein=@employer_profile.fein
+    @fein = @employer_profile.fein
     start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
     end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
     @xml_submit_time = @employer_profile.xml_transmitted_timestamp
@@ -59,12 +62,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-
-    @organizations= Organization.where(:id.in => params[:ids]).all
-
-    @organizations.each do |org|
-      @employer_invoice = EmployerInvoice.new(org)
-      @employer_invoice.save_and_notify_with_clean_up
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @organizations = @benfit_sponsorships.map(&:organization)
+    @employer_profiles = @organizations.flat_map(&:employer_profile)
+    @employer_profiles.each do |employer_profile|
+      employer_profile.trigger_model_event(:generate_initial_employer_invoice)
     end
 
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
@@ -81,13 +83,19 @@ class Exchanges::HbxProfilesController < ApplicationController
     @next_60_day = @next_30_day.next_month
     @next_90_day = @next_60_day.next_month
 
-    @datatable = Effective::Datatables::EmployerDatatable.new
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
 
     respond_to do |format|
       format.js
     end
   end
 
+  def employer_datatable
+    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+    respond_to do |format|
+      format.js
+    end
+  end
 
 def employer_poc
 
@@ -203,11 +211,17 @@ def employer_poc
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
+  def outstanding_verification_dt
+    @selector = params[:scopes][:selector] if params[:scopes].present?
+    @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
+  end
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -215,6 +229,21 @@ def employer_poc
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def get_user_info
+    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    if params[:person_id].present?
+      @person = Person.find(params[:person_id])
+    else
+      @employer_actions = true
+      @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
+      @organization = if params.key?(:employers_action_id)
+        EmployerProfile.find(@element_to_replace_id.split("_").last).organization
+      else
+        Organization.find(@element_to_replace_id.split("_").last)
+      end
+    end
   end
 
   def update_effective_date
@@ -251,28 +280,14 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/cancel_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          hbx.cancel_coverage! if hbx.may_cancel_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.cancel_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/cancel_enrollment_result.js.erb"}
     end
-  end
-
-  def set_transmit_flag(hbx_id)
-    HbxEnrollment.find(hbx_id).update_attributes!(is_tranding_partner_transmittable: true)
   end
 
   def terminate_enrollment
@@ -285,22 +300,11 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/terminate_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-          hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.terminate_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
     end
@@ -384,25 +388,6 @@ def employer_poc
     @organizations = organizations.skip(dt_query.skip).limit(dt_query.take)
     render
 
-  end
-
-  def verifications_index_datatable
-    dt_query = extract_datatable_parameters
-    families = []
-    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
-    @draw = dt_query.draw
-    @total_records = all_families.count
-    @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
-    render
   end
 
   def product_index

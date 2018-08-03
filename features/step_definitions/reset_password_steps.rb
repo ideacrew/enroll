@@ -19,6 +19,11 @@ When(/^Hbx Admin clicks on (.*?) link in action drop down$/) do |link|
   wait_for_ajax
 end
 
+And(/^Hbx admin confirms password send/) do
+  find('.lock-confirm-btn').trigger('click')
+  wait_for_ajax
+end
+
 Then(/^the reset password email should be sent to the user$/) do
   expect(User.all.to_a.last.reset_password_token).to be_a String
 end

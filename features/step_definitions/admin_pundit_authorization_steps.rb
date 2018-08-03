@@ -7,8 +7,7 @@ When(/^the Hbx Admin clicks on the Action button$/) do
 end
 
 Then(/^the Add SEP option should be enabled$/) do
-  # Commenting the line below because we are temporaily disabling the 'Add SEP' link.
-  #find_link('Add SEP')['data-remote'].should == 'true'
+  find_link('Add SEP')['data-remote'].should == 'true'
 end
 
 Then(/^the Add SEP option should be disabled$/) do

@@ -16,8 +16,26 @@ class TimeKeeper
     a_time.in_time_zone("Eastern Time (US & Canada)")
   end
 
+  def self.exchange_zone
+    "Eastern Time (US & Canada)"
+  end
+
+  def self.start_of_exchange_day_from_utc(date)
+    start_of_day = date.beginning_of_day
+    Time.use_zone(exchange_zone) do
+      Time.local(start_of_day.year, start_of_day.month, start_of_day.day, 0,0,0)
+    end.utc
+  end
+
+  def self.end_of_exchange_day_from_utc(date)
+    start_of_next_day = (date + 1.day).beginning_of_day
+    Time.use_zone(exchange_zone) do
+      Time.local(start_of_next_day.year, start_of_next_day.month, start_of_next_day.day, 0,0,0)
+    end.utc
+  end
+
   def self.date_according_to_exchange_at(a_time)
-    a_time.in_time_zone("Eastern Time (US & Canada)").to_date
+    a_time.in_time_zone(exchange_zone).to_date
   end
 
   def self.set_date_of_record(new_date)
@@ -72,8 +90,9 @@ class TimeKeeper
   end
 
   def push_date_of_record
+    BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     BenefitSponsorship.advance_day(self.date_of_record)
-    EmployerProfile.advance_day(self.date_of_record)
+    # EmployerProfile.advance_day(self.date_of_record)
     Family.advance_day(self.date_of_record) if individual_market_is_enabled?
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
@@ -81,7 +100,11 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    PlanYear.date_change_event(self.date_of_record)
+    begin
+      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(self.date_of_record)
+    rescue Exception => e
+      Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
+    end
   end
 
   def self.with_cache

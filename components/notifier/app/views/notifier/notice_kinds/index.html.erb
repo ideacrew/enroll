@@ -10,7 +10,7 @@
 <% end %>
 
 <div class="content landing">
-  <%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+  <%= render "./ui-components/v1/navs/primary_nav", :active_tab => "home-tab" %>
   
   <div class="home">
 
@@ -22,9 +22,8 @@
           <div aria-labelledby="inbox-tab" id="inbox" class="tab-pane-hbx" role="tabpanel">
             <div class="col-xs-12">
               <div class="notices_index_list">
-                <div class='container'>
-                  <h1>Notices</h1>
-                </div>
+                <h1 class="heading-text">Notices</h1>
+
 
                   <span class="pull-right">
                     <%= link_to 'Add Notice', new_notice_kind_path, class: "btn btn-primary notice-preview", remote: true %>

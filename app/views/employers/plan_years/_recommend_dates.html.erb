@@ -13,14 +13,24 @@
       </div>
       <div class="col-xs-3">
         <span class="icon-calendar-large icon-calendar-large-dims">
-          <h3 class="day">
-            <%= @schedule[:advertised_due_date_of_month].strftime("%e") %>
-          </h3>
-          <span class="month">
-            <%= @schedule[:advertised_due_date_of_month].strftime("%B") %>
-          </span>
+          <%if individual_market_is_enabled? %>
+            <h3 class="day">
+              <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%e") %>
+            </h3>
+            <span class="month">
+              <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%B") %>
+            </span>
+          <%else%>
+            <h3 class="day">
+              <%= @schedule[:advertised_due_date_of_month].strftime("%e") %>
+            </h3>
+            <span class="month">
+              <%= @schedule[:advertised_due_date_of_month].strftime("%B") %>
+            </span>
+          <%end%>
         </span>
       </div>
+
     </div>
     <div class="col-xs-6 panel">
       <div class="col-xs-9">
