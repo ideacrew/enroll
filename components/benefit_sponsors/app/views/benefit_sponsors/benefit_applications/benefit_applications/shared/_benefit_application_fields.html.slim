@@ -1,6 +1,7 @@
 h1.heading-text Add Benefit Package
 .row.pl-1
   h3 When would you like your coverage to start? (In the next 2 months)
+  h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_coverage_tip_helper
 .row#benefitApplicationform
   .col-md-12.p0
     - benefit_application_start_dates = f.object.start_on_options.keys
@@ -37,25 +38,25 @@ h1.heading-text Add Benefit Package
 
 #recommend_dates.hidden.mt-1
   = render "benefit_sponsors/benefit_applications/benefit_applications/recommend_dates"
-      
+
 javascript:
 
   var disableSelectric = false;
-  
+
   function selectedDate(element) {
     showHideRecommendDates(element.value)
   }
-  
+
   function setDueDates(id,newvalue) {
 		document.getElementById(id).innerText = newvalue;
   }
-  
+
   function resetInputOptions() {
     document.querySelector('input#benefit_application_end_on').value = '';
     document.querySelector("input#benefit_application_open_enrollment_start_on").value = '';
     document.querySelector("input#benefit_application_open_enrollment_end_on").value = '';
   }
-  
+
   function showHideRecommendDates(date) {
     var recommendDates = document.querySelector('#recommend_dates')
     if (date) {
@@ -66,11 +67,11 @@ javascript:
       resetInputOptions()
     }
   }
-  
+
   var monthName = ["Jan", "Feb", "Mar", "April", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec"
   ];
-  
+
   function assignBenefitApplicationDates(targetDate) {
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
     var latest_submitted_on = date[targetDate]["employer_initial_application_latest_submit_on"];
@@ -87,18 +88,18 @@ javascript:
 		dateOptions.oeStartOn = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
 		dateOptions.oeEndOn = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
   }
-  
+
   var employeeCounts = {
     fte: Number,
     pte: Number,
     msp: Number
   }
-	
+
 	var dateOptions = {
 		oeStartOn:String,
 		oeEndOn:String
 	}
-  
+
   function checkEmployeeCount(element) {
     if (element.id == "fteEmployee") {
       employeeCounts.fte = element.value
@@ -115,8 +116,8 @@ javascript:
       document.getElementById('benefitContinueBtn').classList.add('disabled')
     }
   }
-  
+
 	function showDatepicker(id) {
 		initDatepicker(id,new Date(dateOptions.oeStartOn),new Date(dateOptions.oeEndOn))
 	}
-  
+

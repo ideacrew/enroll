@@ -72,7 +72,8 @@ module BenefitSponsors
 
       def benefit_renewal
         months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
-        renewal_application_begin = (new_date + months_prior_to_effective.months)
+        renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
+        renewal_application_begin = (new_date + months_prior_to_effective.months - renewal_offset_days)
 
         if renewal_application_begin.mday == 1
           benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
