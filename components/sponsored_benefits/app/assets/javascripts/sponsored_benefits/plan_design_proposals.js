@@ -1,6 +1,6 @@
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
-$(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
+//$(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
 $(document).on('click', '.plan_design_proposals .checkbox', calcPlanDesignContributions);
 // $(document).on('change', '#new_forms_plan_design_proposal input.premium-storage-input', reconcileSliderAndInputVal);
@@ -32,7 +32,7 @@ function pageInit() {
     disableActionButtons();
     setTimeout(function() {
       $('li.sole-source-tab').find('label').trigger('click');
-    },900)
+    },600)
   }
   initSlider();
   $('.loading-plans-button').hide();
@@ -65,10 +65,8 @@ function fetchCarriers() {
       active_year: active_year,
       selected_carrier_level: selected_carrier_level,
     },
-    success: function(data) {
-      setTimeout(function() {
-        formatRadioButtons()
-      },400);
+    success: function() {
+      //Do something
     },
     url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
   });
@@ -97,7 +95,7 @@ function checkIfSbcIncluded(event) {
   var elem_id = $(this).attr('id');
   var obj = $('#'+elem_id);
   if(obj.hasClass('plan-not-saved')) {
-      event.preventDefault();
+      //event.preventDefault();
       var data = buildBenefitGroupParams();
       if (proposalIsInvalid(data)) {
         // handle error messaging
@@ -125,7 +123,6 @@ function displayActiveCarriers() {
 
   if ($(this).find('input[type=radio]').is(':checked')) {
   } else {
-    $(this).find('input[type=radio]').prop('checked', true );
     $(this).closest('.health-plan-design').find('.plan-options > *').hide();
     $(this).closest('.health-plan-design').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
   }
@@ -163,6 +160,8 @@ function carrierSelected() {
   }
 }
 
+/*
+// Will Remove with refactor
 function planSelected() {
   toggleSliders($("#elected_plan_kind").val());
 
@@ -174,8 +173,22 @@ function planSelected() {
     $('.health-plan-design .selected-plan').show();
     calcPlanDesignContributions();
     $(this).siblings('input').prop('checked', true);
+    console.log($(this).siblings('input'))
   };
 
+  clearComparisons();
+}*/
+function setMyPlans(element) {
+  // Need to remove jQuery Selectors
+  toggleSliders($("#elected_plan_kind").val());
+  var reference_plan_id = element.dataset.planid.replace(/['"]+/g, '');
+  document.getElementById('reference_plan_id').value = reference_plan_id;
+  $(this).closest('.benefit-group-fields').find('.health-plan-design .selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
+
+  if (reference_plan_id != "" && reference_plan_id != undefined){
+    $('.health-plan-design .selected-plan').show();
+    calcPlanDesignContributions();
+  };
   clearComparisons();
 }
 
@@ -197,7 +210,6 @@ function toggleSliders(plan_kind) {
 
 function calcPlanDesignContributions() {
   data = buildBenefitGroupParams();
-
   if (proposalIsInvalid(data)) {
     disableActionButtons();
   } else {
@@ -291,15 +303,6 @@ function initSlider() {
   });
 }
 
-function formatRadioButtons() {
-  $('.fa-circle').each(function() {
-    $(this).click(function() {
-      input = $(this).closest('div').find('input');
-      input.prop('checked', true)
-    });
-  })
-}
-
 function setRadioBtn(element) {
   dotIcons = document.querySelectorAll('.fa-dot-circle');
   icons = document.querySelectorAll('.fa-circle');
@@ -314,11 +317,6 @@ function setRadioBtn(element) {
       icon.classList.add('fa-dot-circle')
     }
   });
-}
-
-
-function removeRadioSelectors() {
-  
 }
 
 function preventSubmitPlanDesignProposal(event) {
@@ -530,7 +528,7 @@ function viewComparisons() {
 function clearComparisons() {
   $('.reference-plan').each(function() {
     var checkboxes = $(this).find('input[type=checkbox]');
-    checkboxes.attr('checked', false);
+    //checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
     disableCompareButton();
   });
@@ -604,23 +602,14 @@ function sortPlans() {
 }
 
 function setCarrierRadio(element) {
-  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
+  console.log(element)
+  element.checked = true;
 }
 
 function setMetalRadio(element) {
-  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
+
 }
 
 function setTopLevelRadios(element) {
-  elementId = element.getElementsByClassName('fa-circle')[0].closest('label').dataset.tempid;
-  var tabs = document.querySelectorAll('.elected_plan');
-  tabs.forEach(function(tab) {
-    var icon = tab.querySelectorAll('i')[0];
-    var iconId = tab.dataset.tempid;
-    if (elementId == iconId) {
-      icon.classList.add('fa-dot-circle');
-    } else {
-      icon.classList.remove('fa-dot-circle');
-    }
-  })
+
 }
