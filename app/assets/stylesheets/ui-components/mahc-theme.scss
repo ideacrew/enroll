@@ -544,3 +544,7 @@ thead {
       }
     }
   }
+
+.pagination > .active > a {
+  background:$mhc-blue;
+}

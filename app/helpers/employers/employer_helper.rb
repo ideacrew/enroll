@@ -3,13 +3,15 @@ module Employers::EmployerHelper
     @family.try(:census_employee).try(:address).try(:kind) || 'home'
   end
 
-  def employee_state_format(employee_state=nil, termination_date=nil)
+  def employee_state_format(census_employee=nil, employee_state=nil, termination_date=nil)
     if employee_state == "employee_termination_pending" && termination_date.present?
       return "Termination Pending " + termination_date.to_s
     elsif employee_state == 'employee_role_linked'
       return 'Account Linked'
     elsif employee_state == 'eligible'
       return 'No Account Linked'
+    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
+      return "Cobra Enrolled"
     else
       return employee_state.humanize
     end
