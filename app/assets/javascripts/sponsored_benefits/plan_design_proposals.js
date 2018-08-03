@@ -602,14 +602,6 @@ function sortPlans() {
 }
 
 function setCarrierRadio(element) {
-  console.log(element)
   element.checked = true;
 }
 
-function setMetalRadio(element) {
-
-}
-
-function setTopLevelRadios(element) {
-
-}
