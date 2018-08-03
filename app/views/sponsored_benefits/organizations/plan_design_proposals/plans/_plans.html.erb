@@ -8,11 +8,7 @@
     data-family-deductible="<%= plan.family_deductible %>"
   >
     <div class="col-xs-2">
-
-      <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
-      <%= label_tag "#{@location_id}_reference_plan_id" do %>
-      <i class="far fa-circle" onclick="setRadioButtons(this)" data-tempId="<%= plan.id %>"></i>
-      <% end %>
+      <%= radio_button_tag :reference_plan, "#{plan.id}", false, onclick:"setMyPlans(this)", data:{planId:plan.id} %>			
     </div>
 
     <div class="col-xs-10">
