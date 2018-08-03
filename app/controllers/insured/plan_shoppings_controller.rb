@@ -214,11 +214,9 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def is_eligibility_determined_and_not_csr_100?(person)
-    shopping_family_member_ids = @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
     tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
-    csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
-    csr_eligibility_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind
-    (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
+    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
   end
 
   def send_receipt_emails
