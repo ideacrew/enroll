@@ -265,34 +265,18 @@ class ConsumerRole
     end
   end
 
-  #use this method to check what verification types needs to be included to the notices
-  def types_include_to_notices
-    verification_types.find_all do |type|
-      type.unverified_no_docs?
-    end
-  end
-
   def expired_verification_types
     verification_types.find_all do |type|
       type.is_type_expired?
     end
   end
 
-  def all_types_verified?
-    person.verification_types.all?{ |type| is_type_verified?(type) }
-  end
-
   #check verification type status
-  def is_type_outstanding?(type)
-    case type
-      when "DC Residency"
-        residency_denied? && !has_docs_for_type?(type) && local_residency_outstanding?
-      when 'Social Security Number'
-        !ssn_verified? && !has_docs_for_type?(type)
-      when 'American Indian Status'
-        !native_verified? && !has_docs_for_type?(type)
-      else
-        !lawful_presence_authorized? && !has_docs_for_type?(type)
+
+  #use this method to check what verification types needs to be included to the notices
+  def types_include_to_notices
+    verification_types.find_all do |type|
+      type.unverified_no_docs?
     end
   end
 

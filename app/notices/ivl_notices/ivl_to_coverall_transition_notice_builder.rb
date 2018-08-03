@@ -106,7 +106,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   def append_unverified_individuals
     @transition_people.each do |person|
       person.consumer_role.expired_verification_types.each do |verification_type|
-        case verification_type
+        case verification_type.type_name
         when "Social Security Number"
           notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, past_due_text: "PAST DUE", age: person.age_on(TimeKeeper.date_of_record) })
         when "Immigration status"

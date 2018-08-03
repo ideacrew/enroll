@@ -28,7 +28,7 @@ module Subscribers
                                                                                          event_response_record_id: event_response_record.id)
 
         if "503" == return_status.to_s
-          consumer_role.deny_residency!
+          consumer_role.fail_residency!
           consumer_role.save
           return
         end
