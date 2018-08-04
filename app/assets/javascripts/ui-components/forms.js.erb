@@ -63,9 +63,8 @@ function addOfficeLocation() {
   checkKind(element, defaultValue)
 }
 
-function removeOfficeLocation() {
-  var doc = document.querySelectorAll('#removeAddress')[count]
-  doc.closest('#officeLocations').remove()
+function removeOfficeLocation(element) {
+  element.closest('#officeLocations').remove()
   count --;
 }
 
