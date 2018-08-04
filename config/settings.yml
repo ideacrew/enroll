@@ -46,7 +46,9 @@ site:
   exchange_hbx_id: "MA0"
   mail_address: "noreply@healthconnector.org"
   privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
+  late_rates_message: "Premiums for some coverage effective dates are not yet available. Premiums are typically ready for employers at least 30 days before your coverage starts, and often sooner than that. Please check back again soon to see if premium rates are available, or call customer service if you need more additional assistance."
 
+  exchange_name: "Massachusetts Health Connector"
   social_media:
     facebook_url: ""
 
