@@ -165,6 +165,7 @@ javascript:
       return 0;
     })
     populateReferencePlans(filteredProducts)
+    selectDefaultReferencePlan()
   }
 
   function populateReferencePlans(plans) {
@@ -489,6 +490,22 @@ javascript:
 		document.getElementById('modalSummaryData').innerHTML = '';
 		document.getElementById('btnMoreDetails').innerHTML = "More Details"
 	})
+  
+  // Mouse event needed to enable tooltips css on pageload
+  function selectDefaultReferencePlan() {
+    setTimeout(function() {
+      input = document.querySelectorAll('.reference-plans')[0].querySelector('input');
+      input.click();
+      myplans = document.querySelector('#yourPlans');
+      myplans.onmouseover = function() {
+        myplans.click()
+      }
+      contributions = document.querySelector('#yourSponsorContributions');
+      contributions.onmouseover = function() {
+        contributions.click()
+      }
+    },300);
+  }
 
 - unless @benefit_package_form.new_record?
   javascript:
