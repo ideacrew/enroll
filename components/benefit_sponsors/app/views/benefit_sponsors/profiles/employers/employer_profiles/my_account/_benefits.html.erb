@@ -58,8 +58,7 @@
             </div>
           </h3>
         </div>
-        <div class="row">
-          <div class="col-xs-6 above">
+        <div class="row" style="margin-right:1px">
           <%#= pundit_span EmployerProfile, :updateable? %>
           <% if benefit_application.draft? %>
               <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
@@ -78,7 +77,6 @@
           <% end %>
           <span></span>
         </div>
-      </div>
       <div class="col-xs-1">
             &nbsp;
       </div>
