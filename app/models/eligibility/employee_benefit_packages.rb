@@ -133,8 +133,9 @@ module Eligibility
 
     def reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
-        benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
-        benefit_group_assignment.update_attributes(is_active: false)
+        end_on = benefit_group_assignment.end_on || (new_benefit_group.start_on - 1.day)
+        end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end
 
@@ -146,8 +147,8 @@ module Eligibility
 
     def has_benefit_group_assignment?
       return has_benefit_group_assignment_deprecated? if is_case_old?
-      (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
-      (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
+      (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES).include?(active_benefit_group_assignment.benefit_application.aasm_state)) ||
+      (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
     end
   end
 end
