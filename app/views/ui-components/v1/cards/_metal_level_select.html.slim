@@ -572,6 +572,12 @@ javascript:
     }
   }
 
+  (function() {
+    // Clears localStorage on page load
+    localStorage.removeItem("title");
+    localStorage.removeItem("contributionLevels");
+  })();
+
 - unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
