@@ -12,24 +12,13 @@ RSpec.describe 'Service Area Imports', :type => :task do
 
   before :all do
 
-    glob_pattern = Dir.glob(File.join(Rails.root, "db/seedfiles/cca/fixtures/issuer_profile_*.yaml"))
-    Dir.glob(glob_pattern).each do |f_name|
-      loaded_class = ::BenefitSponsors::Organizations::ExemptOrganization
-      loaded_class_2 = ::BenefitSponsors::Organizations::IssuerProfile
-      yaml_str = File.read(f_name)
-      data = YAML.load(yaml_str)
-      data.new_record = true
-      data.save!
-    end
+    issuer_profiles_file = File.join(Rails.root, "db/seedfiles/cca/issuer_profiles_seed.rb")
+    load issuer_profiles_file
+    load_cca_issuer_profiles_seed
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/cca/fixtures/locations/county_zips", "**", "*.yaml"))
-    files.each do |f_name|
-      loaded_class = ::BenefitMarkets::Locations::CountyZip
-      yaml_str = File.read(f_name)
-      data = YAML.load(yaml_str)
-      data.new_record = true
-      data.save!
-    end
+    locations_file = File.join(Rails.root, "db/seedfiles/cca/locations_seed.rb")
+    load locations_file
+    load_cca_locations_county_zips_seed
 
     Rake.application.rake_require 'tasks/migrations/load_service_area_data'
     Rake::Task.define_task(:environment)

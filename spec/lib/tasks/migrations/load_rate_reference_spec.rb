@@ -5,15 +5,9 @@ describe 'load_rate_reference:update_rating_areas' do
     Rake.application.rake_require "tasks/migrations/load_rate_reference"
     Rake::Task.define_task(:environment)
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/cca/fixtures/locations/county_zips", "**", "*.yaml"))
-
-    files.each do |f_name|
-      loaded_class = ::BenefitMarkets::Locations::CountyZip
-      yaml_str = File.read(f_name)
-      data = YAML.load(yaml_str)
-      data.new_record = true
-      data.save!
-    end
+    glob_pattern = File.join(Rails.root, "db/seedfiles/cca/locations_seed.rb")
+    load glob_pattern
+    load_cca_locations_county_zips_seed
   end
 
   let :run_rake_task do
