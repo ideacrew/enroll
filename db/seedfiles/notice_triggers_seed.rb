@@ -386,7 +386,7 @@ shop_notice_triggers = [
     title: 'Termination of Employer’s Health Coverage Offered Through DC Health Link',
     description: 'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
     resource_name: 'employee_role',
-    event_name: 'renewal_employee_ineligibility_notice',
+    event_name: 'renewal_employer_ineligibility_notice_to_employee',
     notice_triggers: [
       {
         name: 'Employee Eligibility Notice',

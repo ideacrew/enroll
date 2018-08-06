@@ -19,7 +19,7 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
                             :name =>'This notices goes to all the employees who have successfully matched their employer.',
                             :notice_template => 'notices/shop_employee_notices/employee_eligibility_notice',
                             :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
-                            :event_name => 'renewal_employee_ineligibility_notice',
+                            :event_name => 'renewal_employer_ineligibility_notice_to_employee',
                             :mpi_indicator => 'SHOP_D037',
                             :title => "Termination of Employer’s Health Coverage Offered Through DC Health Link"})
                           }
