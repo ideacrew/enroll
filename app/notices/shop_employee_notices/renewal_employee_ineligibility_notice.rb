@@ -14,7 +14,7 @@ class ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice < ShopEmployeeNoti
 
 
   def append_data
-    renewing_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
+    renewing_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING + ["renewing_application_ineligible"]).first
     active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state => "active").first
 
   plan_year_warnings = []
