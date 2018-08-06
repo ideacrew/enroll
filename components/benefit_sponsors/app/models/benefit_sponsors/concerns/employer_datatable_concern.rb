@@ -20,7 +20,7 @@ module BenefitSponsors
 
         scope :attestations_by_kind, ->(attestation_kind) {
           orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state" => attestation_kind)
-          self.where(:"organization".in => orgs.collect{|org| org.id.to_s})}
+          self.where(:"organization".in => orgs.collect{|org| org.id})}
 
         scope :employer_attestations, -> {
           orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state".in => EmployerAttestation::ATTESTATION_KINDS)
