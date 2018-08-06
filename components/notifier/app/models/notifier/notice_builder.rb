@@ -223,8 +223,10 @@ module Notifier
       receiver = resource
       receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
 
+      title = (self.event_name == 'generate_initial_employer_invoice') ? file_name : notice_filename
+
       doc_params = {
-        title: notice_filename,
+        title: title,
         creator: "hbx_staff",
         subject: document_subject,
         identifier: doc_uri,
