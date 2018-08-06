@@ -382,7 +382,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'DRE039',
+    hbx_id: 'SHOP_D039',
     title: 'Termination of Employer’s Health Coverage Offered Through DC Health Link',
     description: 'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
     resource_name: 'employee_role',
@@ -392,7 +392,7 @@ shop_notice_triggers = [
         name: 'Employee Eligibility Notice',
         notice_template: 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
         notice_builder: 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
-        mpi_indicator: 'SHOP_D037',
+        mpi_indicator: 'SHOP_D039',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

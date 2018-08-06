@@ -1,12 +1,21 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.email %></h3></td>
+    </tr>
+  </tbody>
+</table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>TERMINATION OF EMPLOYER’S HEALTH COVERAGE OFFERED THROUGH #{Settings.site.short_name}</h3></td>
+      <td><h3>TERMINATION OF EMPLOYER’S HEALTH COVERAGE OFFERED THROUGH <%= Settings.site.short_name.upcase %> </h3></td>
     </tr>
   </tbody>
 </table>
@@ -20,7 +29,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This letter is notification that effective #{notice.plan_year.end_on} your employer,<strong>#{notice.employer_name}</strong>, is no longer offering health coverage to employees through  #{Settings.site.short_name}."} %>
+  content: "This letter is notification that effective #{notice.plan_year.end_on} your employer, <strong>#{notice.employer_name}</strong>, is no longer offering health coverage to employees through  #{Settings.site.short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "If you are currently enrolled in health or dental coverage through <strong>#{notice.employer_name}</strong>, coverage for you, and any of your enrolled family members, will end on #{notice.plan_year.end_on}."} %>
@@ -69,4 +78,4 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "This notice is being provided in accordance with 45 CFR 155.715(e) and 45 CFR 155.735(g)"} %>
+ content: "This notice is being provided in accordance with 45 C.F.R. 155.735(g)."} %>

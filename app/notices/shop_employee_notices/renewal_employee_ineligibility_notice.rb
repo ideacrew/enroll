@@ -6,7 +6,6 @@ class ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice < ShopEmployeeNoti
     build
     append_data
     generate_pdf_notice
-    employee_appeal_rights_attachment
     non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
@@ -34,6 +33,13 @@ class ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice < ShopEmployeeNoti
         :end_on => active_plan_year.end_on,
         :warnings => plan_year_warnings
       })
+
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+      notice.enrollment = PdfTemplates::Enrollment.new({
+                        :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
+                        :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
+        })
   end
 
 end
