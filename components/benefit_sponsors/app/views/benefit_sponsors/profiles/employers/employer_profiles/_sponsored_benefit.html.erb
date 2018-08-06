@@ -92,7 +92,7 @@
             <% pdt_employee = BigDecimal.new((pdt_total - pdt_employer).to_s).round(2) %>
             <tr>
               <td>
-                <%= raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.try(:humanize)}") %>
+                <%= raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.gsub("Dependents", "Child(ren)").try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.gsub("Dependents", "Child(ren)").try(:humanize)}") %>
               </td>
               <td id="pct">
                 <%= number_to_percentage((pdt.sponsor_contribution_factor * 100.0), precision: 0) %>
