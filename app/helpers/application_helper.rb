@@ -427,6 +427,22 @@ module ApplicationHelper
     carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
+      
+  def digest_logos
+    carrier_logo_hash = Hash.new(carriers:{})
+    carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
+    carriers.each do |car|
+      if Rails.env == "production"
+        image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        digest_image = "/assets/#{Rails.application.assets.find_asset(image).digest_path}"
+        carrier_logo_hash[car.legal_name] = digest_image
+      else
+        image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        carrier_logo_hash[car.legal_name] = image
+      end
+    end
+    carrier_logo_hash
+  end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})
     carrier_name = carrier_logo(plan)
