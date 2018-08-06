@@ -434,7 +434,8 @@ module ApplicationHelper
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        carrier_logo_hash[car.legal_name] = Rails.application.assets.find_asset(image).digest_path
+        digest_image = "/assets/#{Rails.application.assets.find_asset(image).digest_path}"
+        carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
         carrier_logo_hash[car.legal_name] = image
