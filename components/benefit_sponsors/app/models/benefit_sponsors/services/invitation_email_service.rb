@@ -1,8 +1,8 @@
 module BenefitSponsors
   module Services
-    class InvitationEmails
+    class InvitationEmailService
 
-      attr_accessor :broker_role, :employer_profile
+      attr_accessor :broker_role_id, :employer_profile
 
       def initialize(params={})
         @broker_role_id = params[:broker_role_id]
@@ -10,7 +10,7 @@ module BenefitSponsors
       end
 
       def send_broker_successfully_associated_email
-        broker_person = Person.where(:'broker_role._id' => broker_role_id).first
+        broker_person = Person.where(:'broker_role._id' => get_bson_id(broker_role_id)).first
         body = "You have been selected as a broker by #{employer_profile.legal_name}"
 
         message_params = {
@@ -31,6 +31,10 @@ module BenefitSponsors
         msg_box = inbox_provider.inbox
         msg_box.post_message(message)
         msg_box.save
+      end
+
+      def get_bson_id(id)
+        BSON::ObjectId.from_string(id)
       end
 
     end
