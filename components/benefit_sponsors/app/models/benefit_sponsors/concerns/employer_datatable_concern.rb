@@ -37,7 +37,7 @@ module BenefitSponsors
         }
 
         scope :benefit_application_enrolling_renewing, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, :"benefit_applications.predecessor_id" => {:$exists => true})
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open, :enrollment_closed, :draft], :"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_enrolling_initial_oe, -> () {
