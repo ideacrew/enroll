@@ -50,7 +50,6 @@ module BenefitSponsors
       end
 
       def self.resolve_service(attrs={})
-        return @service if defined? @service
         @service = BenefitSponsors::Services::SponsoredBenefitService.new(attrs)
       end
 
