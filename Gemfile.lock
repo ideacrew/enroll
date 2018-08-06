@@ -374,8 +374,6 @@ GEM
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
     ffi (1.9.23)
-    font-awesome-rails (4.5.0.1)
-      railties (>= 3.2, < 5.1)
     forgery (0.7.0)
     gherkin (3.2.0)
     globalid (0.4.1)
@@ -830,7 +828,6 @@ DEPENDENCIES
   eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
-  font-awesome-rails (= 4.5.0.1)
   forgery
   haml
   httparty

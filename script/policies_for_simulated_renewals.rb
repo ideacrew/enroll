@@ -73,6 +73,8 @@ renewed_sponsorships.each do |bs|
     [:enrollment_open,:enrollment_closed,:enrollment_eligible,:active].include?(ba.aasm_state)
   end
 
+  next if selected_application.blank?
+
   benefit_packages = selected_application.benefit_packages
 
   enrollment_ids = []
