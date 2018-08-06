@@ -22,12 +22,12 @@ class MigrateBrokersAsExemptOrganizations < MongoidMigrationTask
         begin
           if organization.profiles.count == 1
             organization.update_attributes!(_type: "BenefitSponsors::Organizations::ExemptOrganization")
-            puts "Successfully migrated broker organization as exempt organization, organization_legal_name: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id}"
+            puts "Successfully migrated broker organization as exempt organization, organization_legal_name: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id}" unless Rails.env.test?
           else
-            puts "Cannot migrate the broker organization because this organization has more than two profiles, organization_legal_name: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id}"
+            puts "Cannot migrate the broker organization because this organization has more than two profiles, organization_legal_name: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id}" unless Rails.env.test?
           end
         rescue => e
-          puts "Failed to migrate organization: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id} because of the error: #{e.backtrace}"
+          puts "Failed to migrate organization: #{organization.legal_name}, organization_hbx_id: #{organization.hbx_id} because of the error: #{e.backtrace}" unless Rails.env.test?
         end
       end
     end
