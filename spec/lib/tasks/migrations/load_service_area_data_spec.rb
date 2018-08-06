@@ -108,7 +108,7 @@ RSpec.describe 'Service Area Imports', :type => :task do
     end
 
     context "for elements that serve partial state but total county" do
-      let!(:county_zip) {BenefitMarkets::Locations::CountyZip.all.where(county_name: "Worcester", zip: "01517", state: "MA")}
+      let!(:county_zip) {BenefitMarkets::Locations::CountyZip.all.where(county_name: "Franklin", zip: "01093", state: "MA")}
       subject { imported_areas.where(:county_zip_ids.in => [county_zip.first.id]).first }
       it_should_behave_like "a carrier service area", {
                                                         active_year: 2017,
@@ -119,7 +119,7 @@ RSpec.describe 'Service Area Imports', :type => :task do
 
     context "it created the correct number of service areas" do
       it "created many service areas for each imported zip code" do
-        expect( imported_areas.count ).to eq 19
+        expect( imported_areas.count ).to eq 2
       end
     end
   end
