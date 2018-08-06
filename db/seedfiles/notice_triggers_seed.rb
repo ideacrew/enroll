@@ -391,7 +391,7 @@ shop_notice_triggers = [
       {
         name: 'Employee Eligibility Notice',
         notice_template: 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
-        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
+        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
         mpi_indicator: 'SHOP_D037',
         notice_trigger_element_group: {
           market_places: ['shop'],
