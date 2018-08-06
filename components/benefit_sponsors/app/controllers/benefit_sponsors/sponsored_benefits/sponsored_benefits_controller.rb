@@ -9,6 +9,10 @@ module BenefitSponsors
         # TODO - add pundit policy
       end
 
+      def edit
+        # @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_edit(sponsored_benefits_params)
+      end
+
       def create
         @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_create(sponsored_benefits_params)
         # TODO - add pundit policy
@@ -21,7 +25,7 @@ module BenefitSponsors
           render :new
         end
       end
-    
+
       private
 
       # def find_benefit_package

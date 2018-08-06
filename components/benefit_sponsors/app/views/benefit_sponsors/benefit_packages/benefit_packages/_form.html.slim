@@ -19,11 +19,12 @@ h1.heading-text Benefit Package - Set Up
 
   button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
   button.btn.btn-default#addDentalBenefits type="submit" name="add_dental_benefits" value="true" Add Dental Benefits
+  button.btn.btn-default#editDentalBenefits type="submit" name="edit_dental_benefits" value="true" Edit Dental Benefits
   button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
-  
+
 
   = link_to 'Cancel', profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits'), :class => 'btn btn-default pull-right mr-1', id:'cancelBenefitPackage'
-      
+
 javascript:
   var disableSelectric = false;
 
@@ -34,3 +35,7 @@ javascript:
       document.getElementById("addDentalBenefits").classList.add("hidden")
     }
 
+    window.onload = function(){
+      document.getElementById("editDentalBenefits").classList.add("hidden")
+      document.getElementById("editDentalBenefits").classList.add("hidden")
+    }

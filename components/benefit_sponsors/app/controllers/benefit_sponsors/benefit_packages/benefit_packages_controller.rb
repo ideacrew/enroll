@@ -37,12 +37,14 @@ module BenefitSponsors
 
       def update
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params.require(:id)}))
-        authorize @benefit_package_form, :updateable?
-
         if @benefit_package_form.update
           flash[:notice] = "Benefit Package successfully updated."
           if params[:add_new_benefit_package] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, add_new_benefit_package: true)
+          elsif params[:add_dental_benefits] == "true"
+            redirect_to new_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, @benefit_package_form.show_page_model, kind: "dental")
+          elsif params[:edit_dental_benefits] == "true"
+            # redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, @benefit_package_form.show_page_model, sponsored_benefit_kind: "dental")
           else
             redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
           end
@@ -89,7 +91,7 @@ module BenefitSponsors
         params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id, :id,
           :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
-            :sponsor_contribution_attributes => [ 
+            :sponsor_contribution_attributes => [
               :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
             ]
           ]

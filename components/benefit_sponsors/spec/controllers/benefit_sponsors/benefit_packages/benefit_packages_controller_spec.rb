@@ -46,7 +46,7 @@ module BenefitSponsors
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
-    
+
     let(:product) { product_package.products.first }
 
     let(:sbc_document) {
@@ -274,6 +274,12 @@ module BenefitSponsors
         it "should redirect to benefit applications" do
           sign_in_and_do_update
           expect(response.location.include?("tab=benefits")).to be_truthy
+        end
+
+        it "should redirect to edit dental benfit page" do
+          sign_in user
+          post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params, add_dental_benefits: "true"
+          expect(response.location.include?("sponsored_benefits/edit?kind=dental")).to be_truthy
         end
       end
 
