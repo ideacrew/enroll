@@ -13,6 +13,7 @@ export default class extends Controller {
   static targets = [ "officeLocations", "officeLocation" ];
 
   addLocation() {
+      event.preventDefault();
     //clone new location node, unhide remove button, modify name attribute
     var newLocation = document.importNode(this.officeLocationTarget, true)
     var totalLocations = document.importNode(this.officeLocationsTarget, true)
@@ -52,6 +53,7 @@ export default class extends Controller {
   }
 
   removeLocation(event) {
+    event.preventDefault();
     //remove itself
     event.target.closest('.js-office-location').querySelectorAll('input[id="delete_location"]').forEach(function(input) {
       input.setAttribute('value', true)
