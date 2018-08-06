@@ -108,7 +108,7 @@ module Effective
           end
 
           benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:attestations]) if attributes[:attestations].present?
+          benefit_sponsorships = benefit_sponsorships.send(attributes[:employer_attestations]) if attributes[:employer_attestations].present?
 
 
           if attributes[:upcoming_dates].present?
@@ -117,24 +117,10 @@ module Effective
               end
           end
 
+          if attributes[:attestations].present? && attributes[:attestations] != "employer_attestations"
+            benefit_sponsorships = benefit_sponsorships.attestations_by_kind(attributes[:attestations])
+          end
         end
-
-          # if employer_attestation_kinds.include?(attributes[:attestations])
-          #   benefit_sponsorships =  @benefit_sponsorships.attestations_by_kind(attributes[:attestations])
-          # elsif enrolling_kinds.include?(attributes[:enrolling])
-          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:enrolling])
-          # elsif enrolled_kinds.include?(attributes[:enrolled])
-          #   #TODO for employer enrolled kinds
-          # else
-          #   benefit_sponsorships = @benefit_sponsorships.send(attributes[:employers])
-          # end
-
-          # employers = @employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
-          # employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
-          # employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
-
-          # employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
-
 
           @employer_collection = benefit_sponsorships
       end
@@ -184,39 +170,33 @@ module Effective
         enrolling_renewing:
           [
             {scope:'all', label: 'All'},
-            #{scope: 'employer_profiles_renewing_application_pending', label: 'Application Pending'},
-            {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'},
-            {scope: 'benefit_application_renewing_binder_paid', label: 'Binder Paid'},
+            {scope: 'benefit_application_renewal_pending', label: 'Application Pending'},
+            {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'}
           ],
         enrolling_initial:
           [
             {scope:'all', label: 'All'},
-            #{scope: 'employer_profiles_initial_application_pending', label: 'Application Pending'},
+            {scope: 'benefit_application_pending', label: 'Application Pending'},
             {scope: 'benefit_application_enrolling_initial_oe', label: 'Open Enrollment'},
-            #{scope: 'employer_profiles_binder_pending', label: 'Binder Pending'},
             {scope: 'benefit_application_initial_binder_paid', label: 'Binder Paid'},
+            {scope: 'benefit_application_initial_binder_pending', label: 'Binder Pending'}
           ],
         enrolled:
           [
             {scope:'benefit_application_enrolled', label: 'All' },
-            {scope:'benefit_application_suspended', label: 'Suspended' },
+            {scope:'benefit_application_suspended', label: 'Suspended' }
           ],
         upcoming_dates:
           [
             {scope: @next_30_day, label: @next_30_day },
-            {scope: @next_60_day, label: @next_60_day },
-            {scope: @next_90_day, label: @next_90_day },
-            #{scope: "employer_profile_plan_year_start_on('#{@next_60_day})'", label: @next_60_day },
-            #{scope: "employer_profile_plan_year_start_on('#{@next_90_day})'",  label: @next_90_day },
+            {scope: @next_60_day, label: @next_60_day }
           ],
         enrolling:
           [
             {scope: 'benefit_application_enrolling', label: 'All'},
             {scope: 'benefit_application_enrolling_initial', label: 'Initial', subfilter: :enrolling_initial},
-            {scope: 'benefit_application_enrolling_renewing', label: 'Renewing', subfilter: :enrolling_renewing},
-            # {scope: 'employer_profiles_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
-            {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates},
-            #{scope: 'benefit_application_imported', label: 'Converting'}
+            {scope: 'benefit_application_enrolling_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
+            {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates}
           ],
          attestations:
           [
@@ -224,18 +204,14 @@ module Effective
             {scope: 'submitted', label: 'Submitted'},
             {scope: 'pending', label: 'Pending'},
             {scope: 'approved', label: 'Approved'},
-            {scope: 'denied', label: 'Denied'},
+            {scope: 'denied', label: 'Denied'}
           ],
         employers:
          [
            {scope:'all', label: 'All'},
            {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
-
            {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
-           #{scope:'benefit_application_enrolling', label: 'Enrolling'},
-
-           {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled},
-           #{scope:'benefit_application_enrolled', label: 'Enrolled'},
+           {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled}
          ],
         top_scope: :employers
         }
