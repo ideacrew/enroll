@@ -15,6 +15,8 @@ describe MigrateBrokersAsExemptOrganizations, dbclean: :after_each do
 
   describe "successful migration", dbclean: :after_each do
     it "should migrate all the general organizations" do
+      expect(::BenefitSponsors::Organizations::ExemptOrganization.all.broker_agency_profiles.count).to eq 0
+      expect(::BenefitSponsors::Organizations::GeneralOrganization.all.broker_agency_profiles.count).to eq 4
       subject.migrate
       expect(::BenefitSponsors::Organizations::ExemptOrganization.all.broker_agency_profiles.count).to eq 4
       expect(::BenefitSponsors::Organizations::GeneralOrganization.all.broker_agency_profiles.count).to eq 0
@@ -28,5 +30,9 @@ describe MigrateBrokersAsExemptOrganizations, dbclean: :after_each do
       subject.migrate
       expect(dual_organization.class).to eq BenefitSponsors::Organizations::GeneralOrganization
     end
+  end
+
+  after :each do
+    FileUtils.rm_rf(Dir["#{Rails.root}/hbx_report"])
   end
 end

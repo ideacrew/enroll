@@ -12,7 +12,7 @@ class MigrateBrokersAsExemptOrganizations < MongoidMigrationTask
     file_name = "#{Rails.root}/hbx_report/broker_general_organizations_report_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
-      organizations = ::BenefitSponsors::Organizations::Organization.all.broker_agency_profiles.where(_type: "BenefitSponsors::Organizations::GeneralOrganization")
+      organizations = ::BenefitSponsors::Organizations::GeneralOrganization.all.broker_agency_profiles
       organizations.each do |organization|
         csv << [
                 organization.hbx_id,
