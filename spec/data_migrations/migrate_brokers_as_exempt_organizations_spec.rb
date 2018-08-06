@@ -21,6 +21,12 @@ describe MigrateBrokersAsExemptOrganizations, dbclean: :after_each do
       expect(::BenefitSponsors::Organizations::ExemptOrganization.all.broker_agency_profiles.count).to eq 4
       expect(::BenefitSponsors::Organizations::GeneralOrganization.all.broker_agency_profiles.count).to eq 0
     end
+
+    it "should not remove any associations after migration" do
+      office_location_id = ::BenefitSponsors::Organizations::GeneralOrganization.all.broker_agency_profiles[0].broker_agency_profile.office_locations.first.id
+      subject.migrate
+      expect(::BenefitSponsors::Organizations::ExemptOrganization.all.broker_agency_profiles[0].broker_agency_profile.office_locations.first.id).to eq office_location_id
+    end
   end
 
   describe "failed to migrate", dbclean: :after_each do
