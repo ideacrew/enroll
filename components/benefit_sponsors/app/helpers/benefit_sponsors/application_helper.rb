@@ -128,15 +128,13 @@ module BenefitSponsors
     end
 
     def profile_unread_messages_count(profile)
-      begin
-        if profile.is_a? BenefitSponsors::Organizations::Profile
-          profile.inbox.unread_messages.count
-        else
-          profile.inbox.unread_messages_count
-        end
-      rescue
-        0
+      if profile.is_a? BenefitSponsors::Organizations::Profile
+        profile.inbox.unread_messages.count
+      else
+        profile.inbox.unread_messages_count
       end
+    rescue Exception => e
+      0
     end
 
     def total_messages(record_id)
