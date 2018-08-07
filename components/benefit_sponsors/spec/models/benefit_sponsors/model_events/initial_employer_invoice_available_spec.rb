@@ -24,10 +24,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
     format: "file_content_type" 
   })}
 
-  before do
-    organization.employer_profile.documents << model_instance
-  end
-
   describe "ModelEvent" do
     context "when initial invoice is generated" do
       it "should trigger model event" do
@@ -46,6 +42,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
     context "when initial invoice is generated" do
       subject { BenefitSponsors::Observers::DocumentObserver.new}
       let!(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_invoice_available, model_instance, {}) }
+      before do
+        organization.employer_profile.documents << model_instance
+      end
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -89,7 +88,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
       before do
         allow(subject).to receive(:resource).and_return(employer_profile)
         allow(subject).to receive(:payload).and_return(payload)
-        model_instance.save!
+        organization.employer_profile.documents << model_instance
       end
 
       it "should retrun merge model" do

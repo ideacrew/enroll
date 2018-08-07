@@ -14,9 +14,15 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice
     :benefit_sponsorship => benefit_sponsorship,
     :aasm_state => 'enrollment_closed'
   )}
+  let!(:person){ FactoryGirl.create(:person, :with_family)}
+  let!(:family) {person.primary_family}
+  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+  let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
+
 
   before do
     allow(model_instance).to receive(:is_renewing?).and_return(true)
+    census_employee.update_attributes(:employee_role_id => employee_role.id )
   end
 
   describe "ModelEvent" do
@@ -43,6 +49,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerIneligibilityNotice
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.renewal_employer_ineligibility_notice"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
+          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
+
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.employee_renewal_employer_ineligibility_notice"
+          expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
