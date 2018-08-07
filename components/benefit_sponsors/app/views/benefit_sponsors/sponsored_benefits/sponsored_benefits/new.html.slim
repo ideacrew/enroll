@@ -10,7 +10,7 @@ h5 Select which plans your employees will choose from
     = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
     = benefit_builder.hidden_field :benefit_package_id, value: benefit_builder.object.benefit_package_id
     = benefit_builder.hidden_field :benefit_sponsorship_id, value: benefit_builder.object.benefit_sponsorship_id
-    = benefit_builder.fields_for :sponsored_benefits, benefit_builder.object.sponsored_benefits, errors: {}, fieldset: false do |f|
+    = benefit_builder.fields_for :sponsored_benefit, benefit_builder.object.sponsored_benefit, errors: {}, fieldset: false do |f|
       ul.nav.nav-tabs.row
         li.col-md-4.col-sm-4
           = f.hidden_field :kind, value: f.object.kind

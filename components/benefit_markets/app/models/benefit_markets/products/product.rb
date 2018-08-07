@@ -31,6 +31,7 @@ module BenefitMarkets
     field :family_deductible, type: String
     field :issuer_assigned_id, type: String
     field :service_area_id, type: BSON::ObjectId
+    field :network_information, type: String
 
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"

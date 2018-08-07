@@ -7,16 +7,16 @@ module BenefitSponsors
 
       attribute :benefit_package_id, String
       attribute :benefit_sponsorship_id, String
-      # attribute :id, String
+      attribute :sponsored_benefit_id, String # This will be the current SB which we're working on
       attribute :kind, String
-      attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
+      attribute :sponsored_benefit, BenefitSponsors::Forms::SponsoredBenefitForm
 
       attr_accessor :service, :catalog
 
 
       def self.for_new(params)
         form = self.new(params)
-        form.sponsored_benefits = BenefitSponsors::Forms::SponsoredBenefitForm.new(kind: params[:kind])
+        form.sponsored_benefit = BenefitSponsors::Forms::SponsoredBenefitForm.new(kind: params[:kind])
         form.service = resolve_service(params)
         form.service.load_form_meta_data(form)
       end
@@ -53,10 +53,12 @@ module BenefitSponsors
         @service = BenefitSponsors::Services::SponsoredBenefitService.new(attrs)
       end
 
-      def sponsored_benefits_attributes=(attributes)
-        attributes.each do |key, values|
-          self.sponsored_benefits = BenefitSponsors::Forms::SponsoredBenefitForm.new(values)
-        end
+      def sponsored_benefit_attributes=(attributes)
+        self.sponsored_benefit = BenefitSponsors::Forms::SponsoredBenefitForm.new(attributes)
+      end
+
+      def id=(val)
+        self.sponsored_benefit_id = val
       end
     end
   end

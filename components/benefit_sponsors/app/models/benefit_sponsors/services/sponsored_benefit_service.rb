@@ -66,8 +66,7 @@ module BenefitSponsors
       end
 
       def form_params_to_attributes(form)
-        # We always deal one Sponsored benefit at a time
-        sb_form = form.sponsored_benefits.first
+        sb_form = form.sponsored_benefit
         attributes = sanitize_params(
           sb_form.attributes.slice(
             :id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id

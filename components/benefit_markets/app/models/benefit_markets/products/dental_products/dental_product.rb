@@ -11,6 +11,7 @@ module BenefitMarkets
       field :dental_level, type: String
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Symbol
+      field :dental_plan_kind,            type: Symbol
 
       belongs_to  :renewal_product,
                   inverse_of: nil,
