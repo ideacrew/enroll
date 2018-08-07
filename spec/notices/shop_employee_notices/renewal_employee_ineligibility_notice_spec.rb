@@ -16,11 +16,11 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
   let(:renewal_plan) { FactoryGirl.create(:plan)}
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'This notices goes to all the employees who have successfully matched their employer.',
-                            :notice_template => 'notices/shop_employee_notices/employee_eligibility_notice',
-                            :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
+                            :name =>'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
+                            :notice_template => 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
+                            :notice_builder => 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
                             :event_name => 'renewal_employer_ineligibility_notice_to_employee',
-                            :mpi_indicator => 'SHOP_D037',
+                            :mpi_indicator => 'SHOP_D039',
                             :title => "Termination of Employer’s Health Coverage Offered Through DC Health Link"})
                           }
   let(:valid_params) {{
