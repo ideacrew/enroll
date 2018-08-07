@@ -29,7 +29,7 @@ module Effective
         }, :sortable => false, :filter => false, :visible => true
 
         table_column :status, :proc => Proc.new { |row|
-          employee_state_format(row.aasm_state, row.employment_terminated_on)
+          employee_state_format(row, row.aasm_state, row.employment_terminated_on)
         }, :sortable => false, :filter => false
 
         table_column :benefit_package, :proc => Proc.new { |row|

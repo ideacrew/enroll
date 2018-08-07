@@ -373,5 +373,23 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         expect(helper.show_cobra_fields?(conversion_employer_profile_with_renewing_plan_year, user)).to eq false 
       end
     end
+
+    context "employee_state_format" do
+
+      before do
+        census_employee.aasm_state ='cobra_linked'
+        census_employee.cobra_begin_date = TimeKeeper.date_of_record
+        census_employee.save
+      end
+
+      it "when cobra employee has enrollments" do
+        allow(census_employee).to receive(:has_cobra_hbx_enrollment?).and_return true
+        expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra Enrolled"
+      end
+
+      it "when cobra employee has no enrollments" do
+        expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra linked"
+      end
+    end
   end
 end

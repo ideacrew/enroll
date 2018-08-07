@@ -29,15 +29,13 @@
 <%- end %>
 
 <%- if @tab == 'home' %>
-<% if @current_plan_year.present? %>
-<aside class="col-xs-4 employer-right-column module">
-  <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
-    <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/open_enrollment_ends_panel' %>
+  <% if @current_plan_year.present? %>
+    <aside class="col-xs-4 employer-right-column module">
+      <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
+        <%= render partial: 'ui-components/v1/cards/open_enrollment_ends' %>
+      <% end %>
+      <%#= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/enrollment_report_widget' %>
+      <%= render partial: 'ui-components/v1/cards/employer_broker_widget' %>
+    </aside>
   <% end %>
-  <%#= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/enrollment_report_widget' %>
-  <%= render partial: 'benefit_sponsors/profiles/employers/employer_profiles/employer_broker_widget' %>
-</aside>
-<% else %>
-
-<% end %>
 <% end %>

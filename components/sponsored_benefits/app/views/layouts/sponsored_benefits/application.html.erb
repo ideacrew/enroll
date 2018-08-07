@@ -3,12 +3,11 @@
 <html>
 <head>
   <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
-  <%= stylesheet_link_tag "application", :media => "all" %>
-  <%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
-  <%= javascript_include_tag "application" %>
-  <%= javascript_include_tag "sponsored_benefits/application" %>
-  <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
-  <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag    "application", media: "all" %>
+	<%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+	<%= javascript_include_tag "application" %>
+	<%= javascript_include_tag "sponsored_benefits/application" %>
   <%= csrf_meta_tags %>
 </head>
 <body class="font">
