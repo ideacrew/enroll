@@ -169,6 +169,7 @@ javascript:
     })
     populateReferencePlans(filteredProducts)
     setTempCL()
+    selectDefaultReferencePlan()
   }
 
   function populateReferencePlans(plans) {
@@ -186,7 +187,7 @@ javascript:
         rplans.remove()
       }
     }
-		
+
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
       productsTotal = filteredProducts.length;
@@ -355,7 +356,7 @@ javascript:
   var employeeOnly;
   var familyOnly;
   var contributionInputs;
-  
+
   var tempContributionValues = {
     eeContribution:eeContribution || 0,
     spouse:spouse || 0,
@@ -363,7 +364,7 @@ javascript:
     childUnder26:childUnder26 || 0,
     employeeOnly:employeeOnly || 0,
     familyOnly:familyOnly || 0
-    
+
   }
 
   function newContributionAmounts(element) {
@@ -409,7 +410,7 @@ javascript:
           }
         break;
       }
-      
+
       tempLevels = JSON.stringify(tempContributionValues);
       localStorage.setItem("contributionLevels",tempLevels);
     })
@@ -524,11 +525,11 @@ javascript:
 		document.getElementById('modalSummaryData').innerHTML = '';
 		document.getElementById('btnMoreDetails').innerHTML = "More Details"
 	})
-  
+
   function setTempCL() {
     var myLevels = localStorage.getItem("contributionLevels");
     selectedTitle = localStorage.getItem("title");
-    
+
     if (myLevels) {
       var contributions = JSON.parse(myLevels)
       setTimeout(function() {
@@ -538,7 +539,7 @@ javascript:
         childUnder26 = document.querySelectorAll("[data-displayname='Child Under 26']");
         employeeOnly = document.querySelectorAll("[data-displayname='Employee Only']");
         family = document.querySelectorAll("[data-displayname='Family']");
-        
+
         if (selectedTitle == "ONE CARRIER") {
           employee[1].value = contributions.eeContribution;
           employee[2].value = contributions.eeContribution;
@@ -549,7 +550,7 @@ javascript:
           childUnder26[1].value = contributions.childUnder26;
           childUnder26[2].value = contributions.childUnder26;
         }
-        
+
         if (selectedTitle == "ONE LEVEL") {
           employee[1].value = contributions.eeContribution;
           employee[2].value = contributions.eeContribution;
@@ -560,14 +561,14 @@ javascript:
           childUnder26[1].value = contributions.childUnder26;
           childUnder26[2].value = contributions.childUnder26;
         }
-        
+
         if (selectedTitle == "ONE PLAN") {
           employeeOnly[1].value = contributions.employeeOnly;
           employeeOnly[2].value = contributions.employeeOnly;
           family[1].value = contributions.familyOnly;
           family[2].value = contributions.familyOnly;
         }
-        
+
       },500)
     }
   }
@@ -577,6 +578,25 @@ javascript:
     localStorage.removeItem("title");
     localStorage.removeItem("contributionLevels");
   })();
+
+  // Mouse event needed to enable tooltips css on pageload
+  function selectDefaultReferencePlan() {
+    setTimeout(function() {
+      input = document.querySelectorAll('.reference-plans')[0].querySelector('input');
+      input.click();
+      myplans = document.querySelector('#yourPlans');
+      myplans.onmouseover = function() {
+        myplans.click()
+        document.getElementById('new_benefit_package').click()
+      }
+      contributions = document.querySelector('#yourSponsorContributions');
+      contributions.onmouseover = function() {
+        contributions.click()
+        document.getElementById('new_benefit_package').click()
+      }
+
+    },300);
+  }
 
 - unless @benefit_package_form.new_record?
   javascript:
@@ -593,7 +613,7 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
-		
+
 - if show_benefit_application_tile == "true"
 	javascript:
 		(function() {
@@ -602,7 +622,7 @@ javascript:
 		},200)
 		})();
 
-			
 
-		
+
+
 
