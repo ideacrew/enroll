@@ -14,14 +14,15 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:benefit_market)      { site.benefit_markets.first }
-  let(:benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
   let(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-  let(:product_package_kind) { :single_issuer }
-  let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
+  let(:product_package_kind) { :single_product }
+  let(:sponsored_benefit_kind) { "dental" }
+  let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind, product_kind: sponsored_benefit_kind).first }
   let(:product) { product_package.products.first }
 
 
@@ -31,7 +32,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
       before :each do
         sign_in user
-        get :new, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, kind: "dental"
+        get :new, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, kind: sponsored_benefit_kind
       end
 
       it "should render new template" do
@@ -56,7 +57,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   describe "POST create", dbclean: :after_each do
     let(:benefits_params) {
       {
-        :kind => "dental",
+        :kind => sponsored_benefit_kind,
         :benefit_package_id => benefit_package.id,
         :benefit_sponsorship_id => benefit_sponsorship.id,
         :sponsored_benefits_attributes => sponsored_benefits_params
@@ -68,7 +69,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
         "0" => {
           :sponsor_contribution_attributes => sponsor_contribution_attributes,
           :product_package_kind => product_package_kind,
-          :kind => "health",
+          :kind => sponsored_benefit_kind,
           :product_option_choice => issuer_profile.legal_name,
           :reference_plan_id => product.id.to_s
         }
@@ -83,16 +84,24 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
     let(:contribution_levels_attributes) {
       {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95"},
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85"},
-        "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"},
-        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75"}
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
+        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
+        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
       }
     }
+
+    let(:contribution_model) { product_package.contribution_model }
+
+    let(:employee_contribution_unit) { contribution_model.contribution_units.where(order: 0).first }
+    let(:spouse_contribution_unit) { contribution_model.contribution_units.where(order: 1).first }
+    let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
+    let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
 
     context "when a user having right permissions signed in" do
 
       before :each do
+        # benefit_application.update(benefit_sponsor_catalog_id: benefit_market_catalog.id)
         sign_in user
         post :create, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, benefits: benefits_params
       end
