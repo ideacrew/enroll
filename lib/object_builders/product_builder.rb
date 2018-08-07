@@ -61,10 +61,10 @@ class ProductBuilder
           standard_component_id: @qhp.standard_component_id.strip,
           active_year: @qhp.active_year
           ).first
+        @qhp.save!
         if existing_qhp.present?
           @existing_qhp_counter += 1
         else
-          @qhp.save!
           @success_plan_counter += 1
         end
       end
@@ -119,6 +119,7 @@ class ProductBuilder
           end
           if new_product.valid?
             new_product.save!
+            cost_share_variance.product_id = new_product.id
           else
             @logger.error "\n Failed to create product: #{new_product.title}, \n hios product id: #{new_product.hios_id}\n Errors: #{new_product.errors.full_messages}\n ******************** \n"
           end
