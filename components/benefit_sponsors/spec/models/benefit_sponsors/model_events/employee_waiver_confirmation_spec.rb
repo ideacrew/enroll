@@ -9,7 +9,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
 
   let(:person)       { FactoryGirl.create(:person, :with_family) }
   let(:family)       { person.primary_family }
-  let!(:benefit_group)    { FactoryGirl.create(:benefit_group) }
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
   let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
 

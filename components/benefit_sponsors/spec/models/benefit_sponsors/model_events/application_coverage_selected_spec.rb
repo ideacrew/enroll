@@ -6,7 +6,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
 
   let(:person)       { FactoryGirl.create(:person, :with_family) }
   let(:family)       { person.primary_family }
-  let!(:benefit_group)    { FactoryGirl.create(:benefit_group) }
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
   let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
 
@@ -65,9 +64,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
         allow(model_instance).to receive(:enrollment_kind).and_return('special_enrollment')
         allow(model_instance).to receive(:census_employee).and_return(census_employee)
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
+
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.employee_mid_year_plan_change_notice_to_employer"
-          expect(payload[:employee_role_id]).to eq model_instance.employer_profile.hbx_id.to_s
+          expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_notice_to_employer"
+          expect(payload[:employer_id]).to eq model_instance.employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
@@ -140,6 +140,62 @@ RSpec.describe 'BenefitSponsors::ModelEvents::ApplicationCoverageSelected', :dbc
       it "should return enrollment coverage_kind" do
         expect(merge_model.enrollment.coverage_start_on).to eq model_instance.effective_on.strftime('%m/%d/%Y')
       end
+    end
+  end
+
+  describe "NoticeBuilder" do
+
+    let(:data_elements) {
+      [
+        "employer_profile.notice_date",
+        "employer_profile.employer_name",
+        "employer_profile.enrollment.employee_first_name",
+        "employer_profile.enrollment.employee_last_name",
+        "employer_profile.enrollment.coverage_start_on",
+        "employer_profile.broker.primary_fullname",
+        "employer_profile.broker.organization",
+        "employer_profile.broker.phone",
+        "employer_profile.broker_present?"
+      ]
+    }
+    let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
+    let(:template)  { Notifier::Template.new(data_elements: data_elements) }
+    let(:payload)   { {
+        "event_object_kind" => "HbxEnrollment",
+        "event_object_id" => model_instance.id
+    } }
+    let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+    let(:merge_model) { subject.construct_notice_object }
+
+    before do
+      allow(subject).to receive(:resource).and_return(employer_profile)
+      allow(subject).to receive(:payload).and_return(payload)
+      employee_role.update_attributes(census_employee_id: census_employee.id)
+      model_instance.select_coverage!
+    end
+
+    it "should return merge model" do
+      expect(merge_model).to be_a(recipient.constantize)
+    end
+
+    it "should return notice date" do
+      expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    end
+
+    it "should return employer name" do
+      expect(merge_model.employer_name).to eq employer_profile.legal_name
+    end
+
+    it "should return employee first_name" do
+      expect(merge_model.enrollment.employee_first_name).to eq model_instance.census_employee.first_name
+    end
+
+    it "should return employee last_name" do
+      expect(merge_model.enrollment.employee_last_name).to eq model_instance.census_employee.last_name
+    end
+
+    it "should return enrollment effective date " do
+      expect(merge_model.enrollment.coverage_start_on).to eq model_instance.effective_on.strftime('%m/%d/%Y')
     end
   end
 end

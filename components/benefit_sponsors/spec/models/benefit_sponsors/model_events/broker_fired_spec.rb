@@ -41,9 +41,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
     context "NoticeTrigger" do
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.broker_fired_confirmation_to_employer"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Accounts::BrokerAgencyAccount'
-          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          expect(event_name).to eq "acapi.info.events.broker.broker_fired_confirmation_to_broker"
+          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
+          expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -53,9 +53,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
         end
 
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.broker.broker_fired_confirmation_to_broker"
-          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
-          expect(payload[:event_object_id]).to eq employer_profile.id.to_s
+          expect(event_name).to eq "acapi.info.events.employer.broker_fired_confirmation_to_employer"
+          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Accounts::BrokerAgencyAccount'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
         subject.notifications_send(model_instance, model_event)
       end

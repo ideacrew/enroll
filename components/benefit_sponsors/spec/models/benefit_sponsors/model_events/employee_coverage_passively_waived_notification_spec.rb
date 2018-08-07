@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNotification' do
+RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNotification', dbclean: :after_each  do
 
   let(:model_event)  { "employee_coverage_passively_waived" }
   let(:notice_event) { "employee_coverage_passively_waived" }
@@ -29,6 +29,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNot
 
   before do
     census_employee.update_attributes(:employee_role_id => employee_role.id )
+    census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_benefit_application})
   end
 
   describe "ModelEvent" do

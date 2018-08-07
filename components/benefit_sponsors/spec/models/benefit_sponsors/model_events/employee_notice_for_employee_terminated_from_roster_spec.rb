@@ -4,23 +4,36 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
 
   let!(:termination_date) {(TimeKeeper.date_of_record)}
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
-  let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
-  let(:current_effective_date)  { TimeKeeper.date_of_record }
 
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-
-  let(:person)       { FactoryGirl.create(:person, :with_family) }
-  let(:family)       { person.primary_family }
-  let!(:model_instance)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
+  let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                              :with_benefit_package,
+                              :benefit_sponsorship => benefit_sponsorship,
+                              :aasm_state => 'active',
+                              :effective_period =>  start_on..(start_on + 1.year) - 1.day
+  )}
+  let!(:benefit_package)  {benefit_application.benefit_packages.first}
+  let!(:person)       { FactoryGirl.create(:person, :with_family) }
+  let!(:family)       { person.primary_family }
+  let!(:model_instance)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id ) }
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: model_instance.id)}
+  let!(:hbx_enrollment) {  FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
+                        aasm_state: "coverage_termination_pending",
+                        effective_on: benefit_application.start_on,
+                        rating_area_id: benefit_application.recorded_rating_area_id,
+                        sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
+                        sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
+                        benefit_sponsorship_id:benefit_application.benefit_sponsorship.id,
+                        employee_role_id: employee_role.id)
+  }
 
+  
   before do
     model_instance.update_attributes(employee_role_id: employee_role.id)
-    family = Family.find_or_build_from_employee_role(employee_role)
-    model_instance
   end
 
   describe "when employee terminated from the roster" do

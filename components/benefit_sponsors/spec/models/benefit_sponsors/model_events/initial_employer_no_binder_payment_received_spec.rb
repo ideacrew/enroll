@@ -13,7 +13,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_closed',
+    :aasm_state => 'enrollment_ineligible',
     :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
   let!(:date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
@@ -23,7 +23,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
 
   before do
     census_employee.update_attributes(employee_role_id: employee_role.id)
-  end
+    benefit_sponsorship.update_attributes(aasm_state: :initial_enrollment_ineligible)
+   end
 
   describe "ModelEvent" do
     it "should trigger model event" do
@@ -57,7 +58,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq benefit_application.id.to_s
         end
-
         subject.notifications_send(benefit_application, model_event)
       end
     end

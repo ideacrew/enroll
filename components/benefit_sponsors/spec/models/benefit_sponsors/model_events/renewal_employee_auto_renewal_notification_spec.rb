@@ -39,9 +39,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
           expect(model_event).to have_attributes(:event_key => :employee_coverage_passively_renewed, :klass_instance => census_employee, :options => {event_object: renewing_benefit_application})
         end
       end
-      binding.pry
-      BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(open_enrollment_start_date)
-      # census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewing_benefit_application})
+      census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewing_benefit_application})
     end
   end
 

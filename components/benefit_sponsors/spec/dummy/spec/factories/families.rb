@@ -19,24 +19,24 @@ FactoryGirl.define do
       family_members { people.map{|person| FactoryGirl.build(:family_member, family: self, is_primary_applicant: (self.person == person), is_active: true, person: person) }}
     end
 
-    # after(:create) do |f, evaluator|
-    #   f.households.first.add_household_coverage_member(f.family_members.first)
-    #   f.save
-    # end
+    after(:create) do |f, evaluator|
+      f.households.first.add_household_coverage_member(f.family_members.first)
+      f.save
+    end
 
-    # trait :with_primary_family_member_and_dependent do
-    #   family_members {
-    #     [
-    #       FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
-    #       FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryGirl.create(:person, first_name: "John", last_name: "Doe")),
-    #       FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryGirl.create(:person, first_name: "Alex", last_name: "Doe"))
-    #     ]
-    #   }
-    #   before(:create)  do |family, evaluator|
-    #     family.dependents.each do |dependent|
-    #       family.relate_new_member(dependent.person, "child")
-    #     end
-    #   end
-    # end
+    trait :with_primary_family_member_and_dependent do
+      family_members {
+        [
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryGirl.create(:person, first_name: "John", last_name: "Doe")),
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryGirl.create(:person, first_name: "Alex", last_name: "Doe"))
+        ]
+      }
+      before(:create)  do |family, evaluator|
+        family.dependents.each do |dependent|
+          family.relate_new_member(dependent.person, "child")
+        end
+      end
+    end
   end
 end

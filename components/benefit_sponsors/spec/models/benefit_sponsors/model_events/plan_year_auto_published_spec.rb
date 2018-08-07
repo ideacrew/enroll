@@ -16,14 +16,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::PlanYearAutoPublished', dbclean: :
 
   before do
     allow(model_instance).to receive(:is_renewing?).and_return(true)
-    # allow(TimeKeeper).to receive(:date_of_record).and_return model_instance.open_enrollment_period.max - 2.days
   end
 
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.each do |observer|
           expect(observer).to receive(:notifications_send) do |model_instance, model_event|
-            binding.pry
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :renewal_application_autosubmitted, :klass_instance => model_instance, :options => {})
         end

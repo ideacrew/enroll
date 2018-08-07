@@ -32,6 +32,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'devise', '~> 3.5.4'
   s.add_dependency 'language_list', '~> 1.1.0'
   s.add_dependency 'mongoid-autoinc'
+  s.add_dependency 'interactor', '3.1.0'
+  s.add_dependency 'interactor-rails', '2.0.2'
 
   s.test_files = Dir["spec/**/*"]
 
