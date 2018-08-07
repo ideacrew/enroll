@@ -24,7 +24,10 @@ FactoryGirl.define do
             when 'Spouse'
               contribution_unit.contribution_factor = 0.80
               contribution_unit.is_offered = true
-            when 'Dependent'
+            when 'Domestic Partner'
+              contribution_unit.contribution_factor = 0.55
+              contribution_unit.is_offered = false
+            when 'Child Under 26'
               contribution_unit.contribution_factor = 0.55
               contribution_unit.is_offered = false
             end

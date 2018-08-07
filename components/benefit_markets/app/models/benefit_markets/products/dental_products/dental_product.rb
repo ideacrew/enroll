@@ -12,6 +12,10 @@ module BenefitMarkets
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Symbol
 
+      belongs_to  :renewal_product,
+                  inverse_of: nil,
+                  class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct"
+
       def metal_level
         metal_level_kind.to_s
       end
