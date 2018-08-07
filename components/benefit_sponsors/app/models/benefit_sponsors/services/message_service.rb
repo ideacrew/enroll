@@ -13,10 +13,6 @@ module BenefitSponsors
       def self.for_destroy(message)
         message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
       end
-
-      def self.unread_messages(profile)
-        profile.inbox.unread_messages
-      end
     end
   end
 end

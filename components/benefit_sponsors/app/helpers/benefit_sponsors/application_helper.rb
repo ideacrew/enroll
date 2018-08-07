@@ -127,6 +127,18 @@ module BenefitSponsors
       employer_profile.census_employees.active.count
     end
 
+    def profile_unread_messages_count(profile)
+      begin
+        if profile.is_a? BenefitSponsors::Organizations::Profile
+          profile.inbox.unread_messages.count
+        else
+          profile.inbox.unread_messages_count
+        end
+      rescue
+        0
+      end
+    end
+
     def total_messages(record_id)
       profile = BenefitSponsors::Organizations::Profile.find(record_id)
 
