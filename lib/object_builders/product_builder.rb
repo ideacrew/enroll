@@ -5,21 +5,21 @@ class ProductBuilder
 
   def initialize(qhp_hash)
     @log_path = LOG_PATH
+    @qhp_hash = qhp_hash
+    @qhp_array = []
     set_issuer_profile_hash
     set_service_areas
     FileUtils.mkdir_p(File.dirname(@log_path)) unless File.directory?(File.dirname(@log_path))
     @logger = Logger.new(@log_path)
-
-    @qhp_hash = qhp_hash
-    @qhp_array = []
   end
 
   def add(qhp_hash)
-    @qhp_array = @qhp_array + qhp_hash[:packages_list][:packages]
+    @qhp_array += qhp_hash[:packages_list][:packages]
   end
 
   def run
     @xml_plan_counter, @success_plan_counter = 0,0
+    @existing_qhp_counter = 0
     iterate_plans
     show_qhp_stats
   end
@@ -44,8 +44,9 @@ class ProductBuilder
 
   def show_qhp_stats
     puts "*"*80
-    puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
-    puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
+    puts "Total Number of Products imported from xml: #{@xml_plan_counter}."
+    puts "Total Number of Products Saved to database: #{@success_plan_counter}."
+    puts "Total Number of Existing Products : #{@existing_qhp_counter}."
     puts "Check the log file #{@log_path}"
     puts "*"*80
     @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
@@ -56,8 +57,16 @@ class ProductBuilder
     begin
       if !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
         associate_product_with_qhp
-        @qhp.save!
-        @success_plan_counter += 1
+        existing_qhp = Products::Qhp.where(
+          standard_component_id: @qhp.standard_component_id.strip,
+          active_year: @qhp.active_year
+          ).first
+        if existing_qhp.present?
+          @existing_qhp_counter += 1
+        else
+          @qhp.save!
+          @success_plan_counter += 1
+        end
       end
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
