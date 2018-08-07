@@ -182,7 +182,7 @@ javascript:
         rplans.remove()
       }
     }
-		
+
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
       productsTotal = filteredProducts.length;
@@ -294,14 +294,14 @@ javascript:
 
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
-    document.getElementById('addDentalBenefits').classList.remove('hidden')
+    document.getElementById('dentalBenefits').classList.remove('hidden')
     document.getElementById('submitBenefitPackage').classList.remove('hidden')
     document.getElementById('cancelBenefitPackage').classList.remove('hidden')
   }
 
   function hideFormButtons() {
     document.getElementById('addBenefitPackage').classList.add('hidden')
-    document.getElementById('addDentalBenefits').classList.add('hidden')
+    document.getElementById('dentalBenefits').classList.add('hidden')
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
@@ -332,12 +332,12 @@ javascript:
   }
 
   function disableDentalBenefitPackage() {
-    var addBenefitPackageButton = document.getElementById('addDentalBenefits');
+    var addBenefitPackageButton = document.getElementById('dentalBenefits');
     addBenefitPackageButton.classList.add('disabled')
   }
 
   function enableDentalBenefitPackage() {
-    var addBenefitPackageButton = document.getElementById('addDentalBenefits');
+    var addBenefitPackageButton = document.getElementById('dentalBenefits');
     addBenefitPackageButton.classList.remove('disabled')
   }
 
@@ -519,7 +519,7 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
-		
+
 - if show_benefit_application_tile == "true"
 	javascript:
 		(function() {
@@ -527,8 +527,3 @@ javascript:
 			document.getElementById('submitBenefitPackage').innerHTML = "Save Plan Year";
 		},200)
 		})();
-
-			
-
-		
-

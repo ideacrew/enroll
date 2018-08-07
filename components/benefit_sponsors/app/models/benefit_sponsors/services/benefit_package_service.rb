@@ -64,6 +64,7 @@ module BenefitSponsors
           form.parent = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(id: application.id.to_s, benefit_sponsorship_id: application.benefit_sponsorship.id.to_s)
         end
         form.is_new_package = false
+        form.has_dental_sponsored_benefits = benefit_package.dental_sponsored_benefit.present?
         attributes_to_form_params(benefit_package, form)
       end
 
@@ -108,7 +109,7 @@ module BenefitSponsors
       # No dental in MA. So, calculating premiums only for health sponsored benefits.
       def calculate_premiums(form)
         sb_form = form.sponsored_benefits.first
-        
+
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
@@ -121,7 +122,7 @@ module BenefitSponsors
 
       def calculate_employee_cost_details(form)
         sb_form = form.sponsored_benefits.first
-        
+
         estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
         benefit_application = find_benefit_application(form)
         model_attributes = form_params_to_attributes(form)
