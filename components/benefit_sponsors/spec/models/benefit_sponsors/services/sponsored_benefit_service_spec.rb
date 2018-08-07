@@ -39,19 +39,17 @@ RSpec.describe do
         :kind => "dental",
         :benefit_package_id => benefit_package.id,
         :benefit_sponsorship_id => benefit_sponsorship.id,
-        :sponsored_benefits_attributes => sponsored_benefits_params
+        :sponsored_benefit_attributes => sponsored_benefits_params
       }
     }
 
     let(:sponsored_benefits_params) {
       {
-        "0" => {
-          :sponsor_contribution_attributes => sponsor_contribution_attributes,
-          :product_package_kind => product_package_kind,
-          :kind => "dental",
-          :product_option_choice => issuer_profile.legal_name,
-          :reference_plan_id => product.id.to_s
-        }
+        :sponsor_contribution_attributes => sponsor_contribution_attributes,
+        :product_package_kind => product_package_kind,
+        :kind => "dental",
+        :product_option_choice => issuer_profile.legal_name,
+        :reference_plan_id => product.id.to_s
       }
     }
 

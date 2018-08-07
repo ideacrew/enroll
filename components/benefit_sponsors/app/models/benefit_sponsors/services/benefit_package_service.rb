@@ -256,7 +256,7 @@ module BenefitSponsors
       end
 
       def sponsored_benefits_attributes_to_form_params(benefit_package)
-        benefit_package.sponsored_benefits.inject([]) do |sponsored_benefits, sponsored_benefit|
+        benefit_package.sponsored_benefits.where(_type: "BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit").inject([]) do |sponsored_benefits, sponsored_benefit|
           sponsored_benefits << Forms::SponsoredBenefitForm.new({
             id: sponsored_benefit.id,
             product_option_choice: sponsored_benefit.product_option_choice,
