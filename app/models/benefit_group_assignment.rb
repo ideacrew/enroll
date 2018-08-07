@@ -261,9 +261,11 @@ class BenefitGroupAssignment
   end
 
   def make_active
-    census_employee.benefit_group_assignments.each do |bg_assignment|
-      if bg_assignment.is_active? && bg_assignment.id != self.id
-        bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
+    census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id
+        end_on = benefit_group_assignment.end_on || (start_on - 1.day)
+        end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end
 

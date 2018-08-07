@@ -120,26 +120,7 @@ class HbxEnrollment
   # Checkbook url
   field :checkbook_url , type: String
 
-  # An external enrollment is one which we keep for recording purposes,
-  # but did not originate with the exchange.  'External' enrollments
-  # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
-
-  # track_history   :on => [:kind,
-  #                         :enrollment_kind,
-  #                         :coverage_kind,
-  #                         :effective_on,
-  #                         :terminated_on,
-  #                         :terminate_reason,
-  #                         :aasm_state,
-  #                         :is_active,
-  #                         :waiver_reason,
-  #                         :review_status,
-  #                         :special_verification_period,
-  #                         :termination_submitted_on],
-  #                 :track_create  => true,    # track document creation, default is false
-  #                 :track_update  => true,    # track document updates, default is true
-  #                 :track_destroy => true     # track document destruction, default is false
 
   associated_with_one :benefit_group, :benefit_group_id, "BenefitGroup"
   associated_with_one :benefit_group_assignment, :benefit_group_assignment_id, "BenefitGroupAssignment"
@@ -304,18 +285,6 @@ class HbxEnrollment
       end
     end
 
-    def families_with_contingent_enrollments
-      Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
-        :$elemMatch => {
-            :aasm_state => "enrolled_contingent",
-            :$or => [
-                {:"terminated_on" => nil},
-                {:"terminated_on".gt => TimeKeeper.date_of_record}
-            ]
-        }
-      })
-    end
-
     def by_hbx_id(policy_hbx_id)
       families = Family.with_enrollment_hbx_id(policy_hbx_id)
       households = families.flat_map(&:households)
@@ -324,78 +293,8 @@ class HbxEnrollment
       end
     end
 
-    def process_verification_reminders(date_passed)
-      people_to_check = Person.where("consumer_role.lawful_presence_determination.aasm_state" => "verification_outstanding")
-      families = Family.where("family_members.person_id" => {"$in" => people_to_check.map(&:_id)})
-
-      # TODO handle multiple enrollments with different special enrolment period dates
-      families.each do |family|
-        [10, 25, 50, 65].each do |reminder_days|
-          enrollment = family.enrollments.order(created_at: :desc).select{|e| e.currently_active? || e.future_active?}.first
-
-          if enrollment.special_verification_period.present? && enrollment.special_verification_period.strftime('%m/%d/%Y') == (date_passed + (95 - reminder_days).days).strftime('%m/%d/%Y')
-            consumer_role = family.primary_applicant.person.consumer_role
-            begin
-              case reminder_days
-                when 10
-                  consumer_role.first_verifications_reminder
-                when 25
-                  consumer_role.second_verifications_reminder
-                when 50
-                  consumer_role.third_verifications_reminder
-                when 65
-                  consumer_role.fourth_verifications_reminder
-              end
-            rescue Exception => e
-              Rails.logger.error e.to_s
-            end
-          end
-        end
-      end
-    end
-
     def advance_day(new_date)
-      # process_verification_reminders(new_date - 1.day)
-
-      # families_with_contingent_enrollments.each do |family|
-      #   enrollment = family.enrollments.where('aasm_state' => 'enrolled_contingent').order(created_at: :desc).to_a.first
-      #   consumer_role = family.primary_applicant.person.consumer_role
-      #   if enrollment.present? && consumer_role.present? && consumer_role.verifications_outstanding?
-      #     case (TimeKeeper.date_of_record - enrollment.created_at).to_i
-      #     when 10
-      #       consumer_role.first_verifications_reminder
-      #     when 25
-      #       consumer_role.second_verifications_reminder
-      #     when 50
-      #       consumer_role.third_verifications_reminder
-      #     when 65
-      #       consumer_role.fourth_verifications_reminder
-      #     else
-      #     end
-      #   end
-      # end
-
       HbxEnrollment.terminate_scheduled_enrollments
-    end
-
-    def update_individual_eligibilities_for(consumer_role)
-      found_families = Family.find_all_by_person(consumer_role.person)
-      found_families.each do |ff|
-        ff.households.each do |hh|
-          hh.hbx_enrollments.active.each do |he|
-            he.evaluate_individual_market_eligiblity
-          end
-        end
-      end
-    end
-  end
-
-  def evaluate_individual_market_eligiblity
-    eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable?
-      if eligibility_ruleset.determine_next_state != :do_nothing
-        self.send(eligibility_ruleset.determine_next_state)
-      end
     end
   end
 
@@ -669,11 +568,6 @@ class HbxEnrollment
     terminate_coverage!
   end
 
-  # def benefit_package
-  #   is_shop? ? benefit_group : benefit_sponsor.benefit_coverage_period.each {}
-  # end
-  #
-
   def benefit_sponsor
     is_shop? ? employer_profile : HbxProfile.current_hbx.benefit_sponsorship
   end
@@ -707,22 +601,6 @@ class HbxEnrollment
       self.sponsored_benefit_package.sponsor_profile
     else
       nil
-    end
-  end
-
-  def mid_year_plan_change_notice
-    if self.census_employee.present?
-      begin
-        if (self.enrollment_kind != "open_enrollment" || self.census_employee.new_hire_enrollment_period.present?)
-          if self.benefit_group.is_congress
-            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
-          else
-            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "ee_mid_year_plan_change_non_congressional_notice", hbx_enrollment: self.hbx_id.to_s)
-          end
-        end
-      rescue Exception => e
-        Rails.logger.error {"Unable to send employee mid year plan change notice to census_employee - #{census_employee.id} due to #{e.backtrace}"}
-      end
     end
   end
 
@@ -815,18 +693,6 @@ class HbxEnrollment
     updated_at
   end
 
-=begin
-  def broker_agency_profile=(new_broker_agency_profile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a? BrokerAgencyProfile
-    self.broker_agency_profile_id = new_broker_agency_profile._id
-    @broker_agency_profile = new_broker_agency_profile
-  end
-
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id) unless broker_agency_profile_id.blank?
-  end
-=end
   def has_broker_agency_profile?
     broker_agency_profile_id.present?
   end
@@ -963,11 +829,6 @@ class HbxEnrollment
              household.hbx_enrollments.ne(id: id).select do |hbx|
                hbx.employee_role.present? and hbx.employee_role.employer_profile_id == employee_role.employer_profile_id
              end
-             #elsif consumer_role_id.present?
-             #  #FIXME when have more than one individual hbx
-             #  household.hbx_enrollments.ne(id: id).select do |hbx|
-             #    hbx.consumer_role_id.present? and hbx.consumer_role_id == consumer_role_id
-             #  end
            else
              []
            end
@@ -982,9 +843,6 @@ class HbxEnrollment
     end
   end
 
-  # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
-  #       This should probably be done by comparing the hired_on date with todays date.
-  #       Also needs to ignore any that were already terminated before a certain date.
   def self.calculate_start_date_from(employee_role, coverage_household, benefit_group)
     benefit_group.effective_on_for(employee_role.hired_on)
   end
@@ -1000,18 +858,6 @@ class HbxEnrollment
           # we always have benefit group unless QLE gives an effective date before plan year start on
           return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           benefit_group.effective_on_for(employee_role.hired_on)
-        end
-      when 'individual'
-        if qle && family.is_under_special_enrollment_period?
-          family.current_sep.effective_on
-        else
-          benefit_sponsorship.current_benefit_period.earliest_effective_date
-        end
-      when 'coverall'
-        if qle && family.is_under_special_enrollment_period?
-          family.current_sep.effective_on
-        else
-          benefit_sponsorship.current_benefit_period.earliest_effective_date
         end
     end
   rescue => e
@@ -1105,35 +951,6 @@ class HbxEnrollment
 
         enrollment.benefit_group_id = benefit_group.id
         enrollment.benefit_group_assignment_id = benefit_group_assignment.id
-      when consumer_role.present?
-        enrollment.consumer_role = consumer_role
-        enrollment.kind = "individual"
-        enrollment.benefit_package_id = benefit_package.try(:id)
-        benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-        if qle && enrollment.family.is_under_special_enrollment_period?
-          enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
-          enrollment.enrollment_kind = "special_enrollment"
-        elsif enrollment.family.is_under_ivl_open_enrollment?
-          enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
-          enrollment.enrollment_kind = "open_enrollment"
-        else
-          raise "You may not enroll until you're eligible under an enrollment period"
-        end
-      when resident_role.present?
-        enrollment.kind = "coverall"
-        enrollment.resident_role = resident_role
-        enrollment.benefit_package_id = benefit_package.try(:id)
-        benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-
-        if qle && enrollment.family.is_under_special_enrollment_period?
-          enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
-          enrollment.enrollment_kind = "special_enrollment"
-        elsif enrollment.family.is_under_ivl_open_enrollment?
-          enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
-          enrollment.enrollment_kind = "open_enrollment"
-        else
-          raise "You may not enroll until you're eligible under an enrollment period"
-        end
       else
         raise "either employee_role or consumer_role is required" unless resident_role.present?
     end
@@ -1587,30 +1404,6 @@ class HbxEnrollment
     return nil if benefit_group_id.blank?
     benefit_group.rating_area
   end
-
-  # def ee_plan_selection_confirmation_sep_new_hire
-  #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
-  #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
-  #       begin
-  #         census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-  #         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire", hbx_enrollment: hbx_id.to_s)
-  #       rescue Exception => e
-  #         (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
-  #       end
-  #     end
-  #   end
-  # end
-
-  # def notify_employee_confirming_coverage_termination
-  #   if is_shop? && census_employee.present?
-  #     begin
-  #       census_employee.update_attributes!(employee_role_id: employee_role.id.to_s ) if !census_employee.employee_role.present?
-  #       ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "notify_employee_confirming_coverage_termination", hbx_enrollment_hbx_id: hbx_id.to_s)
-  #     rescue Exception => e
-  #       (Rails.logger.error { "Unable to deliver Notices to #{census_employee.id.to_s} due to #{e}" })
-  #     end
-  #   end
-  # end
 
   def any_dependent_members_age_above_26?
     hbx_enrollment_members.where(is_subscriber: false).map(&:family_member).map(&:person).each do |person|

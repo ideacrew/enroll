@@ -18,6 +18,9 @@ class BenefitGroupAssignment
   field :is_active, type: Boolean, default: true
   field :activated_at, type: DateTime
 
+  scope :active,         -> { where(:is_active => true) }
+  scope :effective_on,   ->(effective_date) { where(:start_on => effective_date) }
+
 
   def benefit_group=(new_benefit_group)
     warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
@@ -71,6 +74,32 @@ class BenefitGroupAssignment
     raise ArgumentError.new("expected HbxEnrollment") unless new_hbx_enrollment.is_a? HbxEnrollment
     self.hbx_enrollment_id = new_hbx_enrollment._id
     @hbx_enrollment = new_hbx_enrollment
+  end
+
+  def benefit_package=(new_benefit_package)
+    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+    self.benefit_package_id = new_benefit_package._id
+    @benefit_package = new_benefit_package
+  end
+
+  def benefit_package
+    return if benefit_package_id.nil?
+    return @benefit_package if defined? @benefit_package
+    @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
+  end
+
+  def benefit_application
+    benefit_package.benefit_application if benefit_package.present?
+  end
+
+  def make_active
+    census_employee.benefit_group_assignments.each do |bg_assignment|
+      if bg_assignment.is_active? && bg_assignment.id != self.id
+        bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
+      end
+    end
+
+    update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
   aasm do

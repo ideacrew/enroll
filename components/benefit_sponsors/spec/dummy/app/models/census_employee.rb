@@ -63,6 +63,8 @@ class CensusEmployee < CensusMember
   scope :active,             ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
   scope :non_business_owner, ->{ where(is_business_owner: false) }
+  scope :benefit_application_assigned,     ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id)) }
+  scope :benefit_application_unassigned,   ->(benefit_application) { where(:"benefit_group_assignments.benefit_package_id".nin => benefit_application.benefit_packages.pluck(:_id)) }
 
   scope :eligible_without_term_pending, ->{ any_in(aasm_state: (ELIGIBLE_STATES - PENDING_STATES)) }
 
@@ -409,5 +411,28 @@ end
       :"employee_role_id" => self.employee_role_id,
       :"aasm_state".ne => "shopping"
     )
+  end
+
+  def benefit_package_assignment_on(effective_date)
+    benefit_group_assignments.effective_on(effective_date).active.first
+  end
+
+  def assign_to_benefit_package(benefit_package, assignment_on)
+    return if benefit_package.blank?
+
+    benefit_group_assignments.create(
+        start_on: assignment_on,
+        end_on:   benefit_package.effective_period.max,
+        benefit_package: benefit_package,
+        is_active: false
+    )
+  end
+
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.benefit_application && assignment.benefit_application.is_renewing? }
   end
 end

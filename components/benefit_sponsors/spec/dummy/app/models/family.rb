@@ -29,13 +29,10 @@ class Family
 
   belongs_to  :person
 
-  # Collection of insured:  employees, consumers, residents
-
-  # All current and former members of this group
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true
+  embeds_many :irs_groups, cascade_callbacks: true
   embeds_many :households, cascade_callbacks: true, :before_add => :reset_active_household
-  # embeds_many :broker_agency_accounts #depricated
   embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount"
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
@@ -161,6 +158,7 @@ class Family
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+
   scope :enrolled_through_benefit_package,      ->(benefit_package) { unscoped.where(
                                                     :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES),
                                                     :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
