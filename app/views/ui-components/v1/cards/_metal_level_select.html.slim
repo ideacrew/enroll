@@ -73,7 +73,8 @@
 
 
         #referencePlans.hidden
-          h2.heading-text.pt-1.float-left Select Your Reference Plan
+          .row
+            h2.heading-text.pull-left.pl-1 Select Your Reference Plan
 
           h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
           #yourPlans
@@ -129,6 +130,9 @@ javascript:
   function radioSelected(element) {
     setCircle(element)
     disableNewPlanYearButton()
+    // Store radio title to localStorage
+    selectedTitle = element.querySelector('a').innerText;
+    localStorage.setItem("title",selectedTitle);
   }
 
   function setCircle(element) {
@@ -164,6 +168,8 @@ javascript:
       return 0;
     })
     populateReferencePlans(filteredProducts)
+    setTempCL()
+    selectDefaultReferencePlan()
   }
 
   function populateReferencePlans(plans) {
@@ -181,7 +187,7 @@ javascript:
         rplans.remove()
       }
     }
-		
+
     // Build reference plans to be displayed in UI
     for (plan of filteredProducts) {
       productsTotal = filteredProducts.length;
@@ -351,6 +357,16 @@ javascript:
   var familyOnly;
   var contributionInputs;
 
+  var tempContributionValues = {
+    eeContribution:eeContribution || 0,
+    spouse:spouse || 0,
+    domesticPartner:domesticPartner || 0,
+    childUnder26:childUnder26 || 0,
+    employeeOnly:employeeOnly || 0,
+    familyOnly:familyOnly || 0
+
+  }
+
   function newContributionAmounts(element) {
     contributionInputs = document.querySelectorAll("[data-contribution-input='true']")
     contributionHandlers = document.querySelectorAll(".contribution_handler")
@@ -359,23 +375,44 @@ javascript:
       switch (element.dataset.displayname) {
         case 'Employee':
           eeContribution = element.value;
+          if (eeContribution > 0) {
+            tempContributionValues.eeContribution = parseInt (eeContribution);
+          }
         break;
         case 'Spouse':
           spouse = element.value;
+          if (spouse > 0) {
+            tempContributionValues.spouse = parseInt (spouse);
+          }
         break;
         case 'Domestic Partner':
           domesticPartner = element.value;
+          if (domesticPartner > 0) {
+            tempContributionValues.domesticPartner = parseInt (domesticPartner);
+          }
         break;
         case 'Child Under 26':
           childUnder26 = element.value;
+          if (childUnder26 > 0) {
+            tempContributionValues.childUnder26 = parseInt (childUnder26);
+          }
         break;
         case 'Employee Only':
           employeeOnly = element.value;
+          if (employeeOnly) {
+            tempContributionValues.employeeOnly = parseInt (employeeOnly)
+          }
         break;
         case 'Family':
           familyOnly = element.value;
+          if (familyOnly > 0) {
+            tempContributionValues.familyOnly = parseInt (familyOnly)
+          }
         break;
       }
+
+      tempLevels = JSON.stringify(tempContributionValues);
+      localStorage.setItem("contributionLevels",tempLevels);
     })
 
     contributionHandlers.forEach(function(element) {
@@ -489,6 +526,78 @@ javascript:
 		document.getElementById('btnMoreDetails').innerHTML = "More Details"
 	})
 
+  function setTempCL() {
+    var myLevels = localStorage.getItem("contributionLevels");
+    selectedTitle = localStorage.getItem("title");
+
+    if (myLevels) {
+      var contributions = JSON.parse(myLevels)
+      setTimeout(function() {
+        employee = document.querySelectorAll("[data-displayname='Employee']");
+        spouse = document.querySelectorAll("[data-displayname='Spouse']");
+        domesticPartner = document.querySelectorAll("[data-displayname='Domestic Partner']");
+        childUnder26 = document.querySelectorAll("[data-displayname='Child Under 26']");
+        employeeOnly = document.querySelectorAll("[data-displayname='Employee Only']");
+        family = document.querySelectorAll("[data-displayname='Family']");
+
+        if (selectedTitle == "ONE CARRIER") {
+          employee[1].value = contributions.eeContribution;
+          employee[2].value = contributions.eeContribution;
+          spouse[1].value = contributions.spouse;
+          spouse[2].value = contributions.spouse;
+          domesticPartner[1].value = contributions.domesticPartner;
+          domesticPartner[2].value = contributions.domesticPartner;
+          childUnder26[1].value = contributions.childUnder26;
+          childUnder26[2].value = contributions.childUnder26;
+        }
+
+        if (selectedTitle == "ONE LEVEL") {
+          employee[1].value = contributions.eeContribution;
+          employee[2].value = contributions.eeContribution;
+          spouse[1].value = contributions.spouse;
+          spouse[2].value = contributions.spouse;
+          domesticPartner[1].value = contributions.domesticPartner;
+          domesticPartner[2].value = contributions.domesticPartner;
+          childUnder26[1].value = contributions.childUnder26;
+          childUnder26[2].value = contributions.childUnder26;
+        }
+
+        if (selectedTitle == "ONE PLAN") {
+          employeeOnly[1].value = contributions.employeeOnly;
+          employeeOnly[2].value = contributions.employeeOnly;
+          family[1].value = contributions.familyOnly;
+          family[2].value = contributions.familyOnly;
+        }
+
+      },500)
+    }
+  }
+
+  (function() {
+    // Clears localStorage on page load
+    localStorage.removeItem("title");
+    localStorage.removeItem("contributionLevels");
+  })();
+
+  // Mouse event needed to enable tooltips css on pageload
+  function selectDefaultReferencePlan() {
+    setTimeout(function() {
+      input = document.querySelectorAll('.reference-plans')[0].querySelector('input');
+      input.click();
+      myplans = document.querySelector('#yourPlans');
+      myplans.onmouseover = function() {
+        myplans.click()
+        document.getElementById('new_benefit_package').click()
+      }
+      contributions = document.querySelector('#yourSponsorContributions');
+      contributions.onmouseover = function() {
+        contributions.click()
+        document.getElementById('new_benefit_package').click()
+      }
+
+    },300);
+  }
+
 - unless @benefit_package_form.new_record?
   javascript:
     $(document).ready(function() {
@@ -504,7 +613,7 @@ javascript:
         referencePlanID: "#{@benefit_package_form.sponsored_benefits.first.reference_plan_id}"
       });
     });
-		
+
 - if show_benefit_application_tile == "true"
 	javascript:
 		(function() {
@@ -512,8 +621,3 @@ javascript:
 			document.getElementById('submitBenefitPackage').innerHTML = "Save Plan Year";
 		},200)
 		})();
-
-			
-
-		
-

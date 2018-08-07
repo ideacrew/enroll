@@ -1,0 +1,4 @@
+$('.premium-reports-table').next('.container').html('');
+$('.premium-reports-table').html("<%= escape_javascript(render "benefit_sponsors/profiles/employers/employer_profiles/coverage_reports.html.erb") %>");
+initializeDataTables();
+$("div.custom_level_1").children('div').hide();

@@ -3,7 +3,7 @@
     <div class="row">
       <% if @employer_profile.broker_agency_profile.present? && @broker_agency_account.writing_agent.present? %>
         <div class="vertically-aligned-row">
-          <h1 class="darkblue no-buffer">Brokers</h1>
+          <h1 class="heading-text">Brokers</h1>
           <div class="text-right">
             <% if current_user.can_change_broker? %>
               <%= link_to '<i class="fa fa-search" aria-hidden="true"></i> &nbsp;Browse Brokers'.html_safe, profiles_employers_employer_profile_broker_agency_index_path(@employer_profile.id), remote: true, class: "btn btn-primary", id: 'browse_brokers_link',
@@ -14,7 +14,7 @@
           </div>
         </div>
         <% active_broker = @broker_agency_account.writing_agent %>
-        <div class="panel panel-default module broker employer-broker">
+        <div class="panel panel-default" id="employer-broker-card">
           <div class="panel-heading vertically-aligned-row">
             <div>
               <h3 class="panel-title">
