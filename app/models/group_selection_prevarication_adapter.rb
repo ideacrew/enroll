@@ -310,20 +310,27 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def is_eligible_for_dental?(employee_role, is_change_plan, enrollment)
-    false
+    true
   end
 
   def is_dental_offered?(employee_role)
-    false
+    true
   end
 
 	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
 		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
-    eligibility_checker = shop_benefit_eligibilty_checker_for(benefit_group, :health)
-    [eligibility_checker.can_cover?(family_member, coverage_start), false]
+
+    [ 
+      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start), 
+      eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
+    ]
 	end
+
+  def eligibility_checker(benefit_group, coverage_kind)
+    shop_benefit_eligibilty_checker_for(benefit_group, coverage_kind)
+  end
 
 	def class_for_ineligible_row(family_member, is_ivl_coverage, coverage_start)
 		class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
@@ -370,6 +377,7 @@ class GroupSelectionPrevaricationAdapter
     controller_employee_role,
     family_member_ids
   )
+
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: optional_effective_on)
 	end

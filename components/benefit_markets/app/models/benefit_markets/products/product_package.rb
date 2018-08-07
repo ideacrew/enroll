@@ -151,6 +151,8 @@ module BenefitMarkets
     def products_for_plan_option_choice(product_option_choice)
       if package_kind == :metal_level
         products.by_metal_level_kind(product_option_choice)
+      elsif package_kind == :multi_product
+        products
       else
         issuer_profile = BenefitSponsors::Organizations::IssuerProfile.find(product_option_choice)
         return [] unless issuer_profile
