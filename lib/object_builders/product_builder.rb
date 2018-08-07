@@ -91,31 +91,38 @@ class ProductBuilder
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id
         ).select{|a| a.active_year == @qhp.active_year}.first
-        if product.present?
-        else
-          shared_attributes ={
-            benefit_market_kind: "aca_#{parse_market}",
-            title: cost_share_variance.plan_marketing_name.squish!,
-            issuer_profile_id: get_issuer_profile_id,
-            hios_id: cost_share_variance.hios_plan_and_variant_id,
-            hios_base_id: hios_base_id,
-            csr_variant_id: csr_variant_id,
-            application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
-            service_area_id: mapped_service_area_id,
-            deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
-            family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
-            is_reference_plan_eligible: true,
+
+        shared_attributes ={
+          benefit_market_kind: "aca_#{parse_market}",
+          title: cost_share_variance.plan_marketing_name.squish!,
+          issuer_profile_id: get_issuer_profile_id,
+          hios_id: cost_share_variance.hios_plan_and_variant_id,
+          hios_base_id: hios_base_id,
+          csr_variant_id: csr_variant_id,
+          application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
+          service_area_id: mapped_service_area_id,
+          deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
+          family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
+          is_reference_plan_eligible: true,
+        }
+
+        all_attributes = if is_health_product?
+          {
+            health_plan_kind: @qhp.plan_type.downcase,
+            metal_level_kind: parse_metal_level.to_sym,
+            ehb: @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
           }
+        else
+          { product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS}
+        end.merge(shared_attributes)
+
+        if product.present?
+          product.update_attributes(all_attributes)
+        else
           new_product = if is_health_product?
-            BenefitMarkets::Products::HealthProducts::HealthProduct.new({
-              health_plan_kind: @qhp.plan_type.downcase,
-              metal_level_kind: parse_metal_level.to_sym,
-              ehb: @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0,
-            }.merge(shared_attributes))
+            BenefitMarkets::Products::HealthProducts::HealthProduct.new(all_attributes)
           else
-            ::BenefitMarkets::Products::DentalProducts::DentalProduct.new({
-              product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
-            }.merge(shared_attributes))
+            ::BenefitMarkets::Products::DentalProducts::DentalProduct.new(all_attributes)
           end
           if new_product.valid?
             new_product.save!
