@@ -127,9 +127,10 @@ PATH
   remote: components/transport_gateway
   specs:
     transport_gateway (0.0.1)
-      aws-sdk (>= 2.2.4)
-      net-sftp (~> 2.1, >= 2.1.2)
-      rails (>= 4.2.0)
+      aws-sdk (~> 2.2)
+      net-sftp (>= 2.1.2)
+      net-ssh (~> 4.1)
+      rails (~> 4.2)
 
 PATH
   remote: components/transport_profiles
