@@ -24,6 +24,14 @@ import EmployerEmployeeDetail from '../employer/employee_detail.vue'
 import EmployerBenefits from '../employer/benefits.vue'
 import EmployerPlanYear from '../employer/plan_year.vue'
 
+import Bqt from '../bqt/bqt.vue'
+
+import BqtModel from '../bqt/bqt-model.vue'
+
+
+Vue.component('bqt', Bqt);
+Vue.component('bqt-model', BqtModel);
+
 
 Vue.component('hbx', Hbx);
 Vue.component('carrier', Carrier);
@@ -40,6 +48,7 @@ Vue.component('plan-year', EmployerPlanYear);
 
 
 const routes = [
+  { path: '/bqt', name: 'bqt', component: Bqt },
   { path: '/hbx', name: 'hbx', component: Hbx },
   { path: '/employer-home/:id', name: 'employer-home', component: EmployerHome,
     children: [

@@ -30,7 +30,4 @@ export default {
 </script>
 
 <style>
-.tony {
-  border: 3px solid #000;
-}
 </style>
