@@ -1,3 +1,5 @@
+require 'zip'
+
 module TransportProfiles
   class Engine < ::Rails::Engine
     isolate_namespace TransportProfiles
