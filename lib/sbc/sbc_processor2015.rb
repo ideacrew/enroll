@@ -25,34 +25,34 @@ class SbcProcessor2015
     CSV.foreach(@csv_path, :headers => true) do |row|
       hios_id = row[0].gsub(/\A\p{Space}*|\p{Space}*\z/, '')
 
-      if hios_id.include? '-'
-        plans = Plan.where(active_year:'2017').and(hios_id:hios_id)
+      products = if hios_id.include? '-'
+        ::BenefitMarkets::Products::Product.where(hios_id:hios_id)
       else
-        plans = Plan.where(active_year:'2017').and(hios_id:/#{hios_id}/)
-      end
+        ::BenefitMarkets::Products::Product.where(hios_id:/#{hios_id}/)
+      end.select{|a| a.active_year.to_i  == 2018}
 
-      plans.each do |plan|
+      products.each do |product|
         file_name = row[1].strip
 
         if pdf_path(file_name).nil?
-          puts "FILE NOT FOUND #{plan.name} #{plan.hios_id} #{file_name} "
+          puts "FILE NOT FOUND #{product.title} #{product.hios_id} #{file_name} "
           next
         end
 
         uri = Aws::S3Storage.save(pdf_path(file_name), S3_BUCKET)
-        plan.sbc_document = Document.new({title: file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
-        plan.sbc_document.save!
-        plan.save!
+        product.sbc_document = Document.new({title: file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
+        product.sbc_document.save!
+        product.save!
         counter += 1
-        puts "Plan #{plan.name} #{plan.hios_id}updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
+        puts "Plan #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}"
       end
     end
 
-    ::BenefitMarkets::Products::Product.all.each do |product|
-      plan = Plan.where(active_year: year, hios_id: product.hios_id).first
+    Plan.all.each do |plan|
+      plan = ::BenefitMarkets::Products::Product.where(hios_id:hios_id).select{|a| a.active_year.to_i  == plan.active_year.to_i}
 
-      product.sbc_document = plan.sbc_document
-      product.save
+      plan.sbc_document = product.sbc_document
+      plan.save
     end
 
     puts "Total #{counter} plans/products updated."
