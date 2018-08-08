@@ -7,6 +7,7 @@ describe Events::ResidencyVerificationRequestsController do
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
     let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
+    let(:verification_type) { person.verification_types.by_name("DC Residency").first }
 
     before do
       person.consumer_role.verification_type_history_elements.delete_all
@@ -30,17 +31,17 @@ describe Events::ResidencyVerificationRequestsController do
       expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
     end
 
-    it "stores verification history element" do
+    it "stores request record" do
       expect(person.consumer_role.local_residency_requests.count).to be > 0
     end
 
-    it "stores verification history element with proper verification type" do
-      expect(person.consumer_role.verification_type_history_elements.first.verification_type).to eq "DC Residency"
+    it "stores verification type history element" do
+      expect(verification_type.type_history_elements.count).to be > 0
     end
 
     it "stores reference to event_request document" do
       expect(person.consumer_role.local_residency_requests.first.id).to eq BSON::ObjectId.from_string(
-          person.consumer_role.verification_type_history_elements.first.event_request_record_id)
+          verification_type.type_history_elements.first.event_request_record_id)
     end
   end
 end
