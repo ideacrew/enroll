@@ -223,7 +223,7 @@ class Family
                                                     :"households.hbx_enrollments" => {
                                                       :$elemMatch => {
                                                         :sponsored_benefit_package_id => {"$in" => benefit_application.benefit_packages.pluck(:_id) },
-                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping) },
+                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping coverage_terminated) },
                                                         :coverage_kind => "health"
                                                       }
                                                   })}
