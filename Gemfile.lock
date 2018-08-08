@@ -95,7 +95,6 @@ PATH
   specs:
     notifier (0.0.1)
       aasm (~> 4.8.0)
-      acapi
       ckeditor (= 4.2.4)
       combine_pdf
       config
@@ -136,7 +135,6 @@ PATH
   remote: components/transport_profiles
   specs:
     transport_profiles (0.0.1)
-      acapi
       mongoid (= 5.4.0)
       rails (>= 4.2.0)
       rubyzip (>= 1.2.1)
