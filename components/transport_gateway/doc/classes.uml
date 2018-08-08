@@ -1,0 +1,55 @@
+@startuml
+skinparam shadowing false
+hide empty methods
+hide empty attributes
+
+skinparam package<<Layout>> {
+  borderColor Transparent
+  backgroundColor Transparent
+  fontColor Transparent
+  stereotypeFontColor Transparent
+  shadowing false
+}
+
+package Adapters {
+  class Base {
+    + receive_message(message : Message) : Source
+    + send_message(message : Message)
+  }
+
+  class FileAdapter
+  class HttpAdapter
+  class SftpAdapter
+  class S3Adapter
+  class SmtpAdapter
+
+  FileAdapter -r-|> Base
+  HttpAdapter -d-|> Base
+  S3Adapter -l-|> Base
+  SftpAdapter -u-|> Base
+  SmtpAdapter -u-|> Base
+
+  SftpAdapter -l[hidden]- SmtpAdapter
+}
+
+class Gateway {
+  + receive_message(message: Message) : Message
+  + send_message(message: Message)
+}
+class Message
+
+package Sources {
+  interface Source {
+    + cleanup()
+    + stream : IO
+    + size : FixNum
+  }
+  class FileSource
+  class StringIoSource
+  class TempfileSource
+
+  Source <- FileSource
+  Source <-- StringIoSource
+  Source <-- TempfileSource
+}
+@enduml
