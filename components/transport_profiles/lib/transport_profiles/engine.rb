@@ -1,4 +1,5 @@
 require 'zip'
+require 'acapi'
 
 module TransportProfiles
   class Engine < ::Rails::Engine

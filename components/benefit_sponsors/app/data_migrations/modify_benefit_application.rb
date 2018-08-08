@@ -1,6 +1,6 @@
-require File.join(Rails.root, "components/benefit_sponsors/lib/mongoid_migration_task")
+require "mongoid_migration_task"
 
-class ModifyBenefitApplication< MongoidMigrationTask
+class ModifyBenefitApplication < MongoidMigrationTask
 
   def migrate
     action = ENV['action'].to_s
