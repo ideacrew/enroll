@@ -124,7 +124,7 @@ namespace :import do
                 product.product_package_kinds = product_package_kinds
               end
 
-              # product.save
+              product.save
             end
             # end of new model
 
