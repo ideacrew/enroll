@@ -11,10 +11,10 @@
 #           So including http at the start of each rx formulary urls that does not have http.
 
 namespace :import do
-  task :common_data_from_master_xml => :environment do
+  task :common_data_from_master_xml, [:file] => :environment do |task, args|
     NATIONWIDE_NETWORK = ["Nationwide In-Network"]
     DC_IN_NETWORK = ["DC Metro In-Network"]
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
       files.each do |file|
