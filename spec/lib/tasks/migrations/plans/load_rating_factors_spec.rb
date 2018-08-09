@@ -1,5 +1,5 @@
 require 'rails_helper'
-Rake.application.rake_require "tasks/migrations/load_rating_factors"
+Rake.application.rake_require "tasks/migrations/plans/load_rating_factors"
 
 RSpec.describe 'Load Rate Factors Task', :type => :task do
   before :all do

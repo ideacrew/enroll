@@ -8,7 +8,7 @@ describe "plan_cross_walk" do
     @product_2017 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1234502-01", hios_base_id: "42690MA1234502", csr_variant_id: "01", application_period: Date.new(2017, 1, 1)..Date.new(2017, 12, 31))
     @product_2018 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1234502-01", hios_base_id: "42690MA1234502", csr_variant_id: "01", application_period: Date.new(2018, 1, 1)..Date.new(2018, 12, 31))
 
-    Rake.application.rake_require "tasks/plans/plan_cross_walk"
+    Rake.application.rake_require "tasks/migrations/plans/plan_cross_walk"
     Rake::Task.define_task(:environment)
   end
 

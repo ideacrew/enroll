@@ -20,7 +20,7 @@ RSpec.describe 'Service Area Imports', :type => :task do
     load locations_file
     load_cca_locations_county_zips_seed
 
-    Rake.application.rake_require 'tasks/migrations/load_service_area_data'
+    Rake.application.rake_require 'tasks/migrations/plans/load_service_area_data'
     Rake::Task.define_task(:environment)
     create(:rating_area, county_name: 'Suffolk', zip_code: '10010')
     invoke_task

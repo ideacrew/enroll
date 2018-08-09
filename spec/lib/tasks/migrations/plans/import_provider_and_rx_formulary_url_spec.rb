@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe "import_provider_and_rx_formulary_url" do
   before :all do
-    Rake.application.rake_require"tasks/plans/import_provider_and_rx_formulary_url"
+    Rake.application.rake_require"tasks/migrations/plans/import_provider_and_rx_formulary_url"
     Rake::Task.define_task(:environment)
 
     @files = Dir.glob(File.join(Rails.root, "spec/test_data/plan_data/master_xml/2018","*.xlsx"))
