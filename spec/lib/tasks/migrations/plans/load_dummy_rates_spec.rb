@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe "load_dummy_rates" do
   before :all do
+    DatabaseCleaner.clean
+
     glob_pattern = File.join(Rails.root, "db/seedfiles/cca/issuer_profiles_seed.rb")
     load glob_pattern
     load_cca_issuer_profiles_seed
@@ -29,7 +31,7 @@ describe "load_dummy_rates" do
 
     it "should load the dummy data" do
       expect(@hp1.premium_tables.count).to eq 4
-      invoke_tasks
+      invoke_dummy_rates_tasks
       @hp1.reload
       expect(@hp1.premium_tables.count).to eq 7
     end
@@ -54,7 +56,7 @@ describe "load_dummy_rates" do
 
     it "should cleanup the dummy data" do
       expect(@hp1.premium_tables.count).to eq 7
-      invoke_tasks
+      invoke_dummy_rates_tasks
       @hp1.reload
       expect(@hp1.premium_tables.count).to eq 4
     end
@@ -69,7 +71,7 @@ describe "load_dummy_rates" do
   end
 end
 
-def invoke_tasks
+def invoke_dummy_rates_tasks
   Rake::Task["dump_dummy:premium_rates"].reenable
   Rake::Task["dump_dummy:premium_rates"].invoke
 end

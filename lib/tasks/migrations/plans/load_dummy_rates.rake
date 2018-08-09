@@ -19,7 +19,7 @@ namespace :dump_dummy do
     fail 'action is required' unless action.present? unless Rails.env.test?
 
     @issuer_profile_hash = {}
-    set_issuer_profile_hash abbrevs
+    build_issuer_profile_hash abbrevs
     effective_period = set_quarter_range start_date.to_date
 
     fail 'empty set for issuer_profile' unless @issuer_profile_hash.present? unless Rails.env.test?
@@ -67,7 +67,7 @@ def self.cleanup_premiums(product, effective_period)
   print "." unless Rails.env.test?
 end
 
-def self.set_issuer_profile_hash(abbrevs)
+def self.build_issuer_profile_hash(abbrevs)
   abbrevs = abbrevs.split(",") if abbrevs
   exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.abbrev".in => abbrevs) if abbrevs
   exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles if abbrevs.nil?
