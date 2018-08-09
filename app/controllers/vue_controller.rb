@@ -63,7 +63,16 @@ class VueController < ApplicationController
   def plans
     my_plans = []
     #Plan.valid_shop_by_metal_level_and_year("gold",2018).limit(25).each do |p|
-    Plan.where("active_year" => 2018).limit(25).each do |p|
+
+    query = Plan.where("active_year" => 2018).limit(25)
+
+    if ["Single Plan","Single Carrier"].include?(params[:model])
+      query = query.where(:carrier_profile_id => params[:id])
+    elsif ["One Level"].include?(params[:model])
+      query = query.where(:metal_level => params[:criteria].downcase)
+    end
+
+    query.each do |p|
       my_plans << { :image_url => "/logo/carrier/" + p.carrier_profile.legal_name.downcase.parameterize.underscore + ".jpg",
                     :carrier_name => p.carrier_profile.legal_name,
                     :nationwide => p.nationwide ? "Yes" : "No", :render_class => false, :id => p.id, :plan => p.attributes[:name], :metal_level => p.metal_level.capitalize, :market => p.market, :active_year => p.active_year

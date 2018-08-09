@@ -27,10 +27,12 @@ import EmployerPlanYear from '../employer/plan_year.vue'
 import Bqt from '../bqt/bqt.vue'
 
 import BqtModel from '../bqt/bqt-model.vue'
+import BqtPlan from '../bqt/bqt-plan.vue'
 
 
 Vue.component('bqt', Bqt);
 Vue.component('bqt-model', BqtModel);
+Vue.component('bqt-plan', BqtPlan);
 
 
 Vue.component('hbx', Hbx);

@@ -13,12 +13,9 @@
         :label="element.option"
         color="red"
         :value="element.id"
-        v-on:change="$emit('hello', element.option, model.name)"
+        v-on:change="$emit('setModel', element.option, model.name, element.id)"
       ></v-radio>
     </v-radio-group>
-
-<!-- v-on:click="$emit('hello', element.option, model.name)" -->
-    <!--<p><button v-on:click="$emit('hello', 1, model.name)">say</button></p>-->
   </div>
 </template>
 
@@ -34,4 +31,5 @@ export default {
 </script>
 
 <style>
+
 </style>
