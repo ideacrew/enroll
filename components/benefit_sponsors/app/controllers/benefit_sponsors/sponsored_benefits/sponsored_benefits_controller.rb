@@ -5,7 +5,7 @@ module BenefitSponsors
       # before_action :find_benefit_application, :find_employer
 
       def new
-        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_new(params.permit(:kind, :benefit_sponsorship_id, :benefit_package_id))
+        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_new(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id))
         # TODO - add pundit policy
       end
 
@@ -23,7 +23,7 @@ module BenefitSponsors
       end
 
       def edit
-        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_edit(params.permit(:kind, :benefit_sponsorship_id, :benefit_package_id, :id))
+        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_edit(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
         # TODO - add pundit policy
       end
 
@@ -37,6 +37,10 @@ module BenefitSponsors
           flash[:error] = error_messages(@sponsored_benefit_form)
           render :edit
         end
+      end
+
+      def change_reference_product
+        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
       end
 
       private
@@ -55,7 +59,7 @@ module BenefitSponsors
       end
 
       def sponsored_benefits_params
-        params.require(:benefits).permit(:kind, :benefit_sponsorship_id, :benefit_package_id,
+        params.require(:benefits).permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id,
           :sponsored_benefit_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
             :sponsor_contribution_attributes => [ 
               :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]

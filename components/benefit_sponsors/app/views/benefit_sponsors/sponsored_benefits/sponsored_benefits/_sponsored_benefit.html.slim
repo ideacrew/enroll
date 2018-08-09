@@ -1,11 +1,9 @@
 ul.nav.nav-tabs.row
   li.col-md-4.col-sm-4
     = f.hidden_field :kind, value: f.object.kind
-    = f.radio_button :product_package_kind, "single_product", { checked: true, class: 'product_package_kind'}
+    = f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind'
     = f.label :product_package_kind_single_product, class: "elected_plan" do
-      i.far.fa-circle
-      i.far.fa-dot-circle
-      | One Plan
+      = "One Plan"
 
 #singleProductInfo
   - single_product_carriers = @sponsored_benefit_form.catalog.single_product_options
