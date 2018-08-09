@@ -2,7 +2,7 @@ require 'rake'
 
 describe 'load_rate_reference:update_rating_areas' do
   before :all do
-    Rake.application.rake_require "tasks/migrations/load_rate_reference"
+    Rake.application.rake_require "tasks/migrations/load_rating_areas"
     Rake::Task.define_task(:environment)
 
     glob_pattern = File.join(Rails.root, "db/seedfiles/cca/locations_seed.rb")
