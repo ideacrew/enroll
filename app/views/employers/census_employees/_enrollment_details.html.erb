@@ -19,9 +19,9 @@
         <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
         <%# TODO %>
         <% member_enrollment = group_enrollment.member_enrollments.detect {|member_enrollment| member_enrollment.member_id == member.id} %>
-        <td><%= number_to_currency(member_enrollment.product_price.to_f) %></td>
-        <td><%= number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
-        <td><%= number_to_currency(member_enrollment.product_price.to_f - member_enrollment.sponsor_contribution.to_f) %></td>
+        <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f) %></td>
+        <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.sponsor_contribution.to_f) %></td>
+        <td><%= enrollment.composite_rated? ? '--' : number_to_currency(member_enrollment.product_price.to_f - member_enrollment.sponsor_contribution.to_f) %></td>
       </tr>
       <% end %>
       <tr class="gray-row">

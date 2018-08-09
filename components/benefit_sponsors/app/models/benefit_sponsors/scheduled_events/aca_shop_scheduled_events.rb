@@ -72,7 +72,8 @@ module BenefitSponsors
 
       def benefit_renewal
         months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
-        renewal_application_begin = (new_date + months_prior_to_effective.months)
+        renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
+        renewal_application_begin = (new_date + months_prior_to_effective.months - renewal_offset_days)
 
         if renewal_application_begin.mday == 1
           benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.may_renew_application?(renewal_application_begin.prev_day)
@@ -131,12 +132,18 @@ module BenefitSponsors
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
         
         benefit_sponsors.may_transmit_renewal_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
-          execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_eligible_event) if benefit_sponsorship.is_renewal_transmission_eligible?
+            execute_sponsor_event(benefit_sponsorship, :transmit_renewal_carrier_drop_event) if benefit_sponsorship.is_renewal_carrier_drop?
+          rescue Exception => e 
+          end
         end
 
         benefit_sponsors.may_transmit_initial_enrollment?(start_on).each do |benefit_sponsorship|
-          execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          begin
+            execute_sponsor_event(benefit_sponsorship, :transmit_initial_eligible_event)
+          rescue Exception => e 
+          end
         end
       end
 

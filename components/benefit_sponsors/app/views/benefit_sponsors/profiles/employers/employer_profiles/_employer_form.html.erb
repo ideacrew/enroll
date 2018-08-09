@@ -1,5 +1,7 @@
+<% content_for :head do %>
+  <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+<% end %>
 <%= flash_messages  %>
-<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
 <div class="employer-edit-tab">
   <h1 class="heading-text">Business Info</h1>
   <% if @agency.errors.any? %>
@@ -50,7 +52,7 @@
         <th style='width: 18%'> Email</th>
         <th style='width: 18%'> Phone</th>
         <th style='width: 18%'> Status</th>
-        <th style='width: 9%'> Remove Role</th>
+        <th style='width: 12%'> Remove Role</th>
         </thead>
         <% @agency.staff_roles.each do |staff| %>
           <tr style='border: 1px solid #d5d5d5; height: 50px; '>

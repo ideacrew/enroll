@@ -447,10 +447,10 @@ module BenefitSponsors
     end
 
     def carriers_dropped_for(product_kind)
-      active_benefit_application.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
     end
+    
     ####
-
 
     # Workflow for self service
     aasm do

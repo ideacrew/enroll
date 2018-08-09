@@ -63,7 +63,7 @@ module BenefitSponsors
       def update_benefit_package(args)
         @benefit_package = @benefit_application.benefit_packages.find(args[:id])
         @benefit_package.assign_attributes(args.except(:id, :sponsored_benefits_attributes))
-        update_sponsored_benefits(args[:sponsored_benefits_attributes][0])
+        update_sponsored_benefits(args[:sponsored_benefits_attributes][0]) if args[:sponsored_benefits_attributes].present?
         @benefit_package
       end
 
