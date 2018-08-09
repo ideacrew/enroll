@@ -48,10 +48,12 @@ namespace :conversion_import do
         dep_headers << "Dep#{i + 1} #{h}"
       end
     end
-    csv_headers << headers + dep_headers
+    feins_list = ENV['feins_list'].split(' ')
+
     CSV.open(file_name, "w", force_quotes: true) do |csv|
-      csv << csv_headers
-      feins.each do |fein|
+      csv << headers + dep_headers
+
+      feins_list.each do |fein|
         organization = find_organization(fein)
         census_employees = find_census_employees(organization)
         benefit_applications = find_plan_year(organization)
