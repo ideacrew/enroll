@@ -6,15 +6,11 @@
   h5 Select which plans your employees will choose from
 
   .benefit-package-dental
-    = form_for @sponsored_benefit_form, as: :benefits, url: {action: "create"} do |benefit_builder|
+    = form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "create"} do |benefit_builder|
       = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
-      = benefit_builder.hidden_field :benefit_package_id, value: benefit_builder.object.benefit_package_id
-      = benefit_builder.hidden_field :benefit_application_id, value: benefit_builder.object.benefit_application_id
-      = benefit_builder.hidden_field :benefit_sponsorship_id, value: benefit_builder.object.benefit_sponsorship_id
-      = benefit_builder.fields_for :sponsored_benefit, benefit_builder.object.sponsored_benefit, errors: {}, fieldset: false do |f|
-        = render "sponsored_benefit", f: f
-        = link_to "Cancel", profiles_employers_employer_profile_path(benefit_builder.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary pull-left"
-        = f.submit "Submit Dental Benefits", class: "btn btn-default pull-right"
+      = render "sponsored_benefit", f: benefit_builder
+      = link_to "Cancel", profiles_employers_employer_profile_path(benefit_builder.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary pull-left"
+      = benefit_builder.submit "Submit Dental Benefits", class: "btn btn-default pull-right"
 
 javascript:
   function loadSingleProductSponsorContribution(element) {

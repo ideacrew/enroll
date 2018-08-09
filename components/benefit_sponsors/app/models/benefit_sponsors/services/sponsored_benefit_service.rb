@@ -78,7 +78,6 @@ module BenefitSponsors
 
       def attributes_to_form_params(sponsored_benefit)
         {
-          id: sponsored_benefit.id,
           kind: sponsored_benefit.product_kind,
           product_option_choice: sponsored_benefit.product_option_choice,
           product_package_kind: sponsored_benefit.product_package_kind,
@@ -128,14 +127,13 @@ module BenefitSponsors
       end
 
       def form_params_to_attributes(form)
-        sb_form = form.sponsored_benefit
         attributes = sanitize_params(
-          sb_form.attributes.slice(
+          form.attributes.slice(
             :id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id
           )
         )
         attributes.merge!({
-          sponsor_contribution_attributes: sponsor_contribution_form_to_params(sb_form.sponsor_contribution)
+          sponsor_contribution_attributes: sponsor_contribution_form_to_params(form.sponsor_contribution)
         })
       end
 
