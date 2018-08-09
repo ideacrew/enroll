@@ -28,7 +28,6 @@ module BenefitSponsors
       end
 
       def update
-        binding.pry
         @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_update(sponsored_benefits_params)
         # TODO - add pundit policy
         if @sponsored_benefit_form.update
