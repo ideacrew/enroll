@@ -376,6 +376,10 @@ module BenefitSponsors
         sponsored_benefits.detect{|sponsored_benefit| sponsored_benefit.product_kind == coverage_kind.to_sym }
       end
 
+      def is_offering_dental?
+        sponsored_benefit_for(:dental).present?
+      end
+
       def census_employees_assigned_on(effective_date, is_active = true)
         CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_terminated
       end

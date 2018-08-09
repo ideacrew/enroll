@@ -360,21 +360,29 @@ class CensusEmployee < CensusMember
   #   end
   # end
 
-  def active_benefit_group
+  def active_benefit_package
     if active_benefit_group_assignment.present?
-      active_benefit_group_assignment.benefit_group
+      if active_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+        active_benefit_group_assignment.benefit_group
+      end
     end
   end
+
+  alias_method :active_benefit_group, :active_benefit_package
 
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
 
-  def renewal_published_benefit_group
-    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-      renewal_benefit_group_assignment.benefit_group
+  def renewal_published_benefit_package
+    if renewal_benefit_group_assignment.present?
+      if renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+        renewal_benefit_group_assignment.benefit_group
+      end
     end
   end
+
+  alias_method :renewal_published_benefit_group, :renewal_published_benefit_package
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
