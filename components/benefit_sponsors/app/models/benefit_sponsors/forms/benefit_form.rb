@@ -27,10 +27,18 @@ module BenefitSponsors
         form
       end
 
-      def self.for_edit(params, load_benefit_application_form)
+      def self.for_edit(params)
+        form = self.new(params)
+        form.service = resolve_service(params)
+        form_attributes = form.service.find(form.sponsored_benefit_id)
+        form.sponsored_benefit = BenefitSponsors::Forms::SponsoredBenefitForm.new(form_attributes)
+        form.service.load_form_meta_data(form)
       end
 
       def self.for_update(params)
+        form = self.new(params)
+        form.service = resolve_service(params)
+        form
       end
 
       def persist(update: false)

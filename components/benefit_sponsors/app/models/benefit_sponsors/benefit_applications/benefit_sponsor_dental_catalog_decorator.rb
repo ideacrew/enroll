@@ -7,6 +7,10 @@ module BenefitSponsors
         def persisted?
           false
         end
+
+        def is_employee_cl
+          display_name == "Employee" || display_name == "Employee Only"
+        end
       end
       SponsorContribution = Struct.new(:package_kind, :contribution_levels) do
         def persisted?

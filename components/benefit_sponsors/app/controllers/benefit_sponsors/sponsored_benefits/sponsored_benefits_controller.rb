@@ -24,6 +24,20 @@ module BenefitSponsors
 
       def edit
         @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_edit(params.permit(:kind, :benefit_sponsorship_id, :benefit_package_id, :id))
+        # TODO - add pundit policy
+      end
+
+      def update
+        binding.pry
+        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.for_update(sponsored_benefits_params)
+        # TODO - add pundit policy
+        if @sponsored_benefit_form.update
+          flash[:notice] = "Benefit Package successfully updated."
+          redirect_to profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits')
+        else
+          flash[:error] = error_messages(@sponsored_benefit_form)
+          render :edit
+        end
       end
 
       private

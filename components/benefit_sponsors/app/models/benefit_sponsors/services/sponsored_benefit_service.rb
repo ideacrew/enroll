@@ -16,6 +16,11 @@ module BenefitSponsors
         form
       end
 
+      def find(sponsored_benefit_id)
+        sponsored_benefit = find_sponsored_benefit(sponsored_benefit_id)
+        attributes_to_form_params(sponsored_benefit)
+      end
+
       def save(form)
         model_attributes = form_params_to_attributes(form)
         sponsored_benefit = factory.call(package, model_attributes)
@@ -23,6 +28,7 @@ module BenefitSponsors
       end
 
       def update(form)
+        save(form)
       end
 
       def store(form, sponsored_benefit)
@@ -51,6 +57,11 @@ module BenefitSponsors
         "BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator".gsub("Health", kind.humanize).constantize
       end
 
+      def find_sponsored_benefit(sponsored_benefit_id)
+        return nil if sponsored_benefit_id.blank?
+        package.sponsored_benefits.find(sponsored_benefit_id)
+      end
+
       def find_benefit_package(package_id)
         BenefitSponsors::BenefitPackages::BenefitPackage.find(package_id)
       end
@@ -63,6 +74,57 @@ module BenefitSponsors
       def organization
         return @organization if defined? @organization
         @organization = profile.organization
+      end
+
+      def attributes_to_form_params(sponsored_benefit)
+        {
+          id: sponsored_benefit.id,
+          kind: sponsored_benefit.product_kind,
+          product_option_choice: sponsored_benefit.product_option_choice,
+          product_package_kind: sponsored_benefit.product_package_kind,
+          reference_plan_id: sponsored_benefit.reference_product_id,
+          reference_product: reference_product_attributes_to_form_params(sponsored_benefit.reference_product),
+          sponsor_contribution_attributes: sponsor_contribution_attributes_to_form_params(sponsored_benefit.sponsor_contribution)
+        }
+      end
+
+      def sponsor_contribution_attributes_to_form_params(sponsor_contribution)
+        {
+          contribution_levels_attributes: contribution_level_attributes_to_form_params(sponsor_contribution.contribution_levels)
+        }
+      end
+
+      def contribution_level_attributes_to_form_params(contribution_levels)
+        contribution_levels.each_with_index.inject({}) do |result, (contribution_level, index_val)|
+          result[index_val] = {
+            display_name: contribution_level.display_name,
+            contribution_unit_id: contribution_level.contribution_unit_id,
+            is_offered: contribution_level.is_offered,
+            order: contribution_level.order,
+            contribution_factor: contribution_level.contribution_factor
+          }
+          result
+        end
+      end
+
+      def reference_product_attributes_to_form_params(reference_product)
+        attributes = {
+          title: reference_product.title,
+          issuer_name: reference_product.issuer_profile.legal_name,
+          metal_level_kind: reference_product.metal_level_kind,
+          network_information: reference_product.network_information
+        }
+        case reference_product.kind
+        when :health
+          attributes.merge!({
+            plan_kind: reference_product.health_plan_kind
+          })
+        when :dental
+          attributes.merge!({
+            plan_kind: reference_product.dental_plan_kind
+          })
+        end
+        attributes
       end
 
       def form_params_to_attributes(form)
@@ -87,6 +149,7 @@ module BenefitSponsors
         contribution_levels.inject([]) do |result, form|
           attributes = form.attributes.slice(:id, :display_name, :contribution_factor, :is_offered, :contribution_unit_id)
           attributes[:is_offered] = form.is_employee_cl ? true : form.is_offered
+          attributes[:contribution_factor] = (form.contribution_factor * 0.01)
           result << sanitize_params(attributes)
           result
         end

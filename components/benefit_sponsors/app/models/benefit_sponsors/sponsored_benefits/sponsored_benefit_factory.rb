@@ -25,6 +25,13 @@ module BenefitSponsors
         @s_benefit
       end
 
+      def update_sponsored_benefit(attrs)
+        @s_benefit = find_sponsored_benefit(attrs[:id])
+        @s_benefit.assign_attributes(attrs.except(:sponsor_contribution_attributes))
+        @s_benefit.sponsor_contribution = build_sponsor_contribution(sponsored_benefit, attrs[:sponsor_contribution_attributes])
+        @s_benefit
+      end
+
       def build_sponsor_contribution(sponsored_benefit, attrs)
         sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
         
@@ -47,6 +54,11 @@ module BenefitSponsors
 
       def sponsored_benefit
         @s_benefit
+      end
+
+      def find_sponsored_benefit(sponsored_benefit_id)
+        return nil if sponsored_benefit_id.blank?
+        package.sponsored_benefits.find(sponsored_benefit_id)
       end
     end
   end
