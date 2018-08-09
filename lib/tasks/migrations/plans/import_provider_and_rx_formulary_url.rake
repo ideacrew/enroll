@@ -19,13 +19,13 @@ namespace :import do
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
       files.each do |file|
         year = file.split("/")[-2].to_i
-        puts "*"*80
-        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..."
+        puts "*"*80 unless Rails.env.test?
+        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..." unless Rails.env.test?
         if file.present?
           result = Roo::Spreadsheet.open(file)
           sheets = ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
           sheets.each do |sheet_name|
-            puts "processing sheet ::: #{sheet_name} :::"
+            puts "processing sheet ::: #{sheet_name} :::" unless Rails.env.test?
             sheet_data = result.sheet(sheet_name)
 
             @header_row = sheet_data.row(1)
@@ -57,8 +57,8 @@ namespace :import do
     else # MA
       files.each do |file|
       year = file.split("/")[-2].to_i
-      puts "*"*80
-      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..."
+      puts "*"*80 unless Rails.env.test?
+      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..." unless Rails.env.test?
       if file.present?
         result = Roo::Spreadsheet.open(file)
         sheets = if year == 2017
@@ -133,9 +133,9 @@ namespace :import do
       end
     end
     end
-    puts "*"*80
-    puts "import complete"
-    puts "*"*80
+    puts "*"*80 unless Rails.env.test?
+    puts "import complete" unless Rails.env.test?
+    puts "*"*80 unless Rails.env.test?
   end
 
   def assign_headers

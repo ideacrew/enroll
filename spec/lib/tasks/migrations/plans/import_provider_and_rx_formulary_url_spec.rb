@@ -61,7 +61,7 @@ describe "import_provider_and_rx_formulary_url" do
     end
 
     it "should run task" do
-      invoke_tasks
+      invoke_url_tasks
       @plan.reload
       @health_product2.reload
     end
@@ -80,7 +80,7 @@ describe "import_provider_and_rx_formulary_url" do
   end
 end
 
-def invoke_tasks
+def invoke_url_tasks
  Rake::Task["import:common_data_from_master_xml"].invoke(@files.first)
 end
 

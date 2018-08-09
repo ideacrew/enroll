@@ -22,9 +22,9 @@ namespace :xml do
             old_plan = Plan.where(hios_id: /#{hios_id_2017}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
             if old_plan.present?
               old_plan.update(renewal_plan_id: new_plan.id)
-              puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}"
+              puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
             else
-              puts "Old #{@previous_year} plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present."
+              puts "Old #{@previous_year} plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
             end
           end
         end
@@ -38,9 +38,9 @@ namespace :xml do
 
             if old_product.present?
               old_product.update(renewal_product_id: new_product.id)
-              puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}"
+              puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}" unless Rails.env.test?
             else
-              puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present."
+              puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present." unless Rails.env.test?
             end
           end
         end

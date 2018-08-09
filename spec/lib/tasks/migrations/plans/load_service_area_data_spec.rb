@@ -23,7 +23,7 @@ RSpec.describe 'Service Area Imports', :type => :task do
     Rake.application.rake_require 'tasks/migrations/plans/load_service_area_data'
     Rake::Task.define_task(:environment)
     create(:rating_area, county_name: 'Suffolk', zip_code: '10010')
-    invoke_task
+    invoke_service_area_task
   end
 
   context "service_area:update_service_area" do
@@ -131,7 +131,7 @@ end
 
 private
 
-def invoke_task
+def invoke_service_area_task
   file = "#{Rails.root}/spec/test_data/plan_data/service_areas/2017/SHOP_SA_BMCHP.xlsx"
   Rake.application.invoke_task("load_service_reference:update_service_areas[#{file}]")
   Rake.application.invoke_task("load_service_reference:update_service_areas_new_model[#{file}]")

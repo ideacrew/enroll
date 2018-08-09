@@ -16,7 +16,7 @@ describe "plan_cross_walk" do
     it "should run the rake" do
       expect(@plan_2017.renewal_plan_id).to eq nil
       expect(@product_2017.renewal_product_id).to eq nil
-      invoke_tasks
+      invoke_cross_walk_tasks
     end
 
     it "should update the renewal_plan_id " do
@@ -40,7 +40,7 @@ describe "plan_cross_walk" do
     it "should run the rake" do
       expect(@plan_2017.renewal_plan_id).to eq nil
       expect(@product_2017.renewal_product_id).to eq nil
-      invoke_tasks
+      invoke_cross_walk_tasks
     end
 
     it "should not update the renewal_plan_id if there is no old plan" do
@@ -59,7 +59,7 @@ describe "plan_cross_walk" do
   end
 end
 
-def invoke_tasks
+def invoke_cross_walk_tasks
   files = Dir.glob(File.join(Rails.root, "spec/test_data/plan_data", "cross_walk", "2018", "**", "*.xml"))
   Rake::Task["xml:plan_cross_walk"].reenable
   Rake::Task["xml:plan_cross_walk"].invoke(files.first)

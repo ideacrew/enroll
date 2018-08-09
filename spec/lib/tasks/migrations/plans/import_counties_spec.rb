@@ -17,7 +17,7 @@ describe "import_counties" do
 
     it "should invoke task" do
       expect(BenefitMarkets::Locations::CountyZip.all.count).to eq 0
-      invoke_tasks
+      invoke_counties_tasks
     end
 
     it "should load all county zips from file" do
@@ -36,6 +36,6 @@ describe "import_counties" do
   end
 end
 
-def invoke_tasks
+def invoke_counties_tasks
   Rake::Task["import:county_zips"].invoke
 end

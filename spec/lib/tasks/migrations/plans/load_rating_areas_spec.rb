@@ -2,6 +2,8 @@ require 'rake'
 
 describe 'load_rate_reference:update_rating_areas' do
   before :all do
+    DatabaseCleaner.clean
+
     Rake.application.rake_require "tasks/migrations/plans/load_rating_areas"
     Rake::Task.define_task(:environment)
 

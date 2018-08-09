@@ -8,7 +8,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: [hios_id])
     end
 
-    invoke_task
+    invoke_factors_task
   end
 
   context "load_rating_factors:update_factor_sets" do
@@ -193,7 +193,7 @@ end
 
 private
 
-def invoke_task
+def invoke_factors_task
   files = Dir.glob(File.join(Rails.root, "spec/test_data/plan_data/rate_factors", "**", "*.xlsx"))
   Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => files[0], :active_year => TimeKeeper.date_of_record.year})
   Rake::Task["load_rating_factors:update_factor_sets_new_model"].execute({:file_name => files[0], :active_year => TimeKeeper.date_of_record.year})
