@@ -83,7 +83,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   def email_guide
     notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
     flash[:notice] = notice
-    #UserMailer.broker_registration_guide(params).deliver_now
+    UserMailer.broker_registration_guide(params).deliver_now
     render 'confirmation'
   end
 
