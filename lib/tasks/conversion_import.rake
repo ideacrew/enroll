@@ -10,29 +10,29 @@ namespace :conversion_import do
       csv << csv_headers
       feins.each do |fein|
         organization = find_organization(fein.to_s)
-        if organization
-          physical_location, mailing_location = find_address_details(organization)
-          #In conversion sheet we have only one staff role
-          available_staff_roles = find_staff_roles(organization).first
-          physical_address = physical_location.address
-          mailing_attributes = maling_address_attributes(mailing_location)
-          staff_role_attributes = append_attributes(available_staff_roles)
-          benefit_applications = find_plan_year(organization)
-          probation_kind = benefit_applications.first.benefit_packages.first.probation_period_kind.to_s
-          applications = [benefit_applications.first.fte_count, probation_kind, benefit_applications.first.effective_period.min]
-          csv << [
-              organization.fein,
-              organization.dba,
-              organization.legal_name,
-              organization.sic_code,
-              physical_address.address_1,
-              physical_address.address_2,
-              physical_address.city,
-              physical_address.county,
-              physical_address.state,
-              physical_address.zip
-          ] + mailing_attributes + staff_role_attributes + applications
-        end
+        next unless organization
+
+        physical_location, mailing_location = find_address_details(organization)
+
+        #In conversion sheet we have only one staff role
+        available_staff_roles = find_staff_roles(organization).first
+        physical_address = physical_location.address
+        mailing_attributes = mailing_address_attributes(mailing_location)
+        staff_role_attributes = append_attributes(available_staff_roles)
+        benefit_application = find_plan_year(organization).renewing.first
+        probation_kind = benefit_application.benefit_packages.first.probation_period_kind.to_s
+        applications  =  [benefit_application.fte_count, probation_kind, benefit_application.effective_period.min]
+        csv << [organization.fein,
+                 organization.dba,
+                 organization.legal_name,
+                 organization.sic_code,
+                 physical_address.address_1,
+                 physical_address.address_2,
+                 physical_address.city,
+                 physical_address.county,
+                 physical_address.state,
+                 physical_address.zip
+              ] + mailing_attributes + staff_role_attributes + applications
       end
     end
   end
@@ -56,11 +56,10 @@ namespace :conversion_import do
       feins_list.each do |fein|
         organization = find_organization(fein)
         census_employees = find_census_employees(organization)
-        benefit_applications = find_plan_year(organization)
-        coverage_start = benefit_applications.first.effective_period.min
-        premium_total =
-        employer_contribution =
+        benefit_application = find_plan_year(organization).renewing.first
+        coverage_start = benefit_application.effective_period.min
         census_employees.each do |census_employee|
+          premium_total, employer_contribution = find_contribution_details(census_employee)
           census_employee_details = find_initial_attributes(census_employee)
           address_details  = address_attributes(census_employee)
           unless census_employee.census_dependents.empty?
@@ -82,6 +81,11 @@ namespace :conversion_import do
 
   end
 
+  def find_contribution_details(census_employee)
+   hbx_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.active
+   [hbx_enrollment.total_premium, hbx_enrollment.total_employer_contribution]
+  end
+
   def find_initial_attributes(census_employee)
     initial_attr = Array.new
     %w(ssn dob gender first_name middle_name last_name).each do |attr|
@@ -101,16 +105,12 @@ namespace :conversion_import do
   def find_census_employees(organization)
     sponsorship = organization.active_benefit_sponsorship
     employer_profile = organization.employer_profile
-    CensusEmployee.where({
-                             benefit_sponsors_employer_profile_id: employer_profile.id,
-                             benefit_sponsorship_id: sponsorship.id,
-                         })
+    CensusEmployee.where(benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship_id: sponsorship.id)
   end
 
   def find_plan_year(organization)
     organization.benefit_sponsorships.first.benefit_applications
   end
-
 
   def append_attributes(available_staff_roles)
     person = available_staff_roles.person
@@ -123,7 +123,7 @@ namespace :conversion_import do
     staff_details
   end
 
-  def maling_address_attributes(mailing_location)
+  def mailing_address_attributes(mailing_location)
     if mailing_location
       location_details = Array.new
       location_details << mailing_location.address_1
@@ -139,6 +139,7 @@ namespace :conversion_import do
 
   def find_address_details(organization)
     office_locations = organization.employer_profile.office_locations
+    # In conversion we will have only one primary and mailing office locations in the sheet
     primary_office_location = office_locations.where(is_primary: true).first
     mailing_office_location = office_locations.where(is_primary: false).first
     [primary_office_location, mailing_office_location]
@@ -151,6 +152,6 @@ namespace :conversion_import do
   def find_organization(fein)
     BenefitSponsors::Organizations::Organization.where(fein: fein).first
   end
-
 end
+
 
