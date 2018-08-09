@@ -10,6 +10,7 @@ RSpec.describe 'upload commission-statements to s3 and create respective documen
   let!(:broker_role)             { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person, npn: "48115294") }
   let(:sub_folder)                { "#{I18n.t("date.abbr_month_names")[TimeKeeper.date_of_record.month]}-#{TimeKeeper.date_of_record.year}" }
   let(:commission_statement)      { ::BenefitSponsors::Documents::Document.new({ title: "48115294_1024_07102018_COMMISSION_1024-001_R.pdf", subject: "commission-statement", date: Date.strptime("07102018", "%m%d%Y") })}
+  let(:commission_statement2)      { ::BenefitSponsors::Documents::Document.new({ title: "48115294_1024_08102018_COMMISSION_1024-001_R.pdf", subject: "commission-statement", date: Date.strptime("07102018", "%m%d%Y") })}
 
   context "upload commission-statements to S3 and create respective documents for broker_agency_profile" do
     before :each do
@@ -25,8 +26,9 @@ RSpec.describe 'upload commission-statements to s3 and create respective documen
     end
 
     it "should create douments/commission-statements for broker_agency_profile" do
+      broker_agency_profile.documents << commission_statement2
       Rake::Task['nfp:commission_statements_upload'].invoke
-      expect(broker_agency_profile.commission_statements.count).to eq 1
+      expect(broker_agency_profile.commission_statements.count).to eq 2
     end
 
     it "cannot create commission-statements as cannot find broker_role with given npn" do

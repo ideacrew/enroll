@@ -8,10 +8,11 @@ module BenefitSponsors
         Date.strptime(date_string, "%m%d%Y")
       end
 
-      def commission_statement_exist?(statement_date,org)
+      def commission_statement_exist?(statement_date,org, file_path)
+        date_string = File.basename(file_path).split("_")[2]
         broker = org.broker_agency_profile.primary_broker_role
         docs = org.broker_agency_profile.documents.where("date" => statement_date)
-        matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{broker.npn}_\\d{1,}_\\d{6,8}_COMMISSION"))} if broker
+        matching_documents = docs.select {|d| d.title.match(::Regexp.new("^#{broker.npn}_\\d{1,}_#{date_string}_COMMISSION"))} if broker
         return true if (matching_documents && matching_documents.count > 0)
       end
 
@@ -23,7 +24,7 @@ module BenefitSponsors
       def upload_commission_statement(file_path,file_name)
         statement_date = fetch_date(file_path) rescue nil
         org = by_commission_statement_filename(file_path) rescue nil
-        if statement_date && org && !commission_statement_exist?(statement_date,org)
+        if statement_date && org && !commission_statement_exist?(statement_date,org, file_path)
           doc_uri = Aws::S3Storage.save(file_path, "commission-statements", file_name)
           if doc_uri
             document = BenefitSponsors::Documents::Document.new
