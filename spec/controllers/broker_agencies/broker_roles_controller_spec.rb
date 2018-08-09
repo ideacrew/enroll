@@ -137,8 +137,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
-          expect(response).to redirect_to(broker_registration_path)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
@@ -203,7 +202,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
@@ -266,7 +265,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
