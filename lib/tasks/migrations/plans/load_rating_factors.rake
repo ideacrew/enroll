@@ -127,7 +127,7 @@ namespace :load_rating_factors do
         RATING_FACTOR_PAGES.each do |rating_factor_class, sheet_info|
           rating_factor_set = Object.const_get(rating_factor_class)
           ## WARNING THIS DESTROYS ALL CURRENT YEAR FACTOR SETS
-          rating_factor_set.where(active_year: @year).destroy_all
+          # rating_factor_set.where(active_year: @year).destroy_all
           sheet = xlsx.sheet(sheet_info[:page])
           max_integer_factor_key = sheet_info[:max_integer_factor_key]
           (2..number_of_carriers + 1).each do |carrier_column|

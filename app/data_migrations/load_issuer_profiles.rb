@@ -20,6 +20,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
     site_key = "cca"
     site = BenefitSponsors::Site.all.where(site_key: site_key.to_sym).first
 
+    puts "*"*80 unless Rails.env.test?
     issuer_profile_data.each do |issuer_profile|
 
       fein = issuer_profile[:fein]
@@ -47,9 +48,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
 
       issuer_profile = new_exempt_organization.profiles.first
       if issuer_profile.present?
-        puts "*"*80 unless Rails.env.test?
         puts "Carrier #{legal_name} already exists with this hbx_carrier_id #{hbx_carrier_id}." unless Rails.env.test?
-        puts "*"*80 unless Rails.env.test?
       else
         office_location = BenefitSponsors::Locations::OfficeLocation.new(
           is_primary: true,
@@ -73,11 +72,10 @@ class LoadIssuerProfiles < MongoidMigrationTask
         new_exempt_organization.profiles << new_issuer_profile
         new_exempt_organization.save
 
-        puts "*"*80 unless Rails.env.test?
         puts "Successfully created #{legal_name} carrier." unless Rails.env.test?
-        puts "*"*80 unless Rails.env.test?
       end
     end
+    puts "*"*80 unless Rails.env.test?
   end
 
 end
