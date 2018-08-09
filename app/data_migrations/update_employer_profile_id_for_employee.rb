@@ -6,7 +6,7 @@ class UpdateEmployerProfileIdForEmployee< MongoidMigrationTask
       employee_role_id = ENV["employee_role_id"]
 
       employer_profile_id = ::BenefitSponsors::Organizations::Organization.employer_by_fein(organization_fein).first.employer_profile.id.to_s
-      employee_role = Person.all_employee_roles.where(:"employee_roles._id" => BSON::ObjectId.from_string(employee_role_id)).first.employee_roles.find employee_role_id
+      employee_role = EmployeeRole.find(employee_role_id)
 
       if employer_profile_id && employee_role
         employee_role.update_attributes!(benefit_sponsors_employer_profile_id: employer_profile_id)
