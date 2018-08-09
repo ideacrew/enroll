@@ -1,7 +1,7 @@
 require "rails_helper"
-require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_migrations", "modify_benefit_application")
+require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
-describe ModifyBenefitApplication do
+RSpec.describe ModifyBenefitApplication do
 
   let(:given_task_name) { "modify_benefit_application" }
   subject { ModifyBenefitApplication.new(given_task_name, double(:current_scope => nil)) }
