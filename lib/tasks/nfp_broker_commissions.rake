@@ -8,12 +8,12 @@ namespace :nfp do
     if Dir.exists?(absolute_folder_path)
       Dir.entries(absolute_folder_path).each do |file|
         next if File.directory?(file) #skipping directories
-        puts "uploading file #{absolute_folder_path}/#{file}"
+        puts "uploading file #{absolute_folder_path}/#{file}" unless Rails.env.test?
         service = BenefitSponsors::Services::UploadDocumentsToProfilesService.new
         service.upload_commission_statement(absolute_folder_path+"/"+file,file)
       end
     else
-      puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake"
+      puts "Folder #{absolute_folder_path} doesn't exist. Please check and rerun the rake" unless Rails.env.test?
     end
   end
 end
