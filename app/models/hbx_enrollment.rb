@@ -981,9 +981,15 @@ class HbxEnrollment
       raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
     end
 
-    census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ?
-        census_employee.renewal_benefit_group_assignment : (plan_year.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
+    benefit_group_assignment = if plan_year.is_renewing?
+      census_employee.renewal_benefit_group_assignment
+    else
+      if plan_year.expired? && qle
+        census_employee.benefit_group_assignments.order_by(:"created_at".desc).detect{|assignment| assignment.plan_year == plan_year}
+      else
+        census_employee.active_benefit_group_assignment
+      end
+    end
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
