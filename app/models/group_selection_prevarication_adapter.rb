@@ -283,7 +283,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_shop?(person)
-    person.present? && person.has_employer_benefits?
+    person.present? && person.has_employer_benefits? # FIX ME
   end
 
   def can_shop_individual?(person)
@@ -295,7 +295,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_both_markets?(person)
-    false
+    true
   end
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)

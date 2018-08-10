@@ -169,8 +169,13 @@ class Insured::PlanShoppingsController < ApplicationController
     @member_groups = sponsored_cost_calculator.groups_for_products(products).sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
     @enrolled_hbx_enrollment_plan_ids = []
     @products = @member_groups.map(&:group_enrollment).map(&:product)
-    @metal_levels = @products.map(&:metal_level).uniq
-    @plan_types = @products.map(&:health_plan_kind).uniq
+    if @hbx_enrollment.coverage_kind == 'health'
+      @metal_levels = @products.map(&:metal_level).uniq
+      @plan_types = @products.map(&:health_plan_kind).uniq
+    else
+      @plan_types = []
+      @metal_levels = []
+    end
     # @networks = []
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)
