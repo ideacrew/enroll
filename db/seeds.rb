@@ -52,30 +52,24 @@ end
 if missing_plan_dumps
   puts "Running full seed"
 
-  puts "*"*80
-  puts "Importing Counties"
   system "bundle exec rake import:county_zips"
-  puts "::: complete :::"
 
   if Settings.aca.employer_has_sic_field
-    puts "*"*80
-    puts "Loading SIC Codes."
     system "bundle exec rake load_sic_code:update_sic_codes"
     puts "::: complete :::"
   end
 
   puts "*"*80
   puts "Loading Site seed"
-  require File.expand_path(File.join(File.dirname(__FILE__), "site_seed"))
-  Mongoid::Migration.say_with_time("Load MA Site") do
-    load_cca_site_seed
-  end
+  glob_pattern = File.join(Rails.root, "db/seedfiles/cca/site_seed.rb")
+  load glob_pattern
+  load_cca_site_seed
   puts "complete"
 
   unless Settings.aca.use_simple_employer_calculation_model
     puts "*"*80
     puts "Loading Rating Areas."
-    system "bundle exec rake load_rate_reference:update_rating_areas"
+    system "bundle exec rake load_rate_reference:run_all_rating_areas"
     puts "::: complete :::"
   end
 

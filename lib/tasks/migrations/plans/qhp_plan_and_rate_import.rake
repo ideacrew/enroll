@@ -12,15 +12,6 @@ namespace :xml do
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017", "**", "*.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017/Dental/IVL/Dominion/DominionIVLPlanBenefits7.20.16.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
-    qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
-      puts file
-      xml = Nokogiri::XML(File.open(file))
-      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
-      qhp_hash.add(plan.to_hash, file)
-      qhp_hash
-    end
-
-    qhp_import_hash.run
 
     qhp_import_product_hash = files.inject(ProductBuilder.new({})) do |qhp_product_hash, file|
       puts file
@@ -31,6 +22,16 @@ namespace :xml do
     end
 
     qhp_import_product_hash.run
+
+    qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
+      puts file
+      xml = Nokogiri::XML(File.open(file))
+      plan = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+      qhp_hash.add(plan.to_hash, file)
+      qhp_hash
+    end
+
+    qhp_import_hash.run
   end
 end
 

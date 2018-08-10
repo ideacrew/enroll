@@ -11,7 +11,7 @@ namespace :load_rate_reference do
       Rake::Task['load_rate_reference:update_rating_areas'].invoke(file)
       Rake::Task['load_rate_reference:update_rating_areas'].reenable
       puts "created #{RatingArea.all.size} service areas in old model for all years" unless Rails.env.test?
-      puts "created #{BenefitMarkets::Locations::RatingArea.all.size} service areas in old model for all years" unless Rails.env.test?
+      puts "created #{BenefitMarkets::Locations::RatingArea.all.size} service areas in new model for all years" unless Rails.env.test?
     end
     puts "*"*80 unless Rails.env.test?
   end

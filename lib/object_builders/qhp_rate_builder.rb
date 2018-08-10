@@ -87,9 +87,9 @@ class QhpRateBuilder
   end
 
   def find_product_and_create_premium_tables
-    premium_tables = []
     @premium_table_cache.each_pair do |k, v|
       product_hios_id, rating_area_id, applicable_range = k
+      premium_tables = []
       premium_tuples = []
 
       v.each_pair do |pt_age, pt_cost|
@@ -106,11 +106,10 @@ class QhpRateBuilder
         premium_tuples: premium_tuples
       )
 
-      year = applicable_range.first.year
-      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == year}
+      active_year = applicable_range.first.year
+      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == active_year}
       products.each do |product|
-        product.premium_tables = nil
-        product.premium_tables = premium_tables
+        product.premium_tables << premium_tables
         product.premium_ages = premium_tuples.map(&:age).minmax
         product.save
       end
