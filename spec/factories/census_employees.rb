@@ -67,6 +67,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_active_assignment do
+      after(:build) do |census_employee, evaluator|
+        build(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
+      end
+    end
+
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
         create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
