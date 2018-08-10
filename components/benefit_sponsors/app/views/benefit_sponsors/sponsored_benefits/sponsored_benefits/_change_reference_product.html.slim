@@ -3,7 +3,6 @@
   = f.hidden_field :benefit_package_id, value: f.object.benefit_package_id
   = f.hidden_field :benefit_application_id, value: f.object.benefit_application_id
   = f.hidden_field :benefit_sponsorship_id, value: f.object.benefit_sponsorship_id
-  /= f.fields_for :sponsored_benefit, f.object.sponsored_benefit, errors: {}, fieldset: false do |f|
   = f.hidden_field :id, value: f.object.id if f.object.id.present?
   = render "sponsored_benefit", f: f
   = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
