@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe BenefitSponsors::ApplicationHelper do
+RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper do
+  include BenefitSponsors::ApplicationHelper
 
   describe '.profile_unread_messages_count' do
     let(:inbox) { double('inbox', unread_messages: [1], unread_messages_count: 2 )}
@@ -10,21 +11,22 @@ describe BenefitSponsors::ApplicationHelper do
       before do
         expect(profile).to receive(:is_a?).and_return(true)
       end
-      it { expect(helper.profile_unread_messages_count(profile)).to eq(1) }
+      it { expect(profile_unread_messages_count(profile)).to eq(1) }
     end
 
     context 'when profile is not an instance of BenefitSponsors::Organizations::Profile then' do
       before do
         expect(profile).to receive(:is_a?).and_return(false)
       end
-      it { expect(helper.profile_unread_messages_count(profile)).to eq(2) }
+      it { expect(profile_unread_messages_count(profile)).to eq(2) }
     end
 
     context 'when there is an error then' do
-      let!(:broker_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca))}
+      let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:broker_organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site) }
       let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
 
-      it { expect(helper.profile_unread_messages_count(broker_agency_profile)).to eq(0) }
+      it { expect(profile_unread_messages_count(broker_agency_profile)).to eq(0) }
     end
   end
 end
