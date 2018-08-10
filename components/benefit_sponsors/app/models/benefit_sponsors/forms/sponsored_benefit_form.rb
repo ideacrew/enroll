@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Forms
     class SponsoredBenefitForm
-      
+
       include Virtus.model
       include ActiveModel::Model
 
@@ -28,7 +28,7 @@ module BenefitSponsors
       attribute :benefit_application_id, String
       attribute :benefit_sponsorship_id, String
       attribute :sponsored_benefit_id, String # This will be the current SB which we're working on
-    
+
       attr_accessor :sponsor_contribution, :service, :catalog
 
       validates_presence_of :product_package_kind, :product_option_choice, :reference_plan_id, :sponsor_contribution
@@ -73,6 +73,13 @@ module BenefitSponsors
         form = self.new(params)
         form.service = resolve_service(params)
         form
+      end
+
+      def self.fetch(params)
+        form = self.new(params)
+        # form.sponsored_benefit = BenefitSponsors::Forms::SponsoredBenefitForm.new(kind: params[:kind], id: form.sponsored_benefit_id)
+        form.service = resolve_service(params)
+        form.service.load_form_meta_data(form)
       end
 
       def persist(update: false)

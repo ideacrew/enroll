@@ -40,7 +40,7 @@ module BenefitSponsors
       end
 
       def change_reference_product
-        @sponsored_benefit_form = BenefitSponsors::Forms::BenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
+        @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
       end
 
       private
@@ -54,9 +54,9 @@ module BenefitSponsors
       end
 
       def sponsored_benefits_params
-        params.require(:sponsored_benefits).permit(:id, :kind, :product_option_choice, 
+        params.require(:sponsored_benefits).permit(:id, :kind, :product_option_choice,
           :product_package_kind, :reference_plan_id,
-          :sponsor_contribution_attributes => [ 
+          :sponsor_contribution_attributes => [
             :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
           ]
         )

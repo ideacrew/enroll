@@ -1,10 +1,10 @@
-= form_for @sponsored_benefit_form, as: :benefits, url: {action: "update"}, method: :patch do |benefit_builder|
-  = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
-  = benefit_builder.hidden_field :benefit_package_id, value: benefit_builder.object.benefit_package_id
-  = benefit_builder.hidden_field :benefit_application_id, value: benefit_builder.object.benefit_application_id
-  = benefit_builder.hidden_field :benefit_sponsorship_id, value: benefit_builder.object.benefit_sponsorship_id
-  = benefit_builder.fields_for :sponsored_benefit, benefit_builder.object.sponsored_benefit, errors: {}, fieldset: false do |f|
-    = f.hidden_field :id, value: f.object.id if f.object.id.present?
-    = render "sponsored_benefit", f: f
-    = link_to "Cancel", profiles_employers_employer_profile_path(benefit_builder.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
-  = benefit_builder.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"
+= form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "update"}, method: :patch do |f|
+  = f.hidden_field :kind, value: f.object.kind
+  = f.hidden_field :benefit_package_id, value: f.object.benefit_package_id
+  = f.hidden_field :benefit_application_id, value: f.object.benefit_application_id
+  = f.hidden_field :benefit_sponsorship_id, value: f.object.benefit_sponsorship_id
+  /= f.fields_for :sponsored_benefit, f.object.sponsored_benefit, errors: {}, fieldset: false do |f|
+  = f.hidden_field :id, value: f.object.id if f.object.id.present?
+  = render "sponsored_benefit", f: f
+  = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
+  = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"

@@ -22,11 +22,11 @@
         #sponsorContributions.mt-1
           .col-xs-12.mb-1
             .col-xs-6.offered-heading
-              .text-uppercase.text-center 
+              .text-uppercase.text-center
                 | Offered
                 i.fas.fa-question-circle data-toggle='tooltip' title=offered_tool_tip_helper.html_safe
             .col-xs-6.offered-heading
-              .text-uppercase.text-center 
+              .text-uppercase.text-center
                 | Employer Contribution
                 i.fas.fa-question-circle data-toggle='tooltip' title=employer_contribution_tool_tip_helper.html_safe
           .col-xs-12
@@ -51,7 +51,7 @@
       #referencePlanEdit
         = f.hidden_field :reference_plan_id, value: f.object.reference_plan_id
         = render "./ui-components/v1/cards/reference_plan", f: f
-        i.fas.fa-info-circle.mr-1 
+        i.fas.fa-info-circle.mr-1
         | Your final monthly cost is based on final enrollment.
         br
         br
@@ -80,7 +80,7 @@ javascript:
 
   function showPlanSelection() {
     document.getElementById("edit_dental_form").classList.add('hidden');
-    var sponsored_benefit_id = `${form.sponsored_benefit_id}`
+    var sponsored_benefit_id = `${form.id}`
     var benefit_package_id = `${form.benefit_package_id}`
     var benefit_application_id = `${form.benefit_application_id}`
     var benefit_sponsorship_id = `${form.benefit_sponsorship_id}`
