@@ -3,11 +3,22 @@ import VueResource from 'vue-resource';
 
 import Vuetify from 'vuetify';
 import VueRouter from 'vue-router';
+import Vuex from 'vuex';
+
+import BootstrapVue from 'bootstrap-vue';
+
+
+
+Vue.use(Vuex)
 
 Vue.use(VueRouter);
 Vue.use(Vuetify);
 Vue.use(VueResource);
 
+Vue.use(BootstrapVue);
+
+// import 'bootstrap/dist/css/bootstrap.css'
+// import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
 
@@ -48,6 +59,17 @@ Vue.component('employer-employees-datatable', EmployerEmployeesDatatable);
 Vue.component('employer-benefits', EmployerBenefits);
 Vue.component('plan-year', EmployerPlanYear);
 
+
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  }
+})
 
 const routes = [
   { path: '/bqt', name: 'bqt', component: Bqt },
@@ -90,6 +112,7 @@ $(document).on('ready page:load', function () {
     console.log(props)
     var hbx = new Vue({
     el: '#hbx',
+    store,
     router: router,
     data: props,
     computed: {

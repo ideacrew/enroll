@@ -1,0 +1,12 @@
+<h1>Vue</h1>
+
+<% props = {
+  office_location_path: '/vue',
+  office_location_save_path: '/vue/save',
+  link: 'hbx'
+  }.to_json
+%>
+
+<div id="employee_match" data="<%= props %>">
+  <employee-match></employee-match>
+</div>
