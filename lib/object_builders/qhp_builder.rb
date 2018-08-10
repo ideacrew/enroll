@@ -46,8 +46,6 @@ class QhpBuilder
       "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
-    elsif file_path.include?("united")
-      "UnitedHealthcare"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
       "CareFirst"
     end
@@ -215,6 +213,7 @@ class QhpBuilder
               metal_level: parse_metal_level,
               market: parse_market,
               ehb: @qhp.ehb_percent_premium,
+              # carrier_profile_id: "53e67210eb899a460300000d",
               carrier_profile_id: carrier_profile_id,
               coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
               dental_level: @dental_metal_level,
@@ -233,7 +232,7 @@ class QhpBuilder
 
   def parse_metal_level
     return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
-    return @qhp.metal_level.downcase unless ["high","low"].include?(@qhp.metal_level.downcase)
+    return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
 
