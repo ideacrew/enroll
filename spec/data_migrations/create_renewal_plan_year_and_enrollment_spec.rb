@@ -43,7 +43,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
     context "when renewal_plan_year" do
 
       before(:each) do
-        allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+        allow(ENV).to receive(:[]).with("feins").and_return(organization.fein)
         allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year")
       end
 
@@ -59,7 +59,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
     context "when renewal_plan_year_passive_renewal" do
 
       before(:each) do
-        allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+        allow(ENV).to receive(:[]).with("feins").and_return(organization.fein)
         allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year_passive_renewal")
       end
 
