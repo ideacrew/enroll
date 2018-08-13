@@ -29,89 +29,137 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
   let(:coverage_household) { family.active_household.immediate_family_coverage_household }
   let(:employee_role) { person.active_employee_roles.first }
 
-  subject { EnrollmentShopping::EnrollmentBuilder.new(coverage_household, employee_role, coverage_kind) }
+  let(:enrollment_builder) { EnrollmentShopping::EnrollmentBuilder.new(coverage_household, employee_role, coverage_kind) }
 
   describe ".build_new_enrollment" do
 
-    context "when employee shopping for dental coverage" do
+    context "when employee shopping" do
 
       let(:coverage_kind) { 'dental' }
 
-      context "during open enrollment period" do
+      context "under open enrollment period, built dental enrollment" do
 
         let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
         let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
         let(:aasm_state) { :enrollment_open }
 
+        subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: effective_on) }
+
         it "should build a new dental enrollment" do
-
-          new_enrollment = subject.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: effective_on)
-
-          expect(new_enrollment.valid?).to be_truthy
-          expect(new_enrollment.coverage_kind).to eq 'dental'
-          expect(new_enrollment.effective_on).to eq effective_on
-          expect(new_enrollment.enrollment_kind).to eq 'open_enrollment'
-          expect(new_enrollment.hbx_enrollment_members).to be_present
-          expect(new_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-          expect(new_enrollment.sponsored_benefit_package).to eq current_benefit_package
-          expect(new_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          expect(dental_enrollment.valid?).to be_truthy
+          expect(dental_enrollment.coverage_kind).to eq 'dental'
+          expect(dental_enrollment.effective_on).to eq effective_on
+          expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
+          expect(dental_enrollment.hbx_enrollment_members).to be_present
+          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
+          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
+          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
         end
       end
 
-      context "during new hire enrollment period" do
+      context "under new hire enrollment period" do
 
-        it "should build a new dental enrollment" do
+        context "with past hired on date" do
 
+          let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+          let(:aasm_state) { :active }
+
+          let!(:ce) { 
+            census_employee = benefit_sponsorship.census_employees.non_business_owner.first
+            census_employee.update(hired_on: TimeKeeper.date_of_record - 2.years)
+            census_employee
+          } 
+
+          subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
+
+          it "should build a new dental enrollment with effective date same as plan year start date" do
+            expect(dental_enrollment.valid?).to be_truthy
+            expect(dental_enrollment.coverage_kind).to eq 'dental'
+            expect(dental_enrollment.effective_on).to eq start_on
+            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
+            expect(dental_enrollment.hbx_enrollment_members).to be_present
+            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          end
+        end
+
+        context "with current hired on date" do 
+          let(:hired_on) { TimeKeeper.date_of_record - 2.days }
+
+          let(:earliest_effective_on) { 
+            hired_on.mday == 1 ? hired_on : hired_on.next_month.beginning_of_month
+          }
+
+          let!(:ce) { 
+            census_employee = benefit_sponsorship.census_employees.non_business_owner.first
+            census_employee.update(hired_on: hired_on)
+            census_employee
+          } 
+
+          subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
+
+          it "should build a new dental enrollment with effective date beginning of next month" do
+            expect(dental_enrollment.valid?).to be_truthy
+            expect(dental_enrollment.coverage_kind).to eq 'dental'
+            expect(dental_enrollment.effective_on).to eq earliest_effective_on
+            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
+            expect(dental_enrollment.hbx_enrollment_members).to be_present
+            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          end
         end
       end
 
-      context "during special enrollment period" do
+      context "under special enrollment period" do
 
         let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
         let(:aasm_state) { :active }
-        let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, ) }
+        let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+        let(:qle_on) { TimeKeeper.date_of_record - 2.days }
 
-        let(:special_enrollment_period) {
-          special_enrollment = shop_family.special_enrollment_periods.build({
-            qle_on: qle_date,
-            effective_on_kind: "first_of_month",
+        let!(:special_enrollment_period) {
+          special_enrollment = family.special_enrollment_periods.build({
+            qle_on: qle_on,
+            effective_on_kind: "date_of_event",
             })
 
           special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
           special_enrollment.save!
           special_enrollment
         }
-        
-        it "should build a new dental enrollment" do
 
+        subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: true, optional_effective_on: nil) }
+
+        it "should build a new SEP dental enrollment with effective date matching QLE on date" do
+          expect(dental_enrollment.valid?).to be_truthy
+          expect(dental_enrollment.coverage_kind).to eq 'dental'
+          expect(dental_enrollment.effective_on).to eq qle_on
+          expect(dental_enrollment.enrollment_kind).to eq 'special_enrollment'
+          expect(dental_enrollment.hbx_enrollment_members).to be_present
+          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
+          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
+          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
         end
       end
     end
   end
 
-
   describe ".build_change_enrollment" do
     context "when employee making changes to dental coverage" do
-
       context "during open enrollment period" do
-        let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-        let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
-        let(:aasm_state) { :enrollment_open }
-
         it "should change dental enrollmet" do
-
         end
       end
 
       context "during new hire enrollment period" do
         it "should change dental enrollmet" do
-
         end
       end
 
       context "during special enrollment period" do
         it "should change dental enrollmet" do
-
         end
       end
     end 
