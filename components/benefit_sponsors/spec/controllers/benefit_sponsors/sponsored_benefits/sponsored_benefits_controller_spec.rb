@@ -154,9 +154,64 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   end
 
   describe "GET edit" do
+
+    let(:benefits_params) {
+      {
+          :kind => sponsored_benefit_kind,
+          :benefit_application_id => benefit_application.id,
+          :benefit_package_id => benefit_package.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
+          :product_option_choice => issuer_profile.legal_name,
+          :product_package_kind => product_package_kind,
+          :reference_plan_id => product.id.to_s,
+          :sponsor_contribution_attributes => sponsor_contribution_attributes
+      }
+    }
+
+    before :each do
+      sign_in user
+      sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_create(benefits_params)
+      allow(BenefitSponsors::Forms::SponsoredBenefitForm).to receive(:for_edit) { sponsored_benefit_form }
+      get :edit, id: sponsored_benefit_form.service.package.id, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, kind: sponsored_benefit_kind
+    end
+
+    it "should render edit template" do
+      expect(response).to render_template("edit")
+    end
+
+    it "should return http success" do
+      expect(response).to have_http_status(:success)
+    end
   end
 
   describe "POST update" do
+    let(:benefits_params) {
+      {
+          :kind => sponsored_benefit_kind,
+          :benefit_application_id => benefit_application.id,
+          :benefit_package_id => benefit_package.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
+          :product_option_choice => issuer_profile.legal_name,
+          :product_package_kind => product_package_kind,
+          :reference_plan_id => product.id.to_s,
+          :sponsor_contribution_attributes => sponsor_contribution_attributes
+      }
+    }
+
+    before :each do
+      sign_in user
+      @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_create(benefits_params)
+      allow_any_instance_of(BenefitSponsors::Forms::SponsoredBenefitForm).to receive(:update){true}
+      put :update, id: @sponsored_benefit_form.service.package.id, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, sponsored_benefits: sponsored_benefits_params
+    end
+
+    it "should have flash notice" do
+      expect(request.flash[:notice]).to_not be_nil
+    end
+
+    it "should redirect" do
+      expect(response).to be_redirect
+    end
   end
 
   describe "DELETE destroy" do
