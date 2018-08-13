@@ -16,8 +16,8 @@
         <% end %>
       <% end %>
       <%#= pundit_span EmployerProfile,:updateable? %>
-        <% if @benefit_applications.present? && @benefit_applications.published.blank? && !@employer_profile.draft_benefit_applications.present? %>
-        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
+        <% if @benefit_applications.present? && @benefit_applications.published.blank? && !@benefit_applications.any?{|app| app.is_renewing?} %>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block mt-1", data: {loading_text: "Loading..."}, onclick:"checkForDraftPlans(this)" %>
         <% end %>
       </span>
     </div>
@@ -256,10 +256,35 @@
       </h4>
       <br/>
       <%=pundit_span EmployerProfile, :updateable?%>
-        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."} %>
+        <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."}, id:'AddPlanYearBtn' %>
       </span>
   <% end %>
   </div>
 </div>
 
 <%= render "benefit_sponsors/profiles/employers/benefit_applications/claim_quote_modal" %>
+
+<script>
+  function checkForDraftPlans(element) {
+    if (true) {
+      event.preventDefault()
+      swal({
+        title: "Warning",
+        text: "If you choose to continue any previous draft/ineligible plan years will be canceled",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          window.location.href = "<%= new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship) %>"
+        } else {
+          // Do nothing user clicked cancel resets Add Plan Year button back to default state
+          element.innerHTML = "Add Plan Year";
+          element.classList.remove('disabled');
+          element.removeAttribute('disabled')
+        }
+      });
+    }
+  }
+</script>
