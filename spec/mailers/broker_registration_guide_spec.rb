@@ -8,7 +8,7 @@ RSpec.describe UserMailer do
     	expect(email.from).to match(["no-reply@shop.dchealthlink.com"])
     end
 
-    it 'should deliver to john' do
+    it 'should deliver to Broker' do
     	expect(email.to).to match(['Broker@test.com'])
     end
 
