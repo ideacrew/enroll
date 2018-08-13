@@ -348,5 +348,15 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
       end
     end
+    
+    context "broker request registration guide" do
+      before do
+        get :email_guide, {email:'Broker@test.com',first_name:'Broker'}
+      end
+      
+      it "should send Registration Guide to Broker@test.com" do
+        expect(flash[:notice]).to eq "A copy of the Broker Registration Guide has been emailed to Broker@test.com"
+      end
+    end
   end
 end
