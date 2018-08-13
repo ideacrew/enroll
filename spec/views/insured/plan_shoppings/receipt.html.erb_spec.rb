@@ -99,4 +99,32 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should not have cobra msg" do
     expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
+  
+  context "will have a Pay Now option for Kaiser Plans only" do
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:dob) { Date.new(1985, 4, 10) }
+    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
+    let(:family) { person.primary_family }
+    let(:household) { family.active_household }
+    let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let(:plan) { individual_plans.first }
+
+    let!(:hbx_enrollment) {
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
+    }
+    
+    before :each do
+      @enrollment = hbx_enrollment
+    end
+    
+    it "should not have a Pay now button" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
+    end
+
+    it "should have Pay Now option when Kaiser plan" do
+      render file: "insured/plan_shoppings/receipt.html.erb"
+      expect(rendered).to have_selector('button', text: /Pay Now/)
+    end
+  end
 end
