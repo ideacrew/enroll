@@ -611,8 +611,9 @@ module ApplicationHelper
     census_employee.new_hire_enrollment_period.present?
   end
 
-  def eligibility_criteria(employer)
-    if employer.show_plan_year.present?
+  def eligibility_criteria(resource)
+    employer = resource.try(:employer_profile)
+    if employer.present? && employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
       non_owner_participation_rule_text = non_owner_participation_rule(employer)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")

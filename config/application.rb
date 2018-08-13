@@ -66,6 +66,8 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::EmployeeEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeInitialEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeRenewalInvitationsSubscriber")
+      config.acapi.add_async_subscription("Notifier::NotificationSubscriber")
+
     end
   end
 end
