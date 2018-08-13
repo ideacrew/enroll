@@ -17,13 +17,13 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     end
 
     if hbx_enrollment.is_shop?
-      employee_role = gp.employee_roles.detect { |er| er.employer_profile_id == hbx_enrollment.employee_role.employer_profile.id}
+      employee_role = gp.employee_roles.detect { |er| er.benefit_sponsors_employer_profile_id == hbx_enrollment.employee_role.employer_profile.id}
       if employee_role.blank?
         puts "New person don't have ER sponsored benefits related to Enrollment" unless Rails.env.test?
         return
       end
 
-      benefit_group_assignment = employee_role.census_employee.benefit_group_assignments.detect { |bga| bga.benefit_group_id == hbx_enrollment.benefit_group_id}
+      benefit_group_assignment = employee_role.census_employee.benefit_group_assignments.detect { |bga| bga.benefit_package_id == hbx_enrollment.sponsored_benefit_package_id}
       if benefit_group_assignment.blank?
         puts "No Benefit Group Assignment Found" unless Rails.env.test?
         return
