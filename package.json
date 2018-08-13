@@ -8,7 +8,8 @@
     "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.5.16",
     "vue-turbolinks": "^2.0.3",
-    "vuetify": "^1.1.9"
+    "vuetify": "^1.1.9",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "webpack-dev-server": "2.11.2"
