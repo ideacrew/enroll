@@ -981,6 +981,7 @@ class HbxEnrollment
       raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
     end
 
+    census_employee = employee_role.census_employee
     benefit_group_assignment = if plan_year.is_renewing?
       census_employee.renewal_benefit_group_assignment
     else
