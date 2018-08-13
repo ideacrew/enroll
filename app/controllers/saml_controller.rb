@@ -91,6 +91,10 @@ class SamlController < ApplicationController
     redirect_to SamlInformation.saml_logout_url
   end
 
+  def idp_logout_request
+    settings = saml_settings
+    logout_response = ::OneLogin::RubySaml::HelloResponse.new.create(settings, "1234", nil, :RelayState => "1234")
+  end
   private
 
   def saml_settings
