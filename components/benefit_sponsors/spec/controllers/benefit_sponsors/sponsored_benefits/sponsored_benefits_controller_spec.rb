@@ -25,6 +25,47 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind, product_kind: sponsored_benefit_kind).first }
   let(:product) { product_package.products.first }
 
+  let(:benefits_params) {
+    {
+        :kind => sponsored_benefit_kind,
+        :benefit_application_id => benefit_application.id,
+        :benefit_package_id => benefit_package.id,
+        :benefit_sponsorship_id => benefit_sponsorship.id,
+        :sponsored_benefit_attributes => sponsored_benefits_params
+    }
+  }
+
+  let(:sponsored_benefits_params) {
+    {
+        :sponsor_contribution_attributes => sponsor_contribution_attributes,
+        :product_package_kind => product_package_kind,
+        :kind => sponsored_benefit_kind,
+        :product_option_choice => issuer_profile.legal_name,
+        :reference_plan_id => product.id.to_s
+    }
+  }
+
+  let(:sponsor_contribution_attributes) {
+    {
+        :contribution_levels_attributes => contribution_levels_attributes
+    }
+  }
+
+  let(:contribution_levels_attributes) {
+    {
+      "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
+      "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
+      "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
+      "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
+    }
+  }
+
+  let(:contribution_model) { product_package.contribution_model }
+
+  let(:employee_contribution_unit) { contribution_model.contribution_units.where(order: 0).first }
+  let(:spouse_contribution_unit) { contribution_model.contribution_units.where(order: 1).first }
+  let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
+  let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
 
   describe "GET new", dbclean: :after_each do
 
@@ -55,53 +96,13 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   end
 
   describe "POST create", dbclean: :after_each do
-    let(:benefits_params) {
-      {
-        :kind => sponsored_benefit_kind,
-        :benefit_package_id => benefit_package.id,
-        :benefit_sponsorship_id => benefit_sponsorship.id,
-        :sponsored_benefit_attributes => sponsored_benefits_params
-      }
-    }
-
-    let(:sponsored_benefits_params) {
-      {
-        :sponsor_contribution_attributes => sponsor_contribution_attributes,
-        :product_package_kind => product_package_kind,
-        :kind => sponsored_benefit_kind,
-        :product_option_choice => issuer_profile.legal_name,
-        :reference_plan_id => product.id.to_s
-      }
-    }
-
-    let(:sponsor_contribution_attributes) {
-      {
-      :contribution_levels_attributes => contribution_levels_attributes
-      }
-    }
-
-    let(:contribution_levels_attributes) {
-      {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
-        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
-        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
-      }
-    }
-
-    let(:contribution_model) { product_package.contribution_model }
-
-    let(:employee_contribution_unit) { contribution_model.contribution_units.where(order: 0).first }
-    let(:spouse_contribution_unit) { contribution_model.contribution_units.where(order: 1).first }
-    let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
-    let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
 
     context "when a user having right permissions signed in" do
 
       before :each do
         # benefit_application.update(benefit_sponsor_catalog_id: benefit_market_catalog.id)
         sign_in user
-        post :create, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, benefits: benefits_params
+        post :create, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, sponsored_benefits: sponsored_benefits_params
       end
 
       it "should redirect" do
@@ -120,6 +121,38 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
     end
   end
 
+  describe "GET change_reference_product", dbclean: :after_each do
+
+    let(:benefits_params) {
+      {
+          :kind => sponsored_benefit_kind,
+          :benefit_application_id => benefit_application.id,
+          :benefit_package_id => benefit_package.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
+          :product_option_choice => issuer_profile.legal_name,
+          :product_package_kind => product_package_kind,
+          :reference_plan_id => product.id.to_s,
+          :sponsor_contribution_attributes => sponsor_contribution_attributes
+      }
+    }
+
+    context "when a user having right permissions signed in" do
+      before :each do
+        sign_in user
+        sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_create(benefits_params)
+        xhr :get, :change_reference_product, id: sponsored_benefit_form.service.package.id, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, kind: sponsored_benefit_kind
+      end
+
+      it "should render change_reference_product template" do
+        expect(response).to render_template("change_reference_product")
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
   describe "GET edit" do
   end
 
@@ -127,5 +160,5 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   end
 
   describe "DELETE destroy" do
-  end   
+  end
 end
