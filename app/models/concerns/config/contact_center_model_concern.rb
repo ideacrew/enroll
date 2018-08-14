@@ -12,7 +12,6 @@ module Config::ContactCenterModelConcern
     end
 
     def contact_center_phone_number
-      binding.pry
       @contact_center_phone_number ||= Settings.contact_center.phone_number
     end
   end

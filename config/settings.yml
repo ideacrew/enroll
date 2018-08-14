@@ -26,6 +26,24 @@ contact_center:
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
+notices:
+  mailing_address:
+    address_1:
+    address_2:
+    city:
+    state: "DC"
+    zip:
+
+  shop:
+    attachments:
+      non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
+      envelope_without_address: "taglines.pdf"
+      employee_appeal_rights: "employee_appeal_rights.pdf"
+    partials:
+      template: "notifier/notice_kinds/template.html.erb"
+      header: "notices/shared/shop_header.html.erb"
+      footer: "notices/shared/shop_footer.html.erb"
+
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
@@ -46,6 +64,9 @@ aca:
     open_enrollment:
       start_on: <%= Date.new(2017,11,1) %>
       end_on: <%= Date.new(2018,02,05) %>
+    upcoming_open_enrollment:
+      start_on: <%= Date.new(2018,11,1) %>
+      end_on: <%= Date.new(2019,01,31) %>
 
   shop_market:
     small_market_employee_count_maximum: 50
