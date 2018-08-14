@@ -626,7 +626,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
-  describe 'GET create_eligibility' do
+  describe 'GET new_eligibility' do
     let(:person) { FactoryGirl.create(:person, :with_family) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
@@ -638,26 +638,26 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
        format: 'js'}
     end
 
-    it "should render the create_eligibility partial" do
+    it "should render the new_eligibility partial" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      xhr :get, :create_eligibility, params
+      xhr :get, :new_eligibility, params
 
       expect(response).to have_http_status(:success)
-      expect(response).to render_template('create_eligibility')
+      expect(response).to render_template('new_eligibility')
     end
 
     context 'when can_add_pdc permission is not given' do
-      it "should not render the create_eligibility partial" do
+      it "should not render the new_eligibility partial" do
         sign_in(user)
-        xhr :get, :create_eligibility, params
+        xhr :get, :new_eligibility, params
 
-        expect(response).not_to render_template('create_eligibility')
+        expect(response).not_to render_template('new_eligibility')
       end
     end
   end
 
-  describe 'POST update_tax_household_eligibility' do
+  describe 'POST create_eligibility' do
     let(:person) { FactoryGirl.create(:person, :with_family) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
@@ -679,9 +679,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       }}
     end
 
-    it "should render update_tax_household_eligibility if save successful" do
+    it "should render create_eligibility if save successful" do
       sign_in(user)
-      xhr :get, :update_tax_household_eligibility, params
+      xhr :get, :create_eligibility, params
       active_household = person.primary_family.active_household
       latest_active_thh = active_household.reload.latest_active_thh
       eligibility_deter = latest_active_thh.eligibility_determinations.first

@@ -4,7 +4,7 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
   include ApplicationHelper
 
-  PDC_TYPES = [['Assisted','is_ia_eligible'],['Medicaid','is_medicaid_chip_eligible']].freeze
+  PDC_TYPES = [['Assisted','is_ia_eligible'], ['Medicaid','is_medicaid_chip_eligible'], ['Totally Ineligible','is_totally_ineligible'], ['UQHP','is_uqhp_eligible']].freeze
 
   embedded_in :tax_household
   embeds_many :financial_statements
@@ -12,10 +12,12 @@ class TaxHouseholdMember
   field :applicant_id, type: BSON::ObjectId
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
+  field :is_totally_ineligible, type: Boolean, default: false
+  field :is_uqhp_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
   field :reason, type: String
 
-  validate :strictly_boolean
+  validate :strictly_boolean, :strictly_one_pdc_only
 
   def eligibility_determinations
     return nil unless tax_household
@@ -65,6 +67,10 @@ class TaxHouseholdMember
     unless is_subscriber.is_a? Boolean
       self.errors.add(:base, "is_subscriber should be a boolean")
     end
+  end
+
+  def strictly_one_pdc_only
+    errors.add(:base, 'only one of the all pdcs should be a true value') unless [is_ia_eligible, is_medicaid_chip_eligible, is_totally_ineligible, is_uqhp_eligible].count(true) == 1
   end
 
   def person

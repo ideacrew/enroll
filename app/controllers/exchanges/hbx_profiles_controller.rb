@@ -549,41 +549,22 @@ def employer_poc
     end
   end
 
-  def create_eligibility
+  def new_eligibility
     authorize HbxProfile, :can_add_pdc?
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     respond_to do |format|
-      format.js { render "create_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
+      format.js { render "new_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
     end
   end
 
-  def update_tax_household_eligibility
+  def create_eligibility
     @element_to_replace_id = params[:person][:family_actions_id]
-    @person = Person.find(params[:person][:person_id])
-    @primary_family = @person.primary_family
-    effective_date = params[:person][:effective_date].to_date
-    slcsp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
-    @active_household = @primary_family.active_household
-    @active_household.build_thh_and_eligibility(params[:person][:max_aptc], params[:person][:csr], effective_date, slcsp)
-    update_eligibility_kinds
-  end
+    person = Person.find(params[:person][:person_id])
+    return nil unless person.present?
 
-  def update_eligibility_kinds
-    family_members = @primary_family.family_members
-    latest_active_thh = @active_household.latest_active_thh
-    tax_household_members = latest_active_thh.tax_household_members
-    return unless latest_active_thh.present?
-
-    return unless params[:person][:family_members].present?
-
-    params[:person][:family_members].each do |person_hbx_id, value|
-      person = Person.by_hbx_id(person_hbx_id).first
-      family_member = family_members.where(person_id: person.id).first
-      tax_household_member = tax_household_members.where(applicant_id: family_member.id).first
-      tax_household_member.update_attribute(:reason, value['reason'])
-      tax_household_member.update_eligibility_kinds(eligibility_kinds_hash(value))
-    end
+    household = person.primary_family.active_household
+    household.create_new_tax_household(params[:person])
   end
 
   def eligibility_kinds_hash(value)
