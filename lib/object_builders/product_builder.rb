@@ -21,7 +21,7 @@ class ProductBuilder
     @xml_plan_counter, @success_plan_counter = 0,0
     @existing_qhp_counter = 0
     iterate_plans
-    show_qhp_stats
+    show_qhp_stats unless Rails.env.test?
   end
 
   def iterate_plans
