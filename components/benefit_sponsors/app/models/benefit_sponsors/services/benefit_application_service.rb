@@ -35,7 +35,20 @@ module BenefitSponsors
         find_benefit_sponsorship(form)
         benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
 
-        store(form, benefit_application)
+        save_result, persisted_object = store(form, benefit_application)
+        if save_result
+          cancel_draft_and_ineligible_applications(persisted_object)
+        end
+        [save_result, persisted_object]
+      end
+
+      def cancel_draft_and_ineligible_applications(benefit_application)
+        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft.select{|existing_application| existing_application != benefit_application}
+        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
+
+        applications_for_cancel.each do |application|
+          application.cancel! if application.may_cancel?
+        end
       end
 
       def revert(form)
@@ -144,6 +157,7 @@ module BenefitSponsors
           map_errors_for(benefit_application, onto: form)
           return [false, nil]
         end
+
         [true, benefit_application]
       end
 

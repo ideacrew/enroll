@@ -590,11 +590,12 @@ module BenefitSponsors
       when :expired
         cancel! if may_cancel?
       when :canceled
-        cancel! if (may_cancel? && aasm.current_event == :activate_enrollment!)
+        if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
+          cancel! if may_cancel?
+        end
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       end
-
     end
 
     def is_conversion?

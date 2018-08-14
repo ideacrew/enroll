@@ -12,6 +12,7 @@
       |  have enrolled or waived coverage 
       - if @current_plan_year.start_on.to_date.month != 1
         - if TimeKeeper.date_of_record.to_date <= @current_plan_year.open_enrollment_end_on.to_date
+          br
           strong = @current_plan_year.additional_required_participants_count.to_i
           |  or more needed by 
           = @current_plan_year.open_enrollment_end_on.to_date.to_formatted_s :long_ordinal 
