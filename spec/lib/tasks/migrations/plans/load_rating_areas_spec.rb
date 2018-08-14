@@ -34,10 +34,11 @@ describe 'load_rate_reference:update_rating_areas' do
       run_rake_task
       expect(RatingArea.all.count).to eq 40
       expect(BenefitMarkets::Locations::RatingArea.all.count).to eq 7
+      binding.pry
     end
 
     context "match attributes for old model" do
-      subject { RatingArea.first }
+      subject { RatingArea.all.where(zip_code: "01001", county_name: "Hampden", rating_area: "R-MA001").first }
       it { is_expected.to have_attributes(zip_code: "01001") }
       it { is_expected.to have_attributes(county_name: "Hampden") }
       it { is_expected.to have_attributes(zip_code_in_multiple_counties: false) }
@@ -45,7 +46,7 @@ describe 'load_rate_reference:update_rating_areas' do
     end
 
     context "match attributes for new model" do
-      subject { BenefitMarkets::Locations::RatingArea.all.first }
+      subject { BenefitMarkets::Locations::RatingArea.all.where(exchange_provided_code: "R-MA001").first }
       it { is_expected.to have_attributes(exchange_provided_code: "R-MA001") }
     end
   end
