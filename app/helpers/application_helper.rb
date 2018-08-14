@@ -612,6 +612,7 @@ module ApplicationHelper
   end
 
   def eligibility_criteria(resource)
+    return if resource.is_a?(Notifier::NoticeKind)
     employer = resource.try(:employer_profile)
     if employer.present? && employer.show_plan_year.present?
       participation_rule_text = participation_rule(employer)
