@@ -1046,10 +1046,6 @@ class ConsumerRole
     dhs_pending? || ssa_pending?
   end
 
-  def processing_residency_24h?
-    return false if self.residency_determined_at.nil?
-    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
-  end
 
   def sensitive_information_changed(field, person_params)
     if field == "dob"

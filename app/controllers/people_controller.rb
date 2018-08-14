@@ -200,7 +200,6 @@ class PeopleController < ApplicationController
     else
       redirect_path = family_account_path
     end
-
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
 
     respond_to do |format|

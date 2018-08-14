@@ -710,26 +710,7 @@ describe "#find_document" do
   end
 end
 
-describe "#processing_residency_24h?" do
-  let(:consumer_role) {ConsumerRole.new}
 
-  it "returns false if residency determined at attribute is nil" do
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq false
-  end
-
-  it "returns true if called residency hub today and state resident is nil" do
-    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now)
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq true
-  end
-
-  it "returns false if residency is already determined in past and state resident is nil" do
-    consumer_role.update_attributes(is_state_resident: nil, residency_determined_at: DateTime.now - 2.day)
-    subject = consumer_role.send(:processing_residency_24h?)
-    expect(subject).to eq false
-  end
-end
 
 describe "#find_vlp_document_by_key" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
