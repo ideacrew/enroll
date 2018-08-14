@@ -767,6 +767,14 @@ end
       render
     end
 
+    def expect_error_message(member_element, selector)
+      expect(member_element).to have_selector(selector, text: "This dependent is ineligible for employer-sponsored  coverage")
+    end
+
+    def expect_no_error_message(member_element, selector)
+      expect(member_element).not_to have_selector(selector, text: "This dependent is ineligible for employer-sponsored  coverage")
+    end
+
     it 'renders the form for a new enrollment creation' do
       expect(rendered).to have_selector('form#group-selection-form')
     end
@@ -779,14 +787,6 @@ end
       doc = Nokogiri::HTML(rendered)
       member_elements = doc.css("div#coverage-household table tr")
 
-      member_error_matcher = Proc.new  do |member_element, coverage_kind, ineligble|
-        if ineligble
-          expect(member_element).to have_selector("td.#{coverage_kind}_errors_1", text: "This dependent is ineligible for employer-sponsored  coverage")
-        else
-          expect(member_element).not_to have_selector("td.#{coverage_kind}_errors_1", text: "This dependent is ineligible for employer-sponsored  coverage")
-        end
-      end
-
       coverage_household.coverage_household_members.each_with_index do |coverage_household_member, index|
         family_member  = coverage_household_member.family_member
         member_element = member_elements[index]
@@ -798,9 +798,9 @@ end
         else
           expect(member_element).not_to have_selector('.is_primary')
         end
-        
-        member_error_matcher.call(member_element, :health, family_member.health_ineligible?)
-        member_error_matcher.call(member_element, :dental, family_member.dental_ineligible?)
+
+        family_member.health_ineligible? ? expect_error_message(member_element, "td.health_errors_1") : expect_no_error_message(member_element, "td.health_errors_1")
+        family_member.dental_ineligible? ? expect_error_message(member_element, "td.dental_errors_1") : expect_no_error_message(member_element, "td.dental_errors_1")
       end
     end
 
