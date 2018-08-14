@@ -57,16 +57,7 @@ class ProductBuilder
     begin
       if !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
         associate_product_with_qhp
-        existing_qhp = Products::Qhp.where(
-          standard_component_id: @qhp.standard_component_id.strip,
-          active_year: @qhp.active_year
-          ).first
         @qhp.save!
-        if existing_qhp.present?
-          @existing_qhp_counter += 1
-        else
-          @success_plan_counter += 1
-        end
       end
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.standard_component_id} \n"
     rescue Exception => e
@@ -117,6 +108,7 @@ class ProductBuilder
         end.merge(shared_attributes)
 
         if product.present?
+          @existing_qhp_counter += 1
           product.update_attributes(all_attributes)
         else
           new_product = if is_health_product?
@@ -126,6 +118,7 @@ class ProductBuilder
           end
           if new_product.valid?
             new_product.save!
+            @success_plan_counter += 1
             cost_share_variance.product_id = new_product.id
           else
             @logger.error "\n Failed to create product: #{new_product.title}, \n hios product id: #{new_product.hios_id}\n Errors: #{new_product.errors.full_messages}\n ******************** \n"
