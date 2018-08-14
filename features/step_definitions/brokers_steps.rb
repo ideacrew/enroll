@@ -41,7 +41,7 @@ And(/^.+ enters broker agency information$/) do
 end
 
 And(/^.+ clicks? on Create Broker Agency$/) do
-  click_button "Create Broker Agency"
+  click_button "Submit"
 end
 
 Then(/^.+ should see broker registration successful message$/) do
