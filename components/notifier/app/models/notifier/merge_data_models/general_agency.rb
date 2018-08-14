@@ -44,12 +44,28 @@ module Notifier
       []
     end
 
+    def primary_address
+      mailing_address
+    end
+
     def shop?
       true
     end
 
     def employee_notice?
       false
+    end
+
+    def general_agency?
+      true
+    end
+
+    def broker?
+      false
+    end
+
+    def broker_present?
+      self.broker.present?
     end
   end
 end
