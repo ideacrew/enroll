@@ -64,6 +64,14 @@ namespace :load_rating_factors do
               ::BenefitMarkets::Products::ActuarialFactors::CompositeRatingTierActuarialFactor
             end
 
+            existing_record = obj.where(
+              active_year: @year,
+              default_factor_value: RATING_FACTOR_DEFAULT,
+              issuer_profile_id: issuer_profile_id,
+              max_integer_factor_key: max_integer_factor_key
+            )
+            next if existing_record.count > 0
+
             obj.new(
               active_year: @year,
               default_factor_value: RATING_FACTOR_DEFAULT,
@@ -127,7 +135,7 @@ namespace :load_rating_factors do
         RATING_FACTOR_PAGES.each do |rating_factor_class, sheet_info|
           rating_factor_set = Object.const_get(rating_factor_class)
           ## WARNING THIS DESTROYS ALL CURRENT YEAR FACTOR SETS
-          rating_factor_set.where(active_year: @year).destroy_all
+          rating_factor_set.where(active_year: @year).destroy_all if Rails.env.test?
           sheet = xlsx.sheet(sheet_info[:page])
           max_integer_factor_key = sheet_info[:max_integer_factor_key]
           (2..number_of_carriers + 1).each do |carrier_column|
@@ -139,6 +147,16 @@ namespace :load_rating_factors do
 
               if organization.present?
                 carrier_profile = organization.carrier_profile
+
+
+                existing_record = rating_factor_set.where(
+                  active_year: @year,
+                  carrier_profile_id: carrier_profile.id.to_s,
+                  default_factor_value: RATING_FACTOR_DEFAULT,
+                  max_integer_factor_key: max_integer_factor_key
+                )
+                next if existing_record.count > 0
+
                 rating_factor_set.new(active_year: @year,
                   carrier_profile: carrier_profile,
                   default_factor_value: RATING_FACTOR_DEFAULT,

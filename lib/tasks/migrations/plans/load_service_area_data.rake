@@ -3,7 +3,7 @@ namespace :load_service_reference do
   task :run_all_service_areas => :environment do
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
     puts "*"*80 unless Rails.env.test?
-    CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
+    # CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
       # old model
@@ -109,23 +109,33 @@ namespace :load_service_reference do
         serves_partial_county = to_boolean(to_boolean(sheet.cell(i,5)))
 
         if serves_entire_state
-          CarrierServiceArea.create!(
+          csa = CarrierServiceArea.where(
             active_year: @year,
             issuer_hios_id: hios_id,
             service_area_id: sheet.cell(i,1),
             service_area_name: sheet.cell(i,2),
-            serves_entire_state: true,
-            county_name: nil,
-            county_code: nil,
-            state_code: nil,
-            service_area_zipcode: nil,
-            partial_county_justification: nil
-          )
-          count = count + 1
+            serves_entire_state: true
+          ).first
+          if csa.present?
+          else
+            CarrierServiceArea.create!(
+              active_year: @year,
+              issuer_hios_id: hios_id,
+              service_area_id: sheet.cell(i,1),
+              service_area_name: sheet.cell(i,2),
+              serves_entire_state: true,
+              county_name: nil,
+              county_code: nil,
+              state_code: nil,
+              service_area_zipcode: nil,
+              partial_county_justification: nil
+            )
+            count = count + 1
+          end
         elsif serves_partial_county
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
           extracted_zip_codes(sheet.cell(i,6)).each do |zip|
-            CarrierServiceArea.create!(
+            csa_1 = CarrierServiceArea.where(
               active_year: @year,
               issuer_hios_id: hios_id,
               service_area_id: sheet.cell(i,1),
@@ -136,13 +146,28 @@ namespace :load_service_reference do
               state_code: state_code,
               service_area_zipcode: zip,
               partial_county_justification: sheet.cell(i,7)
-            )
-            count = count + 1
+            ).first
+            if csa_1.present?
+            else
+              CarrierServiceArea.create!(
+                active_year: @year,
+                issuer_hios_id: hios_id,
+                service_area_id: sheet.cell(i,1),
+                service_area_name: sheet.cell(i,2),
+                serves_entire_state: false,
+                county_name: county_name,
+                county_code: county_code,
+                state_code: state_code,
+                service_area_zipcode: zip,
+                partial_county_justification: sheet.cell(i,7)
+              )
+              count = count + 1
+            end
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
-            RatingArea.find_zip_codes_for(county_name: county_name).each do |zip|
-              CarrierServiceArea.create!(
+          RatingArea.find_zip_codes_for(county_name: county_name).each do |zip|
+            csa_2 = CarrierServiceArea.where(
               active_year: @year,
               issuer_hios_id: hios_id,
               service_area_id: sheet.cell(i,1),
@@ -153,8 +178,23 @@ namespace :load_service_reference do
               state_code: state_code,
               service_area_zipcode: zip,
               partial_county_justification: nil
-            )
-            count = count + 1
+            ).first
+            if csa_2.present?
+            else
+              CarrierServiceArea.create!(
+                active_year: @year,
+                issuer_hios_id: hios_id,
+                service_area_id: sheet.cell(i,1),
+                service_area_name: sheet.cell(i,2),
+                serves_entire_state: false,
+                county_name: county_name,
+                county_code: county_code,
+                state_code: state_code,
+                service_area_zipcode: zip,
+                partial_county_justification: nil
+              )
+              count = count + 1
+            end
           end
         end
       end
