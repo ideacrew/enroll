@@ -4,7 +4,7 @@ module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::UpdateBrokerAgencyService, type: :model, :dbclean => :after_each do
     let(:params) {
       {
-          :fein => broker_agency_profile.fein
+          :legal_name => broker_agency_profile.legal_name
       }
     }
     let(:service_class) { BenefitSponsors::Services::UpdateBrokerAgencyService }
@@ -13,7 +13,7 @@ module BenefitSponsors
     describe "#new" do
       let(:service_obj) { service_class.new(params)}
       it "should instantiate" do
-        expect(service_obj.fein).to eq broker_agency_profile.fein
+        expect(service_obj.legal_name).to eq broker_agency_profile.legal_name
         expect(service_obj.broker_agency).to eq broker_agency_profile
       end
     end

@@ -2,12 +2,11 @@ module BenefitSponsors
   module Services
     class UpdateBrokerAgencyService
 
-      attr_accessor :broker_agency, :corporate_npn, :fein
+      attr_accessor :broker_agency, :legal_name
 
       def initialize(options={})
-        @fein = options[:fein]
-        @broker_agency = find_broker_agency(@fein)
-        @corporate_npn = options[:corporate_npn] || @broker_agency.corporate_npn
+        @legal_name = options[:legal_name]
+        @broker_agency = find_broker_agency(@legal_name)
       end
 
       def update_broker_profile_id(attr={})
@@ -66,9 +65,9 @@ module BenefitSponsors
 
       private
 
-       def find_broker_agency(fein)
-         organization = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(fein: fein).first
-         raise "organizational broker agency profile do not exist with fein #{fein}" unless organization
+       def find_broker_agency(legal_name)
+         organization = BenefitSponsors::Organizations::Organization.broker_agency_profiles.where(legal_name: legal_name).first
+         raise "organizational broker agency profile do not exist with fein #{legal_name}" unless organization
          organization.broker_agency_profile
        end
 

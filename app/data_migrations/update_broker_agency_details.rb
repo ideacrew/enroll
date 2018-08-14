@@ -5,17 +5,11 @@ class UpdateBrokerAgencyProfile < MongoidMigrationTask
   def migrate
     action = ENV['action'].to_s
     @logger = Logger.new(STDOUT)
-    exist_fein = ENV['exist_fein'].to_s
+    legal_name = ENV['legal_name'].to_s
 
-    service = BenefitSponsors::Services::UpdateBrokerAgencyService.new({fein: exist_fein})
+    service = BenefitSponsors::Services::UpdateBrokerAgencyService.new({legal_name: legal_name})
 
     case action
-
-    when "update_fein"
-      new_fein = ENV['new_fein'].to_s
-      @logger.info "Trying to update fein from #{exist_fein} to #{new_fein}"
-      service.update_organization_attributes({fein: new_fein})
-      @logger.info "Updated to fein #{new_fein}"
 
     when "corporate_npn"
       new_npn = ENV['corporate_npn'].to_s
