@@ -648,9 +648,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response).to render_template('new_eligibility')
     end
 
-    #TODO: fix me when create eligibility feature is merged and working.
     context 'when can_add_pdc permission is not given' do
-      xit 'should not render the new_eligibility partial' do
+      it 'should not render the new_eligibility partial' do
         sign_in(user)
         get :new_eligibility, params: params, xhr: true, format: :js
 
