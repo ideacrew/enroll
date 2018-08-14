@@ -51,6 +51,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
           expect(dental_enrollment.effective_on).to eq effective_on
           expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
           expect(dental_enrollment.hbx_enrollment_members).to be_present
+          expect(dental_enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
           expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
           expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
           expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
@@ -273,6 +274,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
           expect(dental_enrollment.effective_on).to eq previous_enrollment.effective_on
           expect(dental_enrollment.enrollment_kind).to eq 'special_enrollment'
           expect(dental_enrollment.hbx_enrollment_members).to be_present
+          expect(dental_enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
           expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
           expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
           expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
