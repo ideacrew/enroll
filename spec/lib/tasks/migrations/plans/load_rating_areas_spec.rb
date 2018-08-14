@@ -34,7 +34,6 @@ describe 'load_rate_reference:update_rating_areas' do
       run_rake_task
       expect(RatingArea.all.count).to eq 40
       expect(BenefitMarkets::Locations::RatingArea.all.count).to eq 7
-      binding.pry
     end
 
     context "match attributes for old model" do
