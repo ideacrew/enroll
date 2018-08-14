@@ -20,7 +20,7 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def outstanding_types(person)
-    person.verification_types.find_all do |type|
+    person.verification_types.active.find_all do |type|
       type.is_type_outstanding?
     end
   end
@@ -70,7 +70,7 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def people
-    Person.where(:"consumer_role.aasm_state" => "verification_outstanding")
+    Person.where(:"verification_types.validation_status" => "outstanding")
   end
 
   def migrate
