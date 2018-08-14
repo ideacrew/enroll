@@ -412,7 +412,7 @@ class Household
       submitted_at: TimeKeeper.datetime_of_record
     )
 
-    th.eligibility_determinations.build(
+    determination = th.eligibility_determinations.build(
       source: "Admin_Script",
       benchmark_plan_id: slcsp,
       max_aptc: params["max_aptc"].to_f,
@@ -433,7 +433,7 @@ class Household
 
     save!
     th.save!
-    th.eligibility_determinations[0].save!
+    determination.save!
     th.tax_household_members.each(&:save!)
   end
 end
