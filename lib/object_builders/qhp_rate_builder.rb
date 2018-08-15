@@ -90,9 +90,11 @@ class QhpRateBuilder
   def find_product_and_create_premium_tables
     @results_array.uniq.each do |value|
       hios_id, year = value.split(",")
-      product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year.to_s == year.to_s}
-      product.premium_tables = nil
-      product.save
+      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year.to_s == year.to_s}
+      products.each do |product|
+        product.premium_tables = nil
+        product.save
+      end
     end
     @premium_table_cache.each_pair do |k, v|
       product_hios_id, rating_area_id, applicable_range = k
