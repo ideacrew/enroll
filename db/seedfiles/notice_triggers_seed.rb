@@ -68,7 +68,7 @@ shop_notice_triggers = [
     title: 'Employer Approval Notice',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
-    event_name: 'initial_employer_approval',
+    event_name: 'initial_application_submitted',
     notice_triggers: [
       {
         name: 'Initial Employer SHOP Approval Notice',

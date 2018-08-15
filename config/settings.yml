@@ -88,6 +88,7 @@ aca:
       days: -60
 
     initial_application:
+      advertised_deadline_of_month: 1
       publish_due_day_of_month: 5
       earliest_start_prior_to_effective_on:
         months: -3
@@ -99,6 +100,7 @@ aca:
       quiet_period_end_on: 28
 
     renewal_application:
+      application_submission_soft_deadline: 5
       earliest_start_prior_to_effective_on:
         months: -3
       monthly_open_enrollment_end_on: 13
