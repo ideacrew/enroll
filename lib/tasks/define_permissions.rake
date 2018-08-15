@@ -42,12 +42,12 @@ namespace :permissions do
 end
 
 namespace :permissions do
-  desc 'hbx admin can view new consumer application link tab'
+  desc 'hbx admin and csr view new consumer application link tab'
   DefinePermissions.define_task :hbx_admin_can_access_new_consumer_application_sub_tab => :environment
 end
 
 namespace :permissions do
-  desc 'hbx admin can view identity verification link tab'
+  desc 'hbx admin and csr view identity verification link tab'
   DefinePermissions.define_task :hbx_admin_can_access_identity_verification_sub_tab => :environment
 end
 
@@ -56,7 +56,20 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can access accept reject identity documents'
+  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_identity_documents => :environment
+end
 
+namespace :permissions do
+  desc 'hbx admin and all csr access accept reject paper application documents'
+  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_paper_application_documents => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can delete identity and paper application documents'
+  DefinePermissions.define_task :hbx_admin_can_delete_identity_application_documents => :environment
+end
 
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
@@ -64,7 +77,11 @@ end
 #rake permissions:hbx_admin_can_complete_resident_application
 
 #rake permissions:hbx_admin_can_view_application_types
+#rake permissions:hbx_admin_csr_view_personal_info_page
 #rake permissions:hbx_admin_can_access_new_consumer_application_sub_tab
 #rake permissions:hbx_admin_can_access_identity_verification_sub_tab
 #rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
+#rake permissions:hbx_admin_can_access_accept_reject_identity_documents
+#rake permissions:hbx_admin_can_access_accept_reject_paper_application_documents
+#rake permissions:hbx_admin_can_delete_identity_application_documents
 
