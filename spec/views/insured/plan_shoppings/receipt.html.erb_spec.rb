@@ -125,6 +125,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       carrier_profile.legal_name = "Kaiser"
       render file: "insured/plan_shoppings/receipt.html.erb"
       expect(rendered).to have_selector('button', text: /Pay Now/)
+      expect(rendered).to have_selector('div.modal#payNowModal')
     end
   end
 end
