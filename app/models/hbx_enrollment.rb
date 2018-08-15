@@ -1627,12 +1627,6 @@ class HbxEnrollment
     sponsored_benefit.single_plan_type?
   end
 
-  def rating_area
-    return nil unless is_shop?
-    return nil if benefit_group_id.blank?
-    benefit_group.rating_area
-  end
-
   # def ee_plan_selection_confirmation_sep_new_hire
   #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
   #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
