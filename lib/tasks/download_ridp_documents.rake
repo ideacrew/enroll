@@ -12,7 +12,7 @@ namespace :reports do
                                     )
 
         person.consumer_role.ridp_documents.each do |document|
-          file_path = "ridp_documents/#{document.ridp_verification_type}_#{document.created_at.strftime("%Y-%m-%d")}"
+          file_path = "ridp_documents/#{document.ridp_verification_type}_#{document.title}"
           dirname = File.dirname(file_path)
           unless File.directory?(dirname)
             FileUtils.mkdir_p(dirname)
