@@ -63,6 +63,41 @@ describe FixOrganization, dbclean: :after_each do
         end
     end
   end
+
+
+  describe "swap the fein of an Employer" do
+    let(:employer_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "111111111") }
+    let(:employer_organization_2)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "987654321") }
+    let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    before(:each) do
+      ENV["action"] = "swap_fein"
+      ENV["organization_fein"] = employer_organization.fein
+      ENV["correct_fein"] = employer_organization_2.fein
+    end
+    context "updating the fein when the correct information is provided" do
+        it "should swap fein when organization is present" do
+        expect(employer_organization.fein).to eq "111111111"
+        expect(employer_organization_2.fein).to eq "987654321"
+        subject.migrate
+        employer_organization.reload
+        employer_organization_2.reload
+        expect(employer_organization.fein).to eq "987654321"
+        expect(employer_organization_2.fein).to eq "111111111"
+        end
+    end
+        context "updating the fein when the incorrect information is provided" do
+        it "should not swap fein when organization is not present" do
+        employer_organization_2.update_attributes(:fein => "222222222")
+        expect(employer_organization.fein).to eq "111111111"
+        expect(employer_organization_2.fein).to eq "222222222"
+        subject.migrate
+        employer_organization.reload
+        employer_organization_2.reload
+        expect(employer_organization.fein).to eq "111111111"
+        expect(employer_organization_2.fein).to eq "222222222"
+        end
+    end
+  end
   
  describe "update employer attestation for profiles with attestation unsubmitted and document submitted" do
 

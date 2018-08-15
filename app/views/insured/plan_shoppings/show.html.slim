@@ -85,7 +85,8 @@ javascript:
   var carriers = document.getElementById('filteredPlans').dataset.carriers;
   var filterType = String;
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
-
+  var carrierLogos = JSON.parse('#{raw(digest_logos.to_json)}');
+  
   // Grabs available products as JSON for filtering onload
   (function() {
     document.getElementById('filteredPlans').classList.add('hidden');
@@ -285,6 +286,7 @@ javascript:
   function showFilteredResults() {
     var element = document.getElementById('filteredPlans');
     filteredArray.forEach(function(result) {
+      var logo = carrierLogos[result.product.issuer_name];
       // Used to show deductible for plan
       if (result.member_enrollments.length > 1) {
         var deductible = result.product.family_deductible;
@@ -304,10 +306,10 @@ javascript:
                 </div>
                 <div class="row mt-1">
                   <div class="col-sm-2 col-md-2">
-                    <img width=80 src="../../assets/logo/carrier/${result.product.issuer_name.toLowerCase().split(' ').join('_')}.jpg" >
+                    <img width="80px" src="${logo}">
                   </div>
                   <div class="col-md-7" id="plans">
-                    <h3 class="no-buffer"><a data-remote="true">${result.product.title}</a>
+                    <h3 class="no-buffer pl-1"><a data-remote="true">${result.product.title}</a>
                       <br>
                       <small>${result.product.issuer_name}</small>
                     </h3>

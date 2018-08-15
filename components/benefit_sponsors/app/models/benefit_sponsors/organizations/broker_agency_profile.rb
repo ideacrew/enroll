@@ -98,6 +98,10 @@ module BenefitSponsors
         office_locations.detect(&:is_primary?)
       end
 
+      def commission_statements
+        documents.where(subject: "commission-statement")
+      end
+
       def phone
         office = primary_office_location
         office && office.phone.to_s

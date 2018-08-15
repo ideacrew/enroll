@@ -29,6 +29,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         change_benefit_group(enrollments)
       when "change_enrollment_status"
         change_enrollment_status(enrollments)
+      when "create_enrollment_for_benefit_application"
+        create_enrollment_for_benefit_application(enrollments)
     end
   end
 
@@ -153,6 +155,34 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       else
         puts "HbxEnrollment with hbx_id: #{enrollment.hbx_id} can not be moved to #{new_aasm_state}" unless Rails.env.test?
       end
+    end
+  end
+
+  # creates new enrollment with given enrollment details with effective date as benefit application start date.
+  def create_enrollment_for_benefit_application(enrollments)
+
+    benefit_sponsorship = BenefitSponsors::Organizations::Organization.employer_profiles.where(fein: ENV['fein']).first.active_benefit_sponsorship
+    benefit_application = benefit_sponsorship.benefit_applications.where(:'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y")).first
+    benefit_package = benefit_application.benefit_packages.first
+
+    enrollments.each do |enrollment|
+
+      new_enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(enrollment, benefit_package)
+      if  new_enrollment.present? && new_enrollment.valid?
+
+        new_enrollment.save!
+
+        assignment = enrollment.employee_role.census_employee.benefit_group_assignment_by_package(new_enrollment.sponsored_benefit_package_id)
+        assignment.update_attributes(hbx_enrollment_id: new_enrollment.id)
+
+        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
+        new_enrollment.begin_coverage! if new_enrollment.may_begin_coverage?
+
+        puts "New enrollment created " unless Rails.env.test?
+      else
+        puts "Unable to save new enrollment " unless Rails.env.test?
+      end
+
     end
   end
 
