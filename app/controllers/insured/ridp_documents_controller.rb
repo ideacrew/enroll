@@ -10,7 +10,7 @@ class Insured::RidpDocumentsController < ApplicationController
     @docs_owner = @person
     if params[:file]
       params[:file].each do |file|
-        doc_uri = 'www.google.com'#Aws::S3Storage.save(file_path(file), 'id-verification')
+        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
           if update_ridp_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
