@@ -5,6 +5,7 @@ class QhpRateBuilder
 
   def initialize
     @rates_array = []
+    @results_array = []
     @rating_area_id_cache = {}
     @rating_area_cache = {}
     @premium_table_cache = Hash.new {|h, k| h[k] = Hash.new}
@@ -87,6 +88,12 @@ class QhpRateBuilder
   end
 
   def find_product_and_create_premium_tables
+    @result_array.uniq.each do |value|
+      hios_id, year = value.split(",")
+      product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year.to_s == year.to_s}
+      product.premium_tables = nil
+      product.save
+    end
     @premium_table_cache.each_pair do |k, v|
       product_hios_id, rating_area_id, applicable_range = k
       premium_tables = []
@@ -122,6 +129,7 @@ class QhpRateBuilder
     rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
     rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
     @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = @rate[:primary_enrollee]
+    @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
 
   def assign_age
