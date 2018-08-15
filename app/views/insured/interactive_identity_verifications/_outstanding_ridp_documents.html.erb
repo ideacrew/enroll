@@ -40,14 +40,17 @@
                             <% end %>
                         <% end %>
                       </div>
-                      <% if current_user.has_hbx_staff_role? %>
+                      <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
                           <div class="v-type-actions col-md-3">
                             <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Action'} %>
                           </div>
                       <% end %>
                     </div>
                   </div>
-                  <% if current_user.has_hbx_staff_role? %>
+                  
+                  <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
+                      <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+                  <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
                       <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
                   <% end %>
                   <div class="row">
@@ -63,11 +66,13 @@
                                     <% end %>
                                   </div>
                                   <div class="v-doc col-md-1">
-                                    <span class="<%=pundit_class(Family, :updateable?)%>" >
-                                      <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
-                                        <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
-                                      <% end %>
-                                    </span>
+                                    <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
+                                      <span class="<%=pundit_class(Family, :updateable?)%>" >
+                                          <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
+                                            <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
+                                        <% end %>
+                                      </span>
+                                    <% end %>  
                                   </div>
                                 </div>
                               </div>

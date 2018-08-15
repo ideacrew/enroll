@@ -149,6 +149,22 @@ class HbxProfilePolicy < ApplicationPolicy
     return false
   end
 
+  def can_access_accept_reject_identity_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_access_accept_reject_paper_application_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+  def can_delete_identity_application_documents?
+    return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
+
   private
 
   def user_hbx_staff_role
@@ -156,4 +172,5 @@ class HbxProfilePolicy < ApplicationPolicy
     return nil unless person
     person.hbx_staff_role
   end
+
 end

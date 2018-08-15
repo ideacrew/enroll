@@ -804,6 +804,9 @@ describe DefinePermissions, dbclean: :after_each do
     let(:given_task_name) { "hbx_admin_access_outstanding_verification_sub_tab" }
     let(:given_task_name) { "hbx_admin_access_identity_verification_sub_tab" }
     let(:given_task_name) { "hbx_admin_can_complete_resident_application" }
+    let(:given_task_name) { "hbx_admin_can_access_accept_reject_identity_documents" }
+    let(:given_task_name) { "hbx_admin_can_access_accept_reject_paper_application_documents" }
+    let(:given_task_name) { "hbx_admin_can_delete_identity_application_documents" }
 
     describe "given a task name" do
       it "has the given task name" do
@@ -848,11 +851,46 @@ describe DefinePermissions, dbclean: :after_each do
       subject.hbx_admin_access_identity_verification_sub_tab
       expect(Person.all.count).to eq(5)
       expect(@hbx_staff_person.hbx_staff_role.permission.access_identity_verification_sub_tab).to be true
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+    end
+    it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_identity_verification_sub_tab
+      expect(Person.all.count).to eq(5)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+    end
+    it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_outstanding_verification_sub_tab
+      expect(Person.all.count).to eq(5)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
     end
     it "updates hbx_admin_can_complete_resident_application to true" do
       subject.hbx_admin_can_complete_resident_application
       expect(Person.all.count).to eq(5)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_complete_resident_application).to be true
+    end
+    it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
+      subject.hbx_admin_can_access_accept_reject_identity_documents
+      expect(Person.all.count).to eq(5)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
+    end
+    it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
+      subject.hbx_admin_can_access_accept_reject_paper_application_documents
+      expect(Person.all.count).to eq(5)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+    end
+    it "updates hbx_admin_can_delete_identity_application_documents to true" do
+      subject.hbx_admin_can_delete_identity_application_documents
+      expect(Person.all.count).to eq(5)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
     end
   end
 
