@@ -118,18 +118,33 @@ describe ModifyBenefitApplication do
     context "cancel benefit application" do
       let(:past_start_on) {start_on.prev_month}
       let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
+      let!(:mid_plan_year_effective_date) {start_on.prev_month.prev_month}
+      let!(:range_effective_period) { mid_plan_year_effective_date..mid_plan_year_effective_date.next_year.prev_day }
       let!(:draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period)}
+      let!(:import_draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period)}
 
       before :each do
         allow(ENV).to receive(:[]).with('action').and_return 'cancel'
-        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return (draft_benefit_application.effective_period.min.to_s)
       end
 
       it "should cancel benefit application" do
+        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return draft_benefit_application.effective_period.min.to_s
         expect(draft_benefit_application.aasm_state).to eq :imported
         subject.migrate
         draft_benefit_application.reload
         expect(draft_benefit_application.aasm_state).to eq :canceled
+      end
+
+      it "when multiple benefit applications present" do
+        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return import_draft_benefit_application.effective_period.min.to_s
+        # we will have employers with migrated and mid_plan_year with Benefit_application
+        expect(draft_benefit_application.aasm_state).to eq :imported
+        expect(import_draft_benefit_application.aasm_state).to eq :imported
+        subject.migrate
+        draft_benefit_application.reload
+        import_draft_benefit_application.reload
+        expect(draft_benefit_application.aasm_state).to eq :imported
+        expect(import_draft_benefit_application.aasm_state).to eq :canceled
       end
     end
 
