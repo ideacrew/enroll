@@ -7,6 +7,8 @@ class FixOrganization< MongoidMigrationTask
     case action
       when "update_fein"
         update_fein(organization) if organization.present?
+      when "swap_fein"
+        swap_fein(organization) if organization.present?
       when "approve_attestation"
         approve_attestation_for_employer(organization) if organization.present?
       else
@@ -36,6 +38,21 @@ class FixOrganization< MongoidMigrationTask
         puts "Changed fein to #{correct_fein}" unless Rails.env.test?
       end
   end
+
+  def swap_fein(organization)
+    correct_fein = ENV['correct_fein']
+    organization_with_wrong_fein =  organization.fein
+      org_with_correct_fein = BenefitSponsors::Organizations::Organization.where(fein: correct_fein).first
+      if org_with_correct_fein.present?
+         org_with_correct_fein.unset(:fein)
+        organization.set(fein: correct_fein)
+        org_with_correct_fein.set(fein: organization_with_wrong_fein)
+         puts "Feins swapped between the Organizations of #{org_with_correct_fein.hbx_id} and #{organization.hbx_id}" unless Rails.env.test?
+      else
+        puts "No Organization found to swap the fein with" unless Rails.env.test?
+      end
+  end
+  
   def approve_attestation_for_employer(organization)
     employer= organization.employer_profile    
       attestation = employer.employer_attestation.blank?  ? employer.build_employer_attestation : employer.employer_attestation
