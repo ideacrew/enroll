@@ -88,7 +88,7 @@ class QhpRateBuilder
   end
 
   def find_product_and_create_premium_tables
-    @result_array.uniq.each do |value|
+    @results_array.uniq.each do |value|
       hios_id, year = value.split(",")
       product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year.to_s == year.to_s}
       product.premium_tables = nil
