@@ -133,7 +133,7 @@ describe ModifyBenefitApplication do
         expect(draft_benefit_application.reload.aasm_state).to eq :imported
       end
 
-      it "cancels import draft benefit applications"
+      it "cancels import draft benefit applications" do
         expect(import_draft_benefit_application.reload.aasm_state).to eq :canceled
       end
     end
