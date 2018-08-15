@@ -36,11 +36,9 @@ class ModifyBenefitApplication< MongoidMigrationTask
     end
   end
 
-  def cancel_benefit_application(benefit_applications)
-    benefit_applications.each do |benefit_application|
-      service = initialize_service(benefit_application)
-      service.cancel
-    end
+  def cancel_benefit_application(benefit_application)
+    service = initialize_service(benefit_application)
+    service.cancel
   end
 
   def benefit_applications_for_aasm_state_update
@@ -59,7 +57,9 @@ class ModifyBenefitApplication< MongoidMigrationTask
   def benefit_applications_for_cancel
     benefit_sponsorship = get_benefit_sponsorship
     benefit_application_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
-    benefit_sponsorship.benefit_applications.effective_date_begin_on(benefit_application_start_on)
+    application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => benefit_application_start_on)
+    raise "Found #{application.count} benefit applications with that start date" if application.count != 1
+    application.first
   end
 
   def get_benefit_sponsorship
