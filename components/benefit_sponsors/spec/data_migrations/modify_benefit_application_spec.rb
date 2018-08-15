@@ -125,26 +125,13 @@ describe ModifyBenefitApplication do
 
       before :each do
         allow(ENV).to receive(:[]).with('action').and_return 'cancel'
-      end
-
-      it "should cancel benefit application" do
-        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return draft_benefit_application.effective_period.min.to_s
-        expect(draft_benefit_application.aasm_state).to eq :imported
+        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return import_draft_benefit_application.effective_period.min.to_s
         subject.migrate
-        draft_benefit_application.reload
-        expect(draft_benefit_application.aasm_state).to eq :canceled
       end
 
       it "when multiple benefit applications present" do
-        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return import_draft_benefit_application.effective_period.min.to_s
-        # we will have employers with migrated and mid_plan_year with Benefit_application
-        expect(draft_benefit_application.aasm_state).to eq :imported
-        expect(import_draft_benefit_application.aasm_state).to eq :imported
-        subject.migrate
-        draft_benefit_application.reload
-        import_draft_benefit_application.reload
-        expect(draft_benefit_application.aasm_state).to eq :imported
-        expect(import_draft_benefit_application.aasm_state).to eq :canceled
+        expect(draft_benefit_application.reload.aasm_state).to eq :imported
+        expect(import_draft_benefit_application.reload.aasm_state).to eq :canceled
       end
     end
 
