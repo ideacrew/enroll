@@ -203,7 +203,6 @@ describe DefinePermissions, dbclean: :after_each do
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
     end
     it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
-      binding.pry
       subject.hbx_admin_can_access_identity_verification_sub_tab
       expect(Person.all.count).to eq(5)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
