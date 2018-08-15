@@ -37,7 +37,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   def new_plan
     double(
       "Plan",
-      name: "My Silly Plan"
+      name: "My Silly Plan",
+      carrier_profile: carrier_profile,
     )
   end
 
@@ -58,6 +59,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   end
 
   let(:members) { [new_member, new_member] }
+  let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
 
   before :each do
     assign :enrollment, enrollment
@@ -108,21 +110,19 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     let(:household) { family.active_household }
     let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
     let(:plan) { individual_plans.first }
+    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
 
     let!(:hbx_enrollment) {
       FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
     }
-    
-    before :each do
-      @enrollment = hbx_enrollment
-    end
-    
+
     it "should not have a Pay now button" do
       render file: "insured/plan_shoppings/receipt.html.erb"
       expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
     end
 
     it "should have Pay Now option when Kaiser plan" do
+      carrier_profile.legal_name = "Kaiser"
       render file: "insured/plan_shoppings/receipt.html.erb"
       expect(rendered).to have_selector('button', text: /Pay Now/)
     end
