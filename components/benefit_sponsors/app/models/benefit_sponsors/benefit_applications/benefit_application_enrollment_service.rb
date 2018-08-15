@@ -166,12 +166,10 @@ module BenefitSponsors
     def terminate(end_on, termination_date)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_terminate_enrollment?
-          benefit_application.terminate_enrollment!
-          if benefit_application.terminated?
             updated_dates = benefit_application.effective_period.min.to_date..end_on
             benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
+            benefit_application.terminate_enrollment!
           end
-        end
       else
         [false, benefit_application, business_policy.fail_results]
       end
