@@ -38,11 +38,11 @@
         </div>
         <% if @enrollment.employee_role.present? %>
         <% else %>
-          <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
-					<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
-						<button class="btn btn-default">Pay Now</button>
-					<% end %>
-        <% end %>
+					<span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+				<% end %>
+				<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+					<button class="btn btn-default">Pay Now</button>
+				<% end %>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
       </div>
 
