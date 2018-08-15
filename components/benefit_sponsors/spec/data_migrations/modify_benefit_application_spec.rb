@@ -129,8 +129,11 @@ describe ModifyBenefitApplication do
         subject.migrate
       end
 
-      it "when multiple benefit applications present" do
+      it "does not cancel non-imported draft benefit applications" do
         expect(draft_benefit_application.reload.aasm_state).to eq :imported
+      end
+
+      it "cancels import draft benefit applications"
         expect(import_draft_benefit_application.reload.aasm_state).to eq :canceled
       end
     end
