@@ -67,10 +67,6 @@ module Effective
         allow ? 'ajax' : 'disabled'
       end
 
-      def new_eligibility_link_type(allow)
-        allow ? 'ajax' : 'disabled'
-      end
-
       def cancel_enrollment_type(family, allow)
         (family.all_enrollments.cancel_eligible.present? && allow) ? 'ajax' : 'disabled'
       end
