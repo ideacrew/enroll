@@ -17,7 +17,7 @@ module Observers
         if new_model_event.event_key == :renewal_application_denied
           errors = plan_year.enrollment_errors
 
-          if(errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
+          if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
 
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
@@ -43,7 +43,7 @@ module Observers
 
         if new_model_event.event_key == :renewal_application_submitted
           trigger_zero_employees_on_roster_notice(plan_year)
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3a")
         end
 
         if new_model_event.event_key == :initial_employer_open_enrollment_completed
@@ -55,7 +55,7 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_application_autosubmitted
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "plan_year_auto_published")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3b")
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
