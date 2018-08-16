@@ -49,7 +49,7 @@ if use_plan_dumps
 end
 
 
-if missing_plan_dumps
+if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "Running full seed"
 
   system "bundle exec rake import:county_zips"
@@ -210,10 +210,12 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
 puts "importing security questions complete"
 puts "*"*80
 
-require File.join(File.dirname(__FILE__),'seedfiles', 'sic_codes_seed')
+if Settings.site.key.to_s == "cca" && (ENV["type"] == "fixtures")
+  require File.join(File.dirname(__FILE__), 'seedfiles', 'sic_codes_seed')
 
-if Settings.site.key.to_s == "cca"
-  require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
+  puts "*"*80
+  puts "loading plan fixtures"
+  require File.join(File.dirname(__FILE__), 'seedfiles', 'cca', 'cca_seed')
 end
 
 puts "*"*80
