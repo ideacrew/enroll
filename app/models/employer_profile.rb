@@ -989,7 +989,23 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+         self.initial_employee_plan_selection_confirmation(org)
       end
+    end
+  end
+
+   def self.initial_employee_plan_selection_confirmation(org)
+    begin
+      if org.employer_profile.is_new_employer?
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == org.employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+          end
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{org.legal_name} due to #{e.backtrace}"}
     end
   end
 
