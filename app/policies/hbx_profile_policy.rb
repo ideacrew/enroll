@@ -110,4 +110,21 @@ class HbxProfilePolicy < ApplicationPolicy
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_add_pdc
   end
+
+  def can_access_accept_reject_identity_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if (@user.person && @user.person.hbx_staff_role)
+    return false  
+  end
+
+  def can_access_accept_reject_paper_application_documents?
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false  
+  end
+
+  def can_delete_identity_application_documents?
+    return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
+    return false  
+  end
+
+>>>>>>> origin/ridp-phase-2
 end
