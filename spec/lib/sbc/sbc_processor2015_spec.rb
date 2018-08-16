@@ -18,12 +18,15 @@ describe SbcProcessor2015 do
   )}
 
   context "should initialize " do
-    it "should map sbc to the product" do
+
+    before(:each) do
       sbc_processor = SbcProcessor2015.new(csv_path, pdf_path)
       sbc_processor.run
       product.reload
-      expect(product.sbc_document).not_to eq nil
-      expect(product.sbc_document.identifier).to eq "urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-test#11111111-1111-1111-1111-111111111111"
+    end
+
+    it "should map sbc to the product" do
+      expect(product.sbc_document.try(:identifier)).to eq "urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-test#11111111-1111-1111-1111-111111111111"
     end
   end
 end
