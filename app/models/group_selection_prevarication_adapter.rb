@@ -299,20 +299,16 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
-    renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
-    active_benefit_package  = employee_role.census_employee.active_benefit_package
-
     if change_plan == "change_by_qle"
       current_sep  = employee_role.person.primary_family.current_sep
-      raise "Unable to find valid Special enrollment period" unless current_sep
-      effective_on = current_sep.effective_on
+      return false unless current_sep
 
-      if renewal_benefit_package.present? && renewal_benefit_package.effective_period.cover?(effective_on)
-        renewal_benefit_package.is_offering_dental?
-      elsif active_benefit_package.present?
-        active_benefit_package.is_offering_dental?
-      end
+      benefit_package = employee_role.census_employee.benefit_package_for_date(current_sep.effective_on)
+      benefit_package.present? && benefit_package.is_offering_dental?
     else
+      renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
+      active_benefit_package  = employee_role.census_employee.active_benefit_package
+
       if change_plan == 'change_plan' && enrollment.present? && enrollment.is_shop?
         enrollment.sponsored_benefit_package.is_offering_dental?
       elsif employee_role.can_enroll_as_new_hire?
@@ -324,11 +320,11 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
-  def is_dental_offered?(employee_role)
-    census_employee = employee_role.census_employee
-    current_benefit_package = census_employee.renewal_published_benefit_package || census_employee.active_benefit_package
-    current_benefit_package.present? && current_benefit_package.is_offering_dental?
-  end
+  # def is_dental_offered?(employee_role)
+  #   census_employee = employee_role.census_employee
+  #   current_benefit_package = census_employee.renewal_published_benefit_package || census_employee.active_benefit_package
+  #   current_benefit_package.present? && current_benefit_package.is_offering_dental?
+  # end
 
 	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
 		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
