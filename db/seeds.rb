@@ -1,3 +1,6 @@
+#Run below rake, if loading data through fixtures
+##bundle exec rake db:seed type=fixtures
+
 ENV["ENROLL_SEEDING"] = "true"
 
 reset_tasks = %w(
