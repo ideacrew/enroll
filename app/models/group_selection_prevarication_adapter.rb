@@ -301,8 +301,7 @@ class GroupSelectionPrevaricationAdapter
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
     if change_plan == "change_by_qle"
       family = employee_role.person.primary_family
-      earliest_effective_sep = (@employee_role.present? ? family.earliest_effective_shop_sep : family.earliest_effective_ivl_sep)
-      benefit_package = employee_role.census_employee.benefit_package_for_date(earliest_effective_sep.effective_on)
+      benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
       benefit_package.present? && benefit_package.is_offering_dental?
     else
       renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
