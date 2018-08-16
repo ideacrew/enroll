@@ -44,12 +44,14 @@
         <% else %>
 					<span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
 				<% end %>
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
 				<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
 					<button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal">Pay Now</button>
-					<br />
-					<br />
-					<strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without selecting PAY NOW, you’ll have to wait until Kaiser Permanente sends you an invoice to make your first month’s payment and activate your coverage.</strong>
+				<% end %>
+				<%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
+				<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+				<br />
+				<br />
+				<strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without selecting PAY NOW, you’ll have to wait until Kaiser Permanente sends you an invoice to make your first month’s payment and activate your coverage.</strong>
 				<% end %>
       </div>
 
