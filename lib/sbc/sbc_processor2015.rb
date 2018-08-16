@@ -49,7 +49,7 @@ class SbcProcessor2015
         product.sbc_document.save!
         product.save!
         counter += 1
-        puts "Product #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}"
+        puts "Product #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}" unless Rails.env.test?
         # end of new model
       end
     end
@@ -62,7 +62,7 @@ class SbcProcessor2015
       plan.save
     end
     # end  old model
-    puts "Total #{counter} plans/products updated."
+    puts "Total #{counter} plans/products updated." unless Rails.env.test?
 
   end
 end
