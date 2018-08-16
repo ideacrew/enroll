@@ -63,22 +63,17 @@ describe "QhpRateBuilder" do
       hp3.reload
     end
 
-    it "should load rates for 2018 products hp1 & hp3" do
-      expect(hp1.premium_tables.size).to eq 5
-      expect(hp3.premium_tables.size).to eq 5
-    end
-
     it "should not load rates for 2017 products hp2 & hp4" do
       expect(hp2.premium_tables.size).to eq 2
       expect(hp4.premium_tables.size).to eq 2
     end
 
     it "should return 1 tuple with rating area and age from the file" do
-      expect(hp1.premium_tables[4].premium_tuples.count).to eq 1
+      expect(hp1.premium_tables[2].premium_tuples.count).to eq 1
     end
 
     it "should return 2 tuples with same rating area and different age" do
-      expect(hp3.premium_tables[4].premium_tuples.count).to eq 2
+      expect(hp3.premium_tables[2].premium_tuples.count).to eq 2
     end
   end
 end
