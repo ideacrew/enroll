@@ -23,6 +23,13 @@ class UpdateBrokerAgencyProfile < MongoidMigrationTask
       service.update_broker_profile_id({hbx_id: person_hbx_id})
       @logger.info "Updated person broker agency staff roles"
 
+    when "update_start_date"
+      person_hbx_ids = ENV['hbx_ids'].to_s.split(" ")
+      start_date = DateTime.strptime(ENV['new_date'].to_s, "%m/%d/%Y")
+      @logger.info "Trying to update start date on current person broker agency"
+      service.update_broker_assignment_date({hbx_ids: person_hbx_ids, start_date: start_date})
+      @logger.info "Updated the broker assigned start date of related person record"
+
     else
       @logger.warn "Unknown Action found"
     end

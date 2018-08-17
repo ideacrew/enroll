@@ -10,6 +10,12 @@ module BenefitSponsors
     let(:service_class) { BenefitSponsors::Services::UpdateBrokerAgencyService }
     let(:broker_agency_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile) }
 
+    let!(:primary_person) { FactoryGirl.create(:person, :with_family)}
+    let!(:broker_agency_account) { agency_account = FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile)
+                                   primary_person.primary_family.update_attributes(broker_agency_accounts: [agency_account])
+                                   agency_account
+    }
+
     describe "#new" do
       let(:service_obj) { service_class.new(params)}
       it "should instantiate" do
@@ -59,6 +65,15 @@ module BenefitSponsors
       end
     end
 
+    describe "#update_broker_assignment_date" do
+      let(:service_obj) { service_class.new(params)}
+      let!(:start_date) { DateTime.new(2018, 8, 29, 0, 0, 0).change(day: 1)  }
+      let!(:formed_params) { {hbx_ids: [primary_person.hbx_id], start_date: start_date}}
 
+      it "should update broker agnecy account start date" do
+        service_obj.update_broker_assignment_date(formed_params)
+        expect(broker_agency_account.reload.start_on).to eq start_date
+      end
+    end
   end
 end
