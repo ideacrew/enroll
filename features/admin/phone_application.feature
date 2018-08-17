@@ -1,8 +1,8 @@
 Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Identity Proofing- User directed to Document Upload page
 
   Background: Hbx Admin navigates into the new consumer application with phone application option and goes forward till Experian Auth and Consent Page
-    Given Hbx Admin exists
-    When Hbx Admin logs on to the Hbx Portal
+    Given an HBX admin exists
+    And the HBX admin is logged in
     And admin has navigated into the NEW CONSUMER APPLICATION
     And the applicant with no e_case_id and visit personal information edit page
     And the Admin is on the Personal Info page for the family

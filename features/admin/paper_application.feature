@@ -1,8 +1,8 @@
 Feature: Hbx Admin as Paper Application for ivl- User Disagrees to Experian Identity Proofing- User directed to Document Upload page
 
 Background: Hbx Admin navigates into the new consumer application with paper application option and goes forward till DOCUMENT UPLOAD page
-  Given Hbx Admin exists
-  When Hbx Admin logs on to the Hbx Portal
+  Given an HBX admin exists
+  And the HBX admin is logged in
   And admin has navigated into the NEW CONSUMER APPLICATION
   And the Admin is on the Personal Info page for the family
   And the Admin clicks the Application Type drop down
