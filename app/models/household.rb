@@ -403,7 +403,7 @@ class Household
 
   def create_new_tax_household(params)
     effective_date = params["effective_date"].to_date
-    slcsp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
+    slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
 
     th = tax_households.build(
       allocated_aptc: 0.0,
@@ -414,7 +414,7 @@ class Household
 
     determination = th.eligibility_determinations.build(
       source: "Admin_Script",
-      benchmark_plan_id: slcsp,
+      benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
       csr_percent_as_integer: params["csr"].to_i,
       determined_on: TimeKeeper.datetime_of_record
