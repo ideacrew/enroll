@@ -27,7 +27,6 @@ class BenefitGroupAssignment
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
 
   def self.by_benefit_group_id(bg_id)
-    binding.pry
     census_employees = CensusEmployee.where({
       "benefit_group_assignments.benefit_group_id" => bg_id
     })
