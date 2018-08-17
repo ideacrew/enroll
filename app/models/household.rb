@@ -405,14 +405,14 @@ class Household
     effective_date = params["effective_date"].to_date
     slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
 
-    th = tax_households.build(
+    th = tax_households.create(
       allocated_aptc: 0.0,
       effective_starting_on: Date.new(effective_date.year, effective_date.month, effective_date.day),
       is_eligibility_determined: true,
       submitted_at: TimeKeeper.datetime_of_record
     )
 
-    determination = th.eligibility_determinations.build(
+    th.eligibility_determinations.create(
       source: "Admin_Script",
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
@@ -423,7 +423,7 @@ class Household
     params["family_members"].each do |person_hbx_id, thhm_info|
       person_id = Person.by_hbx_id(person_hbx_id).first.id
       family_member = family.family_members.where(person_id: person_id).first
-      th.tax_household_members.build(
+      th.tax_household_members.create(
         :applicant_id => family_member.id,
         :is_subscriber => family_member.is_primary_applicant,
         thhm_info["pdc_type"].to_sym => true,
@@ -431,9 +431,8 @@ class Household
       )
     end
 
+    end_multiple_thh
+
     save!
-    th.save!
-    determination.save!
-    th.tax_household_members.each(&:save!)
   end
 end
