@@ -27,6 +27,7 @@ class BenefitGroupAssignment
   scope :renewing,       ->{ any_in(aasm_state: RENEWING) }
 
   def self.by_benefit_group_id(bg_id)
+    binding.pry
     census_employees = CensusEmployee.where({
       "benefit_group_assignments.benefit_group_id" => bg_id
     })
@@ -210,7 +211,10 @@ class BenefitGroupAssignment
   def make_active
     census_employee.benefit_group_assignments.each do |bg_assignment|
       if bg_assignment.is_active? && bg_assignment.id != self.id
-        bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
+        end_on = bg_assignment.end_on || (start_on - 1.day)
+        py = bg_assignment.plan_year
+        end_on = bg_assignment.plan_year.end_on unless (py.start_on..py.end_on).cover?(end_on)
+        bg_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end
 
