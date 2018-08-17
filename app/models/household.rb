@@ -412,7 +412,7 @@ class Household
       submitted_at: TimeKeeper.datetime_of_record
     )
 
-    determination = th.eligibility_determinations.create(
+    th.eligibility_determinations.create(
       source: "Admin_Script",
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
@@ -433,6 +433,6 @@ class Household
 
     end_multiple_thh
 
-    self.save!
+    save!
   end
 end
