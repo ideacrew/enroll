@@ -67,6 +67,10 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   glob_pattern = File.join(Rails.root, "db/seedfiles/cca/site_seed.rb")
   load glob_pattern
   load_cca_site_seed
+  puts "Loading benefit market seed"
+  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/benefit_markets_seed.rb")
+  load bm_glob_pattern
+  load_cca_benefit_markets_seed
   puts "complete"
 
   unless Settings.aca.use_simple_employer_calculation_model
@@ -122,6 +126,11 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   system "bundle exec rake xml:rates"
   puts "::: complete :::"
   puts "*"*80
+
+  pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/pricing_and_contribution_models_seed.rb")
+  load pricing_and_contribution_models_seed_glob_pattern
+  load_cca_pricing_models_seed
+  load_cca_contribution_models_seed
 
   puts "*"*80
   puts "Loading QLE kinds."
