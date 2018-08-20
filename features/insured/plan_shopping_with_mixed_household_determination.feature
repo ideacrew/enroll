@@ -37,15 +37,15 @@ Feature: plan shopping with mixed household determination
     Given every individual is eligible for Plan shopping for CSR plans
     And I click on continue button on group selection page
     Then the page should have csr plans
-    And selects a non csr plan
-    Then the page should open a model pop-up for confirmation
-    Then user clicks close button
+    And selects a csr plan
+    Then the page should redirect to thankyou page
     And Individual logs out
 
   Scenario: plan shopping with all eligible taxhoushold members
     Given every individual is eligible for Plan shopping for CSR plans
+    When the db has standard plans
     And I click on continue button on group selection page
-    Then the page should have csr plans
-    And selects a csr plan
-    Then the page should redirect to thankyou page
+    And selects a non csr plan
+    Then the page should open a model pop-up for confirmation
+    Then user clicks close button
     And Individual logs out

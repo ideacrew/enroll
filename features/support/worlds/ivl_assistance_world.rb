@@ -1,6 +1,10 @@
 module IvlAssistanceWorld
   def update_a_standard_plan_to_be_csr
-    Plan.silver_level_by_csr_kind("csr_100").first.update_attributes!(csr_variant_id: "05")
+    Plan.all.each { |plan| plan.update_attributes!(csr_variant_id: "05") }
+  end
+
+  def reset_plans_to_be_standard
+    Plan.all.each { |plan| plan.update_attributes!(csr_variant_id: "01") }
   end
 
   def create_tax_household_and_eligibility_determination(family)
