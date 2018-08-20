@@ -23,6 +23,10 @@ Then(/user clicks continue button on household info form/) do
   click_link "Continue"
 end
 
+When(/^the db has standard plans$/) do
+  reset_plans_to_be_standard
+end
+
 Then(/^selects a non csr plan$/) do
   find(:xpath, "//*[@id='plans']/div[2]/div/div[5]/div[3]/a[1]").click
 end
