@@ -2474,7 +2474,6 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     end
   end
 end
-<<<<<<< HEAD
 
 describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean: :after_each do
   let(:person) {FactoryGirl.create(:person)}
