@@ -6,7 +6,7 @@ module BenefitSponsors
 
       def initialize(options={})
         @legal_name = options[:legal_name]
-        @broker_agency = find_broker_agency(@legal_name)
+        @broker_agency = find_broker_agency(@legal_name) unless @legal_name.blank?
       end
 
       def update_broker_profile_id(attr={})
