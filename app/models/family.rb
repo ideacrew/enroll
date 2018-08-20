@@ -51,6 +51,8 @@ class Family
   embeds_many :documents, as: :documentable
   embeds_one :initial_application_snapshot
 
+  has_many :payment_transactions
+
   after_initialize :build_household
   before_save :clear_blank_fields
   before_save :generate_family_id

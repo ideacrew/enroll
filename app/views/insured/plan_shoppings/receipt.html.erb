@@ -44,11 +44,11 @@
         <% else %>
 					<span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
 				<% end %>
-				<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+				<% if show_pay_now? %>
 					<button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal">Pay Now</button>
 				<% end %>
 				<%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
-				<% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+				<% if show_pay_now? %>
 				<br />
 				<br />
 				<strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without selecting PAY NOW, you’ll have to wait until Kaiser Permanente sends you an invoice to make your first month’s payment and activate your coverage.</strong>
@@ -249,7 +249,7 @@
 				</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default pull-left">LEAVE DC HEALTH LINK</button>
+        <%= link_to "LEAVE DC HEALTH LINK", "http://localhost:3000", {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
         <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
