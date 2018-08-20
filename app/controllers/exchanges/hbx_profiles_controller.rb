@@ -212,6 +212,10 @@ def employer_poc
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
 
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
+
   def outstanding_verification_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])

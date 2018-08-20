@@ -23,6 +23,14 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
+  
+  resources :users do
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username, :change_email, :check_for_existing_username_or_email, :edit
+      put :confirm_reset_password, :confirm_change_username, :confirm_change_email, :update
+      post :unlock, :change_password
+    end
+  end
 
   resources :saml, only: [] do
     collection do
@@ -100,6 +108,7 @@ Rails.application.routes.draw do
         get :view_terminated_hbx_enrollments
         get :get_user_info
         get :create_eligibility
+        get :user_account_index
       end
 
       member do
