@@ -74,8 +74,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     assign :enrollment, enrollment
     assign :member_group, member_group
     @plan = plan_cost_decorator
+
     allow(@plan).to receive(:sole_source?).and_return(true)
-    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true)) 
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:show_pay_now?).and_return false
     render file: "insured/plan_shoppings/receipt.en.html.erb"
   end
 
