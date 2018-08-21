@@ -5,7 +5,7 @@ namespace :load do
     site = BenefitSponsors::Site.where(site_key: "#{Settings.site.subdomain}").first
     benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: :aca_shop).first
 
-    puts "Creating Benefit Market Catalog for #{calender_year}"
+    puts "Creating Benefit Market Catalog for #{calender_year}" unless Rails.env.test?
 
     benefit_market_catalog = benefit_market.benefit_market_catalogs.select{
       |a| a.application_period.first.year.to_s == calender_year.to_s
@@ -28,11 +28,11 @@ namespace :load do
     list_bill_pricing_model = BenefitMarkets::PricingModels::PricingModel.where(:name => "MA List Bill Shop Pricing Model").first.create_copy_for_embedding
 
     def products_for(product_package, calender_year)
-      puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
+      puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}" unless Rails.env.test?
       BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
     end
 
-    puts "Creating Product Packages..."
+    puts "Creating Product Packages..." unless Rails.env.test?
 
     {"Single Issuer" => :single_issuer, "Metal Level" => :metal_level, "Single Product" => :single_product}.each do |title, package_kind|
       product_package = benefit_market_catalog.product_packages.where(title: title).first
