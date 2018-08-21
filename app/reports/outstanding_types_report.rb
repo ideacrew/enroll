@@ -79,22 +79,25 @@ class OutstandingTypesReport < MongoidMigrationTask
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
       people.each do |person|
-        next if no_active_enrollments(person)
-        if outstanding_types(person).any?
-          outstanding_types(person).each do |type|
-            csv << [
-                subscriber_id(person),
-                person.hbx_id,
-                person.first_name,
-                person.last_name,
-                type.type_name,
-                created_at(person).to_date,
-                "yes",
-                due_date_for_type(type).to_date,
-                ivl_enrollment(person),
-                shop_enrollment(person)
-            ]
+        begin
+          next if no_active_enrollments(person)
+          if outstanding_types(person).any?
+            outstanding_types(person).each do |type|
+              csv << [  subscriber_id(person),
+                        person.hbx_id,
+                        person.first_name,
+                        person.last_name,
+                        type.type_name,
+                        created_at(person).to_date,
+                        "yes",
+                        due_date_for_type(type).to_date,
+                        ivl_enrollment(person),
+                        shop_enrollment(person)
+                      ]
+            end
           end
+        rescue => e
+          puts "Invalid Person with HBX_ID: #{person.hbx_id}"
         end
       end
     end
