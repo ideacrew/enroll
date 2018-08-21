@@ -141,6 +141,11 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_user_account_tab => :environment
 end
 
+namespace :permissions do
+  desc 'hbx_admin_can_access_pay_now'
+  DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
+end
+
 
 #rake permissions:hbx_admin_can_reset_password
 
@@ -165,3 +170,9 @@ end
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_user_account_tab
 #RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_transition_family_members
 #rake permissions:hbx_admin_can_add_pdc
+
+#rake permissions:initial_hbx
+#rake permissions:migrate_hbx
+#rake permissions:hbx_admin_can_update_ssn
+#rake permissions:hbx_admin_can_complete_resident_application
+#rake permissions:hbx_admin_can_access_pay_now
