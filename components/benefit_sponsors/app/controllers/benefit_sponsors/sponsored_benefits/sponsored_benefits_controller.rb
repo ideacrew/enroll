@@ -39,6 +39,20 @@ module BenefitSponsors
         end
       end
 
+      def destroy
+        binding.pry
+      @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
+
+        if @sponsored_benefit_form.destroy
+          flash[:notice] = "Dental Benefit Package successfully deleted."
+          redirect_to profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits')
+        #  render :js => "window.location = #{profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits').to_json}"
+        else
+          flash[:error] = error_messages(@sponsored_benefit_form)
+        #  render :js => "window.location = #{profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits').to_json}"
+        end
+      end
+
       def change_reference_product
         @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
       end

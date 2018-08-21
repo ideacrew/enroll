@@ -56,7 +56,11 @@
         br
         br
       = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
+      = link_to "Remove Dental Benefits <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br'
       = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"
+      = pundit_span EmployerProfile, :updateable?
+
+
 
 javascript:
 

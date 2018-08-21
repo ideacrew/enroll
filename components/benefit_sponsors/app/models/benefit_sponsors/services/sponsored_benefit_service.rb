@@ -31,6 +31,11 @@ module BenefitSponsors
         save(form)
       end
 
+      def destroy(form)
+        sponsored_benefit = find_sponsored_benefit(form.id)
+        sponsored_benefit.destroy!
+      end
+
       def store(form, sponsored_benefit)
         valid_according_to_factory = factory.validate(sponsored_benefit)
         if valid_according_to_factory

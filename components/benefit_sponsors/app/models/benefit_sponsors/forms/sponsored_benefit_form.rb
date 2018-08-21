@@ -82,6 +82,16 @@ module BenefitSponsors
         form.service.load_form_meta_data(form)
       end
 
+      def self.for_destroy(params)
+        form = self.new(params)
+        form.service = resolve_service(params)
+        form
+      end
+
+      def destroy
+        service.destroy(self)
+      end
+
       def persist(update: false)
         return false unless self.valid?
         save_result, persisted_object = (update ? service.update(self) : service.save(self))
