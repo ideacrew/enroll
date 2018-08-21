@@ -39,17 +39,11 @@ RSpec.describe do
         :kind => "dental",
         :benefit_package_id => benefit_package.id,
         :benefit_sponsorship_id => benefit_sponsorship.id,
-        :sponsored_benefit_attributes => sponsored_benefits_params
-      }
-    }
-
-    let(:sponsored_benefits_params) {
-      {
-        :sponsor_contribution_attributes => sponsor_contribution_attributes,
-        :product_package_kind => product_package_kind,
-        :kind => "dental",
         :product_option_choice => issuer_profile.legal_name,
-        :reference_plan_id => product.id.to_s
+        :product_package_kind => product_package_kind,
+        :reference_plan_id => product.id.to_s,
+
+        :sponsor_contribution_attributes => sponsor_contribution_attributes
       }
     }
 
@@ -68,7 +62,7 @@ RSpec.describe do
       }
     }
 
-    let(:create_form) { BenefitSponsors::Forms::BenefitForm.new(benefits_params) }
+    let(:create_form) { BenefitSponsors::Forms::SponsoredBenefitForm.new(benefits_params) }
     let(:subject) { BenefitSponsors::Services::SponsoredBenefitService.new(attrs) }
 
     it "should not have dental sponsored benefits" do
@@ -119,6 +113,60 @@ RSpec.describe do
         expect(benefit_package.dental_sponsored_benefit.sponsor_contribution.contribution_levels.size).to eq 4
       end
     end
+  end
+
+  describe "while destroying a sponsored benefit" do
+
+    let(:benefits_params) {
+      {
+        :kind => "dental",
+        :benefit_package_id => benefit_package.id,
+        :benefit_sponsorship_id => benefit_sponsorship.id,
+        :product_option_choice => issuer_profile.legal_name,
+        :product_package_kind => product_package_kind,
+        :reference_plan_id => product.id.to_s,
+        :sponsor_contribution_attributes => sponsor_contribution_attributes
+      }
+    }
+
+    let(:sponsor_contribution_attributes) {
+      {
+      :contribution_levels_attributes => contribution_levels_attributes
+      }
+    }
+
+    let(:contribution_levels_attributes) {
+      {
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
+        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
+        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
+      }
+    }
+
+    let(:form) { BenefitSponsors::Forms::SponsoredBenefitForm.new(benefits_params) }
+    let(:subject) { BenefitSponsors::Services::SponsoredBenefitService.new(attrs) }
+
+    context "#destroy", dbclean: :after_each do
+
+      before do
+        subject.save(form)
+        benefit_package.reload
+        update_id_and_destroy(benefit_package, benefits_params)
+      end
+
+      it "should remove dental sponsored benefits" do
+        benefit_package.reload
+        expect(benefit_package.dental_sponsored_benefit).to eq nil
+      end
+
+      def update_id_and_destroy(benefit_package, benefits_params)
+        updated_params = benefits_params.merge!({id: benefit_package.dental_sponsored_benefit.id})
+        updated_form = BenefitSponsors::Forms::SponsoredBenefitForm.new(updated_params)
+        subject.destroy(updated_form)
+      end
+    end
+
   end
 
   describe "while updating a sponsored benefit" do

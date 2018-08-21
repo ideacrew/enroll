@@ -11,6 +11,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
   let(:benefit_application)    { benefit_sponsorship.benefit_applications.first }
   let(:benefit_package)    { benefit_application.benefit_packages.first }
+  let(:sponsored_benefits_id)   { benefit_package.sponsored_benefits.first.id}
 
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:benefit_market)      { site.benefit_markets.first }
@@ -214,6 +215,35 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
     end
   end
 
-  describe "DELETE destroy" do
+  describe "DELETE destroy", dbclean: :after_each do
+
+    let(:benefits_params) {
+      {
+          :kind => sponsored_benefit_kind,
+          :benefit_application_id => benefit_application.id,
+          :benefit_package_id => benefit_package.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
+          :id => sponsored_benefits_id
+      }
+    }
+
+    before :each do
+      sign_in user
+      delete :destroy, benefits_params
+    end
+
+    it "should redirect" do
+      expect(response).to have_http_status(:redirect)
+    end
+
+    it "should redirect to edit page of benefit_sponsor" do
+      expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.employer_profile, :tab=>'benefits'))
+      expect(response.location.include?("benefits")).to eq true
+    end
+
+    it "should get an notice" do
+      expect(flash[:notice]).to match /Dental Benefit Package successfully deleted/
+    end
+
   end
 end

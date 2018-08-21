@@ -9,6 +9,7 @@ module BenefitSponsors
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
   let(:benefit_application)    { benefit_sponsorship.benefit_applications.first }
   let(:benefit_package)    { benefit_application.benefit_packages.first }
+  let(:sponsored_benefits_id)   { benefit_package.sponsored_benefits.first.id}
   describe "model attributes" do
     it {
       [:benefit_package_id, :benefit_sponsorship_id, :sponsored_benefit_id, :kind].each do |key|
@@ -68,6 +69,26 @@ module BenefitSponsors
       expect(fetch_form.benefit_sponsorship_id).to eq params[:benefit_sponsorship_id].to_s
       expect(fetch_form.kind).to eq 'dental'
       expect(fetch_form.id).to be form.id
+    end
+  end
+
+  describe "#for_destroy" do
+    let(:params) {
+      {
+          :kind => 'dental',
+          :benefit_application_id => benefit_application.id,
+          :benefit_package_id => benefit_package.id,
+          :benefit_sponsorship_id => benefit_sponsorship.id,
+          :id => sponsored_benefits_id
+      }
+    }
+
+    it "should destroy the form assign the params for forms" do
+      form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params)
+      expect(form.benefit_application_id).to eq params[:benefit_application_id].to_s
+      expect(form.benefit_package_id).to eq params[:benefit_package_id].to_s
+      expect(form.benefit_sponsorship_id).to eq params[:benefit_sponsorship_id].to_s
+      expect(form.kind).to eq 'dental'
     end
   end
 end

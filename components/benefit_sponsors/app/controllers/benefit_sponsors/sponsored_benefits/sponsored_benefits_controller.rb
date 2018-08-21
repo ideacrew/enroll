@@ -40,7 +40,6 @@ module BenefitSponsors
       end
 
       def destroy
-        binding.pry
       @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
 
         if @sponsored_benefit_form.destroy
