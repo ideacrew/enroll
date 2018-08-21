@@ -47,9 +47,9 @@
 				<% if show_pay_now? %>
           <% if can_access_pay_now_button %>
 					   <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal">Pay Now</button>
-             <% else %>
+          <% else %>
              <button class="btn btn-primary disabled">Pay Now</button>
-             <% end %>
+          <% end %>
 				<% end %>
 				<%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
 				<% if show_pay_now? %>
