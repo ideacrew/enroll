@@ -18,10 +18,11 @@ class ActivateBenefitGroupAssignment < MongoidMigrationTask
     begin
       census_employee = CensusEmployee.by_ssn(ENV['ce_ssn']).first
       if census_employee.nil?
-        puts "No census employee was found with given ssn"
+        puts "No census employee was found with given ssn" unless Rails.env.test?
       else
         benefit_group_assignment=census_employee.benefit_group_assignments.where(id:ENV['bga_id']).first
         benefit_group_assignment.make_active
+        puts "Activated Benefit Group Assignments for the Employee" unless Rails.env.test?
       end
     rescue => e
       e.message
@@ -34,9 +35,10 @@ class ActivateBenefitGroupAssignment < MongoidMigrationTask
       benefit_package_id = ENV['benefit_package_id']      
       benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
       if benefit_package.nil?
-        puts "No census employee was found with given ssn"
+        puts "No Benefit Package was found with given id" unless Rails.env.test?
       else
         benefit_package.activate_benefit_group_assignments
+        puts "Activated Benefit Group Assignments for the given Benefit Package" unless Rails.env.test?
       end
     rescue => e
       e.message
