@@ -1,10 +1,30 @@
 module ApplicationHelper
 
+  def can_employee_shop?(date)
+    return false if date.blank?
+    date = Date.strptime(date.to_s,"%m/%d/%Y")
+    Plan.has_rates_for_all_carriers?(date) == false
+  end
+
+  def no_rates_error(exchange)
+    "Benefits for which you may be eligible to offer are not currently approved by the #{exchange}, please return in 24 hours."
+  end
+
+  def rates_available?(employer, date=nil)
+    employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
+  end
+
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
       plan.family_deductible.split("|").last.squish
     else
       plan.deductible
+    end
+  end
+
+  def draft_plan_year?(plan_year)
+    if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
+      plan_year
     end
   end
 
@@ -406,6 +426,22 @@ module ApplicationHelper
   def display_carrier_logo(plan, options = {:width => 50})
     carrier_name = carrier_logo(plan)
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  end
+      
+  def digest_logos
+    carrier_logo_hash = Hash.new(carriers:{})
+    carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
+    carriers.each do |car|
+      if Rails.env == "production"
+        image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        digest_image = "/assets/#{Rails.application.assets.find_asset(image).digest_path}"
+        carrier_logo_hash[car.legal_name] = digest_image
+      else
+        image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
+        carrier_logo_hash[car.legal_name] = image
+      end
+    end
+    carrier_logo_hash
   end
 
   def display_carrier_pdf_logo(plan, options = {:width => 50})

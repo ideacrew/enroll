@@ -29,6 +29,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         change_benefit_group(enrollments)
       when "change_enrollment_status"
         change_enrollment_status(enrollments)
+      when "create_enrollment_for_benefit_application"
+        create_enrollment_for_benefit_application(enrollments)
     end
   end
 
@@ -54,24 +56,24 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def change_plan(enrollments)
-    if ENV['new_plan_id'].blank?
+    if ENV['new_product_id'].blank?
       raise "Input required: plan id" unless Rails.env.test?
     end
-    new_plan_id = ENV['new_plan_id']
+    new_product_id = ENV['new_product_id']
     enrollments.each do |enrollment|
-      enrollment.update_attributes!(:plan_id => new_plan_id)
-      puts "Changed Enrollment's plan to #{new_plan_id}" unless Rails.env.test?
+      enrollment.update_attributes!(:product_id => new_product_id)
+      puts "Changed Enrollment's plan to #{new_product_id}" unless Rails.env.test?
     end
   end
 
   def change_benefit_group(enrollments)
-    if ENV['new_benefit_group_id'].blank?
+    if ENV['new_sponsored_benefit_package_id'].blank?
       raise "Input required: benefit group id" unless Rails.env.test?
     end
-    new_benefit_group_id = ENV['new_benefit_group_id']
+    new_sponsored_benefit_package_id = ENV['new_sponsored_benefit_package_id']
     enrollments.each do |enrollment|
-      enrollment.update_attributes!(:benefit_group_id => new_benefit_group_id)
-      puts "Changed Enrollment's benefit group to #{new_benefit_group_id}" unless Rails.env.test?
+      enrollment.update_attributes!(:sponsored_benefit_package_id => new_sponsored_benefit_package_id)
+      puts "Changed Enrollment's benefit group to #{new_sponsored_benefit_package_id}" unless Rails.env.test?
     end
   end
 
@@ -156,7 +158,36 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     end
   end
 
+  # creates new enrollment with given enrollment details with effective date as benefit application start date.
+  def create_enrollment_for_benefit_application(enrollments)
+
+    benefit_sponsorship = BenefitSponsors::Organizations::Organization.employer_profiles.where(fein: ENV['fein']).first.active_benefit_sponsorship
+    benefit_application = benefit_sponsorship.benefit_applications.where(:'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y")).first
+    benefit_package = benefit_application.benefit_packages.first
+
+    enrollments.each do |enrollment|
+
+      new_enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(enrollment, benefit_package)
+      if  new_enrollment.present? && new_enrollment.valid?
+
+        new_enrollment.save!
+
+        assignment = enrollment.employee_role.census_employee.benefit_group_assignment_by_package(new_enrollment.sponsored_benefit_package_id)
+        assignment.update_attributes(hbx_enrollment_id: new_enrollment.id)
+
+        new_enrollment.select_coverage! if new_enrollment.may_select_coverage?
+        new_enrollment.begin_coverage! if new_enrollment.may_begin_coverage?
+
+        puts "New enrollment created " unless Rails.env.test?
+      else
+        puts "Unable to save new enrollment " unless Rails.env.test?
+      end
+
+    end
+  end
+
   def transfer_enrollment_from_glue_to_enroll
+    # This method needs to be updated to new model
     ts = TranscriptGenerator.new
     ts.display_enrollment_transcripts
   end
