@@ -2,7 +2,7 @@ namespace :load do
   task :benefit_market_catalog => :environment do
 
     calender_year = 2019
-    site = BenefitSponsors::Site.where(site_key: "#{Settings.site.subdomain}").first
+    site = BenefitSponsors::Site.where(site_key: :cca).first
     benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: :aca_shop).first
 
     puts "Creating Benefit Market Catalog for #{calender_year}" unless Rails.env.test?
@@ -36,6 +36,15 @@ namespace :load do
 
     {"Single Issuer" => :single_issuer, "Metal Level" => :metal_level, "Single Product" => :single_product}.each do |title, package_kind|
       product_package = benefit_market_catalog.product_packages.where(title: title).first
+
+      if package_kind == :single_product
+        contribution_model = composite_contribution_model
+        pricing_model = composite_pricing_model
+      else
+        contribution_model = list_bill_contribution_model
+        pricing_model = list_bill_pricing_model
+      end
+
       if product_package.present?
         product_package.products = []
       else
@@ -43,8 +52,8 @@ namespace :load do
           benefit_kind: :aca_shop, product_kind: :health, title: title,
           package_kind: package_kind,
           application_period: benefit_market_catalog.application_period,
-          contribution_model: list_bill_contribution_model,
-          pricing_model: list_bill_pricing_model
+          contribution_model: contribution_model,
+          pricing_model: pricing_model
         })
       end
       product_package.products = products_for(product_package, calender_year)
