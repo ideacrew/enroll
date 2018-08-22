@@ -1579,7 +1579,7 @@ ivl_notice_triggers = [
 
   {
       hbx_id: 'IVL_CDC',
-      title: 'YOUR INSURANCE THROUGH DC HEALTH LINK HAS CHANGED TO COVER ALL DC',
+      title: 'Your Insurance through DC Health Link Has Changed to Cover All DC',
       description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
       resource_name: 'consumer_role',
       event_name: 'ivl_to_coverall_transition_notice',
@@ -1601,7 +1601,7 @@ ivl_notice_triggers = [
 
   {
       hbx_id: 'IVL_DCH',
-      title: 'YOUR INSURANCE THROUGH COVER ALL DC HAS CHANGED TO DC HEALTH LINK',
+      title: 'Your Insurance through Cover All DC Has Changed to DC Health Link',
       description: 'This is an Transition Notice and is sent for people who are moved to DC HEALTH LINK',
       resource_name: 'consumer_role',
       event_name: 'coverall_to_ivl_transition_notice',
