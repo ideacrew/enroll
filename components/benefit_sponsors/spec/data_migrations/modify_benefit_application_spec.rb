@@ -112,6 +112,9 @@ describe ModifyBenefitApplication do
       it "should terminate any active employee enrollments" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
       end
+      it "should terminate any active employee enrollments with termination date as on Benefit Application" do
+        expect(hbx_enrollment.terminated_on).to eq end_on
+      end
     end
 
 
