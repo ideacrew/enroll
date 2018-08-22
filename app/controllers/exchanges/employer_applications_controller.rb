@@ -23,7 +23,7 @@ class Exchanges::EmployerApplicationsController < ApplicationController
         @application.terminate_employee_enrollments
       end
       flash[:notice] = "Employer Application terminated successfully."
-      redirect_to exchanges_hbx_profiles_root_path
+      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
   end
 
@@ -37,7 +37,7 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       end
       @employer_profile.revert_application! if @employer_profile.may_revert_application?
       flash[:notice] = "Employer Application canceled successfully."
-      redirect_to exchanges_hbx_profiles_root_path
+      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
   end
 
