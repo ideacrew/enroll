@@ -83,6 +83,26 @@ describe ModifyBenefitApplication do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end
 
+    context "update aasm state of benefit application" do
+
+      before do
+        allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state")
+      end
+
+      it "should update the benefit application" do
+        benefit_application.update_attributes!(aasm_state: "enrollment_ineligible", benefit_packages: [])
+        expect(benefit_application.aasm_state).to eq :enrollment_ineligible
+        subject.migrate
+        benefit_application.reload
+        expect(benefit_application.aasm_state).to eq :enrollment_open
+      end
+
+      it "should not update the benefit application" do
+        expect { subject.migrate }.to raise_error(RuntimeError)
+        expect { subject.migrate }.to raise_error("No benefit application in ineligible state")
+      end
+    end
+
     context "terminate benefit application" do
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }

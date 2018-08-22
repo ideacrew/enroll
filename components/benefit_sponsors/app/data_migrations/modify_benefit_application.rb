@@ -18,7 +18,13 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def update_aasm_state(benefit_applications)
-
+    benefit_application = benefit_applications.where(aasm_state: "enrollment_ineligible").last
+    if benefit_application.present?
+      benefit_application.begin_open_enrollment!
+      puts "aasm state has been changed to enrolling" unless Rails.env.test?
+    else
+      raise "No benefit application in ineligible state"
+    end
   end
 
   def reinstate_benefit_application(benefit_applications)
@@ -42,7 +48,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def benefit_applications_for_aasm_state_update
-
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_sponsorship.benefit_applications
   end
 
   def benefit_applications_for_reinstate
