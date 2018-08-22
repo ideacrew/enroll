@@ -27,13 +27,9 @@ module BenefitSponsors
         hbx_ids = attr[:hbx_ids]
         new_date = attr[:start_date]
         hbx_ids.each do |hbx_id|
-          person = find_person(hbx_id)
-          next unless person.present?
-          primary_family = person.primary_family
-          if primary_family.present? && primary_family.current_broker_agency.present?
-            primary_family.current_broker_agency.update_attributes(start_on: new_date)
-            primary_family.save
-          end
+          organization = find_organization(hbx_id)
+          next unless organization.present?
+          organization.employer_profile.active_broker_agency_account.update_attributes(start_on: new_date)
         end
       end
 
@@ -92,6 +88,10 @@ module BenefitSponsors
 
        def find_profile(employer_profile_id)
          BenefitSponsors::Organizations::Profile.find(employer_profile_id)
+       end
+
+       def find_organization(hbx_id)
+         BenefitSponsors::Organizations::Organization.where(hbx_id: hbx_id).first
        end
 
     end
