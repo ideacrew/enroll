@@ -10,6 +10,8 @@ if ( $('tr.child-row:visible').length > 0 ) {
 var actionSelected = "";
 var applicationId = "";
 var employerId = "";
+var pyEndDate = "";
+var termReason = "";
 
 if ( $parent_row.next().hasClass('child-row') ) {
 //
@@ -156,10 +158,12 @@ function pyAction(action, id, employer_id, term_date) {
 }
 // You can use the actionSelected here
 function submitPlanActions() {
+  pyEndDate = $('input.py-end-date').val()
+  termReason = $('input[name=term_actions]:checked').val()
   $.ajax({
     url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
     method: 'PUT',
-    data: { employer_id: employerId }
+    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason }
   });
 }
 

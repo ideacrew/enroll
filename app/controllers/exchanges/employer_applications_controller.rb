@@ -13,32 +13,48 @@ class Exchanges::EmployerApplicationsController < ApplicationController
 
   def terminate
     @application = @employer_profile.plan_years.find(params[:employer_application_id])
-    if @application.present?
-      end_on = Date.strptime(params[:end_on], "%m/%d/%Y")
-      if end_on > TimeKeeper.date_of_record
-        @application.schedule_termination!(end_on) if @application.may_schedule_termination?
+    begin
+      if @application.present?
+        end_on = Date.strptime(params[:end_on], "%m/%d/%Y")
+        if end_on > TimeKeeper.date_of_record
+          @application.schedule_termination!(end_on) if @application.may_schedule_termination?
+        else
+          @application.terminate!(end_on) if @application.may_terminate?
+          if @application.terminated?
+            @application.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record)
+            @application.terminate_employee_enrollments(end_on)
+          else
+            flash[:error] = "Employer Application can't be terminated."
+          end
+        end
+        flash[:notice] = "Employer Application terminated successfully."
       else
-        @application.terminate!(end_on) if @application.may_terminate?
-        @application.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record)
-        @application.terminate_employee_enrollments
+        flash[:error] = "Employer Application can't be terminated."
       end
-      flash[:notice] = "Employer Application terminated successfully."
-      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
+    rescue Exception => e
+      flash[:error] = "Couldn't terminate plan year due to #{e}"
     end
+    render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
   end
 
   def cancel
     @application = @employer_profile.plan_years.find(params[:employer_application_id])
-    if @application.present?
-      if @application.may_cancel?
-        @application.cancel!
-      elsif @application.may_cancel_renewal?
-        @application.cancel_renewal!
+    begin
+      if @application.present?
+        if @application.may_cancel?
+          @application.cancel!
+        elsif @application.may_cancel_renewal?
+          @application.cancel_renewal!
+        end
+        @employer_profile.revert_application! if @employer_profile.may_revert_application?
+        flash[:notice] = "Employer Application canceled successfully."
+      else
+        flash[:error] = "Employer Application can't be canceled."
       end
-      @employer_profile.revert_application! if @employer_profile.may_revert_application?
-      flash[:notice] = "Employer Application canceled successfully."
-      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
+    rescue Exception => e
+      flash[:error] = "Couldn't cancel plan year due to #{e}"
     end
+    render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
   end
 
   def reinstate

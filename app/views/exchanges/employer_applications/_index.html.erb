@@ -63,12 +63,12 @@
           <tr id="<%= application.id %>" class="plan-year-actions hidden">
             <td colspan="2">
               <div class="term_action_radios hidden">
-                <%= radio_button_tag 'term_actions', 'voluntary_term'  %> VOLUNTARY TERMINATION <br />
+                <%= radio_button_tag 'term_actions', 'voluntary_term', true  %> VOLUNTARY TERMINATION <br />
                 <%= radio_button_tag 'term_actions', 'non_pay_term'  %> NON-PAY TERMINATION
               </div>
             </td>
             <td colspan="2">
-              <input type="text" class="form-control date" style="width:120px"> <span class="glyphicon glyphicon-calendar" style="font-size:1.5em" aria-hidden="true" ></span>
+              <input type="text" class="form-control date py-end-date" style="width:120px"> <span class="glyphicon glyphicon-calendar" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
               <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true  %> TRANSMIT TO CARRIER
