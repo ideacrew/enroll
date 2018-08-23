@@ -121,8 +121,7 @@ aca:
     mail_address:
       address_1: "1225 I Street, NW"
       address_2: "Suite 400"
-      city: "Washington"
-      zip_code: "20026"
+      zip_code: "20005"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
