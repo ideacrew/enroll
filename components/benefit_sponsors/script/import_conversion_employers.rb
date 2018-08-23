@@ -12,7 +12,7 @@ module BenefitSponsors
 
         # get site key from new model
         unless Settings.site.key == :mhc
-          importer = BenefitSponsors::Importers::Mhc::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
+          importer = BenefitSponsors::Importers::Mhc::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"], config["conversions"]["mid_year_conversion"])
         else
           importer = ::Importers::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
         end
