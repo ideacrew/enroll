@@ -21,6 +21,12 @@ class ModifyBenefitApplication< MongoidMigrationTask
     benefit_application = benefit_applications.where(aasm_state: "enrollment_ineligible").last
     if benefit_application.present?
       benefit_application.begin_open_enrollment!
+      benefit_sponsorship = benefit_application.benefit_sponsorship
+      benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
+      benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: benefit_sponsorship.aasm_state,
+          to_state: "initial_enrollment_open"
+      )
       puts "aasm state has been changed to enrolling" unless Rails.env.test?
     else
       raise "No benefit application in ineligible state"
