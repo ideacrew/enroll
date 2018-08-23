@@ -8,7 +8,7 @@ module Insured::PlanShopping::ReceiptHelper
   end
 
   def individual?
-    @enrollment.kind == 'individual'
+    @enrollment.kind.in?(['individual', 'coverall'])
   end
 
   def initial_enrollment?
