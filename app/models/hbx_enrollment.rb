@@ -841,15 +841,11 @@ class HbxEnrollment
     end
   end
 
-  def is_an_existing_ivl_plan_by_hios_id?(new_plan)
-    family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
-  end
-
   def is_an_existing_plan?(new_plan)
     if is_shop?
       self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
     else
-      is_an_existing_ivl_plan_by_hios_id?(new_plan)
+      family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
     end
   end
 
