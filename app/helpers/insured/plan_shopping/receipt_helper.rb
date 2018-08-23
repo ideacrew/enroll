@@ -10,7 +10,7 @@ module Insured
       end
 
       def individual?
-        @enrollment.kind == ('individual' || 'coverall')
+        @enrollment.kind.in?(['individual', 'coverall'])
       end
 
       def has_any_previous_kaiser_enrollments?
