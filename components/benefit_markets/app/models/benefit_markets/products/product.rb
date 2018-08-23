@@ -139,6 +139,10 @@ module BenefitMarkets
       @service_area ||= ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
     end
 
+    def product_type
+      health_plan_kind.present? ? health_plan_kind : dental_plan_kind
+    end
+
     def name
       title
     end

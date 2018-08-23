@@ -77,7 +77,7 @@ class ProductBuilder
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
       hios_base_id, csr_variant_id = cost_share_variance.hios_plan_and_variant_id.split("-")
       if csr_variant_id != "00"
-        csr_variant_id = parse_metal_level == "dental" ? "" : csr_variant_id
+        csr_variant_id = retrieve_metal_level == "dental" ? "" : csr_variant_id
         product = ::BenefitMarkets::Products::Product.where(
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id
@@ -95,16 +95,20 @@ class ProductBuilder
           deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
           family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
           is_reference_plan_eligible: true,
+          metal_level_kind: retrieve_metal_level.to_sym,
         }
 
         all_attributes = if is_health_product?
           {
             health_plan_kind: @qhp.plan_type.downcase,
-            metal_level_kind: parse_metal_level.to_sym,
             ehb: @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
           }
         else
-          { product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS}
+          {
+            dental_plan_kind: @qhp.plan_type.downcase,
+            dental_level: @qhp.metal_level.downcase,
+            product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+          }
         end.merge(shared_attributes)
 
         if product.present?
@@ -159,10 +163,8 @@ class ProductBuilder
     @qhp.dental_plan_only_ind.downcase == "no"
   end
 
-  def parse_metal_level
-    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
-    return @qhp.metal_level.downcase unless ["high","low"].include?(@qhp.metal_level.downcase)
-    @qhp.metal_level = "dental"
+  def retrieve_metal_level
+    is_health_product? ? @qhp.metal_level.downcase : "dental"
   end
 
   def parse_market
