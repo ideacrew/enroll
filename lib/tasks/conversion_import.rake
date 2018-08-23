@@ -2,8 +2,8 @@ namespace :conversion_import do
   desc "Import given fein employers into CSV sheet"
   task employers: :environment do |_, args|
     file_name = File.expand_path("#{Rails.root}/public/employers_export_conversion.csv")
-    csv_headers = %w(fein dba legal_name sic_code physical_address_1 physical_address_2 city county state zip mailing_address_1 mailing_address_2 city state zip contact_first_name contact_last_name contact_email contact_phone
-                     Enrolled_Employee_count New_Hire_Coverage_Policy coverage_start_date)
+    csv_headers = %w(action FEIN Doing_Business_As Legal_Name Issuer_Assigned_Employer_Id Sic_Code Physical_Address_1 Physical_Address_2 City County County_FIPS_Code State Zip Mailing_Address_1 Mailing_Address_2 City State Zip Contact_First_Name Contact_Last_Name Contact_Email Contact_Phone
+                     Contact_Phone_Extension Enrolled_Employee_count New_Hire_Coverage_Policy Contact_Address_1 Contact_Address_2 City State Zip Broker_Name Broker_NPN TPA_Name TPA_Fein Coverage_Start_Date)
 
     feins = ENV['feins_list'].split(' ')
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -15,25 +15,35 @@ namespace :conversion_import do
         physical_location, mailing_location = find_address_details(organization)
 
         #In conversion sheet we have only one staff role
-        available_staff_roles = find_staff_roles(organization).first
+        available_staff_roles = find_staff_role(organization).first
         physical_address = physical_location.address
-        mailing_attributes = mailing_address_attributes(mailing_location)
+        mailing_attributes = mailing_address_attributes(mailing_location.address)
         staff_role_attributes = append_attributes(available_staff_roles)
-        benefit_application = find_plan_year(organization).renewing.first
+        benefit_application = find_plan_year(organization).first
         probation_kind = benefit_application.benefit_packages.first.probation_period_kind.to_s
-        applications  =  [benefit_application.fte_count, probation_kind, benefit_application.effective_period.min]
-        csv << [organization.fein,
-                 organization.dba,
-                 organization.legal_name,
-                 organization.sic_code,
-                 physical_address.address_1,
-                 physical_address.address_2,
-                 physical_address.city,
-                 physical_address.county,
-                 physical_address.state,
-                 physical_address.zip
-              ] + mailing_attributes + staff_role_attributes + applications
+        applications  = [benefit_application.fte_count, probation_kind, benefit_application.effective_period.min]
+
+        empty_arr = Array.new
+        attributes_not_used = 8.times do
+          empty_arr.push ""
+        end
+
+        csv << ["Add",
+                organization.fein,
+                organization.dba,
+                organization.legal_name,
+                "",
+                organization.employer_profile.sic_code,
+                physical_address.address_1,
+                physical_address.address_2,
+                physical_address.city,
+                physical_address.county,
+                "",
+                physical_address.state,
+                physical_address.zip
+        ] + mailing_attributes + staff_role_attributes + attributes_not_used + applications
       end
+      puts "Successfully Generated CSV placed in #{file_name}" unless Rails.env.test?
     end
   end
 
@@ -112,13 +122,13 @@ namespace :conversion_import do
     organization.benefit_sponsorships.first.benefit_applications
   end
 
-  def append_attributes(available_staff_roles)
-    person = available_staff_roles.person
+  def append_attributes(person)
     staff_details = Array.new
     staff_details << person.first_name
     staff_details << person.last_name
     staff_details << person.emails.first.address
     staff_details << person.phones.first.full_phone_number
+    staff_details << ""
 
     staff_details
   end
