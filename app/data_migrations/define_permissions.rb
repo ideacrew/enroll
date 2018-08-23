@@ -31,8 +31,9 @@ class DefinePermissions < MigrationTask
     u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u7 = User.create( email: 'themanda.tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    org = Organization.create(legal_name:'Test Org 2050',fein:'123450986')
-    hbx_profile_id = org.build_hbx_profile(cms_id:'DCO',us_state_abbreviation:'DC').id
+    org = Organization.new(legal_name:'Test Org 2050',fein:'123450986')
+    hbx_profile = HbxProfile.all.first
+    hbx_profile_id = hbx_profile.id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
     p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
     p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
