@@ -2,16 +2,10 @@
   <tbody>
     <tr>
       <td>
-        <% if notice.shop? %>
-          <b><%= Settings.site.short_name %></b><br>
-             <%= Settings.aca.shop_market.mail_address.address_1 %><br>
-             <%= Settings.aca.shop_market.mail_address.address_2 %><br>
-             <%= Settings.aca.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.aca.shop_market.mail_address.zip_code %><br>
-        <% else %>
-          <b><%= Settings.site.short_name %> Contact Center</b><br>
-             <%= Settings.aca.individual_market.mail_address.address_1 %><br>
-             <%= Settings.aca.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.aca.individual_market.mail_address.zip_code %><br>
-        <% end %>
+        <b><%= Settings.site.short_name %></b><br>
+        1225 I Street, NW<br>
+        Suite 400<br>
+        Washington, DC 20005
       </td>
       <td colspan="2" align="right"><a href=
                                     "https://dchealthlink.com/"
