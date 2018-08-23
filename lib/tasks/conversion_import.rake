@@ -3,7 +3,9 @@ namespace :conversion_import do
   task employers: :environment do |_, args|
     file_name = File.expand_path("#{Rails.root}/public/employers_export_conversion.csv")
     csv_headers = %w(action FEIN Doing_Business_As Legal_Name Issuer_Assigned_Employer_Id Sic_Code Physical_Address_1 Physical_Address_2 City County County_FIPS_Code State Zip Mailing_Address_1 Mailing_Address_2 City State Zip Contact_First_Name Contact_Last_Name Contact_Email Contact_Phone
-                     Contact_Phone_Extension Enrolled_Employee_count New_Hire_Coverage_Policy Contact_Address_1 Contact_Address_2 City State Zip Broker_Name Broker_NPN TPA_Name TPA_Fein Coverage_Start_Date)
+                     Contact_Phone_Extension Enrolled_Employee_count New_Hire_Coverage_Policy Contact_Address_1 Contact_Address_2 City State Zip Broker_Name Broker_NPN TPA_Name TPA_Fein Coverage_Start_Date Carrier_Selected Plan_Selection_Category Plan_Name Plan_Hios_Id
+                     Employee_only_Rating_tier_Contribution Employee_Only_Rating_Tier_Premium Employee_And_Spouse_Rating_Tier_Offered Employee_And_Spouse_Rating_Tier_Contribution Employee_And_Spouse_Rating_Tier_Premium Employee_And_Dependents_Rating_Tier_Offered
+                     Employee_And_Dependents_Rating_Tier_Contribution Employee_And_Dependents_Rating_Tier_Premium Family_Rating_Tier_Offered Family_Rating_Tier_Contribution Family_Rating_Tier_Premium)
 
     feins = ENV['feins_list'].split(' ')
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -21,13 +23,14 @@ namespace :conversion_import do
         staff_role_attributes = append_attributes(available_staff_roles)
         benefit_application = find_plan_year(organization).first
         probation_kind = benefit_application.benefit_packages.first.probation_period_kind.to_s
-        applications  = [benefit_application.fte_count, probation_kind, benefit_application.effective_period.min]
+        start_on = [benefit_application.effective_period.min]
 
         empty_arr = Array.new
-        attributes_not_used = 8.times do
+        9.times do
           empty_arr.push ""
         end
 
+        applications  = [benefit_application.fte_count, probation_kind]
         csv << ["Add",
                 organization.fein,
                 organization.dba,
@@ -41,7 +44,7 @@ namespace :conversion_import do
                 "",
                 physical_address.state,
                 physical_address.zip
-        ] + mailing_attributes + staff_role_attributes + attributes_not_used + applications
+        ] + mailing_attributes + staff_role_attributes + applications + empty_arr + start_on
       end
       puts "Successfully Generated CSV placed in #{file_name}" unless Rails.env.test?
     end
