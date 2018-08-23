@@ -932,6 +932,16 @@ class PlanYear
       transitions from: [:active, :suspended], to: :terminated
     end
 
+    # Coverage terminated due to voluntary_terminate
+    event :voluntary_terminate, :after => [:record_transition, :notify_employer_py_voluntary_terminate]  do
+      transitions from: [:active, :suspended], to: :terminated
+    end
+
+    # Coverage terminated due to non-payment
+    event :nonpayment_terminate, :after => [:record_transition, :notify_employer_py_nonpayment_terminate] do
+      transitions from: [:active, :suspended], to: :terminated
+    end
+
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
       transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
