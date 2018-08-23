@@ -17,6 +17,13 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
+
+  VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
+  VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
+
+  NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment"
+  NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment"
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -1057,6 +1064,14 @@ class PlanYear
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
+
+  def notify_employer_py_voluntary_terminate
+    notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
+  end
+
+  def notify_employer_py_nonpayment_terminate
+    notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+  end
 
   def log_message(errors)
     msg = yield.first
