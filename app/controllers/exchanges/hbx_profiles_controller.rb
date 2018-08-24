@@ -439,6 +439,22 @@ def employer_poc
     Person.find(params[:person][:person_id]).primary_family.active_household.create_new_tax_household(params[:person]) rescue nil
   end
 
+  def edit_eligibility
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    @year = params[:tax_household_year] rescue nil
+    @tax_household = @person.primary_family.active_household.get_the_latest_tax_household_by_year(@year) rescue nil
+
+    respond_to do |format|
+      format.js { render "edit_eligibility", person: @person, :family_actions_id => params[:family_actions_id] }
+    end
+  end
+
+  def update_eligibility
+    @element_to_replace_id = params[:person][:family_actions_id]
+    @new_tax_household = Person.find(params[:person][:person_id]).primary_family.active_household.create_duplicate_tax_household_with_new_data(params[:person]) rescue nil
+  end
+
   def eligibility_kinds_hash(value)
     if value['pdc_type'] == 'is_medicaid_chip_eligible'
       { is_medicaid_chip_eligible: true, is_ia_eligible: false }.with_indifferent_access

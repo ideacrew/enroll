@@ -312,3 +312,48 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     end
   end
 end
+
+describe Household, "#get_the_latest_tax_household_by_year", :dbclean => :after_each do
+  let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:test_household) { test_family.active_household }
+  let!(:test_tax_household) { FactoryGirl.create(:tax_household, household: test_household) }
+
+  context "for latest_active_thh" do
+    it "should return a valid tax_household" do
+      test_tax_household.update_attributes!(effective_ending_on: nil)
+      expect(test_household.get_the_latest_tax_household_by_year(TimeKeeper.date_of_record.year)).to eq test_tax_household
+    end
+
+    it "should return nil as tax_household doesn't exist" do
+      expect(test_household.get_the_latest_tax_household_by_year(TimeKeeper.date_of_record.year)).to eq nil
+    end
+  end
+end
+
+describe Household, "#create_duplicate_tax_household_with_new_data", :dbclean => :after_each do
+  let!(:test_person) { FactoryGirl.create(:person) }
+  let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member, person: test_person) }
+  let(:test_household) { test_family.active_household }
+  let!(:test_tax_household) { FactoryGirl.create(:tax_household, household: test_household) }
+
+  let(:params) {
+    {"tax_household_id"=>"#{test_tax_household.id}",
+     "person_id"=>"#{test_person.hbx_id}",
+     "tax_household_year"=>"#{TimeKeeper.date_of_record.year}",
+     "family_members"=>
+      {"#{test_person.hbx_id}"=>{"pdc_type"=>"is_ia_eligible", "reason"=>""}
+      }
+    }
+  }
+
+  it "should create a new tax_household and embeded documents as of given data" do
+    expect(test_household.tax_households.count).to eq 1
+    test_household.create_duplicate_tax_household_with_new_data(params)
+    expect(test_household.tax_households.count).to eq 2
+  end
+
+  it "should not create a new tax_household as it raises error for not finding the person" do
+    params.merge!( {"family_members"=>{"2fdsfghdsf7677786"=>{"pdc_type"=>"is_ia_eligible", "reason"=>""}}})
+    expect{test_household.create_duplicate_tax_household_with_new_data(params)}.to raise_error(NoMethodError)
+  end
+end

@@ -8,6 +8,15 @@ module ApplicationHelper
     end
   end
 
+  def display_assistance_years
+    (2015..((TimeKeeper.date_of_record+1.year).year)).to_a
+  end
+
+  def valid_pdc_set(tax_household, family_member)
+    pdc = tax_household.tax_household_members.where(applicant_id: family_member.id).first.valid_pdc
+    ::TaxHouseholdMember::DISPLAY_PDC_TYPES.detect{ |sma_arr| sma_arr.include?(pdc) }
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true

@@ -504,4 +504,42 @@ end
       expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
     end
   end
+
+  describe "#display_assistance_years" do
+    let!(:assistance_year) { helper.display_assistance_years.sample }
+
+    it "should return an array of fixed numbers" do
+      expect(assistance_year.class).to eq Fixnum
+    end
+
+    it "should return an array of years" do
+      expect(assistance_year.to_s.size).to eq 4
+    end
+
+    it "should not return an array of dates" do
+      expect(assistance_year.class).not_to eq Date
+    end
+  end
+
+  describe "#valid_pdc_set" do
+    let!(:test_person) { FactoryGirl.create(:person) }
+    let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member, person: test_person) }
+    let(:test_family_member) { test_family.primary_applicant }
+    let!(:test_tax_household) { FactoryGirl.create(:tax_household, household: test_family.active_household) }
+    let!(:test_tax_household_member) {
+      test_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: test_family_member.id)
+      test_tax_household.tax_household_members[0]
+    }
+
+    ::TaxHouseholdMember::DISPLAY_PDC_TYPES.each do |pdc_array|
+      it "should return valid pdc_set based on the " do
+        test_tax_household_member.update_attributes!(pdc_array[1].to_sym => true)
+        expect(helper.valid_pdc_set(test_tax_household, test_family_member)).to eq pdc_array
+      end
+    end
+
+    it "should return nil for not finding a valid pdc_set" do
+      expect(helper.valid_pdc_set(test_tax_household, test_family_member)).to eq nil
+    end
+  end
 end

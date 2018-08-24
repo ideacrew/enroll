@@ -58,6 +58,19 @@ class TaxHousehold
     end
   end
 
+  def create_tax_household_members(family_member_params)
+    family_member_params.each do |person_hbx_id, thhm_info|
+      person_id = Person.by_hbx_id(person_hbx_id).first.id
+      family_member = family.family_members.where(person_id: person_id).first
+      tax_household_members.create(
+        :applicant_id => family_member.id,
+        :is_subscriber => family_member.is_primary_applicant,
+        thhm_info["pdc_type"].to_sym => true,
+        :reason => thhm_info["reason"]
+      )
+    end
+  end
+
   def aptc_members
     tax_household_members.find_all(&:is_ia_eligible?)
   end

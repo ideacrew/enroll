@@ -464,7 +464,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       xhr :get, :edit_dob_ssn, @params
       expect(response).to have_http_status(:success)
     end
-
   end
 
   describe 'GET new_eligibility' do
@@ -542,6 +541,107 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe 'GET edit_eligibility' do
+    let!(:person) { FactoryGirl.create(:person, :with_family) }
+    let!(:user) { FactoryGirl.create(:user, person: person) }
+    let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let!(:permission) { FactoryGirl.create(:permission, can_add_pdc: true) }
+    let!(:tax_household)  { FactoryGirl.create(:tax_household, household: person.primary_family.active_household, effective_ending_on: nil) }
+
+    let(:params) { 
+      {"family"=>"#{person.primary_family.id.to_s}",
+       "family_actions_id"=>"family_actions_#{person.primary_family.id.to_s}",
+       "person_id"=>"#{person.id.to_s}",
+       "format"=>"js",
+       "action"=>"edit_eligibility"}
+    }
+
+    context "for edit_eligibility with tax_household without passing tax_household_year" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return permission
+        sign_in(user)
+        xhr :get, :edit_eligibility, params
+      end
+
+      it "should return success status" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the edit_eligibility partial" do
+        expect(response).to render_template('edit_eligibility')
+      end
+
+      it "should set the tax_household" do
+        expect(assigns(:tax_household)).to eq tax_household
+      end
+    end
+
+    context "for edit_eligibility with tax_household with tax_household_year" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return permission
+        sign_in(user)
+        params.merge!({"tax_household_year" => "#{TimeKeeper.date_of_record.year}"})
+        xhr :get, :edit_eligibility, params
+      end
+
+      it "should return success status" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render the edit_eligibility partial" do
+        expect(response).to render_template('edit_eligibility')
+      end
+
+      it "should set the tax_household" do
+        expect(assigns(:tax_household)).to eq tax_household
+      end
+
+      it "should set the year" do
+        expect(assigns(:year)).to eq TimeKeeper.date_of_record.year.to_s
+      end
+    end
+  end
+
+  describe 'POST update_eligibility' do
+    let!(:person) { FactoryGirl.create(:person, :with_family) }
+    let!(:user) { FactoryGirl.create(:user, person: person) }
+    let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let!(:permission) { FactoryGirl.create(:permission, can_add_pdc: true) }
+    let!(:tax_household)  { FactoryGirl.create(:tax_household, household: person.primary_family.active_household, effective_ending_on: nil) }
+    let!(:tax_household_member)  {
+      tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: person.primary_family.family_members[0].id, is_ia_eligible: true, is_subscriber: true)
+      tax_household.tax_household_members[0]
+    }
+    let!(:eligibility_determination)  { FactoryGirl.create(:eligibility_determination, tax_household: tax_household) }
+
+    let(:params) {
+      { "person"=>
+        {"tax_household_id"=>"#{tax_household.id.to_s}",
+         "person_id"=>"#{person.id.to_s}",
+         "family_actions_id"=>"family_actions_#{person.primary_family.id.to_s}",
+         "tax_household_year"=>"#{TimeKeeper.date_of_record.year.to_s}",
+         "family_members"=>
+          {"#{person.hbx_id}"=>{"pdc_type"=>"is_uqhp_eligible", "reason"=>""}}},
+       "commit"=>"Submit",
+       "format"=>"js"}
+    }
+
+    before :each do
+      sign_in(user)
+      xhr :get, :update_eligibility, params
+    end
+
+    it "should send a success status update_eligibility" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should create dupicate tax_household and embeded docs if a tax_household is found as of params" do
+      tax_household.household.reload
+      expect(tax_household.household.tax_households.count).to eq 2
+    end
+  end
 
   describe "POST update_dob_ssn" do
 

@@ -4,7 +4,9 @@ class TaxHouseholdMember
   include BelongsToFamilyMember
   include ApplicationHelper
 
-  PDC_TYPES = [['Assisted', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'], ['Totally Ineligible', 'is_totally_ineligible'], ['UQHP', 'is_uqhp_eligible'] ]
+  DISPLAY_PDC_TYPES = [['Assisted', 'is_ia_eligible'], ['Medicaid', 'is_medicaid_chip_eligible'], ['Totally Ineligible', 'is_totally_ineligible'], ['UQHP', 'is_uqhp_eligible'] ]
+
+  PDC_TYPES = %w(is_ia_eligible is_medicaid_chip_eligible is_totally_ineligible is_uqhp_eligible)
 
   embedded_in :tax_household
   embeds_many :financial_statements
@@ -22,6 +24,10 @@ class TaxHouseholdMember
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
+  end
+
+  def valid_pdc
+    PDC_TYPES.detect{ |field| self.send(field) == true }
   end
 
   def update_eligibility_kinds eligibility_kinds

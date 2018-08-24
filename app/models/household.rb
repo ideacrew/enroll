@@ -187,6 +187,10 @@ class Household
     tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
   end
 
+  def get_the_latest_tax_household_by_year(year=nil)
+    year ? latest_active_tax_household_with_year(year.to_i) : latest_active_tax_household_with_year(family.assistance_applicable_year)
+  end
+
   def latest_active_tax_household_with_year(year)
     tax_households = self.tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year
@@ -401,6 +405,33 @@ class Household
     eds
   end
 
+  def create_duplicate_tax_household_with_new_data(params)
+    old_tax_household = tax_households.find(params["tax_household_id"])
+
+    th = tax_households.create(
+      allocated_aptc: old_tax_household.allocated_aptc,
+      effective_starting_on: old_tax_household.effective_starting_on,
+      is_eligibility_determined: old_tax_household.is_eligibility_determined,
+      effective_ending_on: nil,
+      submitted_at: TimeKeeper.datetime_of_record
+    )
+
+    old_tax_household.eligibility_determinations.each do |ed|
+      th.eligibility_determinations.create(
+        source: "Admin",
+        benchmark_plan_id: ed.benchmark_plan_id,
+        max_aptc: ed.max_aptc,
+        csr_percent_as_integer: ed.csr_percent_as_integer,
+        determined_on: TimeKeeper.datetime_of_record
+      )
+    end
+
+    th.create_tax_household_members(params["family_members"])
+    th.save!
+    end_multiple_thh
+    th
+  end
+
   def create_new_tax_household(params)
     effective_date = params["effective_date"].to_date
     slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
@@ -412,24 +443,15 @@ class Household
       submitted_at: TimeKeeper.datetime_of_record
     )
 
-    determination = th.eligibility_determinations.create(
-      source: "Admin_Script",
+    th.eligibility_determinations.create(
+      source: "Admin",
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
       csr_percent_as_integer: params["csr"].to_i,
       determined_on: TimeKeeper.datetime_of_record
     )
 
-    params["family_members"].each do |person_hbx_id, thhm_info|
-      person_id = Person.by_hbx_id(person_hbx_id).first.id
-      family_member = family.family_members.where(person_id: person_id).first
-      th.tax_household_members.create(
-        :applicant_id => family_member.id,
-        :is_subscriber => family_member.is_primary_applicant,
-        thhm_info["pdc_type"].to_sym => true,
-        :reason => thhm_info["reason"]
-      )
-    end
+    th.create_tax_household_members(params["family_members"])
 
     end_multiple_thh
 

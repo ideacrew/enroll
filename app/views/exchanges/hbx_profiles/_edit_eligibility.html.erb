@@ -1,0 +1,60 @@
+<% if @tax_household %>
+  <div class="container bottom-pd">
+    <%= form_for @person, remote: true, url: update_eligibility_path, method: "post", class: "form" do |f| %>
+      <%= f.hidden_field :tax_household_id, value: @tax_household.id if @tax_household %>
+      <%= f.hidden_field :person_id, value: @person.id  %>
+      <%= f.hidden_field :family_actions_id, value: "family_actions_#{@person.primary_family.id.to_s}" %>
+      <table class="table table-border">
+        <thead>
+          <th>Max APTC</th>
+          <th>CSR</th>
+          <th>Effective Date</th>
+          <th style="text-align:left !important">Assistance Year</th>
+        </thead>
+        <tbody>
+          <tr>
+            <td><h5><%= @tax_household.latest_eligibility_determination.max_aptc.to_f %></h5></td>
+            <td><h5><%= @tax_household.latest_eligibility_determination.csr_percent_as_integer %></h5></td>
+            <td><h5><%= @tax_household.effective_starting_on.to_s %></h5></td>
+            <td style="width:260px !important;">
+              <%= select_tag "person[tax_household_year]", options_for_select(display_assistance_years, :selected => @person.primary_family.assistance_applicable_year.to_s), :onchange => "eligibilityApplicableYear('#{@person.id}', this.value, '#{@element_to_replace_id}')" %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-border">
+        <thead>
+          <th>Name</th>
+          <th>SSN</th>
+          <th>DOB</th>
+          <th>HBX ID</th>
+          <th>Current Eligibility</th>
+          <th>PDC Type</th>
+          <th>Reason</th>
+        </thead>
+        <tbody>
+          <% @person.primary_family.active_family_members.each do |family_member| %>
+            <tr>
+              <td><h5><%= family_member.person.first_name%> <%= family_member.person.last_name %></h5></td>
+              <td><h5><%= truncate(number_to_obscured_ssn(family_member.person.ssn)) %></h5></td>
+              <td><h5><%= family_member.person.dob %> </h5></td>
+              <td><h5><%= family_member.person.hbx_id %></h5></td>
+              <td style="vertical-align:middle !important"><%= active_eligibility?(@person) %></td>
+              <td><%= select_tag "person[family_members][#{family_member.person.hbx_id}][pdc_type]",options_for_select(TaxHouseholdMember::DISPLAY_PDC_TYPES, :selected => valid_pdc_set(@tax_household, family_member)) %></td>
+              <td><%= text_field_tag "person[family_members][#{family_member.person.hbx_id}][reason]", nil, class: "required input_txt" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="row no-buffer child-row">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <%= f.submit "Submit", :class => "btn btn-primary", :size => '100px' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="container bottom-pd">
+    <h4 class="title">Active Eligibility doesn't exist for assistance year <%= @year %></h4>
+  </div>
+<% end %>

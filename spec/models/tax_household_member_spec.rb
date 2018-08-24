@@ -4,7 +4,7 @@ RSpec.describe TaxHouseholdMember, type: :model do
   let!(:person) {FactoryGirl.create(:person, :with_family, dob: Date.new(1999, 02, 20))}
   let!(:household) {FactoryGirl.create(:household, family: person.primary_family)}
   let!(:tax_household) {FactoryGirl.create(:tax_household, household: household)}
-  let!(:tax_household_member1) {tax_household.tax_household_members.build(applicant_id: person.primary_family.family_members.first.id)}
+  let!(:tax_household_member1) {tax_household.tax_household_members.create(applicant_id: person.primary_family.family_members.first.id, is_ia_eligible: true)}
   let!(:eligibility_kinds1) {{"is_ia_eligible" => "true", "is_medicaid_chip_eligible" => "true"}}
   let!(:eligibility_kinds2) {{"is_ia_eligible" => "true", "is_medicaid_chip_eligible" => "false"}}
   let!(:eligibility_kinds3) {{"is_ia_eligible" => "false", "is_medicaid_chip_eligible" => "false"}}
@@ -42,6 +42,17 @@ RSpec.describe TaxHouseholdMember, type: :model do
       tax_household_member1.person.update_attributes(dob: Date.new(1999, TimeKeeper.date_of_record.month+1, TimeKeeper.date_of_record.day))
       age = TimeKeeper.date_of_record.year-person.dob.year
       expect(tax_household_member1.age_on_effective_date).to eq age-1
+    end
+  end
+
+  context "valid_pdc" do
+    it "should return the pdc type to which the member is eligible" do
+      expect(tax_household_member1.valid_pdc).to eq "is_ia_eligible"
+    end
+
+    it "should return nil as the member is not eligible for any pdc type" do
+      tax_household_member1.update_attributes!(is_ia_eligible: false)
+      expect(tax_household_member1.valid_pdc).to eq nil
     end
   end
 end

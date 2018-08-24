@@ -1577,3 +1577,31 @@ describe "active dependents" do
     expect(family.active_dependents.count).to eq 1
   end
 end
+
+describe Family,"#assistance_applicable_year" , type: :model, dbclean: :after_each do
+  let(:family100) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
+  let(:current_year) { Date.new(oe_start_year, 10, 10) }
+  let(:future_year) { Date.new(oe_start_year + 1 , 10, 10) }
+  let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+  let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
+  let(:current_hbx_not_under_open_enrollment) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: false)}
+
+  it "returns future year if open enrollment start year is same as current year" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(current_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+    expect(family100.assistance_applicable_year).to eq(future_year.year)
+  end
+
+  it "returns TimeKeeper year when next year added and it is under open enrollment" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(future_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+    expect(family100.assistance_applicable_year).to eq(future_year.year)
+  end
+
+  it "returns current year if not under open enrollment" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(current_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_not_under_open_enrollment)
+    expect(family100.assistance_applicable_year).to eq(current_year.year)
+  end
+end

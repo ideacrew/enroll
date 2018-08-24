@@ -236,4 +236,23 @@ RSpec.describe TaxHousehold, type: :model do
       expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
     end
   end
+
+  describe "#create_tax_household_members", :dbclean => :after_each do
+    let!(:test_person) { FactoryGirl.create(:person) }
+    let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member, person: test_person) }
+    let(:test_household) { test_family.active_household }
+    let!(:test_tax_household) { FactoryGirl.create(:tax_household, household: test_household) }
+    let(:params) { {"family_members"=>{"#{test_person.hbx_id}"=>{"pdc_type"=>"is_ia_eligible", "reason"=>""}}} }
+
+    it "should create a new tax_household_members" do
+      expect(test_tax_household.tax_household_members.count).to eq 0
+      test_tax_household.create_tax_household_members(params["family_members"])
+      expect(test_tax_household.tax_household_members.count).to eq 1
+    end
+
+    it "should not create a new tax_household_members as it raises error for not finding the person" do
+      params.merge!( {"family_members"=>{"2fdsfghdsf7677786"=>{"pdc_type"=>"is_ia_eligible", "reason"=>""}}})
+      expect{test_tax_household.create_tax_household_members(params["family_members"])}.to raise_error(NoMethodError)
+    end
+  end
 end
