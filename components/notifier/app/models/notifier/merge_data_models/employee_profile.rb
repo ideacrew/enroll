@@ -34,7 +34,7 @@ module Notifier
         notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         first_name: 'John',
         last_name: 'Whitmore',
-        employer_name: 'MA Health Connector',
+        employer_name: 'DC Health Link',
         email: 'johnwhitmore@yahoo.com',
         ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
         ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,

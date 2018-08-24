@@ -8,7 +8,7 @@ module Notifier
     def self.stubbed_object
       notice = Notifier::MergeDataModels::CensusEmployee.new
       notice.latest_terminated_health_enrollment_plan_name = "Aetna Health Plan "
-      notice.latest_terminated_dental_enrollment_plan_name = "Delta Dental Plan"
+      notice.latest_terminated_dental_enrollment_plan_name = "CareFirst Dental Plan"
       notice
     end
   end

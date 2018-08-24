@@ -53,7 +53,7 @@ module Config::SiteHelper
   end
 
   def site_help_url
-    Settings.site.help_url
+    Settings.site.healthcare_url
   end
 
   def site_business_resource_center_url
@@ -97,7 +97,7 @@ module Config::SiteHelper
   end
 
   def site_main_web_address
-    Settings.site.main_web_address
+    Settings.site.website_name
   end
 
   def site_main_web_address_url

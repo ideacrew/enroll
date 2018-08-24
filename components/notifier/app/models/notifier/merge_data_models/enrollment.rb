@@ -22,7 +22,7 @@ module Notifier
       enrollment = Notifier::MergeDataModels::Enrollment.new({
         coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
         coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
-        plan_name: 'KP SILVER',
+        plan_name: 'Aetna GOLD',
         employer_responsible_amount: '$250.0',
         employee_responsible_amount: '$90.0',
         premium_amount: '340.0',
