@@ -131,7 +131,9 @@
 
                   <% elsif @plan.carrier_profile.legal_name == "Kaiser" %>
                   <div>
+										<!-- Taking out due to paynow option for Kaiser plans
                     Call: <strong>1-844-524-7370</strong>
+										-->
                     <!-- comment out congressional phone numbers
                     <br/>
                     For Congressional Employees: <strong><a href="tel:+18552513209">1-855-251-3209</a></strong>
@@ -147,10 +149,11 @@
 
                 <br/>
                 <br/>
-
+								<% unless @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
                 <li>
                   <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
                 </li>
+								<% end %>
               </ol>
               <% else %>
               <h4><strong><%= @plan.name %></strong></h4>
