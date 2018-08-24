@@ -23,9 +23,8 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
         before :each do
           assign(:enrollment, hbx_enrollment)
         end
-        it "returns #{market == 'individual'} for #{market} + Kaiser" do
-          allow(helper).to receive(:has_any_previous_kaiser_enrollments?).and_return(false) if (market == ('individual' || 'coverall'))
-          expect(helper.show_pay_now?).to eq market == 'individual'
+        it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
+          expect(helper.show_pay_now?).to eq market.in?(['individual', 'coverall'])
         end
       end
     end
