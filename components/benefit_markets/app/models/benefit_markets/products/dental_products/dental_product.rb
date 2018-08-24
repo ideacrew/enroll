@@ -25,7 +25,11 @@ module BenefitMarkets
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
       def metal_level
-        metal_level_kind.to_s
+        dental_level.to_s
+      end
+
+      def product_type
+        dental_plan_kind.to_s
       end
 
     end

@@ -41,12 +41,12 @@
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.health_plan_kind.to_s.upcase if sponsored_benefit.reference_product.health? %>
+            <%= sponsored_benefit.reference_product.product_type.to_s.upcase %>
           </p>
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.metal_level_kind.to_s.humanize %>
+            <%= sponsored_benefit.reference_product.metal_level.to_s.humanize %>
           </p>
         </td>
         <td>

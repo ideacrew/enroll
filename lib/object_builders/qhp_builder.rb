@@ -159,7 +159,7 @@ class QhpBuilder
 
     @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
     create_plan_from_serff_data
-    create_product_from_serff_data
+    # create_product_from_serff_data
 
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
