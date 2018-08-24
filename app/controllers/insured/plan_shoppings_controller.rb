@@ -171,7 +171,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     if @hbx_enrollment.coverage_kind == 'health'
       @metal_levels = @products.map(&:metal_level).uniq
-      @plan_types = @products.map(&:health_plan_kind).uniq
+      @plan_types = @products.map(&:product_type).uniq
     else
       @plan_types = []
       @metal_levels = []

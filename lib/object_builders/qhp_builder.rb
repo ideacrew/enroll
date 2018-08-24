@@ -36,6 +36,8 @@ class QhpBuilder
       "Aetna"
     elsif file_path.include?("dentegra")
       "Dentegra"
+    elsif file_path.include?("altus")
+      "Altus"
     elsif file_path.include?("delta")
       "Delta Dental"
     elsif file_path.include?("dominion")

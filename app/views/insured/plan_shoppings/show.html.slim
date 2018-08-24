@@ -218,7 +218,7 @@ javascript:
     if (planTypes) {
       planTypes.forEach(function(plan) {
         availableEnrollments.forEach(function(enrollment) {
-          if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
+          if (enrollment.product.product_type.toLowerCase() == plan.toLowerCase()) {
             resultsArray.push(enrollment);
           }
         })
@@ -336,7 +336,7 @@ javascript:
                       </thead>
                       <tbody>
                         <tr>
-                          <td>${result.product.health_plan_kind.toUpperCase()}</td>
+                          <td>${result.product.product_type.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
                           <td>
                             NETWORK NOTES
