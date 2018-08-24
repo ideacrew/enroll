@@ -126,7 +126,7 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   broker_carrier_appointments_enabled: true
-  dental_market_enabled: false
+  dental_market_enabled: true
   calendar_enabled: true
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50

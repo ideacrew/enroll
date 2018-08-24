@@ -4,7 +4,6 @@ module BenefitMarkets
 
       PRODUCT_PACKAGE_KINDS = [:single_product, :multi_product]
 
-
       field :hios_id,                     type: String
       field :hios_base_id,                type: String
       field :csr_variant_id,              type: String
@@ -12,6 +11,15 @@ module BenefitMarkets
       field :dental_level, type: String
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Symbol
+      field :dental_plan_kind,            type: Symbol
+
+      belongs_to  :renewal_product,
+                  inverse_of: nil,
+                  class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct"
+
+      def metal_level
+        metal_level_kind.to_s
+      end
     end
   end
 end

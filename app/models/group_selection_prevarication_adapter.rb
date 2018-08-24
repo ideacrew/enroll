@@ -206,17 +206,6 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
-	def selected_enrollment(family, employee_role)
-		employer_profile = employee_role.employer_profile
-		py = employer_profile.plan_years.detect { |py| is_covered_plan_year?(py, family.current_sep.effective_on)} || employer_profile.published_plan_year
-		enrollments = family.active_household.hbx_enrollments
-		if py.present? && py.is_renewing?
-			renewal_enrollment(enrollments, employee_role)
-		else
-			active_enrollment(enrollments, employee_role)
-		end
-	end
-
 	def renewal_enrollment(enrollments, employee_role)
 		enrollments.where({
 			:"benefit_group_id" => employee_role.census_employee.renewal_published_benefit_group.try(:id),
@@ -294,7 +283,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_shop?(person)
-    person.present? && person.has_employer_benefits?
+    person.present? && person.has_employer_benefits? # FIX ME
   end
 
   def can_shop_individual?(person)
@@ -306,24 +295,48 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_both_markets?(person)
-    false
+    true
   end
 
-  def is_eligible_for_dental?(employee_role, is_change_plan, enrollment)
-    false
+  def is_eligible_for_dental?(employee_role, change_plan, enrollment)
+    if change_plan == "change_by_qle"
+      family = employee_role.person.primary_family
+      benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
+      benefit_package.present? && benefit_package.is_offering_dental?
+    else
+      renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
+      active_benefit_package  = employee_role.census_employee.active_benefit_package
+
+      if change_plan == 'change_plan' && enrollment.present? && enrollment.is_shop?
+        enrollment.sponsored_benefit_package.is_offering_dental?
+      elsif employee_role.can_enroll_as_new_hire?
+        active_benefit_package.present? && active_benefit_package.is_offering_dental?
+      else
+        current_benefit_package = (renewal_benefit_package || active_benefit_package)
+        current_benefit_package.present? && current_benefit_package.is_offering_dental?
+      end
+    end
   end
 
-  def is_dental_offered?(employee_role)
-    false
-  end
+  # def is_dental_offered?(employee_role)
+  #   census_employee = employee_role.census_employee
+  #   current_benefit_package = census_employee.renewal_published_benefit_package || census_employee.active_benefit_package
+  #   current_benefit_package.present? && current_benefit_package.is_offering_dental?
+  # end
 
 	def shop_health_and_dental_attributes(family_member, employee_role, coverage_start)
 		benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
-    eligibility_checker = shop_benefit_eligibilty_checker_for(benefit_group, :health)
-    [eligibility_checker.can_cover?(family_member, coverage_start), false]
+    [ 
+      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start), 
+      eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
+    ]
 	end
+
+  def eligibility_checker(benefit_group, coverage_kind)
+    shop_benefit_eligibilty_checker_for(benefit_group, coverage_kind)
+  end
 
 	def class_for_ineligible_row(family_member, is_ivl_coverage, coverage_start)
 		class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
@@ -370,6 +383,7 @@ class GroupSelectionPrevaricationAdapter
     controller_employee_role,
     family_member_ids
   )
+
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
     e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: optional_effective_on)
 	end

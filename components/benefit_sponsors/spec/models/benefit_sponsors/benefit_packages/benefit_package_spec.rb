@@ -137,6 +137,159 @@ module BenefitSponsors
         it "should renew pricing determinations" do
         end
       end
+
+      context "when employer offering both health and dental coverages" do
+        let(:product_kinds)  { [:health, :dental] }
+        let(:dental_sponsored_benefit) { true }
+
+        let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
+        let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
+        let(:renewal_bp)        { renewal_application.benefit_packages.build }
+
+        let(:current_app) { benefit_sponsorship.benefit_applications[0] }
+        let(:current_bp)  { current_app.benefit_packages[0] }
+
+        subject do
+          current_bp.renew(renewal_bp)
+        end
+
+        context "when renewal product available for both health and dental" do 
+
+          let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
+          let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
+  
+          it "does build valid renewal benefit package" do
+            expect(subject.valid?).to be_truthy
+          end
+
+          it "does renew health sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:health)).to be_present 
+          end
+
+          it "does renew health reference product" do
+            expect(subject.sponsored_benefit_for(:health).reference_product).to eq health_sb.reference_product.renewal_product
+          end
+
+          it "does renew health sponsor contributions" do
+            sponsor_contribution = subject.sponsored_benefit_for(:health).sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq health_sb.sponsor_contribution.contribution_levels.size
+          end
+
+          it "does renew dental sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+          end
+
+          it "does renew dental reference product" do
+            expect(subject.sponsored_benefit_for(:dental).reference_product).to eq dental_sb.reference_product.renewal_product
+          end
+
+          it "does renew dental sponsor contributions" do
+            sponsor_contribution = subject.sponsored_benefit_for(:dental).sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq dental_sb.sponsor_contribution.contribution_levels.size
+          end
+        end
+
+        context "when renewal product available for health only" do
+          let!(:dental_products) { create_list(:benefit_markets_products_dental_products_dental_product, 5,
+            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+            product_package_kinds: [:single_product],
+            service_area: service_area,
+            metal_level_kind: :gold) 
+          }
+
+          let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
+          let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
+  
+          it "does build valid renewal benefit package" do
+            expect(subject.valid?).to be_truthy
+          end
+
+          it "does renew health sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:health)).to be_present 
+          end
+
+          it "does renew health reference product" do
+            expect(subject.sponsored_benefit_for(:health).reference_product).to eq health_sb.reference_product.renewal_product
+          end
+
+          it "does renew health sponsor contributions" do
+            sponsor_contribution = subject.sponsored_benefit_for(:health).sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq health_sb.sponsor_contribution.contribution_levels.size
+          end
+
+          it "does not renew dental sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+          end
+        end
+
+        context "when renewal product available for dental only" do
+          let!(:health_products) { create_list(:benefit_markets_products_health_products_health_product, 5,
+            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+            product_package_kinds: [:single_issuer, :metal_level, :single_product],
+            service_area: service_area,
+            metal_level_kind: :gold)
+          }
+
+          let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
+          let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
+  
+          it "does build valid renewal benefit package" do
+            expect(subject.valid?).to be_truthy
+          end
+
+          it "does not renew health sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+          end
+
+          it "does renew dental sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+          end
+
+          it "does renew dental reference product" do
+            expect(subject.sponsored_benefit_for(:dental).reference_product).to eq dental_sb.reference_product.renewal_product
+          end
+
+          it "does renew dental sponsor contributions" do
+            sponsor_contribution = subject.sponsored_benefit_for(:dental).sponsor_contribution
+            expect(sponsor_contribution).to be_present
+            expect(sponsor_contribution.contribution_levels.size).to eq dental_sb.sponsor_contribution.contribution_levels.size
+          end
+        end
+
+        context "when renewal product not available for both health and dental" do 
+          let!(:health_products) { create_list(:benefit_markets_products_health_products_health_product, 5,
+            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+            product_package_kinds: [:single_issuer, :metal_level, :single_product],
+            service_area: service_area,
+            metal_level_kind: :gold) 
+          }
+
+          let!(:dental_products) { create_list(:benefit_markets_products_dental_products_dental_product, 5,
+            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+            product_package_kinds: [:single_product],
+            service_area: service_area,
+            metal_level_kind: :gold) 
+          }
+
+          let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
+          let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
+  
+          it "does build valid renewal benefit package" do
+            expect(subject.valid?).to be_truthy
+          end
+
+          it "does not renew health sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+          end
+
+          it "does not renew dental sponsored benefit" do
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+          end
+        end
+      end
     end
 
     describe '.is_renewal_benefit_available?' do

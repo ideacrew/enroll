@@ -46,7 +46,7 @@ module BenefitSponsors
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
-    
+
     let(:product) { product_package.products.first }
 
     let(:sbc_document) {
@@ -88,12 +88,19 @@ module BenefitSponsors
 
     let(:contribution_levels_attributes) {
       {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95"},
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85"},
-        "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
+        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
+        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
       }
     }
 
+    let(:contribution_model) { product_package.contribution_model }
+
+    let(:employee_contribution_unit) { contribution_model.contribution_units.where(order: 0).first }
+    let(:spouse_contribution_unit) { contribution_model.contribution_units.where(order: 1).first }
+    let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
+    let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
     before do
       issuer_profile.organization.update_attributes!(site_id: site.id)
     end
@@ -274,6 +281,12 @@ module BenefitSponsors
         it "should redirect to benefit applications" do
           sign_in_and_do_update
           expect(response.location.include?("tab=benefits")).to be_truthy
+        end
+
+        it "should redirect to edit dental benfit page" do
+          sign_in user
+          post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params, add_dental_benefits: "true"
+          expect(response.location.include?("sponsored_benefits/edit?kind=dental")).to be_truthy
         end
       end
 
