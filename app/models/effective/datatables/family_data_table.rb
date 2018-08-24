@@ -75,7 +75,7 @@ module Effective
       end
 
       def new_eligibility_family_member_link_type(row, allow)
-        row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
+        allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
