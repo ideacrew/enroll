@@ -22,10 +22,9 @@ CKEDITOR.addTemplates( 'default', {
 "<h3>For Questions or Assistance:</h3>"+
 "<p>Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:</p>" +
 "<ul>" +
-	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
-"</ul>" +
-"<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
+	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty}</li>" +
+"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
+"<p>You can also find more information on our website at <a href='http://​#{Settings.site.website_name}'>#{Settings.site.website_name}</a></p>" +
 "<p>[[ if employer_profile.broker_present? ]]</p>" +
 "<table border='0'cellpadding='0' cellspacing='0' style='height:auto; width:auto'>" +
 	"<tbody>" +
@@ -70,10 +69,9 @@ CKEDITOR.addTemplates( 'default', {
 "[[ end ]]</p>" +
 "<p>You can also contact the #{site_short_name} with any questions:</p>" +
 "<ul>" +
-	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
-"</ul>" +
-"<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
+	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty}</li>" +
+"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
+"<p>You can also find more information on our website at <a href='http://​#{Settings.site.website_name}'>#{Settings.site.website_name}</a></p>" +
 "[[ if employee_profile.broker_present? ]]" +
 "<table border='0'cellpadding='0' cellspacing='0' style='height:auto; width:auto'>" +
 	"<tbody>" +
@@ -113,7 +111,7 @@ CKEDITOR.addTemplates( 'default', {
 "<p>Please contact #{site_short_name} with any questions:</p>" +
 "<ul>" +
 	"<li>By calling #{contact_center_phone_number}</li>" +
-	"<li>TTY: #{Settings.contact_center.tty_number}</li>" +
+	"<li>TTY: #{Settings.contact_center.tty}</li>" +
 	"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
 "</ul>"
 	}
