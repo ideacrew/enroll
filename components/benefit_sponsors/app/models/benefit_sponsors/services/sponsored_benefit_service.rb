@@ -115,7 +115,7 @@ module BenefitSponsors
         attributes = {
           title: reference_product.title,
           issuer_name: reference_product.issuer_profile.legal_name,
-          metal_level_kind: reference_product.metal_level_kind,
+          metal_level_kind: reference_product.metal_level,
           network_information: reference_product.network_information
         }
         case reference_product.kind
