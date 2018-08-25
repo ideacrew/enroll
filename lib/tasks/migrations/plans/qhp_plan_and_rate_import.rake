@@ -8,7 +8,7 @@ require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
 namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "plans/2018/altus", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "plans", "**", "*.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017", "**", "*.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017/Dental/IVL/Dominion/DominionIVLPlanBenefits7.20.16.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
