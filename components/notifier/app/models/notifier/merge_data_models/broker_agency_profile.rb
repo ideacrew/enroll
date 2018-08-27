@@ -44,5 +44,25 @@ module Notifier
     def conditions
       []
     end
+
+    def primary_address
+      mailing_address
+    end
+
+    def shop?
+      true
+    end
+
+    def employee_notice?
+      false
+    end
+
+    def general_agency?
+      false
+    end
+
+    def broker?
+      false
+    end
   end
 end
