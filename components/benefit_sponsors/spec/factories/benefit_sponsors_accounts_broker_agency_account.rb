@@ -21,7 +21,7 @@ FactoryGirl.define do
       if evaluator.benefit_sponsorship
         broker_agency_account.benefit_sponsorship = evaluator.benefit_sponsorship
       else
-        broker_agency_account.benefit_sponsorship = FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile)
+        broker_agency_account.benefit_sponsorship = FactoryGirl.build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile, site: BenefitSponsors::Site.by_site_key(:cca).first)
       end
     end
   end

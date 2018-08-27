@@ -568,15 +568,13 @@ module BenefitSponsors
     end
 
     def renew_benefit_package_members
-      benefit_packages.each { |benefit_package| benefit_package.activate_benefit_group_assignments }
       benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
     end
 
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
-      return unless transition_kind.present?
+      return if transition_kind.blank?
 
-      # :effectuate, :expire, :terminate, :cancel
       benefit_packages.each { |benefit_package| benefit_package.send("#{transition_kind}_member_benefits".to_sym) }
     end
 
@@ -776,7 +774,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
-        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
+        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES + [:enrollment_ineligible, :active],
           to:     :canceled
       end
 
@@ -808,29 +806,20 @@ module BenefitSponsors
 
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
-
-      begin
-        File.open("benefit_sponsorship_event_subscriber.txt", "a+") do |f|
-          f << "\n---------" + "\n"
-          f << Time.now.getutc.to_s + "\n"
-          f << self.id.to_s + "\n"
-          f << "#{aasm.to_state.to_s}\n"
-          f << "#{aasm.from_state.to_s}\n"
-          f << "#{aasm.current_event.to_s}\n"
-          f << may_approve_enrollment_eligiblity?.to_s + "\n"
-          f << "---------" + "\n"
-        end
-      rescue
-
+      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
+        reverse_enrollment_eligibility!
       end
-
 
       if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
         approve_enrollment_eligiblity!
       end
 
-      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
-        reverse_enrollment_eligibility!
+      if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
+        deny_enrollment_eligiblity!
+      end
+
+      if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
+        cancel! if enrollment_ineligible? && may_cancel?
       end
     end
 

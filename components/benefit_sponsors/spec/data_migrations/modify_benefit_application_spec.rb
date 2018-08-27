@@ -1,7 +1,7 @@
 require "rails_helper"
-require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_migrations", "modify_benefit_application")
+require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
-describe ModifyBenefitApplication do
+RSpec.describe ModifyBenefitApplication do
 
   let(:given_task_name) { "modify_benefit_application" }
   subject { ModifyBenefitApplication.new(given_task_name, double(:current_scope => nil)) }
@@ -111,6 +111,33 @@ describe ModifyBenefitApplication do
 
       it "should terminate any active employee enrollments" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+      it "should terminate any active employee enrollments with termination date as on Benefit Application" do
+        expect(hbx_enrollment.terminated_on).to eq end_on
+      end
+    end
+
+
+    context "cancel benefit application" do
+      let(:past_start_on) {start_on.prev_month}
+      let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
+      let!(:mid_plan_year_effective_date) {start_on.prev_month.prev_month}
+      let!(:range_effective_period) { mid_plan_year_effective_date..mid_plan_year_effective_date.next_year.prev_day }
+      let!(:draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period)}
+      let!(:import_draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period)}
+
+      before :each do
+        allow(ENV).to receive(:[]).with('action').and_return 'cancel'
+        allow(ENV).to receive(:[]).with('plan_year_start_on').and_return import_draft_benefit_application.effective_period.min.to_s
+        subject.migrate
+      end
+
+      it "does not cancel non-imported draft benefit applications" do
+        expect(draft_benefit_application.reload.aasm_state).to eq :imported
+      end
+
+      it "cancels import draft benefit applications" do
+        expect(import_draft_benefit_application.reload.aasm_state).to eq :canceled
       end
     end
 
