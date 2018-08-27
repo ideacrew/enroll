@@ -34,17 +34,30 @@ module BenefitSponsors
 
       def build_sponsor_contribution(sponsored_benefit, attrs)
         sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
-        
-        attrs[:contribution_levels_attributes].each do |contribution_level_hash|
-          contribution_level = sponsor_contribution.contribution_levels.where(contribution_unit_id: contribution_level_hash[:contribution_unit_id]).first
-          
-          contribution_level_attrs = contribution_level_hash.except(:id, :display_name)
-          contribution_level_attrs[:is_offered] ||= false
 
-          if contribution_level
-            contribution_level.assign_attributes(contribution_level_attrs)
+        sponsor_contribution.contribution_levels.each do |new_contribution_level|
+          sponsor_contribution_attrs = attrs[:contribution_levels_attributes]
+          contribution_match = sponsor_contribution_attrs.detect{ |contribution| contribution[:display_name] == new_contribution_level.display_name}
+          contribution_level_attr = sponsor_contribution_attrs.except(:id, :display_name)
+          contribution_level_attr[:is_offere] ||= false
+
+          if contribution_match
+            contribution_match.assign_attributes(contribution_level_attr)
           end
         end
+
+
+        
+        # attrs[:contribution_levels_attributes].each do |contribution_level_hash|
+        #   contribution_level = sponsor_contribution.contribution_levels.where(contribution_unit_id: contribution_level_hash[:contribution_unit_id]).first
+        #
+        #   contribution_level_attrs = contribution_level_hash.except(:id, :display_name)
+        #   contribution_level_attrs[:is_offered] ||= false
+        #
+        #   if contribution_level
+        #     contribution_level.assign_attributes(contribution_level_attrs)
+        #   end
+        # end
         sponsor_contribution
       end
 
