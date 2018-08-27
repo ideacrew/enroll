@@ -2787,11 +2787,11 @@ describe HbxEnrollment, dbclean: :after_all do
 
   describe "is_an_existing_plan?" do
     context "for checking if a new plan is similar to the given enr's plan " do
-      it "should return true as the enrollment kind" do
+      it "should return true as the compared plan has similar hios_id and same active year" do
         expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
       end
 
-      it "should return true as the enrollment kind" do
+      it "should return false as the compared plan has a different hios_id" do
         expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
       end
     end
