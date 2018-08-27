@@ -81,6 +81,11 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_delete_identity_application_documents => :environment
 end
 
+namespace :permissions do
+  desc 'hbx_admin_can_access_pay_now'
+  DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
+end
+
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
@@ -95,3 +100,4 @@ end
 #rake permissions:hbx_admin_can_access_accept_reject_identity_documents
 #rake permissions:hbx_admin_can_access_accept_reject_paper_application_documents
 #rake permissions:hbx_admin_can_delete_identity_application_documents
+#rake permissions:hbx_admin_can_access_pay_now

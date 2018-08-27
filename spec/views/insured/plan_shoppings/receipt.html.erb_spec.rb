@@ -65,6 +65,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     assign :enrollment, enrollment
     @plan = plan_cost_decorator
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:show_pay_now?).and_return false
     render file: "insured/plan_shoppings/receipt.html.erb"
   end
 
@@ -101,8 +102,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should not have cobra msg" do
     expect(rendered).not_to match("Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer")
   end
-  
-  
+
   context "doesn't have a Pay Now option and messaging" do
     before do
       allow(view).to receive(:show_pay_now?).and_return false
@@ -120,7 +120,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     end
   end
   context "have Pay Now options and messaging" do
+    let!(:user){FactoryGirl.create(:user)}
+    let!(:person){FactoryGirl.create(:person, user: user)}
     before do
+      sign_in(user)
       allow(view).to receive(:show_pay_now?).and_return true
     end
     it "should have a Pay now button" do
@@ -135,6 +138,4 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       expect(rendered).to have_text(/You only have the option to PAY NOW while you’re on this page/)
     end
   end
-
-    
 end

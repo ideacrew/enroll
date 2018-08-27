@@ -122,4 +122,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_delete_identity_application_documents
     Permission.hbx_staff.update_attributes!(can_delete_identity_application_documents: true)
   end
+
+  def hbx_admin_can_access_pay_now
+    Permission.hbx_staff.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_supervisor.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_tier1.update_attributes!(can_access_pay_now: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_access_pay_now: true)
+  end
 end
