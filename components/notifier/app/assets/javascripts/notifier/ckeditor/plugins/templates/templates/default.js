@@ -97,6 +97,39 @@ CKEDITOR.addTemplates( 'default', {
 "<p>___________________________________________________________________________________________________________________________________________________</p>" +
 "<p><small>This notice is being provided in accordance with &lt;Insert Legal Compliance Code&gt;.</small></p>"
 	},
+	{
+		title: 'Broker Template',
+		image: 'template1.gif',
+		description: 'Standard template for the notices received by Brokers.',
+		html: "<p>&nbsp;</p>" +
+"<p>#{broker_profile.notice_date}</p>" +
+"<p><strong>SUBJECT: &lt;Change subject&gt;</strong></p>" +
+"<p>Dear #{broker_profile.first_name} #{broker_profile.last_name}:</p>" +
+"<p>&lt;Paste Your Notice Body Here&gt;</p>" +
+"<h3>For Questions or Assistance:</h3>"+
+"<ul>" +
+	"<li>By calling #{Settings.contact_center.phone_number}.</li>  " +
+	"<li>TTY: #{Settings.contact_center.tty}</li>" +
+"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
+"<p>You can also find more information on our website at <a href='http://​#{Settings.site.website_name}'>#{Settings.site.website_name}</a></p>"
+	},
+{
+		title: 'Broker Agency Template',
+		image: 'template1.gif',
+		description: 'Standard template for the notices received by Broker Agencies.',
+		html: "<p>&nbsp;</p>" +
+"<p>#{broker_agency_profile.notice_date}</p>" +
+"<p><strong>SUBJECT: &lt;Change subject&gt;</strong></p>" +
+"<p>Dear #{broker_agency_profile.broker_agency_name}:</p>" +
+"<p>&lt;Paste Your Notice Body Here&gt;</p>" +
+"<h3>For Questions or Assistance:</h3>"+
+"<ul>" +
+	"<li>By calling #{Settings.contact_center.phone_number}.</li>  " +
+	"<li>TTY: #{Settings.contact_center.tty}</li>" +
+"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
+"<p>You can also find more information on our website at <a href='http://​#{Settings.site.website_name}'>#{Settings.site.website_name}</a></p>"
+	},
+
 {
 		title: 'General Agency Template',
 		image: 'template1.gif',
