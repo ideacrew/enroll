@@ -52,11 +52,11 @@ RSpec.describe HbxAdminHelper, :type => :helper do
 
     it "should return yes" do
       tax_household.update_attributes!(effective_ending_on: nil)
-      expect(helper.active_eligibility?(family.primary_applicant.person)).to eq 'Yes'
+      expect(helper.active_eligibility?(family)).to eq 'Yes'
     end
 
     it "should return no" do
-      expect(helper.active_eligibility?(family.primary_applicant.person)).to eq 'No'
+      expect(helper.active_eligibility?(family)).to eq 'No'
     end
   end
 end
