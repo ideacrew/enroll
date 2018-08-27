@@ -2,7 +2,7 @@ module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorDentalCatalogDecorator < SimpleDelegator
 
-      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :dental_plan_kind, :network_information)
+      Product = Struct.new(:id, :title, :metal_level_kind, :carrier_name, :issuer_id, :sole_source, :coverage_kind, :product_type, :network_information)
       ContributionLevel = Struct.new(:id, :display_name, :contribution_factor, :is_offered, :contribution_unit_id) do
         def persisted?
           false
@@ -79,7 +79,7 @@ module BenefitSponsors
         product_packages.by_product_kind(:dental).each do |product_package|
           package_products = product_package.products.collect do |product|
             # TODO
-            Product.new(product.id, product.title, product.metal_level_kind, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, "dental", "TODO", "TODO")
+            Product.new(product.id, product.title, product.metal_level, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.kind.to_s, product.product_type, "TODO")
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :multi_product

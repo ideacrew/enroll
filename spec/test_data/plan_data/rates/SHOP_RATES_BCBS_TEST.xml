@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<qhpApplicationRateGroupListVO xmlns="http://vo.ffe.cms.hhs.gov">
+  <qhpApplicationRateGroupVO>
+    <header>
+      <templateVersion>v7.1</templateVersion>
+      <issuerId cellLocation="Rate_Table-B.6">
+        <cellValue>42690</cellValue>
+      </issuerId>
+      <tin cellLocation="Rate_Table-B.7">
+        <cellValue>04-3332211</cellValue>
+      </tin>
+    </header>
+    <ratingMethod cellLocation="Rate_Table-B.10">
+      <cellValue>Age-Based Rates</cellValue>
+    </ratingMethod>
+    <items>
+      <effectiveDate cellLocation="Rate_Table-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table-A.15">
+        <cellValue>42690MA1234502</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table-B.15">
+        <cellValue>Rating Area 1</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table-C.15">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table-D.15">
+        <cellValue>0-14</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table-E.15">
+        <cellValue>441.16</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.368">
+        <cellValue>42690MA1234502</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.368">
+        <cellValue>Rating Area 3</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.368">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.368">
+        <cellValue>61</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.368">
+        <cellValue>895.51</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.66">
+        <cellValue>42690MA1234502</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.66">
+        <cellValue>Rating Area 2</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.66">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.66">
+        <cellValue>0-14</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.66">
+        <cellValue>241.82</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.369">
+        <cellValue>42690MA1234503</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.369">
+        <cellValue>Rating Area 1</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.369">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.369">
+        <cellValue>62</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.369">
+        <cellValue>195.51</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.370">
+        <cellValue>42690MA1234503</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.370">
+        <cellValue>Rating Area 2</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.370">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.370">
+        <cellValue>63</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.370">
+        <cellValue>295.51</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.371">
+        <cellValue>42690MA1234503</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.371">
+        <cellValue>Rating Area 7</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.371">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.371">
+        <cellValue>64 and over</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.371">
+        <cellValue>395.51</cellValue>
+      </primaryEnrollee>
+    </items>
+    <items>
+      <effectiveDate cellLocation="Rate_Table_(4)-B.8">
+        <cellValue>2018-10-01</cellValue>
+      </effectiveDate>
+      <expirationDate cellLocation="Rate_Table_(4)-B.9">
+        <cellValue>2018-12-31</cellValue>
+      </expirationDate>
+      <planId cellLocation="Rate_Table_(4)-A.371">
+        <cellValue>42690MA1234503</cellValue>
+      </planId>
+      <rateAreaId cellLocation="Rate_Table_(4)-B.371">
+        <cellValue>Rating Area 7</cellValue>
+      </rateAreaId>
+      <tobacco cellLocation="Rate_Table_(4)-C.371">
+        <cellValue>No Preference</cellValue>
+      </tobacco>
+      <ageNumber cellLocation="Rate_Table_(4)-D.371">
+        <cellValue>65</cellValue>
+      </ageNumber>
+      <primaryEnrollee cellLocation="Rate_Table_(4)-E.371">
+        <cellValue>495.51</cellValue>
+      </primaryEnrollee>
+    </items>
+  </qhpApplicationRateGroupVO>
+</qhpApplicationRateGroupListVO>

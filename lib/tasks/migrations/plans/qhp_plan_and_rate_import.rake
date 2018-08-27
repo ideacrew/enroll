@@ -1,5 +1,6 @@
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_builder.rb')
+require Rails.root.join('lib', 'object_builders', 'product_builder.rb')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_parser')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_list_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
@@ -8,9 +9,20 @@ namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "plans", "**", "*.xml"))
-    # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017", "**", "*.xml"))
-    # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017/Dental/IVL/Dominion/DominionIVLPlanBenefits7.20.16.xml"))
-    # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
+    # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017", "**", "*.xml"))
+    # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017/Dental/IVL/Dominion/DominionIVLPlanBenefits7.20.16.xml"))
+    # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
+
+    qhp_import_product_hash = files.inject(ProductBuilder.new({})) do |qhp_product_hash, file|
+      puts file
+      xml = Nokogiri::XML(File.open(file))
+      product = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
+      qhp_product_hash.add(product.to_hash)
+      qhp_product_hash
+    end
+
+    qhp_import_product_hash.run
+
     qhp_import_hash = files.inject(QhpBuilder.new({})) do |qhp_hash, file|
       puts file
       xml = Nokogiri::XML(File.open(file))

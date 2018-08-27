@@ -11,11 +11,11 @@ end
 RSpec.describe 'Load sic codes data Task', :type => :task do
   context "wrgthrdyjfyg" do	
     before :all do
-      Rake.application.rake_require "tasks/migrations/load_sic_code"
+      Rake.application.rake_require "tasks/migrations/plans/load_sic_code"
       Rake::Task.define_task(:environment)
     end  
     before :context do
-      invoke_task
+      invoke_sic_code_task
     end
 
 	context "it creates SicCode correctly" do
@@ -33,7 +33,7 @@ RSpec.describe 'Load sic codes data Task', :type => :task do
 
 	private
 
-    def invoke_task
+    def invoke_sic_code_task
       Rake::Task["load_sic_code:update_sic_codes"].invoke
     end
   end

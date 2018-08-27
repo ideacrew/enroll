@@ -12,17 +12,21 @@
             div.col-xs-4.reference-plans
               div.col-xs-12.p0.mb-1
                 label.container
-                  = f.radio_button :reference_plan_id, product.id, :data => {plan_title: product.title, metal_level: product.metal_level_kind, carrier_name: product.carrier_name, plan_type: product.dental_plan_kind}, :onclick => "loadReferencePlanDetails(this)"
+                  = f.radio_button :reference_plan_id, product.id, :data => {plan_title: product.title, metal_level: product.metal_level_kind, carrier_name: product.carrier_name, plan_type: product.product_type}, :onclick => "loadReferencePlanDetails(this)"
                   span.checkmark
                   p.heading-text.reference-plan-title.mb-1
                     = product.title
                   span.plan-label Type: 
                   span.rp-plan-info
-                    = product.dental_plan_kind
+                    = product.product_type
                   br
                   span.plan-label Carrier: 
                   span.rp-plan-info
                     = product.carrier_name
+                  br
+                  span.plan-label Level:
+                  span.rp-plan-info
+                    = product.metal_level_kind
                   br
                   span.plan-label Network: 
                   span.rp-plan-info

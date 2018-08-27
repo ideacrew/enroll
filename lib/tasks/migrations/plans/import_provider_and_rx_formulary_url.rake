@@ -11,21 +11,21 @@
 #           So including http at the start of each rx formulary urls that does not have http.
 
 namespace :import do
-  task :common_data_from_master_xml => :environment do
+  task :common_data_from_master_xml, [:file] => :environment do |task, args|
     NATIONWIDE_NETWORK = ["Nationwide In-Network"]
     DC_IN_NETWORK = ["DC Metro In-Network"]
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
       files.each do |file|
         year = file.split("/")[-2].to_i
-        puts "*"*80
-        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..."
+        puts "*"*80 unless Rails.env.test?
+        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..." unless Rails.env.test?
         if file.present?
           result = Roo::Spreadsheet.open(file)
           sheets = ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
           sheets.each do |sheet_name|
-            puts "processing sheet ::: #{sheet_name} :::"
+            puts "processing sheet ::: #{sheet_name} :::" unless Rails.env.test?
             sheet_data = result.sheet(sheet_name)
 
             @header_row = sheet_data.row(1)
@@ -57,14 +57,16 @@ namespace :import do
     else # MA
       files.each do |file|
       year = file.split("/")[-2].to_i
-      puts "*"*80
-      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..."
+      puts "*"*80 unless Rails.env.test?
+      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..." unless Rails.env.test?
       if file.present?
         result = Roo::Spreadsheet.open(file)
         sheets = if year == 2017
           ["MA SHOP QHP"]
         elsif year == 2018
           ["2018_QHP", "2018_QDP"]
+        elsif year == 2019
+          ["2018_QHP"]
         end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
@@ -124,7 +126,7 @@ namespace :import do
                 product.product_package_kinds = product_package_kinds
               end
 
-              # product.save
+              product.save
             end
             # end of new model
 
@@ -133,9 +135,9 @@ namespace :import do
       end
     end
     end
-    puts "*"*80
-    puts "import complete"
-    puts "*"*80
+    puts "*"*80 unless Rails.env.test?
+    puts "import complete" unless Rails.env.test?
+    puts "*"*80 unless Rails.env.test?
   end
 
   def assign_headers

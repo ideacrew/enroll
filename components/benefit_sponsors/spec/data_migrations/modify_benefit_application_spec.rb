@@ -1,7 +1,7 @@
 require "rails_helper"
-require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_migrations", "modify_benefit_application")
+require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
-describe ModifyBenefitApplication do
+RSpec.describe ModifyBenefitApplication do
 
   let(:given_task_name) { "modify_benefit_application" }
   subject { ModifyBenefitApplication.new(given_task_name, double(:current_scope => nil)) }
@@ -111,6 +111,9 @@ describe ModifyBenefitApplication do
 
       it "should terminate any active employee enrollments" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
+      end
+      it "should terminate any active employee enrollments with termination date as on Benefit Application" do
+        expect(hbx_enrollment.terminated_on).to eq end_on
       end
     end
 

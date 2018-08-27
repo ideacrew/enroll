@@ -2,7 +2,8 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_pars
 namespace :xml do
   desc "Import plan crosswalk"
   task :plan_cross_walk, [:file] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk", "**", "*.xml"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk", "**", "*.xml"))
+
     files.each do |file_path|
       @file_path = file_path
       @current_year = file_path.split("/")[-2].to_i # Retrieve the year of the master xml file you are uploading
@@ -21,9 +22,25 @@ namespace :xml do
             old_plan = Plan.where(hios_id: /#{hios_id_2017}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
             if old_plan.present?
               old_plan.update(renewal_plan_id: new_plan.id)
-              puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}"
+              puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
             else
-              puts "Old #{@previous_year} plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present."
+              puts "Old #{@previous_year} plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
+            end
+          end
+        end
+        # end of old model
+
+        # new model
+        new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2018}/).select{|a| a.active_year == @current_year}
+        new_products.each do |new_product|
+          if new_product.present? && new_product.csr_variant_id != "00"
+            old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2017}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
+
+            if old_product.present?
+              old_product.update(renewal_product_id: new_product.id)
+              puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}" unless Rails.env.test?
+            else
+              puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present." unless Rails.env.test?
             end
           end
         end
