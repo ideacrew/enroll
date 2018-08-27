@@ -204,7 +204,7 @@ module Factories
           bga.hbx_enrollment.save
         end
       end
-      census_employee.employee_role = employee_role
+      census_employee.employee_role_id = employee_role.id
       employee_role.new_census_employee = census_employee
       employee_role.hired_on = census_employee.hired_on
       employee_role.terminated_on = census_employee.employment_terminated_on

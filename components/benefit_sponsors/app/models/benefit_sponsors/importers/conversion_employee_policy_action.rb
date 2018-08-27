@@ -8,11 +8,19 @@ module BenefitSponsors
         return nil unless census_employee
 
         found_employer = find_employer
-        benefit_application = find_employer.active_benefit_application
+        benefit_application = current_benefit_application(found_employer)
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
           @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+        end
+      end
+
+      def current_benefit_application(employer)
+        if employer.is_conversion?
+          benefit_applications.where(:aasm_state => :imported).first
+        else
+          benefit_applications.where(:aasm_state => :active).first
         end
       end
 
@@ -47,7 +55,7 @@ module BenefitSponsors
 
       def find_sponsor_benefit
         employer = find_employer
-        if benefit_application = employer.active_benefit_application
+        if benefit_application = current_benefit_application(employer)
           benefit_package = benefit_application.benefit_packages.first
           benefit_package.sponsored_benefits.first
         end
@@ -66,7 +74,7 @@ module BenefitSponsors
         employer = find_employer
         employee = find_employee
         employee_role = employee.employee_role
-        benefit_application = employer.active_benefit_application
+        benefit_application = current_benefit_application(employer)
         benefit_package = benefit_application.benefit_packages.first
 
         if find_benefit_group_assignment.blank?
@@ -100,7 +108,7 @@ module BenefitSponsors
 
         employer = find_employer
         sponsor_ship = employer.active_benefit_sponsorship
-        benefit_application = employer.active_benefit_application
+        benefit_application = current_benefit_application(employer)
         # plan_years = employer.plan_years.select {|py| py.coverage_period_contains?(start_date)}
         # active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
         return [] if benefit_application.blank?
