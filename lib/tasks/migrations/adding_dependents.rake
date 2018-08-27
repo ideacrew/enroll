@@ -1,5 +1,5 @@
 require File.join(Rails.root, "app", "data_migrations", "adding_dependents")
-# This rake task is to swap the index of family members in family
+
 # RAILS_ENV=production bundle exec rake migrations:adding_dependents family_id="5b43aaba73e54e55a4000028" file_name="dependents.csv" 
 
 namespace :migrations do

@@ -26,4 +26,3 @@ describe AddingDependents do
     end
   end
 end
-
