@@ -31,7 +31,7 @@ attributes: !ruby/hash:BSON::Document
   is_reference_plan_eligible: true
   kind: :dental
   hsa_eligibility: false
-  updated_at: 2018-08-25 02:09:08.648000000 Z
+  updated_at: 2018-08-25 18:00:35.518000000 Z
   created_at: 2018-07-31 19:31:13.327000000 Z
   premium_tables:
   - !ruby/hash:BSON::Document
