@@ -601,10 +601,6 @@ class HbxEnrollment
     ['employer_sponsored', 'employer_sponsored_cobra'].include?(kind)
   end
 
-  def is_individual?
-    ['individual', 'coverall'].include?(kind)
-  end
-
   def is_coverall?
     kind == "coverall"
   end

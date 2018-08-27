@@ -260,7 +260,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def enrolled_plans_by_hios_id_and_active_year
     @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
-    if @hbx_enrollment.is_individual?
+    if !@hbx_enrollment.is_shop?
       (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
     else
       (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
@@ -286,8 +286,8 @@ class Insured::PlanShoppingsController < ApplicationController
       end
 
       @enrolled_plans.each do |enrolled_plan|
-        case  @hbx_enrollment.is_individual?
-        when true
+        case  @hbx_enrollment.is_shop?
+        when false
           if plan_index = @plans.index{|e| e.is_same_plan_by_hios_id_and_active_year?(enrolled_plan) }
             @plans[plan_index] = enrolled_plan
           end

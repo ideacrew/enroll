@@ -40,7 +40,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "GET plans" do
       before :each do
         allow(hbx_enrollment_one).to receive(:is_shop?).and_return(false)
-        allow(hbx_enrollment_one).to receive(:is_individual?).and_return(true)
         allow(hbx_enrollment_one).to receive(:decorated_elected_plans).and_return([])
         allow(person).to receive(:primary_family).and_return(family)
         allow(family).to receive(:active_household).and_return(household)
@@ -86,7 +85,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:may_select_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:select_coverage!).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:is_individual?).and_return(true)
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(UserMailer).to receive(:plan_shopping_completed).and_return(usermailer)
       allow(usermailer).to receive(:deliver_now).and_return(true)
@@ -158,7 +156,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(enrollment).to receive(:is_shop?).and_return(false)
-      allow(enrollment).to receive(:is_individual?).and_return(true)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(enrollment).to receive(:employee_role).and_return(employee_role)
@@ -177,7 +174,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should get employer_profile" do
       allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:is_individual?).and_return(false)
       allow(enrollment).to receive(:coverage_kind).and_return('health')
       allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
       sign_in(user)
@@ -202,7 +198,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(Plan).to receive(:find).with("plan_id").and_return(plan)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:is_shop?).and_return(false)
-      allow(enrollment).to receive(:is_individual?).and_return(true)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
@@ -238,7 +233,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should get employer_profile" do
       allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:is_individual?).and_return(false)
       allow(enrollment).to receive(:coverage_kind).and_return('health')
       allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
       sign_in(user)
@@ -419,7 +413,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      allow(hbx_enrollment).to receive(:is_individual?).and_return(false)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
       allow(user).to receive(:person).and_return(person)
@@ -513,7 +506,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       before do
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-        allow(hbx_enrollment).to receive(:is_individual?).and_return(true)
         allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
         allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
       end

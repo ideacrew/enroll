@@ -2785,19 +2785,6 @@ describe HbxEnrollment, dbclean: :after_all do
   let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
   let!(:plan100) { FactoryGirl.create(:plan) }
 
-  describe "is_individual?" do
-    context "for checking if an enrollment is IVL or not" do
-      it "should return true as the enrollment kind" do
-        enrollment100.update_attributes!(kind: "employer_sponsored")
-        expect(enrollment100.is_individual?).to eq false
-      end
-
-      it "should return true as the enrollment kind" do
-        expect(enrollment100.is_individual?).to eq true
-      end
-    end
-  end
-
   describe "is_an_existing_plan?" do
     context "for checking if a new plan is similar to the given enr's plan " do
       it "should return true as the enrollment kind" do
