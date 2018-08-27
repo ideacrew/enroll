@@ -436,7 +436,8 @@ def employer_poc
 
   def create_eligibility
     @element_to_replace_id = params[:person][:family_actions_id]
-    Person.find(params[:person][:person_id]).primary_family.active_household.create_new_tax_household(params[:person]) rescue nil
+    family = Person.find(params[:person][:person_id]).primary_family
+    family.active_household.create_new_tax_household(params[:person]) rescue nil
   end
 
   def eligibility_kinds_hash(value)
