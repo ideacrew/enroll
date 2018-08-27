@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "activate_or_deactivate_employer_link_for_broker")
 
-describe BuildShopEnrollment do
+describe ActivateOrDeactivateEmployerLinkForBroker do
 
   let(:given_task_name) { "activate_or_deactivate_employer_link_for_broker" }
   subject { ActivateOrDeactivateEmployerLinkForBroker.new(given_task_name, double(:current_scope => nil)) }
@@ -56,6 +56,16 @@ describe BuildShopEnrollment do
         expect(active_plan_design_organization.has_active_broker_relationship).to eq false
         subject.migrate
         expect(active_plan_design_organization.has_active_broker_relationship).to eq false
+      end
+    end
+
+    context "when both invalid feins is passed" do
+      before :each do
+        allow(ENV).to receive(:[]).with("plan_design_org_id").and_return(nil)
+      end
+
+      it "should not raise any exception" do
+        expect {subject.migrate}.not_to raise_error
       end
     end
   end
