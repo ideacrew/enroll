@@ -60,6 +60,10 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
     end
   end
 
+  def notice_filename
+    "#{subject.titleize.gsub("Dc", "DC").gsub(/[^0-9a-z]/i,'')}"
+  end
+
 
   def check_for_transitioned_individuals
     @transition_people.each do |person|

@@ -11,7 +11,7 @@ RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after
       :notice_builder => 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
       :event_name => 'coverall_to_ivl_transition_notice',
       :mpi_indicator => 'IVL_DCH',
-      :title => "YOUR INSURANCE THROUGH COVER ALL DC HAS CHANGED TO DC HEALTH LINK"})
+      :title => "Your Insurance through Cover All DC Has Changed to DC Health Link"})
   }
   let(:valid_params) {{
       :subject => application_event.title,
@@ -53,6 +53,29 @@ RSpec.describe IvlNotices::CoverallToIvlTransitionNoticeBuilder, dbclean: :after
     end
     it "should return person hbx_id" do
       expect(@cdc_ivl_notice.notice.primary_identifier).to eq person.hbx_id
+    end
+  end
+
+  describe "#notice_filename" do
+    before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
+      @cdc_ivl_notice = IvlNotices::CoverallToIvlTransitionNoticeBuilder.new(person.consumer_role, valid_params)
+    end
+
+    it "should have caps DC in the title" do
+      title = @cdc_ivl_notice.notice_filename
+      expect(title).to match (/DC/)
+    end
+
+    it "should not have Dc in the title" do
+      title = @cdc_ivl_notice.notice_filename
+      expect(title).not_to match (/Dc/)
+    end
+
+    it "should match with the given title" do
+      title = @cdc_ivl_notice.notice_filename
+      expect(title).to match (/YourInsuranceThroughCoverAllDCHasChangedToDCHealthLink/)
     end
   end
 

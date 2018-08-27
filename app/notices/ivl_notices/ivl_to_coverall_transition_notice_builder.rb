@@ -44,6 +44,10 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     attach_required_documents
   end
 
+  def notice_filename
+    "#{subject.titleize.gsub("Dc", "DC").gsub(/[^0-9a-z]/i,'')}"
+  end
+
   def build
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
