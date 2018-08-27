@@ -35,7 +35,10 @@ namespace :load do
     puts "Creating Product Packages..." unless Rails.env.test?
 
     {"Single Issuer" => :single_issuer, "Metal Level" => :metal_level, "Single Product" => :single_product}.each do |title, package_kind|
-      product_package = benefit_market_catalog.product_packages.where(title: title).first
+      product_package = benefit_market_catalog.product_packages.where(
+        title: title,
+        product_kind: :health
+      ).first
 
       if package_kind == :single_product
         contribution_model = composite_contribution_model
