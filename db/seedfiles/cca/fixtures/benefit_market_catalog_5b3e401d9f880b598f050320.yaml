@@ -34,7 +34,7 @@ attributes: !ruby/hash:BSON::Document
     application_period: !ruby/hash:BSON::Document
       min: 2018-01-01 00:00:00.000000000 Z
       max: 2018-12-31 00:00:00.000000000 Z
-    updated_at: 2018-07-05 15:58:23.789000000 Z
+    updated_at: 2018-08-21 19:47:42.593000000 Z
     created_at: 2018-07-05 15:58:23.789000000 Z
     products:
     - !ruby/hash:BSON::Document
@@ -9112,7 +9112,7 @@ attributes: !ruby/hash:BSON::Document
         name: dependent
         display_name: Dependents
         order: 2
-        discounted_above_threshold: 4
+        discounted_above_threshold: 3
         eligible_for_threshold_discount: true
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
@@ -16166,7 +16166,7 @@ attributes: !ruby/hash:BSON::Document
         name: dependent
         display_name: Dependents
         order: 2
-        discounted_above_threshold: 4
+        discounted_above_threshold: 3
         eligible_for_threshold_discount: true
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId

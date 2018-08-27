@@ -1,4 +1,4 @@
-require File.join(Rails.root, "components/benefit_sponsors/lib/mongoid_migration_task")
+require File.join(File.dirname(__FILE__), "..", "..", "lib/mongoid_migration_task")
 
 class ModifyBenefitApplication< MongoidMigrationTask
 
