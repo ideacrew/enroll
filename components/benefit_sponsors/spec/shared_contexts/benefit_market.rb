@@ -38,7 +38,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
           product_package_kinds: [:single_product],
           service_area: service_area,
           renewal_service_area: renewal_service_area, 
-          metal_level_kind: :gold) }
+          metal_level_kind: :dental) }
 
   let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,

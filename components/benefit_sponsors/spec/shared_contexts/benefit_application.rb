@@ -8,7 +8,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let!(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)             { abc_organization.employer_profile }
   let!(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
-  let!(:dental_sponsored_benefit) { false }
+  let(:dental_sponsored_benefit) { false }
 
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
@@ -36,6 +36,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   #                                     recorded_rating_area: benefit_sponsorship.rating_area,
   #                                     recorded_service_areas: recorded_service_areas
   #                                   ) }
+
   # let(:recorded_service_areas) { benefit_sponsorship.service_areas_for(effective_period.min) }
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
@@ -70,7 +71,9 @@ RSpec.shared_context "setup employees", :shared_context => :metadata do
 end
 
 RSpec.shared_context "setup employees with benefits", :shared_context => :metadata do
-  include_context "setup employees"
+  # include_context "setup employees"
   let(:roster_size) { 5 }
+  let(:enrollment_kinds) { ['health'] }
   let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
+
 end
