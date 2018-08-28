@@ -19,6 +19,10 @@ module Insured
         enrollments.present? ? true : false
       end
 
+      def pay_now_button_timed_out?
+        @enrollment.submitted_at + 15.minutes > TimeKeeper.datetime_of_record
+      end
+
       def has_break_in_coverage_enrollments?
         @enrollment.family.enrollments.terminated.any? { |enr| enr.plan.carrier_profile.legal_name == 'Kaiser' && enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
       end
