@@ -125,12 +125,17 @@ class Household
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
       latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+      current_year = Admin::Aptc.years_with_tax_household(parent).sort.last.to_i
+      hbxs = hbx_enrollments.enrolled_and_renewing.by_year(current_year).by_coverage_kind("health")
+      household_info = Admin::Aptc.build_household_level_aptc_csr_data(current_year, parent, hbxs, latest_eligibility_determination.maximum_aptc.to_f)
       th.eligibility_determinations.build(
         e_pdc_id: latest_eligibility_determination.id,
         benchmark_plan_id: benchmark_plan_id,
         max_aptc: latest_eligibility_determination.maximum_aptc,
         csr_percent_as_integer: latest_eligibility_determination.csr_percent,
-        determined_on: latest_eligibility_determination.determination_date
+        determined_on: latest_eligibility_determination.determination_date,
+        max_available_aptc: household_info['available_aptc'].values.last,
+        max_available_aptc_applied: true
       )
 
       th.save!

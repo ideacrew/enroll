@@ -274,5 +274,34 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
     expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
   end
+end
 
+describe "given a valid payload with a user" do
+  let!(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let!(:p_update){family.primary_family_member.person.update_attributes(first_name: "RaNDomnCaSe", last_name: "NoSNN")}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+  let!(:tax_household){FactoryGirl.create(:tax_household, household:family.active_household,effective_ending_on: nil)}
+  let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_87", max_aptc: 100, csr_percent: 0.73, determined_on: TimeKeeper.date_of_record, tax_household: tax_household)}
+  let!(:current_year) { TimeKeeper.date_of_record.year }
+  let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benchmark_plan_id) { hbx_profile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp }
+  let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml"))).first }
+  let(:verified_primary_family_member) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
+  let(:last_name_regex) {verified_primary_family_member.person.name_last}
+  let(:first_name_regex) {verified_primary_family_member.person.name_first}
+  let(:primary_person) { Person.where({:last_name => last_name_regex,:first_name => first_name_regex}).first}
+  let(:active_verified_household) {parser.households.select{|h| h.integrated_case_id == parser.integrated_case_id}.first}
+
+  before :each do
+    allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+
+  it "should create new tax household" do
+		expect(family.households.first.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)).to eq true
+		expect((family.households.first.tax_households).count).to eq 2
+	end
 end
