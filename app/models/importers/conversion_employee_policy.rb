@@ -61,7 +61,7 @@ module Importers
     end
 
     def current_benefit_application(employer)
-      if employer.is_conversion?
+      if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
         employer.benefit_applications.where(:aasm_state => :imported).first
       else
         employer.benefit_applications.where(:aasm_state => :active).first
