@@ -18,9 +18,9 @@ module BenefitSponsors
 
       def current_benefit_application(employer)
         if employer.is_conversion?
-          benefit_applications.where(:aasm_state => :imported).first
+          employer.benefit_applications.where(:aasm_state => :imported).first
         else
-          benefit_applications.where(:aasm_state => :active).first
+          employer.benefit_applications.where(:aasm_state => :active).first
         end
       end
 

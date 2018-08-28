@@ -60,22 +60,11 @@ module Importers
       @found_employee = non_terminated_employees.sort_by(&:hired_on).last
     end
 
-    # def find_plan 
-    #   return @plan unless @plan.nil?
-    #   return nil if hios_id.blank?
-    #   clean_hios = hios_id.strip
-    #   corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-    #   @plan = Plan.where({
-    #     active_year: plan_year.to_i,
-    #     hios_id: corrected_hios_id
-    #   }).first
-    # end
-
     def current_benefit_application(employer)
       if employer.is_conversion?
-        benefit_applications.where(:aasm_state => :imported).first
+        employer.benefit_applications.where(:aasm_state => :imported).first
       else
-        benefit_applications.where(:aasm_state => :active).first
+        employer.benefit_applications.where(:aasm_state => :active).first
       end
     end
 
