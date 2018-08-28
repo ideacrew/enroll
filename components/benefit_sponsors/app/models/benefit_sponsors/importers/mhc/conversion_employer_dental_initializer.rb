@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Importers::Mhc
     class ConversionEmployerDentalInitializer < ConversionEmployerPlanYearCreate
-        include ::BenefitSponsors::Importers::ConversionEmployerEmployeeLookUp
+      include ::BenefitSponsors::Importers::ConversionEmployerEmployeeLookUp
 
       def map_products
         sponsored_benefit = BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
@@ -37,6 +37,47 @@ module BenefitSponsors
       def save
          map_products
       end
+
+
+
+      # def build_sponsored_benefit
+      #   employer = find_employer(fein)
+      #   benefit_package = find_benefit_package(employer)
+      #   sponsored_benefit = BenefitSponsors::SponsoredBenefits::SponsoredBenefitFactory.call(benefit_package, sanitized_sponsored_benefit_params)
+      # end
+      #
+      # def sanitized_sponsored_benefit_params
+      #   carrier = find_carrier
+      #   {
+      #       :kind => "dental",
+      #       :product_option_choice => find_carrier.id,
+      #       :product_package_kind => "single_product",
+      #       :reference_plan_id => "",
+      #       :sponsor_contribution_attributes => formed_params_for_contribution_levels
+      #   }
+      # end
+      #
+      # def formed_params_for_contribution_levels
+      #   params = tier_contribution_values
+      #
+      #
+      #
+      # end
+      #
+      # def relation_ship_mapping
+      #   {
+      #       "employee_only" => "Employee",
+      #       "employee_and_spouse" => "Spouse",
+      #       "employee_and_one_or_more_dependents" => "",
+      #       "family" => ""
+      #   }
+      # end
+      #
+      # def find_carrier
+      #   BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(carrier)
+      # end
+
+
     end
   end
 end
