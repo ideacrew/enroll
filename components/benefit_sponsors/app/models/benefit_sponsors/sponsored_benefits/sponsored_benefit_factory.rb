@@ -39,7 +39,7 @@ module BenefitSponsors
           sponsor_contribution_attrs = attrs[:contribution_levels_attributes]
           contribution_match = sponsor_contribution_attrs.detect{ |contribution| contribution[:display_name] == new_contribution_level.display_name}
           contribution_level_attr = sponsor_contribution_attrs.except(:id, :display_name)
-          contribution_level_attr[:is_offere] ||= false
+          contribution_level_attr[:is_offered] ||= false
 
           if contribution_match
             contribution_match.assign_attributes(contribution_level_attr)
