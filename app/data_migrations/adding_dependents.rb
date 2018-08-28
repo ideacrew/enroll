@@ -6,7 +6,7 @@ class AddingDependents < MongoidMigrationTask
     family_id = ENV['family_id'].to_s
     index = 1
     family = Family.find(family_id)
-    primary = family.primary_applicant
+    primary = family.primary_applicant.person
     CSV.foreach("#{Rails.root}/#{file_name}", headers: true) do |row|
       person = Person.where(hbx_id: row['hbx_id']).first_or_create
       person.first_name =  row['FirstName']
@@ -16,6 +16,7 @@ class AddingDependents < MongoidMigrationTask
       person.ssn = row['SSN']
       person.gender = row['Gender']
       if person.save
+        relationship = row['Relationship'].to_s.downcase
         primary.ensure_relationship_with(person, relationship) if primary.present?
         puts "Person record created for row #{index}." unless Rails.env.test?
         family_member = FamilyMember.new(person_id: person.id)
