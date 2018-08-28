@@ -39,7 +39,7 @@ end
 namespace :xml do
   desc "Import qhp rates from xml files"
   task :rates, [:action] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "rates", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "rates/2019", "**", "*.xml"))
     # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/rates/2017/Health/United (Shop Only)", "UHIC", "**", "*.xml"))
     # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/rates/2017/Health/United (Shop Only)/UHIC/UHIC_SHOP_Rate_Tables_2017_v.1.xml"))
     rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|

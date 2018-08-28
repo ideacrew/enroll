@@ -2,7 +2,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_pars
 namespace :xml do
   desc "Import plan crosswalk"
   task :plan_cross_walk, [:file] => :environment do |task, args|
-    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk", "**", "*.xml"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk/2019", "**", "*.xml"))
 
     files.each do |file_path|
       @file_path = file_path
@@ -44,22 +44,22 @@ namespace :xml do
             end
           end
         end
-        # end of old model
+        # end of new model
 
         # new model
-        new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2018}/).select{|a| a.active_year == @current_year}
-        new_products.each do |new_product|
-          if new_product.present? && new_product.csr_variant_id != "00"
-            old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2017}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
+        # new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2018}/).select{|a| a.active_year == @current_year}
+        # new_products.each do |new_product|
+        #   if new_product.present? && new_product.csr_variant_id != "00"
+        #     old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2017}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
 
-            if old_product.present?
-              old_product.udpate(renewal_product_id: new_product.id)
-              puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}"
-            else
-              puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present."
-            end
-          end
-        end
+        #     if old_product.present?
+        #       old_product.update(renewal_product_id: new_product.id)
+        #       puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}"
+        #     else
+        #       puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present."
+        #     end
+        #   end
+        # end
         # end of new model
       end
     end
