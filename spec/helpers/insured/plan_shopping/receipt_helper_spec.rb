@@ -27,6 +27,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
           assign(:enrollment, hbx_enrollment)
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
+          allow(helper).to receive(:pay_now_button_timed_out?).and_return true
           expect(helper.show_pay_now?).to eq market.in?(['individual', 'coverall'])
         end
       end
@@ -145,6 +146,47 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       hbx_enrollment1.update_attributes(aasm_state: 'coverage_terminated', terminated_on: TimeKeeper.date_of_record.beginning_of_year)
       hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.day)
       expect(helper.has_break_in_coverage_enrollments?).to eq false
+    end
+  end
+
+  describe 'Pay Now button should be available only for limited time' do
+
+    let(:carrier_profile) { FactoryBot.create(:carrier_profile, legal_name: 'Kaiser') }
+    let(:plan) do
+      FactoryBot.create(:plan, carrier_profile: carrier_profile)
+    end
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_enrollment_members,
+                        enrollment_members: family.family_members,
+                        household: household,
+                        plan: plan,
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.month,
+                        kind: 'individual')
+    end
+
+    let!(:hbx_enrollment1) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_enrollment_members,
+                        enrollment_members: family.family_members,
+                        household: household,
+                        plan: plan,
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                        kind: 'individual')
+    end
+
+    before :each do
+      assign(:enrollment, hbx_enrollment)
+    end
+
+    it 'should return false if enrollment submitted_at is less than 15 minutes' do
+      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record - 15.minutes)
+      expect(helper.pay_now_button_timed_out?).to eq false
+    end
+
+    it 'should return true if enrollment submitted_at is greater than 15 minutes' do
+      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record)
+      expect(helper.pay_now_button_timed_out?).to eq true
     end
   end
 end
