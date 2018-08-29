@@ -895,7 +895,6 @@ class PlanYear
     state :active               # Published plan year is in-force
     state :termination_pending
 
-    state :termination_pending
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
