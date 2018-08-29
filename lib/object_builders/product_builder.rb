@@ -141,7 +141,7 @@ class ProductBuilder
     exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     exempt_organizations.each do |exempt_organization|
       issuer_profile = exempt_organization.issuer_profile
-      issuer_profile.issuer_hios_ids.join.split(",").each do |issuer_hios_id|
+      issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
         @issuer_profile_hash[issuer_hios_id] = issuer_profile.id.to_s
       end
     end
