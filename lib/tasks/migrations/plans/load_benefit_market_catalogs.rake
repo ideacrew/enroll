@@ -1,7 +1,8 @@
 namespace :load do
-  task :benefit_market_catalog => :environment do
+  task :benefit_market_catalog, [:year] => :environment do |task, args|
 
-    calender_year = 2019
+    calender_year = args[:year].present? ? args[:year].to_i : 2019
+
     site = BenefitSponsors::Site.where(site_key: :cca).first
     benefit_market = BenefitMarkets::BenefitMarket.where(:site_urn => Settings.site.key, kind: :aca_shop).first
 
