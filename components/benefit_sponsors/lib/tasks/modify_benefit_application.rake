@@ -5,7 +5,7 @@ require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_mig
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=531828 termination_date="12/01/2016" end_on="12/01/2016" action="terminate" termination_notice="true"
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="cancel"
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="reinstate"
-# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="update_aasm_state"
+# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="update_aasm_state_to_enrollment_open" effective_date="09/01/2018"
 
 namespace :migrations do
   desc "Modifying benefit applications - Cancel, Terminate, Re-instate, Update Aasm State"

@@ -83,10 +83,12 @@ describe ModifyBenefitApplication do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end
 
-    context "update aasm state of benefit application" do
+    context "update aasm state to enrollment open" do
+      let(:effective_date) { start_on }
 
       before do
-        allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state")
+        allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state_to_enrollment_open")
+        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.to_s)
       end
 
       it "should update the benefit application" do
