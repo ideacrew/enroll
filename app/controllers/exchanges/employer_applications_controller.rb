@@ -21,7 +21,7 @@ class Exchanges::EmployerApplicationsController < ApplicationController
         else
           @application.terminate!(end_on) if @application.may_terminate?
           if @application.terminated?
-            @application.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record)
+            @application.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: params['term_reason'])
             @application.terminate_employee_enrollments(end_on)
           else
             flash[:error] = "Employer Application can't be terminated."

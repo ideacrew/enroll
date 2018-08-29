@@ -53,11 +53,11 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     before :each do
       sign_in(user)
-      put :terminate, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month
+      put :terminate, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month, term_reason: "nonpayment"
     end
 
-    it "should redirect to root path" do
-      expect(response).to redirect_to exchanges_hbx_profiles_root_path
+    it "should be success" do
+      expect(response).to have_http_status(:success)
     end
 
     it "should terminate the plan year" do
@@ -76,8 +76,8 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       put :cancel, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month
     end
 
-    it "should redirect to root path" do
-      expect(response).to redirect_to exchanges_hbx_profiles_root_path
+    it "should be success" do
+      expect(response).to have_http_status(:success)
     end
 
     it "should cancel the plan year" do
