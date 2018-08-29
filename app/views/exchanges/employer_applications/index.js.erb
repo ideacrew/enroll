@@ -98,6 +98,16 @@ function showTerminationRadios() {
   $('.term_action_radios').removeClass('hidden');
 }
 
+function hideEndDateField() {
+  $('input.py-end-date').addClass('hidden')
+  $('#calendar_icon').addClass('hidden')
+}
+
+function showEndDateField() {
+  $('input.py-end-date').removeClass('hidden')
+  $('#calendar_icon').removeClass('hidden')
+}
+
 function hideTerminationRadios() {
   $('.term_action_radios').addClass('hidden');
 }
@@ -137,6 +147,7 @@ function pyAction(action, id, employer_id, term_date) {
   employerId = employer_id
   actionSelected = action;
   showPlanYearActions(id);
+  showEndDateField();
   if (action == "reinstate") {
     disableDatePicker();
     $('input#datepicker').val(<%= Date.today %>);
@@ -151,9 +162,9 @@ function pyAction(action, id, employer_id, term_date) {
   }
   
   if (action == 'cancel') {
+    hideEndDateField();
     hideTerminationRadios();
-    clearDatePickerValue();
-    disableSubmitButton();
+    enableSubmitButton();
   }
 }
 // You can use the actionSelected here
