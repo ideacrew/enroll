@@ -77,7 +77,7 @@ RSpec.describe Insured::FamiliesController do
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
-      allow(family).to receive(:earliest_effective_sep).and_return sep
+      allow(family).to receive(:latest_active_sep).and_return sep
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
