@@ -12,27 +12,37 @@ class ModifyBenefitApplication< MongoidMigrationTask
       terminate_benefit_application(benefit_applications_for_terminate)
     when "reinstate"
       reinstate_benefit_application(benefit_applications_for_reinstate)
-    when "update_aasm_state_to_enrollment_open"
-      update_aasm_state_to_enrollment_open(benefit_applications_for_aasm_state_update)
+    when "begin_open_enrollment"
+      begin_open_enrollment(benefit_applications_for_aasm_state_update)
     end
   end
 
-  def update_aasm_state_to_enrollment_open(benefit_applications)
+  def begin_open_enrollment(benefit_applications)
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
     benefit_application = benefit_applications.where(:aasm_state.in => [:approved, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible], :"effective_period.min" => effective_date).first
-    if benefit_application.present?
-      benefit_application.begin_open_enrollment!
+    if benefit_application.present? && benefit_application.may_begin_open_enrollment?
+      from_state = benefit_application.aasm_state
+      benefit_application.update_attributes!(:aasm_state => :enrollment_open)
+      benefit_application.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: from_state,
+          to_state: "enrollment_open"
+      )
+      if from_state == :approved
+        benefit_application.recalc_pricing_determinations
+        benefit_application.renew_benefit_package_members
+      end
       benefit_sponsorship = benefit_application.benefit_sponsorship
       unless benefit_application.is_renewing?
+        bs_from_state = benefit_sponsorship.aasm_state
         benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
         benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: benefit_sponsorship.aasm_state,
+            from_state: bs_from_state,
             to_state: "initial_enrollment_open"
         )
       end
       puts "aasm state has been changed to enrolling" unless Rails.env.test?
     else
-      raise "No benefit application in ineligible state"
+      raise "FAILED: Unable to find application or application is in invalid state"
     end
   end
 

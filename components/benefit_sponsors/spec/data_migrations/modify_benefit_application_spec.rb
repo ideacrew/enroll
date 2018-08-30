@@ -88,7 +88,7 @@ describe ModifyBenefitApplication do
         let(:effective_date) { start_on }
 
         before do
-          allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state_to_enrollment_open")
+          allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
           allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.to_s)
         end
 
@@ -106,7 +106,7 @@ describe ModifyBenefitApplication do
 
         it "should not update the benefit application" do
           expect { subject.migrate }.to raise_error(RuntimeError)
-          expect { subject.migrate }.to raise_error("No benefit application in ineligible state")
+          expect { subject.migrate }.to raise_error("FAILED: Unable to find application or application is in invalid state")
         end
       end
 
@@ -114,7 +114,7 @@ describe ModifyBenefitApplication do
         let(:effective_date) { start_on }
 
         before do
-          allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state_to_enrollment_open")
+          allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
           allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.to_s)
           expect_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_renewing?).at_least(:once).and_return(true)
         end
