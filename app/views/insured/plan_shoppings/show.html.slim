@@ -368,9 +368,9 @@ javascript:
                   </div>
                   <div class="col-xs-4">
                     <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" href="/document/download/${result.product.sbc_document.identifier.split("#")[0].split(":").pop()}/${result.product.sbc_document.identifier.split("#")[1]}?content_type=application/pdf&amp;filename=${result.product.title.replace(/[^0-9a-z]/gi,'')}.pdf&amp;disposition=inline">
-  -                   Summary of Benefits and Coverage
-  -                 </a>
--                  </div>
+                      Summary of Benefits and Coverage
+                    </a>
+                  </div>
                   <div class="col-md-5 col-sm-5 col-xs-5 pl-0 pr-0">
                     <a class="btn btn-default btn-right plan-select select" href="/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/thankyou?change_plan=&coverage_kind=${result.product.kind}&enrollment_kind=&market_kind=${result.product.benefit_market_kind.replace('aca_','')}&plan_id=${result.product._id}">Select Plan</a>
                     <a class="btn btn-default ml-1" data-remote="true" href="/products/plans/summary?active_year=${result.coverage_start_on.split('-')[0]}&coverage_kind=${result.product.kind}&enrollment_kind=&hbx_enrollment_id=#{@hbx_enrollment.id.to_s}&market_kind=${result.product.benefit_market_kind.replace('aca_','')}&standard_component_id=${result.product.hios_id}">See Details</a>
