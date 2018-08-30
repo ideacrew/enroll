@@ -52,7 +52,7 @@
 													
 								.col-xs-6
 									.col-xs-3
-										= cl.number_field :contribution_factor, class: "cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100), "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setSliderInput(this)"
+										= cl.number_field :contribution_factor, class: "cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100).to_i, "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setSliderInput(this)"
 									.col-xs-9
 										input.slider class="slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this)"
 											span.slide-label.pull-right
