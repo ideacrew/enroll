@@ -1,9 +1,11 @@
 = content_for :navigation do
   = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
 .container
-  h4 Dental - Set up Benefit Package
+  h1.heading-text Dental - Set up Benefit Package
+  
+  h1.heading-text Select Your Plan Offering
 
-  h5 Select which plans your employees will choose from
+  h4 Let your plan participants choose any plan offered by one carrier, any plan availablr within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
 
   .benefit-package-dental
     = form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "create"} do |benefit_builder|
