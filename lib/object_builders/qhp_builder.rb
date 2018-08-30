@@ -9,7 +9,7 @@ class QhpBuilder
     # @issuer_profile_hash = {}
     # set_issuer_profile_hash
     # @service_area_map = {}
-    set_service_areas
+    # set_service_areas
     FileUtils.mkdir_p(File.dirname(@log_path)) unless File.directory?(File.dirname(@log_path))
     @logger = Logger.new(@log_path)
 

@@ -66,7 +66,7 @@ namespace :import do
         elsif year == 2018
           ["2018_QHP", "2018_QDP"]
         elsif year == 2019
-          ["2018_QHP"]
+          ["2019_QHP", "2019_QDP"]
         end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
@@ -84,7 +84,7 @@ namespace :import do
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
-              if sheet_name != "2018_QDP"
+              if sheet_name != "#{year}_QDP"
                 rx_formulary_url = row_info[@headers["rx formulary url"]].strip
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               end
@@ -102,7 +102,7 @@ namespace :import do
             products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
             products.each do |product|
               product.provider_directory_url = provider_directory_url
-              if sheet_name != "2018_QDP"
+              if sheet_name != "#{year}_QDP"
                 rx_formulary_url = row_info[@headers["rx formulary url"]].strip
                 product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               end
