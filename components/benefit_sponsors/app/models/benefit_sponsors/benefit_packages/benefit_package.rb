@@ -85,7 +85,7 @@ module BenefitSponsors
 
       def successor
         self.benefit_application.benefit_sponsorship.benefit_applications.flat_map(&:benefit_packages).detect do |bp|
-          bp.predecessor_id.to_s == self.id.to_s
+          bp.predecessor_id.to_s == self.id.to_s && (bp.benefit_application.is_submitted?)
         end
       end
 
