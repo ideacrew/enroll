@@ -43,9 +43,12 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
     let!(:benefit_application_id) { benefit_application.id.to_s }
     let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
-    let!(:product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: product_package_kind).first }
-    let(:product) { product_package.products.first }
-    let(:product2) {product_package.products.last}
+    let!(:update_product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: product_package_kind).first.update_attributes(package_kind: :single_product) }
+
+    let!(:product_package) { benefit_sponsor_catalog.product_packages.where(package_kind: :single_product).first}
+    let!(:products){product_package.products.update_all(product_package_kinds: [:single_product])}
+    let!(:product) { product_package.products.first}
+    let!(:product2) {product_package.products.last}
 
     let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
     let(:benefit_group_assignment) {FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package)}
@@ -70,6 +73,7 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
                          employee_role_id: employee_role.id,
                          sponsored_benefit_package_id: benefit_package.id,
                          benefit_group_assignment_id: benefit_group_assignment.id,
+                         sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
                          aasm_state: 'coverage_selected'
       )
     end
