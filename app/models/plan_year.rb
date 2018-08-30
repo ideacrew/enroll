@@ -34,6 +34,7 @@ class PlanYear
   field :open_enrollment_end_on, type: Date
 
   field :terminated_on, type: Date
+  field :termination_kind, type: String
 
   field :imported_plan_year, type: Boolean, default: false
 
@@ -114,7 +115,7 @@ class PlanYear
     )
   }
 
-  after_update :update_employee_benefit_packages
+  after_update :update_employee_benefit_packages, :notify_employer_py_voluntary_terminate, :notify_employer_py_nonpayment_terminate
 
   after_save :notify_on_save
 
@@ -874,6 +875,7 @@ class PlanYear
     state :expired              # Non-published plans are expired following their end on date
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
+    state :termination_pending
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
@@ -977,16 +979,6 @@ class PlanYear
 
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended], to: :terminated
-    end
-
-    # Coverage terminated due to voluntary_terminate
-    event :voluntary_terminate, :after => [:record_transition, :notify_employer_py_voluntary_terminate]  do
-      transitions from: [:active, :suspended], to: :terminated
-    end
-
-    # Coverage terminated due to non-payment
-    event :nonpayment_terminate, :after => [:record_transition, :notify_employer_py_nonpayment_terminate] do
       transitions from: [:active, :suspended], to: :terminated
     end
 
@@ -1120,11 +1112,15 @@ class PlanYear
   private
 
   def notify_employer_py_voluntary_terminate
-    notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    if (termination_pending? || terminated?) && self.termination_kind_changed? && self.termination_kind == "voluntary"
+      notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    end
   end
 
   def notify_employer_py_nonpayment_terminate
-    notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    if (termination_pending? || terminated?) && self.termination_kind_changed? && self.termination_kind == "nonpayment"
+      notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    end
   end
 
   def log_message(errors)
