@@ -13,16 +13,16 @@ describe AddingDependents do
   end
 
   describe "adding dependents" do
-  	let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
-  	before do
-  		allow(ENV).to receive(:[]).with('family_id').and_return family.id
-    	allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/dependent_test_record.csv"
+    let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
+    before do
+      allow(ENV).to receive(:[]).with('family_id').and_return family.id
+      allow(ENV).to receive(:[]).with('file_name').and_return "dependents.csv"
     end
     it "should add new dependent" do
       	expect(family.dependents.size).to eq 0
         subject.migrate
         family.reload
-        expect(family.dependents.size).to eq 1
+        expect(family.dependents.size).to eq 3
     end
   end
 end
