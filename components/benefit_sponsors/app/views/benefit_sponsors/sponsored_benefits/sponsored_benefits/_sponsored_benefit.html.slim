@@ -1,61 +1,65 @@
-ul.nav.nav-tabs.row
-  li.col-md-4.col-sm-4
-    = f.hidden_field :kind, value: f.object.kind
-    = f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind'
-    = f.label :product_package_kind_single_product, class: "elected_plan" do
-      = "One Plan"
+- single_product_carriers = @sponsored_benefit_form.catalog.single_product_options
 
-#singleProductInfo
-  - single_product_carriers = @sponsored_benefit_form.catalog.single_product_options
-  h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.
-  br
-  - single_product_carriers.each do |issuer_name, issuer_id|
-    .col-xs-3.plans
-      .col-xs-12
-        label.container
-          = f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"loadSingleProductSponsorContribution(this)"
-          span.checkmark
-          = issuer_name
-
+#metal-level-select.card
+	.card-body
+		ul.nav.nav-tabs role="tablist"
+			li.active.col-md-4.col-sm-4 role="presentation"
+				a href="#plan" aria-controls="dentalPlan" role="tab" data-toggle="tab" One Plan
+				= f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind mr-1 hidden'
+		.tab-content
+			.tab-pane.active#plan role="tabpanel"
+				h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+				br
+				- single_product_carriers.each do |issuer_name, issuer_id|
+					.col-xs-3.plans
+						.col-xs-12
+							label.container
+								= f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"loadSingleProductSponsorContribution(this)"
+								span.checkmark
+								= issuer_name
+								
 #referencePlans.hidden
-  h2.heading-text.pt-1.float-left Select Your Reference Plan
+	h2.heading-text.pt-1.float-left Select Your Reference Plan
+	
+	h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+	
+	= render "products", f: f
+	
+	#yourSponsorContributions
+		#sponsorContributions.mt-1
+			.col-xs-12
+				.col-xs-6.offered-heading
+					.text-uppercase.text-center 
+						| Offered
+						i.fas.fa-question-circle
+				.col-xs-6.offered-heading
+					.text-uppercase.text-center 
+						| Employer Contribution
+						i.fas.fa-question-circle
+				.col-xs-12#benefitFields
+					= f.fields_for :sponsor_contribution, @sponsored_benefit_form.catalog.sponsor_contributions.first, errors: {}, fieldset: false do |sc|
+						= sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
+							.row
+								.col-xs-6.pr-3
+									.row.sc-container
+										.col-xs-12.ml-2.mt-2
+											label.container.ml-1
+												= cl.object.display_name.try(:humanize)
+												= cl.hidden_field :display_name, value: cl.object.display_name
+												= cl.hidden_field :contribution_unit_id, value: cl.object.contribution_unit_id
+												= cl.check_box :is_offered, {class: "contribution_handler", disabled: (cl.object.is_employee_cl)}, "true", "false"
+												span.checkmark
+													
+								.col-xs-6
+									.col-xs-3
+										= cl.number_field :contribution_factor, class: "cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100).to_i, "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setSliderInput(this)"
+									.col-xs-9
+										input.slider class="slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this)"
+											span.slide-label.pull-right
+								
 
-  h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+	#yourReferencePlanDetails
 
-  = render "products", f: f
-              
 
-  #yourSponsorContributions
-    #sponsorContributions.mt-1
-      .col-xs-12
-        .col-xs-6.offered-heading
-          .text-uppercase.text-center 
-            | Offered 
-            i.fas.fa-question-circle
-        .col-xs-6.offered-heading
-          .text-uppercase.text-center 
-            | Employer Contribution 
-            i.fas.fa-question-circle
-      .col-xs-12#benefitFields
-        = f.fields_for :sponsor_contribution, @sponsored_benefit_form.catalog.sponsor_contributions.first, errors: {}, fieldset: false do |sc|
-          div
-            = sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
-              fieldset
-                div.col-xs-6.form-group.form-group-lg
-                  div.checkbox
-                    label
-                      = cl.check_box :is_offered, {class: "contribution_handler", disabled: (cl.object.is_employee_cl)}, "true", "false"
-                      = cl.hidden_field :display_name, value: cl.object.display_name
-                      = cl.hidden_field :contribution_unit_id, value: cl.object.contribution_unit_id
-                      p
-                        = cl.object.display_name.try(:humanize)
-                div.col-xs-6.form-group.form-group-lg
-                  div.row.col-xs-12
-                    div.col-xs-3
-                      = cl.number_field :contribution_factor, class: "cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100), "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setSliderInput(this)"
-                    div.col-xs-9
-                      input.slider class="slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setNumberInput(this)"
-                      span.slide-label.pull-right
 
-  #yourReferencePlanDetails
-    
+
