@@ -87,13 +87,13 @@
                 <br/>
                 <ol>
                   <li>
-                    <% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+                    <% if show_pay_now? %>
                       You must pay your first month’s premium directly to Kaiser Permanente to activate your
-                      coverage. DC Health Link does not collect premium payments.<br/>
+                      coverage. DC Health Link does not collect premium payments.<br/><br/>
                       There are two ways to pay your first month’s premium and activate your coverage:
                       <br/>
                       <br/>
-                      <ul>
+                      <ul style="padding-left: 18px;list-style-type: disc;/* padding-left: 18px; */">
                         <li>
                           <strong>Select PAY NOW to make your first premium payment directly to Kaiser
                             Permanente. </strong>
@@ -156,15 +156,15 @@
                       </div>
 
                   <% elsif @plan.carrier_profile.legal_name == "Kaiser" %>
+                  <% unless show_pay_now? %>
                   <div>
-										<!-- Taking out due to paynow option for Kaiser plans
                     Call: <strong>1-844-524-7370</strong>
-										-->
                     <!-- comment out congressional phone numbers
                     <br/>
                     For Congressional Employees: <strong><a href="tel:+18552513209">1-855-251-3209</a></strong>
                   -->
                   </div>
+                  <% end %>
                   <% elsif @plan.carrier_profile.legal_name == "UnitedHealthcare" %>
                   <div>
                     Call: <strong>1-877-856-2430</strong><br/>
@@ -175,7 +175,7 @@
 
                 <br/>
                 <br/>
-								<% unless @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+								<% unless show_pay_now? %>
                 <li>
                   <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
                 </li>
