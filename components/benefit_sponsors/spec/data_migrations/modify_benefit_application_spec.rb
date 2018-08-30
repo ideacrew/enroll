@@ -83,6 +83,32 @@ RSpec.describe ModifyBenefitApplication do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end
 
+    context "update aasm state to enrollment open" do
+      let(:effective_date) { start_on }
+
+      before do
+        allow(ENV).to receive(:[]).with("action").and_return("update_aasm_state_to_enrollment_open")
+        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.to_s)
+      end
+
+      it "should update the benefit application" do
+        benefit_application.update_attributes!(aasm_state: "enrollment_ineligible", benefit_packages: [])
+        benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_ineligible")
+        expect(benefit_application.aasm_state).to eq :enrollment_ineligible
+        expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
+        subject.migrate
+        benefit_application.reload
+        benefit_sponsorship.reload
+        expect(benefit_application.aasm_state).to eq :enrollment_open
+        expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+      end
+
+      it "should not update the benefit application" do
+        expect { subject.migrate }.to raise_error(RuntimeError)
+        expect { subject.migrate }.to raise_error("No benefit application in ineligible state")
+      end
+    end
+
     context "terminate benefit application" do
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }

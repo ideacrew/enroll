@@ -12,13 +12,28 @@ class ModifyBenefitApplication< MongoidMigrationTask
       terminate_benefit_application(benefit_applications_for_terminate)
     when "reinstate"
       reinstate_benefit_application(benefit_applications_for_reinstate)
-    when "update_aasm_state"
-      update_aasm_state(benefit_applications_for_aasm_state_update)
+    when "update_aasm_state_to_enrollment_open"
+      update_aasm_state_to_enrollment_open(benefit_applications_for_aasm_state_update)
     end
   end
 
-  def update_aasm_state(benefit_applications)
-
+  def update_aasm_state_to_enrollment_open(benefit_applications)
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    benefit_application = benefit_applications.where(:aasm_state.in => [:enrollment_closed, :enrollment_eligible, :enrollment_ineligible], :"effective_period.min" => effective_date).first
+    if benefit_application.present?
+      benefit_application.begin_open_enrollment!
+      benefit_sponsorship = benefit_application.benefit_sponsorship
+      unless benefit_application.is_renewing?
+        benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
+        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: benefit_sponsorship.aasm_state,
+            to_state: "initial_enrollment_open"
+        )
+      end
+      puts "aasm state has been changed to enrolling" unless Rails.env.test?
+    else
+      raise "No benefit application in ineligible state"
+    end
   end
 
   def reinstate_benefit_application(benefit_applications)
@@ -42,7 +57,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def benefit_applications_for_aasm_state_update
-
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_sponsorship.benefit_applications
   end
 
   def benefit_applications_for_reinstate
