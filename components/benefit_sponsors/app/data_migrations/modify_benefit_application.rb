@@ -14,6 +14,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
       reinstate_benefit_application(benefit_applications_for_reinstate)
     when "update_aasm_state"
       update_aasm_state(benefit_applications_for_aasm_state_update)
+    when "update_effective_period_and_approve"
+      update_effective_period_and_approve(benefit_applications_for_aasm_state_update)
     end
   end
 
@@ -23,6 +25,20 @@ class ModifyBenefitApplication< MongoidMigrationTask
 
   def reinstate_benefit_application(benefit_applications)
 
+  end
+
+  def update_effective_period_and_approve(benefit_applications)
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    new_start_date = Date.strptime(ENV['new_start_date'], "%m/%d/%Y")
+    new_end_date = Date.strptime(ENV['new_end_date'], "%m/%d/%Y")
+    raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
+    benefit_application = benefit_applications.where(:"effective_period.min" => effective_date).first
+    if benefit_application.present?
+      benefit_application.update_attributes!(effective_period: new_start_date..new_end_date)
+      benefit_application.approve_application!
+    else
+      raise "No benefit application found."
+    end
   end
 
   def terminate_benefit_application(benefit_applications)
@@ -41,7 +57,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     service.cancel
   end
 
-  def benefit_applications_for_aasm_state_update
+  def benefit_applications_for_aasm_state_updatee
 
   end
 

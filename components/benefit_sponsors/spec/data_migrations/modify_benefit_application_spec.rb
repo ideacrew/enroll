@@ -141,6 +141,35 @@ RSpec.describe ModifyBenefitApplication do
       end
     end
 
+      context "Should update effective period and approve benefit application" do
+        let(:effective_date) { start_on }
+        let(:new_start_date) { start_on.next_month }
+        let(:new_end_date) { new_start_date + 1.year }
+
+        before do
+          allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
+          allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.to_s)
+          allow(ENV).to receive(:[]).with("new_start_date").and_return(new_start_date.to_s)
+          allow(ENV).to receive(:[]).with("new_end_date").and_return(new_end_date.to_s)
+        end
+
+        it "should update the benefit application" do
+          benefit_application.update_attributes!(aasm_state: "draft", benefit_packages: [])
+          expect(benefit_application.effective_period.min).to eq start_on
+          subject.migrate
+          benefit_application.reload
+          expect(benefit_application.start_on).to eq new_start_date
+          expect(benefit_application.end_on).to eq new_end_date
+          expect(benefit_application.aasm_state).to eq :approved
+        end
+
+        it "should not update the benefit application" do
+          expect { subject.migrate }.to raise_error(RuntimeError)
+          expect { subject.migrate }.to raise_error("No benefit application found.")
+        end
+      end
+
+
     context "should trigger termination notice", db_clean: :after_each do
 
       let(:termination_date) { start_on.next_month.next_day }
