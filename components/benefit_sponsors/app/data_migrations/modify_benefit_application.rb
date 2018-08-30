@@ -57,7 +57,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     service.cancel
   end
 
-  def benefit_applications_for_aasm_state_updatee
+  def benefit_applications_for_aasm_state_update
 
   end
 
