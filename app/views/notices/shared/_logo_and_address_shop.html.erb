@@ -4,13 +4,13 @@
       <td>
         <% if notice.shop? %>
           <b><%= Settings.site.short_name %></b><br>
-             <%= Settings.aca.notices.shop_market.mail_address.address_1 %><br>
-             <%= Settings.aca.notices.shop_market.mail_address.address_2 %><br>
-             <%= Settings.aca.notices.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.aca.notices.shop_market.mail_address.zip_code %><br>
+             <%= Settings.notices.shop_market.mail_address.address_1 %><br>
+             <%= Settings.notices.shop_market.mail_address.address_2 %><br>
+             <%= Settings.notices.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.notices.shop_market.mail_address.zip_code %><br>
         <% else %>
           <b><%= Settings.site.short_name %> Contact Center</b><br>
-             <%= Settings.aca.notices.individual_market.mail_address.address_1 %><br>
-             <%= Settings.aca.notices.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.aca.notices.individual_market.mail_address.zip_code %><br>
+             <%= Settings.notices.individual_market.mail_address.address_1 %><br>
+             <%= Settings.notices.individual_market.mail_address.city %>, <%= Settings.aca.state_abbreviation %> <%= Settings.notices.individual_market.mail_address.zip_code %><br>
         <% end %>
       </td>
       <td colspan="2" align="right"><a href=
