@@ -19,7 +19,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
 
   def update_aasm_state_to_enrollment_open(benefit_applications)
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
-    benefit_application = benefit_applications.where(:aasm_state.in => [:enrollment_closed, :enrollment_eligible, :enrollment_ineligible], :"effective_period.min" => effective_date).first
+    benefit_application = benefit_applications.where(:aasm_state.in => [:approved, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible], :"effective_period.min" => effective_date).first
     if benefit_application.present?
       benefit_application.begin_open_enrollment!
       benefit_sponsorship = benefit_application.benefit_sponsorship
