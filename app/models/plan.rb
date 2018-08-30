@@ -292,6 +292,11 @@ class Plan
     where(carrier_profile_id: carrier_profile._id)
   end
 
+  def is_same_plan_by_hios_id_and_active_year?(plan)
+    #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
+    ((self.hios_id.split("-")[0] == plan.hios_id.split("-")[0]) && self.active_year == plan.active_year )
+  end
+
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
   end

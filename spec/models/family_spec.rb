@@ -1452,6 +1452,7 @@ describe "has_valid_e_case_id" do
   end
 end
 
+<<<<<<< HEAD
 describe Family, "#take_initial_application_snapshot" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -1477,6 +1478,14 @@ describe Family, "#take_initial_application_snapshot" do
     it "creates initial application snapshot" do
       expect(family.initial_application_snapshot.family_member_snapshots.count).to eq family.family_members.count
     end
+  end
+end
+describe "currently_enrolled_plans_ids" do
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+
+  it "should return a non-empty array of plan ids" do
+    expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
   end
 end
 
