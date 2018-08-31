@@ -443,31 +443,32 @@ class ConsumerRole
     end
 
     event :coverage_purchased, :after => [:record_transition ,:notify_of_eligibility_change, :invoke_residency_verification!]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
+      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!, :move_types_to_pending]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!, :move_types_to_pending]
     end
 
     event :coverage_purchased_no_residency, :after => [:record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_lawful_presence]
+      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
 
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
-      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: [:ssa_pending, :verification_outstanding], to: :verification_outstanding
     end
 
     event :ssn_valid_citizenship_invalid, :after => [:pass_ssn, :record_transition, :notify_of_eligibility_change, :fail_lawful_presence] do
-      transitions from: :ssa_pending, to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
-      transitions from: :ssa_pending, to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
+      transitions from: [:ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :is_native?, :after => [:fail_lawful_presence]
+      transitions from: [:ssa_pending, :verification_outstanding], to: :dhs_pending, :guard => :is_non_native?, :after => [:invoke_dhs, :record_partial_pass]
     end
 
     event :ssn_valid_citizenship_valid, :guard => :call_ssa?, :after => [:pass_ssn, :pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
       transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
-      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified?
+      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member_not_verified?
+      transitions from: [:unverified, :ssa_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_tribe_member_verified?
     end
 
     event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -478,13 +479,15 @@ class ConsumerRole
     event :pass_dhs, :guard => :is_non_native?, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_denied?
       transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :sci_verified, :guard => :residency_pending?
-      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :verification_outstanding, :guard => :residency_verified_and_tribe_member_not_verified?
+      transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_tribe_member_verified?
     end
 
     event :pass_residency, :after => [:mark_residency_authorized, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :sci_verified, to: :verification_outstanding, :guards => [:is_tribe_member?]
       transitions from: :sci_verified, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified, :guards => [:ssn_verified?, :lawful_presence_verified?]
       transitions from: :verification_outstanding, to: :verification_outstanding
@@ -550,9 +553,9 @@ class ConsumerRole
 
   def invoke_verification!(*args)
     if person.ssn || is_native?
-      invoke_ssa
+      invoke_ssa 
     else
-      invoke_dhs
+      invoke_dhs 
     end
   end
 
@@ -566,6 +569,36 @@ class ConsumerRole
         self.pass_dhs! verification_attr(args.first)
       end
     end
+  end
+
+  def is_tribe_member_or_native_no_snn?
+    native_no_ssn? || is_tribe_member?
+  end
+
+  def handle_native_no_snn_or_indian_transition
+    if tribal_no_ssn?
+      fail_lawful_presence(verification_attr)
+      fail_indian_tribe
+    elsif tribal_with_ssn?
+      invoke_verification!(verification_attr)
+      move_types_to_pending
+      fail_indian_tribe
+    elsif native_no_ssn?
+      fail_lawful_presence(verification_attr)
+    end
+  end
+
+  def is_tribe_member?
+    return false if tribal_id.nil?
+    !tribal_id.empty?
+  end
+
+  def tribal_no_ssn?
+    is_tribe_member? && no_ssn?
+  end
+
+  def tribal_with_ssn?
+    is_tribe_member? && ssn_applied?
   end
 
   def update_by_person(*args)
@@ -679,6 +712,10 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def native_with_ssn?
+    is_native? && ssn_applied?
+  end
+
   def check_for_critical_changes(person_params, family)
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
       redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
@@ -756,6 +793,23 @@ class ConsumerRole
     lawful_presence_determination.verification_successful?
   end
 
+  def residency_verified_and_tribe_member_not_verified?
+    residency_verified? && !indian_tribe_verified?
+  end
+
+  def residency_verified_and_tribe_member_verified?
+    residency_verified? && indian_tribe_verified?
+  end
+
+  def indian_tribe_verified?
+    indian_tribe_status = verification_types.by_name("American Indian Status").first if verification_types.by_name("American Indian Status").first
+    if indian_tribe_status.present?
+      indian_tribe_status.validation_status == 'outstanding' ? false : true
+    else
+      true
+    end
+  end
+
   def residency_pending?
     local_residency_validation == "pending" || is_state_resident.nil?
   end
@@ -805,7 +859,7 @@ class ConsumerRole
 
   def move_types_to_pending(*args)
     verification_types.each do |type|
-      type.pending_type unless type.type_name == "DC Residency"
+      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status")
     end
   end
 
@@ -833,6 +887,10 @@ class ConsumerRole
 
   def revert_native
     verification_types.by_name("American Indian Status").first.pending_type if verification_types.by_name("American Indian Status").first
+  end
+
+  def fail_indian_tribe
+    verification_types.by_name("American Indian Status").first.fail_type if verification_types.by_name("American Indian Status").first
   end
 
   def revert_lawful_presence(*args)

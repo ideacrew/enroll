@@ -239,11 +239,12 @@ context "Verification process and notices" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
-    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event, tribal_id = ""|
       before do
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
+        consumer.tribal_id = tribal_id
       end
       it "moves from #{from_state} to #{to_state} on #{event}" do
         expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
@@ -298,11 +299,34 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, :unverified, :dhs_pending, "coverage_purchased!"
       end
 
+      describe "indian tribe member with ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+      end
+
+      describe "indian tribe member with NO ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+      end
+
       describe "pending verification type updates" do
         it "updates validation status to pending for unverified consumers" do
           consumer.coverage_purchased!
           expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
         end
+
+        it "updates indian tribe validition status to outstanding and to pending for the rest" do
+          consumer.tribal_id = "345543345"
+          consumer.coverage_purchased!
+          consumer.verification_types.each { |verif| 
+            if verif.type_name == "American Indian Status"
+              expect(verif.validation_status). to eq("outstanding")
+            else
+              expect(verif.validation_status).to eq("pending")
+            end
+          }
+        end
+
       end
     end
 
@@ -613,6 +637,75 @@ describe "#find_document" do
       expect(found_document.subject).to eq("Certificate of Citizenship")
     end
   end
+end
+
+describe "Indian tribe member" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role }
+  let(:verification_types) { consumer.verification_types }
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+
+  context 'Responses from local hub and ssa hub'do
+
+    it 'aasm state should be in verification outstanding if dc response is valid and consumer is tribe member' do
+      person.update_attributes!(tribal_id: "12345")
+      consumer_role.coverage_purchased!(verification_attr)
+      consumer_role.pass_residency!
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+
+    it 'aasm state should be in fully verified if dc response is valid and consumer is not a tribe member' do
+      consumer_role.fail_residency!
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+
+    it 'aasm state should be in verification_outstanding if dc response is negative and consumer is not a tribe member' do
+      consumer_role.fail_residency!
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+
+    it 'aasm state should be in fully verified if dc response is positive and consumer is not a tribe member' do
+      consumer_role.update_attributes(is_state_resident: nil)
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      consumer_role.pass_residency!
+      expect(consumer_role.aasm_state). to eq 'fully_verified'
+    end
+
+    it 'aasm state should be in verification_outstanding if dc response is positive and consumer is a tribe member' do
+      consumer_role.update_attributes(is_state_resident: nil)
+      person.update_attributes!(tribal_id: "12345")
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      consumer_role.pass_residency!
+      expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+  end
+
+  context 'american indian verification type on coverage purchase' do
+    it 'aasm state should be in verification outstanding and american indian status in outstanding upon coverage purchase' do
+      person.update_attributes!(tribal_id: "12345")
+      consumer_role.coverage_purchased!(verification_attr)
+      american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
+      expect(american_indian_status.validation_status). to eq 'outstanding'
+      expect(consumer_role.aasm_state). to eq 'verification_outstanding'
+    end
+  end
+
+  context 'admin verifies american indian status' do
+    it 'consumer aasm state should be in fully_verified if all verification types are verified' do
+      person.update_attributes!(tribal_id: "12345")
+      consumer_role.coverage_purchased!(verification_attr)
+      consumer_role.pass_residency!
+      consumer_role.ssn_valid_citizenship_valid!(verification_attr)
+      american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
+      consumer_role.update_verification_type(american_indian_status, "admin verified")
+      expect(consumer_role.aasm_state). to eq 'fully_verified'
+      expect(american_indian_status.validation_status). to eq 'verified'
+    end
+  end
+
 end
 
 describe "#processing_residency_24h?" do
