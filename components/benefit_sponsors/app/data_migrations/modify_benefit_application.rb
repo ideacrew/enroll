@@ -38,8 +38,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     if benefit_application.present?
       benefit_sponsorship =  benefit_application.benefit_sponsorship
       benefit_package = benefit_application.benefit_packages.detect(&:is_active)
-      benefit_application.update_attributes!(effective_period: new_start_date..new_end_date)
-      benefit_application.update_attributes!(open_enrollment_period: oe_start_on..oe_end_on)
+      benefit_application.update_attributes!(effective_period: new_start_date..new_end_date, open_enrollment_period: oe_start_on..oe_end_on)
       new_effective_date = benefit_application.effective_period.min
       service_areas = benefit_application.benefit_sponsorship.service_areas_on(new_effective_date)
       benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, new_effective_date)
