@@ -136,7 +136,11 @@ notices:
     attachments:
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
       envelope_without_address: "taglines.pdf"
-
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
   individual_market:
     mail_address:
       address_1: "PO Box 44018"
