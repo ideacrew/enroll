@@ -1452,7 +1452,6 @@ describe "has_valid_e_case_id" do
   end
 end
 
-<<<<<<< HEAD
 describe Family, "#take_initial_application_snapshot" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
