@@ -64,11 +64,7 @@ module Effective
         family.active_household.latest_active_tax_household.present? && allow ? 'ajax' : 'disabled'
       end
 
-<<<<<<< HEAD
       def enable_disable_link_type(allow)
-=======
-      def add_sep_link_type(allow)
->>>>>>> origin/App_Dev_User_Story#23576
         allow ? 'ajax' : 'disabled'
       end
 
@@ -80,12 +76,7 @@ module Effective
         (family.all_enrollments.can_terminate.present? && allow) ? 'ajax' : 'disabled'
       end
 
-<<<<<<< HEAD
-
-      def create_eligibility_family_member_link_type(row, allow)
-=======
       def new_eligibility_family_member_link_type(row, allow)
->>>>>>> origin/App_Dev_User_Story#23576
         allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
       end
 

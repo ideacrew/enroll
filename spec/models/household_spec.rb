@@ -405,4 +405,3 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     end
   end
 end
->>>>>>> origin/App_Dev_User_Story#23576
