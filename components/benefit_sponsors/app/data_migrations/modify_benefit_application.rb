@@ -31,10 +31,13 @@ class ModifyBenefitApplication< MongoidMigrationTask
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
     new_start_date = Date.strptime(ENV['new_start_date'], "%m/%d/%Y")
     new_end_date = Date.strptime(ENV['new_end_date'], "%m/%d/%Y")
+    oe_start_on = new_start_date.prev_month
+    oe_end_on = oe_start_on+19.days
     raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
     benefit_application = benefit_applications.where(:"effective_period.min" => effective_date).first
     if benefit_application.present?
       benefit_application.update_attributes!(effective_period: new_start_date..new_end_date)
+      benefit_application.update_attributes!(open_enrollment_period: oe_start_on..oe_end_on)
       benefit_application.approve_application!
     else
       raise "No benefit application found."
