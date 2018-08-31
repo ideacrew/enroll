@@ -86,7 +86,7 @@ javascript:
   var filterType = String;
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
   var carrierLogos = JSON.parse('#{raw(digest_logos.to_json)}');
-  
+
   // Grabs available products as JSON for filtering onload
   (function() {
     document.getElementById('filteredPlans').classList.add('hidden');
@@ -286,7 +286,14 @@ javascript:
   function showFilteredResults() {
     var element = document.getElementById('filteredPlans');
     filteredArray.forEach(function(result) {
+      console.log(result)
       var logo = carrierLogos[result.product.issuer_name];
+      if (result.product.kind == 'health') {
+        var plan_kind = result.product.health_plan_kind
+      }
+      else if (result.product.dental_plan_kind){
+        var plan_kind = result.product.dental_plan_kind
+      }
       // Used to show deductible for plan
       if (result.member_enrollments.length > 1) {
         var deductible = result.product.family_deductible;
@@ -336,7 +343,7 @@ javascript:
                       </thead>
                       <tbody>
                         <tr>
-                          <td>${result.product.product_type.toUpperCase()}</td>
+                          <td>${plan_kind.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
                           <td>
                             NETWORK NOTES

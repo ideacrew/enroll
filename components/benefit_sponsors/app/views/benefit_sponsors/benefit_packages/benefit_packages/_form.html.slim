@@ -18,8 +18,8 @@ h1.heading-text Benefit Package - Set Up
     = f.fields_for :sponsored_benefits, errors: {}, fieldset: false do |sb|
       = render "sponsored_benefit", f: sb
 
-  button.btn.btn-default#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
-  button.btn.btn-default#dentalBenefits type="submit" name="#{action}_dental_benefits" value="true" #{action.humanize} Dental Benefits
+  button.btn.btn-default.ml-1#addBenefitPackage type="submit" name="add_new_benefit_package" value="true" Add Benefit Package
+  button.btn.btn-default.ml-1#dentalBenefits type="submit" name="#{action}_dental_benefits" value="true" #{action.humanize} Dental Benefits
   / button.btn.btn-default#editDentalBenefits type="submit" name="edit_dental_benefits" value="true" Edit Dental Benefits
   button.btn.btn-primary#submitBenefitPackage type="submit" name="add_new_benefit_package" value="false" class="pull-right" Create Plan Year
 

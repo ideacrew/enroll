@@ -45,7 +45,7 @@
                     div.col-xs-3
                       = cl.number_field :contribution_factor, class: "edit_cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100), "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setEditSliderInput(this)"
                     div.col-xs-9
-                      input.slider class="edit_slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100) onchange="setEditNumberInput(this)"
+                      input.slider class="edit_slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100).to_i onchange="setEditNumberInput(this)"
                       span.slide-label.pull-right
 
       #referencePlanEdit
