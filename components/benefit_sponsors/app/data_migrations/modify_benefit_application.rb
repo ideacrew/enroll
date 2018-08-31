@@ -34,7 +34,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     oe_start_on = new_start_date.prev_month
     oe_end_on = oe_start_on+19.days
     raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
-    benefit_application = benefit_applications.where(:"effective_period.min" => effective_date).first
+    benefit_application = benefit_applications.where(:"effective_period.min" => effective_date, :aasm_state => :draft).first
     if benefit_application.present?
       benefit_application.update_attributes!(effective_period: new_start_date..new_end_date)
       benefit_application.update_attributes!(open_enrollment_period: oe_start_on..oe_end_on)
