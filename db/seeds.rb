@@ -133,15 +133,15 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   load_cca_contribution_models_seed
 
   puts "*"*80
+  system "bundle exec rake load:benefit_market_catalog[2018]"
+  puts "::: complete :::"
+  puts "*"*80
+
+  puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
   system "bundle exec rake update_seed:qualifying_life_event"
   puts "::: complete :::"
-
-
-  # puts "Marking plans as standard ..."
-  # system "bundle exec rake xml:standard_plans"
-  # puts "Marking plans as standard completed"
 
   # puts "*"*80
   # puts "updating cost share variance deductibles"
@@ -149,26 +149,10 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   # puts "updating cost share variance deductibles complete"
   # puts "*"*80
 
-  # puts "*"*80
-  # puts "importing provider_directory_urls and rx_formulary_urls for plans"
-  # system "bundle exec rake import:provider_and_rx_formulary_url"
-  # puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
-  # puts "*"*80
-
   puts "*"*80
   puts "::: Mapping Plans to SBC pdfs in S3 :::"
   system "bundle exec rake sbc:map"
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
-
-  puts "*"*80
-  puts "::: Updating network info for 2017 plans :::"
-  system "bundle exec rake import:network_information"
-  puts "::: Updating network info for 2017 plans complete:::"
-
-  # Needs to be a setting catastrophic plans on/off
-  # puts "*"*80
-  # system "bundle exec rake migrations:cat_age_off_renewal_plan"
-  # puts "*"*80
 
   require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
   puts "::: complete :::"
