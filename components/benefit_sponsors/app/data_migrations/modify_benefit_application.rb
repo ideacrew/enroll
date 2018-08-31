@@ -36,8 +36,22 @@ class ModifyBenefitApplication< MongoidMigrationTask
     raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
     benefit_application = benefit_applications.where(:"effective_period.min" => effective_date, :aasm_state => :draft).first
     if benefit_application.present?
+      benefit_sponsorship =  benefit_application.benefit_sponsorship
+      benefit_package = benefit_application.benefit_packages.detect(&:is_active)
       benefit_application.update_attributes!(effective_period: new_start_date..new_end_date)
       benefit_application.update_attributes!(open_enrollment_period: oe_start_on..oe_end_on)
+      new_effective_date = benefit_application.effective_period.min
+      service_areas = benefit_application.benefit_sponsorship.service_areas_on(new_effective_date)
+      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, new_effective_date)
+      benefit_application.benefit_sponsor_catalog.delete
+      benefit_sponsor_catalog.save!
+      benefit_application.benefit_sponsor_catalog =  benefit_sponsor_catalog
+      benefit_application.save!
+      benefit_sponsorship.census_employees.each do |ee|
+        ee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).each do|bga|
+          bga.update_attributes!(start_on: new_start_date)
+        end
+      end
       benefit_application.approve_application!
     else
       raise "No benefit application found."
