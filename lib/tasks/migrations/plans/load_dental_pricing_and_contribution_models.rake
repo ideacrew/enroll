@@ -1,8 +1,8 @@
-namespace :fixtures do
-  task :run_all_models => :environment do
+namespace :seed do
+  task :dental_contribution_and_pricing_model => :environment do
 
-    Rake::Task['fixtures:load_pricing_model'].invoke
-    Rake::Task['fixtures:load_contribution_model'].invoke
+    Rake::Task['seed:load_pricing_model'].invoke
+    Rake::Task['seed:load_contribution_model'].invoke
   end
 
   task :load_pricing_model => :environment do

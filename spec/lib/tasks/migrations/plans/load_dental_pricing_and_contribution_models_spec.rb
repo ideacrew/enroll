@@ -31,6 +31,6 @@ end
 private
 
 def invoke_models_task
-  Rake::Task["fixtures:run_all_models"].reenable
-  Rake::Task["fixtures:run_all_models"].invoke
+  Rake::Task["seed:dental_contribution_and_pricing_model"].reenable
+  Rake::Task["seed:dental_contribution_and_pricing_model"].invoke
 end
