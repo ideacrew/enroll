@@ -69,6 +69,7 @@ namespace :load_service_reference do
           if existing_state_wide_areas.count > 0
             v = existing_state_wide_areas.first
             v.county_zip_ids << location_ids
+            v.county_zip_ids = v.county_zip_ids.flatten.uniq
             v.save
           else
             ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
