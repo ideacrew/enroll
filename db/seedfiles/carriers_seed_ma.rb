@@ -31,7 +31,7 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000085", abbrev: "THPD", 
 # org = Organization.new(fein: "042674079", legal_name: "Tufts Health Plan Premier", office_locations: [hbx_office])
 # cp = org.create_carrier_profile(id: "53e67210eb899a4603000089", abbrev: "THPP", hbx_carrier_id: 20012, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['29125'])
 
-org = Organization.new(fein: "050513223", legal_name: "Altus Dental", office_locations: [hbx_office])
+org = Organization.new(fein: "050153223", legal_name: "Altus Dental", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000057", abbrev: "ALT", hbx_carrier_id: 20001, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: true, issuer_hios_ids: ['18076'])
 
 org = Organization.new(fein: "046143185", legal_name: "Delta Dental", office_locations: [hbx_office])
