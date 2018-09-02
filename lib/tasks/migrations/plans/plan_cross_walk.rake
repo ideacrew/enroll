@@ -10,37 +10,38 @@ namespace :xml do
       @previous_year = @current_year - 1
       xml = Nokogiri::XML(File.open(@file_path))
       result = Parser::PlanCrossWalkListParser.parse(xml.root.canonicalize, :single => true)
-      result.crosswalks.each do |row|
-        hios_id_2017 = row.plan_id_2017_hios.squish
-        hios_id_2018 = row.plan_id_2018_hios.squish
-        hios_id_cat_age_off_2018 = row.plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan
+      cross_walks = result.to_hash[:crosswalks]
+      cross_walks.each do |row|
+        old_hios_id = row["plan_id_#{@previous_year}_hios".to_sym].squish
+        new_hios_id = row["plan_id_#{@current_year}_hios".to_sym].squish
+
         # old model
-        new_plans =  Plan.where(hios_id: /#{hios_id_2018}/, active_year: @current_year)
+        new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
         # cat_age_off_renewal_plan =  Plan.where(hios_id: /#{hios_id_cat_age_off_2018}/, active_year: @current_year)
         new_plans.each do |new_plan|
           if new_plan.present? && new_plan.csr_variant_id != "00"
-            old_plan = Plan.where(hios_id: /#{hios_id_2017}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
+            old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
             if old_plan.present?
               old_plan.update(renewal_plan_id: new_plan.id)
               puts "Old #{@previous_year} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} plan hios_id: #{new_plan.hios_id}" unless Rails.env.test?
             else
-              puts "Old #{@previous_year} plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
+              puts "Old #{@previous_year} plan hios_id #{old_hios_id}-#{new_plan.csr_variant_id} not present." unless Rails.env.test?
             end
           end
         end
         # end of old model
 
         # new model
-        new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2018}/).select{|a| a.active_year == @current_year}
+        new_products = ::BenefitMarkets::Products::Product.where(hios_id: /#{new_hios_id}/).select{|a| a.active_year == @current_year}
         new_products.each do |new_product|
           if new_product.present? && new_product.csr_variant_id != "00"
-            old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id_2017}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
+            old_product = ::BenefitMarkets::Products::Product.where(hios_id: /#{old_hios_id}/, csr_variant_id: /#{new_product.csr_variant_id}/).select{|a| a.active_year == @previous_year}.first
 
             if old_product.present?
               old_product.update(renewal_product_id: new_product.id)
               puts "Old #{@previous_year} product hios_id #{old_product.hios_id} renewed with New #{@current_year} product hios_id: #{new_product.hios_id}" unless Rails.env.test?
             else
-              puts "Old #{@previous_year} product hios_id #{hios_id_2017}-#{new_product.csr_variant_id} not present." unless Rails.env.test?
+              puts "Old #{@previous_year} product hios_id #{old_hios_id}-#{new_product.csr_variant_id} not present." unless Rails.env.test?
             end
           end
         end
