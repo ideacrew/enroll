@@ -87,7 +87,7 @@ class ProductBuilder
           benefit_market_kind: "aca_#{parse_market}",
           title: cost_share_variance.plan_marketing_name.squish!,
           issuer_profile_id: get_issuer_profile_id,
-          hios_id: cost_share_variance.hios_plan_and_variant_id,
+          hios_id: hios_base_id,
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id,
           application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
