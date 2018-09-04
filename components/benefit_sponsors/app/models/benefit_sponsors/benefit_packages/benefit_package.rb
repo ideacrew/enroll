@@ -278,58 +278,85 @@ module BenefitSponsors
       def effectuate_member_benefits
         activate_benefit_group_assignments if predecessor.present?
 
-        enrolled_families.each do |family| 
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
-          end
-        end
+        transition_member_coverages { |hbx_enrollment| 
+          hbx_enrollment.begin_coverage! if hbx_enrollment.may_begin_coverage?
+        }
       end
 
       def expire_member_benefits
-        enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.expire_coverage! if hbx_enrollment && hbx_enrollment.may_expire_coverage?
-          end
-        end
+        transition_member_coverages { |hbx_enrollment| 
+          hbx_enrollment.expire_coverage! if hbx_enrollment.may_expire_coverage?
+        }
       end
  
       def terminate_member_benefits
-        enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            
-            if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
-              hbx_enrollment.terminate_coverage!
-              hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
-            end
+        transition_member_coverages { |hbx_enrollment|
+          if hbx_enrollment.may_terminate_coverage?
+            hbx_enrollment.terminate_coverage!
+            hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
           end
-        end
+        }
       end
 
       def cancel_member_benefits(delete_benefit_package: false)
         deactivate_benefit_group_assignments
 
-        enrolled_families.each do |family|
-          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
-
-          sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
-          end
-        end
+        transition_member_coverages { |hbx_enrollment| 
+          hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage? 
+        }
 
         if delete_benefit_package
           other_benefit_package = self.benefit_application.benefit_packages.detect{ |bp| bp.id != self.id}
           assign_other_benefit_package(other_benefit_package) if other_benefit_package.present?
           deactivate
+        end
+      end
+
+      def transition_member_coverages(&block)
+        enrolled_families.each do |family|
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+            if hbx_enrollment.present?
+              block.call(hbx_enrollment) if block_given?
+            end
+          end
+        end
+      end
+
+      def canceled_as_ineligible?(transition)
+        transition.from_state == 'enrollment_ineligible' && transition.to_state == 'canceled'
+      end
+
+      def canceled_after?(transition, cancellation_time)
+        transition.to_state == 'coverage_canceled' && transition.transition_at >= cancellation_time
+      end
+
+      def reinstate_canceled_member_benefits
+        activate_benefit_group_assignments unless benefit_application.is_renewing?
+        application_transition = benefit_application.workflow_state_transitions[0]
+
+        return if application_transition.blank?
+        return unless canceled_as_ineligible?(application_transition)
+
+        Family.all_enrollments_by_benefit_package(self).each do |family|
+          enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
+          canceled_coverages = enrollments.canceled.by_transition_to_and_on('coverage_canceled', application_transition.transition_at)
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = canceled_coverages.by_coverage_kind(sponsored_benefit.product_kind).first
+            enrollment_transition = hbx_enrollment.workflow_state_transitions[0]
+
+            next unless canceled_after?(enrollment_transition, application_transition.transition_at)
+
+            if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
+              hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
+              hbx_enrollment.workflow_state_transitions.create(from_state: enrollment_transition.to_state, to_state: enrollment_transition.from_state)
+
+              hbx_enrollment.benefit_group_assignment.update_status_from_enrollment(hbx_enrollment)
+            end
+          end
         end
       end
 
