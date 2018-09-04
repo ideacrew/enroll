@@ -1820,3 +1820,23 @@ describe "active dependents" do
     expect(family.active_dependents.count).to eq 1
   end
 end
+
+describe Family, "Child/Parent Rule" do
+  let(:family100) {FactoryGirl.create(:family, :with_primary_family_member_and_dependent)}
+  let(:person1) { family100.primary_applicant.person }
+  let(:person2) { family100.family_members[1].person }
+  let(:person3) { family100.family_members[2].person }
+
+  before :each do
+    person1.person_relationships.where(successor_id: person2.id).first.update_attributes!(kind: "spouse")
+    person2.person_relationships.where(successor_id: person1.id).first.update_attributes!(kind: "spouse")
+    person1.person_relationships.where(successor_id: person3.id).first.update_attributes!(kind: "parent")
+    person3.person_relationships.where(successor_id: person1.id).first.update_attributes!(kind: "child")
+    family100.build_relationship_matrix
+    family100.reload
+  end
+
+  it "should not have any missing relationships" do
+    expect(family100.find_missing_relationships(family100.build_relationship_matrix)).to eq []
+  end
+end
