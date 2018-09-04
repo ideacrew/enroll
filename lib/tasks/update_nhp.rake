@@ -10,7 +10,7 @@ namespace :update do
       :"profiles.hbx_carrier_id" => 20005
     ).first
 
-    exempt_organization.profiles.first << "52710"
+    exempt_organization.profiles.first.issuer_hios_ids << "52710"
     exempt_organization.save
     # end old model
 
