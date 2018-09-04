@@ -1,4 +1,4 @@
-pnamespace :import do
+namespace :import do
   task :county_zips, [:file] => :environment do |task, args|
 
     files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx"))
