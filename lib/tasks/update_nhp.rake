@@ -5,6 +5,13 @@ namespace :update do
     organization = Organization.where(:"carrier_profile.hbx_carrier_id" => 20005).first
     organization.carrier_profile.issuer_hios_ids << "52710"
     organiation.save
+
+    exempt_organization = BenefitSponsors::Organizations::ExemptOrganization.where(
+      :"profiles.hbx_carrier_id" => 20005
+    ).first
+
+    exempt_organization.profiles.first << "52710"
+    exempt_organization.save
     # end old model
 
     # old model
