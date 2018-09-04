@@ -6,7 +6,7 @@
 	<div class="form-group">
 		<%= label_tag(:new_email, "New Email", class:"col-sm-5 control-label") %>
 		<div class="col-sm-6">
-			<%= text_field_tag :new_email, nil, {class:"form-control", onblur:'validateFields()', id:'inputNewEmail'} %>
+			<%= text_field_tag :new_email, user.email, {class:"form-control", onblur:'validateFields()', id:'inputNewEmail'} %>
 			<span id="helpBlock2" class="help-block email-block hidden"></span>
 		</div>
 	</div>
@@ -30,7 +30,7 @@
 	<br />
 	<div class="form-group">
 		<div class="row">
-			<%= submit_tag "Submit", class:'btn btn-primary', id:'submitEmailChange' %>
+			<%= submit_tag "Submit", class:'btn btn-primary', id:'submitEmailChange', data: { confirm: 'Are you sure you want to make changes?' } %>
 		</div>
 <% end %>
 
