@@ -6,7 +6,7 @@
 <div class="form-group">
 	<%= label_tag(:oim_id, "New Username", class:"col-sm-5 control-label") %>
 	<div class="col-sm-6">
-		<%= text_field_tag :oim_id, nil, {class:"form-control", onblur:'validateFields()', id:'inputNewUsername'} %>
+		<%= text_field_tag :oim_id, user.oim_id, {class:"form-control", onblur:'validateFields()', id:'inputNewUsername'} %>
 		<span id="helpBlock2" class="help-block username-block hidden"></span>
 	</div>
 </div>
