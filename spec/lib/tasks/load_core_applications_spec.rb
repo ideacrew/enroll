@@ -6,7 +6,7 @@ describe 'load_core_applications' do
   before :all do
     load File.expand_path("#{Rails.root}/lib/tasks/load_core_applications.rake", __FILE__)
     Rake::Task.define_task(:environment)
-    create_test_directory("#{Rails.root.to_s}/db/fixture_dumps")
+    create_test_directory("#{Rails.root.to_s}/spec/test_data/seedfiles/fixtures_dump")
   end
 
   before :each do
@@ -20,7 +20,7 @@ describe 'load_core_applications' do
 
   it 'should generate folder/files after running rake' do
     invoke_generate_faa_core
-    glob_pattern = File.join(Rails.root, "db", "fixture_dumps", "application_*.yaml")
+    glob_pattern = File.join(Rails.root,"spec", "test_data", "seedfiles/fixtures_dump", "application_*.yaml")
     folder = Dir.glob(glob_pattern)
     expect(folder.present?).to be true
   end
@@ -31,7 +31,7 @@ describe 'load_core_applications' do
   end
 
   after(:all) do
-    FileUtils.rm_rf(Dir["#{Rails.root}//db//fixture_dumps"]) unless Rails.env.test?
+    FileUtils.rm_rf(Dir["#{Rails.root}//spec//test_data//seedfiles//fixtures_dump"])
   end
 end
 
@@ -42,12 +42,12 @@ def invoke_generate_faa_core
 end
 
 def invoke_load_faa_core
-  glob_pattern = File.join(Rails.root, "db", "fixture_dumps", "application_*.yaml")
+  glob_pattern = File.join(Rails.root,"spec", "test_data", "seedfiles/fixtures_dump", "application_*.yaml")
   folder = Dir.glob(glob_pattern)
 
   if folder.present?
     Rake::Task["fixture_dump:load_applications"].reenable
-    Rake::Task["fixture_dump:load_applications"].invoke
+    Rake::Task["fixture_dump:load_applications"].invoke(glob_pattern)
   end
 end
 
