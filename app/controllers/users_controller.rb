@@ -47,14 +47,15 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
   
-  def change_username
+  def change_username_and_email
     authorize User, :change_username_and_email?
     @user_id = params[:user_action_id]
   end
   
-  def confirm_change_username
+  def confirm_change_username_and_email
     authorize User, :change_username_and_email?
     @user.oim_id = params[:oim_id]
+    @user.email = params[:new_email]
     if @user.save!
       redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Username was changed to #{user.oim_id}."
     else
