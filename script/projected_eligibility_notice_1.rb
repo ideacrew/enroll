@@ -31,9 +31,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |family_id , members|
     primary_member = members.detect{ |m| m["is_dependent"].upcase == "FALSE"}
     next if primary_member.nil?
-    next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
-    next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"].upcase == "TRUE"}.present?
-    # next if (members.any?{ |m| m["policy.subscriber.person.citizen_status"].blank? || (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
+    next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
+    next if members.select{ |m| (m["policy.subscriber.person.is_incarcerated"] && m["policy.subscriber.person.is_incarcerated"].upcase == "TRUE")}.present?
+    next if (members.any?{ |m| m["policy.subscriber.person.citizen_status"].blank? || (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
     person = Person.where(:hbx_id => primary_member["policy.subscriber.person.hbx_id"]).first
     consumer_role = person.consumer_role
     if consumer_role.present?
