@@ -295,7 +295,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_both_markets?(person)
-    true
+    false
   end
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
