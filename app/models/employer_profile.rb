@@ -626,11 +626,17 @@ class EmployerProfile
     end
 
     def terminate_scheduled_plan_years
+
       organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
       organizations.each do |org|
-        plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending")
-        plan_years.each do |py|
-          py.terminate!(py.end_on)
+        begin
+          plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending", :end_on.lt => TimeKeeper.date_of_record)
+          plan_years.each do |py|
+            py.terminate!(py.end_on)
+            org.employer_profile.benefit_terminated! if py.terminated?
+          end
+        rescue Exception => e
+          Rails.logger.error { "Unable to terminate plan year for #{org.legal_name} due to #{e.inspect}" }
         end
       end
     end
