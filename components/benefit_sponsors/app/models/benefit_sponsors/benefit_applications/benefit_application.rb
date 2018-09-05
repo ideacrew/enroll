@@ -734,7 +734,7 @@ module BenefitSponsors
       end
 
       event :end_open_enrollment do
-        transitions from:   :enrollment_open,
+        transitions from:   [:enrollment_open, :enrollment_extended],
           to:     :enrollment_closed
       end
 
