@@ -100,6 +100,7 @@ describe DefinePermissions, dbclean: :after_each do
     before do
       User.all.delete
       Person.all.delete
+      hbx_profile = FactoryGirl.create(:hbx_profile)
       allow(Permission).to receive_message_chain('hbx_staff.id'){FactoryGirl.create(:permission, :hbx_staff).id}
       allow(Permission).to receive_message_chain('hbx_read_only.id'){FactoryGirl.create(:permission, :hbx_read_only).id}
       allow(Permission).to receive_message_chain('hbx_csr_supervisor.id'){FactoryGirl.create(:permission, :hbx_csr_supervisor).id}
