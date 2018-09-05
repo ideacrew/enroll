@@ -20,6 +20,7 @@ describe DefinePermissions, dbclean: :after_each do
 
     describe 'update permissions for hbx staff role' do
       let(:given_task_name) {':hbx_admin_can_complete_resident_application'}
+      let(:given_task_name) {':hbx_admin_can_access_user_account_tab'}
 
       before do
         User.all.delete
@@ -44,16 +45,19 @@ describe DefinePermissions, dbclean: :after_each do
         User.all.delete
         Person.all.delete
         @hbx_staff_person = FactoryGirl.create(:person)
+        @hbx_tier3_person = FactoryGirl.create(:person)
         @hbx_read_only_person = FactoryGirl.create(:person)
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         @hbx_csr_tier1_person = FactoryGirl.create(:person)
         @hbx_csr_tier2_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        hbx_tier3_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3_person, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
         subject.hbx_admin_can_view_username_and_email
+        subject.hbx_admin_can_access_user_account_tab
       end
 
       it "updates can_access_pay_now to true" do
@@ -66,7 +70,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_view_username_and_email to true" do
-        expect(Person.all.count).to eq(5)
+        expect(Person.all.count).to eq(6)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_username_and_email).to be true
@@ -74,6 +78,12 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         #verifying that the rake task updated only the correct subroles
         expect(Permission.developer.can_add_sep).to be false
+      end
+
+      it "updates can_access_user_account_tab to true" do
+        expect(Person.all.count).to eq(6)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_access_user_account_tab).to be true
+        expect(@hbx_tier3_person.hbx_staff_role.permission.can_access_user_account_tab).to be true
       end
     end
 
@@ -285,6 +295,7 @@ describe DefinePermissions, dbclean: :after_each do
     before do
       User.all.delete
       Person.all.delete
+      hbx_profile = FactoryGirl.create(:hbx_profile)
       allow(Permission).to receive_message_chain('hbx_staff.id'){FactoryGirl.create(:permission, :hbx_staff).id}
       allow(Permission).to receive_message_chain('hbx_read_only.id'){FactoryGirl.create(:permission, :hbx_read_only).id}
       allow(Permission).to receive_message_chain('hbx_csr_supervisor.id'){FactoryGirl.create(:permission, :hbx_csr_supervisor).id}

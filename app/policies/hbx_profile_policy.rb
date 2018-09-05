@@ -125,4 +125,9 @@ class HbxProfilePolicy < ApplicationPolicy
     return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
     return false  
   end
+
+  def can_access_user_account_tab?
+    return @user.person.hbx_staff_role.permission.can_access_user_account_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
 end
