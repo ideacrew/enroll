@@ -302,6 +302,9 @@ class GroupSelectionPrevaricationAdapter
     if change_plan == "change_by_qle"
       family = employee_role.person.primary_family
       benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
+      if benefit_package.blank?
+        benefit_package = employee_role.benefit_package(qle: true) || employee_role.census_employee.possible_benefit_package
+      end
       benefit_package.present? && benefit_package.is_offering_dental?
     else
       renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package

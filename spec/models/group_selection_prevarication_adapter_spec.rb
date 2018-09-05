@@ -7,7 +7,8 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
   include_context "setup employees with benefits"
-
+  
+  let(:product_kinds)  { [:health, :dental] }
   let(:dental_sponsored_benefit) { true }
   let(:roster_size) { 2 }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
@@ -101,6 +102,39 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
           expect(result).to be_falsey
         end
       end
+    end
+
+    context "When employee purchasing coverage through future application using qle" do
+      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:qle_on) { TimeKeeper.date_of_record - 2.days }
+      let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+
+      let!(:special_enrollment_period) {
+        special_enrollment = family.special_enrollment_periods.build({
+          qle_on: qle_on,
+          effective_on_kind: "date_of_event",
+          })
+
+        special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
+        special_enrollment.save!
+        special_enrollment
+      }
+
+      context "employer offering dental" do 
+        it "returns true" do 
+          result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil)
+          expect(result).to be_truthy
+        end
+      end
+
+      context "employer not offering dental" do
+        let(:dental_sponsored_benefit) { true }
+
+        it "returns false" do 
+          result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil)
+          expect(result).to be_falsey
+        end 
+      end 
     end
   end
 end
