@@ -212,7 +212,7 @@ module BenefitSponsors
     end
 
     # Exempt exception handling situation
-    def extend_open_enrollment(benefit_application, new_end_date = TimeKeeper.date_of_record)
+    def extend_open_enrollment(new_end_date = TimeKeeper.date_of_record)
       if business_policy_satisfied_for?(:extend_open_enrollment)
         if benefit_application.may_extend_open_enrollment?
           benefit_application.update(:open_enrollment_period => benefit_application.open_enrollment_period.min..new_end_date)

@@ -213,16 +213,18 @@ class BenefitGroupAssignment
   end
 
   def update_status_from_enrollment(hbx_enrollment)
-    if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
-      change_state_without_event(:coverage_selected)
-    end
+    if hbx_enrollment.coverage_kind == 'health'
+      if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_selected)
+      end
 
-    if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
-      change_state_without_event(:coverage_renewing)
-    end
+      if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_renewing)
+      end
 
-    if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
-      change_state_without_event(:coverage_waived)
+      if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_waived)
+      end
     end
   end
 

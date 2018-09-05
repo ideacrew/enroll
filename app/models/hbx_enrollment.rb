@@ -206,10 +206,6 @@ class HbxEnrollment
                                                           :"effective_on".lte => effective_period.max
                                                         )}
 
-  scope :by_transition_to_and_on,  ->(to_state, transition_on) { where(
-   :"workflow_state_transitions" => { :"$elemMatch" => {:"to_state" => to_state, :"transition_at".gte => transition_on}}
-   )}
-
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship,

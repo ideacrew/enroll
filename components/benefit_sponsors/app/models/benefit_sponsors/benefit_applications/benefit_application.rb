@@ -800,7 +800,7 @@ module BenefitSponsors
         transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
       end
 
-      event :extend_open_enrollmemt do
+      event :extend_open_enrollment do
         transitions from: [:canceled, :enrollment_ineligible, :enrollment_extended], to: :enrollment_extended
       end      
     end

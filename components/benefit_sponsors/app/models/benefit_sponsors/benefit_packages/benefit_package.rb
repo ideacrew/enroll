@@ -335,20 +335,16 @@ module BenefitSponsors
 
       def reinstate_canceled_member_benefits
         activate_benefit_group_assignments unless benefit_application.is_renewing?
-        application_transition = benefit_application.workflow_state_transitions[0]
-
+        application_transition = benefit_application.workflow_state_transitions.detect{|transition| canceled_as_ineligible?(transition) }
         return if application_transition.blank?
-        return unless canceled_as_ineligible?(application_transition)
 
         Family.all_enrollments_by_benefit_package(self).each do |family|
           enrollments = family.active_household.hbx_enrollments.by_benefit_package(self)
-          canceled_coverages = enrollments.canceled.by_transition_to_and_on('coverage_canceled', application_transition.transition_at)
+          canceled_coverages = enrollments.canceled.select{|enrollment| enrollment.workflow_state_transitions.any?{|wst| canceled_after?(wst, application_transition.transition_at) } }
 
           sponsored_benefits.each do |sponsored_benefit|
-            hbx_enrollment = canceled_coverages.by_coverage_kind(sponsored_benefit.product_kind).first
+            hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
             enrollment_transition = hbx_enrollment.workflow_state_transitions[0]
-
-            next unless canceled_after?(enrollment_transition, application_transition.transition_at)
 
             if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
               hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
