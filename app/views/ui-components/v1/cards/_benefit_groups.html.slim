@@ -25,7 +25,8 @@
             a
               i.fa.fa-chevron-down.fa-lg
         div
-          h5.title.pl-1 Health
+          h5.title.pl-1
+            = sb.reference_product.kind.to_s.titleize
         table.table.benefit-group.borderless
           tr
             th.benefit-group-heading Reference Plan
