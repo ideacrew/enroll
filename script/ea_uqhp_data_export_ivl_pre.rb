@@ -33,7 +33,7 @@ def is_dc_resident(person)
 end
 
 while offset < family_count
-  Family.offset(offset).limit(batch_size).flat_map(&:households).flat_map(&:hbx_enrollments).each do |policy|
+  Family.all_with_hbx_enrollments.offset(offset).limit(batch_size).active_household.map(&:hbx_enrollments).each do |policy|
     begin
       next if policy.plan.nil?
       next if !plan_ids.include?(policy.plan_id)
