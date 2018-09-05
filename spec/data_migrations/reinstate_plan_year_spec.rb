@@ -25,6 +25,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("update_current_enrollment").and_return(true)
       allow(ENV).to receive(:[]).with("update_renewal_enrollment").and_return(true)
       allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(true)
+      # allow(ENV).to receive(:[]).with("plan_year_aasm_state").and_return(plan_year.aasm_state)
     end
 
     context "when reinstating active plan year plan year" do
@@ -67,6 +68,16 @@ describe ReinstatePlanYear, dbclean: :after_each do
         plan_year.reload
         expect(plan_year.aasm_state).to eq 'canceled'
         expect(plan_year.end_on).to eq end_on
+        expect(plan_year.terminated_on).to eq terminated_on
+      end
+
+      it "should pick the correct plan year" do
+        end_on = plan_year.end_on
+        terminated_on = plan_year.terminated_on
+        plan_year.update_attributes!(aasm_state:'expired')
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq 'expired'
         expect(plan_year.terminated_on).to eq terminated_on
       end
 
