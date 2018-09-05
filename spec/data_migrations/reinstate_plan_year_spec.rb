@@ -25,7 +25,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("update_current_enrollment").and_return(true)
       allow(ENV).to receive(:[]).with("update_renewal_enrollment").and_return(true)
       allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(true)
-      # allow(ENV).to receive(:[]).with("plan_year_aasm_state").and_return(plan_year.aasm_state)
     end
 
     context "when reinstating active plan year plan year" do
