@@ -381,13 +381,13 @@ context "Verification process and notices" do
       end
 
       describe "indian tribe member with ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
-        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, nil, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, nil, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
       end
 
       describe "indian tribe member with NO ssn" do
-        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
-        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, nil, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, nil, :unverified, :verification_outstanding, "coverage_purchased!", "232332431"
       end
 
       describe "pending verification type updates" do
@@ -752,12 +752,14 @@ describe "Indian tribe member" do
 
     it 'aasm state should be in fully verified if dc response is valid and consumer is not a tribe member' do
       consumer_role.fail_residency!
+      consumer_role.update_attributes(local_residency_validation: "outstanding")
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       expect(consumer_role.aasm_state). to eq 'verification_outstanding'
     end
 
     it 'aasm state should be in verification_outstanding if dc response is negative and consumer is not a tribe member' do
       consumer_role.fail_residency!
+      consumer_role.update_attributes(local_residency_validation: "outstanding")
       consumer_role.ssn_valid_citizenship_valid!(verification_attr)
       expect(consumer_role.aasm_state). to eq 'verification_outstanding'
     end
