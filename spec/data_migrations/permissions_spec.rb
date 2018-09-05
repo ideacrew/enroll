@@ -62,7 +62,7 @@ describe DefinePermissions, dbclean: :after_each do
 
       it "updates can_access_pay_now to true" do
         subject.hbx_admin_can_access_pay_now
-        expect(Person.all.count).to eq(5)
+        expect(Person.all.count).to eq(6)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_access_pay_now).to be true
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_pay_now).to be true
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_pay_now).to be true
