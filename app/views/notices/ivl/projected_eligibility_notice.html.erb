@@ -112,12 +112,13 @@
       previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
-      <% if thh.max_aptc.present? && thh.max_aptc.to_i > 0 %>
+    <%# Skipped two cases for APTC as per Sarah's request(29688#note-22)%>
+      <% if false && thh.max_aptc.present? && thh.max_aptc.to_i > 0 %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan.", bottom_margin: '5px'} %>
-      <% elsif thh.max_aptc.present? && thh.max_aptc.to_i == 0 %>
+      <% elsif false && thh.max_aptc.present? && thh.max_aptc.to_i == 0 %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> &nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp #{thh.max_aptc.to_f}/month", bottom_margin: '5px'} %>
         <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
