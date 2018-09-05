@@ -50,37 +50,42 @@ namespace :load do
 
       title, product_kind = value
 
-      product_package = benefit_market_catalog.product_packages.where(
-        package_kind: package_kind,
-        product_kind: product_kind
-      ).first
-
-      contribution_model, pricing_model = if product_kind == :health
-        if package_kind == :single_product
-          [composite_contribution_model, composite_pricing_model]
-        else
-          [list_bill_contribution_model, list_bill_pricing_model]
-        end
+      # dont create product package for dental in 2018
+      if product_kind == :dental && calender_year == 2018
       else
-        [list_bill_dental_contribution_model, list_bill_dental_pricing_model]
-      end
 
-      if product_package.present?
-        product_package.products = []
-      else
-        product_package = benefit_market_catalog.product_packages.new({
-          title: title,
-          benefit_kind: :aca_shop,
-          product_kind: product_kind,
+        product_package = benefit_market_catalog.product_packages.where(
           package_kind: package_kind,
-          application_period: benefit_market_catalog.application_period,
-          contribution_model: contribution_model,
-          pricing_model: pricing_model
-        })
-      end
+          product_kind: product_kind
+        ).first
 
-      product_package.products = products_for(product_package, calender_year)
-      product_package.save! if product_package.valid?
+        contribution_model, pricing_model = if product_kind == :health
+          if package_kind == :single_product
+            [composite_contribution_model, composite_pricing_model]
+          else
+            [list_bill_contribution_model, list_bill_pricing_model]
+          end
+        else
+          [list_bill_dental_contribution_model, list_bill_dental_pricing_model]
+        end
+
+        if product_package.present?
+          product_package.products = []
+        else
+          product_package = benefit_market_catalog.product_packages.new({
+            title: title,
+            benefit_kind: :aca_shop,
+            product_kind: product_kind,
+            package_kind: package_kind,
+            application_period: benefit_market_catalog.application_period,
+            contribution_model: contribution_model,
+            pricing_model: pricing_model
+          })
+        end
+
+        product_package.products = products_for(product_package, calender_year)
+        product_package.save! if product_package.valid?
+      end
     end
 
   end

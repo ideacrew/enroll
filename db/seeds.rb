@@ -127,10 +127,12 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
+  puts "Loading Contribution and Pricing models"
   pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/pricing_and_contribution_models_seed.rb")
   load pricing_and_contribution_models_seed_glob_pattern
   load_cca_pricing_models_seed
   load_cca_contribution_models_seed
+  puts "Loading Contribution and Pricing models done"
 
   puts "*"*80
   system "bundle exec rake load:benefit_market_catalog[2018]"
