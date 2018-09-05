@@ -2557,6 +2557,8 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:cobra_begin_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
+    let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:user100) { FactoryGirl.create(:user, person: person100) }
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
 
     before do
@@ -2565,7 +2567,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
 
     context 'When Enrollment Effectve date is prior to cobra begin date' do
       it 'should reset enrollment effective date to cobra begin date' do
-        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
         expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
         expect(hbx_enrollment.effective_on).to eq cobra_begin_date
       end
@@ -2575,7 +2577,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
       let(:cobra_begin_date) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
 
       it 'should not update enrollment effective date' do
-        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
         expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
         expect(hbx_enrollment.effective_on).to eq effective_on
       end
@@ -2585,7 +2587,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
       it 'should raise error' do
-        expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+        expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
   end
