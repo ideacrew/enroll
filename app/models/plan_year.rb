@@ -17,7 +17,6 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
-
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
 
@@ -130,7 +129,35 @@ class PlanYear
     CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => benefit_group_ids })
   end
 
-  def terminate_employee_benefit_packages(py_end_on)
+  def cancel_renewal_plan_year_if_any
+    renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
+    if renewing_plan_year
+      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+    end
+    renewing_plan_year
+  end
+
+  def terminate_plan_year(end_on, terminated_on, termination_kind)
+    renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
+    if renewing_plan_year
+      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+    end
+    if renewing_plan_year.nil? || (renewing_plan_year.present? && renewing_plan_year.renewing_canceled?)
+      if end_on >= TimeKeeper.date_of_record
+        self.schedule_termination!(end_on) if self.may_schedule_termination?
+      else
+        self.terminate!(end_on) if self.may_terminate?
+        if self.terminated?
+          self.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: termination_kind)
+          self.terminate_employee_enrollments(end_on)
+          self.employer_profile.benefit_terminated!
+        end
+      end
+    end
+  end
+
+  def terminate_employee_benefit_packages(*args)
+    py_end_on = args.first
     census_employees_within_play_year.each do |census_employee|
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
         if assignment.end_on.present? && (assignment.end_on > py_end_on) && assignment.may_terminate_coverage?

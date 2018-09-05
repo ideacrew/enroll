@@ -16,24 +16,14 @@ class Exchanges::EmployerApplicationsController < ApplicationController
     begin
       if @application.present?
         end_on = Date.strptime(params[:end_on], "%m/%d/%Y")
-        if end_on >= TimeKeeper.date_of_record
-          @application.schedule_termination!(end_on) if @application.may_schedule_termination?
-        else
-          @application.terminate!(end_on) if @application.may_terminate?
-          if @application.terminated?
-            @application.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: params['term_reason'])
-            @application.terminate_employee_enrollments(end_on)
-            @employer_profile.benefit_terminated!
-          else
-            flash[:error] = "Employer Application can't be terminated."
-          end
-        end
+        termination_kind = params['term_reason']
+        @application.terminate_plan_year(end_on, TimeKeeper.date_of_record, termination_kind)
         flash[:notice] = "Employer Application terminated successfully."
       else
         flash[:error] = "Employer Application can't be terminated."
       end
     rescue Exception => e
-      flash[:error] = "Couldn't terminate plan year due to #{e}"
+      flash[:error] = "Couldn't terminate #{@employer_profile.legal_name}'s plan year due to #{e}"
     end
     render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
   end

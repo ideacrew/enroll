@@ -2478,22 +2478,23 @@ end
 describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean: :after_each do
   let(:person) {FactoryGirl.create(:person)}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile, aasm_state: "enrolled") }
   let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
   let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', start_on: start_on)}
   let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
-  let(:new_end_on) { start_on+2.months }
+  let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
 
   before do
-    plan_year.terminate!(new_end_on)
-    plan_year.update_attributes!(end_on: new_end_on, terminated_on: TimeKeeper.date_of_record)
+    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment')
+    plan_year.reload
     benefit_group_assignment1.reload
   end
+
   context 'when plan year is terminated' do
     it "should terminate employee benefit group assignments" do
-      expect(benefit_group_assignment1.end_on).to eq new_end_on
+      expect(benefit_group_assignment1.end_on).to eq plan_year.end_on
     end
 
     it "should deactivate benefit group assignment" do
