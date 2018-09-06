@@ -16,7 +16,7 @@ class Insured::FamiliesController < FamiliesController
     set_flash_by_announcement
     set_bookmark_url
     set_admin_bookmark_url
-    @active_sep = @family.earliest_effective_sep
+    @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
