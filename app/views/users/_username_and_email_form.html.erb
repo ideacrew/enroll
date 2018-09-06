@@ -21,7 +21,7 @@
 
 	<div class="row no-buffer child-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">   
-      <button type='button', class="btn btn-info", id='resetUsernameAndEmail'>Reset</button>
+      <button type='button', class="btn btn-info", id='resetUsernameAndEmail' onclick="resetFields()">Reset</button>
       <%= submit_tag "Update", class:'btn btn-primary', id:'submitUsernameChange' %> 
     </div>
   </div>
@@ -100,4 +100,10 @@
 		document.getElementsByClassName('username-block')[0].classList.add('hidden');
 		validUsername = true;
 	}
+	
+  function resetFields() {
+    document.getElementById('inputNewEmail').value = '';
+    document.getElementById('inputNewUsername').value = '';
+		disableSubmit()
+  }
 </script>
