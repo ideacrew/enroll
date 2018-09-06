@@ -11,4 +11,4 @@
   = render :partial=> "events/v2/shared/carrier", :object=> elected_plan.issuer_profile, as: :carrier
   %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{elected_plan.metal_level_kind}"
   %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{elected_plan.kind}"
-  %ehb_percent= elected_plan.ehb? ? elected_plan.ehb*100 : 0.0
+  %ehb_percent= elected_plan.ehb*100

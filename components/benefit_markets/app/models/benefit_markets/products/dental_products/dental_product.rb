@@ -14,7 +14,7 @@ module BenefitMarkets
       field :hsa_eligibility,             type: Boolean,  default: false
 
       field :metal_level_kind,            type: Symbol
-      field :ehb,                         type: Symbol
+      field :ehb,                         type: Float,    default: 0.0
 
       belongs_to  :renewal_product,
                   inverse_of: nil,

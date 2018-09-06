@@ -135,6 +135,11 @@ module BenefitMarkets
       end
     end
 
+    def ehb
+      percent = read_attribute(:ehb)
+      (percent && percent > 0) ? percent : 1
+    end
+
     def service_area
       return nil if service_area_id.blank?
       @service_area ||= ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
