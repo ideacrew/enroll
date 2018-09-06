@@ -17,7 +17,7 @@ module BenefitSponsors
     APPLICATION_DRAFT_STATES      = [:draft, :imported] + APPLICATION_EXCEPTION_STATES.freeze
     APPLICATION_APPROVED_STATES   = [:approved].freeze
     APPLICATION_DENIED_STATES     = [:denied].freeze
-    ENROLLING_STATES              = [:enrollment_open, :enrollment_closed].freeze
+    ENROLLING_STATES              = [:enrollment_open, :enrollment_extended, :enrollment_closed].freeze
     ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
@@ -25,7 +25,7 @@ module BenefitSponsors
     CANCELED_STATES               = [:canceled].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
-    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
+    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
 
     # Deprecated - Use SUBMITTED_STATES
@@ -571,6 +571,12 @@ module BenefitSponsors
       benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
     end
 
+    def reinstate_canceled_benefit_package_members
+      if aasm.from_state == :canceled
+        benefit_packages.each { |benefit_package| benefit_package.reinstate_canceled_member_benefits }
+      end
+    end
+
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
       return if transition_kind.blank?
@@ -671,6 +677,7 @@ module BenefitSponsors
 
       # TODO: send_employee_invites - needs to be moved to observer pattern.
       state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
+      state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
@@ -727,7 +734,7 @@ module BenefitSponsors
       end
 
       event :end_open_enrollment do
-        transitions from:   :enrollment_open,
+        transitions from:   [:enrollment_open, :enrollment_extended],
           to:     :enrollment_closed
       end
 
@@ -792,6 +799,10 @@ module BenefitSponsors
       event :reinstate_enrollment do
         transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
       end
+
+      event :extend_open_enrollment do
+        transitions from: [:canceled, :enrollment_ineligible, :enrollment_extended], to: :enrollment_extended
+      end      
     end
 
     # Notify BenefitSponsorship upon state change
