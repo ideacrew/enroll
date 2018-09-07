@@ -693,40 +693,5 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
     end
   end
-
-  describe "POST cancel_initial_plan_year" do
-    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, { household: family.households.first })}
-    let(:plan_year) { FactoryGirl.create(:plan_year, {aasm_state: 'enrolling'}) }
-    let(:employer_profile) { plan_year.employer_profile }
-
-    before :each do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
-      allow_any_instance_of(PlanYear).to receive(:hbx_enrollments).and_return([hbx_enrollment])
-      sign_in user
-    end
-
-    context "success" do
-      it "should returns http success" do
-        allow_any_instance_of(EventsHelper).to receive(:is_initial_or_conversion_employer?).with(employer_profile).and_return(true)
-        allow(controller).to receive(:process_cancel_initial_plan_year).with([hbx_enrollment], employer_profile)
-
-        xhr :get, :cancel_initial_plan_year, format: :js, id:employer_profile.id
-        expect(response).to have_http_status(200)
-        expect(flash.notice).to match(/Initial plan year cancelled for employer/)
-        expect(employer_profile.applicant?).to be_truthy
-      end
-    end
-
-    context "failure" do
-      it "should returns http status 500 with error message" do
-        allow_any_instance_of(EventsHelper).to receive(:is_initial_or_conversion_employer?).with(employer_profile).and_return(false)
-        xhr :get, :cancel_initial_plan_year, format: :js, id:employer_profile.id
-        expect(response).to have_http_status(500)
-        expect(flash["error"]).to match(/Could not cancel initial plan year for employer/)
-      end
-    end
-  end
 end
+
