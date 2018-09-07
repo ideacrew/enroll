@@ -699,6 +699,50 @@ context "Verification process and notices" do
   end
 end
 
+describe "it should check the residency status" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer) { person.consumer_role }
+  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
+  let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
+  let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
+  context "consumer role should check for eligibility" do
+    it "should move the enrollment to unverified" do
+      consumer.coverage_purchased!
+      expect(consumer.aasm_state).to eq("ssa_pending")
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq("unverified")
+    end
+
+    it "should update the consumer and enrollment state when ssn and citizenship is valid" do
+      consumer.coverage_purchased!
+      consumer.ssn_valid_citizenship_valid!(verification_attr)
+      expect(consumer.aasm_state).to eq("sci_verified")
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq("coverage_selected")
+    end
+
+    it "should move the enrollment status to contingent when received negative response from residency hub" do
+      consumer.coverage_purchased!
+      consumer.ssn_valid_citizenship_valid!(verification_attr)
+      consumer.fail_residency!
+      expect(consumer.aasm_state).to eq("verification_outstanding")
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq("enrolled_contingent")
+    end
+
+    it "should move the enrollment status to contingent when received negative response from residency hub" do
+      consumer.coverage_purchased!
+      consumer.ssn_valid_citizenship_valid!(verification_attr)
+      consumer.pass_residency!
+      expect(consumer.aasm_state).to eq("fully_verified")
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq("coverage_selected")
+    end
+  end
+end
+
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
   context "consumer role does not have any vlp_documents" do
