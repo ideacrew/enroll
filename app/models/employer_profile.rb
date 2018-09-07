@@ -658,8 +658,28 @@ class EmployerProfile
                          })
     end
 
+    def terminate_scheduled_plan_years
+
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
+      organizations.each do |org|
+        begin
+          plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending", :end_on.lt => TimeKeeper.date_of_record)
+          plan_years.each do |py|
+            py.terminate!(py.end_on)
+            org.employer_profile.benefit_terminated! if py.terminated?
+          end
+        rescue Exception => e
+          Rails.logger.error { "Unable to terminate plan year for #{org.legal_name} due to #{e.inspect}" }
+        end
+      end
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
+
+        # Terminates scheduled plan years
+        EmployerProfile.terminate_scheduled_plan_years
+
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           plan_year_renewal_factory.employer_profile = organization.employer_profile
