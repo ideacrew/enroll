@@ -90,10 +90,11 @@ namespace :import do
               end
               plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               plan.network_information = row_info[@headers["network notes"]]
-                plan.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
-                plan.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
-                plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
-                plan.save
+              plan.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+              plan.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+              plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+              plan.name = row_info[@headers["plan name"]].strip
+              plan.save
             end
             # end of old model
 
@@ -108,6 +109,7 @@ namespace :import do
               end
               product.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               product.network_information = row_info[@headers["network notes"]]
+              product.title = row_info[@headers["plan name"]].strip
 
               sole_source_offering = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
               horizontal_offering = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
