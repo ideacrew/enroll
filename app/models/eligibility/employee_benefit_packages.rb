@@ -146,8 +146,9 @@ module Eligibility
     end
 
     def has_benefit_group_assignment?
+      binding.pry
       return has_benefit_group_assignment_deprecated? if is_case_old?
-      (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES).include?(active_benefit_group_assignment.benefit_application.aasm_state)) ||
+      (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES).include?(active_benefit_group_assignment.benefit_application.aasm_state)) ||
       (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
     end
   end

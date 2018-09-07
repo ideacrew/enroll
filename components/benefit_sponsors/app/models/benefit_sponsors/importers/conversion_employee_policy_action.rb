@@ -79,7 +79,9 @@ module BenefitSponsors
 
         if find_benefit_group_assignment.blank?
           if benefit_application
-            has_active_state = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES.include?(benefit_application.aasm_state)
+            published_states = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES
+            imported_states = BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES
+            has_active_state = (published_states + imported_states).include?(benefit_application.aasm_state)
             employee.benefit_group_assignments << BenefitGroupAssignment.new({
                                                                                  benefit_package_id: benefit_package.id,
                                                                                  start_on: benefit_application.start_on,
