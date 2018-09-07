@@ -55,11 +55,20 @@ namespace :load_rate_reference do
           county_zip._id
         end
 
-        ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
-                                                                     active_year: file_year,
-                                                                     exchange_provided_code: rating_area_id,
-                                                                     county_zip_ids: location_ids
-                                                                   })
+        ra = ::BenefitMarkets::Locations::RatingArea.where({
+                                                       active_year: file_year,
+                                                       exchange_provided_code: rating_area_id,
+                                                     }).first
+        if ra.present?
+          ra.county_zip_ids = location_ids
+          ra.save
+        else
+          ::BenefitMarkets::Locations::RatingArea.create({
+                                                       active_year: file_year,
+                                                       exchange_provided_code: rating_area_id,
+                                                       county_zip_ids: location_ids
+                                                     })
+        end
       end
         # end of new model
     rescue => e
