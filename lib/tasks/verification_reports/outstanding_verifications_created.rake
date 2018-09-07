@@ -116,7 +116,7 @@ namespace :reports do
 
       collect_rows = []
       people.each do |person|
-        outstanding_types_for_person(person).each do |type|
+      	outstanding_types_for_person(person).each do |type|
           type_history(type).each do |type_history|     
             collect_rows << [
                     subscriber_id(person),

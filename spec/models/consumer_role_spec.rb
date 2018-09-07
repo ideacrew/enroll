@@ -324,8 +324,8 @@ context "Verification process and notices" do
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
-        consumer.local_residency_validation = residency_status
         consumer.tribal_id = tribal_id
+        consumer.local_residency_validation = residency_status
       end
       it "moves from #{from_state} to #{to_state} on #{event}" do
         expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)

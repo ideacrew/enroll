@@ -93,7 +93,7 @@ class OutstandingTypesReport < MongoidMigrationTask
                         due_date_for_type(type).to_date,
                         ivl_enrollment(person),
                         shop_enrollment(person)
-                      ]
+              ]
             end
           end
         rescue => e
