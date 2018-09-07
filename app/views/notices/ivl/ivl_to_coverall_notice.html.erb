@@ -92,7 +92,7 @@
     listing: "If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time.  "} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>. to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}."} %>
+    listing: "The people listed are eligible to change plans, but there's limited time. Login to your account at <a href='https://www.dchealthlink.com'>dchealthlink.com</a> to sign up for a new plan before #{(TimeKeeper.date_of_record + 60.days).strftime("%B %d, %Y")}."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "Get expert help choosing a new plan (at no cost to you) from a DC Health Link registered Broker. Go to <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a> to search for a Broker near you. You can also call DC Health Link if you have questions or need help."} %>
