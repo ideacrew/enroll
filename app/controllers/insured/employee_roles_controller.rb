@@ -64,7 +64,7 @@ class Insured::EmployeeRolesController < ApplicationController
                        end
 
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
-    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
+    if @employee_role.present? && @employee_role.census_employee.present? && (current_user.has_hbx_staff_role? || @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do
