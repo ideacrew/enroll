@@ -43,7 +43,8 @@ FactoryGirl.define do
             evaluator.number_of_products,
             application_period: product_package.application_period,
             product_package_kinds: [ product_package.package_kind ],
-            service_area: service_area)
+            service_area: service_area,
+            metal_level_kind: :dental)
         end
       end
     end
