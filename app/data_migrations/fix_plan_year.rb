@@ -29,7 +29,7 @@ class FixPlanYear < MongoidMigrationTask
         plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: prev_state, to_state: ENV['aasm_state'])
         puts "plan year updated" unless Rails.env.test?
 
-        return unless ENV['update_enrollments'].present? && ENV['update_enrollments'] == true
+        return unless ENV['update_enrollments'].present? && ENV['update_enrollments'] == "true"
 
         if plan_year.aasm_state == "active"
           prev_enrollments.each do |enrollment|

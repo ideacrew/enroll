@@ -8,24 +8,26 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
        trigger_renewal_py_for_employers
        return
      end
+     feins = ENV['feins'].split(',').uniq if ENV['feins'].present?
+     feins.each do |fein|
+      organization = Organization.where(:'employer_profile'.exists=>true, fein: fein).first
+      action = ENV['action'].to_s
 
-    organization = Organization.where(:'employer_profile'.exists=>true, fein: ENV['fein']).first
-    action = ENV['action'].to_s
-
-    if organization.present? && organization.employer_profile.active_plan_year.present?
-      case action
-        when "renewal_plan_year"
-          create_renewal_plan_year(organization)
-        when "renewal_plan_year_passive_renewal"
-          create_renewal_plan_year_passive_renewal(organization)
-        when "trigger_passive_renewal"
-          trigger_passive_renewals(organization)
-        else
-          puts "Invalid action" unless Rails.env.test?
+      if organization.present? && organization.employer_profile.active_plan_year.present?
+        case action
+          when "renewal_plan_year"
+            create_renewal_plan_year(organization)
+          when "renewal_plan_year_passive_renewal"
+            create_renewal_plan_year_passive_renewal(organization)
+          when "trigger_passive_renewal"
+            trigger_passive_renewals(organization)
+          else
+            puts "Invalid action" unless Rails.env.test?
+        end
+      else
+        puts "No Oganization found" unless Rails.env.test? &&  organization.blank?
+        puts "No active plan year found" unless Rails.env.test? &&   organization.employer_profile.active_plan_year.blank?
       end
-    else
-      puts "No Oganization found" unless Rails.env.test? &&  organization.blank?
-      puts "No active plan year found" unless Rails.env.test? &&   organization.employer_profile.active_plan_year.blank?
     end
   end
 
@@ -50,7 +52,7 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
     renewing_plan_year= organization.employer_profile.plan_years.renewing_published_state.first
     if renewing_plan_year.present?
       renewing_plan_year.trigger_passive_renewals
-      puts "passive renewal generated" unless Rails.env.test?
+      puts "passive renewals generated for #{organization.legal_name}" unless Rails.env.test?
     end
   end
 

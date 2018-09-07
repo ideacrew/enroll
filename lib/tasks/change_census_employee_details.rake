@@ -9,7 +9,7 @@ require File.join(Rails.root, "app", "data_migrations", "change_census_employee_
 # RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="delink_employee_role" encrypted_ssn="ZCVGGZG+_DUD+==JKLS"
 
 # To link or construct employee role
-# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="link_or_construct_employee_role" encrypted_ssn="ZCVGGZG+_DUD+==JKLS"
+# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="link_or_construct_employee_role" employer_fein=123456789 ssn="000111001"
 
 namespace :migrations do
   desc "changing attributes on census_employee"

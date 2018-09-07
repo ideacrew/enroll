@@ -32,7 +32,7 @@ describe FixPlanYear, dbclean: :after_each do
         allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'active'
         allow(ENV).to receive(:[]).with("terminated_on").and_return ''
-        allow(ENV).to receive(:[]).with("update_enrollments").and_return true
+        allow(ENV).to receive(:[]).with("update_enrollments").and_return "true"
         plan_year.update_attributes(aasm_state:'terminated', terminated_on: term_date, end_on: term_date)
         hbx_enrollment.update_attributes(aasm_state:'coverage_terminated',terminated_on:term_date)
       end
@@ -58,7 +58,7 @@ describe FixPlanYear, dbclean: :after_each do
         allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'canceled'
         allow(ENV).to receive(:[]).with("terminated_on").and_return ''
-        allow(ENV).to receive(:[]).with("update_enrollments").and_return true
+        allow(ENV).to receive(:[]).with("update_enrollments").and_return "true"
         plan_year.update_attributes(aasm_state:'terminated', terminated_on: term_date, end_on: term_date)
         hbx_enrollment.update_attributes(aasm_state:'coverage_terminated',terminated_on:term_date)
         hbx_enrollment2.update_attributes(aasm_state:'shopping',terminated_on:term_date)
@@ -80,7 +80,7 @@ describe FixPlanYear, dbclean: :after_each do
 
 
       it "should not update enrollments " do
-        allow(ENV).to receive(:[]).with("update_enrollments").and_return false
+        allow(ENV).to receive(:[]).with("update_enrollments").and_return "false"
         expect(plan_year.aasm_state).to eq 'terminated'   # before migration
         expect(plan_year.terminated_on).to eq term_date
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
