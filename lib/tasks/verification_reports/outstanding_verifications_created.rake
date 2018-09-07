@@ -98,9 +98,9 @@ namespace :reports do
     end
 
     def type_history(type)
-      #Find all tranditions from [verified, pending] to outstanding ('reject' action)
+      #Find all tranditions from [verified, pending] to outstanding ('return for deficiency' action)
       history_elements = type.type_history_elements.where(
-        :action => 'reject',
+        :action => 'return for deficiency',
         :updated_at => {'$gte'=>start_date, '$lte' => end_date}
       )
       
