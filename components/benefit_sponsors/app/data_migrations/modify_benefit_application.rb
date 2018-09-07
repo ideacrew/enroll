@@ -12,17 +12,88 @@ class ModifyBenefitApplication< MongoidMigrationTask
       terminate_benefit_application(benefit_applications_for_terminate)
     when "reinstate"
       reinstate_benefit_application(benefit_applications_for_reinstate)
-    when "update_aasm_state"
-      update_aasm_state(benefit_applications_for_aasm_state_update)
+    when "begin_open_enrollment"
+      begin_open_enrollment(benefit_applications_for_aasm_state_update)
+    when "update_effective_period_and_approve"
+      update_effective_period_and_approve(benefit_applications_for_aasm_state_update)
+    when "extend_open_enrollment"
+      extend_open_enrollment
     end
   end
 
-  def update_aasm_state(benefit_applications)
+  def extend_open_enrollment
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    oe_end_date = Date.strptime(ENV['oe_end_date'], "%m/%d/%Y") if ENV['oe_end_date'].present?
 
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_ineligible, :canceled], :"effective_period.min" => effective_date).first
+
+    raise "Unable to find benefit application!!" if benefit_application.blank?
+
+    BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).extend_open_enrollment(oe_end_date)
+  end
+
+  def begin_open_enrollment(benefit_applications)
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    benefit_application = benefit_applications.where(:aasm_state.in => [:approved, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible], :"effective_period.min" => effective_date).first
+    if benefit_application.present? && benefit_application.may_begin_open_enrollment?
+      from_state = benefit_application.aasm_state
+      benefit_application.update_attributes!(:aasm_state => :enrollment_open)
+      benefit_application.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: from_state,
+          to_state: "enrollment_open"
+      )
+      if from_state == :approved
+        benefit_application.recalc_pricing_determinations
+        benefit_application.renew_benefit_package_members
+      end
+      benefit_sponsorship = benefit_application.benefit_sponsorship
+      unless benefit_application.is_renewing?
+        bs_from_state = benefit_sponsorship.aasm_state
+        benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
+        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: bs_from_state,
+            to_state: "initial_enrollment_open"
+        )
+      end
+      puts "aasm state has been changed to enrolling" unless Rails.env.test?
+    else
+      raise "FAILED: Unable to find application or application is in invalid state"
+    end
   end
 
   def reinstate_benefit_application(benefit_applications)
 
+  end
+
+  def update_effective_period_and_approve(benefit_applications)
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    new_start_date = Date.strptime(ENV['new_start_date'], "%m/%d/%Y")
+    new_end_date = Date.strptime(ENV['new_end_date'], "%m/%d/%Y")
+    oe_start_on = new_start_date.prev_month
+    oe_end_on = oe_start_on+19.days
+    raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
+    benefit_application = benefit_applications.where(:"effective_period.min" => effective_date, :aasm_state => :draft).first
+    if benefit_application.present?
+      benefit_sponsorship =  benefit_application.benefit_sponsorship
+      benefit_package = benefit_application.benefit_packages.detect(&:is_active)
+      benefit_application.update_attributes!(effective_period: new_start_date..new_end_date, open_enrollment_period: oe_start_on..oe_end_on)
+      new_effective_date = benefit_application.effective_period.min
+      service_areas = benefit_application.benefit_sponsorship.service_areas_on(new_effective_date)
+      benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, new_effective_date)
+      benefit_application.benefit_sponsor_catalog.delete
+      benefit_sponsor_catalog.save!
+      benefit_application.benefit_sponsor_catalog =  benefit_sponsor_catalog
+      benefit_application.save!
+      benefit_sponsorship.census_employees.each do |ee|
+        ee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).each do|bga|
+          bga.update_attributes!(start_on: new_start_date)
+        end
+      end
+      benefit_application.approve_application!
+    else
+      raise "No benefit application found."
+    end
   end
 
   def terminate_benefit_application(benefit_applications)
@@ -42,7 +113,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def benefit_applications_for_aasm_state_update
-
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_sponsorship.benefit_applications
   end
 
   def benefit_applications_for_reinstate
