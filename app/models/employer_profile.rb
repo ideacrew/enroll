@@ -1071,9 +1071,9 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
   end
 
-  def trigger_notices(event)
+  def trigger_notices(event, options = {})
     begin
-      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event, options)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
     end

@@ -1096,13 +1096,13 @@ class PlanYear
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     if event_name == "publish"
       begin
-        self.employer_profile.trigger_notices("planyear_renewal_3a")
+        self.employer_profile.trigger_notices("planyear_renewal_3a", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer renewal publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
     elsif event_name == "force_publish"
       begin
-        self.employer_profile.trigger_notices("planyear_renewal_3b")
+        self.employer_profile.trigger_notices("planyear_renewal_3b", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer renewal force publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1113,7 +1113,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
       begin
-        self.employer_profile.trigger_notices("zero_employees_on_roster")
+        self.employer_profile.trigger_notices("zero_employees_on_roster", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1124,7 +1124,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.census_employees.non_terminated.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1134,7 +1134,7 @@ class PlanYear
   def initial_employer_approval_notice
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
     begin
-      self.employer_profile.trigger_notices("initial_employer_approval")
+      self.employer_profile.trigger_notices("initial_employer_approval", "acapi_trigger" =>  true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
@@ -1143,7 +1143,7 @@ class PlanYear
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" =>  true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
@@ -1154,13 +1154,13 @@ class PlanYear
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
     if self.employer_profile.is_converting?
       begin
-        self.employer_profile.trigger_notices("conversion_group_renewal")
+        self.employer_profile.trigger_notices("conversion_group_renewal", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer conversion group renewal notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
     else
       begin
-        self.employer_profile.trigger_notices("group_renewal_5")
+        self.employer_profile.trigger_notices("group_renewal_5", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
@@ -1210,7 +1210,7 @@ class PlanYear
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     begin
-      self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+      self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice", "acapi_trigger" =>  true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
