@@ -16,7 +16,21 @@ class ModifyBenefitApplication< MongoidMigrationTask
       begin_open_enrollment(benefit_applications_for_aasm_state_update)
     when "update_effective_period_and_approve"
       update_effective_period_and_approve(benefit_applications_for_aasm_state_update)
+    when "extend_open_enrollment"
+      extend_open_enrollment
     end
+  end
+
+  def extend_open_enrollment
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    oe_end_date = Date.strptime(ENV['oe_end_date'], "%m/%d/%Y") if ENV['oe_end_date'].present?
+
+    benefit_sponsorship = get_benefit_sponsorship
+    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_ineligible, :canceled], :"effective_period.min" => effective_date).first
+
+    raise "Unable to find benefit application!!" if benefit_application.blank?
+
+    BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).extend_open_enrollment(oe_end_date)
   end
 
   def begin_open_enrollment(benefit_applications)
