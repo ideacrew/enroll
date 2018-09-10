@@ -4,10 +4,10 @@ class ShopNoticesNotifierJob < ActiveJob::Base
 
   def perform(id, event, options = {})
     recipient = EmployerProfile.find(id) || GeneralAgencyProfile.find(id) || CensusEmployee.where(id: id).first
-    if options['acapi_trigger'].present?
+    if  options['acapi_trigger'].present? && options['acapi_trigger']
       begin
-        resource = Notifier::ApplicationEventMapper.map_resource(recipient.class)
-        event_name = Notifier::ApplicationEventMapper.map_event_name(resource, event)
+        resource = ApplicationEventMapper.map_resource(recipient.class)
+        event_name = ApplicationEventMapper.map_event_name(resource, event)
         notify(event_name, {
           resource.identifier_key => recipient.send(resource.identifier_method).to_s,
           :event_object_kind => recipient.class.to_s, #no event object in legacy way of trigger notices
