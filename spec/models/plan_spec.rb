@@ -544,4 +544,24 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
   end
+
+  describe "is_same_plan_by_hios_id_and_active_year?", dbclean: :after_each do
+    let(:test_plans) { FactoryGirl.create_list(:plan, 2) }
+
+    context "when both plans have different hios_ids" do
+      it "should return false" do
+        expect(test_plans[0].is_same_plan_by_hios_id_and_active_year?(test_plans[1])).to be false
+      end
+    end
+
+    context "when both plans have similar hios_ids and with same active year" do
+      before :each do
+        test_plans[0].update_attributes!(hios_id: (test_plans[1].hios_id.split("-").first + "-04"))
+      end
+
+      it "should return true" do
+        expect(test_plans[0].is_same_plan_by_hios_id_and_active_year?(test_plans[1])).to be true
+      end
+    end
+  end
 end
