@@ -47,12 +47,12 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
   
-  def change_username
+  def change_username_and_email
     authorize User, :change_username_and_email?
-    @user_id = params[:user_action_id]
+    @user_id = params[:user_id]
   end
-  
-  def confirm_change_username
+
+  def confirm_change_username_and_email
     authorize User, :change_username_and_email?
     @user.oim_id = params[:oim_id]
     if @user.save!
@@ -61,12 +61,12 @@ class UsersController < ApplicationController
       redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
     end
   end
-  
+
   def change_email
     authorize User, :change_username_and_email?
     @user_id = params[:user_action_id]
   end
-  
+
   def confirm_change_email
     authorize User, :change_username_and_email?
     @user.email = params[:new_email]
@@ -91,15 +91,12 @@ class UsersController < ApplicationController
   
   def check_for_existing_username_or_email
     authorize User, :change_username_and_email?
-    if params[:email]
-      user = User.where(email:params[:email]).first
-    elsif params[:oim_id]
-      user = User.where(oim_id:params[:oim_id]).first
-    end
-    if user.present?
-      render json: {available:true}
+    email_taken = User.where(:email => params[:email], :id.ne => @user.id).first if params[:email]
+    username_taken = User.where(:oim_id => params[:oim_id], :id.ne => @user.id).first if params[:oim_id]
+    if email_taken.present? || username_taken.present?
+      render json: {taken: true, email: email_taken.present?, username: username_taken.present? }
     else
-      render json: {available:false}
+      render json: {taken: false}
     end
   end
   
