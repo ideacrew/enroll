@@ -95,10 +95,10 @@
                 errorBlock.classList.remove('hidden');
             }
 
-            function usernameTaken(id) {
+            function usernameTaken(id, name) {
                 document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
                 var errorBlock = document.getElementsByClassName('field-error-block')[0];
-                errorBlock.innerText = "The username matches with the following user: " + id ;
+                errorBlock.innerText = "The username matches with the following user: hbx_id " + id + "  Name: " + name ;
                 errorBlock.classList.remove('hidden');
             }
 
@@ -115,10 +115,10 @@
                 errorBlock.classList.remove('hidden');
             }
 
-            function emailTaken(id) {
+            function emailTaken(id, name) {
                 document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
                 var errorBlock = document.getElementsByClassName('field-error-block')[0];
-                errorBlock.innerText = "The user email matches with the following user: " + id;
+                errorBlock.innerText = "The user email matches with the following user: hbx_id " + id + "  Name: " + name;
                 errorBlock.classList.remove('hidden');
             }
 
@@ -135,13 +135,13 @@
                     data: {"email": email.value, "oim_id": username.value},
                     success: function(data){
                         if (data.taken == true){
-                            if (data.username){
+                            if (data.username_id){
                                 disableSubmit();
-                                usernameTaken(data.username);
+                                usernameTaken(data.username_id, data.username_name);
                             }
-                            if (data.email){
+                            if (data.email_id){
                                 disableSubmit();
-                                emailTaken(data.email);
+                                emailTaken(data.email_id, data.email_name);
                             }
                         } else {
                             validUsername();
