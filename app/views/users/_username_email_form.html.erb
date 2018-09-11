@@ -13,7 +13,7 @@
   <div class="row">
     <div class="form-group col-sm-5">
       <label for="inputNewUsername" class="col-form-label">New Username</label>
-      <%= text_field_tag :oim_id, user.oim_id, {class:"form-control", id:'inputNewUsername'} %>
+      <%= text_field_tag :new_oim_id, user.oim_id, {class:"form-control", id:'inputNewUsername'} %>
     </div>
     <div class="form-group col-sm-5">
       <label for="inputNewEmail" class="col-form-label">New Email</label>
@@ -35,97 +35,122 @@
 
 <script>
     $(document).ready(function(){
-        var username = document.getElementById('inputNewUsername');
-        var email = document.getElementById('inputNewEmail');
-        var resetUsernameEmail = document.getElementById('resetUsernameEmailFields');
+        (function(){
+            var username = document.getElementById('inputNewUsername');
+            var email = document.getElementById('inputNewEmail');
+            var resetUsernameEmail = document.getElementById('resetUsernameEmailFields');
 
-        username.addEventListener('blur', function(event){
-            if (checkUsername()) {
-                disableSubmit();
-                invalidUsername();
+            username.addEventListener('blur', function(event){
+                if (checkUsername()) {
+                    disableSubmit();
+                    invalidUsername();
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else if (!checkEmail()) {
+                    usernameEmailTaken();
+                }
+            });
+
+            email.addEventListener('blur', function(event){
+                if (checkEmail()) {
+                    disableSubmit();
+                    invalidEmail();
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else if (!checkUsername()) {
+                    usernameEmailTaken();
+                }
+            });
+
+            resetUsernameEmail.addEventListener('click', function(event){
                 event.preventDefault();
-                event.stopPropagation();
-            } else if (!checkEmail()) {
-                validUsername();
-                enableSubmit();
+                username.value = "";
+                email.value = "";
+            });
+
+            function checkUsername(){
+                if(username.value.length < 8) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-        });
 
-        email.addEventListener('blur', function(event){
-            if (checkEmail()) {
-                disableSubmit();
-                invalidEmail();
-                event.preventDefault();
-                event.stopPropagation();
-            } else if (!checkUsername()) {
-                validEmail();
-                enableSubmit();
+            function checkEmail(){
+                return (email.value.length > 0) && !(/\S+@\S+\.\S+/.test(email.value));
             }
-        });
 
-        resetUsernameEmail.addEventListener('click', function(event){
-            username.value = "";
-            email.value = "";
-        });
-
-        function checkUsername(){
-            if(username.value.length == 0) {
-                return true;
-            } else {
-                return false;
+            function enableSubmit() {
+                document.getElementById('submitUsernameEmailChange').classList.remove('blocking');
             }
-        }
 
-        function checkEmail(){
-           return (email.value.length > 0) && !(/\S+@\S+\.\S+/.test(email.value));
-        }
+            function disableSubmit() {
+                document.getElementById('submitUsernameEmailChange').classList.add('blocking');
+            }
 
-        function enableSubmit() {
-            document.getElementById('submitUsernameEmailChange').classList.remove('blocking');
-        }
+            function invalidUsername() {
+                document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.innerText = "Username must be 8 or more characters.";
+                errorBlock.classList.remove('hidden');
+            }
 
-        function disableSubmit() {
-            document.getElementById('submitUsernameEmailChange').classList.add('blocking');
-        }
+            function usernameTaken() {
+                document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.innerText = "Username is used by another account.";
+                errorBlock.classList.remove('hidden');
+            }
 
-        function invalidUsername() {
-            document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.innerText = "Username can't be blank.";
-            errorBlock.classList.remove('hidden');
-        }
+            function validUsername() {
+                document.getElementById('inputNewUsername').closest('.form-group').classList.remove('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.classList.add('hidden');
+            }
 
-        function usernameTaken() {
-            document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.innerText = "Username is used by another account.";
-            errorBlock.classList.remove('hidden');
-        }
+            function invalidEmail() {
+                document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.innerText = "Email address is not correct.";
+                errorBlock.classList.remove('hidden');
+            }
 
-        function validUsername() {
-            document.getElementById('inputNewUsername').closest('.form-group').classList.remove('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.classList.add('hidden');
-        }
+            function emailTaken() {
+                document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.innerText = "Email address is already taken by another user.";
+                errorBlock.classList.remove('hidden');
+            }
 
-        function invalidEmail() {
-            document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.innerText = "Email address is not correct.";
-            errorBlock.classList.remove('hidden');
-        }
+            function validEmail() {
+                document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
+                var errorBlock = document.getElementsByClassName('field-error-block')[0];
+                errorBlock.classList.add('hidden');
+            }
 
-        function emailTaken() {
-            document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.innerText = "Email address is already taken by another user.";
-            errorBlock.classList.remove('hidden');
-        }
-
-        function validEmail() {
-            document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            errorBlock.classList.add('hidden');
-        }
+            function usernameEmailTaken(){
+                $.ajax({
+                    url: "<%= check_for_existing_username_or_email_user_path %>",
+                    method: 'GET',
+                    data: {"email": email.value, "oim_id": username.value},
+                    success: function(data){
+                        if (data.taken == true){
+                            if (data.username){
+                                disableSubmit();
+                                usernameTaken();
+                            }
+                            if (data.email){
+                                disableSubmit();
+                                emailTaken();
+                            }
+                        } else {
+                            validUsername();
+                            validEmail();
+                            enableSubmit();
+                        }
+                    }
+                })
+            }
+        })();
     });
 </script>
