@@ -1,3 +1,4 @@
+puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 begin
   @data_hash = {}
   CSV.foreach('uqhp_projected_eligibility_notice_report.csv',:headers =>true).each do |d|
@@ -69,3 +70,4 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   end
   puts "End of #{notice_trigger.mpi_indicator} notice generation" unless Rails.env.test?
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
