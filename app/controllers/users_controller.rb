@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_filter :confirm_existing_password, only: [:change_password]
-  before_filter :set_user, except: [:confirm_lock, :change_username, :change_email]
+  before_filter :set_user, except: [:confirm_lock]
 
   def confirm_lock
     params.permit!
@@ -54,26 +54,16 @@ class UsersController < ApplicationController
 
   def confirm_change_username_and_email
     authorize User, :change_username_and_email?
-    @user.oim_id = params[:oim_id]
+    current_username = params[:current_oim_id]
+    current_email = params[:current_email]
+    new_username = params[:new_oim_id]
+    new_email = params[:new_email]
+    @user.oim_id = new_username if new_username.present? && (new_username != current_username)
+    @user.email = new_email if new_email.present? && (new_email != current_email)
     if @user.save!
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Username was changed to #{user.oim_id}."
+      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User credentials updated."
     else
-      redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
-    end
-  end
-
-  def change_email
-    authorize User, :change_username_and_email?
-    @user_id = params[:user_action_id]
-  end
-
-  def confirm_change_email
-    authorize User, :change_username_and_email?
-    @user.email = params[:new_email]
-    if @user.save!
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Successfully updated the email address"
-    else
-      flash[:error] = "We encountered a problem trying to update the email address, please try again"
+      redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "Can't be updated."
     end
   end
 
