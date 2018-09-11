@@ -138,7 +138,7 @@ module BenefitSponsors
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state => :enrollment_open }}
+        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :"aasm_state".in => [:enrollment_open, :enrollment_extended] }}
       )
     }
 

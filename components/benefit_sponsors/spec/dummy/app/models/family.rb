@@ -32,4 +32,12 @@ class Family
                                                     :"households.hbx_enrollments.sponsored_benefit_package_id" => benefit_package._id
                                                   ) }
 
+  scope :enrolled_under_benefit_application,    ->(benefit_application) { unscoped.where(
+                                                    :"households.hbx_enrollments" => {
+                                                      :$elemMatch => {
+                                                        :sponsored_benefit_package_id => {"$in" => benefit_application.benefit_packages.pluck(:_id) },
+                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping coverage_terminated) },
+                                                        :coverage_kind => "health"
+                                                      }
+                                                  })}
 end
