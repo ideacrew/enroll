@@ -95,10 +95,10 @@
                 errorBlock.classList.remove('hidden');
             }
 
-            function usernameTaken() {
+            function usernameTaken(id) {
                 document.getElementById('inputNewUsername').closest('.form-group').classList.add('has-error');
                 var errorBlock = document.getElementsByClassName('field-error-block')[0];
-                errorBlock.innerText = "Username is used by another account.";
+                errorBlock.innerText = "The username matches with the following user: " + id ;
                 errorBlock.classList.remove('hidden');
             }
 
@@ -115,10 +115,10 @@
                 errorBlock.classList.remove('hidden');
             }
 
-            function emailTaken() {
+            function emailTaken(id) {
                 document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
                 var errorBlock = document.getElementsByClassName('field-error-block')[0];
-                errorBlock.innerText = "Email address is already taken by another user.";
+                errorBlock.innerText = "The user email matches with the following user: " + id;
                 errorBlock.classList.remove('hidden');
             }
 
@@ -137,11 +137,11 @@
                         if (data.taken == true){
                             if (data.username){
                                 disableSubmit();
-                                usernameTaken();
+                                usernameTaken(data.username);
                             }
                             if (data.email){
                                 disableSubmit();
-                                emailTaken();
+                                emailTaken(data.email);
                             }
                         } else {
                             validUsername();
