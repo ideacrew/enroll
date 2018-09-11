@@ -340,6 +340,7 @@ Rails.application.routes.draw do
         get :new_staff_member
         get :new_broker_agency
         get :search_broker_agency
+        post :email_guide
       end
       member do
         get :favorite

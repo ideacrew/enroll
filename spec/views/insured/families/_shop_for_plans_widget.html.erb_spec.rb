@@ -135,7 +135,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       sign_in(current_user)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
-      allow(family).to receive(:earliest_effective_sep).and_return sep
+      allow(family).to receive(:latest_active_sep).and_return sep
       render "insured/families/shop_for_plans_widget"
     end
 
