@@ -382,27 +382,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP_D039',
-    title: 'Termination of Employer’s Health Coverage Offered Through DC Health Link',
-    description: 'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
-    resource_name: 'employee_role',
-    event_name: 'renewal_employer_ineligibility_notice_to_employee',
-    notice_triggers: [
-      {
-        name: 'Employee Eligibility Notice',
-        notice_template: 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
-        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
-        mpi_indicator: 'SHOP_D039',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',

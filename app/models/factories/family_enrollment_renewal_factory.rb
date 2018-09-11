@@ -111,7 +111,7 @@ module Factories
       if !disable_notifications && coverage_kind == 'health'
         notice_name = yield
         begin
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, "acapi_trigger" =>  true) unless Rails.env.test?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
