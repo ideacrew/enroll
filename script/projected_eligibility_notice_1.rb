@@ -23,7 +23,6 @@ file_name = "#{Rails.root}/projected_eligibility_notice_1_report_#{TimeKeeper.da
 #open enrollment information
 hbx = HbxProfile.current_hbx
 bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == TimeKeeper.date_of_record.next_year.year.to_s }
-@counter = 0
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
 
@@ -52,22 +51,21 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
               )
           builder.deliver
-          puts "***************** Notice delivered to #{person.hbx_id} Count: #{@counter} *****************" unless Rails.env.test?
+          csv << [
+            family_id,
+            person.hbx_id,
+            person.full_name
+          ]
+          puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
         rescue Exception => e
           puts "Unable to deliver to #{person.hbx_id} due to the following error #{e}" unless Rails.env.test?
         end
-        csv << [
-          family_id,
-          person.hbx_id,
-          person.full_name
-        ]
       else
         puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
       end
     rescue => e
-      puts "Unable to process family_id: #{family_id} due to the following error #{e}, counter: #{@counter}" unless Rails.env.test?
+      puts "Unable to process family_id: #{family_id} due to the following error #{e}" unless Rails.env.test?
     end
-    @counter += 1
   end
   puts "End of #{notice_trigger.mpi_indicator} notice generation" unless Rails.env.test?
 end
