@@ -47,15 +47,14 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
   
-  def change_username_and_email
+  def change_username
     authorize User, :change_username_and_email?
     @user_id = params[:user_action_id]
   end
   
-  def confirm_change_username_and_email
+  def confirm_change_username
     authorize User, :change_username_and_email?
     @user.oim_id = params[:oim_id]
-    @user.email = params[:new_email]
     if @user.save!
       redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Username was changed to #{user.oim_id}."
     else
@@ -63,6 +62,21 @@ class UsersController < ApplicationController
     end
   end
   
+  def change_email
+    authorize User, :change_username_and_email?
+    @user_id = params[:user_action_id]
+  end
+  
+  def confirm_change_email
+    authorize User, :change_username_and_email?
+    @user.email = params[:new_email]
+    if @user.save!
+      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Successfully updated the email address"
+    else
+      flash[:error] = "We encountered a problem trying to update the email address, please try again"
+    end
+  end
+
   def edit
 
   end

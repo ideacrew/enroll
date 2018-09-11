@@ -36,7 +36,7 @@ describe UsersController do
     allow(User).to receive(:find).with(user_id).and_return(user)
   end
   
-  describe ".change_username_and_email" do
+  describe ".change_username" do
     let(:user) { build(:user, id: '1', oim_id: user_email) }
     before do
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
@@ -47,8 +47,8 @@ describe UsersController do
         sign_in(admin)
       end
       it "renders the change username form" do
-        get :change_username_and_email, id: user_id, format: :js
-        expect(response).to render_template('change_username_and_email')
+        get :change_username, id: user_id, format: :js
+        expect(response).to render_template('change_username')
       end
     end
     
@@ -58,12 +58,39 @@ describe UsersController do
         sign_in(admin)
       end
       it "doesn't render the change username form" do
-        get :change_username_and_email, id: user_id, format: :js
+        get :change_username, id: user_id, format: :js
         expect(response.code).to eq "403"
       end
     end
   end
   
+  describe ".change_email" do
+    let(:user) { build(:user, id: '1', email: user_email) }
+    before do
+      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
+    end
+    
+    context "An admin is allowed to access the change email action" do
+      before do
+        sign_in(admin)
+      end
+      it "renders the change username form" do
+        get :change_email, id: user_id, format: :js
+        expect(response).to render_template('change_email')
+      end
+    end
+    
+    context "An admin is not allowed to access the change email action" do
+      before do
+        allow(user_policy).to receive(:change_username_and_email?).and_return(false)
+        sign_in(admin)
+      end
+      it "doesn't render the change emaile form" do
+        get :change_email, id: user_id, format: :js
+        expect(response.code).to eq "403"
+      end
+    end
+  end
 
   describe ".confirm_lock, with a user allowed to perform locking" do
     before do
