@@ -83,23 +83,20 @@ class UsersController < ApplicationController
     authorize User, :change_username_and_email?
     email_taken = User.where(:email => params[:email], :id.ne => @user.id).first if params[:email]
     username_taken = User.where(:oim_id => params[:oim_id], :id.ne => @user.id).first if params[:oim_id]
-    if email_taken && email_taken.person
-      used_email_id = email_taken.person.hbx_id
-      used_email_name = email_taken.person.full_name
+    response = {taken: nil, id: nil, first_name: nil, last_name: nil}
+    if email_taken.present? && email_taken.person
+      response[:taken] = "email"
+      response[:id] = email_taken.person.hbx_id
+      response[:first_name] = email_taken.person.first_name
+      response[:last_name] = email_taken.person.last_name
     end
-    if username_taken && username_taken.person
-      used_username_id = username_taken.person.hbx_id
-      used_username_name = username_taken.person.full_name
+    if username_taken.present? && username_taken.person
+      response[:taken] = "username"
+      response[:id] = username_taken.person.hbx_id
+      response[:first_name] = username_taken.person.first_name
+      response[:last_name] = username_taken.person.last_name
     end
-    if email_taken.present? || username_taken.present?
-      render json: {taken: true,
-                    email_id: used_email_id,
-                    email_name: used_email_name,
-                    username_id: used_username_id,
-                    username_name: used_username_name }
-    else
-      render json: {taken: false}
-    end
+    render json: response
   end
   
   private
