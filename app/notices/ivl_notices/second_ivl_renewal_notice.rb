@@ -3,7 +3,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
   attr_accessor :family, :data,:identifier, :person
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person.primary_family ? consumer_role.person : consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
