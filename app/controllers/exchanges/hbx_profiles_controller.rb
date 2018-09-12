@@ -60,6 +60,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def disable_ssn_requirement
+    #whatever needs to be done
+    @organizations= Organization.where(:id.in => params[:ids]).all
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def generate_invoice
 
     @organizations= Organization.where(:id.in => params[:ids]).all
