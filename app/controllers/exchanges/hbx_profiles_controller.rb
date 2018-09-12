@@ -21,6 +21,25 @@ class Exchanges::HbxProfilesController < ApplicationController
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
   end
 
+  def oe_extendable_applications
+    @benefit_sponsorship   = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:id]).first
+    @benefit_applications  = @benefit_sponsorship.benefit_applications.select{|application| application.may_extend_open_enrollment?}
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def edit_open_enrollment
+    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:sponsorship_id]).first
+    @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
+  end
+
+  def extend_open_enrollment
+    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:benefit_sponsorship_id]).first
+    @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
+    open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
+    ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).extend_open_enrollment(open_enrollment_end_date)
+    redirect_to exchanges_hbx_profiles_root_path
+  end
+
   def binder_paid
     if params[:ids]
       begin
@@ -91,7 +110,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def employer_datatable
-    @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
+  @datatable = Effective::Datatables::BenefitSponsorsEmployerDatatable.new
     respond_to do |format|
       format.js
     end

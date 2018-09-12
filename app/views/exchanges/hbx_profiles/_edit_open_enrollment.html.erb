@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="row edit_open_enrollment_fields">
+          <div class="col-md-12">
+
+            <%= form_tag extend_open_enrollment_exchanges_hbx_profiles_path(id: @benefit_application.id),:method => :post do |f| %>
+              <%= hidden_field_tag :benefit_sponsorship_id, @benefit_sponsorship.id %>
+
+              <div class='row'>
+                <div class="col-sm-12">
+                  Employer Name: <%= @benefit_sponsorship.organization.legal_name %>
+                </div>
+                <div class="col-sm-12">
+                  Effective Date: <%= @benefit_application.effective_period.min.strftime('%m/%d/%Y') %>
+                </div>
+                <div class="col-sm-12">
+                  Open Enrollment End Date: <%= @benefit_application.open_enrollment_period.max.strftime('%m/%d/%Y') %>
+                </div>
+              </div>
+              <br/>
+              <div class='row'>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <div>
+                      <label><span>Please Choose New Open Enrollment Date<%#= l10n('.reject') %></span></label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-8">
+                  <div class="form-group">
+                    <input name="open_enrollment_end_date" type="text" class="uidatepicker" placeholder="Select OE End Date" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                   <div class="form-group pull-right">
+                    <%if true #@document.may_accept? && @employer_profile.employer_attestation.editable? %>
+                       <button type="submit" id = "extend_open_enrollment_submit" class='btn btn-primary'>Extend Open Enrollment</button>
+                    <%else%>
+                       <button type="button" class="btn disabled"> Extend Open Enrollment </button>
+                    <%end%>
+                     <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <% end %>
+            </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $(".uidatepicker").datepicker({minDate: "-0D", changeMonth: true, changeYear: true, yearRange: (new Date).getFullYear() + ":" + (new Date).getFullYear()+1 });
+  $(".uidatepicker").datepicker( "option", "dateFormat", "mm/dd/yy" );
+</script>
