@@ -49,7 +49,7 @@ class CensusEmployee < CensusMember
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
-  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
+  validates_presence_of :employer_profile_id, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
@@ -57,6 +57,13 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
+  validate :validate_unique_identifier
+
+  # validates :ssn,
+  #   length: { minimum: 3, maximum: 9, message: "Length not met" },
+  #   allow_blank: true,
+  #   numericality: true
+
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
 
@@ -236,7 +243,7 @@ class CensusEmployee < CensusMember
 
   def active_and_renewing_benefit_group_assignments
     result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
   end
@@ -413,7 +420,7 @@ class CensusEmployee < CensusMember
   def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-      
+
       if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
         find_or_create_benefit_group_assignment([benefit_group])
       end
@@ -577,7 +584,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -970,6 +977,24 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def validate_unique_identifier
+    if ssn && ssn.size != 9 && employer_profile.no_ssn == false
+      errors.add(:ssn, "must be 9 digits.")
+    end
+  end
+
+  def ssn=(new_ssn)
+    if !new_ssn.blank?
+      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+    else
+      if new_ssn.blank? && employer_profile.no_ssn == true
+        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+      else
+        unset_sparse("encrypted_ssn")
+      end
+    end
   end
 
   def notify_terminated
