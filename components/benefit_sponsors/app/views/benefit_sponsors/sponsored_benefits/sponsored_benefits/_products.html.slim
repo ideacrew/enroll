@@ -63,6 +63,28 @@
 				.pull-right
 					button.btn.btn-default.btn-sm#btnMoreDetails type="button" onclick="showMoreDetails()" More Details
 					button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
+					
+// Employee Cost Detail Modal
+.modal.fade#eeCostModal tabindex="-1" role="dialog" aria-labelledby="eeCostModal"
+  .modal-dialog.modal-lg role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" &times
+        h3.heading-text.mb-0.mt-0 Employee Costs
+      .modal-body
+        table.table
+					tr
+						td#planOfferingsTitle style="border-top:0" colspan="5"
+					tr
+						td#employerCostTitle style="border-top:0;" colspan="5"
+					tr.eeTableHeader
+						td.text-center Employee
+						td.text-center Dependent Count
+						td.text-center Lowest Cost Available Plan
+						td.text-center Reference Plan
+						td.text-center Highest Cost Available Plan
+					tbody#eeTableBody
 
 
 javascript:
@@ -135,3 +157,7 @@ javascript:
             showLess = true;
         }
     }
+		
+		function showDentalModal() {
+			swal("Here's the title!", "...and here's the text!");
+		}
