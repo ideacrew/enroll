@@ -1,6 +1,7 @@
+puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 begin
   @data_hash = {}
-  CSV.foreach('proj_elig_report_aqhp.csv',:headers =>true).each do |d|
+  CSV.foreach('proj_elig_report_aqhp_2018.csv',:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
       hbx_ids = @data_hash[d["ic_number"]].collect{|r| r['member_id']}
       next if hbx_ids.include?(d["member_id"])
@@ -10,7 +11,7 @@ begin
     end
   end
 rescue Exception => e
-  puts "Unable to open file #{e}"
+  puts "Unable to open file #{e}" unless Rails.env.test?
 end
 
 field_names  = %w(
@@ -47,16 +48,18 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
         builder.deliver
+        puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
         csv << [
           ic_number,
           person.hbx_id,
           person.full_name
         ]
       else
-        puts "No consumer role for #{person.hbx_id} -- #{e}"
+        puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}"
+      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}" unless Rails.env.test?
     end
   end
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
