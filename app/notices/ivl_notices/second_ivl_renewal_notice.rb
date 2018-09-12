@@ -65,7 +65,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
         PdfTemplates::Individual.new({
           :first_name => datum["first_name"],
           :last_name => datum["last_name"],
-          :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
+          :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m-%d-%Y')),
           :incarcerated => datum["incarcerated"].upcase == "N" ? "No" : "Yes",
           :citizen_status => citizen_status(datum["citizen_status"]),
           :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
