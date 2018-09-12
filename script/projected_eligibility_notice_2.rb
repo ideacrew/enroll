@@ -1,6 +1,6 @@
 begin
   @data_hash = {}
-  CSV.foreach('proj_elig_report_aqhp.csv',:headers =>true).each do |d|
+  CSV.foreach('proj_elig_report_aqhp_2018.csv',:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
       hbx_ids = @data_hash[d["ic_number"]].collect{|r| r['member_id']}
       next if hbx_ids.include?(d["member_id"])
