@@ -837,10 +837,18 @@ class HbxEnrollment
     end
   end
 
+  def is_an_existing_plan?(new_plan)
+    if is_shop?
+      self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
+    else
+      family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
+    end
+  end
+
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= self.plan
 
-    if self.family.currently_enrolled_plans(self).include?(new_plan.id)
+    if is_an_existing_plan?(new_plan)
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
