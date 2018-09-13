@@ -10,7 +10,7 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         field_names= %w(
                  employee_name
-                 employee_hix_id
+                 employer_hbx_id
                  er_legal_name
                  plan_name
                  policy_id
