@@ -14,6 +14,16 @@ namespace :reports do
   task :outstanding_types_created => :environment do
     field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE IVL_ENROLLMENT SHOP_ENROLLMENT)
 
+    CITIZEN_INVALID_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "fail_dhs!", "fail_dhs"]
+
+    SSN_INVALID_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "ssn_invalid!", "ssn_invalid"]
+
+    RESIDENCY_INVALID_EVENTS = ["fail_residency!", "fail_residency"]
+
+    IMMIGRATION_INVALID_EVENTS = ["fail_dhs!", "fail_dhs"]
+
+    ALL_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "fail_dhs!", "fail_dhs", "fail_residency!", "fail_residency"]
+
     def date
       begin
         ENV["date"].strip
@@ -73,39 +83,68 @@ namespace :reports do
       Date.parse(date).next_month
     end
 
+    def type_history_elements_with_date_range(v_type)
+     history_elements =  v_type.type_history_elements.
+      where(created_at:{
+        :"$gte" => start_date,
+        :"$lt" => end_date},
+        :"$or" => [
+          {:"action" => "return for deficiency"},
+          {:"modifier" => "external Hub"}
+        ]
+      )
+      remove_dup_override? ? [history_elements.sort_by{|type_history| type_history.updated_at}.last] : history_elements
+    end
+
     def remove_dup_override?
       ENV["remove_dup"].present? && ENV["remove_dup"] == "true"
     end
 
     def people
-      #Return people who have outstanding verifications within the time specified
-      people = Person.where(:"verification_types".elem_match => {
-        "$and" => [
-              { :validation_status => "outstanding"},
-              { :updated_at => {'$gte'=>start_date, '$lte' => end_date} }
-          ]  
-        }
-      )  
+      Person.where(:"verification_types.type_history_elements" => { :"$elemMatch" => {
+        :"created_at" => {
+          :"$gte" => start_date,
+          :"$lt" => end_date
+        },
+        :"$or" => [
+          {:"action" => "return for deficiency"},
+          {:"modifier" => "external Hub"}
+        ]
+      }})
     end
 
-    
-    def outstanding_types_for_person(person)
-      #Return all outstanding types for person
-      types = person.verification_types.where(
-         :validation_status => "outstanding",
-         :updated_at => {'$gte'=>start_date, '$lte' => end_date}
-      )
+    def hub_response_wfst(verification_type)
+      hub_response_on = @history_element.created_at.to_date
+      v_type = verification_type.type_name
+      @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
+        :"$gt" => hub_response_on - 1.day,
+        :"$lt" => hub_response_on + 1.day
+        },
+        :"event".in => (verification_valid_event(v_type))
+      ).first
     end
 
-    def type_history(type)
-      #Find all tranditions from [verified, pending] to outstanding ('return for deficiency' action)
-      history_elements = type.type_history_elements.where(
-        :action => 'return for deficiency',
-        :updated_at => {'$gte'=>start_date, '$lte' => end_date}
-      )
-      
-      #Only return latest one if removing duplicates
-      remove_dup_override? ? [history_elements.sort_by{|type_history| type_history.updated_at}.last] : history_elements
+    def verification_valid_event(v_type)
+      case v_type
+        when 'Social Security Number'
+          SSN_INVALID_EVENTS
+        when 'DC Residency'
+          RESIDENCY_INVALID_EVENTS
+        when 'Immigration status'
+          IMMIGRATION_INVALID_EVENTS
+        when 'Citizenship'
+          CITIZEN_INVALID_EVENTS
+        else
+          ALL_EVENTS
+      end
+    end
+
+    def due_date_for_type(type)
+      type.due_date ||  TimeKeeper.date_of_record + 95.days
+    end
+    def is_not_eligible_transaction?(v_type)
+      return false if @history_element.modifier != "external Hub"
+      hub_response_wfst(v_type).blank?
     end
 
     report_prefix = remove_dup_override? ? "current" : "all"
@@ -116,21 +155,28 @@ namespace :reports do
 
       collect_rows = []
       people.each do |person|
-      	outstanding_types_for_person(person).each do |type|
-          type_history(type).each do |type_history|     
+        begin
+          @person = person
+          person.verification_types.each do |v_type|
+            type_history_elements_with_date_range(v_type).each do |type_history|
+            @history_element = type_history
+            next if is_not_eligible_transaction?(v_type)
             collect_rows << [
                     subscriber_id(person),
                     person.hbx_id,
                     person.first_name,
                     person.last_name,
-                    type.type_name,
+                    v_type.type_name,
                     type_history.updated_at,
                     "outstanding",
-                    type.due_date,
+                    due_date_for_type(v_type).to_date,
                     ivl_enrollment(person),
                     shop_enrollment(person)
                 ]
-          end
+            end
+         end
+         rescue => e
+         puts "Invalid Person with HBX_ID: #{person.hbx_id}"
         end
       end
 
@@ -139,6 +185,5 @@ namespace :reports do
       end
       puts "*********** DONE ******************"
     end
-
   end
 end
