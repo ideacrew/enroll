@@ -111,7 +111,8 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.create :employer_profile}
 
     before :each do
-      allow(ENV).to receive(:[]).with("encrypted_ssn").and_return census_employee.encrypted_ssn
+      allow(ENV).to receive(:[]).with("ssn").and_return census_employee.ssn
+      allow(ENV).to receive(:[]).with("employer_fein").and_return employer_profile.organization.fein
       allow(census_employee).to receive(:has_benefit_group_assignment?).and_return true
       census_employee.active_benefit_group_assignment.update_attributes(benefit_group_id: benefit_group.id)
       benefit_group.plan_year.update_attributes(aasm_state: "active")

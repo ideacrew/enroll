@@ -981,11 +981,7 @@ class PlanYear
   end
 
   def trigger_passive_renewals
-    open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
-    open_enrollment_factory.employer_profile = self.employer_profile
-    open_enrollment_factory.date = TimeKeeper.date_of_record
-    open_enrollment_factory.renewing_plan_year = self
-    open_enrollment_factory.process_family_enrollment_renewals
+    notify("acapi.info.events.plan_year.employee_passive_renewals_requested", {:plan_year_id => self.id.to_s})
   end
 
   def revert_employer_profile_application
