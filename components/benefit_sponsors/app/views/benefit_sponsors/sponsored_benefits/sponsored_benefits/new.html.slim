@@ -12,7 +12,7 @@
       = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
       = render "sponsored_benefit", f: benefit_builder
       = link_to "Cancel", profiles_employers_employer_profile_path(benefit_builder.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary pull-left"
-      = benefit_builder.submit "Submit Dental Benefits", class: "btn btn-default pull-right"
+      = benefit_builder.submit "Submit Dental Benefits", class: "btn btn-default pull-right", id: "submitDentalBenefits"
 
 javascript:
   function loadSingleProductSponsorContribution(element) {
