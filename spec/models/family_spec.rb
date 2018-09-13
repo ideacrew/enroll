@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent", type: :model, dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -320,7 +320,7 @@ describe Family, type: :model, dbclean: :after_each do
 
 end
 
-describe Family do
+describe Family, type: :model, dbclean: :after_each do
   let(:family) { Family.new }
 
   describe "with no special enrollment periods" do
@@ -519,7 +519,7 @@ describe Family do
   end
 end
 
-describe "special enrollment periods" do
+describe "special enrollment periods", dbclean: :after_each do
 =begin
   include_context "BradyBunchAfterAll"
 
@@ -669,7 +669,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   end
 end
 
-describe Family, "given an inactive member" do
+describe Family, "given an inactive member", type: :model, dbclean: :after_each do
   let(:ssn) { double }
   let(:dependent) {
     double(:id => "123456", :ssn => ssn, :last_name => last_name, :first_name => first_name, :dob => dob)
@@ -706,7 +706,7 @@ describe Family, "given an inactive member" do
   end
 end
 
-describe Family, "with a primary applicant" do
+describe Family, "with a primary applicant", type: :model, dbclean: :after_each do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }
     let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
@@ -1164,7 +1164,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, 'coverage_waived?' do
+describe Family, 'coverage_waived?', type: :model, dbclean: :after_each do
   let(:family) {Family.new}
   let(:household) {double}
   let(:hbx_enrollment) {HbxEnrollment.new}
@@ -1509,7 +1509,7 @@ describe Family, "given a primary applicant and 2 dependents with valid relation
   end
 end
 
-describe Family, "#application_applicable_year" do
+describe Family, "#application_applicable_year", type: :model, dbclean: :after_each do
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
   let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
   let(:current_year) { Date.new(oe_start_year, 10, 10) }
@@ -1622,7 +1622,7 @@ describe "min_verification_due_date", dbclean: :after_each do
   end
 end
 
-describe "#all_persons_vlp_documents_status" do
+describe "#all_persons_vlp_documents_status", dbclean: :after_each do
 
   context "vlp documents status for single family member" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -1742,7 +1742,7 @@ describe "#document_due_date", dbclean: :after_each do
   end
 end
 
-describe Family, '#is_document_not_verified' do
+describe Family, '#is_document_not_verified', type: :model, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
 
@@ -1783,7 +1783,7 @@ describe Family, '#is_document_not_verified' do
   end
 end
 
-describe "has_valid_e_case_id" do
+describe "has_valid_e_case_id", dbclean: :after_each do
   let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
 
   it "returns false as e_case_id is nil" do
@@ -1801,7 +1801,7 @@ describe "has_valid_e_case_id" do
   end
 end
 
-describe "active dependents" do
+describe "active dependents", dbclean: :after_each do
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
@@ -1821,7 +1821,7 @@ describe "active dependents" do
   end
 end
 
-describe Family, "Child/Parent Rule" do
+describe Family, "Child/Parent Rule", type: :model, dbclean: :after_each do
   let(:family100) {FactoryGirl.create(:family, :with_primary_family_member_and_dependent)}
   let(:person1) { family100.primary_applicant.person }
   let(:person2) { family100.family_members[1].person }
@@ -1832,11 +1832,18 @@ describe Family, "Child/Parent Rule" do
     person2.person_relationships.where(successor_id: person1.id).first.update_attributes!(kind: "spouse")
     person1.person_relationships.where(successor_id: person3.id).first.update_attributes!(kind: "parent")
     person3.person_relationships.where(successor_id: person1.id).first.update_attributes!(kind: "child")
-    family100.build_relationship_matrix
-    family100.reload
   end
 
   it "should not have any missing relationships" do
+    family100.build_relationship_matrix
+    family100.reload
     expect(family100.find_missing_relationships(family100.build_relationship_matrix)).to eq []
+  end
+
+  it "should have missing relationships as Child/Parent Rule is not satisfied" do
+    person3.person_relationships.where(successor_id: person1.id).first.update_attributes!(kind: "unrelated")
+    family100.build_relationship_matrix
+    family100.reload
+    expect(family100.find_missing_relationships(family100.build_relationship_matrix)).not_to eq []
   end
 end
