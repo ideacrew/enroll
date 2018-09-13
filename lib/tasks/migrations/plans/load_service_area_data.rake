@@ -107,7 +107,6 @@ namespace :load_service_reference do
       puts " --------- " unless Rails.env.test?
       puts e.backtrace unless Rails.env.test?
     end
-    puts "created #{total} service areas in new model" unless Rails.env.test?
 
   end
 
