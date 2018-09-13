@@ -170,10 +170,9 @@ class EmployerProfile
     @broker_agency_profile = active_broker_agency_account.broker_agency_profile if active_broker_agency_account.present?
   end
 
-  def is_ssn_disabled?
-    # Need to update the following code according to further progress in Ticket 'Employees without SSN/TIN'
-    false
-  end
+  # def is_ssn_disabled?
+  #   no_ssn
+  # end
 
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
