@@ -2778,22 +2778,52 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
-end
 
-describe HbxEnrollment, dbclean: :after_all do
-  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-  let!(:plan100) { FactoryGirl.create(:plan) }
-
-  describe "is_an_existing_plan?" do
-    context "for checking if a new plan is similar to the given enr's plan " do
-      it "should return true as the compared plan has similar hios_id and same active year" do
-        expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+  describe "#trigger ee_select_plan_during_oe" do
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, kind: "employer_sponsored", employee_role_id: employee_role.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
+     before :each do
+      @household = mikes_family.households.first
+    end
+     it "should trigger ee_select_plan_during_oe job in queue" do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(hbx_enrollment).to receive_message_chain(:benefit_group, :plan_year, :open_enrollment_contains?).and_return(true)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+       hbx_enrollment.ee_select_plan_during_oe
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
       end
-
-      it "should return false as the compared plan has a different hios_id" do
-        expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+       expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('ee_select_plan_during_oe')).to be_truthy
+      expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+     shared_examples_for "trigger 'ee_select_plan_during_oe' hook" do |event|
+       it "should call 'ee_select_plan_during_oe' hook" do
+        expect(HbxEnrollment.aasm.state_machine.events[event].transitions[0].opts[:after].include?(:ee_select_plan_during_oe)).to eq true
       end
     end
+     it_behaves_like "trigger 'ee_select_plan_during_oe' hook", :force_select_coverage
+    it_behaves_like "trigger 'ee_select_plan_during_oe' hook", :select_coverage
   end
+  
+  describe HbxEnrollment, dbclean: :after_all do
+    let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+    let!(:plan100) { FactoryGirl.create(:plan) }
+
+    describe "is_an_existing_plan?" do
+      context "for checking if a new plan is similar to the given enr's plan " do
+        it "should return true as the compared plan has similar hios_id and same active year" do
+          expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+        end
+
+        it "should return false as the compared plan has a different hios_id" do
+          expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+        end
+      end
+    end
 end

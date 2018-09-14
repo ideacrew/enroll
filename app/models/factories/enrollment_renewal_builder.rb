@@ -8,13 +8,14 @@ module Factories
         renewal_enrollment = clone_shop_enrollment(enrollment, renewal_enrollment)
         renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
         # renewal_enrollment.decorated_hbx_enrollment
-        save_renewal_enrollment(renewal_enrollment, enrollment)
+        save_renewal_enrollment(renewal_enrollment, enrollment, options)
       end
     end
 
-    def save_renewal_enrollment(renewal_enrollment, active_enrollment)
+    def save_renewal_enrollment(renewal_enrollment, active_enrollment, options={})
       if renewal_enrollment.save
-        renewal_enrollment
+        renewal_enrollment.send(options.fetch(:aasm_event, :renew_enrollment))
+        renewal_enrollment.save
       else
         message = "Enrollment: #{active_enrollment.id}, \n" \
         "Unable to save renewal enrollment: #{renewal_enrollment.inspect}, \n" \
