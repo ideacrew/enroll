@@ -1316,12 +1316,12 @@ shop_notice_triggers = [
     ]
   },
 
-  {
+  {                
     hbx_id: 'SHOP_D064',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
     resource_name: 'employee_role',
-    event_name: 'notice_to_employee_for_missing_binder_payment',
+    event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written', 
     notice_triggers: [
       {
         name: "Notice to EEs that ER’s plan year will not be written",
@@ -1329,10 +1329,10 @@ shop_notice_triggers = [
         notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
         mpi_indicator: 'SHOP_D064',
         notice_trigger_element_group: {
-              market_places: ['shop'],
-              primary_recipients: ["employee"],
-              primary_recipient_delivery_method: ["secure_message"],
-              secondary_recipients: []
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
         }
       }
     ]

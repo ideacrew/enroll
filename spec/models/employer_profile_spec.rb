@@ -431,7 +431,7 @@ describe EmployerProfile, dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'employer_invoice_available']
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'employer_invoice_available')
     end
   end
 
@@ -617,7 +617,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employer.hire_broker_agency(broker_agency_profile)
       employer.save
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
-      expect(queued_job.any? {|h| (h[:args] == [employer.id.to_s, 'general_agency_terminated'] && h[:job] == ShopNoticesNotifierJob)}).to eq true
+      expect(queued_job.any? {|h| (h[:args].include?(employer.id.to_s) && h[:args].include?('general_agency_terminated') && h[:job] == ShopNoticesNotifierJob)}).to eq true
     end
 
     it 'works with multiple broker_agency_contacts'  do
@@ -1077,7 +1077,7 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'general_agency_terminated')
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end
@@ -1195,7 +1195,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_fired_confirmation_to_broker']
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'broker_fired_confirmation_to_broker')
     end
   end
 
@@ -1294,16 +1294,6 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
   end
 end
 
-describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
-
-  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
-  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
-
-  it "should return employers" do
-    expect(EmployerProfile.initial_employers_enrolled_plan_year_state(new_plan_year.start_on).size).to eq 1
-  end
-end
-
 describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each do
   let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "termination_pending", end_on: TimeKeeper.date_of_record-1.day)}
@@ -1322,6 +1312,17 @@ describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each
     plan_year.update_attributes!(:aasm_state => "active", :end_on => plan_year.start_on.next_year-1.days)
     plan_year.reload
     expect(plan_year.aasm_state).to eq "active"
+  end
+end
+
+describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
+
+  let!(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled", :start_on => date) }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+   it "should return employers" do
+    organizations = EmployerProfile.initial_employers_enrolled_plan_year_state(date)
+    expect(organizations.count).to eq 1
   end
 end
 

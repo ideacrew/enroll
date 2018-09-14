@@ -618,6 +618,15 @@ class EmployerProfile
         })
     end
 
+    def initial_employers_enrolled_plan_year_state(start_on)
+      Organization.where(:"employer_profile.plan_years" => 
+        { :$elemMatch => { 
+          :"start_on" => start_on,
+          :aasm_state => "enrolled"
+          }
+        })
+    end
+
     def initial_employers_reminder_to_publish(start_on)
       Organization.where(:"employer_profile.plan_years" =>
                              {:$elemMatch => {
@@ -827,22 +836,7 @@ class EmployerProfile
             end
           end
         end
-      end
-      
-      #initial employers misses binder payment due date deadline on next day notice
-      start_date = TimeKeeper.date_of_record.next_month.beginning_of_month
-      binder_next_day = PlanYear.calculate_open_enrollment_date(start_date)[:binder_payment_due_date].next_day
-        if new_date == binder_next_day
-          initial_employers_enrolled_plan_year_state(start_date).each do |org|
-            if !org.employer_profile.binder_paid?
-                begin
-                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
-                rescue Exception => e
-                  (Rails.logger.error {"Unable to deliver missing binder payment notice to #{org.legal_name} due to #{e}"}) unless Rails.env.test?
-                end
-            end
-          end
-        end 
+      end       
 
       # Employer activities that take place monthly - on first of month
       if new_date.day == 1
@@ -1206,9 +1200,13 @@ class EmployerProfile
     end
   end
 
-  def trigger_notices(event)
+  def generate_checkbook_notices
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
+  end
+
+  def trigger_notices(event, options = {})
     begin
-      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event, options)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
     end
@@ -1237,6 +1235,16 @@ class EmployerProfile
         to_state: aasm.to_state,
         event: aasm.current_event
     )
+  end
+   
+  def self.notice_to_employee_for_missing_binder_payment(org)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_employee_for_missing_binder_payment", "acapi_trigger" =>  true )
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver notice_to_employee_for_missing_binder_payment to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
+      end
+    end
   end
 
   def self.notice_to_employee_for_missing_binder_payment(org)
