@@ -32,9 +32,7 @@ RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
   before :each do
-    allow(person).to receive("primary_family").and_return(family)
-    allow(person.consumer_role).to receive_message_chain("person.primary_family").and_return(false)
-    allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
+    allow(person.consumer_role).to receive("person").and_return(person)
   end
 
   describe "New" do
