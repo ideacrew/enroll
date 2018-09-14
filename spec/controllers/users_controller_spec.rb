@@ -64,6 +64,45 @@ describe UsersController do
     end
   end
 
+  describe ".confirm_change_username_and_email", dbclean: :after_each do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, :person => person) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+    let(:invalid_username) { "ggg" }
+    let(:valid_username) { "gariksubaric" }
+    let(:invalid_email) { "email@" }
+    let(:valid_email) { "email@email.com" }
+
+    before do
+      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(admin)
+    end
+
+    context "email format wrong" do
+      it "doesn't update credentials" do
+        params = {id: user_id, new_email: invalid_email, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('change_username_and_email')
+      end
+    end
+    context "username format wrong" do
+      it "doesn't update credentials" do
+        params = {id: user_id, new_email: invalid_username, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('change_username_and_email')
+      end
+    end
+    context "valid credentials format" do
+      it "updates credentials" do
+        params = {id: user_id, new_email: valid_email, new_oim_id: valid_username, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('username_email_result')
+      end
+    end
+  end
+
   describe ".confirm_lock, with a user allowed to perform locking" do
     before do
       allow(user_policy).to receive(:lockable?).and_return(true)

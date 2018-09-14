@@ -54,16 +54,23 @@ class UsersController < ApplicationController
 
   def confirm_change_username_and_email
     authorize User, :change_username_and_email?
-    current_username = params[:current_oim_id]
-    current_email = params[:current_email]
-    new_username = params[:new_oim_id]
-    new_email = params[:new_email]
-    @user.oim_id = new_username if new_username.present? && (new_username != current_username)
-    @user.email = new_email if new_email.present? && (new_email != current_email)
-    if @user.save!
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User credentials updated."
+    @element_to_replace_id = params[:family_actions_id]
+    @email_taken = User.where(:email => params[:new_email], :id.ne => @user.id).first if params[:new_email]
+    @username_taken = User.where(:oim_id => params[:new_oim_id], :id.ne => @user.id).first if params[:new_oim_id]
+    if @email_taken.present? || @username_taken.present?
+      @matches = true
     else
-      redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "Can't be updated."
+      @user.oim_id = params[:new_oim_id] if (params[:new_oim_id] != params[:current_oim_id])
+      @user.email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
+      begin
+        @user.save!
+      rescue => e
+        @errors = @user.errors.messages
+      end
+    end
+    respond_to do |format|
+      format.js { render "change_username_and_email"} if @errors
+      format.js { render "username_email_result"}
     end
   end
 
@@ -77,26 +84,6 @@ class UsersController < ApplicationController
 
   def login_history
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
-  end
-  
-  def check_for_existing_username_or_email
-    authorize User, :change_username_and_email?
-    email_taken = User.where(:email => params[:email], :id.ne => @user.id).first if params[:email]
-    username_taken = User.where(:oim_id => params[:oim_id], :id.ne => @user.id).first if params[:oim_id]
-    response = {taken: nil, id: nil, first_name: nil, last_name: nil}
-    if email_taken.present? && email_taken.person
-      response[:taken] = "email"
-      response[:id] = email_taken.person.hbx_id
-      response[:first_name] = email_taken.person.first_name
-      response[:last_name] = email_taken.person.last_name
-    end
-    if username_taken.present? && username_taken.person
-      response[:taken] = "username"
-      response[:id] = username_taken.person.hbx_id
-      response[:first_name] = username_taken.person.first_name
-      response[:last_name] = username_taken.person.last_name
-    end
-    render json: response
   end
   
   private
