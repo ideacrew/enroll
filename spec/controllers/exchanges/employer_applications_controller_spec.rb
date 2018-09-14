@@ -11,8 +11,10 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
   let(:census_employee1) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role1.id,employer_profile_id: employer_profile.id) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
 
+  let(:person1) { FactoryGirl.create(:person) }
+
   describe ".index" do
-    let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person1) }
 
     before :each do
       sign_in(user)
@@ -25,7 +27,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
     end
 
     context 'when hbx staff role missing' do
-      let(:user) { instance_double("User", :has_hbx_staff_role? => false) }
+      let(:user) { instance_double("User", :has_hbx_staff_role? => false, :person => person1) }
 
       it 'should redirect when hbx staff role missing' do
         expect(response).to have_http_status(:redirect)
@@ -49,41 +51,65 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
   end
 
   describe "PUT terminate" do
-    let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person1) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person1) }
 
-    before :each do
+    context "when user has permissions" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+        sign_in(user)
+        put :terminate, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month, term_reason: "nonpayment"
+      end
+
+      it "should be success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should terminate the plan year" do
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "termination_pending"
+        expect(flash[:notice]).to eq "Employer Application terminated successfully."
+      end
+    end
+
+    it "should not be a success when user doesn't have permissions" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
       sign_in(user)
       put :terminate, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month, term_reason: "nonpayment"
-    end
-
-    it "should be success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should terminate the plan year" do
-      plan_year.reload
-      expect(plan_year.aasm_state).to eq "termination_pending"
-      expect(flash[:notice]).to eq "Employer Application terminated successfully."
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
     end
   end
 
   describe "PUT cancel" do
-    let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person1) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person1) }
 
-    before :each do
+    context "when user has permissions" do
+      before :each do
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+        sign_in(user)
+        plan_year.update_attributes!(:aasm_state => "enrolling")
+        put :cancel, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month
+      end
+
+      it "should be success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should cancel the plan year" do
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "canceled"
+        expect(flash[:notice]).to eq "Employer Application canceled successfully."
+      end
+    end
+
+    it "should not be a success when user doesn't have permissions" do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
       sign_in(user)
-      plan_year.update_attributes!(:aasm_state => "enrolling")
       put :cancel, employer_application_id: plan_year.id, employer_id: employer_profile.id, end_on: plan_year.start_on.next_month
-    end
-
-    it "should be success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should cancel the plan year" do
-      plan_year.reload
-      expect(plan_year.aasm_state).to eq "canceled"
-      expect(flash[:notice]).to eq "Employer Application canceled successfully."
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:error]).to match(/Access not allowed/)
     end
   end
 end

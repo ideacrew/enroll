@@ -1,5 +1,7 @@
 class Exchanges::EmployerApplicationsController < ApplicationController
+  include Pundit
 
+  before_action :modify_admin_tabs?, only: [:terminate, :cancel]
   before_action :check_hbx_staff_role
   before_action :find_employer
 
@@ -54,6 +56,10 @@ class Exchanges::EmployerApplicationsController < ApplicationController
   end
 
   private
+
+  def modify_admin_tabs?
+    authorize HbxProfile, :modify_admin_tabs?
+  end
 
   def check_hbx_staff_role
     unless current_user.has_hbx_staff_role?
