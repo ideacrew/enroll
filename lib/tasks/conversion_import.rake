@@ -2,11 +2,10 @@ namespace :conversion_import do
   desc "Import given fein employers into CSV sheet"
   task employers: :environment do |_, args|
     file_name = File.expand_path("#{Rails.root}/public/employers_export_conversion.csv")
-    csv_headers = %w(action FEIN Doing_Business_As Legal_Name Issuer_Assigned_Employer_Id Sic_Code Physical_Address_1 Physical_Address_2 City County County_FIPS_Code State Zip Mailing_Address_1 Mailing_Address_2 City State Zip Contact_First_Name Contact_Last_Name Contact_Email Contact_Phone
-                     Contact_Phone_Extension Enrolled_Employee_count New_Hire_Coverage_Policy Contact_Address_1 Contact_Address_2 City State Zip Broker_Name Broker_NPN TPA_Name TPA_Fein Coverage_Start_Date Carrier_Selected Plan_Selection_Category Plan_Name Plan_Hios_Id
-                     Employee_only_Rating_tier_Contribution Employee_Only_Rating_Tier_Premium Employee_And_Spouse_Rating_Tier_Offered Employee_And_Spouse_Rating_Tier_Contribution Employee_And_Spouse_Rating_Tier_Premium Employee_And_Dependents_Rating_Tier_Offered
-                     Employee_And_Dependents_Rating_Tier_Contribution Employee_And_Dependents_Rating_Tier_Premium Family_Rating_Tier_Offered Family_Rating_Tier_Contribution Family_Rating_Tier_Premium)
-
+    csv_headers = %w(Action FEIN Doing\ Business\ As Legal\ Name Issuer\ Assigned\ Employer\ ID SIC\ code Physical\ Address\ 1 Physical\ Address\ 2 City County County\ FIPS\ code State Zip Mailing\ Address\ 1 Mailing\ Address\ 2
+                     City State Zip Contact\ First\ Name Contact\ Last\ Name Contact\ Email Contact\ Phone Contact\ Phone\ Extension Enrolled\ Employee\ Count New\ Hire\ Coverage\ Policy Contact\ Address\ 1 Contact\ Address\ 2
+                     City State Zip Broker\ Name Broker\ NPN TPA\ Name TPA\ Fein Coverage\ Start\ Date Carrier\ Selected Plan\ Selection\ Category Plan\ Name Plan\ HIOS\ ID Employer\ Contribution\ -\ Employee Employer\ Contribution\ -\ Spouse
+                     Employer\ Contribution\ -\ Domestic\ Partner Employer\ Contribution\ -\ Child\ under\ 26)
     feins = ENV['feins_list'].split(' ')
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << csv_headers
@@ -17,11 +16,20 @@ namespace :conversion_import do
         physical_location, mailing_location = find_address_details(organization)
 
         #In conversion sheet we have only one staff role
-        available_staff_roles = find_staff_role(organization).first
+        available_staff_roles = find_staff_roles(organization).first
         physical_address = physical_location.address
-        mailing_attributes = mailing_address_attributes(mailing_location.address)
+
+        if mailing_location
+          mailing_attributes = mailing_address_attributes(mailing_location.address)
+        else
+          mailing_attributes = mailing_address_attributes(nil)
+        end
+
+        # mailing_attributes = mailing_address_attributes(mailing_location.address)
         staff_role_attributes = append_attributes(available_staff_roles)
-        benefit_application = find_plan_year(organization).first
+        benefit_applications = find_plan_year(organization)
+        benefit_application = benefit_applications.renewing.present? ?  benefit_applications.renewing.first : benefit_applications.active.first
+
         probation_kind = benefit_application.benefit_packages.first.probation_period_kind.to_s
         start_on = [benefit_application.effective_period.min]
 
@@ -95,8 +103,13 @@ namespace :conversion_import do
   end
 
   def find_contribution_details(census_employee)
-   hbx_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.active
-   [hbx_enrollment.total_premium, hbx_enrollment.total_employer_contribution]
+    benefit_group_assignment = census_employee.published_benefit_group_assignment
+    hbx_enrollment = benefit_group_assignment.active_enrollments.first if benefit_group_assignment
+    if hbx_enrollment
+      [hbx_enrollment.total_premium.to_f, hbx_enrollment.total_employer_contribution.to_f]
+    else
+      ["", ""]
+    end
   end
 
   def find_initial_attributes(census_employee)
@@ -159,7 +172,7 @@ namespace :conversion_import do
   end
 
   def find_staff_role(organization)
-    organization.employer_profile.staff_roles
+    organization.employer_profile.staff_roles.select{|person| person.emails.present? && person.phones.present?}
   end
 
   def find_organization(fein)
