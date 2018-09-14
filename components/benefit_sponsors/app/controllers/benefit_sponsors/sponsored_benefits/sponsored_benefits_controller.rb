@@ -40,7 +40,7 @@ module BenefitSponsors
       end
 
       def destroy
-      @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
+        @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
 
         if @sponsored_benefit_form.destroy
           flash[:notice] = "Dental Benefit Package successfully deleted."
@@ -85,17 +85,9 @@ module BenefitSponsors
         )
       end
 
-      def benefit_package_params
-        params.require(:benefit_package).require(:sponsored_benefits_attributes).require('0').permit(
-            :product_package_kind, :reference_plan_id,
-            :sponsor_contribution_attributes => [
-              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
-            ]
-          )
-      end
-
       def benefit_params
-        params.permit(:benefit_sponsorship_id, :benefit_application_id, :benefit_package_id).merge(benefit_package_params).merge(:kind => 'dental')
+        product_package_kind = params.require(:sponsored_benefits).require(:sponsored_benefits_attributes).require('0').permit(:product_package_kind)
+        params.permit(:benefit_sponsorship_id, :benefit_application_id, :benefit_package_id).merge(sponsored_benefits_params).merge(product_package_kind)
       end
     end
   end

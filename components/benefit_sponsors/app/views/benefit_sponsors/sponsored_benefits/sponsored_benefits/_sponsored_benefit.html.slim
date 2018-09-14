@@ -97,8 +97,8 @@ javascript:
     document.getElementById('planOfferingsTitle').innerHTML = '';
     document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
 
-    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId)
-    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId)
+    calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
+    calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
   }
 
   function newContributionAmounts(element) {
