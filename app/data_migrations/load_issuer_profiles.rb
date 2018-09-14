@@ -9,7 +9,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
       {fein: "042864973", issuer_hios_ids: ["34484"], legal_name: "Health New England", abbreviation: "HNE", hbx_carrier_id: 20007, shop_health: true },
       {fein: "041045815", issuer_hios_ids: ["42690"], legal_name: "Blue Cross Blue Shield MA", abbreviation: "BCBS", hbx_carrier_id: 20002, shop_health: true },
       {fein: "042452600", issuer_hios_ids: ["36046"], legal_name: "Harvard Pilgrim Health Care", abbreviation: "HPHC", hbx_carrier_id: 20008, shop_health: true },
-      {fein: "234547586", issuer_hios_ids: ["41304"], legal_name: "Allways Health Partners", abbreviation: "NHP", hbx_carrier_id: 20010, shop_health: true },
+      {fein: "234547586", issuer_hios_ids: ["41304"], legal_name: "AllWays Health Partners", abbreviation: "NHP", hbx_carrier_id: 20010, shop_health: true },
       {fein: "800721489", issuer_hios_ids: ["59763"], legal_name: "Tufts Health Direct", abbreviation: "THPD", hbx_carrier_id: 20011, shop_health: true },
 
       {fein: "362739571", issuer_hios_ids: ["31779"], legal_name: "UnitedHealthcare", abbreviation: "UHIC", hbx_carrier_id: 20014, shop_health: true },
