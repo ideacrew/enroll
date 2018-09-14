@@ -10,8 +10,7 @@ Organization.where({
   py = org.employer_profile.renewing_plan_year
   if py.may_force_publish? && py.is_application_valid?
     org.employer_profile.renewing_plan_year.force_publish!
-    @logger.debug "Employer #{org.fein} has been force published"
   else
-    @logger.debug "Employer #{org.fein} contains plan_year_errors: #{py.errors} & application_warnings: #{py.application_eligibility_warnings}"
+    @logger.debug "Employer #{org.fein} contains plan_year_errors: #{py.application_errors} & application_warnings: #{py.application_eligibility_warnings}"
   end 
 end
