@@ -8,8 +8,8 @@ module BenefitSponsors
       attribute :id, String
       attribute :kind, String
       attribute :product_option_choice, String
-      attribute :product_package_kind, String
-
+      attribute :product_package_kind, String, :default => 'single_product'
+      
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
 
