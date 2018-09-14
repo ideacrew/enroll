@@ -23,6 +23,9 @@ class PlanYear
   NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment"
   NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment"
 
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -141,7 +144,7 @@ class PlanYear
     renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
 
     if renewing_plan_year
-      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+      renewing_plan_year.cancel_renewal!(transmit_xml) if renewing_plan_year.may_cancel_renewal?
     end
 
     if end_on >= TimeKeeper.date_of_record
@@ -168,7 +171,7 @@ class PlanYear
     end
   end
 
-  def cancel_employee_benefit_packages
+  def cancel_employee_benefit_packages(*args)
     census_employees_within_play_year.each do |census_employee|
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
         if assignment.may_delink_coverage?
@@ -187,9 +190,12 @@ class PlanYear
     end
   end
 
-  def cancel_employee_enrollments
+  def cancel_employee_enrollments(transmit_xml = false)
     enrollments_for_plan_year.each do |hbx_enrollment|
-      hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
+      if hbx_enrollment.may_cancel_coverage?
+        hbx_enrollment.cancel_coverage!
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml)
+      end
     end
   end
 
@@ -1019,7 +1025,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     # Coverage disabled due to non-payment
@@ -1072,7 +1078,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -1157,9 +1163,30 @@ class PlanYear
     end
   end
 
+  def notify_cancel_event(transmit_xml = false)
+
+    return unless transmit_xml
+
+    if TimeKeeper.date_of_record < start_on
+      if (enrolled? || enrolling?) && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      elsif (renewing_enrolling? || renewing_enrolled?) && open_enrollment_completed? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      end
+    else
+      if active?
+        notify_employer_py_cancellation
+      end
+    end
+  end
+
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
+
+  def notify_employer_py_cancellation
+    notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+  end
 
   def notify_employer_py_terminate(transmit_xml)
 

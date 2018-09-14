@@ -31,13 +31,14 @@ class Exchanges::EmployerApplicationsController < ApplicationController
 
   def cancel
     @application = @employer_profile.plan_years.find(params[:employer_application_id])
+    trasmit_to_carrier = (params['trasmit_to_carrier'] == "true" || params['trasmit_to_carrier'] == true) ? true : false
     begin
       if @application.present?
         if @application.may_cancel?
-          @application.cancel!
+          @application.cancel!(trasmit_to_carrier)
           @employer_profile.revert_application! if @employer_profile.may_revert_application?
         elsif @application.may_cancel_renewal?
-          @application.cancel_renewal!
+          @application.cancel_renewal!(trasmit_to_carrier)
         end
         flash[:notice] = "Employer Application canceled successfully."
       else
