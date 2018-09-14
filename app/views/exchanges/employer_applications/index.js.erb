@@ -171,10 +171,11 @@ function pyAction(action, id, employer_id, term_date) {
 function submitPlanActions() {
   pyEndDate = $('input.py-end-date').val()
   termReason = $('input[name=term_actions]:checked').val()
+  trasmit_to_carrier = $('input[id=trasmit_to_carrier]').is(":checked")
   $.ajax({
     url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
     method: 'PUT',
-    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason }
+    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason, trasmit_to_carrier: trasmit_to_carrier }
   });
 }
 

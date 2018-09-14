@@ -249,17 +249,21 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      families = Family.where("households.hbx_enrollments" => {
-        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
-      })
+      begin
+        families = Family.where("households.hbx_enrollments" => {
+                                    :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
+                                })
 
-      enrollments_for_termination = families.inject([]) do |enrollments, family|
-        enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
-                                                                     :terminated_on.lt => as_of_date).to_a
-      end
+        enrollments_for_termination = families.inject([]) do |enrollments, family|
+          enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
+                                                                       :terminated_on.lt => as_of_date).to_a
+        end
 
-      enrollments_for_termination.each do |hbx_enrollment|
-        hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        enrollments_for_termination.each do |hbx_enrollment|
+          hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        end
+      rescue Exception => e
+        Rails.logger.error e.to_s
       end
     end
 
@@ -1515,6 +1519,23 @@ class HbxEnrollment
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
  end
+
+  def notify_enrollment_cancel_or_termination_event(transmit_flag)
+
+    return unless transmit_flag
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+
+    config = Rails.application.config.acapi
+    notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+            "hbx_enrollment_id" => self.hbx_id,
+            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+            "is_trading_partner_publishable" => transmit_flag
+        }
+    )
+  end
 
   private
 

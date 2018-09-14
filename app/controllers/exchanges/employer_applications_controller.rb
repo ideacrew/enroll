@@ -17,7 +17,8 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       if @application.present?
         end_on = Date.strptime(params[:end_on], "%m/%d/%Y")
         termination_kind = params['term_reason']
-        @application.terminate_plan_year(end_on, TimeKeeper.date_of_record, termination_kind)
+        trasmit_to_carrier = (params['trasmit_to_carrier'] == "true" || params['trasmit_to_carrier'] == true) ? true : false
+        @application.terminate_plan_year(end_on, TimeKeeper.date_of_record, termination_kind, trasmit_to_carrier)
         flash[:notice] = "Employer Application terminated successfully."
       else
         flash[:error] = "Employer Application can't be terminated."
@@ -34,10 +35,10 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       if @application.present?
         if @application.may_cancel?
           @application.cancel!
+          @employer_profile.revert_application! if @employer_profile.may_revert_application?
         elsif @application.may_cancel_renewal?
           @application.cancel_renewal!
         end
-        @employer_profile.revert_application! if @employer_profile.may_revert_application?
         flash[:notice] = "Employer Application canceled successfully."
       else
         flash[:error] = "Employer Application can't be canceled."
