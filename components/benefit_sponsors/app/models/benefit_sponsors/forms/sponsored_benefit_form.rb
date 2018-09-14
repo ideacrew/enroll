@@ -108,6 +108,20 @@ module BenefitSponsors
         persist(update: true)
       end
 
+      def self.for_calculating_employer_contributions(params)
+        form = self.new(params)
+        form.service = resolve_service(params)
+        form.service.load_form_meta_data(form)
+        form.service.calculate_premiums(form)
+      end
+
+      def self.for_calculating_employee_cost_details(params)
+        form = self.new(params)
+        form.service = resolve_service(params)
+        form.service.load_form_meta_data(form)
+        form.service.calculate_employee_cost_details(form)
+      end
+
       def self.kinds
         %w(health)
         # get kinds from catalog based on products/product packages

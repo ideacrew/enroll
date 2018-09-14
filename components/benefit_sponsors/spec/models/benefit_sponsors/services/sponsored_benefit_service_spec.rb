@@ -1,6 +1,8 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe do
+RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
@@ -166,7 +168,6 @@ RSpec.describe do
         subject.destroy(updated_form)
       end
     end
-
   end
 
   describe "while updating a sponsored benefit" do
@@ -179,6 +180,65 @@ RSpec.describe do
     context "#save" do
       it "should update dental sponsored benefits" do
         # TODO
+      end
+    end
+  end
+
+  describe 'Cost calculations', :dbclean => :after_each do 
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:product_kinds)  { [:health, :dental] }
+    let(:dental_sponsored_benefit) { false }
+
+    let(:aasm_state)              { :draft }
+    let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
+    let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+    let(:sponsored_benefit)       { BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new }
+
+    let(:dental_product_package) { current_benefit_market_catalog.product_packages.by_product_kind(:dental).first }
+    let(:dental_reference_product) { dental_product_package.products[0] }
+
+    let(:sponsored_benefit_attributes) { {
+      benefit_package_id: initial_application.benefit_packages[0].id,
+      benefit_application_id: initial_application.id,
+      benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+      product_package_kind: "single_product", 
+      reference_plan_id: dental_reference_product.id,
+      kind: "dental"
+      } }
+
+    let(:form) { BenefitSponsors::Forms::SponsoredBenefitForm.new(sponsored_benefit_attributes) }
+    subject { BenefitSponsors::Services::SponsoredBenefitService.new(sponsored_benefit_attributes) }
+
+    context '.calculate_premiums' do 
+
+      context 'when employer setting up dental sponsored benefit' do
+
+        it "should calculate employer contribution amounts" do 
+          subject.load_form_meta_data(form)
+          result = subject.calculate_premiums(form)
+        end
+      end 
+    end
+
+    context '.calculate_employee_cost_details' do 
+
+      include_context "setup employees"
+
+      context 'when employer setting up dental sponsored benefit' do
+
+        before do
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:age_bounding).and_return(20)
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
+        end
+
+        it "should calculate employee cost details" do 
+          subject.load_form_meta_data(form)
+          result = subject.calculate_employee_cost_details(form)
+        end
       end
     end
   end

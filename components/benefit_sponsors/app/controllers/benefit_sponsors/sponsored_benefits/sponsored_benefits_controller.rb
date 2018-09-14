@@ -40,7 +40,7 @@ module BenefitSponsors
       end
 
       def destroy
-      @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
+        @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_destroy(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
 
         if @sponsored_benefit_form.destroy
           flash[:notice] = "Dental Benefit Package successfully deleted."
@@ -50,6 +50,16 @@ module BenefitSponsors
           flash[:error] = error_messages(@sponsored_benefit_form)
         #  render :js => "window.location = #{profiles_employers_employer_profile_path(@sponsored_benefit_form.service.profile, :tab=>'benefits').to_json}"
         end
+      end
+
+      def calculate_employer_contributions
+        @employer_contributions = BenefitSponsors::Forms::SponsoredBenefitForm.for_calculating_employer_contributions(benefit_params)
+        render json: @employer_contributions
+      end
+
+      def calculate_employee_cost_details
+        @employee_cost_details = BenefitSponsors::Forms::SponsoredBenefitForm.for_calculating_employee_cost_details(benefit_params)
+        render json: @employee_cost_details.to_json
       end
 
       def change_reference_product
@@ -73,6 +83,11 @@ module BenefitSponsors
             :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
           ]
         )
+      end
+
+      def benefit_params
+        product_package_kind = params.require(:sponsored_benefits).require(:sponsored_benefits_attributes).require('0').permit(:product_package_kind)
+        params.permit(:benefit_sponsorship_id, :benefit_application_id, :benefit_package_id).merge(sponsored_benefits_params).merge(product_package_kind)
       end
     end
   end
