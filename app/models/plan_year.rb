@@ -148,14 +148,18 @@ class PlanYear
     end
 
     if end_on >= TimeKeeper.date_of_record
-      self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml}) if self.may_schedule_termination?
-      notify_employer_py_terminate(transmit_xml)
+      if self.may_schedule_termination?
+        self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
+        notify_employer_py_terminate(transmit_xml)
+      end
     else
-      self.terminate!(end_on) if self.may_terminate?
-      set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
-      notify_employer_py_terminate(transmit_xml)
-      self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
-      employer_profile.revert_application! if employer_profile.may_revert_application?
+     if self.may_terminate?
+       self.terminate!(end_on)
+       set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
+       notify_employer_py_terminate(transmit_xml)
+       self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
+       employer_profile.revert_application! if employer_profile.may_revert_application?
+     end
     end
   end
 
@@ -1168,9 +1172,9 @@ class PlanYear
     return unless transmit_xml
 
     if TimeKeeper.date_of_record < start_on
-      if (enrolled? || enrolling?) && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+      if enrolled? && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
         notify_employer_py_cancellation
-      elsif (renewing_enrolling? || renewing_enrolled?) && open_enrollment_completed? && past_transmission_threshold?
+      elsif renewing_enrolled? && open_enrollment_completed? && past_transmission_threshold?
         notify_employer_py_cancellation
       end
     else
