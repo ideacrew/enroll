@@ -1,3 +1,11 @@
+<%if @errors && @errors.any? %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@errors.each do |err|%>
+      <li><%= err[0].to_s == "oim_id" ? "Username" : "Email" %> <%= err[1][0] %></li>
+    <%end%>
+  </div>
+<%end%>
+
 <h3>Edit User Credentials</h3>
 <div id="credentials-matches" class="hidden">
   <h4>User Account Update Failed</h4>
@@ -7,11 +15,11 @@
 <br/>
 <%= form_tag(confirm_change_username_and_email_user_path, method: :put, id: "changeUsernameEmailForm", class:"form-horizontal", remote: true) do %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-  <% if user.oim_id.present? %>
-    <%= hidden_field_tag :current_oim_id, user.oim_id %>
+  <% if @user.oim_id.present? %>
+    <%= hidden_field_tag :current_oim_id, @user.oim_id %>
   <% end %>
-  <% if user.email.present? %>
-    <%= hidden_field_tag :current_email, user.email %>
+  <% if @user.email.present? %>
+    <%= hidden_field_tag :current_email, @user.email %>
   <% end %>
   <div class="field-error-block alert-danger hidden" style="margin-bottom:20px;">
   </div>
@@ -23,6 +31,7 @@
     <div class="form-group col-sm-5">
       <label for="inputNewEmail" class="col-form-label">New Email</label>
       <%= text_field_tag :new_email, user.email, {class:"form-control", id:'inputNewEmail'} %>
+      <%= hidden_field :family_actions_id, :value => "family_actions_#{@user.id.to_s}" %>
       <span class="help-block email-block hidden"></span>
     </div>
   </div>
@@ -33,132 +42,19 @@
       <%= button_tag "Reset", class:'btn btn-info', id: 'resetUsernameEmailFields' %>
     </div>
     <div class="col-sm-1">
-      <%= submit_tag "Submit", class:'btn btn-primary blocking', id: 'submitUsernameEmailChange', data: {confirm: "Are you sure?"} %>
+      <%= submit_tag "Submit", class:'btn btn-primary', data: {confirm: "Are you sure?"} %>
     </div>
   </div>
 <% end %>
 
-<script>
+<script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-        (function(){
-            var username = document.getElementById('inputNewUsername');
-            var email = document.getElementById('inputNewEmail');
-            var resetUsernameEmail = document.getElementById('resetUsernameEmailFields');
-            var submitUserChange = document.getElementById('submitUsernameEmailChange');
-            var errorBlock = document.getElementsByClassName('field-error-block')[0];
-            var errorMessage = document.getElementById('credentials-error-message');
-
-            username.addEventListener('blur', function(event){
-                if (checkUsername()) {
-                    disableSubmit();
-                    invalidUsername();
-                    event.preventDefault();
-                    event.stopPropagation();
-                } else if (!checkEmail()) {
-                    validUsername();
-                    validEmail();
-                    usernameEmailTaken();
-                }
-            });
-
-            email.addEventListener('blur', function(event){
-                if (checkEmail()) {
-                    disableSubmit();
-                    invalidEmail();
-                    event.preventDefault();
-                    event.stopPropagation();
-                } else if (!checkUsername()) {
-                    validUsername();
-                    validEmail();
-                    usernameEmailTaken();
-                }
-            });
-
-            resetUsernameEmail.addEventListener('click', function(event){
-                event.preventDefault();
-                username.value = "";
-                email.value = "";
-            });
-
-            function checkUsername(){
-                if(username.value.length < 8) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            function checkEmail(){
-                return (email.value.length > 0) && !(/\S+@\S+\.\S+/.test(email.value));
-            }
-
-            function enableSubmit() {
-                submitUserChange.classList.remove('blocking');
-            }
-
-            function disableSubmit() {
-                submitUserChange.classList.add('blocking');
-            }
-
-            function invalidUsername() {
-                username.closest('.form-group').classList.add('has-error');
-                errorBlock.innerText = "Username must be 8 or more characters.";
-                errorBlock.classList.remove('hidden');
-            }
-
-            function credentialsTaken(match, id, first_name, last_name) {
-                var matchDetails = document.createElement('div');
-                var message = "The "+match+" matches with the following user:";
-                while (errorMessage.firstChild) {
-                    errorMessage.removeChild(errorMessage.firstChild);
-                }
-                matchDetails.innerHTML = message + "<br><br>\nHBX ID: "+id.bold()+"<br>\nFirst Name: "+first_name.bold()+"<br>\nLast Name: "+last_name.bold();
-                errorMessage.appendChild(matchDetails);
-                document.getElementById('credentials-matches').classList.remove('hidden');
-            }
-
-            function validUsername() {
-                username.closest('.form-group').classList.remove('has-error');
-                errorBlock.classList.add('hidden');
-            }
-
-            function invalidEmail() {
-                email.closest('.form-group').classList.add('has-error');
-                errorBlock.innerText = "Email address is not correct.";
-                errorBlock.classList.remove('hidden');
-            }
-
-            function validEmail() {
-                email.closest('.form-group').classList.remove('has-error');
-                errorBlock.classList.add('hidden');
-            }
-
-            function noMatches() {
-                while (errorMessage.firstChild) {
-                    errorMessage.removeChild(errorMessage.firstChild);
-                }
-                document.getElementById('credentials-matches').classList.add('hidden');
-
-            };
-
-            function usernameEmailTaken(){
-                $.ajax({
-                    url: "<%= check_for_existing_username_or_email_user_path %>",
-                    method: 'GET',
-                    data: {"email": email.value, "oim_id": username.value},
-                    success: function(data){
-                        if (data.taken && data.taken.length > 1){
-                            disableSubmit();
-                            credentialsTaken(data.taken, data.id, data.first_name, data.last_name);
-                        } else {
-                            validUsername();
-                            validEmail();
-                            noMatches();
-                            enableSubmit();
-                        }
-                    }
-                })
-            }
-        })();
+        var resetButton = document.getElementById('resetUsernameEmailFields');
+        resetButton.addEventListener('click', function(event){
+            event.preventDefault();
+            document.getElementById('inputNewUsername').value="";
+            document.getElementById('inputNewEmail').value="";
+        });
     });
 </script>
+
