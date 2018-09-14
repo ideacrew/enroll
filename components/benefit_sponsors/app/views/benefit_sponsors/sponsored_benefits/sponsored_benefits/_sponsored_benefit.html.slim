@@ -14,7 +14,7 @@
 					.col-xs-3.plans
 						.col-xs-12
 							label.container
-								= f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"loadSingleProductSponsorContribution(this)"
+								= f.radio_button :product_option_choice, issuer_id, :data => {issuername: issuer_name}, onclick:"getPlanInfo(this); loadSingleProductSponsorContribution(this);"
 								span.checkmark
 								= issuer_name
 								
@@ -72,6 +72,13 @@ javascript:
   var domesticPartner;
   var childUnder26;
   var contributionInputs;
+  var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
+ 
+  function getPlanInfo(element) {
+    var selectedName = element.dataset.issuername;
+    filteredProducts = planOptions[productOptionKind][selectedName];
+    productsTotal = filteredProducts.length;
+  }
 
   function displayReferencePlanDetails(element, options) {
     if(!(element || options)) {
