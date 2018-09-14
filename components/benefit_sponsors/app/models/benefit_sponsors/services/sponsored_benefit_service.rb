@@ -81,6 +81,22 @@ module BenefitSponsors
         @organization = profile.organization
       end
 
+      def calculate_premiums(form)
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        model_attributes = form_params_to_attributes(form)
+        sponsored_benefit = factory.call(package, model_attributes)
+
+        estimator.calculate_estimates_for_package_design(package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+      end
+
+      def calculate_employee_cost_details(form)
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        model_attributes = form_params_to_attributes(form)
+        sponsored_benefit = factory.call(package, model_attributes)
+
+        estimator.calculate_employee_estimates_for_package_design(package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+      end
+
       def attributes_to_form_params(sponsored_benefit)
         {
           kind: sponsored_benefit.product_kind,
@@ -137,9 +153,14 @@ module BenefitSponsors
             :id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id
           )
         )
-        attributes.merge!({
-          sponsor_contribution_attributes: sponsor_contribution_form_to_params(form.sponsor_contribution)
-        })
+
+        if form.sponsor_contribution.present?
+          attributes.merge!({
+            sponsor_contribution_attributes: sponsor_contribution_form_to_params(form.sponsor_contribution)
+            })
+        end
+
+        attributes
       end
 
       def sponsor_contribution_form_to_params(form)

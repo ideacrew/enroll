@@ -49,6 +49,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     initial_application.benefit_packages = [current_benefit_package]
     benefit_sponsorship.benefit_applications = [initial_application]
     benefit_sponsorship.save!
+    benefit_sponsor_catalog.save!
   end
 
   it 'should create a valid benefit sponsorship' do

@@ -52,6 +52,16 @@ module BenefitSponsors
         end
       end
 
+      def calculate_employer_contributions
+        @employer_contributions = BenefitSponsors::Forms::SponsoredBenefitForm.for_calculating_employer_contributions(benefit_params)
+        render json: @employer_contributions
+      end
+
+      def calculate_employee_cost_details
+        @employee_cost_details = BenefitSponsors::Forms::SponsoredBenefitForm.for_calculating_employee_cost_details(benefit_params)
+        render json: @employee_cost_details.to_json
+      end
+
       def change_reference_product
         @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
       end
@@ -73,6 +83,19 @@ module BenefitSponsors
             :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
           ]
         )
+      end
+
+      def benefit_package_params
+        params.require(:benefit_package).require(:sponsored_benefits_attributes).require('0').permit(
+            :product_package_kind, :reference_plan_id,
+            :sponsor_contribution_attributes => [
+              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
+            ]
+          )
+      end
+
+      def benefit_params
+        params.permit(:benefit_sponsorship_id, :benefit_application_id, :benefit_package_id).merge(benefit_package_params).merge(:kind => 'dental')
       end
     end
   end
