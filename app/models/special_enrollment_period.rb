@@ -144,7 +144,7 @@ class SpecialEnrollmentPeriod
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
-    return true unless is_shop?
+    return true unless (is_shop? && family.primary_applicant.has_active_employee_role?)
     min_date = sep_optional_date family, 'min', self.market_kind
     max_date = sep_optional_date family, 'max', self.market_kind
     errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
