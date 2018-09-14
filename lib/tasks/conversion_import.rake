@@ -61,8 +61,8 @@ namespace :conversion_import do
   desc "Import Employee details into CSV"
   task employees: :environment do |_, args|
     file_name = File.expand_path("#{Rails.root}/public/employees_export_conversion.csv")
-    headers = %w(sponsor_name fein hired_on benefit_begin_date premium_total employer_contribution subscriber_ssn subscriber_dob subscriber_gender subscriber_first_name subscriber_middle_initial subscriber_last_name subscriber_email subscriber_phone
-                     subscriber_address_1 subscriber_address_2 subscriber_city subscriber_state subscriber_zip)
+    headers = %w(Action Type\ Of\ Enrollment Market Sponsor\ Name FEIN Issuer\ Assigned\ Employer\ ID  HIRED\ ON Benefit\ Begin\ Date Plan\ Name HIOS\ ID Premium\ Total Employer\ Contribution Employee\ Responsible\ Amount  Subscriber\ SSN Subscriber\ DOB Subscriber\ Gender Subscriber\ First\ Name Subscriber\ Middle\ Name Subscriber\ Last\ Name Subscriber\ Email Subscriber\ Phone
+                     Subscriber\ Address\ 1 Subscriber\ Address\ 2 Subscriber\ City Subscriber\ State Subscriber\ Zip SELF)
     dep_headers = []
     7.times do |i|
       ["SSN", "DOB", "Gender", "First Name", "Middle Name", "Last Name", "Email", "Phone", "Address 1", "Address 2", "City", "State", "Zip", "Relationship"].each do |h|
@@ -77,29 +77,43 @@ namespace :conversion_import do
       feins_list.each do |fein|
         organization = find_organization(fein)
         census_employees = find_census_employees(organization)
-        benefit_application = find_plan_year(organization).renewing.first
+        benefit_applications = find_plan_year(organization)
+        benefit_application = benefit_applications.renewing.present? ? benefit_applications.renewing.first : benefit_applications.active.first
         coverage_start = benefit_application.effective_period.min
-        census_employees.each do |census_employee|
+        census_employees.active.each do |census_employee|
           premium_total, employer_contribution = find_contribution_details(census_employee)
           census_employee_details = find_initial_attributes(census_employee)
           address_details  = address_attributes(census_employee)
+          email_address = census_employee.email.present? ? census_employee.email.address : nil
+          personal_details = [email_address, ""]
+          dependents = Array.new
           unless census_employee.census_dependents.empty?
-            dependents = Array.new
-            census_employee.census_dependents.each do |dependent|
-              initial_details = find_initial_attributes(dependent)
-              address_details = address_attributes(dependents)
-              dependents << initial_details
-              dependents << ""
-              dependents << address_details
-              dependents << dependent.employee_relationship
-            end
+            dependents = fetch_dependents_details(census_employee)
           end
-          csv << [organization.legla_name, fein, census_employee.hired_on, coverage_start,  premium_total, employer_contribution] + census_employee_details + "" + address_details + "" + dependents
+          csv << ["Add", "New Enrollment", "SHOP", organization.legal_name, fein, "", census_employee.hired_on, coverage_start, "", "", premium_total, employer_contribution, ""] + census_employee_details + personal_details + address_details + dependents
         end
       end
     end
+  end
 
+  def fetch_dependents_details(census_employee)
+    dependents = Array.new
+    census_employee.census_dependents.each do |dependent|
+      %w(ssn dob gender first_name middle_name last_name).each do |attr|
+        dependents.push dependent.send(attr)
+      end
+      # for dependents email, phone columns
+      dependents.push ("","")
 
+      %w(address_1 address_2 city state zip).each do |attr|
+        if dependent.address
+          dependents.push dependent.send(attr)
+        else
+          dependents.push("", "", "", "")
+        end
+      end
+    end
+    dependents
   end
 
   def find_contribution_details(census_employee)
@@ -125,7 +139,8 @@ namespace :conversion_import do
     %w(address_1 address_2 city state zip).each do |attr|
       address << census_employee.address.send(attr)
     end
-    address
+    # for SELF column
+    address.push ""
   end
 
   def find_census_employees(organization)
