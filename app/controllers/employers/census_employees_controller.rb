@@ -5,6 +5,12 @@ class Employers::CensusEmployeesController < ApplicationController
   layout "two_column"
   def new
     @census_employee = build_census_employee
+    @no_ssn = @employer_profile.no_ssn || false
+
+    if @no_ssn
+      flash[:notice] = "SSN requirement is current disabled. This means you are not required to input SSN for your employees."
+    end
+
     if params[:modal].present?
       respond_to do |format|
         format.js { render "employers/employer_profiles/upload_employees" }
@@ -17,6 +23,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee = CensusEmployee.new(census_employee_params)
     @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.employer_profile = @employer_profile
+    @census_employee.no_ssn_allowed = true if @employer_profile.no_ssn
 
     if @census_employee.save
       flash[:notice] = "Census Employee is successfully created."
@@ -52,6 +59,8 @@ class Employers::CensusEmployeesController < ApplicationController
 
     @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.attributes = census_employee_params
+    @census_employee.no_ssn_allowed = true if @employer_profile.no_ssn
+
 
     destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
     authorize @census_employee, :update?
@@ -183,6 +192,8 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def show
     @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
+    @no_ssn = @census_employee.no_ssn_allowed || false
+
     past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
     @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
         |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
@@ -190,6 +201,11 @@ class Employers::CensusEmployeesController < ApplicationController
 
     @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
+
+    if @no_ssn && !@employer_profile.no_ssn
+      flash[:notice] = "This employee does not require a SSN because he/she was created at a time when the employer did not require SSN input."
+    end
+
   end
 
   def delink
