@@ -19,9 +19,9 @@ module Forms
     #include Validations::USDate.on(:date_of_birth)
 
     validate :does_not_match_a_different_users_person
-    validates :ssn,
-              length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
-              numericality: true
+    # validates :ssn,
+    #           length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
+    #           numericality: true
     validate :dob_not_in_future
 
     attr_reader :dob
