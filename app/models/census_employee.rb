@@ -891,6 +891,18 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
+  def ssn=(new_ssn)
+    if !new_ssn.blank?
+      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+    else
+      if new_ssn.blank? && employer_profile.no_ssn == true
+        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+      else
+        unset_sparse("encrypted_ssn")
+      end
+    end
+  end
+
   private
 
   def record_transition
@@ -985,17 +997,7 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def ssn=(new_ssn)
-    if !new_ssn.blank?
-      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
-    else
-      if new_ssn.blank? && employer_profile.no_ssn == true
-        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
-      else
-        unset_sparse("encrypted_ssn")
-      end
-    end
-  end
+
 
   def notify_terminated
     notify(EMPLOYEE_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
