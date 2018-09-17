@@ -9,7 +9,6 @@ class RemoveInvalidCoverageHouseholdMember < MongoidMigrationTask
       action = ENV['action'].to_s
       ch = person.first.primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
       if action == "remove_invalid_chms"
-        ch.coverage_household_members.delete_if { |chm| ((chm.family_member_id.present? && !chm.family.family_members.map(&:id).compact.flatten.map(&:to_s).include?(chm.family_member_id.to_s)) || chm.family_member.blank?) }
         ch.coverage_household_members.each { |chm| chm.destroy if ((chm.family_member_id.present? && !chm.family.family_members.map(&:id).compact.flatten.map(&:to_s).include?(chm.family_member_id.to_s)) || chm.family_member.blank?) }
         puts "Removed invalid coverage household members." unless Rails.env.test?
       else
