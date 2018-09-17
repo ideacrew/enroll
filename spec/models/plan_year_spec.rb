@@ -2781,12 +2781,13 @@ end
 
 describe "notify_employer_py_voluntary_terminate" do
   context "notify employer plan year termination " do
-    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active')}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
+    let!(:plan_year) {FactoryGirl.build(:plan_year, aasm_state:'active')}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
 
     it "should notify event" do
-      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, plan_year_id:plan_year.id, event_name: "benefit_coverage_period_terminated_voluntary"})
-      plan_year.voluntary_terminate!
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_voluntary"})
+      plan_year.termination_kind = "voluntary"
+      plan_year.terminate!
     end
 
     it "should not notify event" do
@@ -2798,12 +2799,13 @@ end
 
 describe "notify_employer_py_nonpayment_terminate" do
   context "notify employer plan year termination " do
-    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active')}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
+    let!(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active')}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
 
     it "should notify event" do
       expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_nonpayment"})
-      plan_year.nonpayment_terminate!
+      plan_year.termination_kind = "nonpayment"
+      plan_year.terminate!
     end
 
     it "should not notify event" do
