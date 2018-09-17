@@ -28,6 +28,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
+  field :no_ssn_allowed, type: Boolean, default: false
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -992,12 +993,10 @@ class CensusEmployee < CensusMember
   end
 
   def validate_unique_identifier
-    if ssn && ssn.size != 9 && employer_profile.no_ssn == false
+    if ssn && ssn.size != 9 && no_ssn_allowed == false
       errors.add(:ssn, "must be 9 digits.")
     end
   end
-
-
 
   def notify_terminated
     notify(EMPLOYEE_TERMINATED_EVENT_NAME, { :census_employee_id => self.id } )
