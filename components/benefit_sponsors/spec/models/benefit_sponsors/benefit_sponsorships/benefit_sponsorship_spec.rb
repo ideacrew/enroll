@@ -462,6 +462,14 @@ module BenefitSponsors
         end
       end
 
+      context "when employer with canceled benefit application" do
+        before { benefit_sponsorship.benefit_applications.first.update_attributes(aasm_state: "canceled")}
+
+        it "should not return benefit_application" do
+          expect(benefit_sponsorship.most_recent_benefit_application).to eq nil
+        end
+      end
+
       context "when employer with imported & submitted benefit application" do
 
         let!(:submitted_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
