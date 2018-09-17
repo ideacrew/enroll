@@ -892,6 +892,18 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
+  def ssn=(new_ssn)
+    if !new_ssn.blank?
+      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+    else
+      if new_ssn.blank? && employer_profile.no_ssn == true
+        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+      else
+        unset_sparse("encrypted_ssn")
+      end
+    end
+  end
+
   private
 
   def record_transition
@@ -983,18 +995,6 @@ class CensusEmployee < CensusMember
   def validate_unique_identifier
     if ssn && ssn.size != 9 && no_ssn_allowed == false
       errors.add(:ssn, "must be 9 digits.")
-    end
-  end
-
-  def ssn=(new_ssn)
-    if !new_ssn.blank?
-      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
-    else
-      if new_ssn.blank? && no_ssn_allowed == true
-        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
-      else
-        unset_sparse("encrypted_ssn")
-      end
     end
   end
 
