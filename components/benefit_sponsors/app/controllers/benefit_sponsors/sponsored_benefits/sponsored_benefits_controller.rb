@@ -1,6 +1,8 @@
 module BenefitSponsors
   module SponsoredBenefits
     class SponsoredBenefitsController < ApplicationController
+      
+      layout "two_column"
 
       # before_action :find_benefit_application, :find_employer
 
