@@ -55,8 +55,8 @@ class UsersController < ApplicationController
   def confirm_change_username_and_email
     authorize User, :change_username_and_email?
     @element_to_replace_id = params[:family_actions_id]
-    @email_taken = User.where(:email => params[:new_email], :id.ne => @user.id).first if params[:new_email]
-    @username_taken = User.where(:oim_id => params[:new_oim_id], :id.ne => @user.id).first if params[:new_oim_id]
+    @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user.id).first if params[:new_email]
+    @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user.id).first if params[:new_oim_id]
     if @email_taken.present? || @username_taken.present?
       @matches = true
     else
