@@ -91,6 +91,16 @@ class ModifyBenefitApplication< MongoidMigrationTask
         end
       end
       benefit_application.approve_application!
+      if benefit_application.is_renewing?
+        bs_from_state = benefit_sponsorship.aasm_state
+         if (bs_from_state != "active")
+        benefit_sponsorship.update_attributes!(aasm_state: "active")
+        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: bs_from_state,
+            to_state: "active"
+        )
+         end
+      end
     else
       raise "No benefit application found."
     end
