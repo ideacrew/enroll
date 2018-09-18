@@ -79,7 +79,7 @@ function initDatePicker() {
 
 function validateFormat(element) {
   setTimeout(function() {
-    if (element.value.indexOf("/") != 2 || element.value.length > 10) {
+    if (element.value.length != 10) {
       alert("Date format must be mm/dd/yyyy");
       element.value = "";
       disableSubmitButton()
