@@ -2487,7 +2487,7 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
 
   before do
-    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment')
+    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false)
     plan_year.reload
     benefit_group_assignment1.reload
   end
@@ -2495,10 +2495,6 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   context 'when plan year is terminated' do
     it "should terminate employee benefit group assignments" do
       expect(benefit_group_assignment1.end_on).to eq plan_year.end_on
-    end
-
-    it "should deactivate benefit group assignment" do
-      expect(benefit_group_assignment1.is_active).to be_falsey
     end
   end
 end
