@@ -1,5 +1,7 @@
 - add_new_package = (params["add_new_benefit_package"] == "true")
 - action = f.object.has_dental_sponsored_benefits? ? "edit" : "add"
+- is_new_package = @benefit_package_form.is_new_package
+
 .reference-summary
 
 = f.hidden_field :benefit_application_id
@@ -29,8 +31,9 @@ h1.heading-text Benefit Package - Set Up
 javascript:
   var disableSelectric = false;
 
-javascript:
-  window.onload = function(){
-    disableNewAddBenefitPackageButton()
-    disableDentalBenefitPackage()
-  }
+- if is_new_package || is_new_package.nil?
+  javascript:
+    window.onload = function(){
+      disableNewAddBenefitPackageButton()
+      disableDentalBenefitPackage()
+    }
