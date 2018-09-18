@@ -5,6 +5,15 @@ function getCostDetails(min,max,cost) {
 
 function showCostDetails(cost,min,max) {
   document.getElementById('rpEstimatedMonthlyCost').innerHTML = ('$ '+cost);
+
+  if (min == 'NaN') {
+    min = "0.00"
+  }
+
+  if (max == 'NaN') {
+    max = "0.00"
+  }
+
   document.getElementById('rpMin').innerHTML = ('$ '+ min);
   document.getElementById('rpMax').innerHTML = ('$ '+ max);
   if (document.getElementById('estimatedEEMin')) {
