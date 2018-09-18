@@ -63,16 +63,26 @@ class Exchanges::HbxProfilesController < ApplicationController
   def disable_ssn_requirement
     @organizations= Organization.where(:id.in => params[:ids]).all
     @organizations.each do |org|
-      if org.employer_profile.no_ssn.to_s == "false"
-        org.employer_profile.update_attributes(no_ssn: true)
-        flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of " + org.employer_profile.legal_name
-        redirect_to employer_invoice_exchanges_hbx_profiles_path
+      if params[:can_update].present?
+        if params[:can_update] == "disable"
+          org.employer_profile.update_attributes(no_ssn: true)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false)
+          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+        end
       else
-        org.employer_profile.update_attributes(no_ssn: false)
-        flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of " + org.employer_profile.legal_name
-        redirect_to employer_invoice_exchanges_hbx_profiles_path
+        if org.employer_profile.no_ssn.to_s == "false"
+          org.employer_profile.update_attributes(no_ssn: true)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false)
+          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+        end
       end
     end
+    redirect_to employer_invoice_exchanges_hbx_profiles_path
+    return
   end
 
   def generate_invoice
