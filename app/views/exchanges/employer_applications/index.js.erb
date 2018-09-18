@@ -74,7 +74,11 @@ function disableDatePicker() {
 }
 
 function initDatePicker() {
-  $('input.date').datepicker().removeClass('hasDatepicker');
+  $('input.date').datepicker({
+    onBlur: function(selectedDate) {
+      // custom callback logic here
+    }
+  }).removeClass('hasDatepicker');
 }
 
 function enableDatePicker() {
@@ -119,14 +123,6 @@ function terminateValidations() {
   return false;
 }
 
-function dateValidations() {
-  if ($('input.date').val().length != 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function addDatePicker() {
   $('tr.plan-year-actions').each(function() {
     $('input.date').attr('id','datepicker');
@@ -134,11 +130,14 @@ function addDatePicker() {
 }
 
 function validTerminatePy() {
-  if (dateValidations()) {
-    console.log(terminateValidations())
-    enableSubmitButton()
-  } else {
-    console.log("Im Invalid")
+  var endDates = document.querySelectorAll('.py-end-date')
+
+  for (date of endDates) {
+    if (date.value.length > 0) {
+      enableSubmitButton()
+    } else {
+      console.log("Missing Info")
+    }
   }
 }
 
@@ -165,6 +164,12 @@ function pyAction(action, id, employer_id, term_date) {
     hideEndDateField();
     hideTerminationRadios();
     enableSubmitButton();
+  }
+  // Clears all end dates from previous rows
+  var endDates = document.querySelectorAll('.py-end-date');
+  
+  for (date of endDates) {
+    date.value = "";
   }
 }
 // You can use the actionSelected here
