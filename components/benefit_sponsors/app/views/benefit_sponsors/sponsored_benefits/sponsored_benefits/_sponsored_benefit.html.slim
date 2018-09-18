@@ -26,7 +26,9 @@
 	h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
 	
 	= render "products", f: f
-	
+
+= render "employee_costs_modal"
+
 #yourSponsorContributions
 	#sponsorContributions.mt-1
 		.col-xs-12
@@ -63,13 +65,46 @@
 	#yourReferencePlanDetails
     - if !is_new_benefit && !is_new_benefit.nil?
       #referencePlanEditDisplay
-        = f.hidden_field :reference_plan_id, value: f.object.reference_plan_id
+        span.hidden.edit_flow
+          = f.radio_button :reference_plan_id, f.object.reference_plan_id, :data => {plan_title: f.object.reference_product.title, metal_level: f.object.reference_product.metal_level_kind, carrier_name: f.object.reference_product.issuer_name, plan_type: f.object.reference_product.plan_kind}
         = render "reference_plan", f: f
 
 - if !is_new_benefit && !is_new_benefit.nil?
   javascript:
     window.onload = function() {
-      document.getElementById('metal-level-select').classList.add('hidden')
+      document.getElementById('metal-level-select').classList.add('hidden');
+      loadEmployeeCosts();
+    }
+
+    function loadEmployeeCosts() {
+      var table = document.getElementById('eeTableBody');
+
+      table.querySelectorAll('tr').forEach(function(element) {
+        element.remove()
+        });
+
+      var tr = document.createElement('tr')
+      var estimate = #{@sponsored_benefit_form.employees_cost.to_json.html_safe};
+      var productOptionKind = 'single_product';
+      var productsTotal;
+      var planOptions = #{@sponsored_benefit_form.catalog.plan_options.to_json.html_safe};
+      var element = document.querySelector("input[name='sponsored_benefits[reference_plan_id]']:checked");
+      var selectedName = element.dataset.carrierName;
+      var planTitle = element.dataset.planTitle;
+      filteredProducts = planOptions[productOptionKind][selectedName];
+      
+      document.getElementById('planOfferingsTitle').innerHTML = '';
+      document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${filteredProducts.length})`)
+
+      tr.innerHTML =
+        `
+        <td class="text-center">${estimate[0].name}</td>
+        <td class="text-center">${estimate[0].dependent_count}</td>
+        <td class="text-center">$ ${estimate[0].lowest_cost_estimate}</td>
+        <td class="text-center">$ ${estimate[0].reference_estimate}</td>
+        <td class="text-center">$ ${estimate[0].highest_cost_estimate}</td>
+        `
+      table.appendChild(tr)
     }
 
 javascript:
@@ -113,15 +148,32 @@ javascript:
     sponsoredBenefitId = options.sponsoredBenefitId;
     // showFormButtons();
 
+    if (productsTotal === undefined){
+      if (element) {
+        var selectedName = element.dataset.carrierName;
+        filteredProducts = planOptions[productOptionKind][selectedName];
+        productsTotal = filteredProducts.length;
+      }
+    }
+
     document.getElementById('yourReferencePlanDetails').innerHTML = '#{escape_javascript(render :partial => "./ui-components/v1/cards/reference_plan_details_shell")}'
+
+    if (element.parentElement.classList.contains('edit_flow')) {
+      document.getElementById('changeReferencePlan').classList.remove('hidden');
+    }
 
     document.getElementById('referencePlanTitle').append(planTitle);
     document.getElementById('rpType').append(planType);
     document.getElementById('rpCarrier').append(carrierName);
     document.getElementById('rpMetalLevel').append(metalLevel);
     document.getElementById('rpNetwork').append('N/A');
+
     document.getElementById('planOfferingsTitle').innerHTML = '';
     document.getElementById('planOfferingsTitle').append(`Plan Offerings - ${planTitle} (${productsTotal})`)
+
+    if (document.getElementById('referencePlanEditDisplay')) {
+      document.getElementById('referencePlanEditDisplay').classList.add('hidden');
+    }
 
     calculateEmployerContributions(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
     calculateEmployeeCosts(productOptionKind, referencePlanID, sponsoredBenefitId, "sponsored_benefits")
