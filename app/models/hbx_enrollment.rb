@@ -1300,7 +1300,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :enrolled_contingent, :unverified],
+                         :enrolled_contingent, :unverified, :coverage_expired],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
