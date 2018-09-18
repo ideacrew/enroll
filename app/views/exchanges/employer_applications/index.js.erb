@@ -74,11 +74,19 @@ function disableDatePicker() {
 }
 
 function initDatePicker() {
-  $('input.date').datepicker({
-    onBlur: function(selectedDate) {
-      // custom callback logic here
+  $('input.date').datepicker({dateFormat: "mm/dd/yy"})
+}
+
+function validateFormat(element) {
+  setTimeout(function() {
+    if (element.value.indexOf("/") != 2 || element.value.length > 10) {
+      alert("Date format must be mm/dd/yyyy");
+      element.value = "";
+      disableSubmitButton()
+    } else {
+      enableSubmitButton()
     }
-  }).removeClass('hasDatepicker');
+  },400);
 }
 
 function enableDatePicker() {
