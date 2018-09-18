@@ -9,52 +9,9 @@
     = form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "update"}, method: :patch do |f|
       = f.hidden_field :kind, value: f.object.kind
       = f.hidden_field :id, value: f.object.id if f.object.id.present?
-      = f.hidden_field :kind, value: f.object.kind
       = f.hidden_field :product_option_choice, value: f.object.product_option_choice
-      = f.hidden_field :product_package_kind, value: f.object.product_package_kind
-
-      .col-xs-3.pull-right
-        .btn.btn-default.pull-right.mt-3 data-toggle="modal" data-target="#eeCostModal" Employee Details Costs
-      br
-
-      #scEdit
-      = f.fields_for :sponsor_contribution, f.object.sponsor_contribution, errors: {}, fieldset: false do |sc|
-        #sponsorContributions.mt-1
-          .col-xs-12.mb-1
-            .col-xs-6.offered-heading
-              .text-uppercase.text-center
-                | Offered
-                i.fas.fa-question-circle data-toggle='tooltip' title=offered_tool_tip_helper.html_safe
-            .col-xs-6.offered-heading
-              .text-uppercase.text-center
-                | Employer Contribution
-                i.fas.fa-question-circle data-toggle='tooltip' title=employer_contribution_tool_tip_helper.html_safe
-          .col-xs-12
-            = sc.fields_for :contribution_levels, sc.object.contribution_levels, errors: {}, fieldset: false do |cl|
-              fieldset
-                div.col-xs-6.form-group.form-group-lg
-                  div.checkbox
-                    label
-                      = cl.check_box :is_offered, {class: "contribution_handler", disabled: (cl.object.is_employee_cl)}, "true", "false"
-                      = cl.hidden_field :display_name, value: cl.object.display_name
-                      = cl.hidden_field :contribution_unit_id, value: cl.object.contribution_unit_id
-                      span
-                        = cl.object.display_name.try(:humanize)
-                div.col-xs-6.form-group.form-group-lg
-                  div.row.col-xs-12
-                    div.col-xs-3
-                      = cl.number_field :contribution_factor, class: "edit_cl-input-#{cl.object.contribution_unit_id}", value: (cl.object.contribution_factor * 100).to_i, "data" => {"unit-id" => cl.object.contribution_unit_id.to_s},:onchange => "setEditSliderInput(this)"
-                    div.col-xs-9
-                      input.slider class="edit_slider-#{cl.object.contribution_unit_id.to_s}" data-unit-id=cl.object.contribution_unit_id min=0 max=100 step=5 type="range" value=(cl.object.contribution_factor * 100).to_i onchange="setEditNumberInput(this)"
-                      span.slide-label.pull-right
-
-      #referencePlanEdit
-        = f.hidden_field :reference_plan_id, value: f.object.reference_plan_id
-        = render "./ui-components/v1/cards/reference_plan", f: f
-        i.fas.fa-info-circle.mr-1
-        | Your final monthly cost is based on final enrollment.
-        br
-        br
+      = f.hidden_field :product_package_kind, value: f.object.product_package_kind      
+      = render "sponsored_benefit", f: f
       = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
       = link_to "Remove Dental Benefits <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br'
       = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"
@@ -64,15 +21,15 @@
 
 javascript:
 
-  var form = #{@sponsored_benefit_form.to_json.html_safe}
+  // var form = #{@sponsored_benefit_form.to_json.html_safe}
 
-  function setEditSliderInput(element) {
-    document.querySelector(".edit_slider-"+element.dataset.unitId).value = element.value
-  }
+  // function setEditSliderInput(element) {
+  //   document.querySelector(".edit_slider-"+element.dataset.unitId).value = element.value
+  // }
 
-  function setEditNumberInput(element) {
-    document.querySelector(".edit_cl-input-"+element.dataset.unitId).value = element.value
-  }
+  // function setEditNumberInput(element) {
+  //   document.querySelector(".edit_cl-input-"+element.dataset.unitId).value = element.value
+  // }
 
   function setSliderInput(element) {
     document.querySelector(".slider-"+element.dataset.unitId).value = element.value
@@ -82,22 +39,22 @@ javascript:
     document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value
   }
 
-  function showPlanSelection() {
-    document.getElementById("edit_dental_form").classList.add('hidden');
-    var sponsored_benefit_id = `${form.id}`
-    var benefit_package_id = `${form.benefit_package_id}`
-    var benefit_application_id = `${form.benefit_application_id}`
-    var benefit_sponsorship_id = `${form.benefit_sponsorship_id}`
-    var kind = `${form.kind}`
-    var url = "/benefit_sponsors/benefit_sponsorships/"+benefit_sponsorship_id+"/benefit_applications/"+ benefit_application_id +"/benefit_packages/" + benefit_package_id +"/sponsored_benefits/"+sponsored_benefit_id+"/change_reference_product"
-    $.ajax({
-      type: "GET",
-      url: url,
-      data: {
-        kind: kind
-      }
-    })
-  }
+  // function showPlanSelection() {
+  //   document.getElementById("edit_dental_form").classList.add('hidden');
+  //   var sponsored_benefit_id = `${form.id}`
+  //   var benefit_package_id = `${form.benefit_package_id}`
+  //   var benefit_application_id = `${form.benefit_application_id}`
+  //   var benefit_sponsorship_id = `${form.benefit_sponsorship_id}`
+  //   var kind = `${form.kind}`
+  //   var url = "/benefit_sponsors/benefit_sponsorships/"+benefit_sponsorship_id+"/benefit_applications/"+ benefit_application_id +"/benefit_packages/" + benefit_package_id +"/sponsored_benefits/"+sponsored_benefit_id+"/change_reference_product"
+  //   $.ajax({
+  //     type: "GET",
+  //     url: url,
+  //     data: {
+  //       kind: kind
+  //     }
+  //   })
+  // }
 
   function loadSingleProductSponsorContribution(element) {
     document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {

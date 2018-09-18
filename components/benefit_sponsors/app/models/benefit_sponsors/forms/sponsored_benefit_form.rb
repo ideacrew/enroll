@@ -8,7 +8,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :kind, String
       attribute :product_option_choice, String
-      attribute :product_package_kind, String, :default => 'single_product'
+      attribute :product_package_kind, String, default: 'single_product'
       
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
@@ -28,6 +28,8 @@ module BenefitSponsors
       attribute :benefit_application_id, String
       attribute :benefit_sponsorship_id, String
       attribute :sponsored_benefit_id, String # This will be the current SB which we're working on
+
+      attribute :is_new_benefit, Boolean, default: true
 
       attr_accessor :sponsor_contribution, :service, :catalog
 
@@ -66,6 +68,7 @@ module BenefitSponsors
         form = self.new(params)
         form.service = resolve_service(params)
         form.assign_attributes(form.service.find(form.id))
+        form.is_new_benefit = false
         form.service.load_form_meta_data(form)
       end
 

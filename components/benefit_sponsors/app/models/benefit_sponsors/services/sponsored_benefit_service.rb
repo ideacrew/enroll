@@ -13,6 +13,10 @@ module BenefitSponsors
 
       def load_form_meta_data(form)
         form.catalog = sponsor_catalog_decorator_class.new(package.benefit_sponsor_catalog)
+        if sponsored_benefit = find_sponsored_benefit(form.id)
+          load_employer_estimates(form, sponsored_benefit)
+          load_employees_cost_estimates(form, sponsored_benefit)
+        end
         form
       end
 
@@ -79,6 +83,22 @@ module BenefitSponsors
       def organization
         return @organization if defined? @organization
         @organization = profile.organization
+      end
+
+      def load_employer_estimates(form, sponsored_benefit)
+        benefit_package = sponsored_benefit.benefit_package
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        costs = estimator.calculate_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+        form.employer_estimated_monthly_cost = costs.present? ? costs[:estimated_total_cost] : 0.00
+        form.employer_estimated_min_monthly_cost = costs.present? ? costs[:estimated_enrollee_minimum] : 0.00
+        form.employer_estimated_max_monthly_cost = costs.present? ? costs[:estimated_enrollee_maximum] : 0.00
+      end
+
+      def load_employees_cost_estimates(form, sponsored_benefit)
+        benefit_package = sponsored_benefit.benefit_package
+        estimator = ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService.new
+        costs = estimator.calculate_employee_estimates_for_package_edit(benefit_package.benefit_application, sponsored_benefit, sponsored_benefit.reference_product, sponsored_benefit.product_package)
+        form.employees_cost = costs
       end
 
       def calculate_premiums(form)
