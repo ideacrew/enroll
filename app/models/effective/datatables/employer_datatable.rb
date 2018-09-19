@@ -8,6 +8,8 @@ module Effective
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
            bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+           bulk_action 'Disable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'disable'), data: { confirm: 'disable ssn requirement?', no_turbolink: true }
+           bulk_action 'Enable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'enable'), data: { confirm: 'enable ssn requirement?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row|

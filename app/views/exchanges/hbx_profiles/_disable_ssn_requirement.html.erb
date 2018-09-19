@@ -1,8 +1,0 @@
-<% @organizations.each do |organization| %>
-  <%if organization.employer_profile.no_ssn == true%>
-    SSN/TIN requirement has been successfully disabled for the roster of
-  <%else%>
-    SSN/TIN requirement has been successfully enabled for the roster of
-  <%end%>
-  <%=organization.legal_name %>
-<%end%>
