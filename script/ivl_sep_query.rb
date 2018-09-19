@@ -17,7 +17,7 @@ class IvlEnrollmentsPublisher
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
-active_statuses = %w(coverage_selected auto_renewing)
+active_statuses = %w(coverage_selected auto_renewing enrolled_contingent)
 
 purchases = Family.collection.aggregate([
   {"$match" => {
