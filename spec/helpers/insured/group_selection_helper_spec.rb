@@ -296,22 +296,38 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+    let(:primary) { FactoryGirl.create(:person)}
 
     context "#is_market_kind_disabled?" do
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
         context "when user clicked on IVL enrollment" do
+          describe "family with IVL and resident roles" do
+            before do
+              helper.instance_variable_set("@mc_market_kind", "individual")
+              allow(helper).to receive(:can_shop_individual_or_resident?).and_return true
+            end
+
+            it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("shop", primary)).to eq nil
+            end
+
+            it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("individual", primary)).to eq nil
+            end
+
+          end
 
           before do
             helper.instance_variable_set("@mc_market_kind", "individual")
           end
 
           it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
 
@@ -322,16 +338,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
       end
 
       context "when user selected a QLE" do
+        let(:primary) { FactoryGirl.create(:person)}
 
         context "when user selected shop QLE" do
 
@@ -340,11 +357,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
 
@@ -355,11 +372,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the shop market if user selected IVL based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
       end

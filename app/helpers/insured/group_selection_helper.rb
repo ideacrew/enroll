@@ -125,17 +125,19 @@ module Insured
       employee_role.census_employee.renewal_benefit_group_assignment : (benefit_group.plan_year.aasm_state == "expired" && (change_plan == 'change_by_qle' or enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first : employee_role.census_employee.active_benefit_group_assignment
     end
 
-    def is_market_kind_disabled?(kind)
-      if @mc_market_kind.present?
-        @mc_market_kind != kind
-      else
-        @disable_market_kind == kind
+    def is_market_kind_disabled?(kind, primary)
+      unless can_shop_individual_or_resident?(primary)
+        if @mc_market_kind.present?
+          @mc_market_kind != kind
+        else
+          @disable_market_kind == kind
+        end
       end
     end
 
     def is_market_kind_checked?(kind, primary)
       if @mc_market_kind.present?
-       @mc_market_kind == kind
+        @mc_market_kind == kind
       elsif can_shop_individual_or_resident?(primary) && !(primary.has_active_employee_role?)
         kind == "individual"
       elsif primary.is_consumer_role_active? && !(primary.has_active_employee_role?)

@@ -39,7 +39,6 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
-    #binding.pry
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
