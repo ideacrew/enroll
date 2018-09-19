@@ -3,7 +3,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :set_vars_for_market, only: [:new]
-  before_action :convert_individual_members_to_resident, only: [:create]
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
@@ -215,44 +214,6 @@ class Insured::GroupSelectionController < ApplicationController
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
       if hbx_enrollment.present?
         @coverage_family_members_for_cobra = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
-      end
-    end
-  end
-
-  # This method converts active consumers to residents for a household with a family with family member who has a transition to converall
-  def convert_individual_members_to_resident
-    # no need to do anything if shopping in IVL
-    if (params[:market_kind] == "coverall")
-      family = @person.primary_family
-      family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
-        BSON::ObjectId.from_string(family_member_id)
-      end
-      family_member_ids.each do |fm|
-        person = FamilyMember.find(fm).person
-        # Need to create new invididual market transition instance and resident role if none
-        if person.is_consumer_role_active?
-          # Need to terminate current individual market transition and create new one
-          current_transition = person.current_individual_market_transition
-          current_transition.update_attributes!(effective_ending_on: TimeKeeper.date_of_record)
-          # create resident role if it doesn't exist
-          if person.resident_role.nil?
-            #check for primary_person
-            family.build_resident_role(FamilyMember.find(fm), get_values_to_generate_resident_role(person))
-            if (person.id == @person.id)
-              # need to reload db
-              person = Person.find(person.id)
-              person.resident_role.update_attributes!(is_applicant: true)
-            end
-          else
-            transition = IndividualMarketTransition.new
-            transition.role_type = "resident"
-            transition.submitted_at = TimeKeeper.datetime_of_record
-            transition.reason_code = "generating_resident_role"
-            transition.effective_starting_on = TimeKeeper.datetime_of_record
-            person.individual_market_transitions << transition
-            person.save!
-          end
-        end
       end
     end
   end
