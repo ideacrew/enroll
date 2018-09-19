@@ -414,7 +414,7 @@ module BenefitSponsors
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first
+      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck
