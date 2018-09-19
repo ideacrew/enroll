@@ -68,7 +68,7 @@
               </div>
             </td>
             <td colspan="2">
-              <input type="text" class="form-control date py-end-date" style="width:120px"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
+              <input type="text" class="form-control date py-end-date" style="width:120px" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
               <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true  %> TRANSMIT TO CARRIER

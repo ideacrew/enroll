@@ -19,6 +19,15 @@ class PlanYear
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
 
+  VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
+  VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
+
+  NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment"
+  NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment"
+
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
+  INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
+
   # Plan Year time period
   field :start_on, type: Date
   field :end_on, type: Date
@@ -27,6 +36,7 @@ class PlanYear
   field :open_enrollment_end_on, type: Date
 
   field :terminated_on, type: Date
+  field :termination_kind, type: String
 
   field :imported_plan_year, type: Boolean, default: false
 
@@ -143,22 +153,26 @@ class PlanYear
     renewing_plan_year
   end
 
-  def terminate_plan_year(end_on, terminated_on, termination_kind)
+  def terminate_plan_year(end_on, terminated_on, termination_kind, transmit_xml)
     renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
+
     if renewing_plan_year
-      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+      renewing_plan_year.cancel_renewal!(transmit_xml) if renewing_plan_year.may_cancel_renewal?
     end
-    if renewing_plan_year.nil? || (renewing_plan_year.present? && renewing_plan_year.renewing_canceled?)
-      if end_on >= TimeKeeper.date_of_record
-        self.schedule_termination!(end_on) if self.may_schedule_termination?
-      else
-        self.terminate!(end_on) if self.may_terminate?
-        if self.terminated?
-          self.update_attributes!(end_on: end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: termination_kind)
-          self.terminate_employee_enrollments(end_on)
-          self.employer_profile.benefit_terminated!
-        end
+
+    if end_on >= TimeKeeper.date_of_record
+      if self.may_schedule_termination?
+        self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
+        notify_employer_py_terminate(transmit_xml)
       end
+    else
+     if self.may_terminate?
+       self.terminate!(end_on)
+       set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
+       notify_employer_py_terminate(transmit_xml)
+       self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
+       employer_profile.revert_application! if employer_profile.may_revert_application?
+     end
     end
   end
 
@@ -166,21 +180,20 @@ class PlanYear
     py_end_on = args.first
     census_employees_within_play_year.each do |census_employee|
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
-        if assignment.end_on.present? && (assignment.end_on > py_end_on) && assignment.may_terminate_coverage?
-          assignment.update(end_on: py_end_on)
-          assignment.terminate_coverage!
-          assignment.update_attributes!(:is_active => false)
+        if ((assignment.end_on.present? && (assignment.end_on > py_end_on)) || assignment.end_on.blank?)
+          assignment.update_attributes!(end_on: py_end_on)
+          assignment.terminate_coverage! if assignment.may_terminate_coverage?
         end
       end
     end
   end
 
-  def cancel_employee_benefit_packages
+  def cancel_employee_benefit_packages(*args)
     census_employees_within_play_year.each do |census_employee|
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
         if assignment.may_delink_coverage?
           assignment.delink_coverage!
-          assignment.update_attribute(:is_active, false)
+          assignment.update_attributes!(end_on: assignment.plan_year.end_on, is_active: false)
         end
       end
     end
@@ -194,18 +207,27 @@ class PlanYear
     end
   end
 
-  def cancel_employee_enrollments
+  def cancel_employee_enrollments(transmit_xml = false)
     enrollments_for_plan_year.each do |hbx_enrollment|
-      hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
+      if hbx_enrollment.may_cancel_coverage?
+        hbx_enrollment.cancel_coverage!
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml)
+      end
     end
   end
 
-  def terminate_employee_enrollments(py_end_on)
+  def terminate_employee_enrollments(py_end_on, options= {})
     enrollments_for_plan_year.each do |hbx_enrollment|
       if py_end_on < TimeKeeper.date_of_record
-        hbx_enrollment.terminate_coverage!(py_end_on) if hbx_enrollment.may_terminate_coverage?
+        if hbx_enrollment.may_terminate_coverage?
+          hbx_enrollment.terminate_coverage!(py_end_on)
+          hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+        end
       else
-        hbx_enrollment.schedule_coverage_termination!(py_end_on) if hbx_enrollment.may_schedule_coverage_termination?
+        if hbx_enrollment.may_schedule_coverage_termination?
+          hbx_enrollment.schedule_coverage_termination!(py_end_on)
+          hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+        end
       end
       hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
     end
@@ -954,6 +976,7 @@ class PlanYear
     state :expired              # Non-published plans are expired following their end on date
     state :canceled, :after_enter => :update_end_date             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
+    state :termination_pending
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
@@ -1047,7 +1070,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     # Coverage disabled due to non-payment
@@ -1100,7 +1123,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -1114,9 +1137,11 @@ class PlanYear
     end
   end
 
-  def set_plan_year_termination_date(end_on, terminated_on = TimeKeeper.date_of_record)
+  def set_plan_year_termination_date(end_on, options = {})
     self.end_on = end_on
-    self.terminated_on = terminated_on
+    self.terminated_on = options[:terminated_on]
+    self.termination_kind= options[:termination_kind]
+    self.save
   end
 
   def trigger_passive_renewals
@@ -1196,9 +1221,44 @@ class PlanYear
     end
   end
 
+  def notify_cancel_event(transmit_xml = false)
+
+    return unless transmit_xml
+
+    if TimeKeeper.date_of_record < start_on
+      if enrolled? && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      elsif renewing_enrolled? && open_enrollment_completed? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      end
+    else
+      if active?
+        notify_employer_py_cancellation
+      end
+    end
+  end
+
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
+
+  def notify_employer_py_cancellation
+    notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+  end
+
+  def notify_employer_py_terminate(transmit_xml)
+
+    return unless transmit_xml
+    return unless self.termination_pending? || self.terminated?
+
+    if self.termination_kind == "voluntary"
+      notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    end
+
+    if self.termination_kind == "nonpayment"
+      notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+    end
+  end
 
   def log_message(errors)
     msg = yield.first

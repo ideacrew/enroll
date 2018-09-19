@@ -2508,7 +2508,7 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
   let(:new_end_on) { TimeKeeper.date_of_record.prev_day }
 
   before do
-    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment')
+    plan_year.terminate_plan_year(new_end_on, TimeKeeper.date_of_record, 'nonpayment', false)
     plan_year.reload
     benefit_group_assignment1.reload
   end
@@ -2517,28 +2517,24 @@ describe PlanYear, '.terminate_employee_benefit_packages', type: :model, dbclean
     it "should terminate employee benefit group assignments" do
       expect(benefit_group_assignment1.end_on).to eq plan_year.end_on
     end
-
-    it "should deactivate benefit group assignment" do
-      expect(benefit_group_assignment1.is_active).to be_falsey
-    end
   end
 end
 
 describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
 
-  let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-  let(:benefit_group1) { FactoryGirl.create(:benefit_group)}
-  let!(:active_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
-  let!(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let(:benefit_group) { FactoryGirl.build(:benefit_group)}
+  let(:benefit_group1) { FactoryGirl.build(:benefit_group)}
+  let!(:active_plan_year)  { FactoryGirl.create(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
+  let!(:renewal_plan_year)  { FactoryGirl.create(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
   let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
   let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
-  let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let(:active_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: active_plan_year.start_on, benefit_group_id: benefit_group.id)}
+  let(:renewal_benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, start_on: renewal_plan_year.start_on, benefit_group_id: benefit_group1.id)}
+  let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]) }
   let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
   let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
-  let(:active_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group.id]).first}
-  let(:renewal_benefit_group_assignment) {census_employee.benefit_group_assignments.where(:benefit_group_id.in =>[benefit_group1.id]).first}
 
   context 'when initial plan year is canceled' do
 
@@ -2677,7 +2673,6 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   end
 end
 
-
 describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
   let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
@@ -2703,6 +2698,7 @@ describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbcl
     expect(queued_job[:args]).to eq [census_employee.id.to_s, 'renewal_employee_enrollment_confirmation']
   end
 end
+
 describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
 
@@ -2739,10 +2735,9 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
   context 'renewing employer profile' do 
     let!(:employer_profile) {
       create(:employer_with_renewing_planyear, start_on: start_on, 
-        renewal_plan_year_state: aasm_state
+      renewal_plan_year_state: aasm_state
       )
     }
-
     let!(:plan_year) { 
       plan_year = employer_profile.plan_years.where(aasm_state: aasm_state)[0]
       plan_year.workflow_state_transitions.build(from_state: :renewing_draft, to_state: :renewing_enrolling)
@@ -2775,6 +2770,70 @@ describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all
         expect(quiet_period.begin).to eq (quiet_period_begin)
         expect(quiet_period.end).to eq (quiet_period_end)
       end
+    end
+  end
+end
+
+describe "notify_employer_py_voluntary_terminate" do
+  context "notify employer plan year termination " do
+    let!(:plan_year) {FactoryGirl.build(:plan_year, termination_kind: 'voluntary', aasm_state:'terminated')}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
+
+    it "should notify event" do
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_voluntary"})
+      plan_year.send(:notify_employer_py_terminate, true)
+    end
+
+    it "should not notify event" do
+      expect(plan_year).to receive(:notify).exactly(0).times
+      plan_year.send(:notify_employer_py_terminate, false)
+    end
+  end
+end
+
+describe "notify_employer_py_nonpayment_terminate" do
+  context "notify employer plan year termination " do
+    let!(:plan_year) {FactoryGirl.build(:plan_year, termination_kind: "nonpayment", aasm_state:'terminated')}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
+
+    it "should notify event" do
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_nonpayment"})
+      plan_year.send(:notify_employer_py_terminate, true)
+    end
+
+    it "should not notify event" do
+      expect(plan_year).to receive(:notify).exactly(0).times
+      plan_year.send(:notify_employer_py_terminate, false)
+    end
+  end
+end
+
+describe "notify_employer_py_cancellation" do
+  context "notify employer plan year cancellation " do
+    let(:plan_year) {FactoryGirl.build(:plan_year,aasm_state:'active')}
+    let(:renewal_plan_year) {FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.beginning_of_month.next_month, aasm_state:'renewing_enrolled')}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year, renewal_plan_year]) }
+
+    it "should notify event" do
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: plan_year.employer_profile.hbx_id, plan_year_id:plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      plan_year.cancel!(true)
+    end
+
+    it "should not notify event, when renewal plan year canceled and open enrollment not compeleted" do
+      expect(renewal_plan_year).to receive(:notify).exactly(0).times
+      renewal_plan_year.cancel_renewal!(false)
+    end
+
+    it "should notify event, when renewal plan year canceled" do
+      allow(renewal_plan_year).to receive(:open_enrollment_completed?).and_return true
+      allow(renewal_plan_year).to receive(:past_transmission_threshold?).and_return true
+      expect(renewal_plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewal_plan_year.employer_profile.hbx_id, plan_year_id:renewal_plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      renewal_plan_year.cancel_renewal!(true)
+    end
+
+    it "should not notify event" do
+      expect(plan_year).to receive(:notify).exactly(0).times
+      plan_year.revert_renewal!(false)
     end
   end
 end

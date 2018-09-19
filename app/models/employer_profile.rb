@@ -675,7 +675,7 @@ class EmployerProfile
           plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending", :end_on.lt => TimeKeeper.date_of_record)
           plan_years.each do |py|
             py.terminate!(py.end_on)
-            org.employer_profile.benefit_terminated! if py.terminated?
+            org.employer_profile.revert_application! if py.terminated? && org.employer_profile.may_revert_application?
           end
         rescue Exception => e
           Rails.logger.error { "Unable to terminate plan year for #{org.legal_name} due to #{e.inspect}" }

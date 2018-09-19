@@ -250,17 +250,21 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      families = Family.where("households.hbx_enrollments" => {
-        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
-      })
+      begin
+        families = Family.where("households.hbx_enrollments" => {
+                                    :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
+                                })
 
-      enrollments_for_termination = families.inject([]) do |enrollments, family|
-        enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
-                                                                     :terminated_on.lt => as_of_date).to_a
-      end
+        enrollments_for_termination = families.inject([]) do |enrollments, family|
+          enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
+                                                                       :terminated_on.lt => as_of_date).to_a
+        end
 
-      enrollments_for_termination.each do |hbx_enrollment|
-        hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        enrollments_for_termination.each do |hbx_enrollment|
+          hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        end
+      rescue Exception => e
+        Rails.logger.error e.to_s
       end
     end
 
@@ -1360,7 +1364,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :enrolled_contingent, :unverified],
+                         :enrolled_contingent, :unverified, :coverage_expired],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1635,6 +1639,23 @@ class HbxEnrollment
 
   def is_reinstated_enrollment?
     self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
+  end
+
+  def notify_enrollment_cancel_or_termination_event(transmit_flag)
+
+    return unless transmit_flag
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+
+    config = Rails.application.config.acapi
+    notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+            "hbx_enrollment_id" => self.hbx_id,
+            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+            "is_trading_partner_publishable" => transmit_flag
+        }
+    )
   end
 
   private

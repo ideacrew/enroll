@@ -74,7 +74,35 @@ function disableDatePicker() {
 }
 
 function initDatePicker() {
-  $('input.date').datepicker().removeClass('hasDatepicker');
+  $('input.date').datepicker({dateFormat: "mm/dd/yy"})
+}
+
+function validateFormat(element, pyStartOn, pyEndOn) {
+  pyEndDate = element.value;
+  
+  setTimeout(function() {
+    if (element.value.length != 10 || element.value.indexOf("/") != 2) {
+      element.value = "";
+      alert("Please use mm/dd/yyyy format");
+      disableSubmitButton();
+    } else {
+      enableSubmitButton()
+    }
+    start = pyStartOn.split("/");
+    end = pyEndOn.split("/")
+    value = element.value.split("/")
+    startDate = new Date(start[0],start[1],start[2]).setHours(0,0,0,0);
+    endDate = new Date(end[0],end[1],end[2]).setHours(0,0,0,0);
+    currentDate = new Date(value[0],value[1],value[2]).setHours(0,0,0,0);
+    // Checks if date is in range
+    if (currentDate < startDate) {
+      element.value = "";
+      alert("Please select date within Start Date and End Date");
+      disableSubmitButton();
+    } else {
+      enableSubmitButton()
+    }
+  },400);
 }
 
 function enableDatePicker() {
@@ -119,14 +147,6 @@ function terminateValidations() {
   return false;
 }
 
-function dateValidations() {
-  if ($('input.date').val().length != 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function addDatePicker() {
   $('tr.plan-year-actions').each(function() {
     $('input.date').attr('id','datepicker');
@@ -134,11 +154,14 @@ function addDatePicker() {
 }
 
 function validTerminatePy() {
-  if (dateValidations()) {
-    console.log(terminateValidations())
-    enableSubmitButton()
-  } else {
-    console.log("Im Invalid")
+  var endDates = document.querySelectorAll('.py-end-date')
+
+  for (date of endDates) {
+    if (date.value.length > 0) {
+      enableSubmitButton()
+    } else {
+      console.log("Missing Info")
+    }
   }
 }
 
@@ -166,15 +189,21 @@ function pyAction(action, id, employer_id, term_date) {
     hideTerminationRadios();
     enableSubmitButton();
   }
+  // Clears all end dates from previous rows
+  var endDates = document.querySelectorAll('.py-end-date');
+  
+  for (date of endDates) {
+    date.value = "";
+  }
 }
 // You can use the actionSelected here
 function submitPlanActions() {
-  pyEndDate = $('input.py-end-date').val()
   termReason = $('input[name=term_actions]:checked').val()
+  trasmit_to_carrier = $('input[id=trasmit_to_carrier]').is(":checked")
   $.ajax({
     url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
     method: 'PUT',
-    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason }
+    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason, trasmit_to_carrier: trasmit_to_carrier }
   });
 }
 
