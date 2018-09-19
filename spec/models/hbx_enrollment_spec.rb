@@ -863,13 +863,14 @@ describe HbxProfile, "class methods", type: :model do
     let(:date){ TimeKeeper.date_of_record }
     let!(:carrier_profile1) {FactoryGirl.build(:carrier_profile)}
     let!(:carrier_profile2) {FactoryGirl.create(:carrier_profile, organization: organization)}
+    let!(:carrier_profile3) {FactoryGirl.create(:carrier_profile, organization: organization)}
     let!(:organization) { FactoryGirl.create(:organization, legal_name: "CareFirst", dba: "care")}
     let(:plan1){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1) }
     let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
-
+    let(:plan3){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile3) }
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
-
+    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'enrolled_contingent', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
@@ -907,6 +908,14 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
       expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
+    end
+
+    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
+      hbx_enrollment3.effective_on = date - 10.days
+      hbx_enrollment2.effective_on = date + 1.day
+      hbx_enrollment2.move_to_contingent!
+      expect(hbx_enrollment3.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment2.enrolled_contingent?).to be_truthy
     end
 
     it "terminates previous enrollments if both effective on in the future" do
