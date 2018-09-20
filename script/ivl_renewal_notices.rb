@@ -63,7 +63,7 @@ def set_due_date_on_verification_types(family)
         person.consumer_role.save!
       end
     rescue Exception => e
-      puts "Exception in family ID #{primary_person.primary_family.id}: #{e}"
+      puts "Exception in family ID #{family.id}: #{e}"
     end
   end
 end
@@ -88,21 +88,20 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
-      primary_member = members.first.parent.primary_applicant if primary_member.nil?
-      next if primary_member.nil?
-      # next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      primary_subscriber = members.detect{ |m| m["dependent"].upcase == "NO"}
+      primary_person = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person
+      next if primary_person.nil?
+      # next if (primary_subscriber.present? && primary_subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
-      person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
 
-      next if !person.present?
-      enrollments = valid_enrollments(person)
+      next if !primary_person.present?
+      enrollments = valid_enrollments(primary_person)
       next if enrollments.empty?
-      consumer_role = person.consumer_role
+      consumer_role = primary_person.consumer_role
       if consumer_role.present?
         if InitialEvents.include? event
-          family = person.primary_family
+          family = primary_person.primary_family
           set_due_date_on_verification_types(family)
           family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
         end
@@ -111,7 +110,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             subject: event_kind.title,
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
-            person: person,
+            person: primary_person,
             enrollments: enrollments,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
@@ -119,9 +118,9 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         builder.deliver
         csv << [
           ic_number,
-          person.hbx_id,
-          person.first_name,
-          person.last_name
+          primary_person.hbx_id,
+          primary_person.first_name,
+          primary_person.last_name
         ]
       else
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
