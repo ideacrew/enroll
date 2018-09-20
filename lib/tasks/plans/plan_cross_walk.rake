@@ -10,25 +10,27 @@ namespace :xml do
       @previous_year = @current_year - 1
       xml = Nokogiri::XML(File.open(@file_path))
       result = Parser::PlanCrossWalkListParser.parse(xml.root.canonicalize, :single => true)
-      result.crosswalks.each do |row|
-        hios_id_2017 = row.plan_id_2017_hios.squish
-        hios_id_2018 = row.plan_id_2018_hios.squish
-        is_this_plan_catastrophic_or_child_only_plan = row.is_this_plan_catastrophic_or_child_only_plan.squish.downcase
-        hios_id_cat_age_off_2018 = row.plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan
-        new_plans =  Plan.where(hios_id: /#{hios_id_2018}/, active_year: @current_year)
-        cat_age_off_renewal_plan =  Plan.where(hios_id: /#{hios_id_cat_age_off_2018}/, active_year: @current_year, csr_variant_id: "01").first
+      cross_walks = result.to_hash[:crosswalks]
+      cross_walks.each do |row|
+        old_hios_id = row["plan_id_#{@previous_year}_hios".to_sym].squish
+        new_hios_id = row["plan_id_#{@current_year}_hios".to_sym].squish
+        next if new_hios_id.blank?
+        # is_this_plan_catastrophic_or_child_only_plan = row.is_this_plan_catastrophic_or_child_only_plan.squish.downcase
+        # hios_id_cat_age_off_2018 = row.plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan
+        new_plans =  Plan.where(hios_id: /#{new_hios_id}/, active_year: @current_year)
+        # cat_age_off_renewal_plan =  Plan.where(hios_id: /#{hios_id_cat_age_off_2018}/, active_year: @current_year, csr_variant_id: "01").first
         new_plans.each do |new_plan|
           if new_plan.present? && new_plan.csr_variant_id != "00"
-            old_plan = Plan.where(hios_id: /#{hios_id_2017}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
+            old_plan = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
             if old_plan.present?
               old_plan.update(renewal_plan_id: new_plan.id)
-              if cat_age_off_renewal_plan.present? && new_plan.csr_variant_id == "01" && is_this_plan_catastrophic_or_child_only_plan == "yes" && new_plan.coverage_kind == "health"
-                old_plan.update(cat_age_off_renewal_plan_id: cat_age_off_renewal_plan.id)
-                puts "Successfully mapped #{@previous_year} #{old_plan.carrier_profile.legal_name} cat age off plan with hios_id #{old_plan.hios_id} to #{@current_year} #{cat_age_off_renewal_plan.carrier_profile.legal_name} plan_hios_id: #{cat_age_off_renewal_plan.hios_id}"
-              end
+              # if cat_age_off_renewal_plan.present? && new_plan.csr_variant_id == "01" && is_this_plan_catastrophic_or_child_only_plan == "yes" && new_plan.coverage_kind == "health"
+                # old_plan.update(cat_age_off_renewal_plan_id: cat_age_off_renewal_plan.id)
+                # puts "Successfully mapped #{@previous_year} #{old_plan.carrier_profile.legal_name} cat age off plan with hios_id #{old_plan.hios_id} to #{@current_year} #{cat_age_off_renewal_plan.carrier_profile.legal_name} plan_hios_id: #{cat_age_off_renewal_plan.hios_id}"
+              # end
               puts "Old #{@previous_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}"
             else
-              puts "Old #{@previous_year}  plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present."
+              puts "Old #{@previous_year}  plan hios_id #{old_hios_id}-#{new_plan.csr_variant_id} not present."
             end
           end
         end
