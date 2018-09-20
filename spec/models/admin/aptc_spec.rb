@@ -2,7 +2,7 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
-RSpec.describe Admin::Aptc, :type => :model do
+RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
   # Household
