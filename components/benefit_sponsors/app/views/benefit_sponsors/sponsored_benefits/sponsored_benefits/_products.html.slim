@@ -38,15 +38,16 @@
 										br
 
 // view model details
-.modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-	.modal-dialog role="document"
-		.modal-content
-			.modal-header
-				button.close type="button" data-dismiss="modal" aria-label="close" x
-				h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
-			.modal-body
-					tbody#modalSummaryData
-
+modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="close" x
+        h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
+      .modal-body
+        table.table.compare-table style="font-size:11px"
+          tr
+          tbody#modalSummaryData
 			.modal-footer
 				.pull-left
 					a href="/" id="sbcLink" target="_blank"
@@ -61,6 +62,7 @@ javascript:
     var selectedBenefitApplicationID = "#{params[:benefit_application_id]}";
     var selectedBenefitPackageID = "#{params[:benefit_package_id]}";
     var selectedSummaryTitle;
+    var selectedReferencePlanID;
     var refreshPage = false;
     var showLess = false;
 
@@ -80,7 +82,7 @@ javascript:
       selectedSummaryTitle = element.dataset.planTitle;
       selectedReferencePlanID = element.dataset.planId;
       document.getElementById('viewSummaryTitle').innerHTML = selectedSummaryTitle;
-      fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
+      fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
           .then((res) => res.json())
           .then((data) => {
               data[1].map((s) => {
@@ -98,7 +100,7 @@ javascript:
     function showMoreDetails() {
         if (showLess) {
             document.getElementById('modalSummaryData').innerHTML = '';
-            fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
+            fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
                 .then((res) => res.json())
                 .then((data) => {
                     data[1].map((s) => {
@@ -112,7 +114,7 @@ javascript:
                 .then(document.getElementById('btnMoreDetails').innerHTML = "More Details")
             showLess = false;
         } else {
-            fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
+            fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
                 .then((res) => res.json())
                 .then((data) => {
                     data[1].map((s) => {
