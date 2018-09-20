@@ -910,11 +910,5 @@ private
       unset("e_case_id")
     end
   end
-=======
-                                                        :aasm_state => {"$nin" => %w(coverage_canceled shopping coverage_terminated) },
-                                                        :coverage_kind => "health"
-                                                      }
-                                                  })}
->>>>>>> origin
 end
 
