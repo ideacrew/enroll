@@ -9,6 +9,14 @@ module Insured::PlanFilterHelper
     end
   end
 
+
+  def checkbook_integration
+    if @market_kind == "individual"
+      link_to('Checkbook cost Calculator', 'https://staging.checkbookhealth.org/shop/dc', target: '_blank')
+    end
+  end
+
+
   def estimate_your_costs
     if @market_kind == "shop" && @coverage_kind == "health"
       link_to(l10n("estimate_your_costs"), @dc_checkbook_url , target: '_blank')
