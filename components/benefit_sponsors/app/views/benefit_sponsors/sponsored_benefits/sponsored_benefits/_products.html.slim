@@ -85,11 +85,7 @@ javascript:
           .then((res) => res.json())
           .then((data) => {
               data[1].map((s) => {
-                  document.getElementById('sbcLink').setAttribute('href', data[2])
-                  var tr = document.createElement('tr');
-                  var tbody = document.getElementById('modalSummaryData');
-                  tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
-                  tbody.appendChild(tr)
+                  document.getElementById('sbcLink').setAttribute('href', data[2]);
               });
           })
           .then($('#viewSummaryModal').modal('show'))
