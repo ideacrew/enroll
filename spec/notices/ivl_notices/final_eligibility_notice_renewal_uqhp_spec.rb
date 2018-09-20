@@ -33,10 +33,11 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
       :person => person
   }}
 
+  before :each do
+    allow(person.consumer_role).to receive("person").and_return(person)
+  end
+
   describe "New" do
-    before do
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-    end
     context "valid params" do
       it "should initialze" do
         expect{IvlNotices::FinalEligibilityNoticeRenewalUqhp.new(person.consumer_role, valid_parmas)}.not_to raise_error
@@ -55,8 +56,6 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
 
   describe "#pick_enrollments" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeRenewalUqhp.new(person.consumer_role, valid_parmas)
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
       @final_eligibility_notice.append_data
@@ -77,8 +76,6 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
 
   describe "#append_data" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeRenewalUqhp.new(person.consumer_role, valid_parmas)
       @final_eligibility_notice.append_data
     end
@@ -102,8 +99,6 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalUqhp, :dbclean => :after
 
   describe "#generate_pdf_notice" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeRenewalUqhp.new(person.consumer_role, valid_parmas)
     end
 
