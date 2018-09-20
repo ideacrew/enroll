@@ -67,8 +67,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "#pick_enrollments" do
       before do
-        allow(person).to receive("primary_family").and_return(family)
-        allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
         @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
         person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
         @final_eligibility_notice.append_data
@@ -86,11 +84,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-
     describe "#append_data" do
       before do
-        allow(person).to receive("primary_family").and_return(family)
-        allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
         @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
         @final_eligibility_notice.append_data
       end
@@ -114,8 +109,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     describe "#generate_pdf_notice" do
       before do
-        allow(person).to receive("primary_family").and_return(family)
-        allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
         @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
       end
 
