@@ -53,6 +53,22 @@ module Services
       }
       end
 
+      def build_payload_for_individual
+      {
+        "remote_access_key": Settings.individual_checkbook_services.remote_access_key,
+        "reference_id": Settings.individual_checkbook_services.reference_id,
+        "family": {
+          "age": "Integer",
+          "pregnant": "Boolean"
+          "AIAN": "Boolean"
+        },
+        "aptc": "343",
+        "csr": "-01",
+        "enroll_link_without_assistance": "https://enroll.dchealthlink.com/",
+        "enroll_link_with_assistance": "https://enroll.dchealthlink.com/"
+      }
+      end
+
       def employer_effective_date
         benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
         # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
