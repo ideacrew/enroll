@@ -56,7 +56,7 @@
               .col-xs-3.metals
                 .col-xs-12
                   label.container
-                    = kind
+                    = kind.capitalize
                     = f.radio_button :product_option_choice, kind, class: 'product_option_choice', onclick:"getPlanInfo(this)", data: {name: kind}
                     span.checkmark
 
@@ -136,25 +136,23 @@ javascript:
   }
 
   function setCircle(element) {
-    // Adds toggle circle icon to metal level tabs
-    var items = document.querySelectorAll('#metal-level-select ul li');
-    document.getElementById('referencePlans').classList.add('hidden')
-
-    for (item of items) {
-      if (item.querySelector('.fa-dot-circle')) {
-        item.querySelector('.fa-dot-circle').classList.toggle('fa-circle')
-        item.querySelector('a').classList.remove('active')
-      }
-
-      if (item.innerText == element.innerText) {
-        element.querySelector('.fa-circle').classList.toggle('fa-dot-circle')
-        // Gets product option info
-        productOptionKind = element.querySelector('a').dataset.name;
-        // Sets kind to hidden input field for form submission
-        document.getElementById('ppKind').setAttribute('value', productOptionKind)
-        item.querySelector('a').classList.add('active')
-      }
-    }
+		var items = document.querySelectorAll('#metal-level-select ul li')
+	
+		for (item of items) {
+			item.querySelector('i').classList.remove('fa-dot-circle');
+		}
+		// Sets radio icon to selected
+		setTimeout(function() {
+			if (element.closest('li').classList.contains('active')) {
+				element.querySelector('i').classList.add('fa-dot-circle')
+			}
+		},200)
+		
+    // Gets product option info
+    productOptionKind = element.querySelector('a').dataset.name;
+    // Sets kind to hidden input field for form submission
+    document.getElementById('ppKind').setAttribute('value', productOptionKind)
+    document.getElementById('referencePlans').classList.add('hidden');
   }
 
   function getPlanInfo(element) {

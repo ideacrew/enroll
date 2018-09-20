@@ -51,9 +51,8 @@
 				.pull-left
 					a href="/" id="sbcLink" target="_blank"
 						i.far.fa-file-pdf.fa-2x.mr-1
-						| View Coverage
+						| Plan Summary
 				.pull-right
-					button.btn.btn-default.btn-sm#btnMoreDetails type="button" onclick="showMoreDetails()" More Details
 					button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
 
 javascript:
@@ -76,29 +75,29 @@ javascript:
   //   document.getElementById('rpNetwork').append('N/A');
   // }
 
-  function viewSummary(element) {
-      selectedSummaryTitle = element.dataset.planTitle;
-      selectedReferencePlanID = element.dataset.planId;
-      document.getElementById('viewSummaryTitle').innerHTML = selectedSummaryTitle;
-      fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
-          .then((res) => res.json())
-          .then((data) => {
-              data[1].map((s) => {
-                  document.getElementById('sbcLink').setAttribute('href', data[2])
-                  var tr = document.createElement('tr');
-                  var tbody = document.getElementById('modalSummaryData');
-                  tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
-                  tbody.appendChild(tr)
-              });
-          })
-          .then($('#viewSummaryModal').modal('show'))
-      showLess = false
-  }
-
+	function viewSummary(element) {
+	      selectedSummaryTitle = element.dataset.planTitle;
+	      selectedReferencePlanID = element.dataset.planId;
+	      document.getElementById('viewSummaryTitle').innerHTML = selectedSummaryTitle;
+	      fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
+	          .then((res) => res.json())
+	          .then((data) => {
+	              data[1].map((s) => {
+	                  document.getElementById('sbcLink').setAttribute('href', data[2])
+	                  var tr = document.createElement('tr');
+	                  var tbody = document.getElementById('modalSummaryData');
+	                  tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+	                  tbody.appendChild(tr)
+	              });
+	          })
+	          .then($('#viewSummaryModal').modal('show'))
+	      showLess = false
+	  }
+	
     function showMoreDetails() {
         if (showLess) {
             document.getElementById('modalSummaryData').innerHTML = '';
-            fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' + selectedBenefitApplicationID + '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
+            fetch('/benefit_sponsors/benefit_sponsorships/' + selectedBenefitSponsorsID + '/benefit_applications/' +selectedBenefitApplicationID+ '/benefit_packages/' + selectedBenefitPackageID + 'sponsored_benefits/new?kind=dental')
                 .then((res) => res.json())
                 .then((data) => {
                     data[1].map((s) => {
