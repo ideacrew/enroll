@@ -34,16 +34,15 @@ namespace :xml do
             end
           end
         end
-      end
-    end
-
-    plans_2017 = Plan.where(active_year: 2017)
-    plans_2017.each do |old_plan|
-      new_plan = Plan.where(active_year: 2018, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
-      if new_plan.present? && old_plan.renewal_plan_id.nil?
-        old_plan.renewal_plan_id = new_plan.id
-        old_plan.save
-        puts "Old #{old_plan.active_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.active_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}"
+        o_plans = Plan.where(active_year: @previous_year, renewal_plan_id: nil)
+        o_plans.each do |old_plan|
+          new_plan = Plan.where(active_year: @current_year, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
+          if new_plan.present? && old_plan.renewal_plan_id.nil?
+            old_plan.renewal_plan_id = new_plan.id
+            old_plan.save
+            puts "Old #{old_plan.active_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.active_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}"
+          end
+        end
       end
     end
   end
