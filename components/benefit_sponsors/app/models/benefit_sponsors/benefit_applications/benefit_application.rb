@@ -27,7 +27,7 @@ module BenefitSponsors
     IMPORTED_STATES               = [:imported].freeze
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
-
+    TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
     # Deprecated - Use SUBMITTED_STATES
     PUBLISHED_STATES = SUBMITTED_STATES
 
@@ -112,6 +112,7 @@ module BenefitSponsors
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
+    scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)

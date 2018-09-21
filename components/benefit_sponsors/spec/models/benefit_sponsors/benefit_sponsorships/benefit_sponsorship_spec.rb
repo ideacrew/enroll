@@ -455,7 +455,15 @@ module BenefitSponsors
                                                         benefit_sponsorship: benefit_sponsorship,
                                                         recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :imported) }
 
-      context "when employer with imported benefit application" do
+      context "when employer has no benefit application" do
+
+        it "should not return benefit_application" do
+          expect(benefit_sponsorship.most_recent_benefit_application).to eq nil
+        end
+      end
+
+      context "when employer with no benefit application" do
+        before { benefit_sponsorship.benefit_applications = []}
 
         it "should not return benefit_application" do
           expect(benefit_sponsorship.most_recent_benefit_application).to eq nil
