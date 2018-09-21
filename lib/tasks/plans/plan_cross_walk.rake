@@ -34,9 +34,14 @@ namespace :xml do
             end
           end
         end
-        o_plans = Plan.where(active_year: @previous_year, renewal_plan_id: nil)
-        o_plans.each do |old_plan|
-          new_plan = Plan.where(active_year: @current_year, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
+      end
+      # for scenarios where plan cross walk templates were not provided because
+      # there were no plans retired or no new plans present for the renewing year.
+      plan_mapping_hash = { "2017" => "2018", "2018" => "2019" }
+      plan_mapping_hash.each do |previous_year, current_year|
+        old_plans = Plan.where(active_year: previous_year, renewal_plan_id: nil)
+        old_plans.each do |old_plan|
+          new_plan = Plan.where(active_year: current_year, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
           if new_plan.present? && old_plan.renewal_plan_id.nil?
             old_plan.renewal_plan_id = new_plan.id
             old_plan.save
