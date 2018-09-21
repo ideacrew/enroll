@@ -45,7 +45,7 @@ module BenefitSponsors
 
         case the_action
         when "update"
-          ::Importers::Mhc::ConversionEmployerPlanYearUpdate.new(plan_year_attrs)
+          ConversionEmployerPlanYearUpdate.new(plan_year_attrs)
         else
           ConversionEmployerPlanYearCreate.new(plan_year_attrs)
         end

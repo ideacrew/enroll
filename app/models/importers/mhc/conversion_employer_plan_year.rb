@@ -27,7 +27,9 @@ module Importers::Mhc
       :employee_and_one_or_more_dependents_rt_premium,
       :family_rt_offered,
       :family_rt_contribution,
-      :family_rt_premium
+      :family_rt_premium,
+      :employer_domestic_partner_contribution,
+      :employer_child_under_26_contribution
 
     def initialize(opts = {})
       super(opts)
