@@ -63,6 +63,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def disable_ssn_requirement
     @organizations= Organization.where(:id.in => params[:ids]).all
     @organizations.each do |org|
+      # logic for both Bulk Action drop down and action column drop down under data table
       if params[:can_update].present?
         if params[:can_update] == "disable"
           org.employer_profile.update_attributes(no_ssn: true)
