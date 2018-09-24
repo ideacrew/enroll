@@ -9,8 +9,10 @@ class RemoveDependent < MongoidMigrationTask
         puts "No family member found" unless Rails.env.test?
       else
         active_household = family_member.family.active_household
-        if (active_household.coverage_households.map(&:coverage_household_members).flatten.map(&:family_member_id).map(&:to_s) & [id]).present? || (active_household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state".ne => "coverage_canceled").map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s) & [id]).present?
-          puts "you cannot destroy this family member. This member may have Coverage Household Member records or Enrollments" unless Rails.env.test?
+        coverage_household = active_household.coverage_households.where(:is_immediate_family => true).first
+        enrollments = active_household.hbx_enrollments.my_enrolled_plans.where(:"aasm_state".ne => "coverage_canceled")
+        if (coverage_household.coverage_household_members.map(&:family_member_id).map(&:to_s) & [id]).present?|| (enrollments.map(&:hbx_enrollment_members).flatten.uniq.map(&:applicant_id).map(&:to_s) & [id]).present?
+          puts "you cannot remove this family member. This member may have Coverage Household Member records or Enrollments" unless Rails.env.test?
           return
         else
           family_member.destroy!
