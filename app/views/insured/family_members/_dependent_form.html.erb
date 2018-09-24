@@ -100,7 +100,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
+            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"}, required: true %>
           </div>
 
 
