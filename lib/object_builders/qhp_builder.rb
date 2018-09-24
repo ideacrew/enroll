@@ -1,5 +1,5 @@
 class QhpBuilder
-  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
+  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003", "92479DC0020005", "92479DC0010003", "92479DC0010005"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005", "92479DC0020005", "92479DC0010003", "92479DC0010005"]
 
   def initialize(qhp_hash)
@@ -174,7 +174,7 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
-      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
+      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Market: #{plan.market}, Coverage kind: #{plan.coverage_kind}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
   end
