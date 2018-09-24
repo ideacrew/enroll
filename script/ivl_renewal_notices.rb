@@ -21,7 +21,7 @@ begin
     end
   end
 rescue Exception => e
-  puts "Unable to open file #{e}"
+  puts "Unable to open file #{e}" unless Rails.env.test?
 end
 
 field_names = %w(
@@ -46,8 +46,7 @@ def valid_enrollments(person)
   hbx_enrollments << health_enrollments
   hbx_enrollments << dental_enrollments
 
-  hbx_enrollments.flatten!.compact!
-  hbx_enrollments
+  hbx_enrollments.flatten.compact
 end
 
 def set_due_date_on_verification_types(family)
@@ -63,7 +62,7 @@ def set_due_date_on_verification_types(family)
         person.consumer_role.save!
       end
     rescue Exception => e
-      puts "Exception in family ID #{family.id}: #{e}"
+      puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
     end
   end
 end
@@ -128,6 +127,5 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
     rescue Exception => e
       puts "Unable to deliver #{event} notice to family - #{ic_number} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
-
   end
 end
