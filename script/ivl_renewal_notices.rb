@@ -71,6 +71,14 @@ def future_date
   TimeKeeper.date_of_record + 95.days
 end
 
+def get_primary_person(members, subscriber)
+  primary = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person rescue nil
+  return primary if primary.present?
+  subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
+  primary_person = subscriber_person.primary_family ? subscriber_person : subscriber_person.families.first.primary_applicant.person if subscriber_person.present?
+  return primary_person
+end
+
 unless event_kind.present?
   puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
@@ -87,8 +95,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      subscriber = members.detect{ |m| m["dependent"].upcase == "NO"}
-      primary_person = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person
+      subscriber = members.detect{ |m| (m["dependent"] && m["dependent"].upcase == "NO")}
+      primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
       # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
