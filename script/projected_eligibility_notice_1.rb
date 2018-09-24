@@ -30,10 +30,10 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   notice_trigger = event_kind.notice_triggers.first
   @data_hash.each do |family_id , members|
     begin
-      primary_member = members.detect{ |m| m["is_dependent"].upcase == "FALSE"}
+      subscriber = members.detect{ |m| m["is_dependent"].upcase == "FALSE"}
       primary_person = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person rescue nil
       next if primary_person.nil?
-      next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
+      next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"] && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
       next if members.select{ |m| (m["policy.subscriber.person.is_incarcerated"] && m["policy.subscriber.person.is_incarcerated"].upcase == "TRUE")}.present?
       next if (members.any?{ |m| m["policy.subscriber.person.citizen_status"].blank? || (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
       consumer_role = primary_person.consumer_role

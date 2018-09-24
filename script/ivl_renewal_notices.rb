@@ -88,10 +88,10 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      primary_subscriber = members.detect{ |m| m["dependent"].upcase == "NO"}
+      subscriber = members.detect{ |m| m["dependent"].upcase == "NO"}
       primary_person = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person
       next if primary_person.nil?
-      # next if (primary_subscriber.present? && primary_subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
 
