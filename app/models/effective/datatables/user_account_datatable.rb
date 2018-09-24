@@ -58,6 +58,7 @@ module Effective
                     {scope:'all_employee_roles', label: 'Employee', subfilter: :lock_unlock},
                     {scope:'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock},
                     {scope:'all_broker_roles', label: 'Broker', subfilter: :lock_unlock},
+                    {scope:'all_consumer_roles', label: 'Consumer', subfilter: :lock_unlock}
                 ],
             top_scope: :users
         }
