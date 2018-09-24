@@ -30,11 +30,11 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
       :data => data
   }}
 
+  before :each do
+    allow(person.consumer_role).to receive("person").and_return(person)
+  end
 
   describe "New" do
-    before do
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-    end
     context "valid params" do
       it "should initialze" do
         expect{IvlNotices::IvlRenewalNotice.new(person.consumer_role, valid_parmas)}.not_to raise_error
@@ -53,8 +53,6 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
 
   describe "#build" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @proj_eligibility_notice = IvlNotices::IvlRenewalNotice.new(person.consumer_role, valid_parmas)
       @proj_eligibility_notice.build
     end
@@ -79,8 +77,6 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
 
   describe "#append_open_enrollment_data" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @proj_eligibility_notice = IvlNotices::IvlRenewalNotice.new(person.consumer_role, valid_parmas)
       @proj_eligibility_notice.build
     end
@@ -96,8 +92,6 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
 
   describe "#generate_pdf_notice" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @proj_eligibility_notice = IvlNotices::IvlRenewalNotice.new(person.consumer_role, valid_parmas)
     end
 
