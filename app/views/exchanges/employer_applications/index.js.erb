@@ -91,11 +91,11 @@ function validateFormat(element, pyStartOn, pyEndOn) {
     start = pyStartOn.split("/");
     end = pyEndOn.split("/")
     value = element.value.split("/")
-    startDate = new Date(start[0],start[1],start[2]).setHours(0,0,0,0);
-    endDate = new Date(end[0],end[1],end[2]).setHours(0,0,0,0);
-    currentDate = new Date(value[0],value[1],value[2]).setHours(0,0,0,0);
+    startDate = new Date(start[2],start[0]-1,start[1]).setHours(0,0,0,0);
+    endDate = new Date(end[2],end[0]-1,end[1]).setHours(0,0,0,0);
+    currentDate = new Date(value[2],value[0]-1,value[1]).setHours(0,0,0,0);
     // Checks if date is in range
-    if (currentDate < startDate) {
+    if (startDate > currentDate || currentDate > endDate) {
       element.value = "";
       alert("Please select date within Start Date and End Date");
       disableSubmitButton();
