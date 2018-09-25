@@ -7,12 +7,14 @@ namespace :reports do
     desc "Employers with SSN validation disabled"
     task :employers_with_ssn_validation_disabled => :environment do
 
-      employers = Organization.exists(employer_profile: true).where(:"employer_profile.no_ssn" => true)
+      employers = Organization.exists(employer_profile: true).not_in(:"employer_profile.disable_ssn_date" => nil)
 
       field_names  = %w(
           employer_legal_name
           hbx_id
           fein
+          disable_ssn_date
+          enable_ssn_date
         )
 
         processed_count = 0
@@ -26,8 +28,9 @@ namespace :reports do
             csv << [
                 employer.legal_name,
                 employer.hbx_id,
-                employer.fein
-
+                employer.fein,
+                employer.employer_profile.disable_ssn_date,
+                employer.employer_profile.enable_ssn_date
             ]
           end
           processed_count += 1
