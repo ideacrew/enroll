@@ -71,11 +71,29 @@ def future_date
   TimeKeeper.date_of_record + 95.days
 end
 
+def get_family(dependents)
+  dep_families = dependents.inject({}) do |dep_families, dependent|
+    dep_families[dependent] = get_families_for(dependent).pluck(:id)
+  end rescue nil
+  family_ids = dep_families.values.inject(:&)
+  Family.find(family_ids.first.to_s) if family_ids.count == 1
+end
+
+def get_families_for(dependent)
+  Person.where(:hbx_id => dependent["member_id"]).first.families
+end
+
 def get_primary_person(members, subscriber)
-  primary = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person rescue nil
-  return primary if primary.present?
+  primary_person = (HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person) rescue nil
+  return primary_person if primary_person
   subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
-  primary_person = subscriber_person.primary_family ? subscriber_person : subscriber_person.families.first.primary_applicant.person if subscriber_person.present?
+  primary_person = (subscriber_person if subscriber_person.primary_family) rescue nil
+  return primary_person if primary_person
+  primary_person = Family.where(e_case_id: members.first["policy.id"]).first.primary_person rescue nil
+  return primary_person if primary_person
+  primary_person = get_family(members).primary_person rescue nil
+  return primary_person if primary_person
+  primary_person = subscriber_person.families.first.primary_applicant.person rescue nil
   return primary_person
 end
 
