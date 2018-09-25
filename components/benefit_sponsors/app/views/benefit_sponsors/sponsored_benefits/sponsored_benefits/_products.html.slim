@@ -30,8 +30,12 @@
 										span.rp-plan-info.ml-1
 											= product.metal_level_kind
 										br
-										span.plan-label Network: 
-										span.rp-plan-info
+                                        span.plan-label Network:
+                                        span.rp-plan-info
+                                          - if product.network_information.present?
+                                            a data-toggle="tooltip" title="#{product.network_information}"
+                                                i.fas.fa-question-circle
+                                                = "NETWORK NOTES"
 										br
 										span.plan-label.mt-1.rp-view-summary onclick="viewSummary(this)" data-plan-title=product.title data-plan-id=product.id View Summary
 										br
