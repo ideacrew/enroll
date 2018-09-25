@@ -28,8 +28,9 @@ module Importers::Mhc
       :family_rt_offered,
       :family_rt_contribution,
       :family_rt_premium,
-      :employer_domestic_partner_contribution,
-      :employer_child_under_26_contribution
+      :employer_domestic_partner_rt_contribution,
+      :employer_child_under_26_rt_contribution,
+      :sponsored_benefit_kinds
 
     def initialize(opts = {})
       super(opts)
@@ -37,6 +38,10 @@ module Importers::Mhc
 
     def plan_selection=(val)
       @plan_selection = val.to_s.parameterize('_')
+    end
+
+    def carrier=(val)
+      @carrier = self.class::CARRIER_MAPPING[val]
     end
 
     def validate_reference_plan

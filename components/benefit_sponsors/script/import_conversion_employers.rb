@@ -11,7 +11,7 @@ module BenefitSponsors
         result_file = File.open(File.join(Rails.root, "conversion_employer_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
 
         # get site key from new model
-        unless Settings.site.key == :mhc
+        unless BenefitSponsors::Site.by_site_key(:cca).present?
           importer = BenefitSponsors::Importers::Mhc::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])
         else
           importer = ::Importers::ConversionEmployerSet.new(in_file, result_file, config["conversions"]["employer_profile_date"])

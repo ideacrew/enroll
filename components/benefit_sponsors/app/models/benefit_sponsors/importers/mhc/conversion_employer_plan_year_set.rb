@@ -11,6 +11,7 @@ module BenefitSponsors
         @plan_year_end = config["conversions"]["plan_year_end_date"]
         @mid_year_conversion = config["conversions"]["mid_year_conversion"]
         @orginal_plan_year_begin_date = config["conversions"]["orginal_plan_year_begin_date"]
+        @sponsored_benefit_kinds = config["conversions"]["sponsored_benefit_kinds"]
       end
 
       def recalc_plan_year_dates_from_sheet(coverage_start_date)

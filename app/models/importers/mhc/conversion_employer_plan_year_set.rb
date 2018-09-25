@@ -44,10 +44,10 @@ module Importers::Mhc
      ]
 
        # different headers for health and dental
-      @sponsored_benefit = ["health"]  if @sponsored_benefit.nil?
-      sponsored_headers = @sponsored_benefit.include? "dental" ? dental_benefit_headers : health_benefit_headers
+      @sponsored_benefit_kinds ||=["health"]
+      sponsored_headers = (@sponsored_benefit_kinds.include? "dental") ? dental_benefit_headers : health_benefit_headers
 
-      combined_headers = common_headers.push sponsored_headers.flatten!
+      combined_headers =(common_headers.push sponsored_headers).flatten!
 
       combined_headers
     end
@@ -124,9 +124,9 @@ module Importers::Mhc
       :single_plan_hios_id
       ]
 
-      @sponsored_benefit = ["health"]  if @sponsored_benefit.nil?
-      sponsored_mapping = @sponsored_benefit.include? "dental" ? dental_benefit_mapping : health_benefit_mapping
-      combined_mapping = common_mapping.push sponsored_mapping.flatten!
+      @sponsored_benefit_kinds ||=["health"]
+      sponsored_mapping = (@sponsored_benefit_kinds.include? "dental") ? dental_benefit_mapping : health_benefit_mapping
+      combined_mapping = (common_mapping.push sponsored_mapping).flatten!
       combined_mapping
     end
 
@@ -135,8 +135,8 @@ module Importers::Mhc
       [
          :employee_only_rt_contribution,
          :employee_and_spouse_rt_contribution,
-         :employer_domestic_partner_contribution,
-         :employer_child_under_26_contribution
+         :employer_domestic_partner_rt_contribution,
+         :employer_child_under_26_rt_contribution
       ]
     end
 
