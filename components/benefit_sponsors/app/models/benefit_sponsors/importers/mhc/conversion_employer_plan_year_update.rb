@@ -3,13 +3,10 @@ module BenefitSponsors
     class ConversionEmployerPlanYearUpdate < ConversionEmployerPlanYear
 
       def save
-        return unless self.valid?
-        sponsored_benefit = build_sponsored_benefit
-      end
-
-      def build_sponsored_benefit
+        return false unless self.valid?
         benefit_package = find_benefit_package
-        BenefitSponsors::SponsoredBenefits::SponsoredBenefitFactory.call(benefit_package, sanitized_sponsored_benefit_params)
+        sponsored_benefit =  BenefitSponsors::SponsoredBenefits::SponsoredBenefitFactory.call(benefit_package, sanitized_sponsored_benefit_params)
+        return true if sponsored_benefit.save && benefit_package.save
       end
 
       def sanitized_sponsored_benefit_params
