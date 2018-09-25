@@ -1,3 +1,4 @@
+# sponsored benefit kinds attributes holds type of sponsored benefit wants to add to employer and employee
 conversions:
   plan_year_date: 2018-04-01
   employer_profile_date: 2018-01-01
@@ -8,3 +9,4 @@ conversions:
   mid_year_conversion: true
   orginal_plan_year_begin_date: 2017-09-01
   plan_year_end_date: 2018-08-31
+  sponsored_benefit_kinds: ["dental"]

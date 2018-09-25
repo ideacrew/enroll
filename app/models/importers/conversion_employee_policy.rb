@@ -209,12 +209,15 @@ module Importers
           return false
         end
 
-        cancel_other_enrollments_for_bga(bga)
+        sponsored_benefit_kind = @sponsored_benefit.include? "health" ? 'health' : 'dental'
+
+        cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
         house_hold = family.active_household
         coverage_household = house_hold.immediate_family_coverage_household
 
         benefit_package   = bga.benefit_package
-        sponsored_benefit = benefit_package.sponsored_benefit_for('health')
+
+        sponsored_benefit = benefit_package.sponsored_benefit_for(sponsored_benefit_kind)
         # for regular conversions we are setting flag to true and mid_year_conversions to false
         set_external_enrollments = @mid_year_conversion ? false : true
 
@@ -242,7 +245,7 @@ module Importers
 
         en_attributes = {
           aasm_state: en.effective_on > TimeKeeper.date_of_record ? "coverage_selected" : "coverage_enrolled",
-          coverage_kind: 'health'
+          coverage_kind: sponsored_benefit_kind
         }
 
         unless employer.is_a?(EmployerProfile)
@@ -262,8 +265,10 @@ module Importers
       end
     end
 
-    def cancel_other_enrollments_for_bga(bga)
-      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
+    def cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
+      all_enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
+      enrollments = all_enrollments.select { |enrollment| enrollment.coverage_kind == sponsored_benefit_kind }
+
       enrollments.each do |en|
         en.hbx_enrollment_members.each do |hen|
            hen.coverage_end_on = hen.coverage_start_on

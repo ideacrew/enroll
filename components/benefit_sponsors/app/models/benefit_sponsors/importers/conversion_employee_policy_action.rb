@@ -105,10 +105,13 @@ module BenefitSponsors
         # active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
         return [] if benefit_application.blank?
 
-        family.active_household.hbx_enrollments.where({
+        hbx_enrollments = family.active_household.hbx_enrollments.where({
                                                           :benefit_sponsorship_id => sponsor_ship.id,
                                                           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
                                                       })
+        sponsored_benefit_kind = @sponsored_benefit.include? "health" ? "health" : "dental"
+
+        hbx_enrollments.by_coverage_kind(sponsored_benefit_kind)
       end
     end
   end
