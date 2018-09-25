@@ -292,6 +292,24 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "#disable_ssn_requirement" do
+    subject   {xhr :post, :disable_ssn_requirement, {ids: [organization.id]} ,  format: :js}
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+
+    before :each do
+      sign_in(user)
+    end
+
+    it "renders the 'employer index' template" do
+      expect(employer_profile.no_ssn).to be_falsy
+      expect(subject).to redirect_to employer_invoice_exchanges_hbx_profiles_path
+      expect(employer_profile.reload.no_ssn).to be_truthy
+    end
+  end
+
   describe "GET employer index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
@@ -382,7 +400,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "GET verifications_index_datatable" do
 
     let(:user) { double("User", :has_hbx_staff_role? => true)}
-    
+
     before :each do
       sign_in(user)
     end

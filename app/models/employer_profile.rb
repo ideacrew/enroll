@@ -32,6 +32,8 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  field :no_ssn, type: Boolean, default: false
+
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
@@ -167,6 +169,10 @@ class EmployerProfile
     return @broker_agency_profile if defined? @broker_agency_profile
     @broker_agency_profile = active_broker_agency_account.broker_agency_profile if active_broker_agency_account.present?
   end
+
+  # def is_ssn_disabled?
+  #   no_ssn
+  # end
 
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
