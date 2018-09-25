@@ -39,7 +39,7 @@ namespace :conversion_import do
         end
 
         applications  = [benefit_application.fte_count, probation_kind]
-        csv << ["Add",
+        csv << ["Update",
                 organization.fein,
                 organization.dba,
                 organization.legal_name,
@@ -103,7 +103,7 @@ namespace :conversion_import do
         dependents.push dependent.send(attr)
       end
       # for dependents email, phone columns
-      dependents.push ("","")
+      dependents.push("","")
 
       %w(address_1 address_2 city state zip).each do |attr|
         if dependent.address
@@ -186,7 +186,7 @@ namespace :conversion_import do
     [primary_office_location, mailing_office_location]
   end
 
-  def find_staff_role(organization)
+  def find_staff_roles(organization)
     organization.employer_profile.staff_roles.select{|person| person.emails.present? && person.phones.present?}
   end
 
