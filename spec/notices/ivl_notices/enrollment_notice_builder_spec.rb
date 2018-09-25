@@ -13,18 +13,19 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
                             :mpi_indicator => 'IVL_ENR',
                             :title => "Enrollment notice"})
                           }
-    let(:valid_params) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:valid_params) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+
+  before do
+    allow(person.consumer_role).to receive_message_chain("person").and_return(person)
+  end
 
   describe "New" do
-    before do
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
-    end
     context "valid params" do
       it "should initialze" do
         expect{IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)}.not_to raise_error
@@ -43,8 +44,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "Build" do
     before :each do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
       bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
       @eligibility_notice.build
@@ -110,8 +109,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "min_notice_due_date", dbclean: :after_each do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
@@ -159,8 +156,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "#attach_required_documents" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
@@ -196,8 +191,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "render template and generate pdf" do
     before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
