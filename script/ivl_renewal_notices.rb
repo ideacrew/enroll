@@ -89,7 +89,7 @@ def get_primary_person(members, subscriber)
   subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
   primary_person = (subscriber_person if subscriber_person.primary_family) rescue nil
   return primary_person if primary_person
-  primary_person = Family.where(e_case_id: members.first["policy.id"]).first.primary_person rescue nil
+  primary_person = Family.where(e_case_id: members.first["ic_number"]).first.primary_person rescue nil
   return primary_person if primary_person
   primary_person = get_family(members).primary_person rescue nil
   return primary_person if primary_person
