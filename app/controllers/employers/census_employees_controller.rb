@@ -4,7 +4,7 @@ class Employers::CensusEmployeesController < ApplicationController
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
-    @census_employee = build_census_employee
+    @census_employee = build_census_employee(@employer_profile.try(:id))
     @no_ssn = @employer_profile.no_ssn || false
 
     if @no_ssn
@@ -298,11 +298,12 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee = CensusEmployee.find(id)
   end
 
-  def build_census_employee
+  def build_census_employee(employer_profile_id = nil)
     @census_employee = CensusEmployee.new
     @census_employee.build_address
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
+    @census_employee.employer_profile_id = employer_profile_id
     @census_employee
   end
   private
