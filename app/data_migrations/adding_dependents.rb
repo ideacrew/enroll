@@ -21,7 +21,7 @@ class AddingDependents < MongoidMigrationTask
         puts "Person record created for row #{index}." unless Rails.env.test?
         family_member = FamilyMember.new(person_id: person.id)
         if family.family_members <<  family_member
-          puts "Dependent added for family with family member id: #{family_member.id}"
+          puts "Dependent added for family with family member id: #{family_member.id}" unless Rails.env.test?
         end
       else
         puts person.errors.full_messages
