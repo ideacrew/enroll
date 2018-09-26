@@ -13,6 +13,7 @@ $(document).on('click', '#hide-detail-comparisons', hideDetailComparisons);
 $(document).on('click', '.plan-type-filters .plan-search-option', sortPlans);
 
 $(document).on('submit', '#new_forms_plan_design_proposal', preventSubmitPlanDesignProposal);
+$(document).on('click', '#AddDentalToPlanDesignProposal', AddDentalToPlanDesignProposal);
 $(document).on('click', '#reviewPlanDesignProposal', saveProposalAndNavigateToReview);
 $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#copyPlanDesignProposal', saveProposalAndCopy);
@@ -468,6 +469,11 @@ function saveProposalAndPublish(event) {
       });
     });
   }
+}
+
+function AddDentalToPlanDesignProposal(event) {
+  var url = $("#add_dental_url").val()
+  window.location.href = url
 }
 
 function saveProposalAndNavigateToReview(event) {
