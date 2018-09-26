@@ -88,6 +88,25 @@ describe ConsumerRole, dbclean: :after_each do
       end
     end
   end
+
+  context "for dc_residency_status_under_18" do
+    let!(:person100) { FactoryGirl.create(:person, :with_consumer_role) }
+
+    it "" do
+      person100.consumer_role.update_attributes!(is_state_resident: nil)
+      expect(person100.consumer_role.dc_residency_status_under_18).to eq "attested"
+    end
+
+    it "" do
+      person100.consumer_role.update_attributes!(is_state_resident: true)
+      expect(person100.consumer_role.dc_residency_status_under_18).to eq "verified"
+    end
+
+    it "" do
+      person100.consumer_role.update_attributes!(residency_rejected: true, is_state_resident: false)
+      expect(person100.consumer_role.dc_residency_status_under_18).to eq "outstanding"
+    end
+  end
 end
 
 describe "#find_document" do

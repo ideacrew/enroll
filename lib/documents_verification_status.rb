@@ -24,6 +24,7 @@ module DocumentsVerificationStatus
             "outstanding"
           end
         when 'DC Residency'
+          return consumer.dc_residency_status_under_18 if (consumer.is_a?(ConsumerRole) && consumer.person.is_person_less_or_equal_to_18?)
           if consumer.residency_verified?
             consumer.residency_attested? ? "attested" : "verified"
           elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected

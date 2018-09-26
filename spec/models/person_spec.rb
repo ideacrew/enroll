@@ -1365,4 +1365,17 @@ describe Person do
       end
     end
   end
+
+  context "is_person_less_or_equal_to_18?" do
+    let!(:person100) { FactoryGirl.create(:person, dob: (TimeKeeper.date_of_record - 10.days)) }
+
+    it "should return true as the person's age is equal/below 18" do
+      expect(person100.is_person_less_or_equal_to_18?).to eq true
+    end
+
+    it "should return false as the person's age is above 18" do
+      person100.update_attributes!(dob: (TimeKeeper.date_of_record - 20.years))
+      expect(person100.is_person_less_or_equal_to_18?).to eq false
+    end
+  end
 end

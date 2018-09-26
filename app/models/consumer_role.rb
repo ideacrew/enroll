@@ -691,6 +691,12 @@ class ConsumerRole
     end
   end
 
+  def dc_residency_status_under_18
+    return "attested" if is_state_resident.nil?
+    return "verified" if is_state_resident
+    return "outstanding" if residency_rejected
+  end
+
   private
   def notify_of_eligibility_change(*args)
     CoverageHousehold.update_individual_eligibilities_for(self)

@@ -64,7 +64,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "outstanding", "Immigration status", true, "review", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", false, false
       it_behaves_like "verification type status", "outstanding", "DC Residency", true, "review", false, false
-      it_behaves_like "verification type status", "valid", "DC Residency", true, "attested", false, false, Date.new(2005,11,10)
+      it_behaves_like "verification type status", "valid", "DC Residency", true, "verified", false, false, Date.new(2005,11,10)
       it_behaves_like "verification type status", "valid", "DC Residency", true, "verified", false, false
       it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
     end

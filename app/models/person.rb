@@ -890,6 +890,10 @@ class Person
     end
   end
 
+  def is_person_less_or_equal_to_18?
+    age_on(TimeKeeper.date_of_record) <= 18
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
