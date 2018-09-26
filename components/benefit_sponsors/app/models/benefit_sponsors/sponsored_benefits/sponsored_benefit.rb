@@ -36,7 +36,7 @@ module BenefitSponsors
       validate :product_package_exists
 #      validates_presence_of :sponsor_contribution
 
-      default_scope { where(:source_kind => :benefit_sponsor_catalog) }
+      default_scope { where(:source_kind.ne => :conversion) }
 
       def product_package_exists
         if product_package.blank? && source_kind == :benefit_sponsor_catalog
