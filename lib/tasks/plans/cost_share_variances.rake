@@ -1,11 +1,18 @@
 namespace :serff do
   desc "Update cost share variances for assisted"
-  task :update_cost_share_variances => :environment do
+  task :update_cost_share_variances, [:year] => :environment do |task, args|
 
     puts "*"*80
     puts "updating cost_share_variances"
+    year = args[:year]
 
-    Plan.individual_market.each do |plan|
+    plans = if year.present?
+      Plan.individual_market.by_active_year(year)
+    else
+      Plan.individual_market
+    end
+
+    plans.each do |plan|
       qhp = Products::Qhp.where(active_year: plan.active_year, standard_component_id: plan.hios_base_id).first
       if qhp.present?
         hios_id = plan.coverage_kind == "dental" ? (plan.hios_id + "-01") : plan.hios_id
