@@ -40,5 +40,4 @@ class Family
                                                         :coverage_kind => "health"
                                                       }
                                                   })}
-
 end

@@ -43,4 +43,3 @@ describe ActivateBenefitGroupAssignment do
     end
   end
 end
-

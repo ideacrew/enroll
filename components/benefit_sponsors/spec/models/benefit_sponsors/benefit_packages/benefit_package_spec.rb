@@ -389,5 +389,30 @@ module BenefitSponsors
         end
       end
     end
+
+    describe '.reinstate_canceled_member_benefits' do
+
+      context 'when application got canceled due to ineligble state' do
+
+
+        context 'given employee coverages got canceled after application cancellation' do 
+
+          it 'should reinstate their canceled coverages' do 
+          end
+        end
+
+        context 'given employee coverages got canceled before application cancellation' do
+
+          it 'should not reinstate their canceled coverages' do 
+          end 
+        end
+      end
+
+      context 'when application not canceled due to ineligble state' do 
+
+        it 'should not process any reinstatements on enrollments' do 
+        end
+      end
+    end
   end
 end
