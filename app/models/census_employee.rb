@@ -189,6 +189,10 @@ class CensusEmployee < CensusMember
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
   end
 
+  def is_no_ssn_allowed?
+    employer_profile.try(:no_ssn) == true ? true : false
+  end
+
   # This performs employee summary count for waived and enrolled in the latest plan year
   def perform_employer_plan_year_count
     if plan_year = self.employer_profile.latest_plan_year
@@ -896,7 +900,7 @@ class CensusEmployee < CensusMember
     if !new_ssn.blank?
       write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
     else
-      if new_ssn.blank? && employer_profile.no_ssn == true
+      if new_ssn.blank? && is_no_ssn_allowed?
         write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
       else
         unset_sparse("encrypted_ssn")
