@@ -56,7 +56,7 @@ module BenefitSponsors
         benefit_application = employer.active_benefit_application
         benefit_package = benefit_application.benefit_packages.first
         benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
-          sponsored_benefit.product_kind == @sponsored_benefit_kind
+          sponsored_benefit.product_kind == sponsored_benefit_kind
         }
       end
 

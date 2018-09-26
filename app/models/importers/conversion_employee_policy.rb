@@ -217,7 +217,7 @@ module Importers
 
 
         sponsored_benefit = benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
-          sponsored_benefit.product_kind == @sponsored_benefit_kind
+          sponsored_benefit.product_kind == sponsored_benefit_kind
         }
 
         # for regular conversions we are setting flag to true and mid_year_conversions to false
@@ -247,7 +247,7 @@ module Importers
 
         en_attributes = {
           aasm_state: en.effective_on > TimeKeeper.date_of_record ? "coverage_selected" : "coverage_enrolled",
-          coverage_kind: @sponsored_benefit_kind
+          coverage_kind: sponsored_benefit_kind
         }
 
         unless employer.is_a?(EmployerProfile)

@@ -19,7 +19,7 @@ module BenefitSponsors
         when "delete"
           ::Importers::ConversionEmployeePolicyDelete.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
         else
-          BenefitSponsors::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year}))
+          BenefitSponsors::Importers::ConversionEmployeePolicyAction.new(record_attrs.merge({:default_policy_start => @default_policy_start, :plan_year => @plan_year, :sponsored_benefit_kind => @sponsored_benefit_kind}))
         end
       end
     end
