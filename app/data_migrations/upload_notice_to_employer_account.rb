@@ -22,6 +22,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
 
   def upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)
     doc_uri = upload_to_amazonS3(notice_path)
+    raise "Unable to generate the doc_uri for notice: #{notice_title} to #{employer_profile.legal_name}'s account" unless doc_uri
     notice  = create_recipient_document(employer_profile, doc_uri, notice_title)
     create_secure_inbox_message(employer_profile, notice, notice_subject)
   end

@@ -16,7 +16,6 @@ describe UploadNoticeToEmployerAccount, dbclean: :after_each do
     allow(ENV).to receive(:[]).with('fein').and_return(organization.fein)
     allow(ENV).to receive(:[]).with('notice_name').and_return('Special Enrollment Denial Notice')
     allow(ENV).to receive(:[]).with('file_path').and_return(file_path)
-    allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
   end
 
   context "given a task name" do
@@ -27,6 +26,7 @@ describe UploadNoticeToEmployerAccount, dbclean: :after_each do
 
   context "upload notice" do
     it "should save notice as documents under employer profile" do
+      allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
       expect(employer_profile.documents.size).to eq 0
       subject.migrate
       employer_profile.reload
@@ -36,10 +36,20 @@ describe UploadNoticeToEmployerAccount, dbclean: :after_each do
 
   context "create_secure_inbox_message" do
     it "should send secure inbox message to employer account" do
+      allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
       expect(employer_profile.inbox.messages.size).to eq 0
       subject.migrate
       employer_profile.reload
       expect(employer_profile.inbox.messages.size).to eq 1
+    end
+  end
+
+  context "for a case when doc_uri is nil" do
+    it "should not send secure inbox message to employer account when the pdf is not uploaded to S3 instead should raise error" do
+      allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(nil)
+      expect(employer_profile.inbox.messages.size).to eq 0
+      expect{subject.migrate}.to raise_error(RuntimeError, /Unable to generate the doc_uri for notice: SpecialEnrollmentDenialNotice to #{employer_profile.legal_name}'s account/)
+      expect(employer_profile.inbox.messages.size).to eq 0
     end
   end
 end
