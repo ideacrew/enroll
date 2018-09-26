@@ -10,7 +10,7 @@ module BenefitSponsors
         @out_stream = o_stream
         @out_csv = CSV.new(o_stream)
         @dependents = config["conversions"]["number_of_dependents"]
-        @sponsored_benefit = config["conversions"]["sponsored_benefit_kinds"]
+        @sponsored_benefit = config["conversions"]["sponsored_benefit_kind"]
       end
 
       def create_model(record_attrs)

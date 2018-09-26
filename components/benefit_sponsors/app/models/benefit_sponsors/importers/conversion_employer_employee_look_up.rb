@@ -17,6 +17,10 @@ module BenefitSponsors
         benefit_application = employer_profile.benefit_applications.first
         benefit_application.benefit_packages.first
       end
+
+      def find_product
+        BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+      end
     end
   end
 end

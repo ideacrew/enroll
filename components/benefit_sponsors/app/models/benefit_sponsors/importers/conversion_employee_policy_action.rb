@@ -109,7 +109,7 @@ module BenefitSponsors
                                                           :benefit_sponsorship_id => sponsor_ship.id,
                                                           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
                                                       })
-        sponsored_benefit_kind = @sponsored_benefit.include? "health" ? "health" : "dental"
+        sponsored_benefit_kind = (@sponsored_benefit == :health) ? "health" : "dental"
 
         hbx_enrollments.by_coverage_kind(sponsored_benefit_kind)
       end

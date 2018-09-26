@@ -44,8 +44,8 @@ module Importers::Mhc
      ]
 
        # different headers for health and dental
-      @sponsored_benefit_kinds ||=["health"]
-      sponsored_headers = (@sponsored_benefit_kinds.include? "dental") ? dental_benefit_headers : health_benefit_headers
+      @sponsored_benefit_kind ||= :health
+      sponsored_headers = (@sponsored_benefit_kind == :dental) ? dental_benefit_headers : health_benefit_headers
 
       combined_headers =(common_headers.push sponsored_headers).flatten!
 
@@ -124,8 +124,8 @@ module Importers::Mhc
       :single_plan_hios_id
       ]
 
-      @sponsored_benefit_kinds ||=["health"]
-      sponsored_mapping = (@sponsored_benefit_kinds.include? "dental") ? dental_benefit_mapping : health_benefit_mapping
+      @sponsored_benefit_kind ||= :health
+      sponsored_mapping = (@sponsored_benefit_kind ==  :dental) ? dental_benefit_mapping : health_benefit_mapping
       combined_mapping = (common_mapping.push sponsored_mapping).flatten!
       combined_mapping
     end

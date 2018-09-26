@@ -6,6 +6,8 @@ module BenefitSponsors
         return false unless self.valid?
         benefit_package = find_benefit_package
         sponsored_benefit =  BenefitSponsors::SponsoredBenefits::SponsoredBenefitFactory.call(benefit_package, sanitized_sponsored_benefit_params)
+        product_id = find_product.id
+        sponsored_benefit.update_attributes(source_kind: :conversion, reference_plan_id: product_id)
         return true if sponsored_benefit.save && benefit_package.save
       end
 
@@ -14,7 +16,6 @@ module BenefitSponsors
             :kind => "dental",
             :product_option_choice => find_carrier.id,
             :product_package_kind => "single_product",
-            :reference_plan_id => "",
             :sponsor_contribution_attributes =>
                 {:contribution_levels_attributes => formed_params_for_contribution_levels}
         }

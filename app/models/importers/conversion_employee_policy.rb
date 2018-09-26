@@ -209,7 +209,7 @@ module Importers
           return false
         end
 
-        sponsored_benefit_kind = @sponsored_benefit.include? "health" ? 'health' : 'dental'
+        sponsored_benefit_kind = (@sponsored_benefit == :health) ? 'health' : 'dental'
 
         cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
         house_hold = family.active_household

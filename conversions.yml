@@ -9,4 +9,4 @@ conversions:
   mid_year_conversion: false
   orginal_plan_year_begin_date: 2017-09-01
   plan_year_end_date: 2018-08-31
-  sponsored_benefit_kinds: ["dental"]
+  sponsored_benefit_kind: :dental
