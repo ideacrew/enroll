@@ -160,6 +160,7 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2017_seed')
 system "bundle exec rake import:benefit_package_2018"
+system "bundle exec rake migrations:import_2019_ivl_benefit_package"
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80
