@@ -7,6 +7,9 @@ module SponsoredBenefits
         plan_design_form.build_benefit_group
       end
 
+      def add_dental
+      end
+
       private
       helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group
 
