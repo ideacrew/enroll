@@ -41,9 +41,11 @@ module BenefitSponsors
         clean_hios = hios_id.strip
         corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
         sponsor_benefit = find_sponsor_benefit
+
         if sponsor_benefit.source_kind == :conversion
-          actual_start_on = sponsor_benefit.benefit_package.end_on.next_day.prev_year
-          ::BenefitMarkets::Products::Product.where(hios_id: corrected_hios_id).detect do |product| 
+          actual_start_on = (sponsor_benefit.benefit_package.end_on + 1.day).prev_year
+          hios = (sponsored_benefit_kind == :dental ? hios_id : corrected_hios_id)
+          ::BenefitMarkets::Products::Product.where(hios_id: hios).detect do |product| 
             product.application_period.cover?(actual_start_on)
           end
         else

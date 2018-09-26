@@ -233,6 +233,7 @@ module Importers
           external_enrollment: set_external_enrollments
           })
 
+        en.external_enrollment = set_external_enrollments
         en.hbx_enrollment_members.each do |mem|
           mem.eligibility_date = start_date
           mem.coverage_start_on = start_date
