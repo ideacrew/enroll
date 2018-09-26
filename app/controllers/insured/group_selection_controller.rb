@@ -67,7 +67,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
