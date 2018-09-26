@@ -5,12 +5,13 @@ module BenefitSponsors
       def save
         return false unless self.valid?
         return false if @sponsored_benefit_kind == :health
+        
         # TODO: health sponsored update needs to be implemented. currently plan year update only works for dental.
         benefit_package = find_benefit_package
         sponsored_benefit =  BenefitSponsors::SponsoredBenefits::SponsoredBenefitFactory.call(benefit_package, sanitized_sponsored_benefit_params)
-        product_id = find_product.id
-        sponsored_benefit.update_attributes(source_kind: :conversion, reference_plan_id: product_id)
-        return true if sponsored_benefit.save && benefit_package.save
+        sponsored_benefit.source_kind = :conversion
+        sponsored_benefit.reference_plan_id = find_product.id
+        return true if sponsored_benefit.save
       end
 
       def sanitized_sponsored_benefit_params
