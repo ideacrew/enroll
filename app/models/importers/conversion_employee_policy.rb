@@ -209,15 +209,17 @@ module Importers
           return false
         end
 
-        sponsored_benefit_kind = (@sponsored_benefit == :health) ? 'health' : 'dental'
-
         cancel_other_enrollments_for_bga(bga, sponsored_benefit_kind)
         house_hold = family.active_household
         coverage_household = house_hold.immediate_family_coverage_household
 
         benefit_package   = bga.benefit_package
 
-        sponsored_benefit = benefit_package.sponsored_benefit_for(sponsored_benefit_kind)
+
+        sponsored_benefit = benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
+          sponsored_benefit.product_kind == @sponsored_benefit_kind
+        }
+
         # for regular conversions we are setting flag to true and mid_year_conversions to false
         set_external_enrollments = @mid_year_conversion ? false : true
 
@@ -245,7 +247,7 @@ module Importers
 
         en_attributes = {
           aasm_state: en.effective_on > TimeKeeper.date_of_record ? "coverage_selected" : "coverage_enrolled",
-          coverage_kind: sponsored_benefit_kind
+          coverage_kind: @sponsored_benefit_kind
         }
 
         unless employer.is_a?(EmployerProfile)
