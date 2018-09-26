@@ -11,6 +11,8 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     notice_subject = ENV['notice_name'].titleize
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
+    raise "Unable to find the pdf notice as per the given file name: #{notice_path}" unless File.file?(notice_path)
+
     employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
 
     if employer_profile.present?
