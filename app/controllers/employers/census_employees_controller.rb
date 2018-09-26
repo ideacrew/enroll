@@ -79,7 +79,7 @@ class Employers::CensusEmployeesController < ApplicationController
         end
       end
 
-      flash[:notice] = "Census Employee is successfully updated."
+      flash[:success] = "Census Employee is successfully updated."
       if benefit_group_id.blank?
         flash[:notice] += " Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group."
       end
@@ -202,7 +202,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
 
-    if @no_ssn && !@employer_profile.no_ssn
+    if @no_ssn && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.nil?
       flash[:notice] = "This employee does not require a SSN because he/she was created at a time when the employer did not require SSN input."
     end
 
