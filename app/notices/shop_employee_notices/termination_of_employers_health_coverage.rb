@@ -1,4 +1,5 @@
 class ShopEmployeeNotices::TerminationOfEmployersHealthCoverage < ShopEmployeeNotice
+
   def deliver
     build
     append_data
@@ -15,9 +16,9 @@ class ShopEmployeeNotices::TerminationOfEmployersHealthCoverage < ShopEmployeeNo
                       :start_on => active_plan_year.start_on
       })
     ben_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-    current_open_enrollment_coverage = ben_sponsorship.benefit_coverage_periods.where(open_enrollment_end_on: Settings.aca.individual_market.open_enrollment.end_on ).first
+    current_open_enrollment_coverage = ben_sponsorship.benefit_coverage_periods.where(open_enrollment_end_on: Settings.aca.individual_market.open_enrollment.end_on).first
     bc_period = current_open_enrollment_coverage.open_enrollment_end_on >= TimeKeeper.date_of_record ? current_open_enrollment_coverage : ben_sponsorship.renewal_benefit_coverage_period
-     notice.enrollment = PdfTemplates::Enrollment.new({
+    notice.enrollment = PdfTemplates::Enrollment.new({
               :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
               :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
               })
