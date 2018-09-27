@@ -44,8 +44,8 @@ module BenefitSponsors
 
         if sponsor_benefit.source_kind == :conversion
           actual_start_on = (sponsor_benefit.benefit_package.end_on + 1.day).prev_year
-          hios = (sponsored_benefit_kind == :dental ? hios_id : corrected_hios_id)
-          ::BenefitMarkets::Products::Product.where(hios_id: hios).detect do |product| 
+          # hios = (sponsored_benefit_kind == :dental ? hios_id : corrected_hios_id)
+          ::BenefitMarkets::Products::Product.where(hios_id: corrected_hios_id).detect do |product|
             product.application_period.cover?(actual_start_on)
           end
         else

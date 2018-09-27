@@ -104,6 +104,10 @@ module BenefitMarkets
         ])
     }
 
+    #Products retrieval by type
+    scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
+    scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
+
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this
     # method when we already have the document, I'm going to abuse lazy
