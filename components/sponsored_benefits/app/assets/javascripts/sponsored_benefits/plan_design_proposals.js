@@ -1,5 +1,7 @@
 $(document).on('click', '.health-plan-design .nav-tabs li label', fetchCarriers);
 $(document).on('change', '.health-plan-design .nav-tabs li input', carrierSelected);
+$(document).on('click', '.dental-plan-design .nav-tabs li label', fetchDentalCarriers);
+$(document).on('change', '.dental-plan-design .nav-tabs li input', dentalCarrierSelected);
 //$(document).on('click', '.reference-plan input[type=radio] + label', planSelected);
 $(document).on('slideStop', '#new_forms_plan_design_proposal .benefits-fields .slider', setSliderDisplayVal);
 $(document).on('click', '.plan_design_proposals .checkbox', calcPlanDesignContributions);
@@ -78,6 +80,24 @@ function fetchCarriers() {
   clearComparisons();
 }
 
+function fetchDentalCarriers() {
+  alert("Nisanth");
+  var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
+  var selected_carrier_level = $(this).siblings('input').val();
+  var plan_design_organization_id = $('#plan_design_organization_id').val();
+  $.ajax({
+    type: "GET",
+    data:{
+      active_year: active_year,
+      selected_carrier_level: selected_carrier_level,
+      kind: "dental"
+    },
+    url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
+  });
+
+  displayActiveDentalCarriers();
+}
+
 function setSBC(plan) {
   if ($("#include_sbc").prop('checked')) {
    $('#downloadReferencePlanDetailsButton').attr('href',plan+"?sbc_included=true");
@@ -129,6 +149,19 @@ function displayActiveCarriers() {
   }
 }
 
+function displayActiveDentalCarriers() {
+  $(this).closest('.dental-plan-design').find('.nav-tabs li').removeClass('active');
+  $(this).closest('li').addClass('active');
+  $(this).closest('.dental-plan-design').find('.nav-tabs li.active label').attr('style', '');
+  $(this).closest('.dental-plan-design').find('.nav-tabs li:not(.active) label').css({borderBottom: "none", borderBottomLeftRadius: "0", borderBottomRightRadius: "0" });
+
+  if ($(this).find('input[type=radio]').is(':checked')) {
+  } else {
+    $(this).closest('.dental-plan-design').find('.plan-options > *').hide();
+    $(this).closest('.dental-plan-design').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
+  }
+}
+
 function hidePlanContainer() {
   $('.reference-plans').hide();
   $('.selected-plan').html("");
@@ -158,6 +191,21 @@ function carrierSelected() {
   else if (elected_plan_kind == 'sole_source') {
     $(this).closest('.health-plan-design').find('.sole-source-plan-tab').show();
     $(this).closest('.health-plan-design').find('.plan-options').slideDown();
+  }
+}
+
+function dentalCarrierSelected() {
+  $('.tab-container').hide();
+  var elected_plan_kind = $('.dental-plan-design .nav-tabs li.active input').val()
+  selected_rpids = [];
+  $('.plan-comparison-container').hide();
+
+  $("#elected_plan_kind").val(elected_plan_kind);
+  $("#reference_plan_id").val("");
+
+  if (elected_plan_kind == "one_plan") {
+    $(this).closest('.dental-plan-design').find('.one-plan-tab').show();
+    $(this).closest('.dental-plan-design').find('.plan-options').slideDown();
   }
 }
 

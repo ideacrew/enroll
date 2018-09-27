@@ -249,7 +249,23 @@ class Organization
     end
   end
 
-  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil, kind: nil })
+
+    # toDo
+    if filters[:kind] == "dental"
+      office_location = filters[:primary_office_location]
+      carrier_names = Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        unless (filters[:primary_office_location].nil?)
+          next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+          if filters[:active_year]
+            next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
+          end
+        end
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_dental_plans("carrier", org.carrier_profile.id, filters[:active_year]).present?
+        carrier_names
+      end
+      return carrier_names
+    end
 
     return self.valid_health_carrier_names unless constrain_service_areas?
 

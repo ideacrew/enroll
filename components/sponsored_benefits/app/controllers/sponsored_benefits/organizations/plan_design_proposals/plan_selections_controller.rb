@@ -4,10 +4,8 @@ module SponsoredBenefits
       before_action :published_plans_are_view_only
 
       def new
-        plan_design_form.build_benefit_group
-      end
-
-      def add_dental
+        plan_design_form.for_new
+        # plan_design_form.build_benefit_group
       end
 
       private
@@ -28,7 +26,15 @@ module SponsoredBenefits
       end
 
       def plan_design_form
-        SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id])
+        SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id], kind: params[:kind])
+      end
+
+      def plan_design_application
+        plan_design_proposal.profile.benefit_application
+      end
+
+      def plan_design_proposal_benefit_group
+        plan_design_application.benefit_groups.first
       end
     end
   end
