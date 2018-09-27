@@ -115,6 +115,14 @@ aca:
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
+
+individual_checkbook_services:
+# Note: Need to replace Remote_access_key with Production keys while deploying to prod.
+# Note: currently using Shop Remote Access Keys/URLS for IVL also this needs to be changed once we get Keys and Url's from Checkbook Team
+    ivl_remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
+    ivl_reference_id: "7C6B483A605640B98DEE8EBB7ED8DAA7"
+    ivl_base_url: "https://staging.checkbookhealth.org/hie/dc/api/" 
+
 checkbook_services:
 # Note: Need to replace Remote_access_key with Production keys while deploying to prod.
     remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
@@ -123,15 +131,6 @@ checkbook_services:
     url: "https://staging.checkbookhealth.org"
     congress_url: "https://dc.checkbookhealth.org/congress/dc/2018/"
     plan_match: "DC"
-
- individual_checkbook_services:
-# Note: Need to replace Remote_access_key with Production keys while deploying to prod.
-# Note: currently using Shop Remote Access Keys/URLS for IVL also this needs to be changed once we get Keys and Url's from Checkbook Team
-    remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50' # Need to be changed
-    reference_id: "7C6B483A605640B98DEE8EBB7ED8DAA7"
-    base_url:  "https://staging.checkbookhealth.org" #Need to be changed
-    url: "https://staging.checkbookhealth.org"  # Need to be changed 
-
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
