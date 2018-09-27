@@ -26,7 +26,9 @@
                                                  required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: f.object.no_ssn == "1" ? false : true, :disabled => f.object.no_ssn == "1" ? true : false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+      <%=
+#binding.pry
+      f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: f.object.no_ssn == "1" ? false : true, :disabled => f.object.no_ssn == "1" ? true : false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd top-buffer" >
       <%= f.check_box :no_ssn,  :value => false, :onclick=>"$('#person_ssn').prop('disabled', !$('#person_ssn').prop('disabled')); $('#person_ssn').prop('required', !$('#person_ssn').prop('required'))" %>
@@ -49,3 +51,10 @@
     </div>
   </div>
 </div>
+
+<script>
+$( document ).ready(function() {
+  if ($('#person_no_ssn').prop('checked'))
+    $('#person_ssn').prop('disabled', true);
+});
+</script>
