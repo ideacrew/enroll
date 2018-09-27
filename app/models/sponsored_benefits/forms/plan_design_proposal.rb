@@ -9,6 +9,7 @@ module SponsoredBenefits
       attr_reader :profile
       attr_reader :plan_design_organization
       attr_reader :proposal
+      attr_reader :kind
 
       validates_presence_of :title, :effective_date, :sic_code, :county, :zip_code
 
@@ -17,6 +18,24 @@ module SponsoredBenefits
         ensure_proposal
         ensure_profile
         ensure_sic_zip_county
+      end
+
+      def for_new
+        if kind == 'dental'
+          build_dental_relationship_benefits
+        else
+          build_benefit_group
+        end
+      end
+
+      def build_dental_relationship_benefits
+        application = profile.benefit_application
+        benefit_group = application.benefit_groups.first
+
+        if benefit_group.build_dental_relationship_benefits.empty?
+          benefit_group.build_dental_relationship_benefits 
+        end
+        benefit_group
       end
 
       def build_benefit_group
@@ -51,6 +70,10 @@ module SponsoredBenefits
           @profile = @proposal.profile
           prepopulate_attributes
         end
+      end
+
+      def kind=(val)
+        @kind = val
       end
 
       def prepopulate_attributes
@@ -174,6 +197,10 @@ module SponsoredBenefits
             ]
           ]
         }
+      end
+
+      def is_dental?
+        kind == "dental"
       end
     end
   end
