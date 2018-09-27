@@ -61,8 +61,8 @@ module Services
 
        def construct_body_ivl
         {
-        "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
-        "reference_id": Settings.checkbook_services.ivl_reference_id,
+        "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
+        "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
         "family": {
           "age": 30,
           "pregnant": false,
