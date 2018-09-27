@@ -12,7 +12,7 @@ module Insured::PlanFilterHelper
 
   def checkbook_integration
     if @market_kind == "individual"
-      link_to('Checkbook cost Calculator', 'https://staging.checkbookhealth.org/shop/dc', target: '_blank')
+      link_to('Checkbook cost Calculator', 'https://staging.checkbookhealth.org/hie/dc/api/', target: '_blank')
     end
   end
 

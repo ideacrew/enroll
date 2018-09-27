@@ -11,31 +11,37 @@ module Services
 
       def initialize(hbx_enrollment, is_congress=false)
         @hbx_enrollment = hbx_enrollment
-        @census_employee = @hbx_enrollment.employee_role.census_employee
-        @is_congress = is_congress
-        is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
+        if @hbx_enrollment.kind.downcase == "individual"
+          @person = @hbx_enrollment.consumer_role.person
+        else
+          @census_employee = @hbx_enrollment.employee_role.census_employee
+          @is_congress = is_congress
+          is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
+        end
       end
 
       def generate_url
         return @url if is_congress
         return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
-          @result = HTTParty.post(@url,
-                :body => construct_body.to_json,
-                :headers => { 'Content-Type' => 'application/json' } )
-          uri = @result.parsed_response["URL"]
-          if uri.present?
-            return uri
-          else
-            raise "Unable to generate url"
-          end
+          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
+          if 
+            @result = HTTParty.post(@url,
+                  :body => construct_body.to_json,
+                  :headers => { 'Content-Type' => 'application/json' } )
+            uri = @result.parsed_response["URL"]
+            if uri.present?
+              return uri
+            else
+              raise "Unable to generate url"
+            end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for #{@census_employee.full_name} due to #{e.backtrace}" }
         end
       end
 
       private
-      def construct_body
+      def construct_body_shop
       {
         "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
         "reference_id": Settings.checkbook_services.reference_id,
@@ -53,20 +59,21 @@ module Services
       }
       end
 
-      def build_payload_for_individual
-      {
-        "remote_access_key": Settings.individual_checkbook_services.remote_access_key,
-        "reference_id": Settings.individual_checkbook_services.reference_id,
+       def construct_body_ivl
+        {
+        "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
+        "reference_id": Settings.checkbook_services.ivl_reference_id,
         "family": {
-          "age": "Integer",
-          "pregnant": "Boolean"
-          "AIAN": "Boolean"
+          "age": 30,
+          "pregnant": false,
+          "AIAN": true
         },
+        #"family": build_family,
         "aptc": "343",
         "csr": "-01",
         "enroll_link_without_assistance": "https://enroll.dchealthlink.com/",
         "enroll_link_with_assistance": "https://enroll.dchealthlink.com/"
-      }
+        }
       end
 
       def employer_effective_date
