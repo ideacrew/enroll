@@ -9,7 +9,7 @@
 <%= hidden_field_tag :employer_min_family_contribution, aca_shop_market_employer_family_contribution_percent_minimum %>
 <%= hidden_field_tag :publish_proposal_url, sponsored_benefits.organizations_plan_design_proposal_publish_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :copy_proposal_url, sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(plan_design_proposal.id) %>
-<%= hidden_field_tag :add_dental_url, sponsored_benefits.add_dental_organizations_plan_design_proposal_plan_selections_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :add_dental_url, sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(plan_design_proposal.id, kind: 'dental') %>
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">
@@ -35,7 +35,11 @@
       </div>
       <div class="panel-body" id="pdp-bms">
         <p>Select the type of options you want to offer enrollees.</p>
-        <%= render 'carrier_options', f: f %>
+        <% if plan_design_form.is_dental? %>
+          <%= render 'dental_carrier_options', f: f %>
+        <% else %>
+          <%= render 'health_carrier_options', f: f %>
+        <% end %>
       </div>
     </div>
   </div>
