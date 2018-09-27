@@ -92,17 +92,17 @@ describe ConsumerRole, dbclean: :after_each do
   context "for dc_residency_status_under_18" do
     let!(:person100) { FactoryGirl.create(:person, :with_consumer_role) }
 
-    it "" do
+    it "should return attested as is_state_resident is nil" do
       person100.consumer_role.update_attributes!(is_state_resident: nil)
       expect(person100.consumer_role.dc_residency_status_under_18).to eq "attested"
     end
 
-    it "" do
+    it "should return verified as the person is verified" do
       person100.consumer_role.update_attributes!(is_state_resident: true)
       expect(person100.consumer_role.dc_residency_status_under_18).to eq "verified"
     end
 
-    it "" do
+    it "should return outstanding as the person got rejected" do
       person100.consumer_role.update_attributes!(residency_rejected: true, is_state_resident: false)
       expect(person100.consumer_role.dc_residency_status_under_18).to eq "outstanding"
     end
