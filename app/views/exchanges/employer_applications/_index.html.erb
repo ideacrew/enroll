@@ -52,9 +52,9 @@
                   Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" style="padding:10px">
-                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @employer_profile.id %>', '0')" class="cancel-py">CANCEL</li>
-                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @employer_profile.id %>', '0')" class="terminate-py">TERMINATE</li>
-                    <!-- <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @employer_profile.id %>', '<%= application.terminated_on %>')" class="reinstate-py">REINSTATE</li> -->
+                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @employer_profile.id %>', '0', '<%= application.start_on.to_s %>')" class="cancel-py">CANCEL</li>
+                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @employer_profile.id %>', '0', '<%= application.start_on %>')" class="terminate-py">TERMINATE</li>
+                    <!-- <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @employer_profile.id %>', '<%= application.terminated_on %>', '')" class="reinstate-py">REINSTATE</li> -->
                 </ul>
               </div>
               
@@ -68,7 +68,7 @@
               </div>
             </td>
             <td colspan="2">
-              <input type="text" class="form-control date py-end-date" style="width:120px" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
+              <input type="text" class="form-control date py-end-date" style="width:120px" id="<%= application.id %>" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
               <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true  %> TRANSMIT TO CARRIER
