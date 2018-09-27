@@ -126,9 +126,11 @@ function showTerminationRadios() {
   $('.term_action_radios').removeClass('hidden');
 }
 
-function hideEndDateField() {
-  $('input.py-end-date').addClass('hidden')
-  $('#calendar_icon').addClass('hidden')
+function hideEndDateField(startDate, applicationId) {
+  setTimeout(function() {
+    $('#' + applicationId).find('input.py-end-date').val(startDate);
+    $('#' + applicationId).find('input.py-end-date').prop('disabled', true);
+  },300)
 }
 
 function showEndDateField() {
@@ -165,10 +167,11 @@ function validTerminatePy() {
   }
 }
 
-function pyAction(action, id, employer_id, term_date) {
+function pyAction(action, id, employer_id, term_date, start_on) {
   applicationId = id;
   employerId = employer_id
   actionSelected = action;
+  pyStartDate = start_on
   showPlanYearActions(id);
   showEndDateField();
   if (action == "reinstate") {
@@ -185,7 +188,7 @@ function pyAction(action, id, employer_id, term_date) {
   }
   
   if (action == 'cancel') {
-    hideEndDateField();
+    hideEndDateField(pyStartDate, applicationId);
     hideTerminationRadios();
     enableSubmitButton();
   }
