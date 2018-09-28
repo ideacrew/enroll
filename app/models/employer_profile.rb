@@ -756,11 +756,6 @@ class EmployerProfile
           end
         end
 
-        if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
-          effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
-          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
-        end
-
         #Initial employer reminder notices to publish plan year.
         start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
@@ -791,6 +786,11 @@ class EmployerProfile
               end
             end
           end
+        end
+
+        if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
+          effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
+          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
 
        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
