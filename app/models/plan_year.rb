@@ -211,7 +211,7 @@ class PlanYear
     enrollments_for_plan_year.each do |hbx_enrollment|
       if hbx_enrollment.may_cancel_coverage?
         hbx_enrollment.cancel_coverage!
-        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml)
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
       end
     end
   end
@@ -1070,7 +1070,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages, :notify_cancel_event]
     end
 
     # Coverage disabled due to non-payment
@@ -1123,7 +1123,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:notify_cancel_event, :cancel_employee_enrollments, :cancel_employee_benefit_packages]
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages, :notify_cancel_event]
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -1222,19 +1222,9 @@ class PlanYear
   end
 
   def notify_cancel_event(transmit_xml = false)
-
     return unless transmit_xml
-
-    if TimeKeeper.date_of_record < start_on
-      if enrolled? && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
-        notify_employer_py_cancellation
-      elsif renewing_enrolled? && open_enrollment_completed? && past_transmission_threshold?
-        notify_employer_py_cancellation
-      end
-    else
-      if active?
-        notify_employer_py_cancellation
-      end
+    if eligible_for_export?
+      notify_employer_py_cancellation
     end
   end
 
