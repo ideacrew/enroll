@@ -19,9 +19,23 @@ module BenefitSponsors
             :kind => "dental",
             :product_option_choice => find_carrier.id,
             :product_package_kind => "single_product",
+            :product_package => build_dental_product_package,
             :sponsor_contribution_attributes =>
                 {:contribution_levels_attributes => formed_params_for_contribution_levels}
         }
+      end
+
+      def build_dental_product_package
+        # this line should go away once 2019 dental product packages introduced
+        application_period = {:min=> Time.new(2018,01,01).utc, :max => Time.new(2018,12,31).utc}
+        product_package = BenefitMarkets::Products::ProductPackage.new(benefit_kind: :aca_shop,
+                                                                       product_kind: :dental,
+                                                                       application_period: application_period,
+                                                                       package_kind: :single_product,
+                                                                       title: "Single Product",
+                                                                       description: "")
+        product_package.contribution_model = BenefitMarkets::ContributionModels::ContributionModel.where(title: "MA Shop Simple List Bill Contribution Model").first.create_copy_for_embedding
+        product_package
       end
 
       def formed_params_for_contribution_levels

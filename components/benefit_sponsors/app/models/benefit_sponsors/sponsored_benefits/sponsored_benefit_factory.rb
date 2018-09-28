@@ -33,7 +33,8 @@ module BenefitSponsors
       end
 
       def build_sponsor_contribution(sponsored_benefit, attrs)
-        sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
+        product_package = attrs[:product_package].present? ? attrs[:product_package] : sponsored_benefit.product_package
+        sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(product_package)
         sponsor_contribution_attrs = []
         sponsor_contribution.contribution_levels.each do |new_contribution_level|
           sponsor_contribution_attrs = attrs[:contribution_levels_attributes] if attrs.present?

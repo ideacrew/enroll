@@ -13,7 +13,11 @@ module BenefitSponsors
           return
         end
 
-        reference_product = BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+        if @sponsored_benefit_kind == :dental
+          reference_product = find_product
+        else
+          reference_product = BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+        end
 
         if reference_product.blank?
           errors.add(:reference_product, "Unable to find product with HIOS Id #{single_plan_hios_id}.")

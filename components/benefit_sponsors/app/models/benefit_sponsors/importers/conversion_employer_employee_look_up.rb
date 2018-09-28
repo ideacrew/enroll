@@ -24,11 +24,11 @@ module BenefitSponsors
         return nil if single_plan_hios_id.blank?
 
         benefit_application = find_employer.active_benefit_application
-        period = active_benefit_application.effective_period
+        period = benefit_application.effective_period
 
-        clean_hios = single_plan_hios_id.strip
-        corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        BenefitMarkets::Products::Product.by_application_period(period).where(hios_id: single_plan_hios_id).first
+        clean_hios = single_plan_hios_id.split("-")[0]
+        # corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+        BenefitMarkets::Products::Product.by_application_period(period).where(hios_id: clean_hios).first
       end
     end
   end

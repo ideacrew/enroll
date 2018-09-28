@@ -7,6 +7,7 @@ FactoryGirl.define do
 
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }
     description          "Highest rated and highest value"
+    metal_level_kind :dental
     premium_ages         20..65
     # health_plan_kind     :pos
     ehb                  0.9943
