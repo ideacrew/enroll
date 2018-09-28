@@ -3,5 +3,5 @@ require File.join(Rails.root, "app", "data_migrations", "update_census_employee_
 # RAILS_ENV=production bundle exec rake migrations:update_census_employee_id employee_role_id='5ba26cd3e59c4a47590000a6' census_employee_id='5ba26cd3e59c4a47590000a6' 
 namespace :migrations do
   desc "Changing census employee id for employee record"
-  UpdateCensusEmployee.define_task :update_census_emp => :environment
+  UpdateCensusEmployeeId.define_task :update_census_employee_id => :environment
 end
