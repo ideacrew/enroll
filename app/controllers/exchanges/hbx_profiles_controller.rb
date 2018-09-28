@@ -432,9 +432,11 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-
+    @ssn_fields = @person.employee_roles.map{|e| e.employer_profile.no_ssn} if @person.employee_roles.present?
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
+    elsif @ssn_fields.include?(false)
+      @dont_update_ssn = true
     else
       begin
         @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
