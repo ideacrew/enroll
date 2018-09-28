@@ -10,7 +10,7 @@ module SponsoredBenefits
           when "metal_level"
             offering_query.metal_level_offered_health_plans(params[:metal_level], params[:active_year])
           when "single_plan"
-            offering_query.single_option_offered_health_plans(params[:carrier_id], params[:active_year])
+            offering_query.send "single_option_offered_#{kind}_plans", params[:carrier_id], params[:active_year]
           when "sole_source"
             offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:active_year])
           end
@@ -24,7 +24,7 @@ module SponsoredBenefits
       end
 
       private
-        helper_method :selected_carrier_level, :plan_design_organization, :carrier_profile, :carriers_cache
+        helper_method :selected_carrier_level, :plan_design_organization, :carrier_profile, :carriers_cache, :kind
 
         def selected_carrier_level
           @selected_carrier_level ||= params[:selected_carrier_level]
@@ -40,6 +40,10 @@ module SponsoredBenefits
 
         def carriers_cache
           @carriers_cache ||= ::CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+        end
+
+        def kind
+          params[:kind]
         end
     end
   end
