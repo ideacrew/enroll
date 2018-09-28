@@ -12,7 +12,7 @@ module SponsoredBenefits
       end
 
       private
-        helper_method :selected_carrier_level, :plan_design_organization, :active_year
+        helper_method :selected_carrier_level, :plan_design_organization, :active_year, :kind
 
         def selected_carrier_level
           @selected_carrier_level ||= params[:selected_carrier_level]

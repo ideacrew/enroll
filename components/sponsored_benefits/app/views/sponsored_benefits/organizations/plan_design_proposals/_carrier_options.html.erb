@@ -1,6 +1,6 @@
 <% offering_id = f.object.profile.benefit_sponsorships.first.benefit_applications.first.benefit_groups.first.id %>
 
-<div class="health-plan-design benefits-setup-tab quote-setup-tab">
+<div class="plan-design benefits-setup-tab quote-setup-tab">
   <ul class="nav nav-tabs">
     <% if offer_sole_source? && check_plan_options_title %>
       <li role="presentation" class="col-xs-4 sole-source-tab" data-offering-kind="sole_source" data-offering-id="<%= offering_id %>">
