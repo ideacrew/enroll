@@ -96,6 +96,7 @@ plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'One Level'
   single_carrier: 'One Carrier'
+  single_plan: 'One Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 notices:
@@ -137,6 +138,7 @@ aca:
   security_questions: true
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
+  dental_plan_options_available: ["single_plan"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
   carrier_hios_logo_variant:
