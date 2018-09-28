@@ -1160,7 +1160,7 @@ class PlanYear
       end
     else
       begin
-        self.employer_profile.trigger_notices("group_renewal_5")
+        self.employer_profile.trigger_notices("group_renewal_5", "acapi_trigger" => true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer group_renewal_5 notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
