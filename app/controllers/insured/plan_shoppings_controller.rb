@@ -155,7 +155,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-    products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
+    products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}
