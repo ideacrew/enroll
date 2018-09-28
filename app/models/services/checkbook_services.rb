@@ -66,7 +66,7 @@ module Services
         "family": {
           "age": 30,
           "pregnant": false,
-          "AIAN": true
+          "AIAN": tribal_option
         },
         #"family": build_family,
         "aptc": "343",
@@ -93,6 +93,13 @@ module Services
         else
           reference_plan.carrier_profile.legal_name
         end
+      end
+
+      def tribal_option
+        if  @hbx_enrollment.consumer_role.person.tribal_id.present?
+          return true
+         else 
+          return false   
       end
 
 
