@@ -26,7 +26,8 @@ describe Events::CensusEmployeesController do
       }}).and_return(rendered_template)
     end
 
-    it "should send out a message to the bus with the response xml" do
+    #TODO uncomment spec when service will be turned on
+    xit "should send out a message to the bus with the response xml" do
       expect(exchange).to receive(:publish).with(rendered_template, {
           :routing_key => reply_to_key,
           :headers => {
@@ -45,7 +46,8 @@ describe Events::CensusEmployeesController do
                                                    }}).and_return(rendered_template)
       end
 
-      it "should return return_status = 404" do
+      #TODO uncomment spec when service will be turned on
+      xit "should return return_status = 404" do
         expect(exchange).to receive(:publish).with(rendered_template, {
           :routing_key => reply_to_key,
           :headers => {
