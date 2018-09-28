@@ -11,6 +11,8 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     notice_subject = ENV['notice_name'].titleize
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
+    raise "Unable to find the pdf notice as per the given file name: #{notice_path}" unless File.file?(notice_path)
+
     employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
 
     if employer_profile.present?
@@ -22,6 +24,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
 
   def upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)
     doc_uri = upload_to_amazonS3(notice_path)
+    raise "Unable to generate the doc_uri for notice: #{notice_title} to #{employer_profile.legal_name}'s account" unless doc_uri.present?
     notice  = create_recipient_document(employer_profile, doc_uri, notice_title)
     create_secure_inbox_message(employer_profile, notice, notice_subject)
   end
