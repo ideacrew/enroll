@@ -283,7 +283,9 @@ class ApplicationController < ActionController::Base
 
     def save_bookmark (role, bookmark_url)
       if hbx_staff_and_consumer_role(role)
-        if prior_ridp_bookmark_urls(bookmark_url)
+        if @person.present? && @person.consumer_role.identity_verified?
+          @person.consumer_role.update_attribute(:bookmark_url, bookmark_url)
+        elsif prior_ridp_bookmark_urls(bookmark_url)
           @person.consumer_role.update_attribute(:bookmark_url, bookmark_url)
         end
       else

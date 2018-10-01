@@ -96,7 +96,7 @@ module Insured
         consumer_user.save!
       end
       consumer_role.move_identity_documents_to_verified
-      redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
+      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => consumer_role.id)
     end
 
     def render_session_start
