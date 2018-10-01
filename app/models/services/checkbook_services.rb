@@ -63,11 +63,12 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "family": {
+        "enrollment_year": "2019",
+        "family": [{
           "age": 30,
           "pregnant": false,
           "AIAN": tribal_option
-        },
+        }],
         #"family": build_family,
         "aptc": "343",
         "csr": "-01",
