@@ -11,7 +11,6 @@ FactoryGirl.define do
     premium_ages         20..65
     # health_plan_kind     :pos
     ehb                  0.9943
-    # metal_level_kind     BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS.sample # TODO
 
     product_package_kinds { [:single_product] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }

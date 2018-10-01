@@ -3,8 +3,9 @@ module BenefitSponsors
     class ConversionEmployerPlanYearUpdate < ConversionEmployerPlanYear
 
       def save
+        binding.pry
         return false unless self.valid?
-        return false if @sponsored_benefit_kind == :health
+        return false if sponsored_benefit_kind == :health
         
         # TODO: health sponsored update needs to be implemented. currently plan year update only works for dental.
         benefit_package = find_benefit_package
@@ -19,9 +20,10 @@ module BenefitSponsors
             :kind => "dental",
             :product_option_choice => find_carrier.id,
             :product_package_kind => "single_product",
-            :product_package => build_dental_product_package,
             :sponsor_contribution_attributes =>
-                {:contribution_levels_attributes => formed_params_for_contribution_levels}
+                {:product_package => build_dental_product_package,
+                :contribution_levels_attributes => formed_params_for_contribution_levels
+                }
         }
       end
 

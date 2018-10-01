@@ -30,7 +30,7 @@ module Importers::Mhc
       :family_rt_premium,
       :employer_domestic_partner_rt_contribution,
       :employer_child_under_26_rt_contribution,
-      :sponsored_benefit_kinds
+      :sponsored_benefit_kind
 
     def initialize(opts = {})
       super(opts)
