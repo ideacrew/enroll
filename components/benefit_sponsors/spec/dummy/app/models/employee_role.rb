@@ -14,11 +14,13 @@ class EmployeeRole
   field :bookmark_url, type: String, default: nil
   field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
+
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :primary_family, to: :person, allow_nil: true
+<<<<<<< HEAD
 #  delegate :hired_on, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_open_enrollment, to: :census_employee, allow_nil: true
@@ -48,6 +50,8 @@ class EmployeeRole
     raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
     if new_employer_profile.kind_of?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
       self.benefit_sponsors_employer_profile_id = new_employer_profile._id
+    else
+      self.employer_profile_id = new_employer_profile._id
     end
     @employer_profile = new_employer_profile
   end
