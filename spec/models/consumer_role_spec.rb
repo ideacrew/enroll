@@ -771,10 +771,12 @@ describe "#build_nested_models_for_person" do
 end
 
 describe "can_trigger_residency?" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:consumer_role) { person.consumer_role }
+  let(:residency_verification_type) {consumer_role.verification_types.by_name("DC Residency").first}
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+  let(:hub_request) {EventRequest.new}
 
   context "when person has age > 19 & has an active coverage" do
 
@@ -787,14 +789,17 @@ describe "can_trigger_residency?" do
     end
 
     it "should return false if there is a change in address from dc to non-dc" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from dc to dc" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: false)).to eq false
     end
 
     it "should return false if there is a change in address from non-dc to non-dc" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
     end
   end
@@ -811,11 +816,13 @@ describe "can_trigger_residency?" do
 
     it "should return false if age = 18" do
       person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
 
     it "should return false if age < 18" do
       consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
     end
   end
@@ -831,8 +838,38 @@ describe "can_trigger_residency?" do
     end
 
     it "should return false if no active coverage" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
       expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+    end
+  end
+
+  context "when age > 18 & address change from non-dc to dc & residency status" do
+    before do
+      allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+    end
+
+    it "should return true if residency status is unverified" do
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq true
+    end
+
+    it "should return false if residency status is not unverified" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+    end
+
+    it "should return true if residency status is not unverified & address change from non-dc to dc" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
+    end
+
+    it "should return false if residency status is not unverified & address change from non-dc to non-dc" do
+      consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
     end
   end
 end
