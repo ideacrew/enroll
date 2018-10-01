@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_filter :confirm_existing_password, only: [:change_password]
-  before_filter :set_user, except: [:confirm_lock, :change_username, :change_email]
+  before_filter :set_user, except: [:confirm_lock]
 
   def confirm_lock
     params.permit!
@@ -47,33 +47,30 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
   
-  def change_username
+  def change_username_and_email
     authorize User, :change_username_and_email?
-    @user_id = params[:user_action_id]
+    @user_id = params[:user_id]
   end
-  
-  def confirm_change_username
+
+  def confirm_change_username_and_email
     authorize User, :change_username_and_email?
-    @user.oim_id = params[:oim_id]
-    if @user.save!
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Username was changed to #{user.oim_id}."
+    @element_to_replace_id = params[:family_actions_id]
+    @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user.id).first if params[:new_email]
+    @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user.id).first if params[:new_oim_id]
+    if @email_taken.present? || @username_taken.present?
+      @matches = true
     else
-      redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
+      @user.oim_id = params[:new_oim_id] if (params[:new_oim_id] != params[:current_oim_id])
+      @user.email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
+      begin
+        @user.save!
+      rescue => e
+        @errors = @user.errors.messages
+      end
     end
-  end
-  
-  def change_email
-    authorize User, :change_username_and_email?
-    @user_id = params[:user_action_id]
-  end
-  
-  def confirm_change_email
-    authorize User, :change_username_and_email?
-    @user.email = params[:new_email]
-    if @user.save!
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Successfully updated the email address"
-    else
-      flash[:error] = "We encountered a problem trying to update the email address, please try again"
+    respond_to do |format|
+      format.js { render "change_username_and_email"} if @errors
+      format.js { render "username_email_result"}
     end
   end
 
@@ -87,20 +84,6 @@ class UsersController < ApplicationController
 
   def login_history
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
-  end
-  
-  def check_for_existing_username_or_email
-    authorize User, :change_username_and_email?
-    if params[:email]
-      user = User.where(email:params[:email]).first
-    elsif params[:oim_id]
-      user = User.where(oim_id:params[:oim_id]).first
-    end
-    if user.present?
-      render json: {available:true}
-    else
-      render json: {available:false}
-    end
   end
   
   private

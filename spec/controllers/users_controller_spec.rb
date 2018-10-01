@@ -36,7 +36,7 @@ describe UsersController do
     allow(User).to receive(:find).with(user_id).and_return(user)
   end
   
-  describe ".change_username" do
+  describe ".change_username_and_email" do
     let(:user) { build(:user, id: '1', oim_id: user_email) }
     before do
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
@@ -47,8 +47,8 @@ describe UsersController do
         sign_in(admin)
       end
       it "renders the change username form" do
-        get :change_username, id: user_id, format: :js
-        expect(response).to render_template('change_username')
+        get :change_username_and_email, id: user_id, format: :js
+        expect(response).to render_template('change_username_and_email')
       end
     end
     
@@ -58,36 +58,47 @@ describe UsersController do
         sign_in(admin)
       end
       it "doesn't render the change username form" do
-        get :change_username, id: user_id, format: :js
+        get :change_username_and_email, id: user_id, format: :js
         expect(response.code).to eq "403"
       end
     end
   end
-  
-  describe ".change_email" do
-    let(:user) { build(:user, id: '1', email: user_email) }
+
+  describe ".confirm_change_username_and_email", dbclean: :after_each do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, :person => person) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
+    let(:invalid_username) { "ggg" }
+    let(:valid_username) { "gariksubaric" }
+    let(:invalid_email) { "email@" }
+    let(:valid_email) { "email@email.com" }
+
     before do
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in(admin)
     end
-    
-    context "An admin is allowed to access the change email action" do
-      before do
-        sign_in(admin)
-      end
-      it "renders the change username form" do
-        get :change_email, id: user_id, format: :js
-        expect(response).to render_template('change_email')
+
+    context "email format wrong" do
+      it "doesn't update credentials" do
+        params = {id: user_id, new_email: invalid_email, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('change_username_and_email')
       end
     end
-    
-    context "An admin is not allowed to access the change email action" do
-      before do
-        allow(user_policy).to receive(:change_username_and_email?).and_return(false)
-        sign_in(admin)
+    context "username format wrong" do
+      it "doesn't update credentials" do
+        params = {id: user_id, new_email: invalid_username, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('change_username_and_email')
       end
-      it "doesn't render the change emaile form" do
-        get :change_email, id: user_id, format: :js
-        expect(response.code).to eq "403"
+    end
+    context "valid credentials format" do
+      it "updates credentials" do
+        params = {id: user_id, new_email: valid_email, new_oim_id: valid_username, format: :js}
+        put :confirm_change_username_and_email, params
+        expect(response).to render_template('username_email_result')
       end
     end
   end
