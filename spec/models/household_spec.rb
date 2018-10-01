@@ -87,7 +87,6 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
-
   context "enrolled_including_waived_hbx_enrollments" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:household) {FactoryGirl.create(:household, family: family)}
