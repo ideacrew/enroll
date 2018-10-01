@@ -9,7 +9,7 @@ module SponsoredBenefits
       end
 
       private
-      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group
+      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group, :kind
 
       def published_plans_are_view_only
         if plan_design_proposal.published?
@@ -35,6 +35,14 @@ module SponsoredBenefits
 
       def plan_design_proposal_benefit_group
         plan_design_application.benefit_groups.first
+      end
+
+      def kind
+        if params[:kind] == "dental"
+          "dental"
+        else
+          "health"
+        end
       end
     end
   end
