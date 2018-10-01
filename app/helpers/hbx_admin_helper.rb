@@ -53,4 +53,8 @@ module HbxAdminHelper
   def find_enrollment(hbx_id)
     HbxEnrollment.find(hbx_id)
   end
+
+  def active_eligibility?(family)
+    family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
+  end
 end

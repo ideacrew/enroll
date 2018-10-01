@@ -146,16 +146,17 @@ class BenefitCoveragePeriod
   # @return [ Array<Plan> ] the list of eligible products
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil)
     ivl_bgs = []
+    hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     benefit_packages.each do |bg|
       satisfied = true
-      family = hbx_enrollment_members.first.hbx_enrollment.family
+      family = hbx_enrollment.family
       hbx_enrollment_members.map(&:family_member).each do |family_member|
         consumer_role = family_member.person.consumer_role
         resident_role = family_member.person.resident_role
         unless resident_role.nil?
           rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family)
         else
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment_members.first.hbx_enrollment.effective_on })
+          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment.effective_on })
         end
         satisfied = false and break unless rule.satisfied?[0]
       end
@@ -164,7 +165,7 @@ class BenefitCoveragePeriod
 
     ivl_bgs = ivl_bgs.uniq
     elected_plan_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
-    Plan.individual_plans(coverage_kind: coverage_kind, active_year: start_on.year, tax_household: tax_household).by_plan_ids(elected_plan_ids).entries
+    Plan.individual_plans(coverage_kind: coverage_kind, active_year: start_on.year, tax_household: tax_household, hbx_enrollment: hbx_enrollment).by_plan_ids(elected_plan_ids).entries
   end
 
   ## Class methods
