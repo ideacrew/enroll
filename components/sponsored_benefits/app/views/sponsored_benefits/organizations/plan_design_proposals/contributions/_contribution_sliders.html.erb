@@ -7,8 +7,14 @@
       </div>
     </div>
     <div class="col-xs-12 benefits-fields benefits-adjustmets">
-      <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-        <%= render "sponsored_benefits/organizations/plan_design_proposals/contributions/relationship_benefit_fields", f: rb %>
+      <% if kind == "dental" %>
+        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+          <%= render "sponsored_benefits/organizations/plan_design_proposals/contributions/relationship_benefit_fields", f: rb %>
+        <% end %>
+      <% else %>
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+          <%= render "sponsored_benefits/organizations/plan_design_proposals/contributions/relationship_benefit_fields", f: rb %>
+        <% end %>
       <% end %>
     </div>
   </div>
