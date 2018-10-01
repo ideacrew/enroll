@@ -799,7 +799,7 @@ class EmployerProfile
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
             if !org.employer_profile.binder_paid?
-              notice_to_employee_for_missing_binder_payment(org)
+              notice_to_ee_that_er_plan_year_will_not_be_written(org)
             end
           end
         end
@@ -1145,12 +1145,12 @@ private
     )
   end
    
-  def self.notice_to_employee_for_missing_binder_payment(org)
+  def self.notice_to_ee_that_er_plan_year_will_not_be_written(org)
     org.employer_profile.census_employees.active.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_employee_for_missing_binder_payment", "acapi_trigger" =>  true )
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
       rescue Exception => e
-        (Rails.logger.error {"Unable to deliver notice_to_employee_for_missing_binder_payment to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
+        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
       end
     end
   end
