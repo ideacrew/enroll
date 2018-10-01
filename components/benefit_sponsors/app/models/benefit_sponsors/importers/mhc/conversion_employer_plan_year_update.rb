@@ -3,7 +3,6 @@ module BenefitSponsors
     class ConversionEmployerPlanYearUpdate < ConversionEmployerPlanYear
 
       def save
-        binding.pry
         return false unless self.valid?
         return false if sponsored_benefit_kind == :health
         
