@@ -439,9 +439,12 @@ def employer_poc
       @dont_update_ssn = true
     else
       begin
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
+        @person.ssn = params[:person][:ssn]
+        @person.save
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
+        binding.pry
         @error_on_save = @person.errors.messages
         @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
       end
