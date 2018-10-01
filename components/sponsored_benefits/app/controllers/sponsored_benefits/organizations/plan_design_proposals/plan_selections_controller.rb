@@ -26,7 +26,7 @@ module SponsoredBenefits
       end
 
       def plan_design_form
-        SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id], kind: params[:kind])
+        SponsoredBenefits::Forms::PlanDesignProposal.new(organization: plan_design_organization, proposal_id: params[:plan_design_proposal_id], kind: kind)
       end
 
       def plan_design_application
