@@ -147,20 +147,29 @@ module BenefitSponsors
 
         end
 
-        context "today is date for force publish" do
+      context "today is date for force publish", dbclean: :after_each do
+          let(:open_enrollment_begin) { Date.new(TimeKeeper.date_of_record.year, 7, 3) }
 
-          before(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 11))
+          include_context "setup initial benefit application" do
+            let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
+            let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+            let(:aasm_state) { :draft }
           end
 
-          after(:each) do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
-          end
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 4))
+        end
+
+        after(:all) do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
+        subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
           it "should transition the benefit_application into :enrollment_open" do
-            scheduled_event.advance_day(TimeKeeper.date_of_record)
-            renewal_application.reload
-            expect(renewal_application.aasm_state).to eq :enrollment_open
+              subject.submit_application
+              initial_application.reload
+              expect(initial_application.aasm_state).to eq :enrollment_open
           end
 
           context "the active benefit_application has benefits that can be mapped into renewal benefit_application" do
@@ -182,7 +191,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:open_enrollment_period) { open_enrollment_begin..(effective_period.min - 10.days) }
+          let(:open_enrollment_period) { (effective_period.min - 10.days)..open_enrollment_begin }
           let(:aasm_state) { :approved }
         end
 
@@ -209,8 +218,6 @@ module BenefitSponsors
           let(:open_enrollment_begin) { TimeKeeper.date_of_record + 5.days }
 
           it "should do nothing" do
-            subject.begin_open_enrollment
-            initial_application.reload
             expect(initial_application.aasm_state).to eq :approved
           end
         end
