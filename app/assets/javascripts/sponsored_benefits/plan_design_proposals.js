@@ -25,8 +25,10 @@ $(document).on('ready', pageInit);
 $(document).on('page:load', pageInit);
 
 function pageInit() {
-  if(window.location.href.includes("kind=dental")) {
-    if ($("#dental_reference_plan_id").val() != '') {
+  var kind = fetchBenefitKind();
+  if(kind == "dental") {
+    var dental_reference_plan_id = $("#dental_reference_plan_id").val();
+    if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
       // toDo
     } else {
       setTimeout(function() {
@@ -238,7 +240,8 @@ function toggleSliders(plan_kind) {
 
 function calcPlanDesignContributions() {
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  kind = fetchBenefitKind();
+  if (proposalIsInvalid(data) && kind != "dental") {
     disableActionButtons();
   } else {
     enableActionButtons();
