@@ -65,28 +65,10 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
       benefit_group_assignments: [benefit_group_assignment]
     )}
     let(:person) { FactoryGirl.create(:person) }
-    # let(:family) {::Family.new}
-    # let(:household) {::Household.new}
-    # let(:hbx_enrollment) { ::HbxEnrollment.new(kind: "employer_sponsored", effective_on: start_on, employee_role_id: employee_role.id,
-                            # sponsored_benefit_package_id: benefit_package.id, benefit_group_assignment_id: benefit_group_assignment.id,
-                            # aasm_state: 'coverage_selected') }
     let(:family) { double }
-    # let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let(:hbx_enrollment) { double(kind: "employer_sponsored", effective_on: start_on, employee_role_id: employee_role.id,
                             sponsored_benefit_package_id: benefit_package.id, benefit_group_assignment_id: benefit_group_assignment.id,
                             aasm_state: 'coverage_selected') }
-
-    # let!(:hbx_enrollment) do
-    #   FactoryGirl.create(:hbx_enrollment,
-    #                      household: family.active_household,
-    #                      kind: "employer_sponsored",
-    #                      effective_on: start_on,
-    #                      employee_role_id: employee_role.id,
-    #                      sponsored_benefit_package_id: benefit_package.id,
-    #                      benefit_group_assignment_id: benefit_group_assignment.id,
-    #                      aasm_state: 'coverage_selected'
-    #   )
-    # end
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
@@ -153,8 +135,6 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
         allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
         subject.migrate
         benefit_application.reload
-        allow(hbx_enrollment).to receive(:terminated_on).and_return(end_on)
-        # allow(hbx_enrollment).to receive(:terminate!)
       end
 
       it "should terminate the benefit application" do
