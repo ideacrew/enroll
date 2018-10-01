@@ -21,25 +21,11 @@ module SponsoredBenefits
       end
 
       def for_new
-        if kind == 'dental'
-          build_dental_relationship_benefits
-        else
-          build_benefit_group
-        end
+        service.ensure_benefits
       end
 
-      def build_dental_relationship_benefits
-        application = profile.benefit_application
-        benefit_group = application.benefit_groups.first
-
-        if benefit_group.build_dental_relationship_benefits.empty?
-          benefit_group.build_dental_relationship_benefits 
-        end
-        benefit_group
-      end
-
-      def build_benefit_group
-        ensure_benefit_group
+      def for_create(attrs)
+        service.save_benefits(attrs)
       end
 
       def assign_wrapper_attributes(attrs = {})
@@ -119,27 +105,6 @@ module SponsoredBenefits
         @proposal.save!
       end
 
-      def ensure_benefit_group
-        sponsorship = @proposal.profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.first
-        benefit_group = application.benefit_groups.first || construct_new_benefit_group
-        if benefit_group.relationship_benefits.empty?
-          benefit_group.build_relationship_benefits
-        end
-        if benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
-      end
-
-      def construct_new_benefit_group
-        sponsorship = @proposal.profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.first
-        benefit_group = application.benefit_groups.build
-        benefit_group.build_relationship_benefits
-        benefit_group.build_composite_tier_contributions
-        benefit_group
-      end
-
       def save
         initial_enrollment_period = @effective_date..(@effective_date.next_year.prev_day)
 
@@ -201,6 +166,14 @@ module SponsoredBenefits
 
       def is_dental?
         kind == "dental"
+      end
+
+      def service
+        return @service if defined? @service
+        @service = SponsoredBenefits::Services::PlanDesignProposalService.new(
+          kind: kind,
+          proposal: proposal
+        )
       end
     end
   end
