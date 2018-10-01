@@ -13,12 +13,12 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', reset_password_user_path(row), 'ajax']
+                                     ['Reset Password', reset_password_user_path(row), 'disabled']
                                    else
-                                     ['Reset Password', edit_user_path(row.id), 'ajax']
+                                     ['Reset Password', edit_user_path(row.id), 'disabled']
                                    end,
-                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
-                                   ['View Login History',login_history_user_path(id: row.id), 'ajax'],
+                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'disabled'],
+                                   ['View Login History',login_history_user_path(id: row.id), 'disabled'],
                                    ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
@@ -58,6 +58,7 @@ module Effective
                     {scope:'all_employee_roles', label: 'Employee', subfilter: :lock_unlock},
                     {scope:'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock},
                     {scope:'all_broker_roles', label: 'Broker', subfilter: :lock_unlock},
+                    {scope:'all_consumer_roles', label: 'Consumer', subfilter: :lock_unlock}
                 ],
             top_scope: :users
         }
