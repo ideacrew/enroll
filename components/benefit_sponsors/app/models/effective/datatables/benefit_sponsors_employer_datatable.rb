@@ -36,12 +36,12 @@ module Effective
           :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => "all"}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
-          if row.latest_benefit_application.present?
-            benefit_application_summarized_state(row.latest_benefit_application)
+          if row.effective_dt_latest_benefit_application.present?
+            benefit_application_summarized_state(row.effective_dt_latest_benefit_application)
           end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
-          if row.latest_benefit_application.present?
-            row.latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
+          if row.effective_dt_latest_benefit_application.present?
+            row.effective_dt_latest_benefit_application.effective_period.min.strftime("%m/%d/%Y")
           end }, :filter => false, :sortable => true
 
         table_column :invoiced?, :proc => Proc.new { |row|

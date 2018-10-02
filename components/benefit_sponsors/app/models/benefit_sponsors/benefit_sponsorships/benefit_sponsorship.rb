@@ -417,6 +417,10 @@ module BenefitSponsors
       published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
+    def effective_dt_latest_benefit_application
+      renewal_benefit_application || current_benefit_application
+    end
+
     def renewing_submitted_benefit_application # TODO -recheck
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
     end
