@@ -411,6 +411,9 @@ def employer_poc
       @dont_allow_change = true
     else
       begin
+      if @person.has_active_consumer_role?
+        @person.consumer_role.check_for_critical_changes(params["person"], @person.primary_family)
+      end
         @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
