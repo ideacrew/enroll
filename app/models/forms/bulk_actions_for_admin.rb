@@ -40,7 +40,11 @@ module Forms
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
             termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-            hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
+            if hbx.is_shop? && (termination_date > ::TimeKeeper.date_of_record)
+              hbx.schedule_coverage_termination!(termination_date) if hbx.may_schedule_coverage_termination?
+            else
+              hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
+            end
             @result[:success] << hbx
             terminated_enrollments_transmission_info[hbx.id] = params.key?("transmit_hbx_#{hbx.id.to_s}") ? true : false
           rescue
