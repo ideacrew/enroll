@@ -1,9 +1,5 @@
 RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :model, dbclean: :after_each do
 
-  Dir[Rails.root.join("components/sponsored_benefits/spec/factories/sponsored_benefits_*.rb")].each do |f|
-    require f
-  end
-
   let(:subject) { SponsoredBenefits::Services::PlanDesignProposalService.new(
     kind: benefit_kind,
     proposal: proposal
