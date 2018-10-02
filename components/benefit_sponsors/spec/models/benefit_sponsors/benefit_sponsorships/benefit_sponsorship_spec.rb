@@ -474,6 +474,29 @@ module BenefitSponsors
       end
     end
 
+    describe "submitted_benefit_application", :dbclean => :after_each do
+      let(:benefit_sponsorship)             { employer_profile.add_benefit_sponsorship }
+      let!(:imported_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                                        benefit_sponsorship: benefit_sponsorship,
+                                                        recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :imported) }
+      context "when an employer has imported benefit application" do
+        it "should return imported benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.submitted_benefit_application).to eq imported_benefit_application
+        end
+      end
+
+      context "when employer with imported & active benefit application" do
+        let!(:active_benefit_application)   { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                                                benefit_sponsorship: benefit_sponsorship,
+                                                                recorded_service_areas: benefit_sponsorship.service_areas, aasm_state: :active) }
+        it "should return active benefit application" do
+          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          expect(benefit_sponsorship.submitted_benefit_application).to eq active_benefit_application
+        end
+      end
+    end
+
     describe "Scopes", :dbclean => :after_each do
       let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
       let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
