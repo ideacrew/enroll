@@ -443,7 +443,8 @@ function proposalIsInvalid(data) {
 
 function saveProposal(event) {
   var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  kind = fetchBenefitKind();
+  if (proposalIsInvalid(data) && kind != "dental") {
     // handle error messaging
     return;
   } else {
