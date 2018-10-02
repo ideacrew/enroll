@@ -974,7 +974,7 @@ class PlanYear
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled, :after_enter => :update_end_date             # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled       # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
     state :termination_pending
 
@@ -984,7 +984,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-    state :renewing_canceled, :after_enter => :update_end_date
+    state :renewing_canceled
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
@@ -1069,8 +1069,8 @@ class PlanYear
     end
 
     # Enrollment processed stopped due to missing binder payment
-    event :cancel, :after => :record_transition do
-      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages, :notify_cancel_event]
+    event :cancel, :after => [:record_transition, :update_end_date, :notify_cancel_event] do
+      transitions from: [:draft, :published, :publish_pending, :eligibility_review, :published_invalid, :application_ineligible, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     # Coverage disabled due to non-payment
@@ -1079,9 +1079,9 @@ class PlanYear
     end
 
     # Scheduling terminations for plan years with a future end on date
-    event :schedule_termination, :after => :record_transition do
+    event :schedule_termination, :after => [:record_transition, :set_plan_year_termination_date] do
       transitions from: :active,
-                    to: :termination_pending, :after => [:set_plan_year_termination_date, :terminate_employee_enrollments]
+                    to: :termination_pending, :after => [:terminate_employee_enrollments]
     end
 
     # Coverage terminated due to non-payment
@@ -1122,8 +1122,8 @@ class PlanYear
         :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft, :after => [:cancel_enrollments]
     end
 
-    event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages, :notify_cancel_event]
+    event :cancel_renewal, :after => [:record_transition, :update_end_date, :notify_cancel_event] do
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -1141,7 +1141,7 @@ class PlanYear
     self.end_on = end_on
     self.terminated_on = options[:terminated_on]
     self.termination_kind= options[:termination_kind]
-    self.save
+    self.save!
   end
 
   def trigger_passive_renewals
@@ -1223,8 +1223,17 @@ class PlanYear
 
   def notify_cancel_event(transmit_xml = false)
     return unless transmit_xml
-    if eligible_for_export?
-      notify_employer_py_cancellation
+    transition = self.latest_workflow_state_transition
+    if TimeKeeper.date_of_record < start_on
+      if transition.from_state == "enrolled" && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      elsif transition.from_state == "renewing_enrolled" && open_enrollment_completed? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      end
+    else
+      if transition.from_state == "active"
+        notify_employer_py_cancellation
+      end
     end
   end
 
