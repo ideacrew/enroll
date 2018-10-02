@@ -28,7 +28,9 @@ module BenefitSponsors
 
         clean_hios = single_plan_hios_id.split("-")[0]
         # corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        BenefitMarkets::Products::Product.by_application_period(period).where(hios_id: clean_hios).first
+        BenefitMarkets::Products::Product.dental_products.where(hios_id: clean_hios).detect do |product|
+          product.application_period.cover?(period.min)
+        end
       end
     end
   end
