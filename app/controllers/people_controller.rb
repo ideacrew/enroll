@@ -201,7 +201,6 @@ class PeopleController < ApplicationController
       redirect_path = family_account_path
     end
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
-
     respond_to do |format|
       if @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active?
