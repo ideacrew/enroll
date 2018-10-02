@@ -3,7 +3,7 @@ require "rails_helper"
 module BenefitSponsors
   RSpec.describe Importers::Mhc::ConversionEmployerPlanYearUpdate, db_clean: :after_each do
 
-    def class_initializer(params = {})
+    def class_initializer(params={})
       Importers::Mhc::ConversionEmployerPlanYearUpdate.new(params)
     end
 
@@ -53,7 +53,7 @@ module BenefitSponsors
 
     describe "Action#update" do
       context "When sponsored benefit kind is health" do
-        let(:formed_health_params) { {
+        let(:formed_health_params) {{
             :action => "Update",
             :fein => "rspec-mock",
             :sponsored_benefit_kind => :health
@@ -61,9 +61,9 @@ module BenefitSponsors
         }
         it "should not update benefit application" do
           update_instance = class_initializer(formed_health_params)
-          # we do not want to create un-necessary factories for organization and site to validate a -ive scenario
-          # by mocking the update method we can validate that scenario
-          allow_any_instance_of(Importers::Mhc::ConversionEmployerPlanYearUpdate).to receive(:valid?).and_return(true)
+          # we do not want to search for record and validate
+          # since it is -ive scenario for checking :health sponsored benefit
+          allow(update_instance).to receive(:valid?).and_return(true)
           expect(update_instance.save).to be_falsy
         end
       end
