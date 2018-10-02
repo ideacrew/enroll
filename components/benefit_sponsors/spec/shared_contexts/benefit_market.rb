@@ -1,4 +1,4 @@
-RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
+RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata, dbclean: :after_each do
 
   let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_market)          { site.benefit_markets.first }

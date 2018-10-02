@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe ContributionCalculators::CcaShopReferencePlanContributionCalculator do
+  RSpec.describe ContributionCalculators::CcaShopReferencePlanContributionCalculator, :dbclean => :after_each do
     let(:contribution_calculator) do
       ::BenefitSponsors::ContributionCalculators::CcaShopReferencePlanContributionCalculator.new
     end

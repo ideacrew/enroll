@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper do
+RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, :dbclean => :after_each do
   include BenefitSponsors::ApplicationHelper
 
   describe '.profile_unread_messages_count' do

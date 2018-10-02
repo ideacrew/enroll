@@ -81,7 +81,7 @@ module BenefitSponsors
         end
       end
 
-      context "with two benefit markets of the same kind", dbclean: :after_each do
+      context "with two benefit markets of the same kind" do
         let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
 
         let(:site) { Site.new(params) }
@@ -95,7 +95,7 @@ module BenefitSponsors
         end
       end
 
-      context "with all required arguments", dbclean: :after_each do
+      context "with all required arguments" do
         let(:valid_site) { Site.new(params) }
 
         before do
@@ -172,7 +172,7 @@ module BenefitSponsors
       end
     end
 
-    context "organization associations must be valid", dbclean: :after_each do
+    context "organization associations must be valid" do
 
       let(:owner_legal_name)    { "Hannah Barbara, LLC" }
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
