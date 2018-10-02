@@ -282,7 +282,7 @@ module BenefitSponsors
 
 
           it "invokes pricing determination calculation" do
-            expect(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
+            expect{::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(initial_application, Date.new(Date.today.year, 7, 24))}.not_to raise_error
             subject.end_open_enrollment
           end
         end
