@@ -444,7 +444,6 @@ def employer_poc
         @person.save
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
-        binding.pry
         @error_on_save = @person.errors.messages
         @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
       end
