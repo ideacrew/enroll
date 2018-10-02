@@ -5,7 +5,6 @@ module SponsoredBenefits
 
       def new
         plan_design_form.for_new
-        # plan_design_form.build_benefit_group
       end
 
       private
