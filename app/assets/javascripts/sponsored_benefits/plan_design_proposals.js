@@ -29,7 +29,7 @@ function pageInit() {
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
-      // toDo
+      calcPlanDesignContributions();
     } else {
       setTimeout(function() {
         $('li.single-plan-tab').find('label').trigger('click');
