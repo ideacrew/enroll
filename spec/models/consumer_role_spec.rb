@@ -777,7 +777,7 @@ describe "#find_document" do
   end
 end
 
-describe "Indian tribe member" do
+describe "Indian tribe member", :dbclean => :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role }
   let(:verification_types) { consumer.verification_types }
