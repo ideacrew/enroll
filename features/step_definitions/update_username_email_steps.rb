@@ -4,7 +4,7 @@ Then (/^Hbx Admin Tier 3 sees User Accounts link$/) do
 end
 
 When(/^Hbx Admin Tier 3 clicks on User Accounts link$/) do
-  click_link "User Accounts"
+  find_link("User Accounts").trigger('click')
   wait_for_ajax
 end
 
