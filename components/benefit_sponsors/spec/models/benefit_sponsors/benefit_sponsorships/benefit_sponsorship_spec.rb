@@ -482,13 +482,13 @@ module BenefitSponsors
       end
     end
 
-    describe "effective_dt_latest_benefit_application", :dbclean => :after_each do
+    describe "latest_application", :dbclean => :after_each do
       let!(:benefit_sponsorship)   { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_renewal_draft_benefit_application, profile: employer_profile ) }
 
       context "when employer has renewal benefit application" do
 
         it "should return benefit_application" do
-          expect(benefit_sponsorship.effective_dt_latest_benefit_application.is_renewing?).to eq true
+          expect(benefit_sponsorship.latest_application.is_renewing?).to eq true
         end
       end
 
@@ -496,7 +496,7 @@ module BenefitSponsors
         before { benefit_sponsorship.benefit_applications.where(:predecessor_id.ne => nil).delete }
 
         it "should return benefit_application" do
-          expect(benefit_sponsorship.effective_dt_latest_benefit_application.is_renewing?).to eq false
+          expect(benefit_sponsorship.latest_application.is_renewing?).to eq false
         end
       end
 
@@ -504,7 +504,7 @@ module BenefitSponsors
         before { benefit_sponsorship.benefit_applications = []}
 
         it "should not return benefit_application" do
-          expect(benefit_sponsorship.effective_dt_latest_benefit_application).to eq nil
+          expect(benefit_sponsorship.latest_application).to eq nil
         end
       end
     end
