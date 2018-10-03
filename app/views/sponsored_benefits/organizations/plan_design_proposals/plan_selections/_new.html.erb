@@ -12,8 +12,9 @@
              <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(plan_design_organization), class:'btn btn-primary' %>
           </div>
           <div class="col-md-6 col-md-offset-6 sq-btn-grp plan-selection-button-group">
-            <% dental_label = plan_design_proposal.active_benefit_group.dental_reference_plan_id.present? ? "Edit Dental Benefits" : "Select Dental Benefits" %>
+            <% dental_label = has_dental_benefits? ? "Edit Dental Benefits" : "Select Dental Benefits" %>
             <%= button_tag dental_label, id: "AddDentalToPlanDesignProposal", class:'btn btn-primary save-action' unless plan_design_form.is_dental? %>
+            <%= link_to "Remove Dental Benefits", sponsored_benefits.organizations_plan_design_proposal_benefit_group_path(id: plan_design_proposal.id, benefit_group: {kind: "dental"} ), method: :delete, class:'btn btn-primary' if has_dental_benefits? && plan_design_form.is_dental? %>
             <%= button_tag "Save Quote", id: "submitPlanDesignProposal", class:'btn btn-primary save-action' %>
             <%= button_tag "Copy Quote", id: "copyPlanDesignProposal", class:'btn btn-primary save-action' %>
             <%= button_tag "Review Quote", id: "reviewPlanDesignProposal", class:'btn btn-primary save-action' %>
