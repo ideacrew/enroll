@@ -30,11 +30,12 @@
 										span.rp-plan-info.ml-1
 											= product.metal_level_kind
 										br
-										span.plan-label Network: 
-										span.rp-plan-info
-                      - if product.network_information.present?
-                        NETWORK NOTES <a data-toggle="tooltip" title='#{product.network_information}'><i class="fas fa-question-circle"></i></a>
-
+                                        span.plan-label Network:
+                                        span.rp-plan-info
+                                          - if product.network_information.present?
+                                            a#myToolTip data-toggle="tooltip" data-placement="top" data-container="body" title="#{product.network_information}"
+                                                i.fas.fa-question-circle
+                                                = "NETWORK NOTES"
 										br
 										span.plan-label.mt-1.rp-view-summary onclick="viewSummary(this)" data-plan-title=product.title data-plan-id=product.id View Summary
 										br
@@ -125,7 +126,6 @@ javascript:
             showLess = true;
         }
     }
+
+
 		
-		function showDentalModal() {
-			swal("Here's the title!", "...and here's the text!");
-		}

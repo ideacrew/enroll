@@ -79,7 +79,7 @@ module BenefitSponsors
         product_packages.by_product_kind(:dental).each do |product_package|
           package_products = product_package.products.collect do |product|
             # TODO
-            Product.new(product.id, product.title, product.metal_level, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.kind.to_s, product.product_type, "TODO")
+            Product.new(product.id, product.title, product.metal_level, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.kind.to_s, product.product_type, product.network_information)
           end
           @products[product_package.package_kind] = case product_package.package_kind
             when :multi_product
