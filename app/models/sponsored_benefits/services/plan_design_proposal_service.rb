@@ -17,6 +17,12 @@ module SponsoredBenefits
         self.send("save_#{kind}_benefits", attrs)
       end
 
+      def destroy_benefits
+        # we can only destroy dental benefits
+        reset_dental_benefits
+        benefit_group.update_attributes(dental_reference_plan_id: nil)
+      end
+
       def ensure_health_benefits
         if benefit_group.relationship_benefits.empty?
           benefit_group.build_relationship_benefits

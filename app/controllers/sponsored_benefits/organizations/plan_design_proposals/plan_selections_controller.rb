@@ -8,7 +8,7 @@ module SponsoredBenefits
       end
 
       private
-      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group, :kind
+      helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group, :kind, :has_dental_benefits?
 
       def published_plans_are_view_only
         if plan_design_proposal.published?
@@ -42,6 +42,10 @@ module SponsoredBenefits
         else
           "health"
         end
+      end
+
+      def has_dental_benefits?
+        plan_design_proposal.active_benefit_group.dental_reference_plan_id.present?
       end
     end
   end
