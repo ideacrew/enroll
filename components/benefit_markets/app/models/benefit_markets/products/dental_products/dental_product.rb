@@ -12,6 +12,7 @@ module BenefitMarkets
       field :dental_plan_kind,            type: Symbol
 
       field :hsa_eligibility,             type: Boolean,  default: false
+      field :is_standard_plan,            type: Boolean,  default: false
 
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Float,    default: 0.0
@@ -24,6 +25,8 @@ module BenefitMarkets
                 presence: true,
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
+      alias_method :is_standard_plan?, :is_standard_plan
+      
       def metal_level
         dental_level.to_s
       end
