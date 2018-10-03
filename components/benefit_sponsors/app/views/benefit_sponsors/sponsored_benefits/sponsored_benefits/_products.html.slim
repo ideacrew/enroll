@@ -33,7 +33,7 @@
                                         span.plan-label Network:
                                         span.rp-plan-info
                                           - if product.network_information.present?
-                                            a data-toggle="tooltip" title="#{product.network_information}"
+                                            a#myToolTip data-toggle="tooltip" data-placement="top" data-container="body" title="#{product.network_information}"
                                                 i.fas.fa-question-circle
                                                 = "NETWORK NOTES"
 										br
@@ -126,7 +126,6 @@ javascript:
             showLess = true;
         }
     }
+
+
 		
-		function showDentalModal() {
-			swal("Here's the title!", "...and here's the text!");
-		}
