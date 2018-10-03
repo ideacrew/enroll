@@ -26,7 +26,7 @@ module BenefitMarkets
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
       alias_method :is_standard_plan?, :is_standard_plan
-      
+
       def metal_level
         dental_level.to_s
       end

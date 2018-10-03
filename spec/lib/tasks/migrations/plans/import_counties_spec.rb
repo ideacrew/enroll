@@ -6,7 +6,8 @@ describe "import_counties" do
     Rake.application.rake_require 'tasks/migrations/plans/import_counties'
     Rake::Task.define_task(:environment)
 
-    file =  File.join(Rails.root, "db", "seedfiles", "plan_xmls","#{Settings.aca.state_abbreviation.downcase}","xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx")
+    file =  File.join(Rails.root, "spec", "test_data/plan_data", "rating_areas","2019/SHOP_ZipCode_CY2019_FINAL.xlsx")
+    @files = Dir.glob(file)
     result = Roo::Spreadsheet.open(file)
     sheet_data = result.sheet("Master Zip Code List")
     @raw_info = sheet_data.row(2)
@@ -37,5 +38,5 @@ describe "import_counties" do
 end
 
 def invoke_counties_tasks
-  Rake::Task["import:county_zips"].invoke
+  Rake::Task["import:county_zips"].invoke(@files.first)
 end
