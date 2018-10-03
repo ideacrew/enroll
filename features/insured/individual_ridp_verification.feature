@@ -211,8 +211,5 @@ Feature: Consumer RIDP verification process
     And Individual resumes enrollment
     And I click on sign in existing account
     And I signed in
-    Then the CONTINUE button is functionally ENABLED
-    And visibly ENABLED
-    And I click on Continue button
     Then I should land on home page
     
