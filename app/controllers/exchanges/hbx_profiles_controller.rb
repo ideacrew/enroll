@@ -60,6 +60,32 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def disable_ssn_requirement
+    @organizations= Organization.where(:id.in => params[:ids]).all
+    @organizations.each do |org|
+      # logic for both Bulk Action drop down and action column drop down under data table
+      if params[:can_update].present?
+        if params[:can_update] == "disable"
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+        end
+      else
+        if org.employer_profile.no_ssn.to_s == "false"
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+        end
+      end
+    end
+    redirect_to employer_invoice_exchanges_hbx_profiles_path
+    return
+  end
+
   def generate_invoice
 
     @organizations= Organization.where(:id.in => params[:ids]).all
@@ -407,12 +433,16 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-
+    @ssn_fields = @person.employee_roles.map{|e| e.employer_profile.no_ssn} if @person.employee_roles.present?
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
+    elsif @ssn_fields.include?(false)
+      @dont_update_ssn = true
     else
       begin
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
+        @person.ssn = params[:person][:ssn]
+        @person.save
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
         @error_on_save = @person.errors.messages

@@ -289,7 +289,7 @@ RSpec.describe Employers::CensusEmployeesController do
     end
 
     context "for past enrollments" do
-      let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
+      let(:census_employee) { FactoryGirl.build(:census_employee, employer_profile_id: employer_profile.id, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn,  employee_role_id: employee_role.id)}
       let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
       let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
       let(:person) { FactoryGirl.create(:person, :with_family)}
@@ -546,12 +546,12 @@ RSpec.describe Employers::CensusEmployeesController do
       expect(response).to render_template("benefit_group")
     end
   end
-  
+
   describe "Update census member email" do
-    it "expect census employee to have a email present" do 
+    it "expect census employee to have a email present" do
       expect(census_employee.email.present?).to eq true
     end
-    
+
     it "should allow emails to be updated to nil" do
       census_employee.email.update(address:'', kind:'')
       expect(census_employee.email.kind).to eq ''
