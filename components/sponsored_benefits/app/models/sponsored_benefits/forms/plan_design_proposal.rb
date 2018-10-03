@@ -28,6 +28,10 @@ module SponsoredBenefits
         service.save_benefits(attrs)
       end
 
+      def for_destroy
+        service.destroy_benefits
+      end
+
       def assign_wrapper_attributes(attrs = {})
         attrs.each_pair do |k,v|
           self.send("#{k}=", v)
