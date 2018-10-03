@@ -39,7 +39,13 @@ module BenefitSponsors
         return @plan unless @plan.nil?
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
-        corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+
+        if sponsored_benefit_kind == :dental
+          corrected_hios_id = clean_hios.split("-")[0]
+        else
+          corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+        end
+
         sponsor_benefit = find_sponsor_benefit
 
         if sponsor_benefit.source_kind == :conversion
