@@ -54,11 +54,11 @@ module BenefitSponsors::Importers
 
     let(:relationship_benefits) {
       [
-        {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026693'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"employee"},
-        {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026694'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"spouse"},
-        {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026695'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"domestic_partner"},
-        {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026696'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_under_26"},
-        {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026697'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_26_and_over"}
+        {"premium_pct"=>90.0, "offered"=>true, "relationship"=>"employee"},
+        {"premium_pct"=>80.0, "offered"=>true, "relationship"=>"spouse"},
+        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"domestic_partner"},
+        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_under_26"},
+        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_26_and_over"}
       ]
     }
 
@@ -101,11 +101,11 @@ module BenefitSponsors::Importers
 
       let(:dental_relationship_benefits) {
         [
-          {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026693'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"employee"},
-          {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026694'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"spouse"},
-          {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026695'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"domestic_partner"},
-          {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026696'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_under_26"},
-          {"_id"=>BSON::ObjectId('5bb499f5fb9cdd07e1026697'), "premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_26_and_over"}
+          {"premium_pct"=>100.0, "offered"=>true, "relationship"=>"employee"},
+          {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"spouse"},
+          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"domestic_partner"},
+          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"child_under_26"},
+          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"child_26_and_over"}
         ]
       }
 
