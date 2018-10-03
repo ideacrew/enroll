@@ -1,6 +1,7 @@
 namespace :import do
-  task :county_zips => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx"))
+  task :county_zips, [:file] => :environment do |task, args|
+
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates", "SHOP_ZipCode_CY2017_FINAL.xlsx"))
     count = 0
     if Settings.aca.state_abbreviation.downcase == "ma"
       files.each do |file|

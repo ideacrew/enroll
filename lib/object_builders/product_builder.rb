@@ -87,7 +87,7 @@ class ProductBuilder
           benefit_market_kind: "aca_#{parse_market}",
           title: cost_share_variance.plan_marketing_name.squish!,
           issuer_profile_id: get_issuer_profile_id,
-          hios_id: cost_share_variance.hios_plan_and_variant_id,
+          hios_id: is_health_product? ? cost_share_variance.hios_plan_and_variant_id : hios_base_id,
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id,
           application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
@@ -141,7 +141,7 @@ class ProductBuilder
     exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     exempt_organizations.each do |exempt_organization|
       issuer_profile = exempt_organization.issuer_profile
-      issuer_profile.issuer_hios_ids.join.split(",").each do |issuer_hios_id|
+      issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
         @issuer_profile_hash[issuer_hios_id] = issuer_profile.id.to_s
       end
     end
@@ -149,13 +149,13 @@ class ProductBuilder
   end
 
   def mapped_service_area_id
-    @service_area_map[[get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
   end
 
   def set_service_areas
     @service_area_map = {}
     ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
-      @service_area_map[[sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
     end
   end
 

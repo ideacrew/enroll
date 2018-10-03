@@ -66,7 +66,7 @@ namespace :import do
         elsif year == 2018
           ["2018_QHP", "2018_QDP"]
         elsif year == 2019
-          ["2018_QHP"]
+          ["2019_QHP", "2019_QDP"]
         end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
@@ -84,16 +84,17 @@ namespace :import do
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
-              if sheet_name != "2018_QDP"
+              if sheet_name != "#{year}_QDP"
                 rx_formulary_url = row_info[@headers["rx formulary url"]].strip
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               end
               plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               plan.network_information = row_info[@headers["network notes"]]
-                plan.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
-                plan.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
-                plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
-                plan.save
+              plan.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+              plan.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+              plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+              plan.name = row_info[@headers["plan name"]].strip
+              plan.save
             end
             # end of old model
 
@@ -102,12 +103,13 @@ namespace :import do
             products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
             products.each do |product|
               product.provider_directory_url = provider_directory_url
-              if sheet_name != "2018_QDP"
+              if sheet_name != "#{year}_QDP"
                 rx_formulary_url = row_info[@headers["rx formulary url"]].strip
                 product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               end
               product.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               product.network_information = row_info[@headers["network notes"]]
+              product.title = row_info[@headers["plan name"]].strip
 
               sole_source_offering = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
               horizontal_offering = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
