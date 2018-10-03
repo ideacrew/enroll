@@ -80,9 +80,12 @@ PATH
       active_model_serializers
       config
       devise (~> 3.5.4)
+      interactor (= 3.1.0)
+      interactor-rails (= 2.0.2)
       language_list (~> 1.1.0)
       money-rails (~> 1.3.0)
       mongoid (~> 5.4.0)
+      mongoid-autoinc
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
