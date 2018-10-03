@@ -1,3 +1,4 @@
+puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 batch_size = 500
 offset = 0
 family_count = Family.count
@@ -95,3 +96,4 @@ while offset <= family_count
 
   offset = offset + batch_size
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
