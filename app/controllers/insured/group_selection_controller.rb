@@ -7,6 +7,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def new
     set_bookmark_url
+    set_admin_bookmark_url
     hbx_enrollment = build_hbx_enrollment
     @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
