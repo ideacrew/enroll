@@ -471,6 +471,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "POST update_dob_ssn" do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let(:person1) { FactoryGirl.create(:person) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
@@ -485,6 +486,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      allow(person.consumer_role).to receive(:check_for_critical_changes).with(@params["person"], family).and_return nil
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
     end
@@ -494,6 +496,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      allow(person.consumer_role).to receive(:check_for_critical_changes).with(@params["person"], family).and_return nil
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('update_enrollment')
     end
