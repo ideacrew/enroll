@@ -3,10 +3,7 @@ batch_size = 500
 offset = 0
 family_count = Family.count
 
-plan_ids = Plan.where(:active_year => 2018, :market => "individual").map(&:_id)
-plan_ids << Plan.where(:active_year => 2019, :market => "individual").map(&:_id)
-plan_ids.flatten!
-plan_ids.compact!
+plan_ids = Plan.where(:active_year => 2019, :market => "individual").map(&:_id)
 
 csv = CSV.open("final_eligibility_notice_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(ic_number policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.total_premium deductible family_deductible  subscriber_id member_id person.first_name person.last_name
@@ -50,7 +47,7 @@ def document_due_date(family)
 end
 
 def is_family_renewing(family)
-  family.active_household.hbx_enrollments.where(:aasm_state.in => ["coverage_selected", "enrolled_contingent"], kind: "individual", effective_on: Date.new(2018,1,1)).present?
+  family.active_household.hbx_enrollments.where(:aasm_state.in => ["coverage_selected", "enrolled_contingent"], kind: "individual", effective_on: Date.new(2019,1,1)).present?
 end
 
 def check_for_outstanding_verification_types(person)
@@ -76,7 +73,7 @@ while offset <= family_count
       next if !is_family_renewing(policy.family)
       next if policy.plan.nil?
       next if !plan_ids.include?(policy.plan_id)
-      next if policy.effective_on < Date.new(2018, 01, 01)
+      next if policy.effective_on < Date.new(2019, 01, 01)
       next if !(["auto_renewing", "coverage_selected", "enrolled_contingent"].include?(policy.aasm_state))
       next if !(['01', '03', ''].include?(policy.plan.csr_variant_id))#includes dental plans - csr_variant_id - ''
       next if policy.plan.market != 'individual'
