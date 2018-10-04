@@ -96,6 +96,32 @@
         <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps, single_plan_displayed: true %>
       </div>
     </div>
+		<% if @benefit_group.dental_reference_plan.present? %>
+		<div class="panel panel-default">
+			<div class="panel-heading custom-heading">
+				<h3 class="panel-title">Employee Costs - Dental Benefits</h3>
+			</div>
+			<div class="panel-body">
+				<label>Plan Offerings - <%= @benefit_group.dental_reference_plan.name %></label><br />
+				<label>Employer Lowest/Reference/Highest - $0.00/$0.00/$0.00</label>
+		    <table class="table table-bg-white table-employee-2">
+		      <thead>
+		        <tr>
+		          <th class="text-center">Employee</th>
+		          <th class="text-center">Dependent Count</th>
+		          <th class="text-right">Lowest Cost Available Plan</th>
+		          <th class="text-right">Reference Plan</th>
+		          <th class="text-right">Highest Cost Available Plan</th>
+		        </tr>
+		      </thead>
+		      <tbody id="employee_index_scroll">
+
+		      </tbody>
+		    </table>
+				
+			</div>
+		</div>
+		<% end %>
   </div>
   <div class="col-md-6 col-md-offset-5">
     To finalize your quote and make it available to your client, click publish Quote.  Once you publish your quote, you cannot make edits to it.  If you want to make edits to your qupte now, click Update Roster or Select Benefits.
