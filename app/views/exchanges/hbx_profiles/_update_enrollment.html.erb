@@ -1,6 +1,5 @@
 <div class="container bottom-pd">
-
-  <%if not @dont_allow_change%>
+  <%if !@dont_allow_change && !@dont_update_ssn %>
 
     <h4 class="title">DOB / SSN Update Successful</h4>
       <table class="table table-border">
@@ -17,6 +16,8 @@
         </tbody>
       </table>
     </div>
+  <%elsif  @dont_update_ssn %>
+    <h4 class="title">SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN</h4>
 
   <%else%>
 
@@ -24,7 +25,7 @@
     <h5>
       <h4>SSN matches with the following user:</h4>
       First Name :<b><%=@ssn_match.first_name%></b> <br />
-      Last Name:  <b><%=@ssn_match.last_name%></b>  <br />  
+      Last Name:  <b><%=@ssn_match.last_name%></b>  <br />
       HBX ID:     <b><%=@ssn_match.hbx_id%></b>     <br />
       Date of Birth: <b><%=@ssn_match.dob%></b>     <br />
       SSN: <b><%=@ssn_match.ssn%></b>     <br />

@@ -298,15 +298,18 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
     let(:organization){  FactoryGirl.create(:organization) }
     let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+    let(:date) { TimeKeeper.datetime_of_record }
 
     before :each do
       sign_in(user)
     end
 
-    it "renders the 'employer index' template" do
+    it "renders the 'employer index' template with updated attributes" do
       expect(employer_profile.no_ssn).to be_falsy
+      expect(employer_profile.disable_ssn_date).to be_nil
       expect(subject).to redirect_to employer_invoice_exchanges_hbx_profiles_path
       expect(employer_profile.reload.no_ssn).to be_truthy
+      expect(employer_profile.disable_ssn_date).to eq(date)
     end
   end
 
