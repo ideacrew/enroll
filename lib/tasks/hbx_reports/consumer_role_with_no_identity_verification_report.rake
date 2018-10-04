@@ -22,19 +22,20 @@ namespace :reports do
               ivl_role = person.consumer_role.present? ? 'Y' : 'N'
               ee_role = person.active_employee_roles.present? ? 'Y' : 'N'
               active_enrollments = person.primary_family.active_household.active_hbx_enrollments
-
-              plan_names = active_enrollments.collect() do |list, enrollment|
-                if enrollment.kind=="individual" 
-                  list << enrollment.plan.name 
+              unless active_enrollments.empty?
+                plan_names = []
+                active_enrollments.each do |enrollment|
+                  if enrollment.kind=="individual" 
+                    plan_names << enrollment.plan.name 
+                  end
                 end
-                list
-              end
-              unless plan_names.uniq.empty?
-                csv <<  [ hbx_id,
-                          ivl_role,
-                          ee_role,
-                          plan_names.uniq
-                        ]
+                unless plan_names.uniq.empty?
+                  csv <<  [ hbx_id,
+                            ivl_role,
+                            ee_role,
+                            plan_names.uniq
+                          ]
+                end
               end
             end
           end
