@@ -44,7 +44,7 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
     set_admin_bookmark_url
     @family_members = @family.active_family_members
-    @resident = @person.has_active_resident_role?
+    @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -104,10 +104,10 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
 
     @family_members = @family.active_family_members
-    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
-    @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
-    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
-    @resident = @person.resident_role.present?
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
+    @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
+    @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
+    @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
     end
@@ -118,14 +118,15 @@ class Insured::FamiliesController < FamiliesController
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
     @provider = @person
+    @family_members = @family.active_family_members
   end
 
   def verification
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
   def upload_application
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_resident_family_members
   end
 
   def check_qle_date
@@ -265,7 +266,58 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def transition_family_members
+    @row_id = params[:family_actions_id]
+    @family_members = @family.active_family_members
+    @non_shop_market_kinds = Person::NON_SHOP_ROLES
+    respond_to do |format|
+      format.js { render "insured/families/transition_family_members" }
+    end
+  end
+
+  def transition_family_members_update
+    @row_id = params[:family_actions_id]
+
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.transition_family_members
+    @family = Family.find(params[:family])
+
+    @consumer_people = []
+    @resident_people = []
+    @result[:success].each do |person|
+      @resident_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
+      @consumer_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
+    end
+    trigger_ivl_to_cdc_transition_notice if @resident_people.present?
+    trigger_cdc_to_ivl_transition_notice  if @consumer_people.present?
+
+    respond_to do |format|
+      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
+    end
+  end
+
   private
+
+  def trigger_ivl_to_cdc_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
+
+  def trigger_cdc_to_ivl_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family: @family.id.to_s, result: {:people => @consumer_people}} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
 
   def updateable?
     authorize Family, :updateable?
@@ -307,7 +359,8 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role == "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
@@ -321,7 +374,11 @@ class Insured::FamiliesController < FamiliesController
       if @person.active_employee_roles.present?
         @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
       else @person.consumer_role.present?
-      @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        if current_user.has_hbx_staff_role?
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_without_transition_member_action
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+        end
       end
     end
   end
@@ -331,7 +388,7 @@ class Insured::FamiliesController < FamiliesController
       if @person.addresses.blank?
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
-    elsif @person.has_active_consumer_role?
+    elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection

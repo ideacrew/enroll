@@ -1597,6 +1597,51 @@ ivl_notice_triggers = [
           }
       ]
   },
+
+  {
+      hbx_id: 'IVL_CDC',
+      title: 'Your Insurance through DC Health Link Has Changed to Cover All DC',
+      description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_to_coverall_transition_notice',
+      notice_triggers: [
+          {
+              name: 'Ivl to Coverall Transition Notice',
+              notice_template: 'notices/ivl/ivl_to_coverall_notice',
+              notice_builder: 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+              mpi_indicator: 'IVL_CDC',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
+
+  {
+      hbx_id: 'IVL_DCH',
+      title: 'Your Insurance through Cover All DC Has Changed to DC Health Link',
+      description: 'This is an Transition Notice and is sent for people who are moved to DC HEALTH LINK',
+      resource_name: 'consumer_role',
+      event_name: 'coverall_to_ivl_transition_notice',
+      notice_triggers: [
+          {
+              name: 'Coverall to IVL Transition Notice',
+              notice_template: 'notices/ivl/coverall_to_ivl_notice',
+              notice_builder: 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+              mpi_indicator: 'IVL_DCH',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
+
 ]
 
 shop_notice_triggers.each do |trigger_params|

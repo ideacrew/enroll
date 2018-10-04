@@ -567,13 +567,15 @@ class HbxEnrollment
       benefit_group_assignment.hbx_enrollment = self
       benefit_group_assignment.save
     end
-
-    callback_context = { :hbx_enrollment => self }
-    HandleCoverageSelected.call(callback_context)
   end
 
   def is_applicable_for_renewal?
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
+  end
+
+  def handle_coverage_selection    
+    callback_context = { :hbx_enrollment => self }
+    HandleCoverageSelected.call(callback_context)
   end
 
   def update_renewal_coverage
@@ -884,7 +886,7 @@ class HbxEnrollment
     end
 
     tax_household = household.latest_active_tax_household_with_year(effective_on.year) rescue nil
-    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -1187,7 +1189,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected, :after_enter => :update_renewal_coverage
+    state :coverage_selected, :after_enter => [:update_renewal_coverage, :handle_coverage_selection]
     state :transmitted_to_carrier
     state :coverage_enrolled
 
@@ -1328,12 +1330,12 @@ class HbxEnrollment
       transitions from: :enrolled_contingent, to: :coverage_selected
     end
 
-    event :move_to_contingent, :after => :record_transition do
-      transitions from: :shopping, to: :enrolled_contingent, after: :propagate_selection
+    event :move_to_contingent, :after => [:record_transition, :propagate_selection, :handle_coverage_selection] do
+      transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
-      transitions from: :auto_renewing, to: :enrolled_contingent, after: :propagate_selection
+      transitions from: :auto_renewing, to: :enrolled_contingent
     end
 
     event :move_to_pending, :after => :record_transition do
