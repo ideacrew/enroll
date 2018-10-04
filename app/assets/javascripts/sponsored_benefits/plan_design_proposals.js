@@ -275,12 +275,21 @@ function buildBenefitGroupParams() {
   // var kind = $("#benefit_kind").val();
   var kind = fetchBenefitKind();
   var reference_plan_id = $('#reference_plan_id').val();
+
+  if(kind == "dental") {
+    var reference_plan_id = $("#dental_reference_plan_id").val();
+  }
+
   // var dental_reference_plan_id = $('#dental_reference_plan_id').val();
   if (reference_plan_id == "" || reference_plan_id == undefined) {
     return {};
   }
 
   var plan_option_kind = $("#elected_plan_kind").val();
+
+  if(kind == "dental") {
+    var plan_option_kind = $("#dental_elected_plan_kind").val();
+  }
 
   var premium_pcts = $('.enabled .benefits-fields input.hidden-param').map(function() {
     return $(this).val();

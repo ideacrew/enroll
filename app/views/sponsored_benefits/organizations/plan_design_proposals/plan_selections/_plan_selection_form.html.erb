@@ -1,5 +1,6 @@
 <%= hidden_field_tag :plan_design_organization_id, plan_design_organization._id %>
 <%= hidden_field_tag :elected_plan_kind, plan_design_proposal.active_benefit_group.plan_option_kind %>
+<%= hidden_field_tag :dental_elected_plan_kind, plan_design_proposal.active_benefit_group.dental_plan_option_kind %>
 <%= hidden_field_tag :reference_plan_id, plan_design_proposal.active_benefit_group.reference_plan_id %>
 <%= hidden_field_tag :dental_reference_plan_id, plan_design_proposal.active_benefit_group.dental_reference_plan_id %>
 <%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
