@@ -317,7 +317,11 @@ class BenefitGroup
   end
 
   def dental_relationship_benefit_for(relationship)
-    dental_relationship_benefits.where(relationship: relationship).first
+    if dental_reference_plan.blank? && reference_plan.coverage_kind == 'dental'
+      relationship_benefits.where(relationship: relationship).first
+    else
+      dental_relationship_benefits.where(relationship: relationship).first
+    end
   end
 
   def build_relationship_benefits
