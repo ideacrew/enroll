@@ -21,11 +21,10 @@ namespace :reports do
               hbx_id = person.hbx_id
               ivl_role = person.consumer_role.present? ? 'Y' : 'N'
               ee_role = person.active_employee_roles.present? ? 'Y' : 'N'
-              active_enrollments = person.primary_family.active_household.active_hbx_enrollments
-              unless active_enrollments.empty?
+              if !person.primary_family.blank? && !person.primary_family.enrollments.blank?
                 plan_names = []
-                active_enrollments.each do |enrollment|
-                  if enrollment.kind=="individual" 
+                person.primary_family.enrollments.each do |enrollment|
+                  if enrollment.is_active && enrollment.kind=="individual" 
                     plan_names << enrollment.plan.name 
                   end
                 end
@@ -36,7 +35,7 @@ namespace :reports do
                             plan_names.uniq
                           ]
                 end
-              end
+              end       
             end
           end
         rescue => e
