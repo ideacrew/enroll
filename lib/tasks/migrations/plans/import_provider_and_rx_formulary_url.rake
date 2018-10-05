@@ -11,21 +11,21 @@
 #           So including http at the start of each rx formulary urls that does not have http.
 
 namespace :import do
-  task :common_data_from_master_xml => :environment do
+  task :common_data_from_master_xml, [:file] => :environment do |task, args|
     NATIONWIDE_NETWORK = ["Nationwide In-Network"]
     DC_IN_NETWORK = ["DC Metro In-Network"]
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
+    files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
       files.each do |file|
         year = file.split("/")[-2].to_i
-        puts "*"*80
-        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..."
+        puts "*"*80 unless Rails.env.test?
+        puts "Importing provider, formulary url's, network_data, standard_plan from #{file}..." unless Rails.env.test?
         if file.present?
           result = Roo::Spreadsheet.open(file)
           sheets = ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
           sheets.each do |sheet_name|
-            puts "processing sheet ::: #{sheet_name} :::"
+            puts "processing sheet ::: #{sheet_name} :::" unless Rails.env.test?
             sheet_data = result.sheet(sheet_name)
 
             @header_row = sheet_data.row(1)
@@ -57,14 +57,16 @@ namespace :import do
     else # MA
       files.each do |file|
       year = file.split("/")[-2].to_i
-      puts "*"*80
-      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..."
+      puts "*"*80 unless Rails.env.test?
+      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..." unless Rails.env.test?
       if file.present?
         result = Roo::Spreadsheet.open(file)
         sheets = if year == 2017
           ["MA SHOP QHP"]
         elsif year == 2018
           ["2018_QHP", "2018_QDP"]
+        elsif year == 2019
+          ["2018_QHP"]
         end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
@@ -77,6 +79,8 @@ namespace :import do
             row_info = sheet_data.row(row_number)
             hios_id = row_info[@headers["hios/standard component id"]].squish
             provider_directory_url = row_info[@headers["provider directory url"]].strip
+
+            # old model
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
@@ -91,14 +95,49 @@ namespace :import do
                 plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
                 plan.save
             end
+            # end of old model
+
+            # new model
+            product_package_kinds = []
+            products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year == year}
+            products.each do |product|
+              product.provider_directory_url = provider_directory_url
+              if sheet_name != "2018_QDP"
+                rx_formulary_url = row_info[@headers["rx formulary url"]].strip
+                product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+              end
+              product.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
+              product.network_information = row_info[@headers["network notes"]]
+
+              sole_source_offering = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+              horizontal_offering = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+              vertical_offering = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+
+              if product.product_kind.to_s == "health"
+                if horizontal_offering == true
+                  product_package_kinds << :metal_level
+                end
+                if vertical_offering == true
+                  product_package_kinds << :single_issuer
+                end
+                if sole_source_offering == true
+                  product_package_kinds << :single_product
+                end
+                product.product_package_kinds = product_package_kinds
+              end
+
+              product.save
+            end
+            # end of new model
+
           end
         end
       end
     end
     end
-    puts "*"*80
-    puts "import complete"
-    puts "*"*80
+    puts "*"*80 unless Rails.env.test?
+    puts "import complete" unless Rails.env.test?
+    puts "*"*80 unless Rails.env.test?
   end
 
   def assign_headers

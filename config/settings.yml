@@ -144,9 +144,9 @@ aca:
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
   plan_option_years:
-    single_carriers_available: ['2018']
-    sole_source_carriers_available: ['2017','2018']
-    metal_level_carriers_available: ['2018']
+    single_carriers_available: ['2018', '2019']
+    sole_source_carriers_available: ['2017','2018', '2019']
+    metal_level_carriers_available: ['2018', '2019']
 
   qle:
     with_in_sixty_days: 60
