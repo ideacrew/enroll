@@ -253,8 +253,7 @@ function toggleSliders(plan_kind) {
 
 function calcPlanDesignContributions() {
   data = buildBenefitGroupParams();
-  kind = fetchBenefitKind();
-  if (proposalIsInvalid(data) && kind != "dental") {
+  if (proposalIsInvalid(data)) {
     disableActionButtons();
   } else {
     enableActionButtons();
@@ -460,14 +459,17 @@ function proposalIsInvalid(data) {
   if (data == undefined || data == {} || !('benefit_group' in data)) {
     return true;
   } else {
+    kind = fetchBenefitKind();
+    if(kind == "dental") {
+      return false;
+    }
     return !contributionLevelsAreValid(data['benefit_group']);
   }
 }
 
 function saveProposal(event) {
   var data = buildBenefitGroupParams();
-  kind = fetchBenefitKind();
-  if (proposalIsInvalid(data) && kind != "dental") {
+  if (proposalIsInvalid(data)) {
     // handle error messaging
     return;
   } else {
