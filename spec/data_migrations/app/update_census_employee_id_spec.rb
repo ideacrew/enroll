@@ -21,7 +21,7 @@ describe UpdateCensusEmployeeId, dbclean: :after_each do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
-      allow(ENV).to receive(:[]).with("census_employee_id").and_return(census_employee.id.to_s)
+      allow(ENV).to receive(:[]).with("input_id").and_return(census_employee.id.to_s)
       employee_role.update_attributes!(census_employee_id: census_employee2.id)
     end
 
