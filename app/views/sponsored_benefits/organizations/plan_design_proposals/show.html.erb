@@ -12,7 +12,7 @@
         </div>
         <div class="panel-body">
           <% if @plan %>
-            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved' } %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved', plan: @plan } %>
           <% else %>
             <div class="row">
               <div class="col-xs-12">
@@ -22,6 +22,24 @@
           <% end %>
         </div>
       </div>
+
+      <div class="panel panel-default table">
+        <div class="panel-heading">
+          <h3 class="panel-title">Dental Plan Information</h3>
+        </div>
+        <div class="panel-body">
+          <% if @dental_plan %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved', plan: @dental_plan } %>
+          <% else %>
+            <div class="row">
+              <div class="col-xs-12">
+                No Dental Reference Plan Assigned
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
       <!--Employer Costs End-->
       <!--Employee Costs Start-->
       <div class="row">

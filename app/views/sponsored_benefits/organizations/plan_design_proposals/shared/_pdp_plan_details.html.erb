@@ -9,27 +9,27 @@
       </tr>
       <tr>
         <th>Plan Name</th>
-        <td><%= @plan.name %></td>
+        <td><%= plan.name %></td>
       </tr>
       <tr>
         <th>Plan Coverage Level</th>
-        <td><%= display_dental_metal_level @plan %></td>
+        <td><%= display_dental_metal_level plan %></td>
       </tr>
       <tr>
         <th>Plan Carrier</th>
-        <td><%= @plan.carrier_profile.legal_name %></td>
+        <td><%= plan.carrier_profile.legal_name %></td>
       </tr>
       <tr>
         <th>Deductible - Medical</th>
-        <td><%= @plan.deductible %> / <%= @plan.family_deductible %></td>
+        <td><%= plan.deductible %> / <%= plan.family_deductible %></td>
       </tr>
 <!--       <tr>
         <th>Maximum Out of Pocket Costs</th>
-        <td><%#= @plan.deductible %> / <%#= @plan.family_deductible %></td>
+        <td><%#= plan.deductible %> / <%#= plan.family_deductible %></td>
       </tr> -->
       <tr>
         <th>Summary of Benefits and Coverage (SBC)</th>
-        <td><%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %></td>
+        <td><%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan } %></td>
       </tr>
     </tbody>
   </table>

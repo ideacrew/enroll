@@ -81,7 +81,8 @@ module SponsoredBenefits
 
       if @benefit_group
         @plan = @benefit_group.reference_plan
-        @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
+        @dental_plan = @benefit_group.dental_reference_plan
+        @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
       end
     end
