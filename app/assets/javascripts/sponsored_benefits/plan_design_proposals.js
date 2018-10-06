@@ -17,8 +17,8 @@ $(document).on('click', '#submitPlanDesignProposal', saveProposal);
 $(document).on('click', '#copyPlanDesignProposal', saveProposalAndCopy);
 $(document).on('click', '#publishPlanDesignProposal', saveProposalAndPublish);
 
-$(document).on('click', '#downloadReferencePlanDetailsButton.plan-not-saved', checkIfSbcIncluded);
-$(document).on('click', '#downloadReferencePlanDetailsButton.plan-saved', sendPdf);
+$(document).on('click', '.downloadReferencePlanDetailsButton.plan-not-saved', checkIfSbcIncluded);
+$(document).on('click', '.downloadReferencePlanDetailsButton.plan-saved', sendPdf);
 
 
 $(document).on('ready', pageInit);
@@ -107,11 +107,11 @@ function fetchCarriers() {
 //   displayActiveDentalCarriers();
 // }
 
-function setSBC(plan) {
-  if ($("#include_sbc").prop('checked')) {
-   $('#downloadReferencePlanDetailsButton').attr('href',plan+"?sbc_included=true");
+function setSBC(element, plan) {
+  if (element.parentElement.getElementsByClassName("sbc-download-checkbox")[0].checked == true) {
+   $(element).attr('href',plan+"?sbc_included=true");
   } else {
-   $('#downloadReferencePlanDetailsButton').attr('href',plan);
+   $(element).attr('href',plan);
   }
 }
 
