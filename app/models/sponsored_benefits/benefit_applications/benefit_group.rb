@@ -50,6 +50,20 @@ module SponsoredBenefits
             })
       end
 
+      def employee_costs_for_dental_reference_plan
+        plan = dental_reference_plan
+        employee_costs = census_employees.active.inject({}) do |census_employees, employee|
+          census_employees[employee.id] = {
+            ref_plan_cost: employee_cost_for_plan(employee, plan)
+          }
+          census_employees
+        end
+
+        employee_costs.merge!({
+          ref_plan_employer_cost: monthly_employer_contribution_amount(plan)
+          })
+      end
+
       def lowest_cost_plan
         @lowest_cost_plan ||= ::Plan.find(lowest_cost_plan_id)
       end
