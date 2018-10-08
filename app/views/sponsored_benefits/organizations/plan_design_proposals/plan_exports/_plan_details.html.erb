@@ -100,7 +100,7 @@
     <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/export', qhps: @qhps, single_plan_displayed: true %>
   <% end %>
   <br/>
-  <% @dental_plan = @benefit_group.dental_reference_plan %>
+  <% if @dental_plan = @benefit_group.dental_reference_plan %>
   <div class="row">
     <div class="panel col-xs-12">
       <table class="table table-striped">
@@ -156,4 +156,5 @@
       </div>
     </div>
   </div>
+  <% end %>
 </div>
