@@ -93,3 +93,19 @@ def rates_runner(rates_hash = nil, set_year = nil)
   product_rate.add(set_hash, action, year)
   product_rate.run
 end
+
+def rates_runner(rates_hash = nil, set_year = nil)
+  @files = Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/rates/*.xml'))
+  year = set_year.nil? ? 2018 : set_year
+  action = "new"
+  xml = Nokogiri::XML(File.open(@files.first))
+  rates = if year < 2018
+            Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+          else
+            Parser::PlanRateGroupListParser.parse(xml.root.canonicalize, :single => true)
+          end
+  product_rate = QhpRateBuilder.new()
+  set_hash = rates_hash.nil? ? rates.to_hash : rates_hash
+  product_rate.add(set_hash, action, year)
+  product_rate.run
+end
