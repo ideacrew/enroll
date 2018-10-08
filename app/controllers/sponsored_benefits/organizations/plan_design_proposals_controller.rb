@@ -85,6 +85,7 @@ module SponsoredBenefits
         @employer_health_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
         @employer_dental_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@dental_plan) if @dental_plan.present?
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
+        @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@dental_plan)
       end
     end
 

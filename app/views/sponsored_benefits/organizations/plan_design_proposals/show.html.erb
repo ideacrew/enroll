@@ -23,6 +23,44 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="col-md-3">
+                <h3>Employee Costs - Health Benefits</h3>
+              </div>
+              <div class="col-md-7">
+                <br />
+                <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
+              </div>
+              <div class="col-md-2">
+                <br />
+                <a class="text-center employee-details-text btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+              </div>
+
+              <div class="collapse" id="collapseExample">
+                <div class="employee-costs">
+                  <% if @benefit_group %>
+                    <% if @benefit_group.sole_source? %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
+                    <% else %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: "health"} %>
+                    <% end %>
+                  <% else %>
+                    <div class="row">
+                      <div class="col-md-3">
+                        No Reference Plan Assigned
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel panel-default table">
         <div class="panel-heading">
           <h3 class="panel-title">Dental Plan Information</h3>
@@ -47,7 +85,7 @@
           <div class="panel panel-default">
             <div class="panel-body">
               <div class="col-md-3">
-                <h3>Employee Costs</h3>
+                <h3>Employee Costs - Dental Benefits </h3>
               </div>
               <div class="col-md-7">
                 <br />
@@ -55,21 +93,17 @@
               </div>
               <div class="col-md-2">
                 <br />
-                <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+                <a class="text-center employee-details-text btn btn-primary" data-toggle="collapse" href="#collapseDentalCosts" aria-expanded="true" >Show Details</a>
               </div>
 
-              <div class="collapse" id="collapseExample">
+              <div class="collapse" id="collapseDentalCosts">
                 <div class="employee-costs">
-                  <% if @benefit_group %>
-                    <% if @benefit_group.sole_source? %>
-                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
-                    <% else %>
-                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
-                    <% end %>
+                  <% if @benefit_group.dental_reference_plan.present? %>
+                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: 'dental', benefit_group_costs: @benefit_group_dental_costs } %>
                   <% else %>
                     <div class="row">
                       <div class="col-md-3">
-                        No Reference Plan Assigned
+                        No Dental Reference Plan Assigned
                       </div>
                     </div>
                   <% end %>
