@@ -175,16 +175,20 @@
 		    <table class="table table-bg-white table-employee-2">
 		      <thead>
 		        <tr>
-		          <th class="text-center">Employee</th>
+		          <th class="text-left">Employee</th>
 		          <th class="text-center">Dependent Count</th>
-		          <th class="text-right">Lowest Cost Available Plan</th>
 		          <th class="text-right">Reference Plan</th>
-		          <th class="text-right">Highest Cost Available Plan</th>
 		        </tr>
 		      </thead>
 		      <tbody id="employee_index_scroll">
-
-		      </tbody>
+            <% @benefit_group.census_employees.active.each do |census_employee| %>
+              <tr>
+                <td class="text-left"> <%= census_employee.full_name %></td>
+                <td class="text-center"> <%= census_employee.census_dependents.count %></td>
+                <td class="text-right"> <%= number_to_currency(@benefit_group_dental_costs[census_employee.id][:ref_plan_cost]) %></td>
+              </tr>
+            <% end %>
+          </tbody>
 		    </table>
 			</div>
 		</div>
@@ -200,6 +204,7 @@
     <%= link_to "Download PDF", sponsored_benefits.organizations_plan_design_proposal_plan_reviews_path(@plan_design_proposal), id: "submitPlanDesignProposal", class:'btn btn-default' %>
     <%= link_to "Update Roster", sponsored_benefits.edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal), class:'btn btn-primary' %>
     <%= link_to "Select Health Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal), class:'btn btn-primary' %>
+    <%= link_to "Select Dental Benefits", sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal, kind: "dental"), class:'btn btn-primary' %>
     <%= link_to "Publish Quote", sponsored_benefits.organizations_plan_design_proposal_publish_path(@plan_design_proposal), method: :post, class:'btn btn-primary' %>
     <div class="success-message"></div>
   </div>
