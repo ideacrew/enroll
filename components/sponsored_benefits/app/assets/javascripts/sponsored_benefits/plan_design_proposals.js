@@ -26,6 +26,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   var kind = fetchBenefitKind();
+  
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
@@ -216,10 +217,17 @@ function planSelected() {
 }*/
 function setMyPlans(element) {
   // Need to remove jQuery Selectors
-  toggleSliders($("#elected_plan_kind").val());
+  
   var reference_plan_id = element.dataset.planid.replace(/['"]+/g, '');
-
   var kind = fetchBenefitKind();
+
+  var plan_option_kind = $("#elected_plan_kind").val();
+  if(kind == "dental") {
+    var plan_option_kind = $("#dental_elected_plan_kind").val();
+  }
+
+  toggleSliders(plan_option_kind);
+
   if (kind == "dental") {
     document.getElementById('dental_reference_plan_id').value = reference_plan_id;
   }else {
