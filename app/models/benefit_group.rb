@@ -426,7 +426,11 @@ class BenefitGroup
     elsif plan_option_kind == 'sole_source' && !plan.dental?
       CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
     else
-      PlanCostDecorator.new(plan, ce, self, reference_plan)
+      if plan.dental? && dental_reference_plan.present?
+        PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+      else
+        PlanCostDecorator.new(plan, ce, self, reference_plan)
+      end
     end
     pcd.total_employee_cost
   end
