@@ -42,7 +42,7 @@
           <% if @benefit_group.sole_source? %>
             <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group  %>
           <% else %>
-            <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', benefit_group: @benefit_group %>
+            <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.relationship_benefits, coverage_kind: :health %>
           <% end %>
         </div>
         <br />

@@ -62,7 +62,7 @@
   <div class="row">
     <div class="panel col-xs-12">
       <% if @benefit_group.plan_option_kind != 'sole_source' %>
-        <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', benefit_group: @benefit_group %>
+        <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.relationship_benefits, coverage_kind: :health %>
       <% else %>
         <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group %>
       <% end %>
@@ -99,4 +99,61 @@
   <% if sbc_included %>
     <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/export', qhps: @qhps, single_plan_displayed: true %>
   <% end %>
+  <br/>
+  <% @dental_plan = @benefit_group.dental_reference_plan %>
+  <div class="row">
+    <div class="panel col-xs-12">
+      <table class="table table-striped">
+        <tr>
+          <th>Reference Plan</th>
+          <th>Carrier</th>
+          <th>Type</th>
+          <th>Metal Level</th>
+          <th>Offering By</th>
+        </tr>
+        <tbody>
+          <tr>
+            <td><%= @dental_plan.name %></td>
+            <td><%= @dental_plan.carrier_profile.legal_name %></td>
+            <td><%= @dental_plan.plan_type.upcase %></td>
+            <td><%= @dental_plan.metal_level.capitalize %></td>
+            <td><%= Settings.plan_option_titles.send(@benefit_group.dental_plan_option_kind.to_sym) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="panel col-xs-12">
+      <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.dental_relationship_benefits, coverage_kind: :dental %>
+      <br />
+      <div class="panel benefitgroup col-xs-12 referenceplan home est">
+        <div class="plan-details">
+          <div class="col-xs-4">
+            <div class="row">
+              <span><b>Employer Estimated Maximum Monthly Cost</b></span>
+              <h2 class="main-title emp-cost"><%= number_to_currency(@benefit_group.monthly_employer_contribution_amount(@benefit_group.dental_reference_plan)) %></h2>
+            </div>
+          </div>
+          <div class="col-xs-8 monthly-cost">
+            <div class="row">
+              <table class="table table-striped">
+                <tr>
+                  <th colspan="2"></th>
+                  <th>Min</th>
+                  <th>Max</th>
+                </tr>
+                <tr>
+                  <td colspan="2"><b>Total Estimated Monthly Cost for Plan Participants</b></td>
+                  <td><%= number_to_currency(@benefit_group.monthly_min_employee_cost('dental')) %></td>
+                  <td><%= number_to_currency(@benefit_group.monthly_max_employee_cost('dental')) %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
