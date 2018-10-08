@@ -30,6 +30,7 @@ function pageInit() {
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
+      enableRemoveDentalBenefits();
       calcPlanDesignContributions();
     } else {
       setTimeout(function() {
@@ -463,6 +464,10 @@ function checkContributionLevels(contributions) {
   });
 }
 
+function enableRemoveDentalBenefits(){
+  document.getElementById("removeDentalBenefits").classList.remove('hidden')
+}
+
 function proposalIsInvalid(data) {
   if (data == undefined || data == {} || !('benefit_group' in data)) {
     return true;
@@ -488,6 +493,10 @@ function saveProposal(event) {
       url: url
     }).done(function(){
       $('.success-message').html('Plan successfully updated!');
+      kind = fetchBenefitKind();
+      if(kind == "dental") {
+        enableRemoveDentalBenefits();
+      }
     });
   }
 
