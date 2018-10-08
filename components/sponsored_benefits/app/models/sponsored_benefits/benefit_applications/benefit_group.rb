@@ -26,8 +26,7 @@ module SponsoredBenefits
         )
       end
 
-      def employee_costs_for_reference_plan
-          plan = reference_plan
+      def employee_costs_for_reference_plan(plan = reference_plan)
           employee_costs = census_employees.active.inject({}) do |census_employees, employee|
             costs = {
               ref_plan_cost: employee_cost_for_plan(employee, plan)
