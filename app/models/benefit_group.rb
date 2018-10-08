@@ -377,6 +377,7 @@ class BenefitGroup
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 199
+    rp = (self.persisted? && plan.coverage_kind == "dental") ? dental_reference_plan : reference_plan
 
     if self.sole_source? && self.composite_tier_contributions.empty?
       build_composite_tier_contributions
@@ -384,10 +385,10 @@ class BenefitGroup
     end
     targeted_census_employees.active.collect do |ce|
 
-      if plan_option_kind == 'sole_source'
+      if plan_option_kind == 'sole_source' && plan.coverage_kind == "health"
         pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+        pcd = PlanCostDecorator.new(plan, ce, self, rp)
       end
 
       pcd.total_employer_contribution
