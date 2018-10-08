@@ -70,81 +70,6 @@
     </div>
   </div>
   </div>
-	<% if @benefit_group.dental_reference_plan.present? %>
-	<br />
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <div class="col-md-2">
-        <i class="fa fa-star fa-5x pr-star" aria-hidden="true"></i>
-      </div>
-      <div class="col-md-10">
-        <h3><%= @benefit_group.dental_reference_plan.name %></h3>
-        <a class="pull-right toggle-text" data-toggle="collapse" href="#collapseDental" aria-expanded="true">Hide Details</a>
-        <div class="collapse in" id="collapseDental">
-        <table class="table borderless">
-          <tbody>
-            <tr class="borderless">
-              <th style="width:150px" class="th-gray">Coverage Year</th>
-                <td><%#= @benefit_group.benefit_application.benefit_sponsorship.initial_enrollment_period_to_s %></td>
-            </tr>
-            <tr class="borderless">
-              <th style="width:150px" class="th-gray">Eligibility</th>
-              <td><%#= @benefit_group.dental_reference_plan.effective_title_by_offset %></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table borderless">
-          <tbody>
-            <tr class="borderless">
-              <th class="th-gray">Reference Plan</th>
-              <th class="th-gray">Carrier</th>
-              <th class="th-gray">Type</th>
-              <th class="th-gray">Metal Level</th>
-              <th class="th-gray">Plans By</th>
-            </tr>
-            <tr class="borderless">
-              <td><%= @benefit_group.dental_reference_plan.name %></td>
-              <td><%= @benefit_group.dental_reference_plan.carrier_profile.legal_name %></td>
-              <td><%= @benefit_group.dental_reference_plan.plan_type.upcase %></td>
-              <td><%= @benefit_group.dental_reference_plan.metal_level.capitalize %></td>
-              <td><%#= @benefit_group.dental_reference_plan.plan_option_kind.humanize %></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="col-md-12 no-pd">
-          <% if @benefit_group.sole_source? %>
-            <%#= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group  %>
-          <% else %>
-            <%#= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', benefit_group: @benefit_group %>
-          <% end %>
-        </div>
-        <br />
-        <div class="col-md-4 no-pd">
-          <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
-          <h3 class="text-center"></h3>
-        </div>
-        <div class="col-md-8">
-          <table class="table borderless">
-            <tbody>
-              <tr class="border-bottom">
-                <th style="width:490px"></th>
-                <th class="th-gray" style="width:200px">Mix</th>
-                <th class="th-gray" style="width:200px">Max</th>
-              </tr>
-              <tr>
-                <td style="width:490px">Total Estimated Monthly Cost for Plan Participants</td>
-                <td style="width:200px"></td>
-                <td style="width:200px"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-	<% end %>
-
   <div class="col-md-12 no-pd">
     <a><i class="fa fa-info-circle" aria-hidden="true"></i> Note: Your monthly cost is based on final employee enrollment.</a>
   </div>
@@ -170,7 +95,80 @@
         <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps, single_plan_displayed: true %>
       </div>
     </div>
+    <br />
 		<% if @benefit_group.dental_reference_plan.present? %>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="col-md-2">
+          <i class="fa fa-star fa-5x pr-star" aria-hidden="true"></i>
+        </div>
+        <div class="col-md-10">
+          <h3><%= @benefit_group.dental_reference_plan.name %></h3>
+          <a class="pull-right toggle-text" data-toggle="collapse" href="#collapseDental" aria-expanded="true">Hide Details</a>
+          <div class="collapse in" id="collapseDental">
+          <table class="table borderless">
+            <tbody>
+              <tr class="borderless">
+                <th style="width:150px" class="th-gray">Coverage Year</th>
+                  <td><%#= @benefit_group.benefit_application.benefit_sponsorship.initial_enrollment_period_to_s %></td>
+              </tr>
+              <tr class="borderless">
+                <th style="width:150px" class="th-gray">Eligibility</th>
+                <td><%#= @benefit_group.dental_reference_plan.effective_title_by_offset %></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table borderless">
+            <tbody>
+              <tr class="borderless">
+                <th class="th-gray">Reference Plan</th>
+                <th class="th-gray">Carrier</th>
+                <th class="th-gray">Type</th>
+                <th class="th-gray">Metal Level</th>
+                <th class="th-gray">Plans By</th>
+              </tr>
+              <tr class="borderless">
+                <td><%= @benefit_group.dental_reference_plan.name %></td>
+                <td><%= @benefit_group.dental_reference_plan.carrier_profile.legal_name %></td>
+                <td><%= @benefit_group.dental_reference_plan.plan_type.upcase %></td>
+                <td><%= @benefit_group.dental_reference_plan.metal_level.capitalize %></td>
+                <td><%#= @benefit_group.dental_reference_plan.plan_option_kind.humanize %></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="col-md-12 no-pd">
+            <% if @benefit_group.sole_source? %>
+              <%#= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group  %>
+            <% else %>
+              <%#= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', benefit_group: @benefit_group %>
+            <% end %>
+          </div>
+          <br />
+          <div class="col-md-4 no-pd">
+            <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
+            <h3 class="text-center"></h3>
+          </div>
+          <div class="col-md-8">
+            <table class="table borderless">
+              <tbody>
+                <tr class="border-bottom">
+                  <th style="width:490px"></th>
+                  <th class="th-gray" style="width:200px">Mix</th>
+                  <th class="th-gray" style="width:200px">Max</th>
+                </tr>
+                <tr>
+                  <td style="width:490px">Total Estimated Monthly Cost for Plan Participants</td>
+                  <td style="width:200px"></td>
+                  <td style="width:200px"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
 		<div class="panel panel-default">
 			<div class="panel-heading custom-heading">
 				<h3 class="panel-title">Employee Costs - Dental Benefits</h3>
@@ -192,7 +190,6 @@
 
 		      </tbody>
 		    </table>
-				
 			</div>
 		</div>
 		<% end %>
