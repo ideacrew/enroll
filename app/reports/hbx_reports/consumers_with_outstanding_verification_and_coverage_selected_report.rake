@@ -15,7 +15,7 @@ namespace :reports do
       people.each do |person|
         begin
               household = person.primary_family.active_household if person.primary_family.present?
-              enrollments = household.hbx_enrollments.where(:aasm_state => "coverage_selected", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }) if person.primary_family.present?
+              enrollments = household.hbx_enrollments.individual_market.enrolled.where(:effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }) if person.primary_family.present?
               next if enrollments.nil?
               req_enrollments = enrollments.each do |enrollment|
                 csv << [person.hbx_id,
@@ -29,4 +29,5 @@ namespace :reports do
     puts "Generated report with #{people.count} enrollments" 
   end
 end
+
             
