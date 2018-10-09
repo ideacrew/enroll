@@ -191,7 +191,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:open_enrollment_period) { (effective_period.min - 10.days)..open_enrollment_begin }
+          let(:open_enrollment_period) { (effective_period.min - 2.months)..open_enrollment_begin }
           let(:aasm_state) { :approved }
         end
 
