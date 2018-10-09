@@ -171,7 +171,8 @@
 			</div>
 			<div class="panel-body">
 				<label>Plan Offerings - <%= @benefit_group.dental_reference_plan.name %></label><br />
-				<label>Employer Lowest/Reference/Highest - $0.00/$0.00/$0.00</label>
+        <!-- For dental we allow single_plan choice only. lowest cost plan and highest cost plan are same -->        
+        <label>Employer Lowest/Reference/Highest - <%= number_to_currency(@benefit_group_dental_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_dental_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_dental_costs[:ref_plan_employer_cost]) %></label>
 		    <table class="table table-bg-white table-employee-2">
 		      <thead>
 		        <tr>
