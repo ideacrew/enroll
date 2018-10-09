@@ -59,6 +59,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @enrollment.ee_plan_selection_confirmation_sep_new_hire
 
+    @enrollment.mid_year_plan_change_notice
+
     send_receipt_emails if @person.emails.first
   end
 
@@ -78,7 +80,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
-    
+
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -114,6 +116,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
@@ -134,6 +137,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
+      notify_employer_when_employee_terminate_coverage(hbx_enrollment)
       hbx_enrollment.notify_employee_confirming_coverage_termination
       redirect_to family_account_path
     else
@@ -160,6 +164,10 @@ class Insured::PlanShoppingsController < ApplicationController
       session[:elected_aptc] = 0
     end
 
+    if params[:market_kind] == 'shop' && plan_match_dc
+      is_congress_employee = @hbx_enrollment.benefit_group.is_congress
+      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
@@ -174,8 +182,9 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    if @person.primary_family.active_household.latest_active_tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person)
+    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
+    if @tax_household.present?
+      if is_eligibility_determined_and_not_csr_100?(@person, @tax_household)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -205,9 +214,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person)
-    csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-    (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+  def is_eligibility_determined_and_not_csr_100?(person, tax_household)
+    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
+    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
   end
 
   def send_receipt_emails
@@ -228,7 +237,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans_ids(@hbx_enrollment)
 
     if @hbx_enrollment.blank?
       @plans = []
@@ -250,8 +259,17 @@ class Insured::PlanShoppingsController < ApplicationController
     @carrier_names_map = Organization.valid_carrier_names_filters.select{|k, v| carrier_profile_ids.include?(k)}
   end
 
+  def enrolled_plans_by_hios_id_and_active_year
+    @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    if !@hbx_enrollment.is_shop?
+      (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
+    else
+      (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
+    end
+  end
+
   def build_same_plan_premiums
-    enrolled_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
+    enrolled_plans = enrolled_plans_by_hios_id_and_active_year
     if enrolled_plans.present?
       enrolled_plans = enrolled_plans.collect{|p| Plan.find(p)}
 
@@ -267,10 +285,17 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
-    
+
       @enrolled_plans.each do |enrolled_plan|
-        if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
-          @plans[plan_index] = enrolled_plan
+        case  @hbx_enrollment.is_shop?
+        when false
+          if plan_index = @plans.index{|e| e.is_same_plan_by_hios_id_and_active_year?(enrolled_plan) }
+            @plans[plan_index] = enrolled_plan
+          end
+        else
+          if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
+            @plans[plan_index] = enrolled_plan
+          end
         end
       end
     end

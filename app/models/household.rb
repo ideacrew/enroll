@@ -206,6 +206,7 @@ class Household
     all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
       sorted_ath = active_thh_with_year(k).order_by(:'created_at'.asc)
       c = sorted_ath.count
+      #for update eligibility manually
       sorted_ath.limit(c-1).update_all(effective_ending_on: Date.new(k, 12, 31)) if sorted_ath
     end
   end
@@ -234,7 +235,7 @@ class Household
     th.tax_household_members.build(
         family_member: family.primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: true,
+        is_ia_eligible: true
     )
 
     deter = th.eligibility_determinations.build(
@@ -244,13 +245,14 @@ class Household
         csr_percent_as_integer: csr.to_i,
         determined_on: Date.today
     )
+
     deter.save!
 
     end_multiple_thh
 
     th.save!
 
-    family.dependents.each do |fm|
+    family.active_dependents.each do |fm|
       ath = latest_active_thh
       ath.tax_household_members.build(
           family_member: fm,
@@ -394,5 +396,40 @@ class Household
       end
     end
     eds
+  end
+
+  def create_new_tax_household(params)
+    effective_date = params["effective_date"].to_date
+    slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
+
+    th = tax_households.create(
+      allocated_aptc: 0.0,
+      effective_starting_on: Date.new(effective_date.year, effective_date.month, effective_date.day),
+      is_eligibility_determined: true,
+      submitted_at: TimeKeeper.datetime_of_record
+    )
+
+    determination = th.eligibility_determinations.create(
+      source: "Admin_Script",
+      benchmark_plan_id: slcsp_id,
+      max_aptc: params["max_aptc"].to_f,
+      csr_percent_as_integer: params["csr"].to_i,
+      determined_on: TimeKeeper.datetime_of_record
+    )
+
+    params["family_members"].each do |person_hbx_id, thhm_info|
+      person_id = Person.by_hbx_id(person_hbx_id).first.id
+      family_member = family.family_members.where(person_id: person_id).first
+      th.tax_household_members.create(
+        :applicant_id => family_member.id,
+        :is_subscriber => family_member.is_primary_applicant,
+        thhm_info["pdc_type"].to_sym => true,
+        :reason => thhm_info["reason"]
+      )
+    end
+
+    end_multiple_thh
+
+    self.save!
   end
 end
