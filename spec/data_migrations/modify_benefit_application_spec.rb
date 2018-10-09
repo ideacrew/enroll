@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
-RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
+RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
   let(:given_task_name) { "modify_benefit_application" }
   subject { ModifyBenefitApplication.new(given_task_name, double(:current_scope => nil)) }
@@ -10,13 +10,13 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
     DatabaseCleaner.clean
   end
 
-  describe "given a task name", db_clean: :after_each do
+  describe "given a task name", dbclean: :after_each do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
     end
   end
 
-  describe "modifying benefit application", db_clean: :after_each do
+  describe "modifying benefit application", dbclean: :after_each do
 
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
@@ -124,7 +124,7 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
       end
     end
 
-    context "terminate benefit application", db_clean: :after_each do
+    context "terminate benefit application", dbclean: :after_each do
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }
 
@@ -158,7 +158,7 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
       end
     end
 
-    context "cancel benefit application", db_clean: :after_each do
+    context "cancel benefit application", dbclean: :after_each do
       let(:past_start_on) {start_on.prev_month}
       let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
       let!(:mid_plan_year_effective_date) {start_on.prev_month.prev_month}
@@ -181,7 +181,7 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
       end
     end
 
-    context "Should update effective period and approve initial benefit application", db_clean: :after_each do
+    context "Should update effective period and approve initial benefit application", dbclean: :after_each do
       let(:effective_date) { start_on }
       let(:new_start_date) { start_on.next_month }
       let(:new_end_date) { new_start_date + 1.year }
@@ -211,7 +211,7 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
       end
     end
 
-    context "Should update effective period and approve renewing benefit application", db_clean: :after_each do
+    context "Should update effective period and approve renewing benefit application", dbclean: :after_each do
       let(:effective_date) {start_on.next_month.beginning_of_month}
       let(:new_start_date) { (start_on + 2.months).beginning_of_month}
       let(:new_end_date) { new_start_date + 1.year }
@@ -288,7 +288,7 @@ RSpec.describe ModifyBenefitApplication, db_clean: :after_each do
     end
 
 
-    context "should trigger termination notice", db_clean: :after_each do
+    context "should trigger termination notice", dbclean: :after_each do
 
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }
