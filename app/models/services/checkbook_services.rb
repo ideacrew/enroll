@@ -63,7 +63,7 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": "2019",
+        "enrollment_year": enrollment_year,
         "family": [{
           "age": 30,
           "pregnant": false,
@@ -71,9 +71,7 @@ module Services
         }],
         #"family": build_family,
         "aptc": "343",
-        "csr": "-01",
-        "enroll_link_without_assistance": "https://enroll.dchealthlink.com/",
-        "enroll_link_with_assistance": "https://enroll.dchealthlink.com/"
+        "csr": "-01"
         }
       end
 
@@ -94,6 +92,19 @@ module Services
         else
           reference_plan.carrier_profile.legal_name
         end
+      end
+
+      def enrollment_year
+        @hbx_enrollment.effective_on.strftime('%Y')
+      end
+
+      def csr
+        @hbx_enrollment.household.tax_households.first.latest_eligibility_determination.csr_percent_as_integer
+      end
+
+      def aptc
+        year=@hbx_enrollment.effective_on.year
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year)
       end
 
       def tribal_option
