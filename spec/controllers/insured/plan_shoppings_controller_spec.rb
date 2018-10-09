@@ -689,7 +689,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   describe "plan comparision for IVL", dbclean: :after_each do
-    let!(:person100)                  { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:person100)                  { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
     let!(:user100)                    { FactoryGirl.create(:user, person: person100) }
     let!(:family100)                  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
     let!(:plan1)                      { FactoryGirl.create(:plan) }
@@ -704,9 +704,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         sign_in user100
       end
 
-      it "should successfully include the existing enrollment's plan as the PlanComparision for IVL is based on both active_year and hios_id" do
+      it "should successfully include the existing enrollment's plan as the Plan comparision for IVL is based on both active_year and hios_id" do
         plan1.update_attributes!(hios_id: ("41842DC04000" + (plan1.hios_id.split("-")[0].split("").last(2).join("").to_i + 2).to_s + "-04"))
-        xhr :get, :plans, id: hbx_enrollment101.id, format: :js
+        xhr :get, :plans, id: hbx_enrollment101.id, market_kind: "individual", format: :js
         expect(assigns(:plans).map(&:id).include?(assigns(:enrolled_plans)[0].id)).to be_truthy
       end
 
