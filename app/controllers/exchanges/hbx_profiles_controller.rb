@@ -219,6 +219,7 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
@@ -423,6 +424,29 @@ def employer_poc
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
       format.js { render "update_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id] }
+    end
+  end
+
+  def new_eligibility
+    authorize  HbxProfile, :can_add_pdc?
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    respond_to do |format|
+      format.js { render "new_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
+    end
+  end
+
+  def create_eligibility
+    @element_to_replace_id = params[:person][:family_actions_id]
+    family = Person.find(params[:person][:person_id]).primary_family
+    family.active_household.create_new_tax_household(params[:person]) rescue nil
+  end
+
+  def eligibility_kinds_hash(value)
+    if value['pdc_type'] == 'is_medicaid_chip_eligible'
+      { is_medicaid_chip_eligible: true, is_ia_eligible: false }.with_indifferent_access
+    elsif value['pdc_type'] == 'is_ia_eligible'
+      { is_ia_eligible: true, is_medicaid_chip_eligible: false }.with_indifferent_access
     end
   end
 

@@ -483,7 +483,7 @@ class ConsumerRole
       transitions from: [:unverified, :dhs_pending, :verification_outstanding], to: :fully_verified, :guard => :residency_verified_and_tribe_member_verified?
     end
 
-    event :pass_residency, :after => [:mark_residency_authorized, :record_transition] do
+    event :pass_residency, :after => [:mark_residency_authorized, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :dhs_pending, to: :dhs_pending
@@ -493,7 +493,7 @@ class ConsumerRole
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :fail_residency, :after => [:mark_residency_denied, :record_transition] do
+    event :fail_residency, :after => [:mark_residency_denied, :notify_of_eligibility_change, :record_transition] do
       transitions from: :unverified, to: :verification_outstanding
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :dhs_pending, to: :dhs_pending
