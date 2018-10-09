@@ -529,9 +529,21 @@ module Importers::Transcripts
       end
     end
 
+    def find_plan_year_by_effective_date(employer_profile, target_date)
+      plan_years = employer_profile.plan_years
+
+      plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(:aasm_state.in => ["expired", "terminated"])).detect do |py|
+        (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
+      end
+
+      (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
+    end
+
     def employee_current_benefit_group(employee_role, hbx_enrollment)
       effective_date = hbx_enrollment.effective_on
-      if plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+      plan_year = find_plan_year_by_effective_date(employee_role.employer_profile, effective_date)
+      
+      if plan_year.present?
 
         if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
           raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
@@ -543,7 +555,7 @@ module Importers::Transcripts
         if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
           census_employee.add_benefit_group_assignment(plan_year.benefit_groups.first, plan_year.start_on)
           census_employee.save!
-          benefit_group_assignment = census_employee.active_benefit_group_assignment
+          benefit_group_assignment = census_employee.benefit_group_assignments.detect{|assignment| assignment.benefit_group == plan_year.benefit_groups.first}
         end
 
         return benefit_group_assignment.benefit_group, benefit_group_assignment
