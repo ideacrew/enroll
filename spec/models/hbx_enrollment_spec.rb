@@ -863,13 +863,14 @@ describe HbxProfile, "class methods", type: :model do
     let(:date){ TimeKeeper.date_of_record }
     let!(:carrier_profile1) {FactoryGirl.build(:carrier_profile)}
     let!(:carrier_profile2) {FactoryGirl.create(:carrier_profile, organization: organization)}
+    let!(:carrier_profile3) {FactoryGirl.create(:carrier_profile, organization: organization)}
     let!(:organization) { FactoryGirl.create(:organization, legal_name: "CareFirst", dba: "care")}
     let(:plan1){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1) }
     let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
-
+    let(:plan3){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile3) }
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
-
+    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'enrolled_contingent', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
@@ -909,6 +910,14 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
 
+    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
+      hbx_enrollment3.effective_on = date - 10.days
+      hbx_enrollment2.effective_on = date + 1.day
+      hbx_enrollment2.move_to_contingent!
+      expect(hbx_enrollment3.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment2.enrolled_contingent?).to be_truthy
+    end
+
     it "terminates previous enrollments if both effective on in the future" do
       hbx_enrollment1.effective_on = date + 10.days
       hbx_enrollment2.effective_on = date + 20.days
@@ -918,6 +927,69 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
 
+  end
+
+  describe "when maket type is individual" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:coverage_household) { family.households.first.coverage_households.first }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:active_year) {TimeKeeper.date_of_record.year}
+    let(:plan) { Plan.new(active_year: active_year)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:enrollment) {
+      enrollment = family.latest_household.new_hbx_enrollment_from(
+          consumer_role: person.consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+      )
+      enrollment.save
+      enrollment
+    }
+    let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
+
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(enrollment). to receive(:plan).and_return plan
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      enrollment.update_attributes!(plan_id: plan.id)
+    end
+
+    context "ivl consumer role with unverified state purchased a plan" do
+      it "should return enrollment status as unverified" do
+        person.consumer_role.update_attribute("aasm_state","unverified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "ssa_pending"
+        expect(enrollment.coverage_selected?).to be_falsy
+        expect(enrollment.aasm_state).to eq "unverified"
+      end
+    end
+
+    context "ivl user in fully verified state." do
+      it "should return enrollment status as coverage_selected" do
+        person.consumer_role.update_attribute("aasm_state","fully_verified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "fully_verified"
+        expect(enrollment.coverage_selected?).to be_truthy
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+      end
+    end
+
+    context "ivl user in verification outstanding state." do
+      it "should return enrollment status as enrolled_contingent" do
+        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+        enrollment.move_to_contingent!
+        enrollment.reload
+        expect(enrollment.coverage_selected?).to eq false
+        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+      end
+    end
   end
 
   context "can_terminate_coverage?" do
@@ -1438,10 +1510,6 @@ context "Benefits are terminated" do
     end
   end
 end
-
-
-
-
 
 # describe HbxEnrollment, "#save", type: :model do
 #
@@ -2557,6 +2625,8 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:cobra_begin_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
+    let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:user100) { FactoryGirl.create(:user, person: person100) }
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
 
     before do
@@ -2565,7 +2635,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
 
     context 'When Enrollment Effectve date is prior to cobra begin date' do
       it 'should reset enrollment effective date to cobra begin date' do
-        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
         expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
         expect(hbx_enrollment.effective_on).to eq cobra_begin_date
       end
@@ -2575,7 +2645,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
       let(:cobra_begin_date) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
 
       it 'should not update enrollment effective date' do
-        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
         expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
         expect(hbx_enrollment.effective_on).to eq effective_on
       end
@@ -2585,7 +2655,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
       it 'should raise error' do
-        expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+        expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
   end
@@ -2776,6 +2846,24 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(queued_job[:args].include?('notify_employee_confirming_coverage_termination')).to be_truthy
       expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
       expect(queued_job[:args].third["hbx_enrollment_hbx_id"]).to eq hbx_enrollment.hbx_id.to_s
+    end
+  end
+end
+
+describe HbxEnrollment, dbclean: :after_all do
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+  let!(:plan100) { FactoryGirl.create(:plan) }
+
+  describe "is_an_existing_plan?" do
+    context "for checking if a new plan is similar to the given enr's plan " do
+      it "should return true as the compared plan has similar hios_id and same active year" do
+        expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+      end
+
+      it "should return false as the compared plan has a different hios_id" do
+        expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+      end
     end
   end
 end

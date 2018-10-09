@@ -450,13 +450,13 @@ class HbxEnrollment
     is_cobra_status? && future_active?
   end
 
-  def validate_for_cobra_eligiblity(role)
+  def validate_for_cobra_eligiblity(role, current_user)
     if self.is_shop?
       if role.present? && role.is_cobra_status?
         census_employee = role.census_employee
         self.kind = 'employer_sponsored_cobra'
         self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
-        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
+        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?(current_user)
           raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
         end
       end
@@ -569,13 +569,13 @@ class HbxEnrollment
     end
   end
 
-  def is_applicable_for_renewal?
-    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
-  end
-
-  def handle_coverage_selection    
+  def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
+  end
+
+  def is_applicable_for_renewal?
+    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
   end
 
   def update_renewal_coverage
@@ -839,10 +839,18 @@ class HbxEnrollment
     end
   end
 
+  def is_an_existing_plan?(new_plan)
+    if is_shop?
+      self.family.currently_enrolled_plans_ids(self).include?(new_plan.id)
+    else
+      family.currently_enrolled_plans(self).select{ |plan| plan.is_same_plan_by_hios_id_and_active_year?(new_plan) }.present?
+    end
+  end
+
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= self.plan
 
-    if self.family.currently_enrolled_plans(self).include?(new_plan.id)
+    if is_an_existing_plan?(new_plan)
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
@@ -877,7 +885,7 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_household = household.latest_active_tax_household_with_year(effective_on.year)
+    tax_household = household.latest_active_tax_household_with_year(effective_on.year) rescue nil
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household, market)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
@@ -1327,7 +1335,7 @@ class HbxEnrollment
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
-      transitions from: :auto_renewing, to: :enrolled_contingent
+      transitions from: :auto_renewing, to: :enrolled_contingent, after: :propagate_selection
     end
 
     event :move_to_pending, :after => :record_transition do

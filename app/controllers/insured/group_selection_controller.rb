@@ -68,7 +68,12 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
+
+    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+    if invalid_member_exist
+      raise "Please select valid enrolling members"
+    end
 
     # case for responsible party with primary and dependent in separate markets
     # it assumes the primary and dependent are in either IVL or coverall

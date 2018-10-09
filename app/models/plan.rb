@@ -293,6 +293,11 @@ class Plan
     where(carrier_profile_id: carrier_profile._id)
   end
 
+  def is_same_plan_by_hios_id_and_active_year?(plan)
+    #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
+    ((self.hios_id.split("-")[0] == plan.hios_id.split("-")[0]) && self.active_year == plan.active_year )
+  end
+
   def metal_level=(new_metal_level)
     write_attribute(:metal_level, new_metal_level.to_s.downcase)
   end
@@ -461,12 +466,14 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:)
+    def individual_plans(coverage_kind:, active_year:, tax_household:, hbx_enrollment:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
+        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
+        csr_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind rescue nil
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else
