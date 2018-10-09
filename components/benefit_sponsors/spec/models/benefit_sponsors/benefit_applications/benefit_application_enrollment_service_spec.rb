@@ -23,11 +23,11 @@ module BenefitSponsors
       let(:business_policy) { instance_double("some_policy", success_results: "validated successfully")}
       include_context "setup initial benefit application"
 
-      before(:all) do
+      before(:each) do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
       end
 
-      after(:all) do
+      after(:each) do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
@@ -67,11 +67,11 @@ module BenefitSponsors
           let(:aasm_state) { :draft }
         end
 
-        before do
+        before(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 4))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
@@ -156,11 +156,11 @@ module BenefitSponsors
             let(:aasm_state) { :draft }
           end
 
-        before do
+        before(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 4))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
@@ -195,11 +195,11 @@ module BenefitSponsors
           let(:aasm_state) { :approved }
         end
 
-        before(:all) do
+        before(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
@@ -314,11 +314,11 @@ module BenefitSponsors
           let(:aasm_state) {  application_state }
         end
 
-        before(:all) do
+        before(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 
@@ -364,11 +364,11 @@ module BenefitSponsors
           let(:aasm_state) { :active }
         end
 
-        before(:all) do
+        before(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 8, 1))
         end
 
-        after(:all) do
+        after(:each) do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
 

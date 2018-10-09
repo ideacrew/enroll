@@ -6,10 +6,6 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
   let(:given_task_name) { "modify_benefit_application" }
   subject { ModifyBenefitApplication.new(given_task_name, double(:current_scope => nil)) }
 
-  after :each do
-    DatabaseCleaner.clean
-  end
-
   describe "given a task name", dbclean: :after_each do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
