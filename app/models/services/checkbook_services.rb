@@ -99,7 +99,8 @@ module Services
       end
 
       def csr
-        @hbx_enrollment.household.tax_households.first.latest_eligibility_determination.csr_percent_as_integer
+        year=@hbx_enrollment.effective_on.year
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer
       end
 
       def aptc
