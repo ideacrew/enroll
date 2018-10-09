@@ -91,7 +91,11 @@
     <% if offers_single_plan? || (plan_design_form.is_dental? && dental_offers_single_plan?) %>
       <div class="col-xs-12 single-plan-tab tab-container" style="display: none;">
         <br><br>
-        <p class="twenty plan_heading_text">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</p>
+        <% if plan_design_form.is_dental? %>
+          <p class="twenty plan_heading_text">For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in.</p>
+        <% else %>
+          <p class="twenty plan_heading_text">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</p>
+        <% end %>
         <br/>
         <div id="singlePlanCarrierList" class="carrier-list-container">
           <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>

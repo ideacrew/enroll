@@ -10,7 +10,7 @@
 				= f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind mr-1 hidden'
 		.tab-content
 			.tab-pane.active#plan role="tabpanel"
-				h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+				h4 For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in.
 				br
 				- single_product_carriers.each do |issuer_name, issuer_id|
 					.col-xs-3.plans
