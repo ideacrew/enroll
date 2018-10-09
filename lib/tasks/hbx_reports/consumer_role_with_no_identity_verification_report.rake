@@ -23,10 +23,8 @@ namespace :reports do
               ee_role = person.active_employee_roles.present? ? 'Y' : 'N'
               if !person.primary_family.blank? && !person.primary_family.enrollments.blank?
                 plan_names = []
-                person.primary_family.enrollments.each do |enrollment|
-                  if enrollment.is_active && enrollment.kind=="individual" 
-                    plan_names << enrollment.plan.name 
-                  end
+                person.primary_family.enrollments.individual_market.enrolled.each do |enrollment|
+                  plan_names << enrollment.plan.name
                 end
                 unless plan_names.uniq.empty?
                   csv <<  [ hbx_id,
