@@ -8,6 +8,7 @@ namespace :reports do
                       Person_Hbx_id
                       Enrollment_id
                      )
+    count = 0                 
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
@@ -21,12 +22,13 @@ namespace :reports do
                 csv << [person.hbx_id,
                         enrollment.hbx_id]
               end
+              count += 1 if enrollments.present?
         rescue => e
           puts "Bad person record, error: #{e}" unless Rails.env.test?
         end
       end
     end
-    puts "Generated report with #{people.count} enrollments" 
+    puts "Generated report with #{count} consumers" 
   end
 end
 
