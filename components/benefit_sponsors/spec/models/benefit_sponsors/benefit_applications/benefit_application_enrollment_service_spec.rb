@@ -258,7 +258,11 @@ module BenefitSponsors
           end
 
           context "and the benefit_application enrollment passes eligibility policy validation" do
-
+            let(:business_policy) { instance_double("some_policy", success_results: { business_rule: "validation passed" })}
+            before do
+              allow(subject).to receive(:business_policy).and_return(business_policy)
+              allow(subject).to receive(:business_policy_satisfied_for?).with(:end_open_enrollment).and_return(true)
+            end
             it "should close open enrollment" do
               subject.end_open_enrollment
               initial_application.reload
