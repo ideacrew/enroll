@@ -138,6 +138,14 @@ module Importers
       end
     end
 
+    # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
+    # but while creating :dental sponsored_benefit we will add it on :active benefit_application
+    def fetch_application_based_sponsored_kind
+      employer = find_employer
+      benefit_application = sponsored_benefit_kind == :dental ? employer.active_benefit_application : current_benefit_application(employer)
+      benefit_application
+    end
+
     def save
       return false unless valid?
       employer = find_employer      
@@ -149,7 +157,7 @@ module Importers
       end
 
       plan = find_plan
-      benefit_application = current_benefit_application(employer)
+      benefit_application = fetch_application_based_sponsored_kind
       rating_area_id = benefit_application.recorded_rating_area_id
       bga = find_benefit_group_assignment
 

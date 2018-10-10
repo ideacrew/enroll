@@ -133,6 +133,8 @@ module BenefitSponsors
         family = person.primary_family
         return [] if family.blank?
 
+        employer = find_employer
+
         sponsor_ship = employer.active_benefit_sponsorship
 
         benefit_application = fetch_application_based_sponsored_kind
