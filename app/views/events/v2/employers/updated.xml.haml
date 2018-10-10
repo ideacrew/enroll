@@ -29,9 +29,9 @@
     - if manual_gen
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => plan_years_for_manual_export(employer)
-    - elsif employer_plan_years(employer).present?
+    - elsif employer_plan_years(employer, plan_year_id).present?
       %plan_years
-        = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer)
+        = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer, plan_year_id)
     - if employer.is_conversion?
       %shop_transfer
         %hbx_active_on= employer.created_at.strftime("%Y-%m-%d")
