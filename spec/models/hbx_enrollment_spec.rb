@@ -929,6 +929,69 @@ describe HbxProfile, "class methods", type: :model do
 
   end
 
+  describe "when maket type is individual" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:coverage_household) { family.households.first.coverage_households.first }
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+    let(:active_year) {TimeKeeper.date_of_record.year}
+    let(:plan) { Plan.new(active_year: active_year)}
+    let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:enrollment) {
+      enrollment = family.latest_household.new_hbx_enrollment_from(
+          consumer_role: person.consumer_role,
+          coverage_household: coverage_household,
+          benefit_package: benefit_package,
+          qle: true
+      )
+      enrollment.save
+      enrollment
+    }
+    let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
+
+    before :each do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+      allow(enrollment). to receive(:plan).and_return plan
+      allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      enrollment.update_attributes!(plan_id: plan.id)
+    end
+
+    context "ivl consumer role with unverified state purchased a plan" do
+      it "should return enrollment status as unverified" do
+        person.consumer_role.update_attribute("aasm_state","unverified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "ssa_pending"
+        expect(enrollment.coverage_selected?).to be_falsy
+        expect(enrollment.aasm_state).to eq "unverified"
+      end
+    end
+
+    context "ivl user in fully verified state." do
+      it "should return enrollment status as coverage_selected" do
+        person.consumer_role.update_attribute("aasm_state","fully_verified")
+        enrollment.select_coverage!
+        enrollment.reload
+        expect(person.consumer_role.aasm_state).to eq "fully_verified"
+        expect(enrollment.coverage_selected?).to be_truthy
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+      end
+    end
+
+    context "ivl user in verification outstanding state." do
+      it "should return enrollment status as enrolled_contingent" do
+        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+        enrollment.move_to_contingent!
+        enrollment.reload
+        expect(enrollment.coverage_selected?).to eq false
+        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+      end
+    end
+  end
+
   context "can_terminate_coverage?" do
     let(:hbx_enrollment) {HbxEnrollment.new(
                             kind: 'employer_sponsored',
@@ -1447,10 +1510,6 @@ context "Benefits are terminated" do
     end
   end
 end
-
-
-
-
 
 # describe HbxEnrollment, "#save", type: :model do
 #

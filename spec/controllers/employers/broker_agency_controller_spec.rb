@@ -252,9 +252,10 @@ RSpec.describe Employers::BrokerAgencyController do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.each do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired"]}).to eq true
-      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_agency_hired"]}).to eq true
-      expect(queued_job.any? {|j| j[:args] == [@employer_profile.id.to_s, "broker_hired_confirmation_notice"]}).to eq true
+
+      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_hired")}).to eq true
+      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_agency_hired")}).to eq true
+      expect(queued_job.any? {|j| j[:args].include?(@employer_profile.id.to_s) && j[:args].include?("broker_hired_confirmation_notice")}).to eq true
     end
 
     context "send_broker_assigned_msg" do
