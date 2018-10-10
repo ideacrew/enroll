@@ -45,9 +45,10 @@ module BenefitSponsors
         dental_tiers.each do |contribution_level|
           relation = contribution_level[:relationship]
           contribution_name = relation_ship_mapping[relation]
-          contribution_factor = contribution_level[:premium_pct]
+          contribution_factor = (contribution_level[:premium_pct].to_f)/100
           contribution_levels.push({:display_name => contribution_name, :contribution_factor => contribution_factor, :is_offered => true})
         end
+        contribution_levels
       end
 
       def formed_dental_tier_contribution_levels
