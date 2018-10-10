@@ -205,18 +205,22 @@ class PlanYear
 
   def terminate_employee_enrollments(py_end_on, options= {})
     enrollments_for_plan_year.each do |hbx_enrollment|
-      if py_end_on < TimeKeeper.date_of_record
-        if hbx_enrollment.may_terminate_coverage?
-          hbx_enrollment.terminate_coverage!(py_end_on)
-          hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
-        end
+      if hbx_enrollment.effective_on > py_end_on
+        hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
       else
-        if hbx_enrollment.may_schedule_coverage_termination?
-          hbx_enrollment.schedule_coverage_termination!(py_end_on)
-          hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+        if py_end_on < TimeKeeper.date_of_record
+          if hbx_enrollment.may_terminate_coverage?
+            hbx_enrollment.terminate_coverage!(py_end_on)
+            hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+          end
+        else
+          if hbx_enrollment.may_schedule_coverage_termination?
+            hbx_enrollment.schedule_coverage_termination!(py_end_on)
+            hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+          end
         end
+        hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
       end
-      hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
     end
   end
 
