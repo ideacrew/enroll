@@ -7,8 +7,7 @@ module BenefitSponsors
         census_employee = find_employee
         return nil unless census_employee
 
-        found_employer = find_employer
-        benefit_application = current_benefit_application(found_employer)
+        benefit_application = fetch_application_based_sponsored_kind
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
@@ -68,12 +67,19 @@ module BenefitSponsors
       end
 
       def find_sponsor_benefit
-        employer = find_employer
-        benefit_application = current_benefit_application(employer)
+        benefit_application = fetch_application_based_sponsored_kind
         benefit_package = benefit_application.benefit_packages.first
         benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
           sponsored_benefit.product_kind == sponsored_benefit_kind
         }
+      end
+
+      # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
+      # but while creating :dental sponsored_benefit we will add it on :active benefit_application
+      def fetch_application_based_sponsored_kind
+        employer = find_employer
+        benefit_application = sponsored_benefit_kind == :dental ? employer.active_benefit_application : current_benefit_application(employer)
+        benefit_application
       end
 
       def find_employer
