@@ -179,6 +179,11 @@ module SponsoredBenefits
           proposal: proposal
         )
       end
+
+      def is_dental_plans_avialable?
+        self.effective_date = @effective_date unless @effective_date.is_a?(Date)
+        service.is_dental_plans_avialable?(self)
+      end
     end
   end
 end
