@@ -113,6 +113,19 @@ aca:
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
 
+notices:
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
+
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
 checkbook_services:
@@ -121,7 +134,7 @@ checkbook_services:
     reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
     base_url:  "https://staging.checkbookhealth.org"
     url: "https://staging.checkbookhealth.org"
-    congress_url: "https://dc.checkbookhealth.org/congress/dc/2018/"
+    congress_url: "https://dc.checkbookhealth.org/congress/dc/"
     plan_match: "DC"
 
 aptc_errors:
