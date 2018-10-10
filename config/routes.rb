@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -55,6 +55,7 @@ Rails.application.routes.draw do
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
+        post :disable_ssn_requirement
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -94,6 +95,12 @@ Rails.application.routes.draw do
       resources :hbx_staff_roles do
         # root 'hbx_profiles/hbx_staff_roles#show'
       end
+    end
+
+    resources :employer_applications do
+      put :terminate
+      put :cancel
+      put :reinstate
     end
 
     resources :agents do
@@ -209,7 +216,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
