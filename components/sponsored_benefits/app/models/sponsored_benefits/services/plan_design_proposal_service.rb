@@ -101,6 +101,13 @@ module SponsoredBenefits
       def is_dental_benefits?
         kind == "dental"
       end
+
+      def is_dental_plans_avialable?(form)
+        ::Plan.where(
+          coverage_kind: "dental",
+          active_year: form.effective_date.year
+        ).present?
+      end
     end
   end
 end
