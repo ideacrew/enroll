@@ -29,7 +29,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   describe "ModelEvent" do
     it "should trigger model event" do
       benefit_application.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:notifications_send).exactly(3).times do |instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_no_binder_payment_received, :klass_instance => benefit_application, :options => {})
         end
