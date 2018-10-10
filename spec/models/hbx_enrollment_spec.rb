@@ -2046,7 +2046,7 @@ context "for cobra", :dbclean => :after_each do
       employee_role.census_employee = census_employee
       enrollment.employee_role = employee_role
       enrollment.aasm_state = "coverage_termination_pending"
-      expect(enrollment.future_enrollment_termination_date).to eq coverage_termiante_date
+      expect(enrollment.future_enrollment_termination_date).to eq enrollment.terminated_on
     end
   end
 
