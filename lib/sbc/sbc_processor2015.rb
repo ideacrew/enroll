@@ -44,7 +44,7 @@ class SbcProcessor2015
         plan.sbc_document.save!
         plan.save!
         counter += 1
-        puts "Plan #{plan.name} #{plan.hios_id}updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
+        puts "Plan #{plan.name} #{plan.hios_id} updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
       end
     end
     puts "Total #{counter} plans updated."

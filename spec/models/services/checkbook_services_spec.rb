@@ -7,7 +7,9 @@ describe Services::CheckbookServices::PlanComparision do
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
+  let(:plan_year){ FactoryGirl.create(:next_month_plan_year, :with_benefit_group)}
+  let(:benefit_group){ plan_year.benefit_groups.first }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
 
   describe "when employee is not congress" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
@@ -19,7 +21,7 @@ describe Services::CheckbookServices::PlanComparision do
         allow(HTTParty).to receive(:post).with("https://staging.checkbookhealth.org/shop/dc/api/",
           {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
           and_return(result)
-        expect(subject.generate_url).to eq Settings.checkbook_services.congress_url
+        expect(subject.generate_url).to eq Settings.checkbook_services.congress_url+"#{hbx_enrollment.effective_on.year}/"
       end
     end
   end

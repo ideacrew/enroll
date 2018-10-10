@@ -18,7 +18,7 @@ class Import2019IvlBenefitPackage < MongoidMigrationTask
     else
     # create benefit package and benefit_coverage_period for 2019
       bc_period_2018 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2018 }.first
-      bc_period_2019 = bc_period_2018.dup
+      bc_period_2019 = bc_period_2018.clone
       bc_period_2019.title = "Individual Market Benefits 2019"
       bc_period_2019.start_on = bc_period_2018.start_on + 1.year
       bc_period_2019.end_on = bc_period_2018.end_on + 1.year
