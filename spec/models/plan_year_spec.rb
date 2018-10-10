@@ -2654,6 +2654,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
     it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
       hbx_enrollment.update_attributes!(effective_on: start_on.next_month)
       plan_year.schedule_termination!(py_termination_dates[1])
+      hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
     end
   end
