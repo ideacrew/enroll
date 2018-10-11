@@ -8,6 +8,7 @@ namespace :reports do
                       Person_Hbx_id
                       Enrollment_id
                      )
+    count = 0                 
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
@@ -15,18 +16,20 @@ namespace :reports do
       people.each do |person|
         begin
               household = person.primary_family.active_household if person.primary_family.present?
-              enrollments = household.hbx_enrollments.where(:aasm_state => "coverage_selected", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }) if person.primary_family.present?
+              enrollments = household.hbx_enrollments.individual_market.enrolled.where(:effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }) if person.primary_family.present?
               next if enrollments.nil?
               req_enrollments = enrollments.each do |enrollment|
                 csv << [person.hbx_id,
                         enrollment.hbx_id]
               end
+              count += 1 if enrollments.present?
         rescue => e
           puts "Bad person record, error: #{e}" unless Rails.env.test?
         end
       end
     end
-    puts "Generated report with #{people.count} enrollments" 
+    puts "Generated report with #{count} consumers" 
   end
 end
+
             
