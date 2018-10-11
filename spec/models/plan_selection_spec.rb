@@ -173,6 +173,7 @@ describe PlanSelection do
       it "enrollment should be moved to termination pending" do
         allow(family).to receive(:earliest_effective_shop_sep).and_return special_enrollment_period
         subject.select_plan_and_deactivate_other_enrollments(nil,"shop")
+        subject.hbx_enrollment.reload
         expect(subject.hbx_enrollment.aasm_state).to eq("coverage_termination_pending")
       end
     end
