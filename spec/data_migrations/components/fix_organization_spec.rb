@@ -184,5 +184,45 @@ describe FixOrganization, dbclean: :after_each do
         expect(employer_attestation.aasm_state).to eq "approved"
       end
     end
+ end
+
+  describe "update employer broker agency account of an Employer" do
+
+    let(:benefit_sponsorship) {FactoryGirl.create :benefit_sponsors_benefit_sponsorship,
+                                                  :with_benefit_market,
+                                                  :with_organization_cca_profile,
+                                                  :with_broker_agency_account,
+                                                  :with_initial_benefit_application}
+    let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile) }
+    let!(:broker_role) { FactoryGirl.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    before(:each) do
+      ENV['action'] = 'update_employer_broker_agency_account'
+      ENV['organization_fein'] = benefit_sponsorship.organization.fein
+      ENV['npn'] = broker_role.npn
+    end
+    context "updating broker agency account details to correct information is provided" do
+      it "should update broker agency account when organization is present" do
+        subject.migrate
+        benefit_sponsorship.reload
+        expect(benefit_sponsorship.active_broker_agency_account.writing_agent_id).to eq broker_role.id
+        expect(benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile.id
+      end
+    end
+
+    context "updating broker agency account details to correct information is provided" do
+
+      before(:each) do
+        ENV['action'] = 'update_employer_broker_agency_account'
+        ENV['organization_fein'] = benefit_sponsorship.organization.fein
+        ENV['npn'] = ""
+      end
+
+      it "should not update broker agency account when organization is present" do
+        subject.migrate
+        benefit_sponsorship.reload
+        expect(benefit_sponsorship.active_broker_agency_account.writing_agent_id).not_to eq broker_role.id
+        expect(benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).not_to eq broker_agency_profile.id
+      end
+    end
   end
 end
