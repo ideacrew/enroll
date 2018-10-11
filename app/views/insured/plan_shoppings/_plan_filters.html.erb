@@ -8,13 +8,33 @@
       <% end %>
       <h4>
         <%= find_my_doctor %>
-        <%=link_to "Estimate your cost" , @dc_individual_checkbook_url %>
+        <%=link_to "Estimate your cost" , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
         </br>
         <% if plan_match_dc %>
         <%= estimate_your_costs %>
         <% end %>
       </h4>
     </div>
+
+    <div class="modal fade" id="plan_match_redirection" tabindex="-1" role="dialog" role="document">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-header" style="border-bottom:none">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <hr>
+          </div> 
+          <div style="margin-left:20px;">
+            <p> You are about to redirect to a separate website where you can compare coverage options using Plan Match, a decision-support tool that features on out-of-pocket cost calculator, integrated provider and drug directories, and more.</p>
+          </div>
+          <div class="modal-footer" style="margin-right:190px">
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+            <%= submit_tag "Confirm", class: 'btn btn-primary  mtz' %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   <h3 class="header-title">Filter Results</h3>
   <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
