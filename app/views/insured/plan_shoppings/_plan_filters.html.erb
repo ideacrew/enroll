@@ -2,13 +2,13 @@
   <div class="row">
     <div class="checkbox-filter-wrapper">
       <% if !@hbx_enrollment.is_shop? %>
-      <h4>
+      <!-- <h4>
         <%= link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
-      </h4>
+      </h4> -->
       <% end %>
       <h4>
         <%= find_my_doctor %>
-        <%= checkbook_integration%>
+        <%=link_to "Estimate your cost" , @dc_individual_checkbook_url %>
         </br>
         <% if plan_match_dc %>
         <%= estimate_your_costs %>

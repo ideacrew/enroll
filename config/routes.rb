@@ -137,6 +137,7 @@ Rails.application.routes.draw do
         post 'waive'
         post 'terminate'
         post 'set_elected_aptc'
+        get 'plan_selection_callback'
       end
     end
 

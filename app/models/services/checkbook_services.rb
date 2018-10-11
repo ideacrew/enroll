@@ -13,6 +13,7 @@ module Services
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"
           @person = @hbx_enrollment.consumer_role.person
+          @url = Settings.consumer_checkbook_services.base_url
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
@@ -25,10 +26,10 @@ module Services
         return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
-          if 
             @result = HTTParty.post(@url,
                   :body => construct_body.to_json,
                   :headers => { 'Content-Type' => 'application/json' } )
+
             uri = @result.parsed_response["URL"]
             if uri.present?
               return uri
@@ -36,7 +37,7 @@ module Services
               raise "Unable to generate url"
             end
         rescue Exception => e
-          Rails.logger.error { "Unable to generate url for #{@census_employee.full_name} due to #{e.backtrace}" }
+          Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
         end
       end
 
@@ -71,7 +72,9 @@ module Services
         }],
         #"family": build_family,
         "aptc": "343",
-        "csr": "-01"
+        "csr": "-01",
+        "callback_url": "http://#{request.host_with_port}/insured/plan_shoppings/#{@hbx_enrollment.id}/plan_selection_callback/",
+
         }
       end
 
@@ -111,8 +114,9 @@ module Services
       def tribal_option
         if  @hbx_enrollment.consumer_role.person.tribal_id.present?
           return true
-         else 
-          return false   
+        else 
+          return false 
+        end  
       end
 
 

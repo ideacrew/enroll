@@ -7,7 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
@@ -167,15 +167,24 @@ class Insured::PlanShoppingsController < ApplicationController
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
       @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
-    else
-      is_individual_consumer = @hbx_enrollment.kind = "individual"
-      @dc_individual_checkbook_url = is_individual_consumer ?Settings.checkbook_services.ivl_base_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+    elsif @hbx_enrollment.kind == "individual"
+      @dc_individual_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
+
+  def plan_selection_callback
+    selected_plan= Plan.where(:hios_id=> params[:hios_id]).first
+    if selected_plan.present?
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id]})
+    else
+      redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
+    end
+  end
+
 
   def set_elected_aptc
     session[:elected_aptc] = params[:elected_aptc].to_f
