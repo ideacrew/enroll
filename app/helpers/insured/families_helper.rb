@@ -241,4 +241,52 @@ module Insured::FamiliesHelper
     end
     return first_checked, second_checked
   end
+
+  def current_market_kind(person)
+    if person.is_consumer_role_active? || person.is_resident_role_active?
+      person.active_individual_market_role
+    else
+      "No Consumer/CoverAll Market"
+    end
+  end
+
+  def new_market_kind(person)
+    if person.is_consumer_role_active?
+      "resident"
+    elsif person.is_resident_role_active?
+      "consumer"
+    else
+      " - "
+    end
+  end
+
+  def build_consumer_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_consumer_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_consumer_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def build_resident_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_resident_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_resident_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def transition_reason(person)
+    if person.is_consumer_role_active?
+    @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      { @qle.title => @qle.reason }
+    elsif person.is_resident_role_active?
+     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+     { @qle.title => @qle.reason }
+    end
+  end
 end
