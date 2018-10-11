@@ -420,7 +420,7 @@ class HbxEnrollment
 
   def future_enrollment_termination_date
     return "" unless coverage_termination_pending?
-    employee_role && employee_role.census_employee && employee_role.census_employee.coverage_terminated_on
+    terminated_on
   end
 
   def benefit_sponsored?
