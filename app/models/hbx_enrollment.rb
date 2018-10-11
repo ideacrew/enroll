@@ -56,6 +56,8 @@ class HbxEnrollment
 
   ENROLLMENT_TRAIN_STOPS_STEPS.default = 0
 
+  # This field will be used to handle if the any of the enollment members are outstanding.
+  field :is_any_enrollment_member_outstanding, type: Boolean, default: false
 
   field :coverage_household_id, type: String
   field :kind, type: String
