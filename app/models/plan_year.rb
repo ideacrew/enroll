@@ -1220,7 +1220,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
       self.employer_profile.census_employees.non_terminated.each do |ce|
        begin
-         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employer_ineligibility_notice_to_employee", :acapi_trigger =>  true)
+         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employer_ineligibility_notice_to_employee", "acapi_trigger" =>  true)
        rescue Exception => e
          Rails.logger.error { "Unable to deliver employer renewal ineligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end

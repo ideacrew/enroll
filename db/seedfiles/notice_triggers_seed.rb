@@ -389,7 +389,7 @@ shop_notice_triggers = [
     event_name: 'renewal_employer_ineligibility_notice_to_employee',
     notice_triggers: [
       {
-        name: 'Employee Eligibility Notice',
+        name: 'Renewal Employee Ineligibilty Notice',
         notice_template: 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
         notice_builder: 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
         mpi_indicator: 'SHOP_D039',
@@ -806,7 +806,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP10047',
+    hbx_id: 'DIE040',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'Notification to employees regarding their Employer’s ineligibility.',
     resource_name: 'employee_role',
@@ -816,7 +816,7 @@ shop_notice_triggers = [
         name: 'Notification to employees regarding their Employer’s ineligibility.',
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
         notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
-        mpi_indicator: 'MPI_SHOP10047',
+        mpi_indicator: 'SHOP_D040',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
