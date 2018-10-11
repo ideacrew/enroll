@@ -113,7 +113,7 @@ class VlpDocument < Document
   field :status, type: String, default: "not submitted"
 
   # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
-  field :verification_type, default: "Citizenship"
+  field :verification_type
 
   field :comment, type: String
 
