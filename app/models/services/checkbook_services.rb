@@ -144,6 +144,17 @@ module Services
         @hbx_enrollment.benefit_group.reference_plan
       end
 
+      def consumer_build_family
+        year = TimeKeeper.date_of_record.year
+          @hbx_enrollment.hbx_enrollment_members.each do |member|
+            dob_year= member.family_member.person.dob.strftime("%Y").to_i
+            age = year - dob_year
+            family << {'age': dob_year-year}
+          end
+          family
+      end
+
+
       def build_family
         family = []
         # family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
