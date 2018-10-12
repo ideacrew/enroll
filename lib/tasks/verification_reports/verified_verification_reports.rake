@@ -74,8 +74,8 @@ namespace :reports do
       Date.parse(date).next_month
     end
 
-    def verified_history_elements_with_date_range
-      @person.consumer_role.verification_type_history_elements.
+    def type_history_elements_with_date_range(v_type)
+      v_type.type_history_elements.
       where(created_at:{
         :"$gte" => start_date,
         :"$lt" => end_date},
@@ -83,11 +83,11 @@ namespace :reports do
           {:"action" => "verify"},
           {:"modifier" => "external Hub"}
         ]
-      ).uniq{|element| [element.modifier,element.created_at.to_date,element.verification_type]}
+      ).uniq{|element| [element.modifier,element.created_at.to_date]}
     end
   
     def verified_people
-      Person.where(:"consumer_role.verification_type_history_elements" => { :"$elemMatch" => {
+      Person.where(:"verification_types.type_history_elements" => { :"$elemMatch" => {
         :"created_at" => {
           :"$gte" => start_date,
           :"$lt" => end_date
@@ -99,9 +99,9 @@ namespace :reports do
       }})
     end
 
-    def hub_response_wfst
+    def hub_response_wfst(verification_type)
       hub_response_on = @history_element.created_at.to_date
-      v_type = @history_element.verification_type
+      v_type = verification_type.type_name
       @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
         :"$gt" => hub_response_on - 1.day,
         :"$lt" => hub_response_on + 1.day
@@ -123,12 +123,11 @@ namespace :reports do
         else
           ALL_EVENTS
       end
-
     end
     
-   def is_not_eligible_transaction?
+   def is_not_eligible_transaction?(v_type)
       return false if @history_element.modifier != "external Hub"
-      hub_response_wfst.blank?
+      hub_response_wfst(v_type).blank?
     end
 
 
@@ -141,22 +140,22 @@ namespace :reports do
       verified_people.each do |person|
         begin
           @person = person
-          verified_history_elements_with_date_range.each do |history_element|
+          person.verification_types.each do |v_type|
+            type_history_elements_with_date_range(v_type).each do |history_element|
             @history_element = history_element
-
-            next if is_not_eligible_transaction?
-          
+            next if is_not_eligible_transaction?(v_type)
             csv << [  subscriber_id,
                       person.hbx_id,
                       person.first_name,
-                      person.last_name,  
-                      person.consumer_role.verification_type_status(history_element.verification_type,person),
-                      history_element.verification_type,
+                      person.last_name,
+                      v_type.validation_status,
+                      v_type.type_name,
                       history_element.created_at,
                       history_element.update_reason,
                       ivl_enrollment(person),
                       shop_enrollment(person)
-                    ]
+            ]
+            end
           end
         rescue => e
          puts "Invalid Person with HBX_ID: #{person.hbx_id}"
@@ -168,4 +167,3 @@ namespace :reports do
 
   end
 end
-
