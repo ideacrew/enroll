@@ -194,8 +194,9 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    if @person.primary_family.active_household.latest_active_tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person)
+    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
+    if @tax_household.present?
+      if is_eligibility_determined_and_not_csr_100?(@person, @tax_household)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -225,9 +226,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person)
-    csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-    (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+  def is_eligibility_determined_and_not_csr_100?(person, tax_household)
+    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
+    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
   end
 
   def send_receipt_emails
@@ -256,10 +257,8 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
 
       build_same_plan_premiums
