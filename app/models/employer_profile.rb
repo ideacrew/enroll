@@ -327,7 +327,7 @@ class EmployerProfile
   end
 
   def find_plan_year_by_effective_date(target_date)
-    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(:aasm_state.in => ["expired", "termination_pending"])).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 

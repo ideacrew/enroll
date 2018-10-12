@@ -2658,9 +2658,8 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   end
 
   py_termination_dates = [TimeKeeper.date_of_record - 8.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 14.days]
-
-  context 'when plan year is terminated' do
-    py_termination_dates.each do |py_end_on|
+  py_termination_dates.each do |py_end_on|
+    context 'when plan year is terminated' do
       it "should move the enrollment to coverage terminated/pending status" do
         plan_year.schedule_termination!(py_end_on)
         hbx_enrollment.reload
@@ -2670,13 +2669,6 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
           expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
         end
       end
-    end
-
-    it "should move the enrollment to canceled state if enrollment effective_on > py_end_on" do
-      hbx_enrollment.update_attributes!(effective_on: start_on.next_month)
-      plan_year.schedule_termination!(py_termination_dates[1])
-      hbx_enrollment.reload
-      expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
     end
   end
 end
