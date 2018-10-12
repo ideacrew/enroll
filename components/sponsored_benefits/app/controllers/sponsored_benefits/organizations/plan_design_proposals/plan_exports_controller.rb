@@ -2,9 +2,11 @@ module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanExportsController < ApplicationController
 
-      def new
+      skip_before_action :verify_authenticity_token
+
+      def create
         @plan_design_organization = plan_design_organization
-        @benefit_group = benefit_group
+        find_or_build_benefit_group
         @census_employees = sponsorship.census_employees
 
         if @benefit_group
@@ -35,8 +37,25 @@ module SponsoredBenefits
           @sponsorship ||= plan_design_proposal.profile.benefit_sponsorships.first
         end
 
-        def benefit_group
-          @benefit_group ||= sponsorship.benefit_applications.first.benefit_groups.first || sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
+        def find_or_build_benefit_group
+          @benefit_group = sponsorship.benefit_applications.first.benefit_groups.first
+
+          if @benefit_group.present?
+            if kind == 'dental'
+              @benefit_group.dental_relationship_benefits = []
+              @benefit_group.assign_attributes(dental_benefit_params)
+              @benefit_group.elected_dental_plans = @benefit_group.elected_dental_plans_by_option_kind
+            else
+              @benefit_group.relationship_benefits = []
+              @benefit_group.assign_attributes(benefit_group_params)
+            end
+          end
+
+          if @benefit_group.blank? && benefit_group_params.present?
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params)
+          end
+
+          @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
         end
 
         def plan_array(plan)
@@ -53,6 +72,27 @@ module SponsoredBenefits
 
         def sbc_included
           params[:sbc_included] == 'true'
+        end
+
+        def kind
+          params.require(:benefit_group).require(:kind)
+        end
+
+        def benefit_group_params
+          params.require(:benefit_group).permit(
+                      :reference_plan_id,
+                      :plan_option_kind,
+                      relationship_benefits_attributes: [:relationship, :premium_pct, :offered],
+                      composite_tier_contributions_attributes: [:composite_rating_tier, :employer_contribution_percent, :offered]
+          )
+        end
+
+        def dental_benefit_params
+          {
+            dental_reference_plan_id: benefit_group_params[:reference_plan_id],
+            dental_relationship_benefits: benefit_group_params[:relationship_benefits_attributes],
+            dental_plan_option_kind:  benefit_group_params[:plan_option_kind]
+          }
         end
     end
   end

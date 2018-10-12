@@ -44,7 +44,7 @@ SponsoredBenefits::Engine.routes.draw do
       end
       post :publish
 
-      resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:new] do
+      resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:create] do
       end
 
     end

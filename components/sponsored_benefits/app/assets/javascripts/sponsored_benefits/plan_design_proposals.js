@@ -117,6 +117,34 @@ function setSBC(element, plan) {
   }
 }
 
+function url_redirect(options){
+  var $form = $("<form />");
+  $form.attr("action",options.url);
+  $form.attr("method",options.method);
+            
+  for (var key in options.data)
+    buildChiderenElements($form, key, options.data[key]);
+            
+  $("body").append($form);
+  $form.submit();
+}
+
+function buildChiderenElements(form, prefix, data) {
+    for (var key in data)
+      if (typeof(data[key]) == 'string'){
+        form.append("<input type='hidden' name='"+prefix+"["+ key +"]"+"' value='"+ data[key] +"' />");
+      }
+      else {
+        buildChiderenElements(form, prefix+"["+ key +"]", data[key]);
+      }
+}
+
+function downloadPdf(event, element) {
+  event.preventDefault();
+  var data = buildBenefitGroupParams();
+  url_redirect({url: element.href, method: "post", data: data});
+}
+
 function sendPdf(event) {
   $(this).addClass('plan-not-saved');
   $(this).removeClass('plan-saved');
