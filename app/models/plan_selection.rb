@@ -44,9 +44,11 @@ class PlanSelection
       hbx_enrollment.move_to_contingent!
     else
       hbx_enrollment.select_coverage!(qle: qle)
-      plan_year = hbx_enrollment.benefit_group.plan_year
-      if plan_year.termination_pending?
-        plan_year.terminate_employee_enrollments(plan_year.end_on, transmit_xml:true)
+      if market_kind == 'shop'
+        plan_year = hbx_enrollment.benefit_group.plan_year
+        if plan_year.termination_pending?
+          plan_year.terminate_employee_enrollments(plan_year.end_on, transmit_xml:true)
+        end
       end
     end
   end
