@@ -6,7 +6,7 @@ module BenefitSponsors
 
 
     def initialize(benefit_application)
-      @benefit_application   = benefit_application
+      @benefit_application = benefit_application
     end
 
     def renew_application

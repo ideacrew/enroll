@@ -353,6 +353,7 @@ module BenefitSponsors
       let(:renewal_benefit_package)        { renewal_application.benefit_packages.build }
 
       context "when renewal product missing" do 
+<<<<<<< .merge_file_geTYtX
         let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false, coverage_kind: :health) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer
@@ -363,6 +364,9 @@ module BenefitSponsors
           allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products[0..1])
           allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
         end
+=======
+        let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false ) }
+>>>>>>> .merge_file_K3ubw3
 
         it 'should return false' do
           expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_falsey
@@ -370,6 +374,10 @@ module BenefitSponsors
       end
 
       context "when renewal product offered by employer" do
+<<<<<<< .merge_file_geTYtX
+=======
+
+>>>>>>> .merge_file_K3ubw3
         let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer
@@ -388,6 +396,10 @@ module BenefitSponsors
 
       context "when renewal product not offered by employer" do
         let(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+<<<<<<< .merge_file_geTYtX
+=======
+
+>>>>>>> .merge_file_K3ubw3
         let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer
