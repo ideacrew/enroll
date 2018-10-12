@@ -73,7 +73,7 @@ module Services
         #"family": build_family,
         "aptc": "343",
         "csr": "-01",
-        "callback_url": "http://#{request.host_with_port}/insured/plan_shoppings/#{@hbx_enrollment.id}/plan_selection_callback/",
+        "callback_url": "http://localhost:3000/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/plan_selection_callback/",
 
         }
       end
@@ -103,12 +103,12 @@ module Services
 
       def csr
         year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer rescue 0.00
       end
 
       def aptc
         year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year)
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year) rescue 0.00
       end
 
       def tribal_option
