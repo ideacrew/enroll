@@ -809,12 +809,6 @@ class EmployerProfile
           end
         end
 
-        if new_date.prev_day.mday == Settings.aca.shop_market.initial_application.quiet_period.mday
-          effective_on = (new_date.prev_day.beginning_of_month - Settings.aca.shop_market.initial_application.quiet_period.month_offset.months).to_s(:db)
-
-          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
-        end
-
         #Initial employer reminder notices to publish plan year.
         start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
@@ -847,13 +841,18 @@ class EmployerProfile
           end
         end
 
-        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
+        if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
+          effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
+          notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
+        end
+
+       #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
         start_on_for_missing_binder_payments = TimeKeeper.date_of_record.next_month.beginning_of_month
         binder_next_day = PlanYear.calculate_open_enrollment_date(start_on_for_missing_binder_payments)[:binder_payment_due_date].next_day
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
             if !org.employer_profile.binder_paid?
-              notice_to_employee_for_missing_binder_payment(org)
+              notice_to_ee_that_er_plan_year_will_not_be_written(org)
             end
           end
         end
@@ -1258,12 +1257,12 @@ class EmployerProfile
     )
   end
    
-  def self.notice_to_employee_for_missing_binder_payment(org)
+  def self.notice_to_ee_that_er_plan_year_will_not_be_written(org)
     org.employer_profile.census_employees.active.each do |ce|
       begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_employee_for_missing_binder_payment", "acapi_trigger" =>  true )
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
       rescue Exception => e
-        (Rails.logger.error {"Unable to deliver notice_to_employee_for_missing_binder_payment to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
+        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
       end
     end
   end

@@ -585,11 +585,6 @@ class HbxEnrollment
     is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
   end
 
-  def handle_coverage_selection    
-    callback_context = { :hbx_enrollment => self }
-    HandleCoverageSelected.call(callback_context)
-  end
-
   def update_renewal_coverage
     if is_applicable_for_renewal?
       if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated

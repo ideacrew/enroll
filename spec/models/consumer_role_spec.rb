@@ -712,6 +712,7 @@ describe "#revert_lawful_presence" do
     expect(consumer.verification_types.by_name("Citizenship").first.validation_status). to eq "pending"
   end
 end
+
 describe "it should check the residency status" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:consumer) { person.consumer_role }

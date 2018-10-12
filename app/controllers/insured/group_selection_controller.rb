@@ -68,6 +68,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     hbx_enrollment.coverage_kind = @coverage_kind
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
+
     invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
     if invalid_member_exist
       raise "Please select valid enrolling members"

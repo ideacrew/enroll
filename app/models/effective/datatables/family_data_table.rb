@@ -80,6 +80,7 @@ module Effective
         allow && row.primary_applicant.person.has_active_consumer_role? ? 'ajax' : 'disabled'
       end
 
+
       def nested_filter_definition
         {
         employer_options: [

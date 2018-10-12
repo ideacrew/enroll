@@ -107,3 +107,7 @@ end
 #rake permissions:hbx_admin_can_delete_identity_application_documents
 #rake permissions:hbx_admin_can_access_pay_now
 #rake permissions:hbx_admin_can_access_user_account_tab
+
+#rake permissions:hbx_admin_can_transition_family_members
+
+#rake permissions:hbx_admin_can_add_pdc
