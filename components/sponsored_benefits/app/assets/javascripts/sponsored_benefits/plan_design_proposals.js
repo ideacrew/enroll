@@ -110,7 +110,9 @@ function fetchCarriers() {
 // }
 
 function setSBC(element, plan) {
-  if (element.parentElement.getElementsByClassName("sbc-download-checkbox")[0].checked == true) {
+  var kind = fetchBenefitKind();
+
+  if (kind == "health" && element.parentElement.getElementsByClassName("sbc-download-checkbox")[0].checked == true) {
    $(element).attr('href',plan+"?sbc_included=true");
   } else {
    $(element).attr('href',plan);

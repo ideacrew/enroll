@@ -10,6 +10,7 @@ module SponsoredBenefits
         @census_employees = sponsorship.census_employees
 
         if @benefit_group
+          @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
           @plan = @benefit_group.reference_plan
           @employer_contribution_amount = @benefit_group.monthly_employer_contribution_amount
           @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
