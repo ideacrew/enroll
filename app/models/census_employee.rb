@@ -999,6 +999,8 @@ class CensusEmployee < CensusMember
   def validate_unique_identifier
     if ssn && ssn.size != 9 && no_ssn_allowed == false
       errors.add(:ssn, "must be 9 digits.")
+    elsif ssn.blank? && no_ssn_allowed == false
+      errors.add(:ssn, "Can't be blank")
     end
   end
 
