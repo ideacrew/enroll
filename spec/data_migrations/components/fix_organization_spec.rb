@@ -202,8 +202,10 @@ describe FixOrganization, dbclean: :after_each do
     end
     context "updating broker agency account details to correct information is provided" do
       it "should update broker agency account when organization is present" do
+        expect(benefit_sponsorship.active_broker_agency_account.is_active).to eq true
         subject.migrate
         benefit_sponsorship.reload
+        expect(benefit_sponsorship.broker_agency_accounts.unscoped.first.is_active).to eq false
         expect(benefit_sponsorship.active_broker_agency_account.writing_agent_id).to eq broker_role.id
         expect(benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile.id
       end
