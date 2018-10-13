@@ -4,7 +4,7 @@ namespace :recurring do
     families = Family.where({
       "households.hbx_enrollments" => {
         "$elemMatch" => {
-        "aasm_state" => { "$in" => ["enrolled_contingent"] },
+          :"is_any_enrollment_member_outstanding" =>  true,
         } }
         })
     puts "families #{families.count}" unless Rails.env.test?
