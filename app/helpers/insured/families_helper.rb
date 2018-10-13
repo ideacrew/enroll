@@ -165,6 +165,8 @@ module Insured::FamiliesHelper
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
+    elsif enrollment.is_any_enrollment_member_outstanding && enrollment.aasm_state != 'auto_renewing'
+      false
     else
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
