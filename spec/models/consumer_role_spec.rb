@@ -649,13 +649,14 @@ describe "it should check the residency status" do
       expect(enrollment.aasm_state).to eq("coverage_selected")
     end
 
-    it "should move the enrollment status to contingent when received negative response from residency hub" do
+    it "should set is_any_enrollment_member_outstanding to true when received negative response from residency hub" do
       consumer.coverage_purchased!
       consumer.ssn_valid_citizenship_valid!(verification_attr)
       consumer.fail_residency!
       expect(consumer.aasm_state).to eq("verification_outstanding")
       enrollment.reload
-      expect(enrollment.aasm_state).to eq("enrolled_contingent")
+      expect(enrollment.aasm_state).to eq("coverage_selected")
+      expect(enrollment.is_any_enrollment_member_outstanding).to eq(true)
     end
 
     it "should move the enrollment status to contingent when received negative response from residency hub" do
