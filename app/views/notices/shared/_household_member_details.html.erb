@@ -15,7 +15,11 @@
             <%= member.full_name%> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= member.age %>
           </td>
           <td class="small">
-            <%= member.documents_due_date.strftime("%B %d, %Y") rescue "" %>
+            <% if member.past_due_text.present? %>
+              <%= member.past_due_text  %>
+            <% else %>
+              <%= member.documents_due_date.strftime("%B %d, %Y") rescue "" %>
+            <% end %>
           </td>
         </tr>
       <%end%>

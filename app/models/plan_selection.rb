@@ -28,6 +28,7 @@ class PlanSelection
   end
 
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
+
     hbx_enrollment.update_current(plan_id: plan.id)
     # hbx_enrollment.inactive_related_hbxs
     # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
@@ -46,7 +47,7 @@ class PlanSelection
       hbx_enrollment.select_coverage!(qle: qle)
     end
   end
-
+  
   def enrollment_members_verification_status(market_kind)
     members = hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role)
     if market_kind == "individual"
