@@ -25,7 +25,7 @@ class HbxEnrollment
   COVERAGE_KINDS      = %w(health dental)
 
   ENROLLED_STATUSES   = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending
-                              enrolled_contingent unverified
+                               unverified
                             )
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
@@ -49,7 +49,7 @@ class HbxEnrollment
     "I have coverage through Medicaid",
     "I do not have other coverage"
   ]
-  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
+  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
@@ -110,6 +110,7 @@ class HbxEnrollment
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
   field :termination_submitted_on, type: DateTime
+  field :is_any_enrollment_member_outstanding, type: Boolean, default: false
   # Checkbook url
   field :checkbook_url , type: String
 
@@ -166,7 +167,7 @@ class HbxEnrollment
   scope :effective_asc,      -> { order(effective_on: :asc) }
   scope :effective_desc,      ->{ order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) }
   scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
-  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing", "enrolled_contingent"] )}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
   scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
@@ -372,8 +373,9 @@ class HbxEnrollment
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
     if eligibility_ruleset.applicable?
-      if eligibility_ruleset.determine_next_state != :do_nothing
-        self.send(eligibility_ruleset.determine_next_state)
+      if eligibility_ruleset.determine_next_state[1] != :do_nothing
+        self.update_attributes!(is_any_enrollment_member_outstanding: eligibility_ruleset.determine_next_state[0])
+        self.send(eligibility_ruleset.determine_next_state[1])
       end
     end
   end
@@ -1112,7 +1114,7 @@ class HbxEnrollment
         1
       when transmitted_to_carrier? #transmitted
         2
-      when enrolled_contingent? #acknowledged
+      when is_any_enrollment_member_outstanding? #acknowledged
         3
       when coverage_enrolled? #enrolled
         4
@@ -1204,7 +1206,7 @@ class HbxEnrollment
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
-    state :enrolled_contingent
+    #state :enrolled_contingent
 
     state :void       # nullify enrollment
 
@@ -1223,7 +1225,7 @@ class HbxEnrollment
 
     event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
-      transitions from: :enrolled_contingent, to: :auto_renewing_contingent, after: :propagate_renewal
+      #transitions from: :enrolled_contingent, to: :auto_renewing_contingent, after: :propagate_renewal
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1261,7 +1263,7 @@ class HbxEnrollment
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier,
                          :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier,
                          :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
-                         :coverage_renewed, :enrolled_contingent, :unverified],
+                         :coverage_renewed, :unverified],
                   to: :coverage_enrolled, :guard => :is_shop?
 
       transitions from: :auto_renewing, to: :coverage_selected
@@ -1269,13 +1271,13 @@ class HbxEnrollment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:shopping, :enrolled_contingent, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
+      transitions from: [:shopping, :coverage_selected, :transmitted_to_carrier, :coverage_enrolled],
                   to: :coverage_expired, :guard  => :can_be_expired?
     end
 
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing,
-                         :enrolled_contingent, :coverage_enrolled],
+                         :coverage_enrolled],
                   to: :coverage_termination_pending, after: :set_coverage_termination_date
 
       transitions from: [:renewing_waived, :inactive], to: :inactive
@@ -1284,7 +1286,7 @@ class HbxEnrollment
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
-                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
+                         :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
                   to: :coverage_canceled
     end
@@ -1292,7 +1294,7 @@ class HbxEnrollment
     event :cancel_for_non_payment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
-                         :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
+                         :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
                   to: :coverage_canceled
     end
@@ -1301,7 +1303,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :enrolled_contingent, :unverified],
+                          :unverified],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1309,7 +1311,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :enrolled_contingent, :unverified],
+                         :unverified],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1319,7 +1321,7 @@ class HbxEnrollment
                   guard: :termination_attributes_cleared?
 
       transitions from: [:shopping, :coverage_selected, :coverage_enrolled, :transmitted_to_carrier,
-                         :coverage_expired, :inactive, :unverified, :enrolled_contingent, :void,
+                         :coverage_expired, :inactive, :unverified, :void,
                          :auto_renewing, :renewing_waived, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled,
                          :auto_renewing_contingent, :renewing_contingent_selected,
@@ -1329,21 +1331,12 @@ class HbxEnrollment
 
     event :move_to_enrolled, :after => :record_transition do
       transitions from: :unverified, to: :coverage_selected
-      transitions from: :enrolled_contingent, to: :coverage_selected
-    end
-
-    event :move_to_contingent, :after => [:record_transition, :propagate_selection, :handle_coverage_selection] do
-      transitions from: :shopping, to: :enrolled_contingent
-      transitions from: :coverage_selected, to: :enrolled_contingent
-      transitions from: :unverified, to: :enrolled_contingent
-      transitions from: :coverage_enrolled, to: :enrolled_contingent
-      transitions from: :auto_renewing, to: :enrolled_contingent, after: :propagate_selection
+      transitions from: :coverage_selected, to: :coverage_selected
     end
 
     event :move_to_pending, :after => :record_transition do
       transitions from: :shopping, to: :unverified
       transitions from: :coverage_selected, to: :unverified
-      transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified
     end

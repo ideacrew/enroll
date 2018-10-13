@@ -604,8 +604,8 @@ describe HbxEnrollment, dbclean: :after_all do
         expect(hbx_enrollment.status_step).to eq 2
       end
 
-      it "return 3 when enrolled_contingent" do
-        hbx_enrollment.aasm_state = "enrolled_contingent"
+      it "return 3 when is_any_enrollment_member_outstanding is true" do
+        hbx_enrollment.is_any_enrollment_member_outstanding = true
         expect(hbx_enrollment.status_step).to eq 3
       end
 
@@ -914,9 +914,9 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan1){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile1) }
     let(:plan2){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile2) }
     let(:plan3){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile3) }
-    let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true) }
-    let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
-    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'enrolled_contingent', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
+    let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true, is_any_enrollment_member_outstanding: false) }
+    let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date, is_any_enrollment_member_outstanding: false) }
+    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date, is_any_enrollment_member_outstanding: true) }
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
@@ -959,9 +959,10 @@ describe HbxProfile, "class methods", type: :model do
     it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
       hbx_enrollment3.effective_on = date - 10.days
       hbx_enrollment2.effective_on = date + 1.day
-      hbx_enrollment2.move_to_contingent!
+      hbx_enrollment2.select_coverage!
       expect(hbx_enrollment3.coverage_terminated?).to be_truthy
-      expect(hbx_enrollment2.enrolled_contingent?).to be_truthy
+      expect(hbx_enrollment2.is_any_enrollment_member_outstanding?).to be_falsy
+      expect(hbx_enrollment3.is_any_enrollment_member_outstanding?).to be_truthy
     end
 
     it "terminates previous enrollments if both effective on in the future" do
@@ -979,6 +980,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
     let(:active_year) {TimeKeeper.date_of_record.year}
     let(:plan) { Plan.new(active_year: active_year)}
@@ -1028,12 +1030,13 @@ describe HbxProfile, "class methods", type: :model do
     end
 
     context "ivl user in verification outstanding state." do
-      it "should return enrollment status as enrolled_contingent" do
-        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
-        enrollment.move_to_contingent!
+      it "should return enrollment status as coverage_selected and set is_any_enrollment_member_outstanding to true " do
+        enrollment.select_coverage!
+        person.consumer_role.ssn_invalid!(verification_attr)
         enrollment.reload
-        expect(enrollment.coverage_selected?).to eq false
-        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(enrollment.coverage_selected?).to eq true
+        expect(enrollment.aasm_state).to eq "coverage_selected"
+        expect(enrollment.is_any_enrollment_member_outstanding?). to be_truthy
       end
     end
   end
@@ -2427,7 +2430,7 @@ describe HbxEnrollment, 'state machine' do
   let(:family) { FactoryGirl.build(:individual_market_family) }
   subject { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
 
-  events = [:move_to_enrolled, :move_to_contingent, :move_to_pending]
+  events = [:move_to_enrolled, :move_to_pending]
 
   shared_examples_for "state machine transitions" do |current_state, new_state, event|
     it "transition #{current_state} to #{new_state} on #{event} event" do
@@ -2437,21 +2440,12 @@ describe HbxEnrollment, 'state machine' do
 
   context "move_to_enrolled event" do
     it_behaves_like "state machine transitions", :unverified, :coverage_selected, :move_to_enrolled
-    it_behaves_like "state machine transitions", :enrolled_contingent, :coverage_selected, :move_to_enrolled
-  end
-
-  context "move_to_contingent event" do
-    it_behaves_like "state machine transitions", :shopping, :enrolled_contingent, :move_to_contingent!
-    it_behaves_like "state machine transitions", :coverage_selected, :enrolled_contingent, :move_to_contingent!
-    it_behaves_like "state machine transitions", :unverified, :enrolled_contingent, :move_to_contingent!
-    it_behaves_like "state machine transitions", :coverage_enrolled, :enrolled_contingent, :move_to_contingent!
-    it_behaves_like "state machine transitions", :auto_renewing, :enrolled_contingent, :move_to_contingent!
+    it_behaves_like "state machine transitions", :coverage_selected, :coverage_selected, :move_to_enrolled
   end
 
   context "move_to_pending event" do
     it_behaves_like "state machine transitions", :shopping, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :coverage_selected, :unverified, :move_to_pending!
-    it_behaves_like "state machine transitions", :enrolled_contingent, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
     it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
   end
