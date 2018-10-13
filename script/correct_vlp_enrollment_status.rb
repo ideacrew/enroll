@@ -18,7 +18,7 @@ affected_policies = Family.collection.aggregate([
     "households.hbx_enrollments.consumer_role_id" => {"$in" => consumer_role_ids},
     "households.hbx_enrollments.plan_id" => {"$ne" => nil},
     "households.hbx_enrollments.aasm_state" => {
-      "$nin" => ["inactive", "coverage_canceled", "enrolled_contingent"]
+      "$nin" => ["inactive", "coverage_canceled"]
     }
   } },
   { "$match" => {

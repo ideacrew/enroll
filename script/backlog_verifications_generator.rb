@@ -16,7 +16,7 @@ end
 families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
-      "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "is_any_enrollment_member_outstanding" => true,
       "effective_on" => { "$gte" => Date.new(2017,1,1)},
   } }
 }).to_a

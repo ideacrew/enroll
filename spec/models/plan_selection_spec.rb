@@ -107,6 +107,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+<<<<<<< HEAD
 
     describe ".select_plan_and_deactivate_other_enrollments" do
 
@@ -116,6 +117,27 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
           expect(subject.hbx_enrollment.aasm_state).to eq("enrolled_contingent")
         end
+=======
+  end
+
+  describe ".select_plan_and_deactivate_other_enrollments" do
+
+    context 'hbx_enrollment aasm state check' do
+      it 'should set is_any_enrollment_member_outstanding to true if any verification outstanding people' do
+        subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","verification_outstanding")
+        subject.hbx_enrollment.update_attributes(aasm_state: "shopping")
+        subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
+        expect(subject.hbx_enrollment.aasm_state).to eq("coverage_selected")
+        expect(subject.hbx_enrollment.is_any_enrollment_member_outstanding).to eq true
+      end
+
+      it 'should set is_any_enrollment_member_outstanding to false if no verification outstanding people' do
+        subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","verified")
+        subject.hbx_enrollment.update_attributes(aasm_state: "shopping")
+        subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
+        expect(subject.hbx_enrollment.aasm_state).to eq("coverage_selected")
+        expect(subject.hbx_enrollment.is_any_enrollment_member_outstanding).to eq false
+>>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
       end
     end
 =end

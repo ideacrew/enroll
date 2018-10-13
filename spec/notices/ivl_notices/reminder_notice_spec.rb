@@ -6,7 +6,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household, kind: "individual", aasm_state: "enrolled_contingent")}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household, kind: "individual", is_any_enrollment_member_outstanding: true)}
   let(:plan){ FactoryBot.create(:plan) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'First Outstanding Verification Notification',
@@ -82,9 +82,8 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       let(:person) { FactoryBot.create(:person, :with_consumer_role)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-      context "when the family member had an 'enrolled_contingent' policy" do
-
-        let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
+      context "when the family member had an 'outstanding' state" do
+        let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, is_any_enrollment_member_outstanding: true)}
 
         before do
           fm = family.primary_family_member
