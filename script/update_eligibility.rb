@@ -61,6 +61,12 @@ def check_and_run
 
     effective_date = date.to_date
 
+    if aptc.blank? || csr.blank?
+      not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data(csr/aptc)"}
+      puts "Either aptc or csr are not valid"
+      next
+    end
+
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
@@ -69,7 +75,7 @@ def check_and_run
     person_by_hbx = Person.by_hbx_id(hbx_id).first rescue nil
 
     if ssn && hbx_id && person.id != person_by_hbx.id
-      not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data"}
+      not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data(ssn/hbx_id)"}
       puts "Person with ssn: #{ssn} and person with hbx_id: #{hbx_id} are not same"
       next
     end
