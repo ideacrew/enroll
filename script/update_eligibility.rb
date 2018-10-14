@@ -58,7 +58,7 @@ def check_and_run
 
   CSV.foreach("pids/2019_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr, date = row_with_ssn
-
+    date = "1/1/2019" unless date
     effective_date = date.to_date
 
     if aptc.blank? || csr.blank?
