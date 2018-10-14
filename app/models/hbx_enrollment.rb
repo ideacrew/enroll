@@ -1336,6 +1336,7 @@ class HbxEnrollment
 
     event :move_to_pending, :after => :record_transition do
       transitions from: :shopping, to: :unverified
+      transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified

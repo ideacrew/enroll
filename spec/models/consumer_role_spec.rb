@@ -646,7 +646,7 @@ describe "it should check the residency status" do
       consumer.ssn_valid_citizenship_valid!(verification_attr)
       expect(consumer.aasm_state).to eq("sci_verified")
       enrollment.reload
-      expect(enrollment.aasm_state).to eq("coverage_selected")
+      expect(enrollment.aasm_state).to eq("unverified")
     end
 
     it "should set is_any_enrollment_member_outstanding to true when received negative response from residency hub" do
