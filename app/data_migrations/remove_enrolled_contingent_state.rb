@@ -9,11 +9,15 @@ class RemoveEnrolledContingentState < MongoidMigrationTask
   end
 
   def migrate
-    Family.where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent").each do |family|
+    start_of_year = TimeKeeper.date_of_record.beginning_of_year
+    end_of_year = TimeKeeper.date_of_record.end_of_year
+    Family.by_enrollment_effective_date_range(start_of_year, end_of_year).where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent").each do |family|
       begin
-        contingent_enrollments = family.active_household.hbx_enrollments.where(aasm_state: "enrolled_contingent")
-        contingent_enrollments.each { |enrollment| manage_enrollment(enrollment) }
-        puts "Successfully migrated enrollments for family with family_id: #{family.id}" unless Rails.env.test?
+        contingent_enrollments = family.active_household.hbx_enrollments.current_year.where(aasm_state: "enrolled_contingent")
+        if contingent_enrollments.present?
+          contingent_enrollments.each { |enrollment| manage_enrollment(enrollment) }
+          puts "Successfully migrated enrollments for family with family_id: #{family.id}" unless Rails.env.test?
+        end
       rescue => e
         puts "Could not migrate enrollments for family with family_id: #{family.id}, Error: #{e.backtrace}" unless Rails.env.test?
       end
