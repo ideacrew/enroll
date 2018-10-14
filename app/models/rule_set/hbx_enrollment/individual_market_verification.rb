@@ -33,7 +33,7 @@ module RuleSet
       end
 
       def any_pending?
-        roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?)
+        roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?) || roles_for_determination.any?(&:sci_verified?)
       end
     end
   end
