@@ -64,12 +64,12 @@ module Subscribers
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
-        args.citizenship_result = "us_citizen"
+        args.citizenship_result = ::ConsumerRole::US_CITIZEN_STATUS
         consumer_role.ssn_valid_citizenship_valid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("false")
         args.determined_at = Time.now
         args.vlp_authority = 'ssa'
-        args.citizenship_result = "not_lawfully_present_in_us"
+        args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.ssn_valid_citizenship_invalid!(args)
       end
       consumer_role.save
