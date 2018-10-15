@@ -2549,6 +2549,21 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
     end
   end
 
+  context 'when plan year is canceled' do
+
+    before do
+      enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'inactive')
+      active_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment.id,aasm_state:'coverage_selected')
+      active_plan_year.cancel!
+      active_benefit_group_assignment.reload
+    end
+
+    it "should cancel waived enrollment" do
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    end
+  end
+
   context 'when renewal plan year is canceled' do
 
     before do
