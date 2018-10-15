@@ -104,6 +104,16 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
   end
 
+  context "for verifying newly added attribute" do
+    let!(:person100)          { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let!(:hbx_enrollment100)  { FactoryBot.create(:hbx_enrollment, household: family100.active_household) }
+
+    it "should not raise error" do
+      expect{hbx_enrollment100.is_any_enrollment_member_outstanding}.not_to raise_error
+    end
+  end
+
   describe HbxEnrollment, dbclean: :around_each do
 
     include_context "BradyWorkAfterAll"
@@ -323,7 +333,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     #   end
     end
 
-    context "when maket type is individual" do
+    context "when market type is individual" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: family.households.first)}
