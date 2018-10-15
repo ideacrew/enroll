@@ -1,6 +1,8 @@
 <%= hidden_field_tag :plan_design_organization_id, plan_design_organization._id %>
 <%= hidden_field_tag :elected_plan_kind, plan_design_proposal.active_benefit_group.plan_option_kind %>
+<%= hidden_field_tag :dental_elected_plan_kind, plan_design_proposal.active_benefit_group.dental_plan_option_kind %>
 <%= hidden_field_tag :reference_plan_id, plan_design_proposal.active_benefit_group.reference_plan_id %>
+<%= hidden_field_tag :dental_reference_plan_id, plan_design_proposal.active_benefit_group.dental_reference_plan_id %>
 <%= hidden_field_tag :plan_design_proposal_id, plan_design_proposal.id %>
 <%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
@@ -9,6 +11,8 @@
 <%= hidden_field_tag :employer_min_family_contribution, aca_shop_market_employer_family_contribution_percent_minimum %>
 <%= hidden_field_tag :publish_proposal_url, sponsored_benefits.organizations_plan_design_proposal_publish_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :copy_proposal_url, sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(plan_design_proposal.id) %>
+<%= hidden_field_tag :benefits_kind, kind %>
+<%= hidden_field_tag :add_dental_url, sponsored_benefits.new_organizations_plan_design_proposal_plan_selection_path(plan_design_proposal.id, kind: 'dental') %>
 <div class="row">
   <div class="col-md-12">
       <div class="hidden">
@@ -72,13 +76,15 @@
         </div>
         <div class="col-md-2 plan-type-filters">
         </div>
-        <div class="col-md-12">
-          <div class="col-md-6 col-md-offset-5">
-            <button class="btn btn-primary view-plans-button" id="view-comparison">Compare Plans</button>
-            <button class="btn btn-primary loading-plans-button" id="view-comparison"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
-            <button class="btn btn-primary" id="clear-comparison">Clear All</button>
+        <% if !plan_design_form.is_dental? %>
+          <div class="col-md-12">
+            <div class="col-md-6 col-md-offset-5">
+              <button class="btn btn-primary view-plans-button" id="view-comparison">Compare Plans</button>
+              <button class="btn btn-primary loading-plans-button" id="view-comparison"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+              <button class="btn btn-primary" id="clear-comparison">Clear All</button>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>
@@ -90,7 +96,7 @@
   <div class="col-md-12">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title">Health Plan Information</h3>
+        <h3 class="panel-title"><%= kind.humanize %> Plan Information</h3>
       </div>
       <div class="panel-body">
         <div class="selected-plan"></div>
