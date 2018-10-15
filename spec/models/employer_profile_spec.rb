@@ -139,7 +139,7 @@ describe EmployerProfile, dbclean: :after_each do
         queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
           job_info[:job] == ShopNoticesNotifierJob
         end
-        expect(queued_job[:args]).to eq [census_employee.id.to_s, 'initial_employee_plan_selection_confirmation']
+        expect(queued_job[:args]).to include(census_employee.id.to_s, 'initial_employee_plan_selection_confirmation')
       end
     end
 
