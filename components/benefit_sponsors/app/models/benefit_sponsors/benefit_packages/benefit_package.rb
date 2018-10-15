@@ -206,7 +206,7 @@ module BenefitSponsors
 
         new_benefit_package.predecessor = self
 
-        sponsored_benefits.each do |sponsored_benefit|
+        sponsored_benefits.unscoped.each do |sponsored_benefit|
           new_benefit_package.add_sponsored_benefit(sponsored_benefit.renew(new_benefit_package))
         end
         new_benefit_package
