@@ -212,6 +212,28 @@ class BenefitGroupAssignment
     terminate_coverage! if may_terminate_coverage?
   end
 
+  def update_status_from_enrollment(hbx_enrollment)
+    if hbx_enrollment.coverage_kind == 'health'
+      if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_selected)
+      end
+
+      if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_renewing)
+      end
+
+      if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
+        change_state_without_event(:coverage_waived)
+      end
+    end
+  end
+
+  def change_state_without_event(new_state)
+    old_state = self.aasm_state
+    self.update(aasm_state: new_state.to_s)
+    self.workflow_state_transitions.create(from_state: old_state, to_state: new_state)
+  end
+
   aasm do
     state :initialized, initial: true
     state :coverage_selected

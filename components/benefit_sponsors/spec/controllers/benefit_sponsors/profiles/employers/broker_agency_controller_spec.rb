@@ -29,10 +29,6 @@ module BenefitSponsors
     let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
-    after :each do
-      DatabaseCleaner.clean
-    end
-
     before :each do
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
@@ -43,10 +39,6 @@ module BenefitSponsors
       broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role2.id)
       broker_agency_profile2.approve!
       organization.reload
-    end
-
-    after :all do
-      DatabaseCleaner.clean
     end
 
     describe 'for index' do

@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-	RSpec.describe SponsoredBenefits::TieredRosterEligibilityOptimizer do
+	RSpec.describe SponsoredBenefits::TieredRosterEligibilityOptimizer, :dbclean => :after_each do
 		subject { ::BenefitSponsors::SponsoredBenefits::TieredRosterEligibilityOptimizer.new }
 
 		let(:employee_dob) { Date.new(1990, 6, 1) }

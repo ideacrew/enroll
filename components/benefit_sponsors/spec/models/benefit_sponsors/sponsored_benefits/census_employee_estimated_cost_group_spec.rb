@@ -4,7 +4,7 @@ module BenefitSponsors
   RSpec.describe BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup::CensusEmployeeMemberGroupMapper, "given:
     - a census employee
     - with a domestic partner
-    - a disabled child > age 26" do
+    - a disabled child > age 26", :dbclean => :after_each do
 
     let(:census_employee) do 
       double({

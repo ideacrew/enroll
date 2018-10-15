@@ -22,10 +22,6 @@ module BenefitSponsors
     let!(:product)                  { product_package.products.first }
     let!(:issuer_profile)           { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site }
 
-    after :all do
-      DatabaseCleaner.clean
-    end
-
     shared_context "valid params", :shared_context => :metadata do
       let(:benefit_package_params) {
         {

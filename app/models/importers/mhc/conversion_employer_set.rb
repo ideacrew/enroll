@@ -101,11 +101,12 @@ module Importers::Mhc
 
     include ::Importers::RowSet
 
-    def initialize(file_name, o_stream, conversion_date)
+    def initialize(file_name, o_stream, conversion_date, mid_year_conversion)
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
       @conversion_date = conversion_date
+      @mid_year_conversion = mid_year_conversion
     end
 
     def create_model(record_attrs)
