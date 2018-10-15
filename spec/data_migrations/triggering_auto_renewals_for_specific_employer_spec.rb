@@ -53,21 +53,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
         census_employee.renewal_benefit_group_assignment.benefit_group.save!
       end
 
-      it "should trigger a auto-renewing enrollment if we have an an active enrollment", dbclean: :after_each do
-        subject.migrate
-        household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
-        household.reload
-        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
-        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "auto_renewing").size).to eq 1
-      end
-
-      it "should trigger a renewing waived enrollment if the previous existing enrollment is inactive", dbclean: :after_each do
-        hbx_enrollment.update_attribute(:aasm_state, "inactive")
-        subject.migrate
-        household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
-        household.reload
-        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
-        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "renewing_waived").size).to eq 1
+      it "should trigger a auto-renewing enrollment by detecting the required event", dbclean: :after_each do
+        expect(Subscribers::EmployeePassiveRenewalsSubscriber.subscription_details).to eq ["acapi.info.events.plan_year.employee_passive_renewals_requested"]
       end
 
       it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
