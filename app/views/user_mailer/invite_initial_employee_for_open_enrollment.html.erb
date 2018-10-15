@@ -1,10 +1,13 @@
 <html>
+<%= render :partial => "notices/shared/logo" %>
+<span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">SHOP_M034</span><br><br><br><br><br>
+<span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span><br><br>
 <body>
   <b>Enroll Now: Your Plan Open Enrollment Period has Begun </b>
   <br/>
   <br/>
   <div>
-   Dear <%= census_employee.first_name.humanize.titleize %>,</div>
+   Dear <%= census_employee.full_name.humanize.titleize %>,</div>
   <br/>
   <div>
     Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer of insurance coverage to its employees through the <%= site_short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.

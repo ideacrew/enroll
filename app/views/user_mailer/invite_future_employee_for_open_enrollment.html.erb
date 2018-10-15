@@ -1,9 +1,12 @@
 <html>
+<%= render :partial => "notices/shared/logo" %>
+<span class="fssize1 health-connector-address" align="right" style="padding-right: 15px">SHOP_M035</span><br><br><br><br><br>
+<span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span><br><br>
 <body>
   <b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the Massachusetts <%= site_short_name %></b>
 <br/>
 <br/>
-<div>Dear <%= census_employee.first_name.humanize.titleize %>,</div>
+<div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
 <br/><br/>
   Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored insurance through the <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
