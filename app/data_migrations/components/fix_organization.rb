@@ -82,7 +82,7 @@ class FixOrganization< MongoidMigrationTask
     writing_agent = BrokerRole.by_npn(correct_npn).first
     broker_agency_profile = writing_agent.broker_agency_profile if writing_agent.present?
 
-    if writing_agent.present? && broker_agency_profile.present?
+    if broker_agency_profile.present?
         broker_agency_account = organization.active_benefit_sponsorship.active_broker_agency_account
         if broker_agency_account.present?
           hired_on = broker_agency_account.start_on
@@ -91,11 +91,10 @@ class FixOrganization< MongoidMigrationTask
           new_broker_agency_account.save
           puts "broker_agency_profile and writing_agent updated for broker_agency_account" unless Rails.env.test?
         else
-          puts "No broker_agency_account found for organization fein:#{fein}" if !Rails.env.test?  && broker_agency_account.blank?
+          puts "No broker_agency_account found for organization fein:#{fein}" unless Rails.env.test?
         end
     else
-      puts "writing_agent not found" if !Rails.env.test?  && writing_agent.blank?
-      puts "broker_agency_profile not found for broker" if !Rails.env.test? && broker_agency_profile.blank?
+      puts "broker_agency_profile not found for broker" unless Rails.env.test?
     end
   end
 end
