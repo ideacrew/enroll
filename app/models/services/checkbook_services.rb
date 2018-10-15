@@ -23,7 +23,7 @@ module Services
 
       def generate_url
         return @url if is_congress
-        return Settings.checkbook_services.congress_url if Rails.env.test?
+        return (Settings.checkbook_services.congress_url+"#{@hbx_enrollment.coverage_year}/") if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
             @result = HTTParty.post(@url,
