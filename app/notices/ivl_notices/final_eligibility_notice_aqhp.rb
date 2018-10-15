@@ -60,7 +60,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
       notice.tax_households = append_tax_household_information(primary_member)
     end
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
-    notice.primary_firstname = primary_member["first_name"]
+    notice.primary_firstname = primary_member["first_name"].titleize
   end
 
   def append_member_information_for_aqhp(primary_member)
