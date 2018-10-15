@@ -197,7 +197,9 @@ class PlanYear
 
   def cancel_employee_enrollments(transmit_xml = false)
     enrollments_for_plan_year(true).each do |hbx_enrollment|
-      if hbx_enrollment.may_cancel_coverage?
+      if hbx_enrollment.may_cancel_coverage? && hbx_enrollment.inactive?
+        hbx_enrollment.cancel_coverage!
+      else
         hbx_enrollment.cancel_coverage!
         hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
       end
