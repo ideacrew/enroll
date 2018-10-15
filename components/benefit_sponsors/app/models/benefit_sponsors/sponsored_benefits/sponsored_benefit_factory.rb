@@ -45,16 +45,6 @@ module BenefitSponsors
           end
         end
 
-        # attrs[:contribution_levels_attributes].each do |contribution_level_hash|
-        #   contribution_level = sponsor_contribution.contribution_levels.where(contribution_unit_id: contribution_level_hash[:contribution_unit_id]).first
-        #
-        #   contribution_level_attrs = contribution_level_hash.except(:id, :display_name)
-        #   contribution_level_attrs[:is_offered] ||= false
-        #
-        #   if contribution_level
-        #     contribution_level.assign_attributes(contribution_level_attrs)
-        #   end
-        # end
         sponsor_contribution
       end
 

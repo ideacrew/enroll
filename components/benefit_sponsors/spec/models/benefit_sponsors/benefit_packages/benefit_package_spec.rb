@@ -196,7 +196,7 @@ module BenefitSponsors
             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
             product_package_kinds: [:single_product],
             service_area: service_area,
-            metal_level_kind: :gold) 
+            metal_level_kind: :dental)
           }
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
@@ -264,14 +264,14 @@ module BenefitSponsors
             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
             product_package_kinds: [:single_issuer, :metal_level, :single_product],
             service_area: service_area,
-            metal_level_kind: :gold) 
+            metal_level_kind: :gold)
           }
 
           let!(:dental_products) { create_list(:benefit_markets_products_dental_products_dental_product, 5,
             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
             product_package_kinds: [:single_product],
             service_area: service_area,
-            metal_level_kind: :gold) 
+            metal_level_kind: :dental)
           }
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
@@ -309,7 +309,7 @@ module BenefitSponsors
 
 
       context "when renewal product missing" do 
-        let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false ) }
+        let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false, coverage_kind: "health") }
 
         it 'should return false' do
           expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_falsey
