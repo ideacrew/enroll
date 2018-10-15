@@ -29,13 +29,14 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
       :template => application_event.notice_template
   }}
 
+  before do
+    @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
+  end
+
   describe "New" do
-    before do
-      @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
-    end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)}.not_to raise_error
+        expect{@employee_notice}.not_to raise_error
       end
     end
 
@@ -50,11 +51,7 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
   end
 
   describe "Build" do
-    before do
-      @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
-    end
     it "should build notice with all necessory info" do
-
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
@@ -63,7 +60,6 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
 
   describe "append data" do
     before do
-      @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should append data" do
@@ -77,7 +73,6 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
 
   describe "render template and generate pdf" do
     before do
-      @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
       @employee_notice.build
@@ -100,5 +95,4 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
       expect(File.exist?(file.path)).to be true
     end
   end
-
 end

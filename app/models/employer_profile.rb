@@ -852,7 +852,7 @@ class EmployerProfile
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
             if !org.employer_profile.binder_paid?
-              notice_to_ee_that_er_plan_year_will_not_be_written(org)
+              notice_for_missing_binder_payment(org)
             end
           end
         end
@@ -1112,25 +1112,23 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        self.initial_employee_plan_selection_confirmation(id)
+        self.initial_employee_plan_selection_confirmation(org)
       end
     end
   end
 
-  def self.initial_employee_plan_selection_confirmation(id)
+  def self.initial_employee_plan_selection_confirmation(org)
     begin
-      employer = Organization.find(id).employer_profile
-      plan_year = employer.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first
-      if employer.is_new_employer? && plan_year.present?
-        census_employees = employer.census_employees.active
+      if org.employer_profile.is_new_employer?
+        census_employees = org.employer_profile.census_employees.non_terminated
         census_employees.each do |ce|
-          if ce.active_benefit_group_assignment.hbx_enrollment.present? && (ce.active_benefit_group_assignment.hbx_enrollment.effective_on == plan_year.start_on)
-            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+          if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == org.employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation", "acapi_trigger" => true )
           end
         end
       end
     rescue Exception => e
-      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{employer.legal_name} due to #{e.backtrace}"}
+      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{org.legal_name} due to #{e.backtrace}"}
     end
   end
 
@@ -1257,7 +1255,8 @@ class EmployerProfile
     )
   end
    
-  def self.notice_to_ee_that_er_plan_year_will_not_be_written(org)
+  def self.notice_for_missing_binder_payment(org)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "initial_employer_no_binder_payment_received", "acapi_trigger" =>  true )
     org.employer_profile.census_employees.active.each do |ce|
       begin
         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )

@@ -1361,7 +1361,7 @@ class PlanYear
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
