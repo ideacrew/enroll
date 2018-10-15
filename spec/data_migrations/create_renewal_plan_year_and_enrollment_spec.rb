@@ -63,14 +63,8 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
         allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year_passive_renewal")
       end
 
-      it "should create renewing plan year and passive enrollments" do
-        expect(employer_profile.plan_years.map(&:aasm_state)).to eq ['active']
-        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
-        subject.migrate
-        employer_profile.reload
-        active_household.reload
-        expect(employer_profile.plan_years.map(&:aasm_state)).to eq ['active','renewing_enrolling']
-        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected','auto_renewing']
+      it "should subscribe to the correct event" do
+        expect(Subscribers::EmployeePassiveRenewalsSubscriber.subscription_details).to eq ["acapi.info.events.plan_year.employee_passive_renewals_requested"]
       end
     end
 

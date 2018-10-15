@@ -507,7 +507,8 @@ RSpec.describe Plan, dbclean: :after_each do
       let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
       let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
       let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
-      let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
+      let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94"), tax_household_members: double(where: []))}
+      let(:hbx_enrollment) { double(hbx_enrollment_members: []) }
 
       before :each do
         Plan.delete_all
@@ -515,17 +516,17 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "should return dental plans" do
         plans = [plan4]
-        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_household:nil, hbx_enrollment: hbx_enrollment).to_a).to eq plans
       end
 
       it "should return health plans without silver" do
         plans = [plan1, plan3]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to include(plan1,plan3)
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household, hbx_enrollment: hbx_enrollment).to_a).to include(plan1,plan3)
       end
 
       it "should return health plans" do
         plans = [plan2]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:tax_household, hbx_enrollment: hbx_enrollment).to_a).to eq plans
       end
     end
   end
@@ -541,6 +542,26 @@ RSpec.describe Plan, dbclean: :after_each do
       (Plan::METAL_LEVEL_KINDS - ['catastrophic']).each do |metal_level|
         plan.metal_level = metal_level
         expect(plan.can_use_aptc?).to eq true
+      end
+    end
+  end
+
+  describe "is_same_plan_by_hios_id_and_active_year?", dbclean: :after_each do
+    let(:test_plans) { FactoryGirl.create_list(:plan, 2) }
+
+    context "when both plans have different hios_ids" do
+      it "should return false" do
+        expect(test_plans[0].is_same_plan_by_hios_id_and_active_year?(test_plans[1])).to be false
+      end
+    end
+
+    context "when both plans have similar hios_ids and with same active year" do
+      before :each do
+        test_plans[0].update_attributes!(hios_id: (test_plans[1].hios_id.split("-").first + "-04"))
+      end
+
+      it "should return true" do
+        expect(test_plans[0].is_same_plan_by_hios_id_and_active_year?(test_plans[1])).to be true
       end
     end
   end
