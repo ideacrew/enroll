@@ -8,13 +8,6 @@ module BenefitSponsors
     let!(:benefit_markets_location_rating_area) { FactoryGirl.create_default(:benefit_markets_locations_rating_area) }
     let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
-
-    # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-    # let!(:benefit_market) { site.benefit_markets.first }
-    # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
-    # let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
-    # let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, organization: organization, profile_id: organization.profiles.first.id, benefit_market: benefit_market, employer_attestation: employer_attestation) }
-    # let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
 
@@ -283,10 +276,10 @@ module BenefitSponsors
           expect(response.location.include?("tab=benefits")).to be_truthy
         end
 
-        it "should redirect to edit dental benfit page" do
+        it "should redirect to edit dental benefit page" do
           sign_in user
           post :update, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params, add_dental_benefits: "true"
-          expect(response.location.include?("sponsored_benefits/edit?kind=dental")).to be_truthy
+          expect(response.location.include?("sponsored_benefits/new?kind=dental")).to be_truthy
         end
       end
 
