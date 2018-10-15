@@ -17,9 +17,9 @@ class ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice < ShopEmployeeNoti
     renewing_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING + ["renewing_application_ineligible"]).first
     active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state => "active").first
 
-  plan_year_warnings = []
+    plan_year_warnings = []
     renewing_plan_year.enrollment_errors.each do |k, v|
-      case k.to_s
+    case k.to_s
       when "enrollment_ratio"
         plan_year_warnings << "At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
       when "non_business_owner_enrollment_count"

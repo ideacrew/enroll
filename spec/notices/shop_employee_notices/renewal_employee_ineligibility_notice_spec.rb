@@ -1,6 +1,5 @@
 require 'rails_helper'
-
-RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean => :after_each do
+ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean => :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -33,8 +32,7 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
       :options => { :hbx_enrollment_hbx_id => hbx_enrollment.hbx_id.to_s }
   }}
   let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected', coverage_kind: "dental")}
-
-  describe "New" do
+   describe "New" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice.new(census_employee, valid_params)
@@ -44,8 +42,7 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
         expect{ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice.new(census_employee, valid_params)}.not_to raise_error
       end
     end
-
-    context "invalid params" do
+     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
@@ -54,21 +51,18 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
       end
     end
   end
-
-  describe "Build" do
+   describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice.new(census_employee, valid_params)
     end
-
-    it "should build notice with all necessory info" do
+     it "should build notice with all necessory info" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
     end
   end
-
-  describe "append data" do
+   describe "append data" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice.new(census_employee, valid_params)
@@ -77,13 +71,11 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
-
-    it "should append data" do
+     it "should append data" do
       @employee_notice=ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice.new(census_employee, valid_params)
       benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_draft")
     end
-
-  end
+   end
   
   describe "Rendering terminating_coverage_notice template and generate pdf" do
     before do
@@ -94,25 +86,21 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice, :dbclean
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment  
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
-
-    it "should render terminating_coverage_notice" do
+     it "should render terminating_coverage_notice" do
       expect(@employee_notice.template).to eq application_event.notice_template
     end
-
-    it "should render terminating_coverage_notice" do
+     it "should render terminating_coverage_notice" do
       expect(@employee_notice.mpi_indicator).to eq application_event.mpi_indicator
     end
-
-    it "should render terminating_coverage_notice" do
+     it "should render terminating_coverage_notice" do
       expect(@employee_notice.event_name).to eq application_event.event_name
     end
-
-    it "should generate pdf" do
+     it "should generate pdf" do
       @employee_notice.build
       @employee_notice.append_data
       file = @employee_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
   end 
-
-end
+ end
+ 
