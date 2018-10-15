@@ -24,7 +24,6 @@ module BenefitSponsors
         end
       end
 
-<<<<<<< .merge_file_MPdhJG
       # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
       # but while creating :dental sponsored_benefit we will add it on :active benefit_application
       def fetch_application_based_sponsored_kind
@@ -33,8 +32,6 @@ module BenefitSponsors
         benefit_application
       end
 
-=======
->>>>>>> .merge_file_yueg99
       def find_employee
         return @found_employee unless @found_employee.nil?
         return nil if subscriber_ssn.blank?
@@ -139,12 +136,8 @@ module BenefitSponsors
         employer = find_employer
 
         sponsor_ship = employer.active_benefit_sponsorship
-<<<<<<< .merge_file_MPdhJG
 
         benefit_application = fetch_application_based_sponsored_kind
-=======
-        benefit_application = current_benefit_application(employer)
->>>>>>> .merge_file_yueg99
         # plan_years = employer.plan_years.select {|py| py.coverage_period_contains?(start_date)}
         # active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
         return [] if benefit_application.blank?
