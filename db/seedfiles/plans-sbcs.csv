@@ -123,7 +123,7 @@ BlueChoice Advantage Gold 500,86052DC0440011-01,2019,3e261172-d36c-4351-bc83-01f
 BlueChoice Advantage HSA/HRA $1500,86052DC0450002-01,2015,bae39fdf-23d8-4b92-8136-23f4f0f34e51,CFBC_86052_BlueChoice Advantage HSAHRA 1500_SG.pdf
 BlueChoice Advantage HSA/HRA Bronze 5000,86052DC0440018-01,2016,afd14fe7-aec1-4b5e-859b-68aa4e62f30a,CFBC_BlueChoice Advantage HSA HRA 5000_SHOP.pdf
 BlueChoice Advantage HSA/HRA Bronze 6000,86052DC0440018-01,2018,b60dff8b-d1f0-497f-8e34-52d03a662bb1,BlueChoice Advantage HSA HRA Bronze 6000_SHOP.pdf
-BlueChoice Advantage HSA/HRA Bronze 6000,86052DC0440018-01,2019,dd628080-9e2c-4c86-add6-49d99a2632fd,BlueChoice Advantage Gold 3000_SHOP.pdf
+BlueChoice Advantage HSA/HRA Bronze 6000,86052DC0440018-01,2019,e2e4c6bc-595e-4911-9747-66b97adb2e34,BlueChoice Advantage HSAHRA Bronze 6000_SHOP.pdf
 BlueChoice Advantage HSA/HRA Bronze 6500,86052DC0440018-01,2017,d22ce5de-2ee7-429e-96f9-c3cb4c60bfb0,CareFirst BlueChoice Advantage HSAHRA Bronze 6500.pdf
 BlueChoice Advantage HSA/HRA Gold 1500,86052DC0440021-01,2017,fc1993f5-ca39-417e-b845-7aa1295ae23f,CareFirst BlueChoice Advantage HSAHRA Gold 1500.pdf
 BlueChoice Advantage HSA/HRA Gold 1500,86052DC0440021-01,2018,44bcece2-d4a7-440a-b3a7-f9deb5cad5ed,BlueChoice Advantage HSA HRA Gold 1500_SHOP.pdf
@@ -238,7 +238,7 @@ BlueChoice HMO Referral Gold 500,86052DC0480008-01,2019,73816bb3-043c-486d-a5e1-
 BlueChoice HMO Referral Gold 80,86052DC0480011-01,2017,30fca66a-7c46-45c3-b580-a4f604d2eb64,CareFirst BlueChoice HMO Referral Gold 80.pdf
 BlueChoice HMO Referral Gold 80,86052DC0480011-01,2018,32a7f949-0ad9-4a33-bebc-c36ddf3cec76,BlueChoice HMO Referral Gold 80_SHOP.pdf
 BlueChoice HMO Referral Gold 80,86052DC0480011-01,2016,800e63cd-34f7-4d96-a5d9-0f8a1018653f,CFBC_BlueChoice HMO Referral Gold 80_SHOP.pdf
-BlueChoice HMO Referral Gold 80,86052DC0480011-01,2019,411fa4ba-0665-46f2-b31e-dc0896e0561d,BlueChoice HMO Referral Gold 0_SHOP.pdf
+BlueChoice HMO Referral Gold 80,86052DC0480011-01,2019,ce796661-6972-4a14-977c-02b76610cc81,BlueChoice HMO Referral Gold 80_SHOP.pdf
 "BlueChoice HMO Referral HSA/HRA $4,000",86052DC0490001-01,2015,bf58f9fe-7994-46a3-9860-540031c672d5,CFBC_86052_BlueChoice HMO HSAHRA Referral 4000_SG.pdf
 BlueChoice HMO Referral Platinum 0,86052DC0480007-01,2017,db0191f0-f301-4725-9828-4dab563e630c,CareFirst BlueChoice HMO Referral Platinum 0.pdf
 BlueChoice HMO Referral Platinum 0,86052DC0480007-01,2018,5eaf4367-99b4-42be-88b1-8d6ab65f0716,BlueChoice HMO Referral Platinum 0_SHOP.pdf
@@ -316,7 +316,7 @@ BlueChoice HMO Standard Silver $2000,86052DC0400001-06,2016,22c9760b-91b7-47e7-a
 "BlueChoice HMO Standard Silver $3,500",86052DC0400001-01,2019,938bc7a2-24cb-44d2-a58e-d0f18b4cbbd6,BlueChoice_HMOStandardSilver3500_IVL.pdf
 "BlueChoice HMO Standard Silver $3,500",86052DC0400001-06,2019,5212fddc-df68-43d9-a3fa-c40bd21cc4ff,BlueChoice_HMOStandardSilver3500_94CSR_IVL.pdf
 "BlueChoice HMO Standard Silver $3,500",86052DC0400001-04,2019,562333cf-5693-464d-b958-468e19054c75,BlueChoice_HMOStandardSilver3500_73CSR_IVL.pdf
-"BlueChoice HMO Standard Silver $3,500",86052DC0400001-05,2019,c94287a5-b533-4bc1-8e4a-4b7f56f5bde8,BlueChoice_HMOStandardSilver3500_73CSR_IVL.pdf
+"BlueChoice HMO Standard Silver $3,500",86052DC0400001-05,2019,d35ecdfd-2980-4352-8c7b-42d0be69f01e,BlueChoice_HMOStandardSilver3500_87CSR_IVL.pdf
 "BlueChoice HMO Standard Silver $3,500",86052DC0400001-03,2019,84e4db34-5b89-434c-9e62-a639f362e201,BlueChoice_HMOStandardSilver3500_NAL_IVL.pdf
 "BlueChoice HMO Standard Silver $3,500",86052DC0400001-02,2019,19d74a0e-9898-456b-b964-65c49e883d2e,BlueChoice_HMOStandardSilver3500_NA0_IVL.pdf
 "BlueChoice HMO Young Adult $6,850",86052DC0400004-01,2016,9b86d1a5-48d4-4b2a-9ed4-c58084c9dcb3,CFBC_BlueChoiceYoungAdult6850_Base_IVL.pdf
@@ -599,7 +599,7 @@ DeltaCare USA Basic Plan for Families for Small Businesses,81334DC0040006,2016,d
 DeltaCare USA Preferred Plan for Families,81334DC0030004,2017,c9cfd8b3-0196-4f61-8340-ec97ed542ecc,PB_DCU_DC_I_FAM_PRF_17.pdf
 DeltaCare USA Preferred Plan for Families,81334DC0030004,2018,70a8ad8d-3d4f-4dc8-837d-8cdac0d1984b,DeltaCare USA Preferred Plan for Families.pdf
 DeltaCare USA Preferred Plan for Families,81334DC0030004,2016,2d227791-7fd5-4a86-9885-4745caca7a1e,DeltaCare USA Family Hi_IND.pdf
-DeltaCare USA Preferred Plan for Families,81334DC0030004,2019,f225c1e2-2e64-4391-a2aa-cd38d9affe39,PB_DCU_DC_I_FAM_BSC_19.pdf
+DeltaCare USA Preferred Plan for Families,81334DC0030004,2019,1b08be4f-3d7a-4c82-941c-9b829c5a56c1,PB_DCU_DC_I_FAM_PRF_19.pdf
 DeltaCare USA Preferred Plan for Families for Small Businesses,81334DC0040004,2017,09e149b2-5aca-4866-8aa6-97667ce2f2e8,PB_DCU_DC_G_FAM_PRF_17.pdf
 DeltaCare USA Preferred Plan for Families for Small Businesses,81334DC0040004,2016,aa5e8e9d-fff5-45ff-b751-ec32e28d6131,PB_DCU_DC_G_FAM_PRF_16 .pdf
 Dentegra Dental PPO Family Basic Plan,96156DC0010006,2016,885acd6d-9fe3-4cc8-8ae0-fcd5ae2a7d17,Dentegra PPO Family Lo_IND.pdf
@@ -854,9 +854,7 @@ KP DC Gold 500/20/Dental/Ped Dental,94506DC0350022-01,2016,f9dfb318-921a-4fc6-a1
 KP DC Gold 500/20/Dental/Ped Dental (SEL),94506DC0350022-01,2017,fb66bc96-0cce-43d6-9f3a-660dd201d183,KP DC DHMO Gold 500_20_SHOP.SEL.pdf
 KP DC Gold 500/20/Dental/Ped Dental/SEL,94506DC0350022-01,2015,56710b76-6899-4434-8076-175f2c88e4ed,KP DC Gold-500-20-Dental-PedDental-Sel.pdf
 KP DC Gold DHMO Plus 1500/20/Dental,94506DC0350026-01,2019,3e8fcd85-279d-434b-b99c-af5d02be49d1,KPDCGoldDHMOPlus150020Dental.pdf
-KP DC Gold DHMO Plus 1500/20/Dental (SEL),94506DC0350031-01,2019,137413e5-eb87-4070-8999-28c4a48b2528,KPDCGoldDHMOPlus150020DentalSEL.pdf
 KP DC Gold HMO Plus 0/20/Dental,94506DC0350024-01,2019,9dd9cc03-b036-42e3-afdf-9c6dbf91978c,KPDCGoldHMOPlus020Dental.pdf
-KP DC Gold HMO Plus 0/20/Dental (SEL),94506DC0350030-01,2019,fcf3c6c4-f84c-482b-a15a-6ef9b0c2af64,KPDCGoldHMOPlus020DentalSEL.pdf
 KP DC Platinum 0/10/Dental,94506DC0350001-01,2018,03811752-1eaf-45cd-a975-f7bfc2ddb04a,KP DC Platinum 0_10 SHOP - SIG.pdf
 KP DC Platinum 0/10/Dental,94506DC0350001-01,2019,601b1ffe-a562-455d-bbbf-f2cd520ac1cc,KPDCPlatinum010Dental.pdf
 KP DC Platinum 0/10/Dental (SEL),94506DC0350016-01,2018,91d46581-b922-40b0-a7e5-ccb7d251336e,KP DC Platinum 0_10 SHOP - SEL.pdf
@@ -881,7 +879,6 @@ KP DC Platinum 500/20/Dental/Ped Dental,94506DC0350017-01,2016,d090655f-5dd7-484
 KP DC Platinum 500/20/Dental/Ped Dental (SEL),94506DC0350017-01,2017,09ab83e0-d5da-4640-b09b-51a987a1817c,KP DC DHMO Platinum 500_20_SHOP.SEL.pdf
 KP DC Platinum 500/20/Dental/Ped Dental/SEL,94506DC0350017-01,2015,a7018332-49cf-4ef4-b2cc-22989ca4aca8,KP DC Platinum-500-20-Dental-PedDental-Sel.pdf
 KP DC Platinum HMO Plus 0/10/Dental,94506DC0350023-01,2019,dd0e766d-dd83-4b9f-97eb-a18d6d911790,KPDCPlatinumHMOPlus010Dental.pdf
-KP DC Platinum HMO Plus 0/10/Dental (SEL),94506DC0350029-01,2019,e26bb46d-826f-4dca-9829-f218fe534f6b,KPDCPlatinumHMOPlus010DentalSEL.pdf
 KP DC STANDARD Bronze 5000/50/Dental/Ped Dental,94506DC0390007-01,2017,a70869ab-d179-4ddd-83bb-f74849102058,KP DC DHMO STD Bronze 5000_50 IVL.pdf
 KP DC STANDARD Bronze 5000/50/Dental/Ped Dental,94506DC0390007-02,2017,13a279bb-dda7-402b-b1af-4f2ea1a54101,KP DC DHMO STD Bronze 5000_50 IVL.pdf
 KP DC STANDARD Bronze 5000/50/Dental/Ped Dental,94506DC0390007-03,2017,8587086f-4c7e-4499-8fc6-659bd6071b63,KP DC DHMO STD Bronze 5000_50 IVL.pdf
