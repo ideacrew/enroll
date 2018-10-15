@@ -73,7 +73,7 @@ module Services
         #"family": build_family,
         "aptc": "343",
         "csr": "-01",
-        "callback_url": "http:///enroll-hotfix.dchbx.org/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/plan_selection_callback/", #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+        "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
 
         }
       end
