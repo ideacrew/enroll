@@ -241,6 +241,13 @@ module BenefitSponsors
         model_attribute_name
       end
 
+      def is_dental_products_available?(form)
+        form.catalog.product_packages.where(
+          :product_kind => :dental,
+          :"products" => {:"$exists" => true}
+        ).present?
+      end
+
       private
 
       def attributes_to_form_params(benefit_package, form)

@@ -164,6 +164,10 @@ module BenefitSponsors
       def has_dental_sponsored_benefits?
         self.has_dental_sponsored_benefits
       end
+
+      def is_dental_products_available?
+        service.is_dental_products_available?(self)
+      end
     end
   end
 end

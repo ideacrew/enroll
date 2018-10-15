@@ -6,12 +6,13 @@ module SponsoredBenefits
         @carrier_names = ::Organization.load_carriers(
                             primary_office_location: plan_design_organization.primary_office_location,
                             selected_carrier_level: selected_carrier_level,
-                            active_year: active_year
+                            active_year: active_year,
+                            kind: kind
                             )
       end
 
       private
-        helper_method :selected_carrier_level, :plan_design_organization, :active_year
+        helper_method :selected_carrier_level, :plan_design_organization, :active_year, :kind
 
         def selected_carrier_level
           @selected_carrier_level ||= params[:selected_carrier_level]
@@ -23,6 +24,10 @@ module SponsoredBenefits
 
         def active_year
           params[:active_year]
+        end
+
+        def kind
+          params[:kind]
         end
     end
   end
