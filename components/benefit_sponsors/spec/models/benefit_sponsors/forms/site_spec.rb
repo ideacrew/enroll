@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   module Factories
-    RSpec.describe Site, type: :model do
+    RSpec.describe Site, type: :model, dbclean: :after_each do
       shared_context "params", :shared_context => :metadata do
         let(:params) do
           {

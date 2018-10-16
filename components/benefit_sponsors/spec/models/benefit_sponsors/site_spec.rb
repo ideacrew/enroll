@@ -46,7 +46,7 @@ module BenefitSponsors
       end
     end
 
-    describe 'Site Model has a' do
+    describe 'Site Model has a', dbclean: :after_each do
       let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca)}
       it 'has a valid factory' do
         expect(site.valid?).to be_truthy
@@ -172,7 +172,7 @@ module BenefitSponsors
       end
     end
 
-    context "organization associations must be valid" do
+    context "organization associations must be valid", dbclean: :after_each do
 
       let(:owner_legal_name)    { "Hannah Barbara, LLC" }
       let(:loony_legal_name)    { "Loony Tunes, LLC" }
