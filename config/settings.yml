@@ -136,7 +136,8 @@ consumer_checkbook_services:
 # Note: currently using Shop Remote Access Keys/URLS for IVL also this needs to be changed once we get Keys and Url's from Checkbook Team
     consumer_remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
     consumer_reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
-    base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=dev" #Environment should be changed according to deployment RE #19392 (#24)
+    # base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=dev" #Environment should be changed according to current environment RE #19392 (#24)
+    base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=test"
 
 checkbook_services:
 # Note: Need to replace Remote_access_key with Production keys while deploying to prod.
