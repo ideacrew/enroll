@@ -33,7 +33,7 @@ def is_dc_resident(person)
 end
 
 def document_due_date(family)
-  enrolled_contingent_enrollment = family.enrollments.current_year.where(:is_any_enrollment_member_outstanding => true, :kind => 'individual').first
+  enrolled_contingent_enrollment = family.enrollments.outstanding_verification.first
   if enrolled_contingent_enrollment.present?
     if enrolled_contingent_enrollment.special_verification_period.present?
       enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
