@@ -24,7 +24,7 @@ module Subscribers
         if recipient.blank?
           notify("acapi.error.application.enroll.remote_listener.legacy_notification_subscriber", {
             :body => JSON.dump({
-              :error => "Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}."
+              :error => "Bad Payload...could n't find resource with #{payload[finder_mapping.identifier_key.to_s]}."
             })})
           return
         end
@@ -46,7 +46,7 @@ module Subscribers
           }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
         end
 
-      rescue => e
+      rescue Exception => e
         notify("acapi.error.application.enroll.remote_listener.legacy_notification_subscriber", {
           :body => JSON.dump({
             :error => e.inspect,
