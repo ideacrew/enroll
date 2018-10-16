@@ -4,11 +4,7 @@ module Subscribers
 
     def self.subscription_details
       [
-        /acapi\.info\.events\.broker_role\..*/,
-        /acapi\.info\.events\.general_agent_profile\..*/,
-        /acapi\.info\.events\.employee_role\..*/,
-        /acapi\.info\.events\.consumer_role\..*/,
-        /acapi\.info\.events\.employer\..*/
+        /acapi\.info\.events\..*/
       ]
     end
 
