@@ -13,6 +13,22 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
     end
   end
 
+  # context ".estimate cost for ivl user" do 
+  #   it "should return link for ivl" do
+  #     @market_kind="individual"
+  #     @dc_checkbook_url=Settings.consumer_checkbook_services.base_url
+  #     @coverage_kind="health"
+  #     expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"https://staging.checkbookhealth.org/hie/dc/api?environment=dev/\">Estimate Your Costs</a>"
+  #   end
+    
+  #   it "should return link for individual" do
+  #     @market_kind="individual"
+  #     @coverage_kind = "health"
+  #     @dc_checkbook_url="fake_url"
+  #     expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"fake_url\">Estimate Your Costs</a>"
+  #   end
+  # end
+
   context ".estimate_your_costs" do 
     it "should return link for congressional employee" do
       @market_kind="shop"
