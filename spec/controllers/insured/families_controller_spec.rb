@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryGirl.create(:user, person: person) }
     let(:person) { FactoryGirl.create(:person) }
@@ -886,7 +886,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET purchase" do
     let(:hbx_enrollment) { HbxEnrollment.new }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
