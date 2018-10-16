@@ -14,6 +14,16 @@ namespace :reports do
   task :outstanding_types_created => :environment do
     field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE IVL_ENROLLMENT SHOP_ENROLLMENT)
 
+    CITIZEN_INVALID_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "fail_dhs!", "fail_dhs"]
+
+    SSN_INVALID_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "ssn_invalid!", "ssn_invalid"]
+
+    RESIDENCY_INVALID_EVENTS = ["fail_residency!", "fail_residency"]
+
+    IMMIGRATION_INVALID_EVENTS = ["fail_dhs!", "fail_dhs"]
+
+    ALL_EVENTS = ["ssn_valid_citizenship_invalid!", "ssn_valid_citizenship_invalid", "fail_dhs!", "fail_dhs", "fail_residency!", "fail_residency"]
+
     def date
       begin
         ENV["date"].strip
@@ -73,18 +83,17 @@ namespace :reports do
       Date.parse(date).next_month
     end
 
-    def due_date_for_type(person, type, transition)
-      if person.consumer_role.special_verifications.any?
-        sv = person.consumer_role.special_verifications.order_by(:created_at => 'desc').select{|sv| sv.verification_type == type }.select{|svp| svp.created_at < end_date}.first
-        sv.present? ? sv.due_date : transition.transition_at + 95.days
-      else
-        transition.transition_at + 95.days
-      end
-    end
-
-    def get_rejected_type(person)
-      record = person.consumer_role.verification_type_history_elements.where(:action => "return for deficiency", :created_at=>{'$gte'=>start_date, '$lte' => end_date}).first
-      record.verification_type if record
+    def type_history_elements_with_date_range(v_type)
+     history_elements =  v_type.type_history_elements.
+      where(created_at:{
+        :"$gte" => start_date,
+        :"$lt" => end_date},
+        :"$or" => [
+          {:"action" => "return for deficiency"},
+          {:"modifier" => "external Hub"}
+        ]
+      )
+      remove_dup_override? ? [history_elements.sort_by{|type_history| type_history.updated_at}.last] : history_elements
     end
 
     def remove_dup_override?
@@ -92,37 +101,50 @@ namespace :reports do
     end
 
     def people
-      people = Person.where(:"consumer_role.workflow_state_transitions".elem_match => {
-          "$and" => [
-              {:event => {"$in" => ["ssn_invalid!",
-                                    "ssn_valid_citizenship_invalid!",
-                                    "fail_dhs!",
-                                    "fail_residency!",
-                                    "reject!",
-                                    "coverage_purchased!"] }},
-              { :transition_at.gte => start_date },
-              { :transition_at.lte => end_date }
-          ]
-      })
-
-      remove_dup_override? ? people.where(:"consumer_role.aasm_state" => "verification_outstanding") : people
+      Person.where(:"verification_types.type_history_elements" => { :"$elemMatch" => {
+        :"created_at" => {
+          :"$gte" => start_date,
+          :"$lt" => end_date
+        },
+        :"$or" => [
+          {:"action" => "return for deficiency"},
+          {:"modifier" => "external Hub"}
+        ]
+      }})
     end
 
-    def workflow_transitions(person)
-      transitions_no_ssn = person.consumer_role.workflow_state_transitions.where(:event => "coverage_purchased!", :to_state => "verification_outstanding", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+    def hub_response_wfst(verification_type)
+      hub_response_on = @history_element.created_at.to_date
+      v_type = verification_type.type_name
+      @person.consumer_role.workflow_state_transitions.where(:"created_at" => {
+        :"$gt" => hub_response_on - 1.day,
+        :"$lt" => hub_response_on + 1.day
+        },
+        :"event".in => (verification_valid_event(v_type))
+      ).first
+    end
 
-      transitions_reject = person.consumer_role.workflow_state_transitions.where(:event => "reject!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
+    def verification_valid_event(v_type)
+      case v_type
+        when 'Social Security Number'
+          SSN_INVALID_EVENTS
+        when 'DC Residency'
+          RESIDENCY_INVALID_EVENTS
+        when 'Immigration status'
+          IMMIGRATION_INVALID_EVENTS
+        when 'Citizenship'
+          CITIZEN_INVALID_EVENTS
+        else
+          ALL_EVENTS
+      end
+    end
 
-      transitions_dc = person.consumer_role.workflow_state_transitions.where(:event => "fail_residency!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
-
-      transitions_ssn = person.consumer_role.workflow_state_transitions.where(:event => "ssn_invalid!", :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
-
-      transitions_cit = person.consumer_role.workflow_state_transitions.where(:event => {"$in" => ["ssn_valid_citizenship_invalid!", "fail_dhs!"]},
-                                                                              :transition_at => {'$gte'=>start_date, '$lte' => end_date}).to_a.uniq{|t| t.created_at.to_date}
-
-      transitions = transitions_reject + transitions_dc + transitions_ssn + transitions_cit + transitions_no_ssn
-
-      remove_dup_override? ? transitions.sort_by{|t| t.created_at}.reverse.uniq{|e| e.event} : transitions
+    def due_date_for_type(type)
+      type.due_date ||  TimeKeeper.date_of_record + 95.days
+    end
+    def is_not_eligible_transaction?(v_type)
+      return false if @history_element.modifier != "external Hub"
+      hub_response_wfst(v_type).blank?
     end
 
     report_prefix = remove_dup_override? ? "current" : "all"
@@ -133,49 +155,35 @@ namespace :reports do
 
       collect_rows = []
       people.each do |person|
-        if workflow_transitions(person).any?
-          workflow_transitions(person).each do |transition|
-            case transition.event
-            when "ssn_invalid!"
-              types = person.verification_types - ['DC Residency', 'American Indian Status']
-            when "ssn_valid_citizenship_invalid!"
-              types = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status'])
-            when "fail_dhs!"
-              types = (person.verification_types - ['DC Residency', 'Social Security Number', 'American Indian Status'])
-            when "fail_residency!"
-              types = ["DC Residency"]
-            when "reject!"
-              types = [get_rejected_type(person)]
-            when "coverage_purchased!"
-              types = person.verification_types - ['DC Residency', 'American Indian Status']
+        begin
+          @person = person
+          person.verification_types.each do |v_type|
+            type_history_elements_with_date_range(v_type).each do |type_history|
+            @history_element = type_history
+            next if is_not_eligible_transaction?(v_type)
+            collect_rows << [
+                    subscriber_id(person),
+                    person.hbx_id,
+                    person.first_name,
+                    person.last_name,
+                    v_type.type_name,
+                    type_history.updated_at,
+                    "outstanding",
+                    due_date_for_type(v_type).to_date,
+                    ivl_enrollment(person),
+                    shop_enrollment(person)
+                ]
             end
-
-            types.each do |type|
-              collect_rows << [
-                  subscriber_id(person),
-                  person.hbx_id,
-                  person.first_name,
-                  person.last_name,
-                  type,
-                  transition.transition_at,
-                  "outstanding",
-                  due_date_for_type(person, type, transition).to_date,
-                  ivl_enrollment(person),
-                  shop_enrollment(person)
-              ]
-            end
-          end
+         end
+         rescue => e
+         puts "Invalid Person with HBX_ID: #{person.hbx_id}"
         end
       end
-      rows_for_csv = remove_dup_override? ? collect_rows.uniq{|row| [row[2], row[4]] } : collect_rows
 
-      rows_for_csv.each do |row|
+      collect_rows.each do |row|
         csv << row
       end
       puts "*********** DONE ******************"
     end
-
   end
 end
-
-
