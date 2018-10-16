@@ -1,5 +1,5 @@
 module Subscribers
-  class LegacyNotificationSubscriber < ::Acapi::Subscription
+  class LegacyNotificationSubscriber
     include Acapi::Notifiers
 
     def self.worker_specification
