@@ -10,7 +10,7 @@ module Subscribers
 
     def call(event_name, e_start, e_end, msg_id, payload)
       begin
-        log("NOTICE EVENT: #{event_name} #{payload}", {:severity => 'info'})
+        log("NOTICE EVENT: #{event_name} #{payload.inspect}", {:severity => 'info'})
 
         notice_event = event_name.split(".")[4]
 
