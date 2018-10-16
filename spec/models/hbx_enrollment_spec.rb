@@ -2367,3 +2367,21 @@ end
 #     end
 #   end
 # end
+
+describe HbxEnrollment, dbclean: :after_all do
+  let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
+  let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household,
+                            kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
+
+  context ".is_ivl_actively_outstanding?" do
+    it "should return true" do
+      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_truthy
+    end
+
+    it "should return false" do
+      ivl_enrollment.update_attributes!(is_any_enrollment_member_outstanding: false)
+      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
+    end
+  end
+end
