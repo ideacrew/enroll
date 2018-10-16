@@ -3,7 +3,13 @@ module Subscribers
     include Acapi::Notifiers
 
     def self.subscription_details
-      [/acapi\.info\.events\..*/]
+      [
+        /acapi\.info\.events\.broker_role\..*/,
+        /acapi\.info\.events\.general_agent_profile\..*/,
+        /acapi\.info\.events\.employee_role\..*/,
+        /acapi\.info\.events\.consumer_role\..*/,
+        /acapi\.info\.events\.employer\..*/
+      ]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
