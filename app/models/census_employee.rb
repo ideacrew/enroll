@@ -127,7 +127,6 @@ class CensusEmployee < CensusMember
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
-    binding.pry
     benefit_group_assignment_ids = matched.flat_map() do |ee|
       ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
     end
