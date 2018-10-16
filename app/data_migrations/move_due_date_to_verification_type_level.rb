@@ -8,7 +8,7 @@ class MoveDueDateToVerificationTypeLevel < MongoidMigrationTask
       :"households.hbx_enrollments" => {
         :"$elemMatch" => {
           :"special_verification_period".ne => nil,
-          :"aasm_state" => "enrolled_contingent"
+          :"is_any_enrollment_member_outstanding" => true
         }
     }).each do |family|
       family.family_members.each do |f_member|

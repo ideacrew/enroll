@@ -33,9 +33,10 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
         person.consumer_role.ssn_invalid!(denial_information)
       end
 
-      it "puts the enrollment in enrolled_contingent state" do
+      it "sets is_any_enrollment_member_outstanding field to true" do
           enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
-          expect(enroll.aasm_state).to eql "enrolled_contingent"
+          expect(enroll.aasm_state).to eql "coverage_selected"
+          expect(enroll.is_any_enrollment_member_outstanding).to eql true
       end
     end
 
