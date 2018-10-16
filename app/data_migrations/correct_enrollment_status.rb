@@ -22,7 +22,7 @@ class CorrectEnrollmentStatus < MongoidMigrationTask
     members = get_members(enrollment)
     if members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)
       enrollment.update_attributes!(is_any_enrollment_member_outstanding: true)
-      enrollment.move_to_enrolled!
+      enrollment.move_to_enrolled! if enrollment.may_move_to_enrolled?
     elsif members.any?(&:ssa_pending?) || members.any?(&:dhs_pending?)
     enrollment.update_attributes!(is_any_enrollment_member_outstanding: false)
      enrollment.move_to_pending!

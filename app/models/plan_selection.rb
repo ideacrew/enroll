@@ -43,10 +43,8 @@ class PlanSelection
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     if enrollment_members_verification_status(market_kind)
       hbx_enrollment.update_attributes!(is_any_enrollment_member_outstanding: true)
-      hbx_enrollment.select_coverage!(qle: qle)
-    else
-      hbx_enrollment.select_coverage!(qle: qle)
     end
+    hbx_enrollment.select_coverage!(qle: qle)
   end
   
   def enrollment_members_verification_status(market_kind)
