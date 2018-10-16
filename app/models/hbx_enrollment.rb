@@ -373,8 +373,11 @@ class HbxEnrollment
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
     if eligibility_ruleset.applicable?
-      if eligibility_ruleset.determine_next_state[1] != :do_nothing
+      if self.is_any_enrollment_member_outstanding != eligibility_ruleset.determine_next_state[0]
         self.update_attributes!(is_any_enrollment_member_outstanding: eligibility_ruleset.determine_next_state[0])
+      end
+
+      if eligibility_ruleset.determine_next_state[1] != :do_nothing
         self.send(eligibility_ruleset.determine_next_state[1])
       end
     end
@@ -1108,21 +1111,6 @@ class HbxEnrollment
     end
   end
 
-  def status_step
-    case
-      when coverage_selected?  #submitted
-        1
-      when transmitted_to_carrier? #transmitted
-        2
-      when is_any_enrollment_member_outstanding? #acknowledged
-        3
-      when coverage_enrolled? #enrolled
-        4
-      when coverage_canceled? || coverage_terminated? #canceled/terminated
-        5
-    end
-  end
-
   def can_terminate_coverage?
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
@@ -1206,7 +1194,6 @@ class HbxEnrollment
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
-    #state :enrolled_contingent
 
     state :void       # nullify enrollment
 
@@ -1225,7 +1212,6 @@ class HbxEnrollment
 
     event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
-      #transitions from: :enrolled_contingent, to: :auto_renewing_contingent, after: :propagate_renewal
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1331,12 +1317,10 @@ class HbxEnrollment
 
     event :move_to_enrolled, :after => :record_transition do
       transitions from: :unverified, to: :coverage_selected
-      transitions from: :coverage_selected, to: :coverage_selected
     end
 
     event :move_to_pending, :after => :record_transition do
       transitions from: :shopping, to: :unverified
-      transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified

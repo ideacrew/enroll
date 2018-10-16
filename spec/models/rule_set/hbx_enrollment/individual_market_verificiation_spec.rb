@@ -59,13 +59,13 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       end
     end
 
-    context "enrollment with fully verified member and status is_any_enrollment_member_outstanding true" do
+    context "enrollment with fully verified member and status is_any_enrollment_member_outstanding false" do
       let(:enrollment_status) { 'coverage_selected' }
-      let(:is_any_enrollment_member_outstanding) { true }
+      let(:is_any_enrollment_member_outstanding) { false }
 
       it "return move_to_enrolled! event" do
         allow(subject).to receive(:roles_for_determination).and_return([fully_verified_person.consumer_role])
-        expect(subject.determine_next_state).to eq [false, :move_to_enrolled!]
+        expect(subject.determine_next_state).to eq [false, :do_nothing]
       end
     end
 
@@ -75,7 +75,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       
       it 'should return do_nothing' do
         allow(subject).to receive(:roles_for_determination).and_return([fully_verified_person.consumer_role])
-        expect(subject.determine_next_state).to eq [false, :move_to_enrolled!]
+        expect(subject.determine_next_state).to eq [false, :do_nothing]
       end 
     end
 
@@ -83,7 +83,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       let(:enrollment_status) { 'coverage_selected' }
       it "return move_to_enrolled! event along with true value" do
         allow(subject).to receive(:roles_for_determination).and_return([verification_outstanding_person.consumer_role])
-        expect(subject.determine_next_state).to eq [true, :move_to_enrolled!]
+        expect(subject.determine_next_state).to eq [true, :do_nothing]
       end
     end
 
@@ -91,14 +91,14 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
       let(:enrollment_status) { 'coverage_selected' }
       it "return move_to_enrolled! event along with true value" do
         allow(subject).to receive(:roles_for_determination).and_return([verification_outstanding_person.consumer_role])
-        expect(subject.determine_next_state).to eq [true, :move_to_enrolled!]
+        expect(subject.determine_next_state).to eq [true, :do_nothing]
       end
     end
 
     context "enrollment with verification_period_ended member" do
       it "return move_to_enrolled! event along with true value" do
         allow(subject).to receive(:roles_for_determination).and_return([verification_period_ended_person.consumer_role])
-        expect(subject.determine_next_state).to eq [true, :move_to_enrolled!]
+        expect(subject.determine_next_state).to eq [true, :do_nothing]
       end
     end
 
@@ -110,6 +110,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
     end
 
     context "enrollment with mixed and outstanding members" do
+      let(:enrollment_status) { 'unverified' }
       it "return move_to_enrolled! event along with true value" do
         allow(subject).to receive(:roles_for_determination).and_return([verification_outstanding_person.consumer_role, fully_verified_person.consumer_role, ssa_pending_person.consumer_role])
         expect(subject.determine_next_state).to eq [true, :move_to_enrolled!]
