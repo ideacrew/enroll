@@ -1,6 +1,6 @@
 
 gem 'aasm', '~> 4.8.0'
-gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.0.0'
+gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.3.1'
 gem 'addressable', '2.3.8'
 gem 'animate-rails', '~> 1.0.7'
 gem 'aws-sdk', '2.2.4'
@@ -38,7 +38,7 @@ gem 'mongoid-enum'
 gem 'mongoid-history'
 gem 'mongoid-versioning'
 gem 'mongoid_userstamp'
-gem 'nokogiri', '1.8.2'
+gem 'nokogiri', '1.6.7.2'
 gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 gem 'nokogiri-happymapper', :require => 'happymapper'
 gem "notifier",           path: "components/notifier"
