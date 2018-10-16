@@ -109,6 +109,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:kind).and_return('individual')
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
+      allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
@@ -291,7 +292,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected', is_any_enrollment_member_outstanding: true)}
+                                  aasm_state: 'coverage_selected', is_any_enrollment_member_outstanding: true)}
    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 >>>>>>> a9619997ea... refs #33617 remove enrolled contingent aasm state in EA
 
@@ -340,7 +341,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected', is_any_enrollment_member_outstanding: true)}
+                                  aasm_state: 'coverage_selected', is_any_enrollment_member_outstanding: true)}
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
