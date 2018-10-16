@@ -20,7 +20,7 @@ module Subscribers
         headers = properties.headers || {}
         event_name = delivery_info.routing_key
         stringed_payload = headers.stringify_keys
-        log("NOTICE EVENT: #{event_name} #{stringed_payloed.inspect} #{body.inspect}", {:severity => 'info'})
+        log("NOTICE EVENT: #{event_name} #{stringed_payload.inspect} #{body.inspect}", {:severity => 'info'})
 
         notice_event = event_name.split(".")[3]
 
