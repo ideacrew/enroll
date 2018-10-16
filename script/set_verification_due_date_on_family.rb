@@ -1,4 +1,4 @@
-all_families = Family.outstanding_verification.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
+all_families = Family.outstanding_verification
 
 all_families.each do |family|
   begin
