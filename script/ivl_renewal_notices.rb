@@ -1,5 +1,6 @@
 include VerificationHelper
 
+puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 InitialEvents = ["final_eligibility_notice_uqhp", "final_eligibility_notice_renewal_uqhp"]
 unless ARGV[0].present? && ARGV[1].present?
   puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
@@ -121,6 +122,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           person.first_name,
           person.last_name
         ]
+        puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
       else
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end
@@ -130,3 +132,4 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
   end
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
