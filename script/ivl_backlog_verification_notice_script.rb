@@ -40,7 +40,7 @@ def set_due_date_on_verification_types(family)
     begin
       person = family_member.person
       person.verification_types.each do |v_type|
-        next if !type_unverified?(v_type, person)
+        next if !(v_type.type_unverified?)
         person.consumer_role.special_verifications << SpecialVerification.new(due_date: future_date,
                                                                               verification_type: v_type,
                                                                               updated_by: nil,
