@@ -129,12 +129,6 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_year + 1.day)
       expect(helper.has_break_in_coverage_enrollments?).to eq false
     end
-
-    it 'should return false if erollments are in expired or unverified or void' do
-      hbx_enrollment1.update_attributes(aasm_state: 'coverage_expired')
-      hbx_enrollment.update_attributes(aasm_state: "unverified")
-      expect(helper.has_break_in_coverage_enrollments?).to eq false
-    end
   end
 
   describe 'Pay Now button should be available only for limited time' do

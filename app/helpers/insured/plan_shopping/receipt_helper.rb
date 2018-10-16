@@ -22,6 +22,6 @@ module Insured::PlanShopping::ReceiptHelper
   end
 
   def has_break_in_coverage_enrollments?
-    @enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated").any? { |enr| enr.plan.carrier_profile.legal_name == 'Kaiser' &&  enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
+    @enrollment.family.enrollments.terminated.any? { |enr| enr.plan.carrier_profile.legal_name == 'Kaiser' &&  enr.terminated_on.year == @enrollment.effective_on.year && (@enrollment.effective_on - enr.terminated_on) > 1 }
   end
 end
