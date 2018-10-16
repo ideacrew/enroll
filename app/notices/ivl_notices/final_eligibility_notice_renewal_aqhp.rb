@@ -171,7 +171,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   end
 
   def document_due_date(family)
-    enrolled_contingent_enrollment = family.enrollments.where(:is_any_enrollment_member_outstanding => true, :kind => 'individual').first
+    enrolled_contingent_enrollment = family.enrollments.enrolled.where(:is_any_enrollment_member_outstanding => true, :kind => 'individual').first
     if enrolled_contingent_enrollment.present?
       if enrolled_contingent_enrollment.special_verification_period.present?
         enrolled_contingent_enrollment.special_verification_period
