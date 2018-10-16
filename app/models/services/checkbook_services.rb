@@ -64,10 +64,10 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": enrollment_year,
+        "enrollment_year": "2019",
         "family": consumer_build_family,
-        "aptc": "343",
-        "csr": "-01",
+        "aptc": aptc,
+        "csr": csr,
         "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
 
         }
