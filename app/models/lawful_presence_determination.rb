@@ -53,6 +53,7 @@ class LawfulPresenceDetermination
     event :revert, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_pending, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_pending, after: :record_denial_information
+      transitions from: :expired, to: :verification_pending
       transitions from: :verification_successful, to: :verification_pending
     end
   end
@@ -93,6 +94,7 @@ class LawfulPresenceDetermination
         if self.ivl_role.person
           unless self.ivl_role.person.ssn.blank?
             self.ivl_role.ssn_validation = "valid"
+            self.ivl_role.person.verification_types.active.where(type_name:"Social Security Number").first.validation_status = "verified"
           end
         end
       end
