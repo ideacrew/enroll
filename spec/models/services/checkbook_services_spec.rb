@@ -7,9 +7,10 @@ describe Services::CheckbookServices::PlanComparision do
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  let(:plan_year){ FactoryGirl.create(:next_month_plan_year, :with_benefit_group)}
-  let(:benefit_group){ plan_year.benefit_groups.first }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
+  let!(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
+  let!(:hbx_enrollment1) { FactoryGirl.create(:hbx_enrollment, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
 
   describe "when employee is not congress" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
@@ -17,13 +18,29 @@ describe Services::CheckbookServices::PlanComparision do
 
     it "should generate non-congressional link" do
       if plan_match_dc
-        allow(subject).to receive(:construct_body).and_return({})
+        allow(subject).to receive(:construct_body_shop).and_return({})
         allow(HTTParty).to receive(:post).with("https://staging.checkbookhealth.org/shop/dc/api/",
           {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
           and_return(result)
-        expect(subject.generate_url).to eq Settings.checkbook_services.congress_url+"#{hbx_enrollment.effective_on.year}/"
+        expect(subject.generate_url).to eq "http://checkbook_url"
       end
     end
+  end
+
+  describe "when user is consumer" do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
+    let(:checkbook_url) {"http://checkbook_url"}
+    let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => checkbook_url})}
+
+    it "should generate consumer link" do
+        if plan_match_dc
+          allow(subject).to receive(:construct_body_ivl).and_return({})
+          allow(HTTParty).to receive(:post).with(Settings.consumer_checkbook_services.base_url,
+            {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
+            and_return(result)
+          expect(subject.generate_url).to eq checkbook_url
+        end
+      end
   end
 
   describe "when employee is congress member" do
@@ -31,7 +48,7 @@ describe Services::CheckbookServices::PlanComparision do
 
     it "should generate congressional url" do
      if plan_match_dc
-       allow(subject).to receive(:construct_body).and_return({})
+       allow(subject).to receive(:construct_body_shop).and_return({})
        expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/2018/")
       end
     end

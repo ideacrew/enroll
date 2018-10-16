@@ -23,7 +23,7 @@ module Services
 
       def generate_url
         return @url if is_congress
-        return (Settings.checkbook_services.congress_url+"#{@hbx_enrollment.coverage_year}/") if Rails.env.test?
+        #return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
             @result = HTTParty.post(@url,
@@ -64,16 +64,11 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": enrollment_year,
-        "family": [{
-          "age": 30,
-          "pregnant": false,
-          "AIAN": tribal_option
-        }],
-        #"family": build_family,
-        "aptc": "343",
-        "csr": "-01",
-        "callback_url": "http:///enroll-hotfix.dchbx.org/insured/plan_shoppings/#{@hbx_enrollment.id.to_s}/plan_selection_callback/", #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+        "enrollment_year": "2019",
+        "family": consumer_build_family,
+        "aptc": aptc,
+        "csr": csr,
+        "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
 
         }
       end
@@ -102,12 +97,12 @@ module Services
 
       def csr
         year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer rescue 0.00
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer rescue 00
       end
 
       def aptc
         year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year) rescue 0.00
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year) rescue 00
       end
 
       def tribal_option
@@ -145,11 +140,12 @@ module Services
       end
 
       def consumer_build_family
+        family=[]
         year = TimeKeeper.date_of_record.year
           @hbx_enrollment.hbx_enrollment_members.each do |member|
             dob_year= member.family_member.person.dob.strftime("%Y").to_i
             age = year - dob_year
-            family << {'age': dob_year-year}
+            family << {"age": age,"pregnant": false, "AIAN": tribal_option}
           end
           family
       end
