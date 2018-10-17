@@ -603,7 +603,7 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion? && !Rails.env.test?
       # we do not want to create employer role durig census employee saving for conversion
       return if self.employer_profile.is_a_conversion_employer?
 
