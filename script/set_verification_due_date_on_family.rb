@@ -1,4 +1,4 @@
-all_families = Family.outstanding_verification
+all_families = Family.outstanding_enrollments
 
 all_families.each do |family|
   begin

@@ -33,7 +33,7 @@ def is_dc_resident(person)
 end
 
 def document_due_date(family)
-  enrolled_contingent_enrollment = family.enrollments.outstanding_verification.first
+  enrolled_contingent_enrollment = family.enrollments.outstanding_enrollments.first
   if enrolled_contingent_enrollment.present?
     if enrolled_contingent_enrollment.special_verification_period.present?
       enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
