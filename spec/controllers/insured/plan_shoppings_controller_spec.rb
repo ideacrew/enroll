@@ -465,12 +465,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       allow(hbx_enrollment).to receive(:family).and_return(family)
-<<<<<<< HEAD
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
-=======
       allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return(nil)
->>>>>>> origin/master
 
       sign_in user
     end
