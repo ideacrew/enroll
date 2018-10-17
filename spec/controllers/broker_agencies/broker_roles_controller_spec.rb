@@ -137,8 +137,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
-          expect(response).to redirect_to(broker_registration_path)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
@@ -203,7 +202,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
@@ -266,7 +265,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
         end
 
         it "should be a redirect" do
-          expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:ok)
         end
 
         it "should has successful notice" do
@@ -347,6 +346,16 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
           expect(response).to render_template("search_broker_agency")
           expect(assigns(:broker_agency_profiles)).to eq [@broker_agency_profile]
         end
+      end
+    end
+    
+    context "broker request registration guide" do
+      before do
+        get :email_guide, {email:'Broker@test.com',first_name:'Broker'}
+      end
+      
+      it "should send Registration Guide to Broker@test.com" do
+        expect(flash[:notice]).to eq "A copy of the Broker Registration Guide has been emailed to Broker@test.com"
       end
     end
   end

@@ -13,6 +13,7 @@ module VlpDoc
 
   def update_vlp_documents(consumer_role, source='person', dependent=nil)
     return true if consumer_role.blank?
+    return true if params[source][:is_applying_coverage] == "false"
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
@@ -24,8 +25,8 @@ module VlpDoc
     end
 
     if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
-      if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
-        params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
+        if params[:dependent].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
+          params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
       elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
         params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
       end
@@ -51,5 +52,13 @@ module VlpDoc
     docs_for_status = consumer_role.citizen_status == "naturalized_citizen" ? naturalized_citizen_docs : VlpDocument::VLP_DOCUMENT_KINDS
     docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject=>{"$in" => docs_for_status})
     docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
+  end
+
+  def sensitive_info_changed?(role)
+    if role
+      info_changed = role.sensitive_information_changed?(params[:person] || params[:dependent])
+      dc_status = role.person.no_dc_address
+      return info_changed, dc_status
+    end
   end
 end
