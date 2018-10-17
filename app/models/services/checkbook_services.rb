@@ -23,7 +23,6 @@ module Services
 
       def generate_url
         return @url if is_congress
-        #return Settings.checkbook_services.congress_url if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
             @result = HTTParty.post(@url,
@@ -60,17 +59,17 @@ module Services
       }
       end
 
-       def construct_body_ivl
+      def construct_body_ivl
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": "2019",
+        "enrollment_year": enrollment_year,
         "family": consumer_build_family,
-        "aptc": aptc,
-        "csr": csr,
+        "aptc": aptc_value,
+        "csr": csr_value,
         "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
 
-        }
+        }s
       end
 
       def employer_effective_date
@@ -95,14 +94,14 @@ module Services
         @hbx_enrollment.effective_on.strftime('%Y')
       end
 
-      def csr
+      def csr_value
         year=@hbx_enrollment.effective_on.year
         @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer rescue 00
       end
 
-      def aptc
+      def aptc_value
         year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year) rescue 00
+        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc rescue 00
       end
 
       def tribal_option
