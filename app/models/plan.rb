@@ -8,6 +8,9 @@ class Plan
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo indemnity]
+
+  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
+  
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
 

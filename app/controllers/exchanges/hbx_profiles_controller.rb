@@ -3,6 +3,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesSearch
   include Pundit
   include SepAll
+  include VlpDoc
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
@@ -434,6 +435,7 @@ def employer_poc
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
     @ssn_fields = @person.employee_roles.map{|e| e.employer_profile.no_ssn} if @person.employee_roles.present?
+    @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
     elsif @ssn_fields.include?(false)
@@ -447,6 +449,7 @@ def employer_poc
           @person.ssn = params[:person][:ssn]
         end
         @person.save!
+        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
         @error_on_save = @person.errors.messages
