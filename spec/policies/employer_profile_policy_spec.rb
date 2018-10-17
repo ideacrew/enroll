@@ -6,7 +6,6 @@ describe EmployerProfilePolicy do
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
   let(:policy){EmployerProfilePolicy.new(user,FactoryGirl.create(:employer_profile))}
   let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
-  Permission.all.delete	
 
   context 'hbx_staff_role subroles' do
     it 'hbx_staff' do 
