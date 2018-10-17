@@ -63,7 +63,7 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": enrollment_year,
+        "enrollment_year": @hbx_enrollment.effective_on.strftime('%Y'),
         "family": consumer_build_family,
         "aptc": aptc_value,
         "csr": csr_value,
@@ -91,25 +91,19 @@ module Services
       end
 
       def enrollment_year
-        @hbx_enrollment.effective_on.strftime('%Y')
+        @hbx_enrollment.effective_on.year
       end
 
       def csr_value
-        year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.csr_percent_as_integer rescue 00
+        @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year).latest_eligibility_determination.csr_percent_as_integer.to_s rescue 00
       end
 
       def aptc_value
-        year=@hbx_enrollment.effective_on.year
-        @hbx_enrollment.household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc rescue 00
+        @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year).latest_eligibility_determination.max_aptc.to_s rescue 00
       end
 
       def tribal_option
-        if  @hbx_enrollment.consumer_role.person.tribal_id.present?
-          return true
-        else 
-          return false 
-        end  
+        @hbx_enrollment.consumer_role.person.tribal_id.present?
       end
 
 
