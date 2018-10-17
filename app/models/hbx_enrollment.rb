@@ -174,7 +174,7 @@ class HbxEnrollment
   scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:is_any_enrollment_member_outstanding => true, :aasm_state.in => ENROLLED_STATUSES).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}).order(created_at: :desc) }
-  scope :outstanding_verification, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
+  scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
@@ -1505,7 +1505,7 @@ class HbxEnrollment
     (Kinds - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
   end
 
-  def is_an_enrolled_by_aasm_state?
+  def is_enrolled_by_aasm_state?
     ENROLLED_STATUSES.include?(aasm_state)
   end
 
@@ -1514,7 +1514,7 @@ class HbxEnrollment
   end
 
   def is_ivl_actively_outstanding?
-    is_ivl_by_kind? && is_an_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
+    is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
   end
 
   private
