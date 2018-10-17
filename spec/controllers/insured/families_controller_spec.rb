@@ -36,7 +36,7 @@ RSpec.describe Insured::FamiliesController do
   end
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
@@ -163,7 +163,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "for SHOP market" do
+    context "for SHOP market", dbclean: :after_each do
 
       let(:employee_roles) { double }
       let(:employee_role) { FactoryGirl.create(:employee_role, bookmark_url: "/families/home") }
@@ -264,7 +264,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "for both ivl and shop" do
+    context "for both ivl and shop", dbclean: :after_each do
       let(:employee_roles) { double }
       let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
@@ -652,7 +652,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "GET check_qle_date" do
+    context "GET check_qle_date", dbclean: :after_each do
       let!(:user) { FactoryGirl.create(:user) }
       let!(:person1) { FactoryGirl.create(:person) }
       let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
@@ -754,7 +754,7 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "GET upload_notice_form" do
+  describe "GET upload_notice_form", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
     let(:person) { FactoryGirl.create(:person) }
 

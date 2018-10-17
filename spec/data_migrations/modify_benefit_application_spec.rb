@@ -1,5 +1,5 @@
 require "rails_helper"
-require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
+require File.join(File.dirname(__FILE__), "..", "..", "components", "benefit_sponsors", "app", "data_migrations", "modify_benefit_application")
 
 RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
