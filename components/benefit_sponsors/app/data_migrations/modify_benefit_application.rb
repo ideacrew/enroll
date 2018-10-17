@@ -135,9 +135,6 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def benefit_applications_for_reinstate
-    effective_date = Date.strptime("09/01/2018", "%m/%d/%Y")
-    benefit_sponsorship = get_benefit_sponsorship
-    benefit_sponsorship.benefit_applications.effective_date_begin_on(effective_date)
   end
 
   def benefit_application_for_force_submission
