@@ -18,9 +18,9 @@ describe Forms::EmployeeCandidate do
     expect(subject).to have_errors_on(:first_name)
   end
 
-  it "should have errors on the ssn" do
-    expect(subject).to have_errors_on(:ssn)
-  end
+  # it "should have errors on the ssn" do
+  #   expect(subject).to have_errors_on(:ssn)
+  # end
 end
 
 describe Forms::EmployeeCandidate, "asked to match a census employee" do

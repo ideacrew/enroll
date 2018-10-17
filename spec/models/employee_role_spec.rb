@@ -5,7 +5,7 @@ describe EmployeeRole do
     subject.valid?
   end
 
-  [:hired_on, :dob, :gender, :ssn, :employer_profile_id].each do |property|
+  [:hired_on, :dob, :gender, :employer_profile_id].each do |property|
     it "should require #{property}" do
       expect(subject).to have_errors_on(property)
     end

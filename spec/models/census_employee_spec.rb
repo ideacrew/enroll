@@ -60,13 +60,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no ssn" do
-      let(:params) {valid_params.except(:ssn)}
-
-      it "should fail validation" do
-        expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
-      end
-    end
+    # No longer valid with NO SSN feature
+    # context "with no ssn" do
+    #   let(:params) {valid_params.except(:ssn)}
+    #
+    #   it "should fail validation" do
+    #     expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+    #   end
+    # end
 
     context "with no dob" do
       let(:params) {valid_params.except(:dob)}
@@ -260,8 +261,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { 
-                        initial_census_employee.employee_role = valid_employee_role 
+                      before {
+                        initial_census_employee.employee_role = valid_employee_role
                       }
 
                       it "should link the roster instance and employer role" do
@@ -1508,10 +1509,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_cobra_coverage_eligible?" do 
+  context "is_cobra_coverage_eligible?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:hbx_enrollment) { HbxEnrollment.new aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record , coverage_kind: 'health'}
-  
+
     it "should return true when employement is terminated and " do
       allow(Family).to receive(:where).and_return([hbx_enrollment])
       allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
@@ -1525,16 +1526,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "cobra_eligibility_expired?" do 
+  context "cobra_eligibility_expired?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-  
+
     it "should return true when coverage is terminated more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months)
       expect(census_employee.cobra_eligibility_expired?).to be_truthy
     end
 
     it "should return false when coverage is terminated not more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
 
