@@ -22,7 +22,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       @dependent_age_off = nil
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
-      puts "#{enrollment.hbx_id}---#{e.inspect}"
+      puts "#{enrollment.hbx_id}---#{e.inspect}" unless Rails.env.test?
       @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
     end
   end
@@ -102,20 +102,32 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_renewal_plan
-    # TODO: Make sure tax households create script treats 0 as 100 
-    if is_csr?
-      if @aptc_values[:csr_amt] == '0'
-        csr_variant = '01'
-      else
-        csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
-      end
+    # TODO: Make sure tax households create script treats 0 as 100
+    if is_all_eligible?
+      if is_csr?
+        if @aptc_values[:csr_amt] == '0'
+          csr_variant = '01'
+        else
+          csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
+        end
 
-      Plan.where({
-        :active_year => renewal_coverage_start.year, 
-        :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
-      }).first.id
+        Plan.where({
+                       :active_year => renewal_coverage_start.year,
+                       :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
+                   }).first.id
+      else
+        @enrollment.plan.renewal_plan_id
+      end
     else
-      @enrollment.plan.renewal_plan_id
+
+    end
+  end
+
+  def is_all_eligible?
+    active_household = @enrollment.family.active_household
+    coverage_period_tax_household = active_household.latest_active_thh_with_year(renewal_benefit_coverage_period.start_on.year)
+    coverage_period_tax_household.tax_household_members.each do |thhm|
+      thhm.is_ia_eligible
     end
   end
 

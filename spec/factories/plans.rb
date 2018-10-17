@@ -4,6 +4,7 @@ FactoryGirl.define do
     sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
     abbrev              "BC Silver $2k"
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
+    sequence(:hios_base_id, (10..99).cycle)  { |n| "41842DC04000#{n}" }
     active_year         { TimeKeeper.date_of_record.year }
     coverage_kind       "health"
     metal_level         "silver"
@@ -83,7 +84,7 @@ FactoryGirl.define do
     end
 
     trait :next_year do
-      active_year Time.now.year
+      active_year Time.now.year + 1
     end
 
     trait :premiums_for_2015 do

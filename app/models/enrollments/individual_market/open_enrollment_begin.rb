@@ -102,7 +102,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
         puts "Processing #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
 
-        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+        active_household = family.active_household
+        coverage_period_tax_household = active_household.latest_active_thh_with_year(renewal_benefit_coverage_period.start_on.year)
+
+        enrollments = active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
         enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
         if enrollments.size > 1
@@ -115,7 +118,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
             count += 1    
             enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
             enrollment_renewal.enrollment = enrollments.first
-            enrollment_renewal.assisted = true
+            enrollment_renewal.assisted = coverage_period_tax_household.present? ? true : false
             enrollment_renewal.aptc_values = aptc_values
             enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
 
