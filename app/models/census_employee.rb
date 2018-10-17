@@ -139,6 +139,14 @@ class CensusEmployee < CensusMember
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
 
+  scope :matchable_by_dob_lname_fname, ->(dob, first_name, last_name) {
+    matched = unscoped.and(dob: dob, first_name: first_name, last_name: last_name, aasm_state: {"$in": ELIGIBLE_STATES })
+    benefit_group_assignment_ids = matched.flat_map() do |ee|
+      ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
+    end
+    matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
+  }
+
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")

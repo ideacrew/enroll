@@ -438,7 +438,7 @@ def employer_poc
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
-    elsif @ssn_fields.include?(false)
+    elsif @ssn_fields.present? && @ssn_fields.include?(false)
       @dont_update_ssn = true
     else
       begin

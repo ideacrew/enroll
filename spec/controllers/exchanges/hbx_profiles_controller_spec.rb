@@ -567,7 +567,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "POST update_dob_ssn" do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:person1) { FactoryGirl.create(:person) }
+    let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
@@ -580,7 +580,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person=>{:pid => person1.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
     end
