@@ -5,7 +5,7 @@
       <% end %>
       <h4>
         <%= find_my_doctor %>
-          <%=link_to "Estimate your cost" , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
+          <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
         </br>
       </h4>
     </div>
@@ -18,11 +18,11 @@
            <hr>
           </div> 
           <div style="margin-left:20px;">
-            <p> You are about to redirect to a separate website where you can compare coverage options using Plan Match, a decision-support tool that features on out-of-pocket cost calculator, integrated provider and drug directories, and more.</p>
+            <p><%= l10n("modal_onscreen") %></p>
           </div>
           <div class="modal-footer" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-            <%=link_to "Confirm" , @dc_individual_checkbook_url,target: "_blank", class: "btn btn-primary  mtz" %>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_url,target: "_blank", class: "btn btn-primary  mtz" %>
           </div>
        </div>
     </div>
