@@ -34,6 +34,21 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
     }
   }
 
+  let(:sponsor_contribution_attributes) {
+    {
+        :contribution_levels_attributes => contribution_levels_attributes
+    }
+  }
+
+  let(:contribution_levels_attributes) {
+    {
+        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit.id },
+        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit.id },
+        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit.id },
+        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit.id }
+    }
+  }
+
   describe "while creating a sponsored benefit", dbclean: :after_each do
 
     let(:benefits_params) {
@@ -41,26 +56,11 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
         :kind => "dental",
         :benefit_package_id => benefit_package.id,
         :benefit_sponsorship_id => benefit_sponsorship.id,
-        :product_option_choice => issuer_profile.legal_name,
+        :product_option_choice => issuer_profile.id,
         :product_package_kind => product_package_kind,
-        :reference_plan_id => product.id.to_s,
+        :reference_plan_id => product.id,
 
         :sponsor_contribution_attributes => sponsor_contribution_attributes
-      }
-    }
-
-    let(:sponsor_contribution_attributes) {
-      {
-      :contribution_levels_attributes => contribution_levels_attributes
-      }
-    }
-
-    let(:contribution_levels_attributes) {
-      {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
-        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
-        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
       }
     }
 
@@ -88,7 +88,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
       end
 
       it "should have selected product_option_choice(Issuer legal name)" do
-        expect(create_result[:product_option_choice]).to eq issuer_profile.legal_name
+        expect(create_result[:product_option_choice]).to eq issuer_profile.id.to_s
       end
 
       it "should have contribution_levels_attributes" do
@@ -124,25 +124,10 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
         :kind => "dental",
         :benefit_package_id => benefit_package.id,
         :benefit_sponsorship_id => benefit_sponsorship.id,
-        :product_option_choice => issuer_profile.legal_name,
+        :product_option_choice => issuer_profile.id.to_s,
         :product_package_kind => product_package_kind,
         :reference_plan_id => product.id.to_s,
         :sponsor_contribution_attributes => sponsor_contribution_attributes
-      }
-    }
-
-    let(:sponsor_contribution_attributes) {
-      {
-      :contribution_levels_attributes => contribution_levels_attributes
-      }
-    }
-
-    let(:contribution_levels_attributes) {
-      {
-        "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
-        "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
-        "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
-        "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
       }
     }
 
@@ -170,18 +155,23 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
     end
   end
 
-  describe "while updating a sponsored benefit" do
-    context "#form_params_to_attributes" do
-      it "should have sponsored benefit id" do
-        # TODO
-      end
-    end
+  # describe "while updating a sponsored benefit" do
+  #   context "#form_params_to_attributes" do
+  #     it "should have sponsored benefit id" do
+  #       # TODO
+  #     end
+  #   end
+  #
+  #   context "#save" do
+  #     it "should update dental sponsored benefits" do
+  #       # TODO
+  #     end
+  #   end
+  # end
+  #
+  describe ".load_employer_estimates" do
 
-    context "#save" do
-      it "should update dental sponsored benefits" do
-        # TODO
-      end
-    end
+
   end
 
   describe 'Cost calculations', :dbclean => :after_each do 
@@ -207,6 +197,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
       benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
       product_package_kind: "single_product", 
       reference_plan_id: dental_reference_product.id,
+      :sponsor_contribution_attributes => sponsor_contribution_attributes,
       kind: "dental"
       } }
 
