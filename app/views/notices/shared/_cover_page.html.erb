@@ -1,5 +1,4 @@
 <div class="page-break">
-
   <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 
   <% if notice.shop? %>
@@ -7,7 +6,6 @@
   <% else %>
     <%= render partial: 'notices/shared/address', :locals => {notice: notice, show_mpi_indicator: false} %>
   <% end %>
-
 
   <table class="total_table" border="0">
     <tbody>

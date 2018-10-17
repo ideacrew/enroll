@@ -31,6 +31,7 @@ module PdfTemplates
     attribute :first_name, String
     attribute :notice_subject, String
     attribute :due_date, Date
+    attribute :past_due_text, String
     attribute :application_date, Date
     attribute :last_name, String
     attribute :documents_needed, Boolean
@@ -43,10 +44,18 @@ module PdfTemplates
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
     end
 
+    def general_agency?
+      false
+    end
+
     def shop?
       false
     end
 
+    def broker?
+      return false
+    end
+     
     def employee_notice?
       false
     end

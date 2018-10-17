@@ -11,14 +11,36 @@ describe Subscribers::LocalResidency do
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "residency_verification_payloads", "response.xml")) }
     let(:xml_hash) { {residency_verification_response: 'ADDRESS_NOT_IN_AREA'} }
     let(:xml_hash2) { {residency_verification_response: 'ADDRESS_IN_AREA'} }
-    let(:person) { person = FactoryGirl.build(:person);
-    consumer_role = person.build_consumer_role;
-    consumer_role = FactoryGirl.build(:consumer_role);
-    person.consumer_role = consumer_role;
-    person
-    }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+    let(:history_elements_DC) {consumer_role.verification_types.by_name("DC Residency").first.type_history_elements}
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
+
+    context "stores Local Hub response in verification history" do
+      it "stores verification history element" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements_DC.count).to be > 0
+      end
+
+      it "stores verification history element for right verification type" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements_DC.first.action).to eq "Local Hub Response"
+      end
+
+      it "stores reference to EventResponse in verification history element" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(BSON::ObjectId.from_string(
+            history_elements_DC.first.event_response_record_id
+        )).to eq consumer_role.local_residency_responses.first.id
+      end
+    end
 
     context "ADDRESS_NOT_IN_AREA" do
       it "should deny local residency" do

@@ -178,6 +178,7 @@ class Family
                                                       )
                                                     }
 
+  scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
@@ -199,7 +200,7 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -233,14 +234,18 @@ class Family
   end
 
   def currently_enrolled_plans(enrollment)
-    enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
 
     if enrollment.is_shop?
       bg_ids = enrollment.benefit_group.plan_year.benefit_groups.map(&:id)
-      enrolled_plans = enrolled_plans.where(:benefit_group_id.in => bg_ids)
+      enrolled_enrollments = enrolled_enrollments.where(:benefit_group_id.in => bg_ids)
     end
 
-    enrolled_plans.collect(&:plan_id)
+    enrolled_enrollments.map(&:plan)
+  end
+
+  def currently_enrolled_plans_ids(enrollment)
+    currently_enrolled_plans(enrollment).collect(&:id)
   end
 
   def enrollments
@@ -634,9 +639,19 @@ class Family
   # @example Which family members are non-primary applicants?
   #   model.dependents
   #
-  # @return [ Array<FamilyMember> ] the list of dependents
+  # @return [ Array<FamilyMember> ] the list of dependents are active and inactive
   def dependents
     family_members.reject(&:is_primary_applicant)
+  end
+
+  # Get list of family members who are not the primary applicant
+  #
+  # @example Which family members are non-primary applicants?
+  #   model.dependents
+  #
+  # @return [ Array<FamilyMember> ] the list of dependents are active
+  def active_dependents
+    family_members.reject(&:is_primary_applicant).find_all { |family_member| family_member.is_active? }
   end
 
   def people_relationship_map
@@ -845,13 +860,19 @@ class Family
     person = family_member.person
     return if person.consumer_role.present?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    person.individual_market_transitions << transition
     person.save!
   end
 
   def check_for_consumer_role
-    if primary_applicant.person.consumer_role.present?
+    if primary_applicant.person.is_consumer_role_active?
       active_family_members.each do |family_member|
-        build_consumer_role(family_member)
+        build_consumer_role(family_member) if family_member.person.is_consumer_role_active?
       end
     end
   end
@@ -860,13 +881,19 @@ class Family
     person = family_member.person
     return if person.resident_role.present?
     person.build_resident_role({:is_applicant => false}.merge(opts))
+    transition = IndividualMarketTransition.new
+    transition.role_type = "resident"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_resident_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    person.individual_market_transitions << transition
     person.save!
   end
 
   def check_for_resident_role
-    if primary_applicant.person.resident_role.present?
+    if primary_applicant.person.is_resident_role_active?
       active_family_members.each do |family_member|
-        build_resident_role(family_member)
+        build_resident_role(family_member) if family_member.person.is_resident_role_active?
       end
     end
   end
@@ -972,8 +999,8 @@ class Family
   def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
-      family_member.person.verification_types.each do |v_type|
-        due_dates << document_due_date(family_member, v_type)
+      family_member.person.verification_types.active.each do |v_type|
+        due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
     due_dates.compact!
@@ -986,7 +1013,8 @@ class Family
 
   def contingent_enrolled_active_family_members
     enrolled_family_members = []
-    family_members.active.each do |family_member|
+    family_members = active_family_members.collect { |member| member if member.person.is_consumer_role_active? }.compact
+    family_members.each do |family_member|
       if enrolled_policy(family_member).present?
         enrolled_family_members << family_member
       end
@@ -994,10 +1022,8 @@ class Family
     enrolled_family_members
   end
 
-  def document_due_date(family_member, v_type)
-    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
-    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    sv.present? ? sv.due_date : nil
+  def document_due_date(v_type)
+    (["verified", "attested", "valid"].include? v_type.validation_status) ? nil : v_type.due_date
   end
 
   def enrolled_policy(family_member)
@@ -1026,37 +1052,31 @@ class Family
   end
 
   def all_persons_vlp_documents_status
-    documents_list = []
-    document_status_outstanding = []
+    outstanding_types = []
     self.active_family_members.each do |member|
-      member.person.verification_types.each do |type|
-      if member.person.consumer_role && is_document_not_verified(type, member.person)
-        documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding")
-        document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
-      end
-      end
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
     end
-    case
-    when documents_list.include?(true) && documents_list.include?(false)
-      return "Partially Uploaded"
-    when documents_list.include?(true) && !documents_list.include?(false)
-      if document_status_outstanding.include?("outstanding")
-        return "Partially Uploaded"
-      else
-        return "Fully Uploaded"
-      end
-    when !documents_list.include?(true) && documents_list.include?(false)
-      return "None"
+    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
+    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
+    if fully_uploaded
+      "Fully Uploaded"
+    elsif partially_uploaded
+      "Partially Uploaded"
+    else
+      "None"
     end
+  end
+
+  def has_active_consumer_family_members
+    self.active_family_members.select { |member| member if member.person.consumer_role.present?}
+  end
+
+  def has_active_resident_family_members
+    self.active_family_members.select { |member| member if member.person.is_resident_role_active? }
   end
 
   def update_family_document_status!
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
-  end
-
-  def is_document_not_verified(type, person)
-    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
-    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
   end
 
   def has_valid_e_case_id?
