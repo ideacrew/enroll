@@ -13,12 +13,12 @@ module Services
         @hbx_enrollment = hbx_enrollment
         @census_employee = @hbx_enrollment.employee_role.census_employee
         @is_congress = is_congress
-        is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
+        @url = is_congress ? CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : BASE_URL+"/shop/dc/api/"
       end
 
       def generate_url
         return @url if is_congress
-        return Settings.checkbook_services.congress_url if Rails.env.test?
+        return (Settings.checkbook_services.congress_url+"#{@hbx_enrollment.coverage_year}/") if Rails.env.test?
         begin
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
