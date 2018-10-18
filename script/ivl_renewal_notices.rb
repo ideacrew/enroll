@@ -55,13 +55,12 @@ def set_due_date_on_verification_types(family)
   family.family_members.each do |family_member|
     begin
       person = family_member.person
-      person.verification_types.each do |v_type|
+      person.consumer_role.verification_types.each do |v_type|
         next if !(v_type.type_unverified?)
-        person.consumer_role.special_verifications << SpecialVerification.new(due_date: future_date,
-                                                                              verification_type: v_type,
-                                                                              updated_by: nil,
-                                                                              type: "notice")
-        person.consumer_role.save!
+        v_type.update_attributes(due_date: future_date,
+                                 updated_by: nil,
+                                 due_date_type:  "notice" )
+        person.save!
       end
     rescue Exception => e
       puts "Exception in family ID #{primary_person.primary_family.id}: #{e}"
@@ -89,7 +88,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
+      primary_member = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       next if primary_member.nil?
       # next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
