@@ -270,6 +270,7 @@ Rails.application.routes.draw do
     # Redirect from Enroll old model to Enroll new model
     match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
     match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
+    match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
     match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
 
     post 'search', to: 'employers#search'
@@ -370,7 +371,7 @@ Rails.application.routes.draw do
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
 
-  match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get, :post]
+  match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
