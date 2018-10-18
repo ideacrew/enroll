@@ -28,7 +28,6 @@ module Services
             @result = HTTParty.post(@url,
                   :body => construct_body.to_json,
                   :headers => { 'Content-Type' => 'application/json' } )
-
             uri = @result.parsed_response["URL"]
             if uri.present?
               return uri
@@ -63,13 +62,12 @@ module Services
         {
         "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
         "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": @hbx_enrollment.effective_on.strftime('%Y'),
+        "enrollment_year": 2019,
         "family": consumer_build_family,
         "aptc": aptc_value,
         "csr": csr_value,
         "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
-
-        }s
+         }
       end
 
       def employer_effective_date
@@ -95,17 +93,22 @@ module Services
       end
 
       def csr_value
-        @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year).latest_eligibility_determination.csr_percent_as_integer.to_s rescue 00
+        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+        if active_house_hold.nil?
+          return "-01"
+        else 
+          active_house_hold.latest_eligibility_determination.csr_percent_as_integer
+        end
       end
 
       def aptc_value
-        @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year).latest_eligibility_determination.max_aptc.to_s rescue 00
+        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+        if active_house_hold.nil?
+          return "000"
+        else 
+          active_house_hold.latest_eligibility_determination.max_aptc
+        end
       end
-
-      def tribal_option
-        @hbx_enrollment.consumer_role.person.tribal_id.present?
-      end
-
 
       def filter_option
         case @hbx_enrollment.benefit_group.plan_option_kind
@@ -133,14 +136,14 @@ module Services
       end
 
       def consumer_build_family
-        family=[]
-        year = TimeKeeper.date_of_record.year
-          @hbx_enrollment.hbx_enrollment_members.each do |member|
-            dob_year= member.family_member.person.dob.strftime("%Y").to_i
-            age = year - dob_year
-            family << {"age": age,"pregnant": false, "AIAN": tribal_option}
-          end
-          family
+        family = []
+        today = TimeKeeper.date_of_record
+        tribal_id = @hbx_enrollment.consumer_role.person.tribal_id.present?
+        @hbx_enrollment.hbx_enrollment_members.each do |member|
+          age = member.family_member.person.age_on(today)
+          family << {"age": age, "pregnant": false, "AIAN": tribal_id}
+        end
+        family
       end
 
 
