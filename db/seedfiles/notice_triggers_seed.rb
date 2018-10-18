@@ -1296,7 +1296,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP_D076',
+    hbx_id: 'DRE076',
     title: 'Employee Enrollment Confirmation',
     description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
     resource_name: 'employee_role',
@@ -1439,28 +1439,6 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
         notice_builder: 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
         mpi_indicator: 'SHOP_D074',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-
-  {
-    hbx_id: 'SHOPDRE076',
-    title: 'Employee Enrollment Confirmation',
-    description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
-    resource_name: 'employee_role',
-    event_name: 'renewal_employee_enrollment_confirmation',
-    notice_triggers: [
-      {
-        name: 'Notify Employees Enrollment confirmation',
-        notice_template: 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
-        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
-        mpi_indicator: 'MPI_SHOPDRE076',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

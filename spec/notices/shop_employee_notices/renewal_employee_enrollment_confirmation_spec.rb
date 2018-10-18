@@ -32,14 +32,16 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
     :template => application_event.notice_template
   } }
 
+  before do
+    @employee_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
+    allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+    allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
+  end
+
   describe "New" do
-    before do
-      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-    end
     context "valid params" do
       it "should initialze" do
-        expect { ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params) }.not_to raise_error
+        expect { @employee_notice }.not_to raise_error
       end
     end
 
@@ -54,28 +56,22 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
   end
 
   describe "Build" do
-    before do
-      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-    end
-
     it "should build notice with all necessory info" do
-      @employer_notice.build
-      expect(@employer_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      @employee_notice.build
+      expect(@employee_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
+      expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
     end
   end
 
   describe "append data" do
     before do
-      @employee_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-      allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
-    end
-    it "should append data" do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
       @employee_notice.build
+    end
+
+    it "should append data" do
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
       expect(@employee_notice.notice.enrollment.employee_cost).to eq("0.0")
       expect(@employee_notice.notice.enrollment.effective_on).to eq hbx_enrollment.effective_on
@@ -84,8 +80,6 @@ RSpec.describe ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation do
 
   describe "render template and generate pdf" do
     before do
-      @employee_notice = ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation.new(census_employee, valid_params)
-      allow(census_employee).to receive(:renewal_benefit_group_assignment).and_return benefit_group_assignment
       @employee_notice.build
       @employee_notice.append_data
       @employee_notice.generate_pdf_notice

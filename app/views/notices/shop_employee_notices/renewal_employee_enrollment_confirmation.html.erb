@@ -22,11 +22,21 @@
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Congratulations! Your employer has completed its open enrollment period and has successfully met all eligibility requirements." }%>
 
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Your plan selection <strong>#{notice.plan.plan_name}<strong> will go into effect on <strong>#{notice.enrollment.effective_on}</strong>." }%>
+<% if notice.enrollment.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { 
+    content: "Your plan selection <strong>#{notice.plan.plan_name}</strong> will go into effect on <strong>#{notice.enrollment.effective_on}</strong>."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium." }%>
+  <%= render partial: 'notices/shared/paragraph', :locals => { 
+    content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium."} %>
+<% end %>
+
+<% if notice.dental_enrollment.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { 
+    content: "Your plan selection <strong>#{notice.dental_plan.plan_name}</strong> will go into effect on <strong>#{notice.dental_enrollment.effective_on}</strong>."} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => { 
+    content: "Please note that your monthly premium contribution will be <strong>#{number_to_currency(notice.dental_enrollment.employee_cost, precision: 2)}</strong>. Your employer, <strong>#{notice.employer_name}</strong>, will contribute <strong>#{number_to_currency(notice.dental_enrollment.employer_contribution, precision: 2)}</strong> towards your monthly premium."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals =>
   { content: "Thank you for enrolling into employer-sponsored coverage through #{Settings.site.short_name}", top_margin: '10px', bottom_margin: '10px' }%>
