@@ -140,7 +140,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
   def benefit_application_for_force_submission
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
     benefit_sponsorship = get_benefit_sponsorship
-    application = benefit_sponsorship.benefit_applications.effective_date_begin_on(effective_date)
+    application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => effective_date)
     raise "Found #{application.count} benefit applications with that start date" if application.count != 1
     application.first
   end
