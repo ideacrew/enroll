@@ -1602,6 +1602,16 @@ class HbxEnrollment
         if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
           ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s)
         end
+      end
+    end
+  end
+
+  def ee_select_plan_during_oe
+    if self.census_employee.present?
+      begin
+        if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
+          ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s, :acapi_trigger =>  true)
+        end
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employee plan selection during OE notice to #{self.census_employee.id.to_s} due to #{e.backtrace}" }
       end
