@@ -38,7 +38,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
-    renewal_enrollment.kind = "individual"
+    renewal_enrollment.kind = @enrollment.kind
     renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
