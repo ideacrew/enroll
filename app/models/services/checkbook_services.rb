@@ -4,9 +4,9 @@ module Services
   module CheckbookServices
     class PlanComparision
 
-      attr_accessor :hbx_enrollment,:is_congress
+      attr_accessor :hbx_enrollment, :is_congress
 
-      BASE_URL =   Rails.application.config.checkbook_services_base_url
+      BASE_URL = Rails.application.config.checkbook_services_base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
 
       def initialize(hbx_enrollment, is_congress=false)
@@ -25,48 +25,51 @@ module Services
         return @url if is_congress
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
-            @result = HTTParty.post(@url,
-                  :body => construct_body.to_json,
-                  :headers => { 'Content-Type' => 'application/json' } )
-            uri = @result.parsed_response["URL"]
-            if uri.present?
-              return uri
-            else
-              raise "Unable to generate url"
-            end
+
+          @result = HTTParty.post(@url,
+                :body => construct_body.to_json,
+                :headers => { 'Content-Type' => 'application/json' } )
+
+          uri = @result.parsed_response["URL"]
+          if uri.present?
+            return uri
+          else
+            raise "Unable to generate url"
+          end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
         end
       end
 
       private
+
       def construct_body_shop
-      {
-        "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
-        "reference_id": Settings.checkbook_services.reference_id,
-        "employer_effective_date": employer_effective_date,
-        "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
-        "employer": {
-          "state": 11,
-          "county": 001
-        },
-        "family": build_family,
-        "contribution": employer_contributions,
-        "reference_plan": reference_plan.hios_id,
-        "filterOption": filter_option,
-        "filterValue": filter_value
-      }
+        {
+          "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
+          "reference_id": Settings.checkbook_services.reference_id,
+          "employer_effective_date": employer_effective_date,
+          "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
+          "employer": {
+            "state": 11,
+            "county": 001
+          },
+          "family": build_family,
+          "contribution": employer_contributions,
+          "reference_plan": reference_plan.hios_id,
+          "filterOption": filter_option,
+          "filterValue": filter_value
+        }
       end
 
       def construct_body_ivl
         {
-        "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
-        "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
-        "enrollment_year": 2019,
-        "family": consumer_build_family,
-        "aptc": aptc_value,
-        "csr": csr_value,
-        "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+          "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
+          "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
+          "enrollment_year": 2019,
+          "family": consumer_build_family,
+          "aptc": aptc_value,
+          "csr": csr_value,
+          "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
       end
 
@@ -145,7 +148,6 @@ module Services
         end
         family
       end
-
 
       def build_family
         family = []
