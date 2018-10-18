@@ -1,5 +1,8 @@
 require 'rails_helper'
 
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryGirl.create(:user, person: person) }
@@ -591,7 +594,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 
-  describe "GET check_qle_date" do
+  describe "GET check_qle_date", dbclean: :after_each do
 
     before(:each) do
       sign_in(user)
@@ -653,15 +656,17 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "GET check_qle_date", dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+
       let!(:user) { FactoryGirl.create(:user) }
       let!(:person1) { FactoryGirl.create(:person) }
       let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
-      let!(:employer_profile){ FactoryGirl.create(:employer_profile)}
-      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, :aasm_state => 'enrolling') }
-      let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-      let!(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-      let!(:employee_role) {FactoryGirl.create(:employee_role, person: person1, employer_profile: employer_profile)}
-      let!(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment1]) }
+
+      let(:employee_role) {FactoryGirl.create(:employee_role, person: person1, employer_profile: abc_profile)}
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
 
       before :each do
         allow(user).to receive(:person).and_return person1
@@ -714,13 +719,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_sep_denial"
-            expect(payload[:event_object_kind]).to eq 'PlanYear'
-            expect(payload[:event_object_id]).to eq plan_year.id.to_s
+            expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+            expect(payload[:event_object_id]).to eq initial_application.id.to_s
             expect(payload[:notice_params][:qle_title]).to eq qle.title
             expect(payload[:notice_params][:qle_reporting_deadline]).to eq date
             expect(payload[:notice_params][:qle_event_on]).to eq date
           end
-          subject.deliver(recipient: employee_role, event_object: plan_year, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
+          subject.deliver(recipient: employee_role, event_object: initial_application, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
         end
 
         it "should have effective_on_options" do
