@@ -87,8 +87,10 @@ class FixOrganization< MongoidMigrationTask
         if broker_agency_account.present?
           hired_on = broker_agency_account.start_on
           broker_agency_account.update_attributes!(:is_active => false)
-          new_broker_agency_account = organization.active_benefit_sponsorship.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: writing_agent.id, start_on: hired_on)
-          new_broker_agency_account.save
+          employer_profile = BenefitSponsors::Organizations::Profile.find(organization.employer_profile.id)
+          employer_profile.broker_role_id = writing_agent.id
+          employer_profile.hire_broker_agency(broker_agency_profile, hired_on)
+          employer_profile.save!
           puts "broker_agency_profile and writing_agent updated for broker_agency_account" unless Rails.env.test?
         else
           puts "No broker_agency_account found for organization fein:#{fein}" unless Rails.env.test?
