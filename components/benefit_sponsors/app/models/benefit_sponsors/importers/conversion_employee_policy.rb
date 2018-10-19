@@ -8,11 +8,19 @@ module BenefitSponsors
         return nil unless census_employee
 
         found_employer = find_employer
-        benefit_application = find_employer.active_benefit_application
+        benefit_application = current_benefit_application(found_employer)
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
           @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+        end
+      end
+
+      def current_benefit_application(employer)
+        if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+          employer.benefit_applications.where(:aasm_state => :imported).first
+        else
+          employer.benefit_applications.where(:aasm_state => :active).first
         end
       end
 
@@ -46,7 +54,7 @@ module BenefitSponsors
 
       def find_sponsor_benefit
         employer = find_employer
-        benefit_application = employer.active_benefit_application
+        benefit_application = current_benefit_application(employer)
         benefit_package = benefit_application.benefit_packages.first
         sponsor_benefit = benefit_package.sponsored_benefits.first
       end

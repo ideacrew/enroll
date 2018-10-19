@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe PricingCalculators::CcaShopListBillPricingCalculator do
+  RSpec.describe PricingCalculators::CcaShopListBillPricingCalculator, :dbclean => :after_each do
     let(:employee_dob) { Date.new(1990, 6, 1) }
     let(:employee_member_id) { "some_employee_id" }
     let(:roster_entry) do

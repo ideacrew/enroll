@@ -97,7 +97,7 @@ module BenefitSponsors
 
         it "should renew benefit package" do
           expect(renewal_benefit_package).to be_present
-          expect(renewal_benefit_package.title).to eq current_benefit_package.title
+          expect(renewal_benefit_package.title).to match(current_benefit_package.title)
           expect(renewal_benefit_package.description).to eq current_benefit_package.description
           expect(renewal_benefit_package.probation_period_kind).to eq current_benefit_package.probation_period_kind
           expect(renewal_benefit_package.is_default).to eq  current_benefit_package.is_default
@@ -156,7 +156,7 @@ module BenefitSponsors
 
 
       context "when renewal product missing" do 
-        let(:hbx_enrollment) { double(product: product_package.products[2]) }
+        let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false ) }
 
         it 'should return false' do
           expect(renewal_benefit_package.is_renewal_benefit_available?(hbx_enrollment)).to be_falsey
@@ -165,7 +165,7 @@ module BenefitSponsors
 
       context "when renewal product offered by employer" do
 
-        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health) }
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer
           ) 
@@ -184,7 +184,7 @@ module BenefitSponsors
       context "when renewal product not offered by employer" do
         let(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
 
-        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health) }
+        let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer
           ) 

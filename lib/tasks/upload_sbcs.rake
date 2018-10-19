@@ -26,6 +26,7 @@ namespace :sbc do
         counter += 1
       end
     end
+
     puts "Total #{counter} plans exported"
     puts "CSV written #{file_path} with schema plan.name, plan.hios_id, plan.active_year, plan.sbc_document.identifier key, plan.sbc_document.title"
   end

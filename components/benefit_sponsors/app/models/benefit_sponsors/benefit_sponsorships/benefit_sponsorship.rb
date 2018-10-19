@@ -375,7 +375,11 @@ module BenefitSponsors
 
     def submitted_benefit_application
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application
+      published_benefit_application || imported_benefit_application
+    end
+
+    def imported_benefit_application
+      benefit_applications.order_by(:"updated_at".desc).imported.first if is_conversion?
     end
 
     def benefit_applications_by(ids)
@@ -414,7 +418,7 @@ module BenefitSponsors
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order_by(:"updated_at".desc).non_imported.first
+      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck

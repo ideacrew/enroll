@@ -38,7 +38,8 @@ module Importers
                   :broker_name,
                   :contact_first_name,
                   :contact_last_name,
-                  :registered_on
+                  :registered_on,
+                  :mid_year_conversion
 
     include Validations::Email
 

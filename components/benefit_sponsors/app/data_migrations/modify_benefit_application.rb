@@ -18,6 +18,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
       update_effective_period_and_approve(benefit_applications_for_aasm_state_update)
     when "extend_open_enrollment"
       extend_open_enrollment
+    when "force_submit_application"
+      force_submit_application(benefit_application_for_force_submission)
     end
   end
 
@@ -91,6 +93,16 @@ class ModifyBenefitApplication< MongoidMigrationTask
         end
       end
       benefit_application.approve_application!
+      if benefit_application.is_renewing?
+        bs_from_state = benefit_sponsorship.aasm_state
+         if (bs_from_state != "active")
+        benefit_sponsorship.update_attributes!(aasm_state: "active")
+        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: bs_from_state,
+            to_state: "active"
+        )
+         end
+      end
     else
       raise "No benefit application found."
     end
@@ -112,13 +124,25 @@ class ModifyBenefitApplication< MongoidMigrationTask
     service.cancel
   end
 
+  def force_submit_application(benefit_application)
+    service = initialize_service(benefit_application)
+    service.force_submit_application
+  end
+
   def benefit_applications_for_aasm_state_update
     benefit_sponsorship = get_benefit_sponsorship
     benefit_sponsorship.benefit_applications
   end
 
   def benefit_applications_for_reinstate
+  end
 
+  def benefit_application_for_force_submission
+    effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
+    benefit_sponsorship = get_benefit_sponsorship
+    application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => effective_date)
+    raise "Found #{application.count} benefit applications with that start date" if application.count != 1
+    application.first
   end
 
   def benefit_applications_for_terminate
