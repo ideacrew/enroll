@@ -860,9 +860,8 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster, :renewal_employer_ineligibility_notice_to_employee]
-
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
 
@@ -1044,6 +1043,30 @@ class PlanYear
     end
   end
 
+  def send_employee_renewal_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_renewal_employee!(ce)
+      end
+    end
+  end
+
+  def send_employee_initial_enrollment_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_initial_employee!(ce)
+      end
+    end
+  end
+
+  def send_active_employee_invites
+    benefit_groups.each do |bg|
+      bg.census_employees.non_terminated.each do |ce|
+        Invitation.invite_employee!(ce)
+      end
+    end
+  end
+
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
@@ -1207,6 +1230,19 @@ class PlanYear
     self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
   end
 
+  def renewal_employee_enrollment_confirmation
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation", "acapi_trigger" => true)
+        end
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver renewal_employee_enrollment_confirmation to census_employee - #{ce.id} notice due to '#{e}' " }
+      end
+    end
+  end
+
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     begin
@@ -1243,30 +1279,6 @@ class PlanYear
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def send_employee_renewal_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_renewal_employee!(ce)
-      end
-    end
-  end
-
-  def send_employee_initial_enrollment_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_initial_employee!(ce)
-      end
-    end
-  end
-
-  def send_active_employee_invites
-    benefit_groups.each do |bg|
-      bg.census_employees.non_terminated.each do |ce|
-        Invitation.invite_employee!(ce)
-      end
-    end
   end
 
   def send_employee_invites
