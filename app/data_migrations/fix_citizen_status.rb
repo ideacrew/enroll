@@ -21,7 +21,7 @@ class FixCitizenStatus < MongoidMigrationTask
 
   def update_citizen_status_not_lawfully_present(person)
     old_status = person.citizen_status
-    if person.verification_types.include? 'Immigration status'
+    if person.verification_types.active.map(&:type_name).include? 'Immigration status'
       lpd(person).update_attributes!(:citizen_status => "alien_lawfully_present")
       puts "Person HBX_ID: #{person.hbx_id} citizen status was changed from #{old_status} to ==> #{person.citizen_status}" unless Rails.env.test?
     end
