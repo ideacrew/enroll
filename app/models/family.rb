@@ -88,6 +88,20 @@ class Family
          },
          {name: "kind_and_state_and_created_and_terminated"})
 
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1})
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.terminated_on" => 1
+       },
+       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.effective_on" => 1
+       },
+       {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
+
   index({"households.hbx_enrollments._id" => 1})
   index({"households.hbx_enrollments.kind" => 1,
          "households.hbx_enrollments.aasm_state" => 1,
