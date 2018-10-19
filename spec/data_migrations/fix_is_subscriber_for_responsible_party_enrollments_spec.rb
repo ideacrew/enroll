@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pry'
 
 require File.join(Rails.root, "app", "data_migrations", "fix_is_subscriber_for_responsible_party_enrollments")
 
