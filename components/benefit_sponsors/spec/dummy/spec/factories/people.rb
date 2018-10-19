@@ -16,6 +16,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_family do
+      after :create do |person|
+        family = FactoryGirl.create :family, :with_primary_family_member, person: person
+      end
+    end
+
     trait :with_work_phone do
       phones { [FactoryGirl.build(:phone, kind: "work") ] }
     end

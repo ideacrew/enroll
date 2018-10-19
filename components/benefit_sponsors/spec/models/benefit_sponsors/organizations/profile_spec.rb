@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Organizations::Profile, type: :model do
+  RSpec.describe Organizations::Profile, type: :model, :dbclean => :after_each do
 
     let(:hbx_id)            { "56789" }
     let(:legal_name)        { "Tyrell Corporation" }

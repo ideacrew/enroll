@@ -60,15 +60,12 @@ module Importers
       @found_employee = non_terminated_employees.sort_by(&:hired_on).last
     end
 
-    def find_plan 
-      return @plan unless @plan.nil?
-      return nil if hios_id.blank?
-      clean_hios = hios_id.strip
-      corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-      @plan = Plan.where({
-        active_year: plan_year.to_i,
-        hios_id: corrected_hios_id
-      }).first
+    def current_benefit_application(employer)
+      if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+        employer.benefit_applications.where(:aasm_state => :imported).first
+      else
+        employer.benefit_applications.where(:aasm_state => :active).first
+      end
     end
 
     def find_employer
@@ -163,7 +160,8 @@ module Importers
       end
 
       plan = find_plan
-      rating_area_id = employer.active_benefit_application.recorded_rating_area_id
+      benefit_application = current_benefit_application(employer)
+      rating_area_id = benefit_application.recorded_rating_area_id
       bga = find_benefit_group_assignment
 
       # add when benefit_group_assignments not added to employees

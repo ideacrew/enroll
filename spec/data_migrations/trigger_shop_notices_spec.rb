@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "trigger_shop_notices")
 
-describe TriggerShopNotices do
+describe TriggerShopNotices, dbclean: :after_each do
 
   let(:given_task_name) { "trigger_shop_notices" }
   subject { TriggerShopNotices.new(given_task_name, double(:current_scope => nil)) }

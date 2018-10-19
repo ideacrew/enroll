@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Members::MemberGroup, type: :model do
+  RSpec.describe Members::MemberGroup, type: :model, :dbclean => :after_each do
 
     context "A new MemberGroup instance" do
       let(:member_group)  { described_class.new }

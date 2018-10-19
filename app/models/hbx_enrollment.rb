@@ -206,7 +206,6 @@ class HbxEnrollment
                                                           :"effective_on".lte => effective_period.max
                                                         )}
 
-
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship,
@@ -1466,7 +1465,6 @@ class HbxEnrollment
     event :force_select_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
-
   end
 
   def termination_attributes_cleared?

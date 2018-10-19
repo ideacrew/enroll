@@ -138,7 +138,7 @@ module BenefitSponsors
 
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state => :enrollment_open }}
+        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :"aasm_state".in => [:enrollment_open, :enrollment_extended] }}
       )
     }
 
@@ -375,7 +375,11 @@ module BenefitSponsors
 
     def submitted_benefit_application
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application
+      published_benefit_application || imported_benefit_application
+    end
+
+    def imported_benefit_application
+      benefit_applications.order_by(:"updated_at".desc).imported.first if is_conversion?
     end
 
     def benefit_applications_by(ids)
@@ -414,7 +418,7 @@ module BenefitSponsors
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order_by(:"updated_at".desc).non_imported.first
+      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck
@@ -595,7 +599,33 @@ module BenefitSponsors
         end
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
+      when :enrollment_extended
+        extend_open_enrollment(aasm)
       end
+    end
+
+    def extend_open_enrollment(aasm)
+      if aasm.from_state == :enrollment_ineligible
+        if initial_enrollment_ineligible?
+          update_state_without_event(:initial_enrollment_open)
+        end
+      else
+        transition = workflow_state_transitions[0]
+
+        if transition.from_state == 'initial_enrollment_ineligible' && transition.to_state == 'applicant'
+          update_state_without_event(:initial_enrollment_open)
+        end
+
+        if transition.from_state == 'active' && transition.to_state == 'applicant'
+          update_state_without_event(:active)
+        end
+      end
+    end
+
+    def update_state_without_event(new_state)
+      old_state = self.aasm_state
+      self.update(aasm_state: new_state)
+      self.workflow_state_transitions.create(from_state: old_state, to_state: new_state)
     end
 
     def is_conversion?
