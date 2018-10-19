@@ -509,7 +509,6 @@ RSpec.describe TaxHousehold, type: :model do
           end
         end
       end
->>>>>>> origin/App-Dev-User-Story#23578
     end
   end
 end
