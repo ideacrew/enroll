@@ -41,7 +41,7 @@ module Services
         end
       end
 
-      private
+      # private
 
       def construct_body_shop
         {

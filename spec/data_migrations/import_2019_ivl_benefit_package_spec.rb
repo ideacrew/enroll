@@ -13,6 +13,7 @@ describe Import2019IvlBenefitPackage, :dbclean => :after_each do
 
   describe "create 2019 benefit package for IVL market" do
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let!(:plan) {FactoryGirl.create(:plan, active_year: 2019, hios_id: "94506DC0390006-01")}
     let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
     let!(:bcp) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
 

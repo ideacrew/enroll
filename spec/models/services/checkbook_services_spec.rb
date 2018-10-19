@@ -93,7 +93,7 @@ describe Services::CheckbookServices::PlanComparision do
     it "should generate congressional url" do
      if plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
-       expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/2018/")
+       expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/")
       end
     end
   end
