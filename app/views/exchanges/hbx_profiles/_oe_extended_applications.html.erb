@@ -17,7 +17,7 @@
 
 <div class="container" id="extendable_applications_table">
   <div class = "table-responsive table-override">
-  <h4 class="text-center heading-text"> Extend Open Enrollment </h4>
+  <h4 class="text-center heading-text"> Close Open Enrollment </h4>
 
   <table class = "table" style="table-layout: fixed;">
     <thead>
@@ -39,7 +39,7 @@
           <td><%= TimeKeeper.local_time(application.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td><%= TimeKeeper.local_time(application.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to 'Edit Open Enrollment', main_app.edit_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            <%= link_to 'Close Open Enrollment', main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
         </tr>
         <% end %>

@@ -12,6 +12,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -22,22 +23,30 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def oe_extendable_applications
-    @benefit_sponsorship   = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:id]).first
     @benefit_applications  = @benefit_sponsorship.benefit_applications.select{|application| application.may_extend_open_enrollment?}
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  def oe_extended_applications
+    @benefit_applications  = @benefit_sponsorship.benefit_applications.select{|application| application.enrollment_extended?}
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
   def edit_open_enrollment
-    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:sponsorship_id]).first
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
   end
 
   def extend_open_enrollment
-    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id" => params[:benefit_sponsorship_id]).first
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
     open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
     ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).extend_open_enrollment(open_enrollment_end_date)
-    redirect_to exchanges_hbx_profiles_root_path
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Extended Open enrollment successfully." }
+  end
+
+  def close_extended_open_enrollment
+    @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
+    ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Closed Open Enrollment successfully." }
   end
 
   def binder_paid
@@ -675,5 +684,10 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def find_benefit_sponsorship
+    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id] || params[:id])
+    raise "Unable to find benefit sponsorship" if @benefit_sponsorship.blank?
   end
 end
