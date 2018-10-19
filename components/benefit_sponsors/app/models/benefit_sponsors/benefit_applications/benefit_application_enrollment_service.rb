@@ -111,9 +111,9 @@ module BenefitSponsors
       end
     end
 
-    def end_open_enrollment
+    def end_open_enrollment(end_date = nil)
       if benefit_application.may_end_open_enrollment?
-        benefit_application.update(open_enrollment_period: benefit_application.open_enrollment_period.min..TimeKeeper.date_of_record)
+        benefit_application.update(open_enrollment_period: benefit_application.open_enrollment_period.min..end_date) if end_date.present?
         benefit_application.end_open_enrollment!
 
         if business_policy_satisfied_for?(:end_open_enrollment)

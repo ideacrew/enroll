@@ -45,7 +45,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def close_extended_open_enrollment
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
-    ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment
+    ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment(TimeKeeper.date_of_record)
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Closed Open Enrollment successfully." }
   end
 
