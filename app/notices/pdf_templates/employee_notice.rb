@@ -17,6 +17,7 @@ module PdfTemplates
     attribute :enrollment, PdfTemplates::Enrollment
     attribute :dental_enrollment, PdfTemplates::Enrollment
     attribute :email, String
+    attribute :primary_email, String
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
 
