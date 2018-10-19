@@ -1,18 +1,17 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UnsetBenefitGroupAssignment < MongoidMigrationTask
-
   def migrate
-    census_employee = CensusEmployee.where(id:ENV['ce_id']).first
-    if census_employee.present?
-      bga = census_employee.benefit_group_assignments.last
-      if bga.present?
-        bga.update_attributes(is_active: 'false')
+    begin
+      census_employee = CensusEmployee.where(id:ENV['ce_id']).first
+      if census_employee.nil?
+        puts "No census employee was found with given id"
       else
-        "No Benefit Group Assignment found for census employee" unless Rails.env.test?
+        benefit_group_assignment = census_employee.benefit_group_assignments.where(id:ENV['bga_id']).first
+        benefit_group_assignment.update_attributes(is_active: 'false')
       end
-    else
-      puts " No Census Employee Found." unless Rails.env.test?
+    rescue => e
+      e.message
     end
   end
 end
