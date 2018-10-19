@@ -87,6 +87,20 @@ class Family
          },
          {name: "kind_and_state_and_created_and_terminated"})
 
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1})
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.terminated_on" => 1
+       },
+       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.effective_on" => 1
+       },
+       {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
+
   index({"households.hbx_enrollments._id" => 1})
   index({"households.hbx_enrollments.kind" => 1,
          "households.hbx_enrollments.aasm_state" => 1,
@@ -197,6 +211,7 @@ class Family
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,              ->{ by_enrollment_individual_market.all_enrollments.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true, :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
