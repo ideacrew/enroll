@@ -207,6 +207,33 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
     end
 
+    context "Should force publish the benefit application", dbclean: :after_each do
+      let(:effective_date) { start_on }
+      
+      before do
+        allow(ENV).to receive(:[]).with("action").and_return("force_submit_application")
+        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+      end
+
+      it "should update the benefit application and transition the benefit sponsorship" do
+        benefit_application.update_attributes!(aasm_state: "draft")
+        expect(benefit_application.effective_period.min.to_date).to eq effective_date
+        subject.migrate
+        benefit_application.reload
+        benefit_sponsorship.reload
+        expect(benefit_application.effective_period.min.to_date).to eq effective_date
+        expect(benefit_application.aasm_state).to eq :enrollment_open
+        expect(benefit_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+      end
+
+      it "should not update the benefit application" do
+        benefit_sponsorship.benefit_applications.delete_all
+        expect { subject.migrate }.to raise_error(RuntimeError)
+        expect { subject.migrate }.to raise_error("Found 0 benefit applications with that start date")
+      end
+    end
+
+
     context "Should update effective period and approve renewing benefit application", dbclean: :after_each do
       let(:effective_date) {start_on.next_month.beginning_of_month}
       let(:new_start_date) { (start_on + 2.months).beginning_of_month}
