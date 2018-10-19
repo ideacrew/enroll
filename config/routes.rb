@@ -269,8 +269,8 @@ Rails.application.routes.draw do
 
     # Redirect from Enroll old model to Enroll new model
     match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
-    match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
-    match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
+    #match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
+    #match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
     match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
 
     post 'search', to: 'employers#search'
@@ -309,6 +309,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
 
       member do
+        #match '/:id/*path' , to: redirect('/'), via: [:get, :post]
         get "download_invoice"
         get 'new_document'
         post 'download_documents'

@@ -1,6 +1,8 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
 
+  before_action :redirect_new_model
+
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
 
@@ -13,6 +15,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
+
+  def redirect_new_model
+    redirect_to root_path
+  end
 
   def link_from_quote
     claim_code = params[:claim_code].upcase
