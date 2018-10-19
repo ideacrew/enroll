@@ -27,7 +27,7 @@ class Permission
   field :can_access_accept_reject_identity_documents, type: Boolean, default: false
   field :can_access_accept_reject_paper_application_documents, type: Boolean, default: false
   field :can_delete_identity_application_documents, type: Boolean, default: false
-
+  field :can_transition_family_members, type: Boolean, default: false
 
   class << self
     def hbx_staff
