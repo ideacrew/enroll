@@ -17,7 +17,7 @@ describe FixSpecialEnrollmentPeriod do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("sep_id").and_return(sep.id)
-      allow(ENV).to receive(:[]).with("attrs").and_return({market_kind: "ivl"})
+      allow(ENV).to receive(:[]).with("attrs").and_return("{market_kind: 'ivl'}")
       subject.migrate
       sep.reload
     end
