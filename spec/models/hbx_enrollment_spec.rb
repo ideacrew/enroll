@@ -1033,12 +1033,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       end
     end
-
-
   end
 
   describe HbxEnrollment, dbclean: :after_each do
-
     let(:employer_profile) {FactoryGirl.create(:employer_profile)}
 
     let(:calendar_year) {TimeKeeper.date_of_record.year}
@@ -1091,7 +1088,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
                                              employee_role_id: employee_role.id,
                                              benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
     )}
-
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 45.days)
@@ -2635,6 +2631,12 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_eac
     end
 
     context 'for non congression employer' do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.is_congress") {false}
+        allow(enrollment).to receive(:composite_rated?).and_return(false)
+        allow(enrollment).to receive_message_chain("benefit_group.reference_plan") { plan }
+      end
+
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: enrollment.plan)
         expect(plan).to be_kind_of(PlanCostDecorator)
@@ -2680,11 +2682,13 @@ describe HbxEnrollment, dbclean: :after_each do
       @enrollment1.aasm_state = "coverage_selected"
       @enrollment1.save
       @enrollment2 = household.create_hbx_enrollment_from(employee_role: mikes_employee_role, coverage_household: coverage_household, benefit_group: mikes_benefit_group, benefit_group_assignment: @mikes_benefit_group_assignments)
+      @enrollment2.predecessor_enrollment_id = @enrollment1.id
       @enrollment2.save
     end
 
     it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
       @enrollment2.update_existing_shop_coverage
+      @enrollment1.reload
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
