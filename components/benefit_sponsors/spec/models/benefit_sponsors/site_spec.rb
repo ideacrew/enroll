@@ -46,7 +46,7 @@ module BenefitSponsors
       end
     end
 
-    describe 'Site Model has a' do
+    describe 'Site Model has a', dbclean: :after_each do
       let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca)}
       it 'has a valid factory' do
         expect(site.valid?).to be_truthy
@@ -81,7 +81,7 @@ module BenefitSponsors
         end
       end
 
-      context "with two benefit markets of the same kind", dbclean: :after_each do
+      context "with two benefit markets of the same kind" do
         let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
 
         let(:site) { Site.new(params) }
@@ -95,7 +95,7 @@ module BenefitSponsors
         end
       end
 
-      context "with all required arguments", dbclean: :after_each do
+      context "with all required arguments" do
         let(:valid_site) { Site.new(params) }
 
         before do

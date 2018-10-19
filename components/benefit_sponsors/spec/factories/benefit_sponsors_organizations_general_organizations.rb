@@ -79,6 +79,17 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_aca_shop_cca_employer_profile_renewal_draft_application do
+      with_aca_shop_cca_employer_profile
+      after :build do |organization, evaluator|
+        organization.benefit_sponsorships = [build(:benefit_sponsors_benefit_sponsorship,
+          :with_benefit_market,
+          :with_renewal_draft_benefit_application,
+          profile: organization.employer_profile
+        )]
+      end
+    end
+
     trait :with_aca_shop_cca_employer_profile_expired_application do
       with_aca_shop_cca_employer_profile
       after :build do |organization, evaluator|

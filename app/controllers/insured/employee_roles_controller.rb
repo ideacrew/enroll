@@ -64,7 +64,7 @@ class Insured::EmployeeRolesController < ApplicationController
                        end
 
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
-    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
+    if @employee_role.present? && @employee_role.census_employee.present? && (current_user.has_hbx_staff_role? || @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do
@@ -216,8 +216,8 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def check_employee_role
     set_current_person(required: false)
-    if @person.try(:employee_roles).try(:last)
-      redirect_to @person.employee_roles.last.bookmark_url || family_account_path
+    if @person.present? && @person.has_active_employee_role?
+      redirect_to @person.active_employee_roles.first.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!

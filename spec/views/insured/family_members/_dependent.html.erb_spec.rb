@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "insured/family_members/_dependent.html.erb" do
+describe "insured/family_members/_dependent.html.erb", dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:family) { Family.new }
