@@ -43,6 +43,50 @@ describe Services::CheckbookServices::PlanComparision do
       end
   end
 
+  describe "#csr_value" do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
+    context "when active household is present" do 
+      let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
+      let(:sample_max_aptc_1) {511.78}
+      let(:sample_csr_percent_1) {87}
+      let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
+
+      it "should return correct csr percentage" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        expect(subject.csr_value).to eq tax_household.latest_eligibility_determination.csr_percent_as_integer
+      end
+    end
+     context "when active household not present" do 
+      it "should return -01" do
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
+        expect(subject.csr_value).to eq "-01"
+      end
+    end
+   end
+
+  describe "#aptc_value  " do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    context "when active household is present" do 
+      let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
+      let(:sample_max_aptc_1) {511.78}
+      let(:sample_csr_percent_1) {87}
+      let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
+
+      it "should return max aptc" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc
+      end
+    end
+     context "when active household  not present" do 
+      it "should return max 000" do
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
+        expect(subject.aptc_value).to eq "000"
+      end
+    end
+  end
+
   describe "when employee is congress member" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
 
