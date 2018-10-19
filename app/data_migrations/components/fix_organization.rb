@@ -86,8 +86,7 @@ class FixOrganization< MongoidMigrationTask
         broker_agency_account = organization.active_benefit_sponsorship.active_broker_agency_account
         if broker_agency_account.present?
           hired_on = broker_agency_account.start_on
-          broker_agency_account.update_attributes!(:is_active => false)
-          employer_profile = BenefitSponsors::Organizations::Profile.find(organization.employer_profile.id)
+          employer_profile = organization.employer_profile
           employer_profile.broker_role_id = writing_agent.id
           employer_profile.hire_broker_agency(broker_agency_profile, hired_on)
           employer_profile.save!
