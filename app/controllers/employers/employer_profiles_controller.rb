@@ -17,7 +17,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   layout "two_column", except: [:new]
 
   def redirect_new_model
-    redirect_to root_path
+    redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"
   end
 
   def link_from_quote
