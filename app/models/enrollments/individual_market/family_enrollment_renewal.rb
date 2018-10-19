@@ -42,7 +42,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
-    renewal_enrollment.is_any_enrollment_member_outstanding = (is_household_outstanding?(clone_enrollment_members) rescue false)
+    renewal_enrollment.is_any_enrollment_member_outstanding = (is_household_outstanding?(renewal_enrollment.hbx_enrollment_members) rescue false)
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
