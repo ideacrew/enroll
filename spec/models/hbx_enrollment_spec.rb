@@ -1033,12 +1033,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         expect(hbx_enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       end
     end
-
-
   end
 
   describe HbxEnrollment, dbclean: :after_each do
-
     let(:employer_profile) {FactoryGirl.create(:employer_profile)}
 
     let(:calendar_year) {TimeKeeper.date_of_record.year}
@@ -1091,7 +1088,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
                                              employee_role_id: employee_role.id,
                                              benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
     )}
-
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 45.days)

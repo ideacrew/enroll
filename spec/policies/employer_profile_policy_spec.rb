@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe EmployerProfilePolicy do
+describe EmployerProfilePolicy, dbclean: :after_each do
   let(:person){FactoryGirl.create(:person, user: user)}
   let(:user){FactoryGirl.create(:user)}
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
@@ -45,10 +45,3 @@ describe EmployerProfilePolicy do
 
   end
 end
-
-
-
-
-
-
-
