@@ -753,7 +753,7 @@ shop_notice_triggers = [
         name: 'Denial of SEP Requested by EE outside of allowable time frame',
         notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
         notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'MPI_SHOP35',
+        mpi_indicator: 'SHOP_D035',
                 notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

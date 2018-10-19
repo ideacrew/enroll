@@ -150,7 +150,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
       sep_request_denial_notice
     elsif is_ee_sep_request_accepted?
       ee_sep_request_accepted_notice
@@ -243,7 +243,7 @@ class Insured::FamiliesController < FamiliesController
 
   def sep_request_denial_notice
     begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.id}")
     end
