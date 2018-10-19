@@ -2744,7 +2744,7 @@ describe "notify_employer_py_cancellation" do
 
       it "should cancel waived enrollment" do
         expect(enrollment.aasm_state).to eq "inactive"
-        allow(plan_year).to receive(:enrollments_for_plan_year).with(true).and_return [enrollment]
+        allow(plan_year).to receive(:enrollments_for_plan_year).and_return [enrollment]
         expect(plan_year).to receive(:notify).exactly(0).times
         plan_year.cancel_employee_enrollments( true)
         expect(enrollment.aasm_state).to eq "coverage_canceled"
