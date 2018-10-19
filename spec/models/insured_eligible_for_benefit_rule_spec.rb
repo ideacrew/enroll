@@ -119,6 +119,8 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
+    let(:consumer_role) { ConsumerRole.new}
+    let(:tax_household) { double("TaxHousehold", current_csr_eligibility_kind: nil)}
     before :all do
       create_tax_household_for_mikes_family
       @consumer_role = mike.consumer_role
@@ -129,25 +131,26 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package_with_current_date_start_on) { FactoryGirl.build(:benefit_package) }
 
     it "should return true when csr_kind is blank" do
-      rule = InsuredEligibleForBenefitRule.new(ConsumerRole.new, benefit_package, family: family)
+      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is blank" do
       allow(benefit_package_with_current_date_start_on).to receive(:start_on).and_return(TimeKeeper.date_of_record)
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package_with_current_date_start_on, family: family )
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package_with_current_date_start_on, family: mike.primary_family )
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return true when cost_sharing is equal to csr_kind" do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_87'
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: family)
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return false when cost_sharing is not equal to csr_kind" do
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
-      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: family)
+      rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family)
       expect(rule.is_cost_sharing_satisfied?).to eq false
     end
   end
@@ -260,6 +263,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
     let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
 
+    before do
+      allow(rule).to receive(:is_cost_sharing_satisfied?).and_return(true)
+    end
+
     context "consumer_role aasm_state is fully_verified" do
       before :each do
         consumer_role.aasm_state = "fully_verified"
@@ -282,7 +289,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns array with benefit_eligibility_element_group fields" do
         array = ["_id", "market_places", "enrollment_periods", "family_relationships",
                  "benefit_categories", "incarceration_status", "age_range", "citizenship_status",
-                 "residency_status", "ethnicity", "cost_sharing", "lawful_presence_status"]
+                 "residency_status", "ethnicity", "cost_sharing", "lawful_presence_status", "active_individual_role"]
         expect(benefit_package.benefit_eligibility_element_group.class.fields.keys).to eq array
       end
 
@@ -290,6 +297,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        allow(rule).to receive(:is_active_individual_role_satisfied?).and_return(true)
         consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [true, []]
       end
@@ -333,6 +341,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
         allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
+        allow(rule).to receive(:is_active_individual_role_satisfied?).and_return(true)
         consumer_role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
         error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]

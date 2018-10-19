@@ -6,12 +6,21 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   describe "#can shop individual" do
     let(:person) { FactoryGirl.create(:person) }
 
+    before(:each) do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+    end
+
+
     it "should not have an active consumer role" do
       expect(subject.can_shop_individual?(person)).not_to be_truthy
     end
 
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+
+      before(:each) do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      end
       it "should have active consumer role" do
         expect(subject.can_shop_individual?(person)).to be_truthy
       end
@@ -28,7 +37,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active employee role" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
 
       it "should have active employee role but no benefit group" do
@@ -36,11 +45,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
 
     end
-    
+
     context "with active employee role and benefit group" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
       end
 
@@ -56,18 +65,21 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
       end
     end
-    
+
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).to be_truthy
@@ -76,14 +88,14 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
   end
 
-  describe "#health_relationship_benefits" do
+  context "relationship_benefits" do
 
-    context "active/renewal health benefit group offered relationships" do
-      let(:employee_role){FactoryGirl.build(:employee_role)}
-      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
 
-      let(:relationship_benefits) do
+    context "#health_relationship_benefits" do
+
+      let(:initial_health__relationship_benefits) do
         [
             RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
             RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
@@ -91,49 +103,94 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         ]
       end
 
-      it "should return offered relationships of active health benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
-        allow(active_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
-        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
-      end
-
-      it "should return offered relationships of renewal health benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
-        allow(renewal_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
-        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
-      end
-    end
-  end
-
-  describe "#dental_relationship_benefits" do
-
-    context "active/renewal dental benefit group offered relationships" do
-      let(:employee_role){FactoryGirl.build(:employee_role)}
-      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
-
-      let(:dental_relationship_benefits) do
+      let(:renewal_health_relationship_benefits) do
         [
             RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
-            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75)
+        ]
+      end
+
+      context "active/renewal health benefit group offered relationships" do
+
+        it "should return offered relationships of active health benefit group" do
+          allow(active_benefit_group).to receive_message_chain(:relationship_benefits).and_return(initial_health__relationship_benefits)
+          expect(helper.health_relationship_benefits(active_benefit_group)).to eq ["employee", "spouse", "child_under_26"]
+        end
+
+        it "should return offered relationships of renewal health benefit group" do
+          allow(renewal_benefit_group).to receive_message_chain(:relationship_benefits).and_return(renewal_health_relationship_benefits)
+          expect(helper.health_relationship_benefits(renewal_benefit_group)).to eq ["employee", "spouse"]
+        end
+      end
+    end
+
+    context "#dental_relationship_benefits" do
+
+      let(:initial_dental_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
             RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
         ]
       end
 
-      it "should return offered relationships of active dental benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
-        allow(active_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
-        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      let(:renewal_dental_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+        ]
       end
 
-      it "should return offered relationships of renewal dental benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
-        allow(renewal_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
-        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      context "active/renewal dental benefit group offered relationships" do
+
+        it "should return offered relationships of active dental benefit group" do
+          allow(active_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(initial_dental_relationship_benefits)
+          expect(helper.dental_relationship_benefits(active_benefit_group)).to eq ["employee", "child_under_26"]
+        end
+
+        it "should return offered relationships of renewal dental benefit group" do
+          allow(renewal_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(renewal_dental_relationship_benefits)
+          expect(helper.dental_relationship_benefits(renewal_benefit_group)).to eq ["employee"]
+        end
       end
     end
   end
 
+  describe "#select_benefit_group" do
+    let(:benefit_group) { double("BenefitGroup")}
+    let(:employee_role) { double("EmployeeRole")}
+
+    it "should return nil if market kind is not shop" do
+      helper.instance_variable_set("@market_kind", "individual")
+      expect(helper.select_benefit_group(false, employee_role)).to eq nil
+    end
+
+    it "should return benefit group on employee role if shop" do
+      helper.instance_variable_set("@market_kind", "shop")
+      helper.instance_variable_set("@employee_role", employee_role)
+      allow(employee_role).to receive(:benefit_group).with(qle: false).and_return benefit_group
+      expect(helper.select_benefit_group(false, employee_role)).to eq benefit_group
+    end
+  end
+
+  describe "#view_market_places" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return shop & individual if can_shop_both_markets? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      expect(helper.view_market_places(person)).to eq Plan::MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["shop", "individual"]
+    end
+
+    it "should return individual & coverall if can_shop_individual? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_resident? return true" do
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+  end
 
   describe "#selected_enrollment" do
 
@@ -259,22 +316,38 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+    let(:primary) { FactoryGirl.create(:person)}
 
     context "#is_market_kind_disabled?" do
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
         context "when user clicked on IVL enrollment" do
+          describe "family with IVL and resident roles" do
+            before do
+              helper.instance_variable_set("@mc_market_kind", "individual")
+              allow(helper).to receive(:can_shop_individual_or_resident?).and_return true
+            end
+
+            it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("shop", primary)).to eq nil
+            end
+
+            it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("individual", primary)).to eq nil
+            end
+
+          end
 
           before do
             helper.instance_variable_set("@mc_market_kind", "individual")
           end
 
           it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
 
@@ -285,16 +358,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
       end
 
       context "when user selected a QLE" do
+        let(:primary) { FactoryGirl.create(:person)}
 
         context "when user selected shop QLE" do
 
@@ -303,11 +377,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
 
@@ -318,11 +392,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the shop market if user selected IVL based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
       end
@@ -338,11 +412,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq false
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq false
           end
 
           it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq true
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq true
           end
         end
 
@@ -353,11 +427,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq false
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq false
           end
 
           it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq true
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq true
           end
         end
       end
@@ -575,6 +649,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
     before do
       allow(employee_role).to receive(:census_employee).and_return census_employee
+      allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return false
     end
 
     context "when ER is an initial ER" do
@@ -585,12 +660,12 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
       it "should return true if active benefit group offers dental" do
         allow(active_bg).to receive(:is_offering_dental?).and_return true
-        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+        expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq true
       end
 
       it "should return false if active benefit group not offers dental" do
         allow(active_bg).to receive(:is_offering_dental?).and_return false
-        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+        expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq false
       end
     end
 
@@ -604,16 +679,16 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
         it "should return true if renewal benefit group offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
-          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+          expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq true
         end
 
         it "should return false if renewal benefit group not offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return false
-          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+          expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq false
         end
       end
 
-      context "when EE selects SEP & effective_on does not covers under renewal plan year period", db_clean: :after_each do
+      context "when EE selects SEP & effective_on does not covers under renewal plan year period", dbclean: :after_each do
 
         before do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
@@ -623,16 +698,16 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
         it "should return true if active benefit group offers dental" do
           allow(active_bg).to receive(:is_offering_dental?).and_return true
-          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle", nil)).to eq true
         end
 
         it "should return false if active benefit group not offers dental" do
           allow(active_bg).to receive(:is_offering_dental?).and_return false
-          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle", nil)).to eq false
         end
       end
 
-      context "when EE selects SEP & effective_on covers under renewal plan year period", db_clean: :after_each do
+      context "when EE selects SEP & effective_on covers under renewal plan year period", dbclean: :after_each do
 
         before do
           allow(active_bg).to receive(:is_offering_dental?).and_return true
@@ -642,14 +717,113 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
         it "should return true if renewal benefit group offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
-          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle", nil)).to eq true
         end
 
         it "should return false if renewal benefit group not offers dental" do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return false
-          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle", nil)).to eq false
         end
       end
+
+      context "when EE is in new hire enrollment period" do
+        before do
+          allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
+        end
+        it "should return true if active benefit group offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq true
+        end
+
+        it "should return false if active benefit group not offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, nil, nil)).to eq false
+        end
+      end
+
+      context "when EE clicked on make changes button of a shop enrollment" do
+        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, is_shop?: true)}
+
+        it "should return true if benefit group on enrollment offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq true
+        end
+
+        it "should return false if benefit group on enrollment does not offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq false
+        end
+      end
+
+      context "when EE clicked on make changes button of an ivl enrollment" do
+        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, is_shop?: false)}
+        before do
+          allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
+        end
+        it "should not depend on enrollment benefit group" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return false
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq false
+        end
+      end
+    end
+  end
+
+  describe "#class_for_ineligible_row" do
+    let(:person) { FactoryGirl.create(:person, :with_family)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+    # let(:employee_role_2) { FactoryGirl.create(:employee_role, person: employee_role_1.person)}
+
+    before do
+      assign(:"person", person)
+      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      @member = person.primary_family.primary_applicant
+    end
+
+    it "should return a string" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).class).to eq String
+    end
+
+    it "should have 'ineligible_health_employee_role_id' class if not eligible for ER sponsored health benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([false, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq true
+    end
+
+    it "should have 'ineligible_dental_employee_role_id' class if not eligible for ER sponsored dental benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, false])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq true
+    end
+
+    it "should have both 'ineligible_dental' & 'ineligible_health' classes if not eligible for both types of ER sponsored benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([false, false])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq true
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq true
+    end
+
+    it "should have 'ineligible_ivl_row' class if not eligible for IVL benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, false).include?("ineligible_ivl_row")).to eq true
+    end
+
+    it "should not have 'ineligible_health_employee_role_id' class if eligible for ER sponsored health benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([true, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq false
+    end
+
+    it "should not have 'ineligible_dental_employee_role_id' class if eligible for ER sponsored dental benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, true])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq false
+    end
+
+    it "should not have 'ineligible_ivl_row' class if eligible for IVL benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, true).include?("ineligible_ivl_row")).to eq false
+    end
+
+    it "should have 'is_primary' class for primary person" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, true).include?("is_primary")).to eq true
     end
   end
 end

@@ -4,6 +4,7 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -11,7 +12,7 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.first
+    plan_year = employer_profile.plan_years.where(aasm_state: 'publish_pending').last
     plan_year_warnings = []
     plan_year.application_eligibility_warnings.each do |k, v|
       case k.to_s

@@ -4,7 +4,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
   let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
-    let(:person) {double(has_active_consumer_role?: false)}
+    let(:person) {double(is_consumer_role_active?: false)}
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
@@ -54,7 +54,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Plan Type title text ' do
-      expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay./i
+      expect(rendered).to match /The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you‘ll pay./i
     end
 
     it 'should have Network title text' do
@@ -70,7 +70,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have HMO title text' do
-      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won't cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
+      expect(rendered).to match /#{Regexp.escape("An HMO (Health Maintenance Organization) plan usually only covers care from in-network providers. It generally won‘t cover out-of-network care except in an emergency, and may require you to live or work in its service area to be eligible for coverage. You may be required to choose a primary care doctor.")}/i
     end
 
     it 'should have PPO title text' do
@@ -82,7 +82,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     end
 
     it 'should have Hsa_eligibilty title text' do
-      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.")}/i)
+      expect(rendered).to match(/#{Regexp.escape("Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don‘t spend them.")}/i)
     end
 
     it "should have Premium amount search" do
@@ -103,7 +103,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:person, person)
       assign(:carriers, Array.new)
       assign(:benefit_group, benefit_group)
-      allow(person).to receive(:has_active_consumer_role?).and_return(false)
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       assign(:hbx_enrollment, hbx_enrollment)
 
@@ -143,7 +143,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with consumer_role and tax_household" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
 
     before :each do
@@ -187,7 +187,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with tax_household plan_shopping in shop market" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
     before :each do
       assign(:hbx_enrollment, hbx_enrollment)
@@ -214,7 +214,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   end
 
   context "with consumer_role but without tax_household" do
-    let(:person) {double(has_active_consumer_role?: true)}
+    let(:person) {double(is_consumer_role_active?: true)}
 
     before :each do
       assign(:hbx_enrollment, hbx_enrollment)

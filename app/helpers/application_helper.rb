@@ -428,7 +428,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -438,7 +438,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -494,7 +494,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
     end
   end
 
@@ -504,13 +504,17 @@ module ApplicationHelper
     end.uniq
   end
 
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
+  end
+
   def calculate_age_by_dob(dob)
     now = TimeKeeper.date_of_record
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
@@ -533,12 +537,21 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
+    end
+  end
+
+  def notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+    begin
+      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present? && hbx_enrollment.employer_profile.present?
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.employer_profile.id.to_s, "notify_employer_when_employee_terminate_coverage", hbx_enrollment: hbx_enrollment.hbx_id.to_s)
+      end
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employee_terminate_coverage_notice of employee #{hbx_enrollment.census_employee.id.to_s} to #{hbx_enrollment.employer_profile.id.to_s}due to #{e}" }) unless Rails.env.test?
     end
   end
 
@@ -644,4 +657,36 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
+  def previous_year
+    TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def resident_application_enabled?
+    if Settings.aca.individual_market.dc_resident_application
+      policy(:family).hbx_super_admin_visible?
+    else
+      false
+    end
+  end
+
+  def transition_family_members_link_type row, allow
+    if Settings.aca.individual_market.transition_family_members_link
+      allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
+    else
+      "disabled"
+    end
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
+  end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
 end
+

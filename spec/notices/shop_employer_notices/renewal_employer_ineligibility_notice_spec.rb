@@ -6,7 +6,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerIneligibilityNotice do
   let!(:person){ create :person}
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_application_ineligible' ) }
+  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling') }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Group Ineligible to Obtain Coverage',
@@ -59,14 +59,34 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerIneligibilityNotice do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      TimeKeeper.set_date_of_record_unprotected!(renewal_plan_year.open_enrollment_end_on.next_day)
+      renewal_plan_year.advance_date!
       @employer_notice = ShopEmployerNotices::RenewalEmployerIneligibilityNotice.new(employer_profile, valid_parmas)
-    end
-    it "should append necessary information" do
       @employer_notice.append_data
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    it "should return renewal plan year start on" do
       expect(@employer_notice.notice.plan_year.start_on).to eq renewal_plan_year.start_on
+    end
+
+    it "should return open enrollment end on date" do
       expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq renewal_plan_year.open_enrollment_end_on
+    end
+
+    it "should return active plan year end on" do
       expect(@employer_notice.notice.plan_year.end_on).to eq plan_year.end_on
-      expect(@employer_notice.notice.plan_year.warnings).to eq ["At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+    end
+
+    it "should return plan year warnings" do
+      if renewal_plan_year.start_on.yday != 1
+        expect(@employer_notice.notice.plan_year.warnings).to eq ["At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."]
+      else
+        expect(@employer_notice.notice.plan_year.warnings).to eq []
+      end
     end
   end
 

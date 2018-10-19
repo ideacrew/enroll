@@ -107,7 +107,10 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def generic_notice_alert(first_name, notice_subject, email)
+  def generic_notice_alert(first_name, notice_subject, email,files_to_attach={})
+    files_to_attach.each do |file_name, file_path|
+      attachments["#{file_name}"] = File.read(file_path)
+    end
     message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
@@ -126,7 +129,14 @@ class UserMailer < ApplicationMailer
       format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
     end
   end
-
+  
+  def broker_registration_guide(user)
+    attachments['Broker Registration Guide.pdf'] = File.read('public/new_broker_registration.pdf')
+    mail({to: user[:email], subject: "Broker Registration Guide"}) do |format|
+      format.html { render "broker_registration_guide", :locals => { :first_name => user[:first_name]}}
+    end
+  end
+  
   def broker_denied_notification(broker_role)
     if broker_role.email_address.present?
       mail({to: broker_role.email_address, subject: "Broker application denied"}) do |format|
@@ -142,7 +152,7 @@ class UserMailer < ApplicationMailer
       end
     end
   end
-
+  
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
     subject_prefix = broker_role.training || broker_role.training == true ? "Completed NAHU Training" : "Needs to Complete NAHU training"

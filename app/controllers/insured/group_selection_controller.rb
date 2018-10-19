@@ -1,35 +1,18 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
-  before_action :initialize_common_vars, only: [:create, :terminate_selection]
+  before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
+  before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
-
-
-  def select_market(person, params)
-    return params[:market_kind] if params[:market_kind].present?
-    if params[:qle_id].present? && (!person.has_active_resident_role?)
-      qle = QualifyingLifeEventKind.find(params[:qle_id])
-      return qle.market_kind
-    end
-    if person.has_active_employee_role?
-      'shop'
-    elsif person.has_active_consumer_role? && !person.has_active_resident_role?
-      'individual'
-    elsif person.has_active_resident_role?
-      'coverall'
-    else
-      nil
-    end
-  end
 
   def new
     set_bookmark_url
-    initialize_common_vars
+    hbx_enrollment = build_hbx_enrollment
+    @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
-    @effective_on_date = params[:effective_on_date]
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
-    if @market_kind == 'individual' || (@person.try(:has_active_employee_role?) && @person.try(:has_active_consumer_role?)) || @resident
+    if @market_kind == 'individual' || @market_kind == 'coverall' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
       if params[:hbx_enrollment_id].present?
         session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
         pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -40,22 +23,12 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end
 
-    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      @disable_market_kind = "shop"
-      @disable_market_kind = "individual" if @market_kind == "shop"
-    end
-
-    if @hbx_enrollment.present? && @change_plan == "change_plan"
-      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
-      @mc_coverage_kind = @hbx_enrollment.coverage_kind
-    end
-
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
-    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    benefit_group = (@employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil)
-    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: benefit_group)
+    @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    @benefit_group = select_benefit_group(@qle, @employee_role)
+    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
 
     generate_coverage_family_members_for_cobra
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
@@ -71,6 +44,7 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
+
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
@@ -94,7 +68,21 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
+    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
+
+    invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+    if invalid_member_exist
+      raise "Please select valid enrolling members"
+    end
+
+    # case for responsible party with primary and dependent in separate markets
+    # it assumes the primary and dependent are in either IVL or coverall
+    # TODO will need to account for shop market as well with coverall phase 3 when
+    # people will be able to receive a transition from shop to coverall, etc.
+    
+    if ((hbx_enrollment.kind != @market_kind) && (@market_kind != "shop"))
+      hbx_enrollment.kind = @market_kind
+    end
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
@@ -130,11 +118,9 @@ class Insured::GroupSelectionController < ApplicationController
   def terminate
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-
-    if hbx_enrollment.may_terminate_coverage?
+    if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
-      hbx_enrollment.propogate_terminate(term_date)
       redirect_to family_account_path
     else
       redirect_to :back
@@ -178,7 +164,8 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        opt_effective_on: @optional_effective_on)
     end
   end
 
@@ -209,6 +196,24 @@ class Insured::GroupSelectionController < ApplicationController
     @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
   end
 
+  def set_vars_for_market
+    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+      @disable_market_kind = "shop"
+      @disable_market_kind = "individual" if select_market(@person, params) == "shop"
+    end
+
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      if @hbx_enrollment.kind == "employer_sponsored"
+        @mc_market_kind = "shop"
+      elsif @hbx_enrollment.kind == "coverall"
+        @mc_market_kind = "coverall"
+      else
+        @mc_market_kind = "individual"
+      end
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
+    end
+  end
+
   def generate_coverage_family_members_for_cobra
     if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
@@ -217,4 +222,16 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
   end
+
+  def get_values_to_generate_resident_role(person)
+    options = {}
+    options[:is_applicant] = person.consumer_role.is_applicant
+    options[:bookmark_url] = person.consumer_role.bookmark_url
+    options[:is_state_resident] = person.consumer_role.is_state_resident
+    options[:residency_determined_at] = person.consumer_role.residency_determined_at
+    options[:contact_method] = person.consumer_role.contact_method
+    options[:language_preference] = person.consumer_role.language_preference
+    options
+  end
+
 end

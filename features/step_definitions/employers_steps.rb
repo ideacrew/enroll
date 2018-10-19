@@ -287,8 +287,9 @@ And(/^.+ should see a button to create new plan year$/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
@@ -444,6 +445,19 @@ Given /^an employer exists$/ do
   owner :with_family, :employer, organization: employer
 end
 
+Given /^the employer has draft plan year$/ do
+  create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: 'draft', with_dental: false)
+end
+
+Given /^the employer has broker agency profile$/ do
+  employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.save!
+end
+
+When /^they visit the Employer Home page$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
+end
+
 When /^they visit the Employee Roster$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
 end
@@ -483,6 +497,10 @@ Then /^employer clicks on terminated filter$/ do
   wait_for_ajax
   page.execute_script("$('.filter-options').show();")
   find("#terminated_yes").trigger('click')
+end
+
+Then /^employer should not see the Get Help from Broker$/ do
+  expect(page).not_to have_xpath("//h3", :text => "Get Help From a Broker")
 end
 
 Then /^employer sees termination date column$/ do

@@ -7,6 +7,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
   let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
@@ -106,6 +107,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq ""
       end
 
+      it "should have benefit group id" do
+        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_group.id.to_s
+      end
+
       it "should be schema valid" do
         expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
@@ -156,19 +161,50 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       end
     end
 
-    context "when manual gen of cv = true" do
+    context "POC address" do
 
-      before :each do
-        employer.plan_years = [plan_year,future_plan_year]
-        employer.save
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: true }
+      before do
+        allow(employer).to receive(:staff_roles).and_return([staff])
+        allow(staff).to receive(:addresses).and_return([mailing_address,home_address])
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
         @doc = Nokogiri::XML(rendered)
       end
 
-      it "should return all eligible for export plan years" do
-        expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
+      it "should be included only poc mailing address" do
+        expect(@doc.xpath("//x:contacts/x:contact/x:addresses", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+        expect(@doc.xpath("//x:contacts/x:contact/x:addresses/x:address/x:type", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#mailing"
       end
     end
 
+    context "when manual gen of cv = true" do
+
+      context "non termination case" do
+        before :each do
+          employer.plan_years = [plan_year, future_plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 2
+        end
+      end
+
+      context "terminated plan year with future termination date" do
+        before :each do
+          plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
+                                       :aasm_state => "terminated"})
+          employer.plan_years = [plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 1
+        end
+      end
+    end
   end
 end

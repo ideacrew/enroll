@@ -27,6 +27,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(role_form).to receive(:active_employee_roles).and_return [employee_role]
+      allow(census_employee).to receive(:trigger_notices).and_return(true)
       sign_in user
     end
 
@@ -196,6 +197,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
+        allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         post :create, :employment_relationship => employment_relationship_properties
       end
 
@@ -221,6 +223,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       before :each do
         allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
+        allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         request.env["HTTP_REFERER"] = "/"
         sign_in(user)
         post :create, :employment_relationship => employment_relationship_properties

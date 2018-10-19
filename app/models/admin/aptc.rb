@@ -22,7 +22,7 @@ class Admin::Aptc < ApplicationController
       total_aptc_applied_vals_for_household = Hash[$months_array.map { |x| [x, '%.2f' % 0.0] }] # Initialize a Hash for monthly values.
       hbxs.each do |hbx|
         aptc_applied_vals_for_enrollment = build_aptc_applied_values_for_enrollment(year, family, hbx, applied_aptc_array)
-        total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes. 
+        total_aptc_applied_vals_for_household  = total_aptc_applied_vals_for_household.merge(aptc_applied_vals_for_enrollment) { |k, a_value, b_value| a_value.to_f + b_value.to_f } # Adding values of two similar hashes.
       end
       #subtract each value of aptc_applied hash from the max_aptc hash to get APTC Available.
       max_aptc_vals.merge(total_aptc_applied_vals_for_household) { |k, a_value, b_value| '%.2f' % (a_value.to_f >= b_value.to_f ? (a_value.to_f - b_value.to_f) : a_value.to_f - b_value.to_f) }
@@ -50,7 +50,7 @@ class Admin::Aptc < ApplicationController
       return enrollments_data
     end
 
-    def build_enrollment_level_aptc_csr_data(year, family, hbx, applied_aptc_array=nil, max_aptc=nil, csr_percentage=nil,  member_ids=nil) #TODO: Last param remove 
+    def build_enrollment_level_aptc_csr_data(year, family, hbx, applied_aptc_array=nil, max_aptc=nil, csr_percentage=nil,  member_ids=nil) #TODO: Last param remove
       aptc_applied_vals             = build_aptc_applied_values_for_enrollment(year, family, hbx, applied_aptc_array)
       aptc_applied_per_member_vals  = build_aptc_applied_per_member_values_for_enrollment(family, hbx, aptc_applied_vals, applied_aptc_array)
       return { "aptc_applied" => aptc_applied_vals, "aptc_applied_per_member" => aptc_applied_per_member_vals }
@@ -66,7 +66,7 @@ class Admin::Aptc < ApplicationController
 
 
     def build_aptc_applied_values_for_enrollment(year, family, current_hbx, applied_aptc_array=nil)
-      # Get all aptc enrollments (coverage selected, terminated or cancelled) that have the same hbx_id as current_hbx. 
+      # Get all aptc enrollments (coverage selected, terminated or cancelled) that have the same hbx_id as current_hbx.
       # These are the dups of the current enrollment that were saved when APTC values were updated.
       enrollments_with_same_hbx_id = family.active_household.hbx_enrollments_with_aptc_by_year(year).by_hbx_id(current_hbx.hbx_id)
       enrollments_with_same_hbx_id.sort! {|a, b| a.effective_on <=> b.effective_on}
@@ -339,6 +339,8 @@ class Admin::Aptc < ApplicationController
             # Update elected_aptc_pct to the correct value based on the new applied_amount
             duplicate_hbx.elected_aptc_pct = actual_aptc_value/max_aptc
 
+            # Reset aasm_state
+            duplicate_hbx.aasm_state = "shopping"
 
             # This (and the division using percent_sum_for_all_enrolles in the next block) is needed to get the right ratio for members to use in an enrollment. (ratio of the applied_aptc for an enrollment)
             duplicate_hbx.hbx_enrollment_members.each do |member|
@@ -353,6 +355,12 @@ class Admin::Aptc < ApplicationController
 
             family.active_household.hbx_enrollments << duplicate_hbx
             family.save
+
+            # Reload and Select Coverage for new Enrollment. This ensures workflow transition is set
+            duplicate_hbx.reload
+            duplicate_hbx.select_coverage!
+
+
             # Cancel or Terminate Coverage.
             if original_hbx.may_terminate_coverage? && (duplicate_hbx.effective_on > original_hbx.effective_on)
               original_hbx.terminate_coverage!
@@ -372,7 +380,7 @@ class Admin::Aptc < ApplicationController
       offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
       year = hbx_created_datetime.year
       month = hbx_created_datetime.month + offset_month
-      # Based on the 15th of the month rule, if the effective date happpens to be after the policy's life (next year), 
+      # Based on the 15th of the month rule, if the effective date happpens to be after the policy's life (next year),
       # raise an error and do not create a new EligibilityDetermination (when there is an active enrollment) and/or HbxEnrollment (Eg: After Nov 15th)
       if month > 12
         year = year + 1
@@ -398,6 +406,9 @@ class Admin::Aptc < ApplicationController
           max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx[1]["hbx_id"].gsub("aptc_applied_",""), max_aptc)
           applied_aptc = hbx[1]["aptc_applied"].to_f
           aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.enrollment_max_smaller_than_applied + "[NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
+          hbx_enrollment = hbxs.select{|h| h.id.to_s == hbx[1]["hbx_id"].gsub("aptc_applied_","") }.first
+          plan_premium = hbx_enrollment.total_premium
+          aptc_errors["PREMIUM_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.plan_premium_smaller_than_applied + "[PLAN_PREMIUM (#{'%.2f' % plan_premium.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > plan_premium
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f
         end
       end
@@ -432,7 +443,16 @@ class Admin::Aptc < ApplicationController
     end
 
     def years_with_tax_household(family)
-      family.active_household.tax_households.map(&:effective_starting_on).map(&:year).uniq
+      year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
+      current_hbx = HbxProfile.current_hbx
+      oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.year
+      current_year = TimeKeeper.date_of_record.year
+
+      if current_hbx && current_hbx.under_open_enrollment? && oe_start_year == current_year
+        year_set << (TimeKeeper.date_of_record.next_year.year)
+      end
+
+      year_set.uniq
     end
 
   end #  end of class << self

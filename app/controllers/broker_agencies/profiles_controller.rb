@@ -42,7 +42,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def show
     set_flash_by_announcement
     session[:person_id] = nil
-     @provider = current_user.person
+     @provider = @broker_agency_profile.primary_broker_role.person
      @staff_role = current_user.has_broker_agency_staff_role?
      @id=params[:id]
   end
@@ -67,28 +67,18 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
-    # person.update_attributes(person_profile_params)
-    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
-    office_locations = broker_agency_profile.office_locations
-    office_locations.each do |office_location|
-      # && office_location.phones.kind == “phone main”
-      if person.phones.any?
-        person.phones.first.update_attributes(country_code: office_location.phone.country_code,
-                                              area_code: office_location.phone.area_code,
-                                              number: office_location.phone.number,
-                                              extension: office_location.phone.extension)
-        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
-        person.phones.first.update_attributes(full_phone_number: full_phone)
-      end
-    end
 
     person.update_attributes(person_profile_params)
-    person.save!
 
     @broker_agency_profile.update_attributes(languages_spoken_params)
 
 
     if @organization.update_attributes(broker_profile_params)
+      office_location = @organization.primary_office_location
+      if office_location.present?
+        update_broker_phone(office_location, person)
+      end
+
       flash[:notice] = "Successfully Update Broker Agency Profile"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
     else
@@ -200,16 +190,17 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def set_default_ga
     authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
-
     if @broker_agency_profile.present?
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
+        @broker_agency_profile.employer_clients.each do |employer_profile|
+          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
+        end
       end
       @broker_agency_profile.save
-      #update_ga_for_employers(@broker_agency_profile, old_default_ga)
       notify("acapi.info.events.broker.default_ga_changed", {:broker_id => @broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => old_default_ga_id})
       @notice = "Changing default general agencies may take a few minutes to update all employers."
 
@@ -312,6 +303,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
+            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
           end
         end
         flash.now[:notice] ="Assign successful."
@@ -366,7 +358,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def messages
     @sent_box = true
-    @provider = current_user.person
+    @provider = Person.find(params["id"])
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:profile_id])
   end
 
   def agency_messages
@@ -396,6 +389,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     params.require(:organization).permit(
       :legal_name,
       :dba,
+      :home_page,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension],
@@ -500,5 +494,21 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
+  end
+
+  def update_broker_phone(office_location, person)
+    phone = office_location.phone
+    broker_main_phone = person.phones.where(kind: "phone main").first
+    if broker_main_phone.present?
+      broker_main_phone.update_attributes!(
+        kind: phone.kind,
+        country_code: phone.country_code,
+        area_code: phone.area_code,
+        number: phone.number,
+        extension: phone.extension,
+        full_phone_number: phone.full_phone_number
+      )
+    end
+    person.save!
   end
 end

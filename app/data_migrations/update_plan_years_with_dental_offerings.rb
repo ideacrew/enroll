@@ -4,8 +4,9 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
 
   def migrate
     month = ENV['calender_month']
+    year  = ENV['calender_year']
     @passive_renewals = []
-    start_on = Date.new(TimeKeeper.date_of_record.year, month.to_i, 1)
+    start_on = Date.new(year, month.to_i, 1)
     puts "Processing Groups for #{start_on.strftime('%m/%d/%Y')}" unless Rails.env.test?
 
     organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => prev_year_query(start_on)})
@@ -88,7 +89,8 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
           factory.renewing_plan_year = renewing_plan_year
           factory.active_plan_year = active_plan_year
           factory.disable_notifications = true
-          factory.process_renewals_for('dental')
+          factory.coverage_kind = 'dental'
+          factory.generate_renewals
 
           family.reload
           family.active_household.hbx_enrollments.shop_market.where({

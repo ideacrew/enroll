@@ -9,9 +9,9 @@
       <thead class="thead-default">
         <tr>
           <th>Employee Name<!-- <i class="fa fa-caret-down"></i>--></th>
-          <th>DOB</th>
-          <th>Hired</th>
-          <th>Status</th>
+          <th>Date of Birth</th>
+          <th>Date of Hire</th>
+          <th>Employee Account Status</th>
           <th>Benefit Package</th>
           <% if @employer_profile.renewing_plan_year.present? %>
           <th>Renewal Benefit Package</th>
@@ -19,7 +19,7 @@
           <% if ['terminated', 'all'].include?(status) %>
             <th>Termination Date</th>
           <% end %>
-          <th>Enrollment Status</th>
+          <th>Current Enrollment Status</th>
           <% if @employer_profile.renewing_published_plan_year.present? %>
               <th>Renewal Enrollment Status</th>
           <% end %>

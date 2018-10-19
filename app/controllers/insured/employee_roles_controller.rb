@@ -52,7 +52,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    census_employees = CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a
+    census_employees = actual_user.person.present? ? CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a : []
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
     if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
@@ -65,7 +65,8 @@ class Insured::EmployeeRolesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to :back, alert: "You can not enroll as another employee"}
+        log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity=>'error')
+        format.html { redirect_to :back, alert: "You can not enroll as another employee. Please reach out to customer service for assistance"}
       end
     end
   end
@@ -94,6 +95,7 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         # set_employee_bookmark_url
+        @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
         redirect_path = insured_family_members_path(employee_role_id: @employee_role.id)
         if @person.primary_family && @person.primary_family.active_household
           if @person.primary_family.active_household.hbx_enrollments.any?

@@ -1,4 +1,5 @@
 class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNotice
+include ActionView::Helpers::NumberHelper
 
   attr_accessor :census_employee
 
@@ -6,6 +7,7 @@ class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNoti
     build
     append_data
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -21,10 +23,15 @@ class ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal < ShopEmployeeNoti
     notice.plan = PdfTemplates::Plan.new({
       :plan_name => enrollment.plan.name
       })
+    
+    total_employee_cost =  number_to_currency(enrollment.total_employee_cost)
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :enrollees => enrollment.hbx_enrollment_members.map(&:person).map(&:full_name),
-      :employee_cost => enrollment.total_employee_cost
-      })
+      :enrollees => enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+        enrollee = PdfTemplates::Individual.new({
+          full_name: member.person.full_name.titleize })
+        enrollees << enrollee end,
+      :employee_cost => total_employee_cost
+    })
   end
 
 end

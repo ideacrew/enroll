@@ -27,6 +27,9 @@ class Insured::FamilyMembersController < ApplicationController
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
+      if @sep.submitted_at.to_date != TimeKeeper.date_of_record
+        @sep = duplicate_sep(@sep)
+      end
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
@@ -116,7 +119,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+    if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }
@@ -126,8 +129,10 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-    consumer_role.check_for_critical_changes(params[:dependent]) if consumer_role
+    @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+      consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+      consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|
         format.html { render 'show' }
@@ -153,7 +158,7 @@ class Insured::FamilyMembersController < ApplicationController
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
+      @effective_on_date =  special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
@@ -209,6 +214,14 @@ private
       end
       @dependent.addresses = addresses
     end
+  end
+
+  def duplicate_sep(sep)
+    sp = SpecialEnrollmentPeriod.new(sep.attributes.except("effective_on", "submitted_at", "_id"))
+    sp.qualifying_life_event_kind = sep.qualifying_life_event_kind    # initiate sep dates
+    @family.special_enrollment_periods << sp
+    sp.save
+    sp
   end
 
   def set_dependent

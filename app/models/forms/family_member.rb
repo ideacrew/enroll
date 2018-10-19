@@ -47,12 +47,13 @@ module Forms
         elsif @us_citizen == true && @naturalized_citizen.nil?
           self.errors.add(:base, "Naturalized citizen is required")
         end
-        if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
-          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
-        end
 
         if @indian_tribe_member.nil?
           self.errors.add(:base, "native american / alaskan native status is required")
+        end
+
+        if !tribal_id.present? && @indian_tribe_member
+          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
         end
 
         if @is_incarcerated.nil?

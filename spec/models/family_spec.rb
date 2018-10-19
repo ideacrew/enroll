@@ -411,9 +411,9 @@ describe Family do
     before do
       @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date1)
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month', submitted_at: date2)
     end
 
     it "should return latest active sep" do
@@ -423,6 +423,28 @@ describe Family do
       expect(@another_current_sep.is_active?).to eq true
       expect(sep.is_active?).to eq false
       expect(family.latest_shop_sep).to eq @another_current_sep
+    end
+  end
+
+  context "best_verification_due_date" do 
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    
+    it "should earliest duedate when family had two or more due dates" do
+      family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 40
+    end
+
+    it "should return only possible due date when we only have one due date even if it passed or less than 30days" do
+      family_due_dates = [TimeKeeper.date_of_record+20]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 20
+    end
+
+    it "should return next possible due date when the first due date is passed or less than 30days" do
+      family_due_dates = [TimeKeeper.date_of_record+20 , TimeKeeper.date_of_record+ 80]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 80
     end
   end
 
@@ -452,7 +474,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
@@ -809,6 +831,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
       expect(family.current_shop_eligible_open_enrollments.count).to eq 1
     end
 
+    it "should have no current shop eligible open enrollments if the employee role is not active" do
+      census_employee.update_attributes(aasm_state: "employment_terminated")
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
+    end
+
     it "should not be in ivl open enrollment" do
       expect(family.is_under_ivl_open_enrollment?).to be_falsey
     end
@@ -1153,6 +1180,7 @@ end
 
 describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person)}
+  let(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person)}
   let(:person_two) { FactoryGirl.create(:person) }
   let(:family_member_dependent) { FactoryGirl.build(:family_member, person: person_two, family: family)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
@@ -1164,6 +1192,8 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should build the consumer role for the dependents when primary has a consumer role" do
+    allow(person).to receive(:is_consumer_role_active?).and_return(true)
+    allow(family_member_dependent.person).to receive(:is_consumer_role_active?).and_return(true)
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
     expect(family_member_dependent.person.consumer_role).to eq nil
@@ -1172,6 +1202,7 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 
   it "should return the existing consumer roles if dependents already have a consumer role" do
+    allow(person_two).to receive(:is_consumer_role_active?).and_return(true)
     person.consumer_role = FactoryGirl.create(:consumer_role)
     person.save
     cr = FactoryGirl.create(:consumer_role)
@@ -1318,46 +1349,60 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   end
 end
 
-describe "#document_due_date", dbclean: :after_each do
-  context "when special verifications exists" do
-    let(:special_verification) { FactoryGirl.create(:special_verification)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
+describe "min_verification_due_date", dbclean: :after_each do
+  let!(:today) { Date.today }
+  let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
 
-    it "should return the due date on the related latest special verification" do
-      expect(family.document_due_date(family.primary_family_member, special_verification.verification_type)).to eq special_verification.due_date.to_date
+  context "::min_verification_due_date_range" do
+    it "returns a family in the range" do
+      expect(Family.min_verification_due_date_range(10.days.ago, today).to_a).to eq([family])
     end
   end
+end
 
-  context "when special verifications not exist" do
+describe "has_valid_e_case_id" do
+  let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
 
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  it "returns false as e_case_id is nil" do
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
 
-    context "when the family member had an 'enrolled_contingent' policy" do
+  it "returns true as it has a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
+    expect(family1000.has_valid_e_case_id?).to be_falsey
+  end
 
-      let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
+  it "returns false as it don't have a valid e_case_id" do
+    family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
+    expect(family1000.has_valid_e_case_id?).to be_truthy
+  end
+end
 
-      before do
-        fm = family.primary_family_member
-        enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
-      end
-      it "should return the special_verification_period on the enrollment if it exists" do
-        enrollment.special_verification_period = TimeKeeper.date_of_record + 45.days
-        enrollment.save!
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq enrollment.special_verification_period.to_date
-      end
+describe "currently_enrolled_plans_ids" do
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
 
-      it "should return nil if special_verification_period on the enrollment is nil" do
-        enrollment.special_verification_period = nil
-        enrollment.save
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-      end
-    end
+  it "should return a non-empty array of plan ids" do
+    expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
+  end
+end
 
-    context "when the family member had no policy" do
-      it "should return nil" do
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
-      end
-    end
+describe "active dependents" do
+  let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryGirl.create(:household, family: family) }
+  let!(:family_member1) { FactoryGirl.create(:family_member, family: family,person: person2) }
+  let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person3) }
+
+  it 'should return 2 active dependents when all the family member are active' do
+    allow(family_member2).to receive(:is_active).and_return(true)
+    expect(family.active_dependents.count).to eq 2
+  end
+
+  it 'should return 1 active dependent when one of the family member is inactive' do
+    allow(family_member2).to receive(:is_active).and_return(false)
+    expect(family.active_dependents.count).to eq 1
   end
 end

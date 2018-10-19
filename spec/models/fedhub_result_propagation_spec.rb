@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe "A new consumer role with an individual market enrollment", :dbclean => :after_each do
+describe "A new consumer role with an individual market enrollment", :dbclean => :around_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:individual_market_family, primary_person: person) }
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
