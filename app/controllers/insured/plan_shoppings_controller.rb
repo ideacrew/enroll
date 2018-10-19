@@ -166,7 +166,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      @dc_checkbook_url = is_congress_employee ? (Settings.checkbook_services.congress_url + "#{@hbx_enrollment.coverage_year}") : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
@@ -245,10 +245,8 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
 
       build_same_plan_premiums

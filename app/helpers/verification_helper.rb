@@ -14,22 +14,26 @@ module VerificationHelper
     end
   end
 
-  def verification_type_class(type, member, admin=false)
-    case verification_type_status(type, member, admin)
+  def verification_type_class(status)
+    case status
       when "verified"
         "success"
       when "review"
         "warning"
       when "outstanding"
         "danger"
-      when "External Source"
+      when "curam"
         "default"
       when "attested"
         "default"
       when "valid"
         "success"
-      when "processing"
+      when "pending"
         "info"
+      when "expired"
+        "default"
+      when "unverified"
+        "default"
     end
   end
 
@@ -38,7 +42,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
   end
 
   def verification_needed?(person)
@@ -52,11 +56,11 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
-    !family_member.person.consumer_role.is_type_verified?(v_type)
+    !(["na", "verified", "attested", "expired"].include?(v_type.validation_status))
   end
 
-  def can_show_due_date?(person, options ={})
-    enrollment_group_unverified?(person) && verification_needed?(person) && (has_enrolled_policy?(options[:f_member]) && is_not_verified?(options[:f_member], options[:v_type]))
+  def can_show_due_date?(person)
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| VerificationType::DUE_DATE_STATES.include?(type.validation_status)}.any?
   end
 
   def documents_uploaded
@@ -138,8 +142,13 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-  def show_v_type(v_type, person, admin = false)
-    verification_type_status(v_type, person, admin).split.map(&:capitalize).join(' ').center(12).gsub(' ', '&nbsp;').html_safe
+  def show_v_type(status, admin = nil)
+    if status == "curam"
+      admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+    elsif status
+      status = "verified" if status == "valid"
+      status.capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+    end
   end
 
   # returns vlp_documents array for verification type
@@ -194,25 +203,41 @@ module VerificationHelper
     raw_request = person.consumer_role.local_residency_requests.select{
         |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
     }
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
   end
 
   def show_ssa_dhs_request(person, record)
     requests = person.consumer_role.lawful_presence_determination.ssa_requests + person.consumer_role.lawful_presence_determination.vlp_requests
     raw_request = requests.select{|request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)} if requests.any?
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no request record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
   end
 
   def show_residency_response(person, record)
     raw_response = person.consumer_role.local_residency_responses.select{
         |response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)
     }
-    raw_response ? Nokogiri::XML(raw_response.first.body) : "no response record"
+    raw_response.any? ? Nokogiri::XML(raw_response.first.body) : "no response record"
   end
 
   def show_ssa_dhs_response(person, record)
     responses = person.consumer_role.lawful_presence_determination.ssa_responses + person.consumer_role.lawful_presence_determination.vlp_responses
     raw_request = responses.select{|response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)} if responses.any?
-    raw_request ? Nokogiri::XML(raw_request.first.body) : "no response record"
+    raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no response record"
+  end
+
+  def has_active_consumer_or_resident_members?(family_members)
+    family_members.present? && (family_members.map(&:person).any?(&:is_consumer_role_active?) || family_members.map(&:person).any?(&:is_resident_role_active?))
+  end
+
+  def has_active_resident_members?(family_members)
+    family_members.present? && family_members.map(&:person).any?(&:is_resident_role_active?)
+  end
+
+  def has_active_consumer_dependent?(person,dependent)
+    !person.has_active_employee_role? && (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_consumer_role_active?)
+  end
+
+  def has_active_resident_dependent?(person,dependent)
+    (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
   end
 end
