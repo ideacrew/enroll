@@ -1143,6 +1143,48 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'DIG063',
+    title: "NO PAYMENT FOR GROUP HEALTH COVERAGE ON DC HEALTH LINK",
+    description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_no_binder_payment_received',
+    notice_triggers: [
+      {
+        name: 'Initial Employer No Binder Payment Received',
+        notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
+        notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
+        mpi_indicator: 'SHOP_D063',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DIE075',
+    title: 'Employee Enrollment Confirmation',
+    description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
+    resource_name: 'employee_role',
+    event_name: 'initial_employee_plan_selection_confirmation',
+    notice_triggers: [
+      {
+          name: 'Notice to employee after they select a plan Annual Open Enrollment',
+          notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
+          notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
+          mpi_indicator: 'SHOP_D075',
+          notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employee"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+          }
+      }
+    ]
+  },
 ]
 
 ivl_notice_triggers = [
