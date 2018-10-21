@@ -5,7 +5,11 @@
       <% end %>
       <h4>
         <%= find_my_doctor %>
+        <% if @market_kind == "individual" && @coverage_kind == "health" %>
           <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
+          <% elsif @market_kind == "individual" && @coverage_kind == "dental" %>
+          <%= link_to l10n("estimate_your_cost"), 'https://dc.checkbookhealth.org/sadpi/dc/2019/', target: '_blank' %>
+        <% end %>
         </br>
       </h4>
     </div>
