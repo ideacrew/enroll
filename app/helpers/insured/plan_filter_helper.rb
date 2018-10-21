@@ -2,10 +2,10 @@ module Insured::PlanFilterHelper
   include L10nHelper
 
   def find_my_doctor
-    if @market_kind == "individual"
+    if @market_kind == "individual" && @coverage_kind == "health"
       link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dc/', target: '_blank')
-    elsif @market_kind == "shop"
-      link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dcshop/', target: '_blank')
+    elsif @market_kind == "shop" && @coverage_kind == "health"
+      link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dcshopnationwide/', target: '_blank')
     end
   end
 
