@@ -70,7 +70,7 @@ describe BenefitGroup, dbclean: :after_each do
   end
 end
 
-describe BenefitGroup, "instance methods" do
+describe BenefitGroup, "instance methods", dbclean: :after_each do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
   let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
   let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
@@ -169,7 +169,7 @@ describe BenefitGroup, "instance methods" do
   end
 end
 
-describe BenefitGroup, type: :model do
+describe BenefitGroup, type: :model, dbclean: :after_each do
 
   context 'disabling the benefit group' do
     let(:plan_year) { FactoryGirl.create(:plan_year)}
@@ -216,7 +216,7 @@ describe BenefitGroup, type: :model do
   end
 end
 
-describe BenefitGroup, type: :model do
+describe BenefitGroup, type: :model, dbclean: :after_each do
   let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
   let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
   let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
@@ -268,7 +268,7 @@ describe BenefitGroup, type: :model do
   end
 end
 
-describe BenefitGroup, type: :model do
+describe BenefitGroup, type: :model, dbclean: :after_each do
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }

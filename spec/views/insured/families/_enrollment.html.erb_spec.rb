@@ -12,11 +12,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   context "should display legal_name" do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }
-    let(:plan) { FactoryGirl.build(:plan) }
+    let(:plan) { FactoryGirl.build(:benefit_markets_products_health_products_health_product) }
     let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
     before :each do
       allow(hbx).to receive(:employer_profile).and_return(employer_profile)
-      allow(hbx).to receive(:plan).and_return(plan)
+      allow(hbx).to receive(:product).and_return(plan)
       allow(hbx).to receive(:coverage_year).and_return(2016)
     end
 
@@ -43,8 +43,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
   context "without consumer_role", dbclean: :before_each do
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
-    let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
-    let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
+    let(:mock_organization){ instance_double(Organization, hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
+    let(:mock_carrier_profile) { instance_double(CarrierProfile, :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
     let(:plan) { double("Plan",
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
@@ -70,7 +70,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
     #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double(HbxEnrollment, product: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  subscriber: nil,
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
@@ -185,10 +185,10 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "with consumer_role", dbclean: :before_each do
-    let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
+    let(:plan) {FactoryGirl.build(:benefit_markets_products_health_products_health_product, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double(HbxEnrollment, product: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),

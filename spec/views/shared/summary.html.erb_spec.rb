@@ -2,10 +2,10 @@ require 'rails_helper'
 
 describe "shared/_summary.html.erb" do
   let(:aws_env) { ENV['AWS_ENV'] || "qa" }
-  let(:person){ instance_double("Person") }
-  let(:family) { instance_double("Family") }
-  let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name") }
-  let(:mock_hbx_enrollment) { instance_double("HbxEnrollment", :hbx_enrollment_members => [], :id => "3241251524", :shopping? => true, plan: mock_plan, coverage_kind: 'health') }
+  let(:person){ instance_double(Person) }
+  let(:family) { instance_double(Family) }
+  let(:mock_carrier_profile) { instance_double(CarrierProfile, :dba => "a carrier name", :legal_name => "name") }
+  let(:mock_hbx_enrollment) { instance_double(HbxEnrollment, :hbx_enrollment_members => [], :id => "3241251524", :shopping? => true, product: mock_plan, coverage_kind: 'health') }
   let(:mock_plan) { double("Plan",
       :active_year => 2016,
       :name => "A Plan Name",
@@ -31,7 +31,7 @@ describe "shared/_summary.html.erb" do
       :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
                                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
       ) }
-  let(:mock_qhp_cost_share_variance) { instance_double("Products::QhpCostShareVariance", :qhp_service_visits => []) }
+  let(:mock_qhp_cost_share_variance) { instance_double(Products::QhpCostShareVariance, :qhp_service_visits => []) }
 
   before :each do
     Caches::MongoidCache.release(CarrierProfile)
