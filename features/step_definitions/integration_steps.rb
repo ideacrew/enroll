@@ -1,4 +1,3 @@
-require 'pry'
 # load Rails.root + "db/seeds.rb"
 
 When(/I use unique values/) do
