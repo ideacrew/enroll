@@ -4,7 +4,7 @@ class EventsHelperSlug
   include EventsHelper
 end
 
-describe EventsHelper, "given an address_kind" do
+describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
   subject { EventsHelperSlug.new }
 

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
+RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_each do
   let(:subject)  { Class.new { extend Insured::GroupSelectionHelper } }
 
   describe "#can shop individual" do
@@ -26,7 +26,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         expect(subject.can_shop_shop?(person)).not_to be_truthy
     end
     context "with active employee role" do
-      let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+      let(:person) { FactoryGirl.create(:person) }
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
@@ -38,7 +38,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
 
     context "with active employee role and benefit group" do
-      let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+      let(:person) { FactoryGirl.create(:person) }
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
@@ -369,9 +369,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
 
     context "#is_employer_disabled?" do
+      let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
-      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
-      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_dc_employer_profile_initial_application,
+        site: site
+       )}
+
+      let(:employer_profile) { organization.employer_profile }
+  
+      let(:employee_role_one) { FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
       let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
@@ -417,9 +425,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
 
     context "#is_employer_checked?" do
+      let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
-      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
-      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_dc_employer_profile_initial_application,
+        site: site
+       )}
+
+      let(:employer_profile) { organization.employer_profile }
+
+      let(:employee_role_one) { FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
       let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
@@ -570,12 +586,21 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   end
 
   describe "#is_eligible_for_dental?" do
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
+
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_dc_employer_profile_initial_application,
+        site: site
+       )}
+
+    let(:employer_profile) { organization.employer_profile }
+
 
     let(:active_bg) { double("ActiveBenefitGroup", plan_year: double("ActivePlanYear")) }
     let(:renewal_bg) { double("RenewalBenefitGroup", plan_year: double("RenewingPlanYear")) }
     let!(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
+    let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg, employer_profile: employer_profile)}
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: employee_role.person)}
 
     before do
@@ -701,8 +726,16 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   end
 
   describe "#class_for_ineligible_row" do
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
+
+    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_dc_employer_profile_initial_application,
+        site: site
+       )}
+
+    let(:employer_profile) { organization.employer_profile }
     let(:person) { FactoryGirl.create(:person, :with_family)}
-    let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
     # let(:employee_role_2) { FactoryGirl.create(:employee_role, person: employee_role_1.person)}
 
     before do
