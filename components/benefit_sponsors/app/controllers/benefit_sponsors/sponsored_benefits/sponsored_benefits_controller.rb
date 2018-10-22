@@ -64,10 +64,6 @@ module BenefitSponsors
         render json: @employee_cost_details.to_json
       end
 
-      def change_reference_product
-        @sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.fetch(params.permit(:kind, :benefit_sponsorship_id, :benefit_application_id, :benefit_package_id, :id))
-      end
-
       private
 
       def error_messages(object)
