@@ -31,7 +31,7 @@
     heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "Having quality affordable health insurance is important for you and your family. It can give you peace of mind if something unexpected happens like you get sick or have an accident. The #{Settings.aca.state_name} has recently established an individual responsibility requirement. This means that if you don't have health coverage and don’t qualify for an exemption, you may have to pay a penalty on your DC taxes. The penalty is up to $695 or 2.5 percent of income above the tax filing threshold, whichever is greater. So, be sure to get coverd and stay covered!"} %>
+  content: "Having quality affordable health insurance is important for you and your family. It can give you peace of mind if something unexpected happens like you get sick or have an accident. The #{Settings.aca.state_name} has recently established an individual responsibility requirement. This means that if you don't have health coverage and don’t qualify for an exemption, you may have to pay a penalty on your DC taxes. The penalty is up to $695 or 2.5 percent of income above the tax filing threshold, whichever is greater. So, be sure to get covered and stay covered!"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
@@ -131,7 +131,7 @@
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end %>
 
@@ -145,7 +145,7 @@
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
           col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end%>
 
@@ -182,7 +182,7 @@
           Your monthly premium payment:
         </td>
         <td align="right">
-          <%= number_to_currency(enrollment.responsible_amount, precision: 2) %>
+          <%= enrollment.responsible_amount %>
         </td>
       </tr>
     </table>
