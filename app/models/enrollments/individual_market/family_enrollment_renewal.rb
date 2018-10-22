@@ -40,18 +40,18 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
-      ehb_premium = (renewal_enrollment.total_premium * renewal_enrollment.plan.ehb)
-      applied_aptc_amt = [@aptc_values[:applied_aptc].to_f, ehb_premium].min
-      renewal_enrollment.applied_aptc_amount = applied_aptc_amt
-
-      if applied_aptc_amt == @aptc_values[:applied_aptc].to_f
-        renewal_enrollment.elected_aptc_pct = (@aptc_values[:applied_percentage].to_f/100.0)
-      else
-        renewal_enrollment.elected_aptc_pct = (applied_aptc_amt / @aptc_values[:"max_aptc"].to_f)
-      end
+      renewal_enrollment = assisted_enrollment(renewal_enrollment)
     end
 
     renewal_enrollment
+  end
+
+  def assisted_enrollment(renewal_enrollment)
+    eligibility_service = Services::EligibilityService.new
+    eligibility_service.enrollment = renewal_enrollment
+    eligibility_service.aptc_values = @aptc_values
+    eligibility_service.family = @enrollment.family
+    eligibility_service.apply_aptc
   end
 
   def is_dependent_dropped?
@@ -103,7 +103,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def assisted_renewal_plan
     # TODO: Make sure tax households create script treats 0 as 100
-    if is_all_eligible?
       if is_csr?
         if @aptc_values[:csr_amt] == '0'
           csr_variant = '01'
@@ -118,17 +117,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       else
         @enrollment.plan.renewal_plan_id
       end
-    else
-
-    end
-  end
-
-  def is_all_eligible?
-    active_household = @enrollment.family.active_household
-    coverage_period_tax_household = active_household.latest_active_thh_with_year(renewal_benefit_coverage_period.start_on.year)
-    coverage_period_tax_household.tax_household_members.each do |thhm|
-      thhm.is_ia_eligible
-    end
   end
 
   def has_catastrophic_plan?

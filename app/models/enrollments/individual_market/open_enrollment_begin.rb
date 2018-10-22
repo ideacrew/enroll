@@ -129,7 +129,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         end
       end
 
-      puts count
+      puts count unless Rails.env.test?
     end
 
 
@@ -179,7 +179,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
         end
       end
-      puts count
+      puts count unless Rails.env.test?
     end
 
     def process_enrollment_renewal(enrollment, renewal_benefit_coverage_period)
