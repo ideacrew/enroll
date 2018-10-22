@@ -377,7 +377,8 @@ class BenefitGroup
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 199
-    rp = (self.persisted? && plan.coverage_kind == "dental") ? dental_reference_plan : reference_plan
+    is_dental = self.persisted? && plan.present? && plan.coverage_kind == "dental"
+    rp = is_dental ? dental_reference_plan : reference_plan
 
     if self.sole_source? && self.composite_tier_contributions.empty?
       build_composite_tier_contributions
