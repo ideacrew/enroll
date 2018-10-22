@@ -12,9 +12,11 @@ FactoryGirl.define do
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, strategy: :create
+    association :benefit_sponsorship, :with_organization_cca_profile, factory: :benefit_sponsors_benefit_sponsorship
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+      instance.employer_profile = instance.benefit_sponsorship.profile
     end
 
     transient do
@@ -64,6 +66,12 @@ FactoryGirl.define do
 
       after :create do |organization, evaluator|
         FactoryGirl.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
+      end
+    end
+
+    trait :with_active_assignment do
+      after(:build) do |census_employee, evaluator|
+        build(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

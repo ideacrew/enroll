@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "employers/census_employees/show.html.erb" do
+RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each do
   let(:plan){ FactoryGirl.create(:plan) }
   let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household){ FactoryGirl.create(:household, family: family) }
@@ -37,6 +37,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   let(:user) { FactoryGirl.create(:user) }
 
   before(:each) do
+    view.extend BenefitSponsors::Engine.helpers
     sign_in user
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     assign(:employer_profile, employer_profile)
