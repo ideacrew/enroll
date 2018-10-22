@@ -498,6 +498,42 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
+    context "when outstanding member is present" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role, :with_primary)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+      let(:coverage_household) { family.households.first.coverage_households.first }
+      let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+      let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+      # let(:enrollment) {
+      #   enrollment = household.new_hbx_enrollment_from(
+      #     consumer_role: person.consumer_role,
+      #     coverage_household: coverage_household,
+      #     benefit_package: benefit_package,
+      #     qle: true
+      #   )
+      #   enrollment.save
+      #   enrollment
+      # }
+      let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+                              household: family.active_household, kind: "individual") }
+      let(:hbx_enrollment_members) { hbx_enrollment.hbx_enrollment_members}
+      let(:active_year) {TimeKeeper.date_of_record.year}
+
+      before :each do
+        allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+        allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+      end
+
+      it "should check for outstanding members" do
+        person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+        person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+        enrollment.reload
+        expect(enrollment.is_any_member_outstanding?).to be_truthy
+      end
+    end
+
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
