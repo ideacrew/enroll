@@ -77,7 +77,7 @@ module Notifier
     end
 
     def has_multiple_enrolled_enrollments?
-      (enrollment && enrollment.plan_name.present?) && (dental_enrollment && dental_enrollment.plan_name.present?)
+      has_health_enrolled_enrollment? && has_dental_enrolled_enrollment?
     end
 
     def has_health_enrolled_enrollment?

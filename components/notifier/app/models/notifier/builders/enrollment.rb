@@ -5,7 +5,7 @@ module Notifier
       return @enrollment if defined? @enrollment
       if payload['event_object_kind'].constantize == HbxEnrollment
         @enrollment = HbxEnrollment.find(payload['event_object_id'])
-      elsif event_name == "employee_notice_for_employee_terminated_from_roster"
+      elsif ["employee_notice_for_employee_terminated_from_roster", "initial_employee_plan_selection_confirmation"].include?(event_name)
         @enrollment = health_enrollment
       end
     end

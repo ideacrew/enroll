@@ -910,6 +910,4 @@ private
       unset("e_case_id")
     end
   end
-
 end
-
