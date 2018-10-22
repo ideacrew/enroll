@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
+RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice, dbclean: :after_each do
   before(:all) do
     @employer_profile = FactoryGirl.create(:employer_profile)
     @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')

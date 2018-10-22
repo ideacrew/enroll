@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::PlanShoppingsController, :type => :controller do
+RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: :after_each do
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
   let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
   let(:household){ double("Household") }
