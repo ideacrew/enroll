@@ -23,6 +23,7 @@ module Services
 
       def generate_url
         return @url if is_congress
+        return "http://checkbook_url" if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
 
@@ -41,7 +42,7 @@ module Services
         end
       end
 
-      # private
+      private
 
       def construct_body_shop
         {
@@ -100,7 +101,7 @@ module Services
         if active_house_hold.nil?
           return "-01"
         else 
-          active_house_hold.latest_eligibility_determination.csr_percent_as_integer
+          active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
         end
       end
 
@@ -109,7 +110,7 @@ module Services
         if active_house_hold.nil?
           return "000"
         else 
-          active_house_hold.latest_eligibility_determination.max_aptc
+          active_house_hold.latest_eligibility_determination.max_aptc.to_s
         end
       end
 
