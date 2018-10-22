@@ -504,7 +504,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       it "should get the checkbook_url" do
-        expect(assigns(:dc_checkbook_url)).to eq Settings.checkbook_services.congress_url+"#{hbx_enrollment.coverage_year}/"
+        expect(assigns(:dc_checkbook_url)).to eq "http://checkbook_url"
       end
     end
 

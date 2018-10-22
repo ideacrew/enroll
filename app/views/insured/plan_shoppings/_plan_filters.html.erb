@@ -11,6 +11,10 @@
           <%= link_to l10n("estimate_your_cost"), 'https://dc.checkbookhealth.org/sadpi/dc/2019/', target: '_blank' %>
         <% end %>
         </br>
+        <% if plan_match_dc %>
+        <%= estimate_your_costs %>
+        <% end %>
+      </br>
       </h4>
     </div>
 
