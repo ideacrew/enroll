@@ -30,13 +30,13 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
     let!(:dep_consumer_role1) { FactoryBot.create(:consumer_role, person: dep_person1) }
     let!(:dep_imt1) { FactoryBot.create :individual_market_transition, person: dep_person1 }
 
-    context "it should update the due. date and enrollment state" do 
       before :each do
         consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         subject.migrate
         hbx_enrollment.reload
         consumer_role.verification_types.map(&:reload)
       end
+
 
       it "should return is_any_member_outstanding? as true" do
         expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
@@ -85,4 +85,3 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
       end
     end
   end
-end
