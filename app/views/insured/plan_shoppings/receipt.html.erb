@@ -12,7 +12,7 @@
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
           <% if @enrollment.employee_role.present? %>
           <% else %>
-            <% if @enrollment.plan.carrier_profile.legal_name == "Kaiser" %>
+            <% if show_pay_now? %>
               <p><strong>Important:</strong> You must pay your first month’s premium directly to Kaiser Permanente
                 to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
                 other payment options, select ‘How to Pay’.</p>
