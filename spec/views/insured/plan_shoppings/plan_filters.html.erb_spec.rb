@@ -13,13 +13,16 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
       assign(:hbx_enrollment, hbx_enrollment)
+      assign(:market_kind, "shop")
+      assign(:coverage_kind, "health")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      assign(:dc_checkbook_url, "https://staging.checkbookhealth.org/hie/dc/")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
     it 'should display find your doctor link' do
-      expect(rendered).to have_selector('a', text: /estimate your cost/i)
+      expect(rendered).to have_selector('a', text: /estimate your costs/i)
     end
 
     it 'should display filter selections' do

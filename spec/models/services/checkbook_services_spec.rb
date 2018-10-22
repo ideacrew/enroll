@@ -54,7 +54,7 @@ describe Services::CheckbookServices::PlanComparision do
       it "should return correct csr percentage" do
         allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
-        expect(subject.csr_value).to eq tax_household.latest_eligibility_determination.csr_percent_as_integer
+        expect(subject.csr_value).to eq tax_household.latest_eligibility_determination.csr_percent_as_integer.to_s
       end
     end
      context "when active household not present" do 
@@ -76,13 +76,13 @@ describe Services::CheckbookServices::PlanComparision do
       it "should return max aptc" do
         allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
-        expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc
+        expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc.to_s
       end
     end
      context "when active household  not present" do 
-      it "should return max 000" do
+      it "should return max NULL" do
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
-        expect(subject.aptc_value).to eq "000"
+        expect(subject.aptc_value).to eq "NULL"
       end
     end
   end

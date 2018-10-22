@@ -42,6 +42,24 @@ module Services
         end
       end
 
+      def csr_value
+        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+        if active_house_hold.nil?
+          return "-01"
+        else 
+          active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
+        end
+      end
+
+      def aptc_value
+        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+        if active_house_hold.nil?
+          return "NULL"
+        else 
+          active_house_hold.latest_eligibility_determination.max_aptc.to_s
+        end
+      end
+
       private
 
       def construct_body_shop
@@ -94,24 +112,6 @@ module Services
 
       def enrollment_year
         @hbx_enrollment.effective_on.year
-      end
-
-      def csr_value
-        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
-        if active_house_hold.nil?
-          return "-01"
-        else 
-          active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
-        end
-      end
-
-      def aptc_value
-        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
-        if active_house_hold.nil?
-          return "000"
-        else 
-          active_house_hold.latest_eligibility_determination.max_aptc.to_s
-        end
       end
 
       def filter_option
