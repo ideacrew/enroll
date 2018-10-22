@@ -14,6 +14,28 @@ module VerificationHelper
     end
   end
 
+  def ridp_type_status(type, person)
+    consumer = person.consumer_role
+    case type
+      when 'Identity'
+        if consumer.identity_verified?
+          consumer.identity_validation
+        elsif consumer.has_ridp_docs_for_type?(type) && !consumer.identity_rejected
+          'in review'
+        else
+          'outstanding'
+        end
+      when 'Application'
+        if consumer.application_verified?
+          consumer.application_validation
+        elsif consumer.has_ridp_docs_for_type?(type) && !consumer.application_rejected
+          'in review'
+        else
+          'outstanding'
+        end
+    end
+  end
+
   def verification_type_class(status)
     case status
       when "verified"
@@ -34,6 +56,17 @@ module VerificationHelper
         "default"
       when "unverified"
         "default"
+    end
+  end
+
+  def ridp_type_class(type, person)
+    case ridp_type_status(type, person)
+      when 'valid'
+        'success'
+      when 'in review'
+        'warning'
+      when 'outstanding'
+        'danger'
     end
   end
 
@@ -137,17 +170,41 @@ module VerificationHelper
     end
   end
 
+  def show_ridp_type(ridp_type, person)
+    case ridp_type_status(ridp_type, person)
+      when 'in review'
+        "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
+      when 'valid'
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      else
+        "&nbsp;&nbsp;Outstanding&nbsp;&nbsp;".html_safe
+    end
+  end
+
+  def text_center(v_type, person)
+    (current_user && !current_user.has_hbx_staff_role?) || show_v_type(v_type, person) == '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+  end
+
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+  end
+
+  # returns ridp_documents array for ridp verification type
+  def ridp_documents_list(person, ridp_type)
+    person.consumer_role.ridp_documents.select{|doc| doc.identifier && doc.ridp_verification_type == ridp_type } if person.consumer_role
   end
 
   def admin_actions(v_type, f_member)
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
 
+  def ridp_admin_actions(ridp_type, person)
+    options_for_select(build_ridp_admin_actions_list(ridp_type, person))
+  end
+
   def mod_attr(attr, val)
-      attr.to_s + " => " + val.to_s
+    attr.to_s + " => " + val.to_s
   end
 
   def build_admin_actions_list(v_type, f_member)
@@ -157,6 +214,14 @@ module VerificationHelper
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def build_ridp_admin_actions_list(ridp_type, person)
+    if ridp_type_status(ridp_type, person) == 'outstanding'
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == 'Reject'}
+    else
+      ::RidpDocument::ADMIN_VERIFICATION_ACTIONS
     end
   end
 
@@ -175,6 +240,11 @@ module VerificationHelper
 
   def type_unverified?(v_type, person)
     !["verified", "valid", "attested"].include?(verification_type_status(v_type, person))
+  end
+
+
+  def ridp_type_unverified?(ridp_type, person)
+    ridp_type_status(ridp_type, person) != 'valid'
   end
 
   def request_response_details(person, record, v_type)
