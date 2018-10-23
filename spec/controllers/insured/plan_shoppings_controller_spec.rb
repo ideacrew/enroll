@@ -444,7 +444,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:plans) {[plan1, plan2, plan3]}
     let(:coverage_kind){"health"}
     let (:individual_market_transition) { double ("IndividualMarketTransition") }
-
+    #let(:person) { FactoryGirl.create(:person, :with_family)}
+    let(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
+    #let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -452,6 +454,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:kind).and_return("employer_sponsored")
+      allow(hbx_enrollment).to receive(:consumer_role).and_return(consumer_person.consumer_role)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
       allow(user).to receive(:person).and_return(person)
@@ -502,7 +506,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
 
       it "should get the checkbook_url" do
-        expect(assigns(:dc_checkbook_url)).to eq Settings.checkbook_services.congress_url+"#{hbx_enrollment.coverage_year}/"
+        expect(assigns(:dc_checkbook_url)).to eq "http://checkbook_url"
       end
     end
 

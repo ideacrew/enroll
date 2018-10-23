@@ -2,18 +2,41 @@
   <div class="row">
     <div class="checkbox-filter-wrapper">
       <% if !@hbx_enrollment.is_shop? %>
-      <h4>
-        <%= link_to l10n('estimate_your_costs'), "https://dc.checkbookhealth.org/hie/dc/#{@hbx_enrollment.coverage_year}/", target: '_blank' %>
-      </h4>
       <% end %>
       <h4>
         <%= find_my_doctor %>
+        <% if @market_kind == "individual" && @coverage_kind == "health" %>
+          <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
+          <% elsif @market_kind == "individual" && @coverage_kind == "dental" %>
+          <%= link_to l10n("estimate_your_cost"), 'https://staging.checkbookhealth.org/sadpi/DC/2019/', target: '_blank' %>
+          <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
+        <% end %>
         </br>
         <% if plan_match_dc %>
         <%= estimate_your_costs %>
         <% end %>
+      </br>
       </h4>
     </div>
+
+  <div class="modal fade" id="plan_match_redirection" tabindex="-1" role="dialog" role="document">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header" style="border-bottom:none">
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+           <hr>
+          </div> 
+          <div style="margin-left:20px;">
+            <p><%= l10n("modal_onscreen") %></p>
+          </div>
+          <div class="modal-footer" style="margin-right:190px">
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_url,target: "_blank", class: "btn btn-primary  mtz" %>
+          </div>
+       </div>
+    </div>
+  </div>
+
   <h3 class="header-title">Filter Results</h3>
   <% if @market_kind == "individual" || @benefit_group.try(:plan_option_kind) == "single_carrier" %>
   <div class="checkbox-filter-wrapper">
