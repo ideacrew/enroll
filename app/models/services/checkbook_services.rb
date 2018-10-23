@@ -17,7 +17,7 @@ module Services
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = CONGRESS_URL : @url = BASE_URL+"/shop/dc/api/"
+          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+"/shop/dc/api/"
         end
       end
 
