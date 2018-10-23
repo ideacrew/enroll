@@ -245,7 +245,7 @@ class HbxEnrollment
 
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_enrollment_events]
 
-  before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber
+  before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at
   after_save :notify_on_save
 
@@ -1752,6 +1752,14 @@ class HbxEnrollment
   end
 
   private
+
+  def set_is_any_enrollment_member_outstanding
+    if kind == "individual"
+      active_consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+      true_or_false = active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+      self.assign_attributes({:is_any_enrollment_member_outstanding => true_or_false})
+    end
+  end
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
