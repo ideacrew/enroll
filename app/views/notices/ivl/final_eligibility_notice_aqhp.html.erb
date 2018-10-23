@@ -121,35 +121,31 @@
  contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
    heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
-<% if notice.enrollments.size > 1 %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-     contents: ["The people listed will be enrolled in the plan(s) shown below for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan. The plan you have now will not be offered in #{notice.coverage_year}, but the plan shown is similar to it.", "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different. "],
-       heading: 'Your Plan', sub_heading: '', bottom_margin: '5px'} %>
-
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctors and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
-
-  <% notice.enrollments.each do |enrollment| %>
-    <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
-        col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+<% if notice.health_enrollments.present? && notice.dental_enrollments.present? %>
+  <% if (notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
+  <% elsif (notice.same_plan_health_enrollment && !notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
+  <% elsif (!notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
   <% end %>
-
-<% else %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["The people listed will be enrolled in the same plan you have now for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan.", "Copayments, coinsurance, and deductibles for #{notice.coverage_year} may be different. Your insurance company will send you a letter about any changes."],
-     heading: 'Your Plan', sub_heading: '', bottom_margin: '3px'} %>
-
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctors and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
-
-  <% notice.enrollments.each do |enrollment| %>
-    <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
-          col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
-  <% end%>
-
-<% end%>
+<% elsif notice.health_enrollments.present? && notice.dental_enrollments.blank? %>
+  <% if notice.same_plan_health_enrollment %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
+  <% end %>
+<% elsif notice.health_enrollments.blank? && notice.dental_enrollments.present? %>
+  <% if notice.same_plan_dental_enrollment %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
+  <% end %>
+<% end %>
 
 <% notice.renewal_health_enrollments.each do |enrollment|%>
   <% if enrollment.aptc_amount > 0 %>
