@@ -17,6 +17,8 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     benefit_sponsorship.service_areas_on(effective_period.min) 
   }
 
+  let(:dental_sponsored_benefit) { false }
+
   let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
   
   let(:initial_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
