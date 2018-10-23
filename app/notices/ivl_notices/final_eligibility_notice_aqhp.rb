@@ -1,6 +1,6 @@
 class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person, :enrollments
+  attr_accessor :family, :data, :person, :renewing_enrollments, :active_enrollments
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -9,7 +9,8 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.person = args[:person]
-    self.enrollments = args[:enrollments]
+    self.renewing_enrollments = args[:renewing_enrollments]
+    self.active_enrollments = args[:active_enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -53,9 +54,34 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   end
 
   def append_data
+    hbx_enrollments = []
     primary_member = data.detect{|m| m["subscriber"].upcase == "YES"}
     append_member_information_for_aqhp(primary_member)
-    append_enrollment_information
+    health_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == "2019"}
+    dental_enrollments = renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == "2019"}
+
+    previous_health_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == "2018"}
+    previous_dental_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == "2018"}
+    renewal_health_plan_id = (previous_health_enrollments.plan.renewal_plan_id) rescue nil
+    future_health_plan_id = (health_enrollments.plan.id) rescue nil
+    renewal_dental_plan_id = (previous_dental_enrollments.plan.renewal_plan_id) rescue nil
+    future_dental_plan_id = (dental_enrollments.plan.id) rescue nil
+    notice.same_plan_health_enrollment = (renewal_health_plan_id && future_health_plan_id) ? (renewal_health_plan_id == future_health_plan_id) : false
+    notice.same_plan_dental_enrollment = (renewal_dental_plan_id && future_dental_plan_id) ? (renewal_dental_plan_id == future_dental_plan_id) : false
+    hbx_enrollments << health_enrollments
+    hbx_enrollments << dental_enrollments
+    return nil if hbx_enrollments.flatten.compact.empty?
+    notice.health_enrollments << (append_enrollment_information(health_enrollments) if health_enrollments)
+    notice.dental_enrollments << (append_enrollment_information(dental_enrollments) if dental_enrollments)
+    notice.health_enrollments.flatten!
+    notice.health_enrollments.compact!
+    notice.dental_enrollments.flatten!
+    notice.dental_enrollments.compact!
+    notice.enrollments << notice.health_enrollments
+    notice.enrollments << notice.dental_enrollments
+    notice.enrollments.flatten!
+    notice.enrollments.compact!
+    #append_enrollment_information
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
     end
@@ -101,8 +127,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     end
   end
 
-  def append_enrollment_information
-    enrollments.each do |enrollment|
+  def append_enrollment_information(enrollment)
       plan = PdfTemplates::Plan.new({
         plan_name: enrollment.plan.name,
         is_csr: enrollment.plan.is_csr?,
@@ -111,7 +136,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
         deductible: enrollment.plan.deductible
         })
-      notice.enrollments << PdfTemplates::Enrollment.new({
+        PdfTemplates::Enrollment.new({
         premium: enrollment.total_premium.round(2),
         aptc_amount: enrollment.applied_aptc_amount.round(2),
         responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
@@ -129,7 +154,6 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
           enrollees << enrollee
         end
       })
-    end
   end
 
   def phone_number(legal_name)
