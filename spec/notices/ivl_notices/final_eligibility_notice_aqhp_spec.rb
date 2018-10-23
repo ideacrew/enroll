@@ -11,6 +11,8 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: year, hios_id: "11111111122302-01") }
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
+  let!(:hbx_enrollment2) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "coverage_selected", effective_on: Date.new(year-1,1,1))}
+
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Eligibility Notice for AQHP individuals',
                             :notice_template => 'notices/ivl/final_eligibility_notice_aqhp',
@@ -27,7 +29,8 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :data => data,
-      enrollments: [hbx_enrollment],
+      :renewing_enrollments =>  [hbx_enrollment],
+      :active_enrollments => [hbx_enrollment2],
       :person => person
   }}
 

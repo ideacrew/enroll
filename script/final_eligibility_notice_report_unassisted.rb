@@ -54,7 +54,7 @@ def check_for_outstanding_verification_types(person)
   outstanding_verification_types = []
 
   if person.consumer_role.outstanding_verification_types.present?
-    outstanding_verification_types << person.consumer_role.outstanding_verification_types
+    outstanding_verification_types << person.consumer_role.outstanding_verification_types.map(&:type_name)
   else
     return nil
   end
