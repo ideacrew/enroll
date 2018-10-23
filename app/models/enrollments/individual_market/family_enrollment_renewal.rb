@@ -23,12 +23,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
       puts "#{enrollment.hbx_id}---#{e.inspect}"
-      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
+      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
     end
   end
 
   def is_household_outstanding?(hbx_enrollment_members)
     active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    @logger.info "Active Consumer Role People: count- #{active_consumer_role_people.count}, hbx_ids- #{active_consumer_role_people.map(&:hbx_id)}"
     active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
   end
 
@@ -42,7 +43,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
-    renewal_enrollment.is_any_enrollment_member_outstanding = (is_household_outstanding?(renewal_enrollment.hbx_enrollment_members) rescue false)
+    renewal_enrollment.is_any_enrollment_member_outstanding = is_household_outstanding?(renewal_enrollment.hbx_enrollment_members)
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
