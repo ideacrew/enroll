@@ -1,44 +1,14 @@
 require 'rails_helper'
+require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
   before do
     DatabaseCleaner.clean
   end
 
-  let!(:hbx_profile) {FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)}
-  let!(:renewal_calender_date) { HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on}
-  let!(:renewal_calender_year) { renewal_calender_date.year}
-
-  let!(:family_unassisted) {FactoryGirl.create(:individual_market_family)}
-  let!(:enrollment_unassisted) {FactoryGirl.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
-                                                   household: family_unassisted.active_household,
-                                                   enrollment_members: [family_unassisted.family_members.first],
-                                                   plan: active_individual_health_plan)}
-
-  let!(:family_assisted) {FactoryGirl.create(:individual_market_family)}
-  let!(:tax_household1) {FactoryGirl.create(:tax_household, effective_starting_on: renewal_calender_date,
-                                            effective_ending_on: nil, household: family_assisted.active_household)}
-  let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
-  let!(:tax_household_member1) {tax_household1.tax_household_members.create(applicant_id: family_assisted.family_members.first.id,
-                                                                            is_ia_eligible: true)}
-  let!(:enrollment_assisted) {FactoryGirl.create(:hbx_enrollment, :individual_assisted, :with_enrollment_members,
-                                                 applied_aptc_amount: 110,
-                                                 consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
-                                                 household: family_assisted.active_household,
-                                                 enrollment_members: [family_assisted.family_members.first],
-                                                 plan: active_csr_87_plan)}
-
-  let!(:active_individual_health_plan) {FactoryGirl.create(:active_individual_health_plan, renewal_plan: renewal_individual_health_plan)}
-  let!(:active_csr_87_plan) {FactoryGirl.create(:active_csr_87_plan, renewal_plan: renewal_csr_87_plan)}
-
-  let!(:renewal_individual_health_plan) {FactoryGirl.build(:renewal_individual_health_plan)}
-  let!(:update_renewal_individual_health_plan) {renewal_individual_health_plan.update_attributes!(hios_id: active_individual_health_plan.hios_id,
-                                                                                                  hios_base_id: active_individual_health_plan.hios_base_id)}
-  let!(:renewal_csr_87_plan) {FactoryGirl.create(:renewal_csr_87_plan)}
-  let!(:update_renewal_csr_87_plan) {renewal_csr_87_plan.update_attributes!(hios_id: active_csr_87_plan.hios_id,
-                                                                            hios_base_id: active_csr_87_plan.hios_base_id)}
-
   describe "To test passive renewals with only ivl health plans" do
+    include_context "setup families enrollments"
+
     context "Given a database of Families" do
       it "at least one Family with an active 'Individual Market Health plan Enrollment only'" do
         expect(family_unassisted.active_household.hbx_enrollments.first.kind).to eq "individual"
