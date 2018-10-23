@@ -2668,19 +2668,37 @@ describe HbxEnrollment, dbclean: :after_all do
 end
 
 describe HbxEnrollment, dbclean: :after_all do
-  let!(:ivl_person)       { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
-  let!(:ivl_family)       { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
-  let!(:ivl_enrollment)   { FactoryGirl.create(:hbx_enrollment, household: ivl_family.active_household,
-                            kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
+  let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
+  let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household,
+                                  kind: "individual", aasm_state: "coverage_selected") }
+  let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+                                  applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
+                                  eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
 
   context ".is_ivl_actively_outstanding?" do
     it "should return true" do
+      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+      ivl_enrollment.save!
       expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_truthy
     end
 
     it "should return false" do
-      ivl_enrollment.update_attributes!(is_any_enrollment_member_outstanding: false)
       expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
+    end
+  end
+
+  context "for set_is_any_enrollment_member_outstanding" do
+
+    it "should return true for is_any_enrollment_member_outstanding" do
+      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
+    end
+
+    it "should return false for is_any_enrollment_member_outstanding" do
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
     end
   end
 end
