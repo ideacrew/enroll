@@ -37,18 +37,27 @@ event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
 def valid_enrollments(person)
-  hbx_enrollments = []
+  renewing_hbx_enrollments = []
+  active_hbx_enrollments = []
   family = person.primary_family
   enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
   return [] if enrollments.blank?
-  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
-  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
+  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
 
-  hbx_enrollments << health_enrollments
-  hbx_enrollments << dental_enrollments
+  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
+  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
 
-  hbx_enrollments.flatten!.compact!
-  hbx_enrollments
+  active_hbx_enrollments <<  active_health_enrollments
+  active_hbx_enrollments << active_dental_enrollments
+
+  active_hbx_enrollments.flatten!.compact!
+
+  renewing_hbx_enrollments << renewing_health_enrollments
+  renewing_hbx_enrollments << renewing_dental_enrollments
+
+  renewing_hbx_enrollments.flatten!.compact!
+  return renewing_hbx_enrollments, active_hbx_enrollments
 end
 
 def set_due_date_on_verification_types(family)
@@ -95,8 +104,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       next if !person.present?
-      enrollments = valid_enrollments(person)
-      next if enrollments.empty?
+      renewing_enrollments, active_enrollments = valid_enrollments(person)
+      next if renewing_enrollments.empty?
       consumer_role = person.consumer_role
       if consumer_role.present?
         if InitialEvents.include? event
@@ -110,7 +119,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
-            enrollments: enrollments,
+            renewing_enrollments: renewing_enrollments,
+            active_enrollments: active_enrollments,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
