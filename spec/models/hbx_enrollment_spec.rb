@@ -506,16 +506,6 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-      # let(:enrollment) {
-      #   enrollment = household.new_hbx_enrollment_from(
-      #     consumer_role: person.consumer_role,
-      #     coverage_household: coverage_household,
-      #     benefit_package: benefit_package,
-      #     qle: true
-      #   )
-      #   enrollment.save
-      #   enrollment
-      # }
       let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
                               household: family.active_household, kind: "individual") }
       let(:hbx_enrollment_members) { hbx_enrollment.hbx_enrollment_members}
