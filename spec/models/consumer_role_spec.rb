@@ -705,7 +705,7 @@ describe "#revert_lawful_presence" do
 end
 
 describe "it should check the residency status" do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:consumer) { person.consumer_role }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
