@@ -7,6 +7,12 @@ FactoryGirl.define do
     gender "male"
     dob  {Date.new(1965,1,1)}
     hired_on {20.months.ago}
+
+    after :build do |ce, evaluator|
+      if ce.employer_profile.blank?
+        ce.employer_profile = create(:employer_profile)
+      end
+    end
   end
 
 end
