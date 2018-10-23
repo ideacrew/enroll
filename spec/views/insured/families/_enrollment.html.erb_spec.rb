@@ -79,38 +79,6 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
       )
     end
 
-    let(:product) do
-      instance_double(
-        BenefitMarkets::Products::HealthProducts::HealthProduct,
-        issuer_profile: carrier_profile,
-        title: "Your Selected Plan",
-        kind: "health",
-        active_year: 2018,
-        metal_level_kind: :gold,
-        id: "some product id",
-        hios_id: "some product hios id",
-        health_plan_kind: :hmo,
-        sbc_document: nil
-      )
-    end
-
-    let(:employer_profile) do
-      instance_double(
-        BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
-        legal_name: employer_legal_name
-      )
-    end
-
-    let(:employer_legal_name) { "employer_legal_name" }
-
-    let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
-    let(:census_employee) do
-      instance_double(CensusEmployee)
-    end
-    let(:employee_role) do
-      instance_double(EmployeeRole)
-    end
-
     before :each do
       allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
     end
@@ -143,29 +111,6 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
   end
 
   context "without consumer_role", dbclean: :after_each do
-=begin
-    let(:mock_organization){ instance_double(Organization, hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
-    let(:plan) { double("Plan",
-      :name => "A Plan Name",
-      :carrier_profile_id => "a carrier profile id",
-      :carrier_profile => mock_carrier_profile,
-      :metal_level => "Silver",
-      :coverage_kind => "health",
-      :hios_id => "19393939399",
-      :plan_type => "A plan type",
-      :created_at =>  TimeKeeper.date_of_record,
-      :active_year => TimeKeeper.date_of_record.year,
-
-      :nationwide => true,
-      :deductible => 0,
-      :total_premium => 100,
-      :total_employer_contribution => 20,
-      :total_employee_cost => 30,
-      :id => "1234234234",
-      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
-                      :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
-    ) }
-=end
 
     let(:hbx_enrollment) do
       instance_double(
@@ -215,9 +160,6 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
       )
     end
 
-    let(:plan_active_year) { 2018 }
-    let(:plan_coverage_kind) { "health" }
-
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
     let(:sbc_document) do
       Document.new({title: 'sbc_file_name', subject: "SBC",
@@ -228,14 +170,6 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
       instance_double(
         BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
         hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")
-    end
-
-    let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
-    let(:census_employee) do
-      instance_double(CensusEmployee)
-    end
-    let(:employee_role) do
-      instance_double(EmployeeRole)
     end
 
     before :each do
@@ -344,41 +278,6 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
     end
 
   end
-  end
-
-  context "about covered_members_first_names of hbx_enrollment" do
-    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record)}
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
-                                 covered_members_first_names: [], can_complete_shopping?: false,
-                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
-                                 consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected')}
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-
-    before :each do
-      allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
-      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
-      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
-      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
-      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
-      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
-      allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
-      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(nil)
-      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-    end
-
-    it "should not disable the Make Changes button" do
-      expect(rendered).to_not have_selector('.cna')
-    end
   end
 
   context "when the enrollment is coverage_terminated" do
