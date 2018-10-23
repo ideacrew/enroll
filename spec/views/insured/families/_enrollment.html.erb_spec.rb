@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
+RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:person) { double(id: '31111113') }
   let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
 
@@ -110,7 +110,7 @@ RSpec.describe "insured/families/_enrollment.html.erb", dbclean: :after_each do
     end
   end
 
-  context "without consumer_role", dbclean: :after_each do
+  context "without consumer_role" do
 
     let(:hbx_enrollment) do
       instance_double(
