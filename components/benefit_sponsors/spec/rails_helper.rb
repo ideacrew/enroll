@@ -15,7 +15,6 @@ require "forgery"
 require 'factory_girl_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
-require "pry"
 require 'pundit/rspec'
 
 
