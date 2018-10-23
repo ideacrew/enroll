@@ -12,9 +12,11 @@ FactoryGirl.define do
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, strategy: :create
+    association :benefit_sponsorship, :with_organization_cca_profile, factory: :benefit_sponsors_benefit_sponsorship
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+      instance.employer_profile = instance.benefit_sponsorship.profile
     end
 
     transient do
