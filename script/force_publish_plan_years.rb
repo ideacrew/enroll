@@ -12,21 +12,11 @@ class ForcePublishPlanYears
     assign_packages #assign benefit packages to census employeess missing them    
     set_back_oe_date #set back oe dates for renewing draft employers with oe dates greater than current date 
     force_publish #first run at force publish
-    # clean_up#take any employers that moved to renewing_published, revert their plan years to renewing_draft and set back their OE start dates
+    clean_up#take any employers that moved to renewing_published, revert their plan years to renewing_draft and set back their OE start dates
   end
   
   
   def unassigned(ce)
-    py = ce.employer_profile.plan_years.published.first || ce.employer_profile.plan_years.where(aasm_state: 'draft').first
-    if py.present?
-      if ce.active_benefit_group_assignment.blank? || ce.active_benefit_group_assignment.benefit_group.plan_year != py
-        find_or_create_benefit_group_assignment(py.benefit_groups)
-        return false 
-      else 
-        return true
-      end
-    end
-
     if py = ce.employer_profile.plan_years.renewing.first
       if ce.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
         ce.add_renew_benefit_group_assignment(py.benefit_groups.first)
@@ -119,12 +109,29 @@ class ForcePublishPlanYears
         :aasm_state => 'renewing_draft'
         }}
         }).each do |org|
-          if org.employer_profile.plan_years.last.open_enrollment_start_on > @current_date
-            org.employer_profile.plan_years.last.update_attributes!(open_enrollment_start_on: @current_date)
+          py = org.employer_profile.plan_years.last
+          if py.open_enrollment_start_on > @current_date
+            py.update_attributes!(open_enrollment_start_on: @current_date)
+            py.save!
           end
       end
   end
 end
+
+
+# Organization.where({
+#   :'employer_profile.plan_years' =>
+#   { :$elemMatch => {
+#     :start_on => @publish_date
+#     }}
+#     }).each do |org|
+     
+#         puts org.employer_profile.plan_years.last.open_enrollment_start_on
+#         puts org.employer_profile.plan_years.last.aasm_state
+
+     
+  
+# end
 
 
 
