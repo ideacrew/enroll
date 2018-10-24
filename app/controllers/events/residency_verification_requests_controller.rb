@@ -11,12 +11,10 @@ module Events
       event_payload = render_to_string "events/residency/verification_request", :formats => ["xml"], :locals => { :individual => individual }
       event_request_record = EventRequest.new({requested_at: Time.now, body: event_payload})
       individual.consumer_role.local_residency_requests << event_request_record
-      individual.consumer_role.add_type_history_element(verification_type: "DC Residency",
-                                             action: "Local Hub Request",
-                                             modifier: "Enroll App",
-                                             update_reason: "Hub request",
-                                             event_request_record_id: event_request_record.id)
-
+      individual.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Request",
+                                                                                           modifier: "Enroll App",
+                                                                                           update_reason: "Hub request",
+                                                                                           event_request_record_id: event_request_record.id)
       notify("acapi.info.events.residency.verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :retry_deadline => (Time.now + 24.hours).to_i})
     end
 
