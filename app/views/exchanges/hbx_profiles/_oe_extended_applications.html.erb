@@ -1,20 +1,3 @@
-<style>
-  .custom_filter{
-    margin-left: 15em;
-    margin-top: -30px;
-    position: absolute;
-    z-index: 999;
-  }
-  #upload{
-    position: absolute;
-    margin-left: 75em;
-  }
-  .attestation_form{
-    text-align: left !important;
-  }
-</style>
-
-
 <div class="container" id="extendable_applications_table">
   <div class = "table-responsive table-override">
   <h4 class="text-center heading-text"> Close Open Enrollment </h4>
@@ -41,7 +24,7 @@
           <td><%= TimeKeeper.local_time(application.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td><%= TimeKeeper.local_time(application.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to 'Close Open Enrollment', main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm", data: { confirm: "Are you sure?" } %>
+            <%= link_to 'Close Open Enrollment', main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm", data: { confirm: "Are you sure? Closing Open Enrollment Period will not allow employees to shop again." } %>
           </td>
         </tr>
         <% end %>
