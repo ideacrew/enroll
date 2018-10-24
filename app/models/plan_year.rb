@@ -199,18 +199,20 @@ class PlanYear
     end
   end
 
-  def enrollments_for_plan_year(include_waivers = false)
+  def enrollments_for_plan_year
     id_list = self.benefit_groups.map(&:id)
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    enrollment_selector = include_waivers ? [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector] : [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]
+    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector]
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of(enrollment_selector).to_a
     end
   end
 
   def cancel_employee_enrollments(transmit_xml = false)
-    enrollments_for_plan_year(true).each do |hbx_enrollment|
-      if hbx_enrollment.may_cancel_coverage?
+    enrollments_for_plan_year.each do |hbx_enrollment|
+      if hbx_enrollment.may_cancel_coverage? && hbx_enrollment.inactive?
+        hbx_enrollment.cancel_coverage!
+      else
         hbx_enrollment.cancel_coverage!
         hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
       end
