@@ -511,8 +511,8 @@ describe HbxEnrollment, dbclean: :after_all do
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-      let(:person) { double(primary_family: family)}
-      let(:family) { double }
+      let(:person) { household.family.primary_applicant.person}
+      let(:family) { household.family }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -624,7 +624,8 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
       let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:hbx) {HbxEnrollment.new(consumer_role_id: consumer_role.id)}
-      let(:family) {FactoryGirl.build(:family)}
+      let(:person) { household.family.primary_applicant.person}
+      let(:family) { household.family }
       before :each do
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
         allow(coverage_household).to receive(:household).and_return household
@@ -869,7 +870,7 @@ describe HbxProfile, "class methods", type: :model do
   end
 
   context "ivl user switching plan from one carrier to other carrier previous hbx_enrollment aasm_sate should be cancel/terminate in DB." do
-    let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person1) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
     let(:family1) {FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
     let(:household) {FactoryGirl.create(:household, family: family1)}
     let(:date){ TimeKeeper.date_of_record }
@@ -882,7 +883,10 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan3){ Plan.new(active_year: date.year, market: "individual", carrier_profile: carrier_profile3) }
     let(:hbx_enrollment1){ HbxEnrollment.new(kind: "individual", plan: plan1, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true, is_any_enrollment_member_outstanding: false) }
     let(:hbx_enrollment2){ HbxEnrollment.new(kind: "individual", plan: plan2, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'shopping', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date, is_any_enrollment_member_outstanding: false) }
-    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date, is_any_enrollment_member_outstanding: true) }
+    let(:hbx_enrollment3){ HbxEnrollment.new(kind: "individual", plan: plan3, household: family1.latest_household, enrollment_kind: "open_enrollment", aasm_state: 'coverage_selected', consumer_role: person1.consumer_role, enrollment_signature: true, effective_on: date) }
+    let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+                                                       applicant_id: family1.primary_applicant.id, hbx_enrollment: hbx_enrollment3,
+                                                       eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.today + 20.days) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
@@ -923,6 +927,7 @@ describe HbxProfile, "class methods", type: :model do
     end
 
     it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
+      person1.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
       hbx_enrollment3.effective_on = date - 10.days
       hbx_enrollment2.effective_on = date + 1.day
       hbx_enrollment2.select_coverage!
@@ -943,7 +948,7 @@ describe HbxProfile, "class methods", type: :model do
   end
 
   describe "when maket type is individual" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:person) { FactoryGirl.create(:person, :with_active_consumer_role,  :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
@@ -2573,10 +2578,11 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-    let(:family) {FactoryGirl.build(:family)}
+    #let(:family) {FactoryGirl.build(:family)}
 
     before :each do
       @household = mikes_family.households.first
+      family =  @household.family
       @coverage_household = household.coverage_households.first
       allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
       allow(coverage_household).to receive(:household).and_return household
