@@ -156,7 +156,7 @@ consumer_checkbook_services:
     consumer_remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
     consumer_reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
     # base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=dev" #Environment should be changed according to current environment RE #19392 (#24)
-    base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=test"
+    base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=staging"
     current_year: 2019
 
 checkbook_services:
