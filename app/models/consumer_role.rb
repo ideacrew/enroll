@@ -28,6 +28,8 @@ class ConsumerRole
   SSN_VALIDATION_STATES = %w(na valid outstanding pending expired)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending expired)
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending expired) #attested state is used for people with active enrollments before locale residency verification was turned on
+
+
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -92,7 +94,6 @@ class ConsumerRole
   field :local_residency_validation, type: String, default: nil #move to verification type
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true #move to verification type
 
-
   # Identity
   field :identity_validation, type: String, default: "na"
   validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
@@ -105,10 +106,10 @@ class ConsumerRole
   field :identity_update_reason, type: String
   field :application_update_reason, type: String
 
-  field :ssn_update_reason, type: String
-  field :lawful_presence_update_reason, type: Hash
-  field :native_update_reason, type: String
-  field :residency_update_reason, type: String
+  field :ssn_update_reason, type: String #move to verification type
+  field :lawful_presence_update_reason, type: Hash #move to verification type
+  field :native_update_reason, type: String #move to verification type
+  field :residency_update_reason, type: String #move to verification type
 
   #rejection flags for verification types
   field :ssn_rejected, type: Boolean, default: false #move to verification type
@@ -823,28 +824,27 @@ class ConsumerRole
     end
   end
 
-  def verification_types
-    person.verification_types.active.where(applied_roles: "consumer_role") if person
-  end
-
   def move_identity_documents_to_outstanding
     if identity_unverified? && application_unverified?
       update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
     end
   end
 
-
   def move_identity_documents_to_verified(app_type=nil)
     case app_type
-      when 'Curam'
-        type = 'Curam'
-      when 'Mobile'
-        type = 'Mobile'
-      else
-        type = 'Experian'
+    when 'Curam'
+      type = 'Curam'
+    when 'Mobile'
+      type = 'Mobile'
+    else
+      type = 'Experian'
     end
     update_attributes(identity_validation: 'valid', application_validation: 'valid',
                       identity_update_reason: "Verified from #{type}", application_update_reason: "Verified from #{type}")
+  end
+
+  def verification_types
+    person.verification_types.active.where(applied_roles: "consumer_role") if person
   end
 
   #class methods
@@ -937,6 +937,21 @@ class ConsumerRole
 
   def indian_conflict?
     citizen_status == "indian_tribe_member"
+  end
+
+  def mark_doc_type_uploaded(v_type)
+    case v_type
+      when "Social Security Number"
+        update_attributes(:ssn_rejected => false)
+      when "Citizenship"
+        update_attributes(:lawful_presence_rejected => false)
+      when "Immigration status"
+        update_attributes(:lawful_presence_rejected => false)
+      when "American Indian Status"
+        update_attributes(:native_rejected => false)
+      when "DC Residency"
+        update_attributes(:residency_rejected => false)
+    end
   end
 
   def mark_ridp_doc_uploaded(ridp_type)

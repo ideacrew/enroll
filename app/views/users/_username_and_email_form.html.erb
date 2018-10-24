@@ -8,12 +8,12 @@
 	  <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 	    <div class="col-md-3 col-md-offset-3 col-sm-3 col-md-offset-3 col-xs-12 form-group form-group-lg no-pd" style='margin-right: -225px; margin-left: 224px; !important;'>
 	      New Username 
-	      <%= text_field_tag :oim_id, user.oim_id, {class:"input_txt", onblur:'validateFields()', id:'inputNewUsername'} %>
+	      <%= text_field_tag :oim_id, nil, {class:"input_txt", onblur:'validateFields()', id:'inputNewUsername'} %>
 				<span id="helpBlock2" class="help-block username-block hidden"></span>
 	    </div> 
 	    <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style='margin-right: -225px; margin-left: 224px; !important;'>
 	      New User_Email
-	      <%= text_field_tag :new_email, user.email, {class:"input_txt", onblur:'validateFields()', id:'inputNewEmail'} %>
+	      <%= text_field_tag :new_email, nil, {class:"input_txt", onblur:'validateFields()', id:'inputNewEmail'} %>
 				<span id="helpBlock2" class="help-block email-block hidden"></span>
 	    </div>
 	  </div>
@@ -22,7 +22,7 @@
 	<div class="row no-buffer child-row">
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">   
       <button type='button', class="btn btn-info", id='resetUsernameAndEmail' onclick="resetFields()">Reset</button>
-      <%= submit_tag "Update", class:'btn btn-primary', id:'submitUsernameChange', data: { confirm: 'Are you sure you want to make changes?' } %> 
+      <%= submit_tag "Update", class:'btn btn-primary', id:'submitUsernameChange' %> 
     </div>
   </div>
 <% end %>

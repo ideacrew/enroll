@@ -45,12 +45,12 @@ describe Family, "given a primary applicant and a dependent" do
 
   context "enrollments_for_display" do
     let(:expired_enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'coverage_expired'
-    )}
+      FactoryGirl.create(:hbx_enrollment,
+                         household: household,
+                         coverage_kind: "health",
+                         enrollment_kind: "open_enrollment",
+                         aasm_state: 'coverage_expired'
+      )}
 
     it "should not return expired enrollment" do
       expect(subject.enrollments_for_display.to_a).to eq []
@@ -104,10 +104,10 @@ describe Family, type: :model, dbclean: :after_each do
 
       let(:valid_params) do
         {
-          e_case_id: e_case_id,
-          renewal_consent_through_year: renewal_consent_through_year,
-          submitted_at: submitted_at,
-          updated_by: updated_by
+            e_case_id: e_case_id,
+            renewal_consent_through_year: renewal_consent_through_year,
+            submitted_at: submitted_at,
+            updated_by: updated_by
         }
       end
 
@@ -397,7 +397,7 @@ describe Family do
       expect(family.current_special_enrollment_periods.size).to eq 1
       expect(family.current_special_enrollment_periods.first).to eq @current_sep
     end
-   end
+  end
 
   context "and the family is under more than one SEP" do
     before do
@@ -554,7 +554,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
                                  PersonRelationship.new(relative: child, kind: "child")] }
   let(:family_relationships)  {  married_relationships <<
-                                 PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+      PersonRelationship.new(relative: grandpa, kind: "grandparent") }
 
   let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
   let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
@@ -826,15 +826,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -887,15 +887,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -917,15 +917,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
     let!(:census_employee2) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile2
       )
       employee_role2.census_employee = ce
       employee_role2.save
@@ -1003,15 +1003,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -1061,15 +1061,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -1091,15 +1091,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
     let!(:census_employee2) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile2
       )
       employee_role2.census_employee = ce
       employee_role2.save

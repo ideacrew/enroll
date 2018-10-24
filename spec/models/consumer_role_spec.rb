@@ -311,6 +311,42 @@ context "Verification process and notices" do
     end
   end
 
+  describe "update_ridp_verification_type private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "update ridp verification type for consumer" do |verification_type, reason|
+      before do
+        consumer.update_ridp_verification_type(verification_type, reason)
+      end
+      it "updates #{verification_type}" do
+        expect(consumer.identity_verified?).to eq true
+      end
+    end
+
+    it_behaves_like "update ridp verification type for consumer", "Identity", "documents in Enroll"
+  end
+
+  describe "#admin_ridp_verification_action private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "admin ridp verification actions" do |admin_action, v_type, update_reason, upd_attr, result, rejected_field|
+      before do
+        consumer.admin_ridp_verification_action(admin_action, v_type, update_reason)
+      end
+      it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
+        expect(consumer.send(upd_attr)).to eq result
+      end
+
+      if admin_action == "return_for_deficiency"
+        it "marks #{v_type} type as rejected" do
+          expect(consumer.send(rejected_field)).to be_truthy
+        end
+      end
+    end
+
+    it_behaves_like "admin ridp verification actions", "verify", "Identity", "Document in EnrollApp", "identity_validation", "valid"
+    it_behaves_like "admin ridp verification actions", "return_for_deficiency", "Identity", "Document in EnrollApp", "identity_validation", "outstanding", "identity_rejected"
+
+  end
+
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }
@@ -376,7 +412,7 @@ context "Verification process and notices" do
       describe "immigrant with NO ssn" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", true,  "valid", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
-      it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
       end
 
@@ -399,7 +435,7 @@ context "Verification process and notices" do
         it "updates indian tribe validition status to outstanding and to pending for the rest" do
           consumer.tribal_id = "345543345"
           consumer.coverage_purchased!
-          consumer.verification_types.each { |verif| 
+          consumer.verification_types.each { |verif|
             if verif.type_name == "American Indian Status"
               expect(verif.validation_status). to eq("outstanding")
             else
@@ -710,50 +746,6 @@ describe "#revert_lawful_presence" do
     expect(consumer.verification_types.by_name("DC Residency").first.validation_status). to eq "unverified"
     expect(consumer.verification_types.by_name("Social Security Number").first.validation_status). to eq "unverified"
     expect(consumer.verification_types.by_name("Citizenship").first.validation_status). to eq "pending"
-  end
-end
-
-describe "it should check the residency status" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-  let(:consumer) { person.consumer_role }
-  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_selected", kind: 'individual') }
-  let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
-  let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
-  context "consumer role should check for eligibility" do
-    it "should move the enrollment to unverified" do
-      consumer.coverage_purchased!
-      expect(consumer.aasm_state).to eq("ssa_pending")
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq("unverified")
-    end
-
-    it "should update the consumer and enrollment state when ssn and citizenship is valid" do
-      consumer.coverage_purchased!
-      consumer.ssn_valid_citizenship_valid!(verification_attr)
-      expect(consumer.aasm_state).to eq("sci_verified")
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq("coverage_selected")
-    end
-
-    it "should move the enrollment status to contingent when received negative response from residency hub" do
-      consumer.coverage_purchased!
-      consumer.ssn_valid_citizenship_valid!(verification_attr)
-      consumer.fail_residency!
-      expect(consumer.aasm_state).to eq("verification_outstanding")
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq("enrolled_contingent")
-    end
-
-    it "should move the enrollment status to contingent when received negative response from residency hub" do
-      consumer.coverage_purchased!
-      consumer.ssn_valid_citizenship_valid!(verification_attr)
-      consumer.pass_residency!
-      expect(consumer.aasm_state).to eq("fully_verified")
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq("coverage_selected")
-    end
   end
 end
 

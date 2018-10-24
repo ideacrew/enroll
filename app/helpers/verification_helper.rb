@@ -14,6 +14,28 @@ module VerificationHelper
     end
   end
 
+  def ridp_type_status(type, person)
+    consumer = person.consumer_role
+    case type
+      when 'Identity'
+        if consumer.identity_verified?
+          consumer.identity_validation
+        elsif consumer.has_ridp_docs_for_type?(type) && !consumer.identity_rejected
+          'in review'
+        else
+          'outstanding'
+        end
+      when 'Application'
+        if consumer.application_verified?
+          consumer.application_validation
+        elsif consumer.has_ridp_docs_for_type?(type) && !consumer.application_rejected
+          'in review'
+        else
+          'outstanding'
+        end
+    end
+  end
+
   def verification_type_class(status)
     case status
       when "verified"
@@ -34,28 +56,6 @@ module VerificationHelper
         "default"
       when "unverified"
         "default"
-    end
-  end
-
-  def ridp_type_status(type, person)
-    consumer = person.consumer_role
-    case type
-    when 'Identity'
-      if consumer.identity_verified?
-        consumer.identity_validation
-      elsif consumer.has_ridp_docs_for_type?(type) && !consumer.identity_rejected
-        'in review'
-      else
-        'outstanding'
-      end
-    when 'Application'
-      if consumer.application_verified?
-        consumer.application_validation
-      elsif consumer.has_ridp_docs_for_type?(type) && !consumer.application_rejected
-        'in review'
-      else
-        'outstanding'
-      end
     end
   end
 

@@ -31,10 +31,10 @@ class DefinePermissions < MigrationTask
     u4 = User.create( email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
     u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u7 = User.create( email: 'themanda.tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")   
+    u7 = User.create( email: 'themanda.tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     org = Organization.new(legal_name:'Test Org 2050',fein:'123450986')
     hbx_profile = HbxProfile.all.first
-    hbx_profile_id = hbx_profile.id   
+    hbx_profile_id = hbx_profile.id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1, dob: Date.new(1990,1,1))
     p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2, dob: Date.new(1990,1,1))
     p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3, dob: Date.new(1990,1,1))
@@ -104,10 +104,6 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_outstanding_verification_sub_tab: true)
   end
 
-  def hbx_admin_can_transition_family_members
-   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
-  end
-
   def hbx_admin_can_access_accept_reject_identity_documents
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_identity_documents: true)
   end
@@ -128,6 +124,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_csr_supervisor.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_pay_now: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_pay_now: true)
+  end
+
+  def hbx_admin_can_transition_family_members
+   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
   end
 
   def hbx_admin_can_access_user_account_tab
