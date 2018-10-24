@@ -4,8 +4,16 @@ describe PlanSelection do
 
   subject { PlanSelection.new(hbx_enrollment, hbx_enrollment.plan) }
 
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) do
+    person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+    person.consumer_role.aasm_state = "verification_outstanding"
+    person
+  end
+  let(:person1) do
+    person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+    person.consumer_role.aasm_state = "verification_outstanding"
+    person
+  end
 
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, :person => person)}
   let(:household) {FactoryGirl.create(:household, family: family)}
