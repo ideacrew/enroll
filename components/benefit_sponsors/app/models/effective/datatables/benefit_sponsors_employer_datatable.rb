@@ -88,7 +88,7 @@ module Effective
 
           if row.latest_benefit_application.present?
             if row.latest_benefit_application.enrollment_extended?
-              dropdown.insert(4,['Close Extended Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+              dropdown.insert(4,['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
             end
           end
 

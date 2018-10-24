@@ -23,11 +23,12 @@
     <thead>
       <tr>
        <th>Application Type</th>
-       <th>Application Effective On</th>
+       <th>Effective Date</th>
+       <th>OE End Date</th>
        <th>Application Status</th>
        <th>Submitted At</th>
        <th>Last Updated At</th>
-       <th></th>
+       <th></th>  
       </tr>
     </thead>
     <tbody>
@@ -35,7 +36,8 @@
         <tr>
           <td><%= application.predecessor.present? ? "Renewal" : "Initial" %></td>
           <td><%= application.effective_period.min.strftime('%m/%d/%Y') %></td>
-          <td><%= application.aasm_state.to_s.camelcase %></td>
+          <td><%= application.open_enrollment_period.max.strftime('%m/%d/%Y') %></td>
+          <td><%= benefit_application_summarized_state(application) %></td>
           <td><%= TimeKeeper.local_time(application.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td><%= TimeKeeper.local_time(application.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>

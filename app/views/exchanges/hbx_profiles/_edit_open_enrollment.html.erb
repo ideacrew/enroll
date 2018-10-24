@@ -38,12 +38,9 @@
               <div class="row">
                 <div class="col-sm-12">
                    <div class="form-group pull-right">
-                    <%if true #@document.may_accept? && @employer_profile.employer_attestation.editable? %>
-                       <button type="submit" id = "extend_open_enrollment_submit" class='btn btn-primary'>Extend Open Enrollment</button>
-                    <%else%>
-                       <button type="button" class="btn disabled"> Extend Open Enrollment </button>
-                    <%end%>
-                     <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                      <%= submit_tag "Extend Open Enrollment", class: "btn btn-primary", data: { confirm: 'Are You Sure? Changing Open Enrollment Period End Date will allow employees to shop again.' } %>
+
+                      <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
                   </div>
                 </div>
               </div>

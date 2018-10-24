@@ -40,13 +40,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
     open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
     ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).extend_open_enrollment(open_enrollment_end_date)
-    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Extended Open enrollment successfully." }
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
   end
 
   def close_extended_open_enrollment
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
     ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment(TimeKeeper.date_of_record)
-    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Closed Open Enrollment successfully." }
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
   def binder_paid
