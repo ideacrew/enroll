@@ -24,7 +24,7 @@
           <td><%= TimeKeeper.local_time(application.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td><%= TimeKeeper.local_time(application.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to 'Close Open Enrollment', main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm", data: { confirm: "Are you sure? Closing Open Enrollment Period will not allow employees to shop again." } %>
+            <%= link_to 'Close Open Enrollment', main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
         </tr>
         <% end %>
