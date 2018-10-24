@@ -196,7 +196,7 @@ javascript:
       div.setAttribute('id', 'yourAvailablePlans')
         var network = "";
         if (plan.network_information)
-          network = `NETWORK NOTES <a data-toggle="tooltip" title='${plan.network_information}'><i class="fas fa-question-circle"></i></a>`
+          network = `NETWORK NOTES <a data-toggle="tooltip" data-placement="top" data-container="body" title='${plan.network_information}'><i class="fas fa-question-circle"></i></a>`
         div.innerHTML =
         `<div class="col-xs-4 reference-plans">
           <div class="col-xs-12 p0 mb-1">
