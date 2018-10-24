@@ -201,8 +201,9 @@ function pyAction(action, id, employer_id, term_date, start_on) {
 }
 // You can use the actionSelected here
 function submitPlanActions() {
-  termReason = $('input[name=term_actions]:checked').val()
-  trasmit_to_carrier = $('input[id=trasmit_to_carrier]').is(":checked")
+    alert(actionSelected);
+  termReason = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
+  trasmit_to_carrier =  $('#' + applicationId).find('input[id=trasmit_to_carrier]').is(":checked")
   $.ajax({
     url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
     method: 'PUT',
