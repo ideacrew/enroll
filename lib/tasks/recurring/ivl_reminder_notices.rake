@@ -1,3 +1,4 @@
+# RAILS_ENV=production bundle exec rake recurring:ivl_reminder_notices
 namespace :recurring do
   desc "an automation task that sends out verification reminder notifications to IVL individuals"
   task ivl_reminder_notices: :environment do
@@ -12,17 +13,17 @@ namespace :recurring do
         if consumer_role.present? && (family.best_verification_due_date > date)
           case (family.best_verification_due_date.to_date.mjd - date.mjd)
           when 85
-            puts "sending first_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
             IvlNoticesNotifierJob.perform_later(person.id.to_s, "first_verifications_reminder")
+            puts "Sent first_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
           when 70
-            puts "sending second_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
             IvlNoticesNotifierJob.perform_later(person.id.to_s, "second_verifications_reminder")
+            puts "Sent second_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
           when 45
-            puts "sending third_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
             IvlNoticesNotifierJob.perform_later(person.id.to_s, "third_verifications_reminder")
+            puts "Sent third_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
           when 30
-            puts "sending fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
             IvlNoticesNotifierJob.perform_later(person.id.to_s, "fourth_verifications_reminder")
+            puts "Sent fourth_verifications_reminder to #{person.hbx_id}" unless Rails.env.test?
           end
         end
       rescue Exception => e
