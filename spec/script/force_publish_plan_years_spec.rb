@@ -123,18 +123,16 @@ describe ForcePublishPlanYears, dbclean: :after_each do
 
         subject.call
         renewing_draft_employer_profile_2.reload
-        # expect(renewing_draft_employer_profile_2.plan_years.first.open_enrollment_start_on).to eq(current_date)
         renewing_draft_plan_year.reload
         renewing_draft_plan_year_2.reload
         renewing_published_plan_year.reload
         census_employee_1.reload
-
-      
+        
+        expect(renewing_draft_employer_profile_2.plan_years.first.open_enrollment_start_on).to eq(current_date)
         expect(census_employee_1.benefit_group_assignments.first.class).to eq BenefitGroupAssignment
         expect(renewing_draft_plan_years.count).to eq 0
         expect(renewing_enrolling_plan_years.count).to eq 3
         `rm -rf #{file}`
-
       end
 
     end
