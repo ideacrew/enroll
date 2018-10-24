@@ -2578,7 +2578,6 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-    #let(:family) {FactoryGirl.build(:family)}
 
     before :each do
       @household = mikes_family.households.first
