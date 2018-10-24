@@ -63,6 +63,7 @@ class UsersController < ApplicationController
       @user.oim_id = params[:new_oim_id] if (params[:new_oim_id] != params[:current_oim_id])
       @user.email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
       begin
+        @user.modifier = current_user
         @user.save!
       rescue => e
         @errors = @user.errors.messages
