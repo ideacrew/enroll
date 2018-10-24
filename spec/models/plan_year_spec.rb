@@ -2736,5 +2736,19 @@ describe "notify_employer_py_cancellation" do
       expect(plan_year).to receive(:notify).exactly(0).times
       plan_year.revert_renewal!(false)
     end
+
+
+    context 'when wavied enrollment cancelled should not notify enrollment event.' do
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'inactive')}
+
+      it "should cancel waived enrollment" do
+        expect(enrollment.aasm_state).to eq "inactive"
+        allow(plan_year).to receive(:enrollments_for_plan_year).and_return [enrollment]
+        expect(plan_year).to receive(:notify).exactly(0).times
+        plan_year.cancel_employee_enrollments( true)
+        expect(enrollment.aasm_state).to eq "coverage_canceled"
+      end
+    end
   end
 end
