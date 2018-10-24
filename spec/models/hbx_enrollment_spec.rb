@@ -372,8 +372,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     context "decorated_elected_plans" do
       let(:benefit_package) { BenefitPackage.new }
       let(:consumer_role) { FactoryBot.create(:consumer_role) }
-      let(:person) { double(primary_family: family)}
-      let(:family) { double }
+      let(:person) { household.family.primary_applicant.person}
+      let(:family) { household.family }
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -543,7 +543,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:benefit_package) {BenefitPackage.new}
       let(:consumer_role) {FactoryBot.create(:consumer_role)}
       let(:person) {double(primary_family: family)}
-      let(:family) {double(current_sep: double(effective_on: TimeKeeper.date_of_record))}
+      let(:family) {@household.family}
+      let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
       let(:hbx_profile) {double}
       let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp)}
       let(:bcp) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months)}
@@ -556,6 +557,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         allow(consumer_role).to receive(:person).and_return(person)
         allow(household).to receive(:family).and_return family
         allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+        allow(family).to receive(:current_sep).and_return sep
       end
 
       shared_examples_for "new enrollment from" do |qle, sep, enrollment_period, error|
@@ -794,18 +796,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         end
     end
 
-    context "can_terminate_coverage?" do
-      let(:hbx_enrollment) {HbxEnrollment.new(
-          kind: 'employer_sponsored',
-          aasm_state: 'coverage_selected',
-          effective_on: TimeKeeper.date_of_record - 10.days
-      )}
-      it "should return false when may not terminate_coverage" do
-        hbx_enrollment.aasm_state = 'inactive'
-        expect(hbx_enrollment.can_terminate_coverage?).to eq false
-      end
   describe "when market type is individual" do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
     let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
@@ -2049,10 +2041,10 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let(:benefit_package) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
       let(:benefit_coverage_period) {hbx_profile.benefit_sponsorship.benefit_coverage_periods.first}
-      let(:family) {FactoryBot.build(:family)}
 
       before :each do
         @household = mikes_family.households.first
+        family =  @household.family
         @coverage_household = household.coverage_households.first
         allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
         allow(coverage_household).to receive(:household).and_return household
@@ -2348,7 +2340,6 @@ end
       hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
     end
   end
-end
 #TODO: fix me when ivl plans refactored to products
 # describe HbxEnrollment, dbclean: :after_all do
 #   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
@@ -2373,7 +2364,7 @@ describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
   let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, household: ivl_family.active_household,
                             kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected") }
-  let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+  let!(:ivl_enrollment_member)  { FactoryBot.create(:hbx_enrollment_member, is_subscriber: true,
                                   applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
                                   eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
 

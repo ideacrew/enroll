@@ -11,7 +11,7 @@ describe CorrectEnrollmentStatus, dbclean: :after_each do
   verification_states.each do |state|
     obj=(state+"_person").to_sym
     let(obj) {
-      person = FactoryBot.create(:person, :with_consumer_role)
+      person = FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)
       person.consumer_role.aasm_state = state
       person
     }
@@ -22,11 +22,13 @@ describe CorrectEnrollmentStatus, dbclean: :after_each do
     let(hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: eval(family_member.to_s) ) }
   end
 
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: verification_outstanding_person) }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
   let(:enrollment) {
     FactoryBot.create(:hbx_enrollment,
                       product: product,
+                      hbx_enrollment_members: [ hbx_enrollment_member ],
                       household: family.active_household,
                       coverage_kind: "health",
                       effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

@@ -2,7 +2,11 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:person) do
+    person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+    person.consumer_role.aasm_state = "verification_outstanding"
+    person
+  end
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
