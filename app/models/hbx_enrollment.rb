@@ -1663,6 +1663,11 @@ class HbxEnrollment
     )
   end
 
+  def is_any_member_outstanding?
+    active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
