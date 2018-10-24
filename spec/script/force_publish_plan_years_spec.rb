@@ -68,6 +68,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
       expect(census_employee_1.benefit_group_assignments).to be_empty
 
       subject.assign_packages
+      
       census_employee_1.reload
 
       expect(census_employee_1.benefit_group_assignments).not_to be_empty
@@ -107,7 +108,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
       expect(File.read(file)).not_to include('renewing_enrolling')
       expect(File.read(file)).to include(renewing_published_plan_year.employer_profile.organization.fein)
       expect(File.read(file)).to include(renewing_draft_plan_year.employer_profile.organization.fein)
-      `rm -rf #{file}`
+      # `rm -rf #{file}`
     end
 
     describe 'Complete Force Publish Process', dbclean: :before_each  do 
@@ -132,7 +133,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
         expect(census_employee_1.benefit_group_assignments.first.class).to eq BenefitGroupAssignment
         expect(renewing_draft_plan_years.count).to eq 0
         expect(renewing_enrolling_plan_years.count).to eq 3
-        `rm -rf #{file}`
+        # `rm -rf #{file}`
       end
 
     end

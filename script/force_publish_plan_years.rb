@@ -1,5 +1,3 @@
-
-
 class ForcePublishPlanYears
   
   def initialize(publish_date, current_date)  
@@ -33,14 +31,14 @@ class ForcePublishPlanYears
   
   def assign_packages
     CSV.open("#{Rails.root}/unnassigned_packages_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv", "w") do |csv|
-      csv << ["Org", "Employee"]
-      Organization.where({
-        :'employer_profile.plan_years' =>
-        { :$elemMatch => {
-          :start_on => @publish_date,
-          :aasm_state => 'renewing_draft'
-          }}
-          }).each do |org|
+    csv << ["Org", "Employee"]
+    Organization.where({
+      :'employer_profile.plan_years' =>
+      { :$elemMatch => {
+        :start_on => @publish_date,
+        :aasm_state => 'renewing_draft'
+        }}
+      }).each do |org|
         py = org.employer_profile.renewing_plan_year
         if py.application_errors.present?
           org.employer_profile.census_employees.each do |ce|
@@ -52,23 +50,24 @@ class ForcePublishPlanYears
         end
       end
     end 
-  end
-  def unassigned(census_employee)
-    if py = census_employee.employer_profile.plan_years.renewing.first
-      if census_employee.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-         census_employee.try(:add_renew_benefit_group_assignment, py.benefit_groups.first)
-         if census_employee.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).present?
-          return false
-        else 
-          return true
+    
+    def set_back_oe_date
+      Organization.where({
+        :'employer_profile.plan_years' =>
+        { :$elemMatch => {
+          :start_on => @publish_date,
+          :aasm_state => 'renewing_draft'
+          }}
+          }).each do |org|
+            py = org.employer_profile.plan_years.last
+            if py.open_enrollment_start_on > @current_date
+              py.update_attributes!(open_enrollment_start_on: @current_date)
+              py.save!
+            end
         end
-      else 
-        return true
-      end
     end
   end
-  
-
+    
   def force_publish
     Organization.where({
       :'employer_profile.plan_years' =>
@@ -82,6 +81,21 @@ class ForcePublishPlanYears
       end
   end
 
+
+  def unassigned(census_employee)
+     py = census_employee.employer_profile.plan_years.renewing.first
+      if census_employee.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
+         census_employee.try(:add_renew_benefit_group_assignment, py.benefit_groups.first)
+         if census_employee.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).present?
+          return false
+        else 
+          return true
+        end
+      else 
+        return false
+      end
+  end
+  
   def clean_up
     CSV.open("#{Rails.root}/employers_not_in_renewing_enrolling_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv", "w") do |csv|
     csv << ["Organization", "Plan Year State"]
@@ -103,26 +117,10 @@ class ForcePublishPlanYears
       end
     end
   end
-
-
-
-  
-  def set_back_oe_date
-    Organization.where({
-      :'employer_profile.plan_years' =>
-      { :$elemMatch => {
-        :start_on => @publish_date,
-        :aasm_state => 'renewing_draft'
-        }}
-        }).each do |org|
-          py = org.employer_profile.plan_years.last
-          if py.open_enrollment_start_on > @current_date
-            py.update_attributes!(open_enrollment_start_on: @current_date)
-            py.save!
-          end
-      end
-  end
 end
+
+
+
 
 
 # Organization.where({
