@@ -5,7 +5,7 @@ module Factories
     attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :disable_notifications, :active_plan_year, :coverage_kind
 
     def initialize
-      @disable_notifications = false
+      @disable_notifications = renewing_plan_year.benefit_groups.any?{ |bg| bg.is_congress? }
     end
 
     def renew
