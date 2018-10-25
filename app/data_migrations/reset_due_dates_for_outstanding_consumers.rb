@@ -10,11 +10,11 @@ class ResetDueDatesForOutstandingConsumers < MongoidMigrationTask
           if hbx_enrollment.is_any_member_outstanding? && hbx_enrollment.may_move_to_contingent?
             family.set_due_date_on_verification_types
             hbx_enrollment.move_to_contingent!
-            puts "enrollment with #{hbx_enrollment.hbx_id} associated to #{person.hbx_id} moved to contingent" unless Rails.env.test?
+            puts "enrollment with #{hbx_enrollment.hbx_id} associated to #{family.id} moved to contingent" unless Rails.env.test?
           end
         end
       rescue Exception => e
-        puts "Exception in family ID #{person.hbx_id}: #{e}" unless Rails.env.test?
+        puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
       end
     end
   end
