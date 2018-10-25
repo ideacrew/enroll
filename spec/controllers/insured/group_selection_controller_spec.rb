@@ -409,6 +409,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
       allow(census_employee).to receive(:cobra_begin_date).and_return(TimeKeeper.date_of_record + 1.day)
       allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
+      person.employee_roles.first.census_employee.update_attributes(aasm_state: "cobra_eligible", coverage_terminated_on: TimeKeeper.date_of_record, cobra_begin_date: TimeKeeper.date_of_record - 1.day)
+      person.reload
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match /You may not enroll for cobra after/
