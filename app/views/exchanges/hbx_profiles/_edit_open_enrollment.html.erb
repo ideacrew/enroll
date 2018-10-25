@@ -10,27 +10,29 @@
 
               <div class='row'>
                 <div class="col-sm-12">
-                  Employer Name: <%= @benefit_sponsorship.organization.legal_name %>
-                </div>
-                <div class="col-sm-12">
-                  Effective Date: <%= @benefit_application.effective_period.min.strftime('%m/%d/%Y') %>
-                </div>
-                <div class="col-sm-12">
-                  Open Enrollment End Date: <%= @benefit_application.open_enrollment_period.max.strftime('%m/%d/%Y') %>
-                </div>
-              </div>
-              <br/>
-              <div class='row'>
-                <div class="col-sm-4">
                   <div class="form-group">
-                    <div>
-                      <label><span>Please Choose New Open Enrollment Date<%#= l10n('.reject') %></span></label>
-                    </div>
+                    <label for="empoyerName">Employer Name:</label>
+                    <%= @benefit_sponsorship.organization.legal_name %>
                   </div>
                 </div>
-                <div class="col-sm-8">
+                <div class="col-sm-12">
                   <div class="form-group">
-                    <input name="open_enrollment_end_date" type="text" class="uidatepicker" placeholder="Select OE End Date" class="form-control">
+                    <label for="effectiveDate">Effective Date:</label>
+                    <%= @benefit_application.effective_period.min.strftime('%m/%d/%Y') %>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="openEnrollmentEndDate">Open Enrollment End Date:</label>
+                    <%= @benefit_application.open_enrollment_period.max.strftime('%m/%d/%Y') %>
+                  </div>
+                </div>
+              </div>
+              <div class='row'>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="newOpenEnrollmentEnd">Please Choose New Open Enrollment Date:</label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<input name="open_enrollment_end_date" type="text" class="uidatepicker" placeholder="Select OE End Date" class="form-control" required>
                   </div>
                 </div>
               </div>
