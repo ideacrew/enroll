@@ -3,11 +3,11 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   attr_accessor :family, :data, :person, :renewing_enrollments, :active_enrollments
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
     self.renewing_enrollments = args[:renewing_enrollments]
     self.active_enrollments = args[:active_enrollments]

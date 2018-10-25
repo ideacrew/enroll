@@ -22,7 +22,7 @@ begin
     end
   end
 rescue Exception => e
-  puts "Unable to open file #{e}"
+  puts "Unable to open file #{e}" unless Rails.env.test?
 end
 
 field_names = %w(
@@ -72,13 +72,39 @@ def set_due_date_on_verification_types(family)
         person.save!
       end
     rescue Exception => e
-      puts "Exception in family ID #{primary_person.primary_family.id}: #{e}"
+      puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
     end
   end
 end
 
 def future_date
   TimeKeeper.date_of_record + 95.days
+end
+
+def get_family(dependents)
+  dep_families = dependents.inject({}) do |dep_families, dependent|
+    dep_families[dependent] = get_families_for(dependent).pluck(:id)
+  end rescue nil
+  family_ids = dep_families.values.inject(:&)
+  Family.find(family_ids.first.to_s) if family_ids.count == 1
+end
+
+def get_families_for(dependent)
+  Person.where(:hbx_id => dependent["member_id"]).first.families
+end
+
+def get_primary_person(members, subscriber)
+  primary_person = (HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person) rescue nil
+  return primary_person if primary_person
+  subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
+  primary_person = (subscriber_person if subscriber_person.primary_family) rescue nil
+  return primary_person if primary_person
+  primary_person = Family.where(e_case_id: members.first["ic_number"]).first.primary_person rescue nil
+  return primary_person if primary_person
+  primary_person = get_family(members).primary_person rescue nil
+  return primary_person if primary_person
+  primary_person = subscriber_person.families.first.primary_applicant.person rescue nil
+  return primary_person
 end
 
 unless event_kind.present?
@@ -97,19 +123,18 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   @data_hash.each do |ic_number , members|
     begin
       #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      primary_member = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
-      next if primary_member.nil?
-      # next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
+      primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
+      next if primary_person.nil?
+      # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
-      person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
-      next if !person.present?
       renewing_enrollments, active_enrollments = valid_enrollments(person)
       next if renewing_enrollments.empty?
-      consumer_role = person.consumer_role
+      consumer_role = primary_person.consumer_role
       if consumer_role.present?
         if InitialEvents.include? event
-          family = person.primary_family
+          family = primary_person.primary_family
           set_due_date_on_verification_types(family)
           family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
         end
@@ -118,7 +143,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             subject: event_kind.title,
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
-            person: person,
+            person: primary_person,
             renewing_enrollments: renewing_enrollments,
             active_enrollments: active_enrollments,
             data: members
@@ -127,9 +152,9 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         builder.deliver
         csv << [
           ic_number,
-          person.hbx_id,
-          person.first_name,
-          person.last_name
+          primary_person.hbx_id,
+          primary_person.first_name,
+          primary_person.last_name
         ]
         puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
       else
@@ -138,7 +163,6 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
     rescue Exception => e
       puts "Unable to deliver #{event} notice to family - #{ic_number} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
-
   end
 end
 puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
