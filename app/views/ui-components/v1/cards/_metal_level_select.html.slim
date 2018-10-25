@@ -194,7 +194,7 @@ javascript:
       div.setAttribute('id', 'yourAvailablePlans')
         var network = "";
         if (plan.network_information)
-          network = `NETWORK NOTES <a data-toggle="tooltip" title='${plan.network_information}'><i class="fas fa-question-circle"></i></a>`
+          network = `NETWORK NOTES <a data-toggle="tooltip" data-placement="top" data-container="body" title='${plan.network_information}'><i class="fas fa-question-circle"></i></a>`
         div.innerHTML =
         `<div class="col-xs-4 reference-plans">
           <div class="col-xs-12 p0 mb-1">
@@ -297,14 +297,20 @@ javascript:
 
   function showFormButtons() {
     document.getElementById('addBenefitPackage').classList.remove('hidden')
-    document.getElementById('dentalBenefits').classList.remove('hidden')
+    var dentalBenefits = document.getElementById('dentalBenefits')
+    if(dentalBenefits) {
+      dentalBenefits.classList.remove('hidden')
+    }
     document.getElementById('submitBenefitPackage').classList.remove('hidden')
     document.getElementById('cancelBenefitPackage').classList.remove('hidden')
   }
 
   function hideFormButtons() {
     document.getElementById('addBenefitPackage').classList.add('hidden')
-    document.getElementById('dentalBenefits').classList.add('hidden')
+    var dentalBenefits = document.getElementById('dentalBenefits')
+    if(dentalBenefits) {
+      dentalBenefits.classList.add('hidden')
+    }
     document.getElementById('submitBenefitPackage').classList.add('hidden')
     document.getElementById('cancelBenefitPackage').classList.add('hidden')
   }
@@ -336,12 +342,16 @@ javascript:
 
   function disableDentalBenefitPackage() {
     var addBenefitPackageButton = document.getElementById('dentalBenefits');
-    addBenefitPackageButton.classList.add('disabled')
+    if(addBenefitPackageButton) {
+      addBenefitPackageButton.classList.add('disabled')
+    }
   }
 
   function enableDentalBenefitPackage() {
     var addBenefitPackageButton = document.getElementById('dentalBenefits');
-    addBenefitPackageButton.classList.remove('disabled')
+    if(addBenefitPackageButton) {
+      addBenefitPackageButton.classList.remove('disabled')
+    }
   }
 
 	function preventSubmissionOnEnter() {

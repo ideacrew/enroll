@@ -39,23 +39,6 @@ javascript:
     document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value
   }
 
-  // function showPlanSelection() {
-  //   document.getElementById("edit_dental_form").classList.add('hidden');
-  //   var sponsored_benefit_id = `${form.id}`
-  //   var benefit_package_id = `${form.benefit_package_id}`
-  //   var benefit_application_id = `${form.benefit_application_id}`
-  //   var benefit_sponsorship_id = `${form.benefit_sponsorship_id}`
-  //   var kind = `${form.kind}`
-  //   var url = "/benefit_sponsors/benefit_sponsorships/"+benefit_sponsorship_id+"/benefit_applications/"+ benefit_application_id +"/benefit_packages/" + benefit_package_id +"/sponsored_benefits/"+sponsored_benefit_id+"/change_reference_product"
-  //   $.ajax({
-  //     type: "GET",
-  //     url: url,
-  //     data: {
-  //       kind: kind
-  //     }
-  //   })
-  // }
-
   function loadSingleProductSponsorContribution(element) {
     document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {
       key.classList.add("hidden")

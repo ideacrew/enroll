@@ -124,7 +124,8 @@ module BenefitSponsors
           roster_eligibility_optimizer,
           sponsored_benefit
         )
-          group_mapper = CensusEmployeeMemberGroupMapper.new(eligible_employee_criteria, product, coverage_start, sponsored_benefit)
+          enrolling_employees = eligible_employee_criteria.where({expected_selection: "enroll"})
+          group_mapper = CensusEmployeeMemberGroupMapper.new(enrolling_employees, product, coverage_start, sponsored_benefit)
           group_mapper.map do |ce_roster|
             roster_group = roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, ce_roster, sponsor_contribution)
             price_group = p_calculator.calculate_price_for(pricing_model, roster_group, sponsor_contribution)

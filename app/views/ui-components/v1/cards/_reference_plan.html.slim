@@ -84,12 +84,16 @@
 
     function disableDentalBenefitPackage() {
       var addBenefitPackageButton = document.getElementById('dentalBenefits');
-      addBenefitPackageButton.classList.add('disabled')
+      if(addBenefitPackageButton) {
+        addBenefitPackageButton.classList.add('disabled')
+      }
     }
 
     function enableDentalBenefitPackage() {
       var addBenefitPackageButton = document.getElementById('dentalBenefits');
-      addBenefitPackageButton.classList.remove('disabled')
+      if(addBenefitPackageButton) {
+        addBenefitPackageButton.classList.remove('disabled')
+      }
     }
 
     function preventSubmissionOnEnter() {

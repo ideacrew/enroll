@@ -54,10 +54,10 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
   let(:contribution_levels_attributes) {
     {
-      "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
-      "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
-      "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
-      "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
+      "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit.id },
+      "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit.id},
+      "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit.id },
+      "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit.id }
     }
   }
 
@@ -101,7 +101,6 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
     context "when a user having right permissions signed in" do
 
       before :each do
-        # benefit_application.update(benefit_sponsor_catalog_id: benefit_market_catalog.id)
         sign_in user
         post :create, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, sponsored_benefits: sponsored_benefits_params
       end
@@ -118,38 +117,6 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
     context "when a user not having valid permissions signed in" do
 
       it "should redirect to xxxxx " do
-      end
-    end
-  end
-
-  describe "GET change_reference_product", dbclean: :after_each do
-
-    let(:benefits_params) {
-      {
-          :kind => sponsored_benefit_kind,
-          :benefit_application_id => benefit_application.id,
-          :benefit_package_id => benefit_package.id,
-          :benefit_sponsorship_id => benefit_sponsorship.id,
-          :product_option_choice => issuer_profile.legal_name,
-          :product_package_kind => product_package_kind,
-          :reference_plan_id => product.id.to_s,
-          :sponsor_contribution_attributes => sponsor_contribution_attributes
-      }
-    }
-
-    context "when a user having right permissions signed in" do
-      before :each do
-        sign_in user
-        sponsored_benefit_form = BenefitSponsors::Forms::SponsoredBenefitForm.for_create(benefits_params)
-        xhr :get, :change_reference_product, id: sponsored_benefit_form.service.package.id, benefit_package_id: benefit_package.id, benefit_application_id: benefit_application.id, benefit_sponsorship_id: benefit_sponsorship.id, kind: sponsored_benefit_kind
-      end
-
-      it "should render change_reference_product template" do
-        expect(response).to render_template("change_reference_product")
-      end
-
-      it "should return http success" do
-        expect(response).to have_http_status(:success)
       end
     end
   end
