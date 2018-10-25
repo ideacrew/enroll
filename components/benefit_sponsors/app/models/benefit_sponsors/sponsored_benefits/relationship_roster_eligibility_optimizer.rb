@@ -65,6 +65,7 @@ module BenefitSponsors
         roster_coverage.member_enrollments.each do |m_en|
           coverage_eligibility_dates[m_en.member_id] = m_en.coverage_eligibility_on
         end
+
         state = OptimizerState.new(contribution_model, sponsor_contribution.sponsored_benefit.pricing_model, level_map, coverage_eligibility_dates, roster_coverage.coverage_start_on, roster_coverage.product, roster_coverage.previous_product, covered_roster_entry.primary_member.member_id)
         covered_roster_entry.members.each do |member|
           state.add(member)
