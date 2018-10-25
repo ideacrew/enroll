@@ -17,6 +17,7 @@ class IndividualMarketTransition
   field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
+  scope :resident_types,  -> { where(:role_type => "resident") }
 
 	validates_presence_of :submitted_at
 
