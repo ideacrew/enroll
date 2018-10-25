@@ -4,8 +4,16 @@ describe PlanSelection do
 
   subject { PlanSelection.new(hbx_enrollment, hbx_enrollment.plan) }
 
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) do
+    person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+    person.consumer_role.aasm_state = "verification_outstanding"
+    person
+  end
+  let(:person1) do
+    person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+    person.consumer_role.aasm_state = "verification_outstanding"
+    person
+  end
 
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, :person => person)}
   let(:household) {FactoryGirl.create(:household, family: family)}
@@ -110,10 +118,20 @@ describe PlanSelection do
   describe ".select_plan_and_deactivate_other_enrollments" do
 
     context 'hbx_enrollment aasm state check' do
-      it 'should set eligibility dates to that of the previous enrollment' do
+      it 'should set is_any_enrollment_member_outstanding to true if any verification outstanding people' do
         subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","verification_outstanding")
+        subject.hbx_enrollment.update_attributes(aasm_state: "shopping")
         subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
-        expect(subject.hbx_enrollment.aasm_state).to eq("enrolled_contingent")
+        expect(subject.hbx_enrollment.aasm_state).to eq("coverage_selected")
+        expect(subject.hbx_enrollment.is_any_enrollment_member_outstanding).to eq true
+      end
+
+      it 'should set is_any_enrollment_member_outstanding to false if no verification outstanding people' do
+        subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","verified")
+        subject.hbx_enrollment.update_attributes(aasm_state: "shopping")
+        subject.select_plan_and_deactivate_other_enrollments(nil,"individual")
+        expect(subject.hbx_enrollment.aasm_state).to eq("coverage_selected")
+        expect(subject.hbx_enrollment.is_any_enrollment_member_outstanding).to eq false
       end
     end
   end
