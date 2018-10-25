@@ -711,8 +711,9 @@ describe HbxProfile, "class methods", type: :model do
     end
     let(:benefit_package) { BenefitPackage.new }
     let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-    let(:person) { double(primary_family: family)}
-    let(:family) { double(current_sep: double(effective_on:TimeKeeper.date_of_record)) }
+    let(:person) { family.primary_applicant.person}
+    let(:family) { @household.family }
+    let(:sep) {SpecialEnrollmentPeriod.new(effective_on: TimeKeeper.date_of_record)}
     let(:hbx_profile) {double}
     let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
     let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months) }
@@ -724,6 +725,7 @@ describe HbxProfile, "class methods", type: :model do
       allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(household).to receive(:family).and_return family
+      allow(family).to receive(:current_sep).and_return sep
       allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
     end
 
