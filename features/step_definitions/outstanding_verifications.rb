@@ -1,6 +1,7 @@
 Given(/^oustanding verfications users exists$/) do
-  person = FactoryBot.create(:person, :with_consumer_role)
+  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
   @person_name = person.full_name
+  person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
   family = FactoryBot.create(:family, :with_primary_family_member, person: person)
   FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
                     :household => family.active_household,
@@ -8,6 +9,8 @@ Given(/^oustanding verfications users exists$/) do
                     :is_any_enrollment_member_outstanding => true,
                     :kind => "individual",
                     :effective_on => TimeKeeper.date_of_record.beginning_of_year)
+  FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+  enrollment.save!
   Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
 end
 
