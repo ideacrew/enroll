@@ -34,9 +34,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = "individual"
-    renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
+    renewal_enrollment.plan_id = ( can_renew_assisted_plan?(renewal_enrollment) ? assisted_renewal_plan : renewal_plan)
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
@@ -46,12 +46,22 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment
   end
 
+  def can_renew_assisted_plan?(renewal_enrollment)
+    if @assisted
+      tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
+      members = tax_household.tax_household_members
+      enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
+      enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
+    else
+      return false
+    end
+  end
+
   def assisted_enrollment(renewal_enrollment)
-    eligibility_service = Services::EligibilityService.new
-    eligibility_service.enrollment = renewal_enrollment
-    eligibility_service.aptc_values = @aptc_values
-    eligibility_service.family = @enrollment.family
-    eligibility_service.apply_aptc
+    eligibility_service = Services::EligibilityService.new( renewal_enrollment)
+    eligibility_service.process
+    eligibility_service.assign(@aptc_values)
+    eligibility_service
   end
 
   def is_dependent_dropped?
