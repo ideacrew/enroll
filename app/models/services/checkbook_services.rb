@@ -42,12 +42,29 @@ module Services
         end
       end
 
+      def enrollment_year
+        @hbx_enrollment.effective_on.year
+      end
+
       def csr_value
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "-01"
         else 
-          active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
+          case active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
+          when "100"
+            "-01"
+          when "94"
+            "-06"
+          when "87"
+            "-05"
+          when "73"
+            "-04"
+          when "0"
+             "-02"
+          when "limited"
+            "-03"
+          end
         end
       end
 
@@ -56,7 +73,7 @@ module Services
         if active_house_hold.nil?
           return "NULL"
         else 
-          active_house_hold.latest_eligibility_determination.max_aptc.to_s
+          active_house_hold.latest_eligibility_determination.max_aptc.to_i
         end
       end
 
@@ -86,7 +103,7 @@ module Services
           "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
           "enrollment_year": 2019,
           "family": consumer_build_family,
-          "aptc": aptc_value,
+          "aptc": aptc_value.to_s,
           "csr": csr_value,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
@@ -108,10 +125,6 @@ module Services
         else
           reference_plan.carrier_profile.legal_name
         end
-      end
-
-      def enrollment_year
-        @hbx_enrollment.effective_on.year
       end
 
       def filter_option
