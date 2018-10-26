@@ -1161,8 +1161,8 @@ private
     )
   end
    
-  def self.notice_for_missing_binder_payment(org)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, "initial_employer_no_binder_payment_received", "acapi_trigger" =>  true )
+  def notice_for_missing_binder_payment(org)
+    org.employer_profile.trigger_notices("initial_employer_no_binder_payment_received", "acapi_trigger" => true)
     org.employer_profile.census_employees.active.each do |ce|
       begin
         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
