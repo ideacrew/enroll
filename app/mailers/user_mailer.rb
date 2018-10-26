@@ -163,7 +163,7 @@ class UserMailer < ApplicationMailer
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?
-      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: " Welcome! You've Submitted a Broker Application on the #{site_short_name} for Business"}) do |format|
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application through the #{site_short_name} for Business"}) do |format|
         format.html { render "broker_application_confirmation", :locals => { :person => person }}
       end
     end
