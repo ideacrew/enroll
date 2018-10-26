@@ -12,7 +12,7 @@ module Subscribers
           "info.events.employee_role.#",
           "info.events.consumer_role.#",
           "info.events.employer.#",
-          "info.events.census_employee.#",
+          "info.events.census_employee.#"
         ]
       )
     end
