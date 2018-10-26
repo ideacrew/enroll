@@ -170,8 +170,12 @@ class Insured::PlanShoppingsController < ApplicationController
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
       @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     elsif @hbx_enrollment.kind == "individual"
-      @dc_individual_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
-    end
+      if @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.current_year
+        @dc_individual_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      elsif @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.previous_year 
+        @dc_individual_checkbook_url = Settings.consumer_checkbook_services.checkbook_previous_year
+      end
+   end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
