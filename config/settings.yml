@@ -139,8 +139,10 @@ consumer_checkbook_services:
     # base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=dev" #Environment should be changed according to current environment RE #19392 (#24)
     base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=test"
     current_year: 2019
+    previous_year: 2018
     dental_prod_url: "https://dc.checkbookhealth.org/sadpi/dc/2019/"
     dental_stage_url: "https://staging.checkbookhealth.org/sadpi/DC/2019/"
+    checkbook_previous_year: "https://dc.checkbookhealth.org/hie/dc/2018/"
 
 checkbook_services:
 # Note: Need to replace Remote_access_key with Production keys while deploying to prod.
