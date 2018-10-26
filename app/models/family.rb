@@ -769,7 +769,7 @@ class Family
             enrollment.expire_coverage! if enrollment.may_expire_coverage?
           end
         rescue Exception => e
-          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+          Rails.logger.error "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         end
       end
     end
@@ -784,8 +784,12 @@ class Family
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
 
       families.each do |family|
-        family.active_household.hbx_enrollments.where(query).each do |enrollment|
-          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+        begin
+          family.active_household.hbx_enrollments.where(query).each do |enrollment|
+            enrollment.begin_coverage! if enrollment.may_begin_coverage?
+          end
+        rescue Exception => e
+          Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
         end
       end
     end
