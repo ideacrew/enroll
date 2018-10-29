@@ -108,18 +108,12 @@ group :development do
 end
 
 group :development, :test do
-  gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
   gem 'parallel_tests'
-  gem 'pry'
-  gem 'pry-byebug'
-  gem 'pry-rails'
-  gem 'pry-remote'
-  gem 'pry-stack_explorer'
   gem 'puma'
   gem 'railroady', '~> 1.5.2'
   gem 'rspec-rails', '~> 3.4.2'
