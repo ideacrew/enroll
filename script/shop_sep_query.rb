@@ -82,7 +82,7 @@ def quiet_period_enrollment?(plan_year, submitted_at)
 end
 
 def is_valid_plan_year?(plan_year)
-  %w(enrolled renewing_enrolled canceled expired renewing_canceled active terminated termination_pending).include?(plan_year.aasm_state)
+  %w(enrolled renewing_enrolled expired active terminated termination_pending).include?(plan_year.aasm_state)
 end
 
 def term_states
