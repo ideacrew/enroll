@@ -94,12 +94,11 @@ describe Services::CheckbookServices::PlanComparision do
 
   describe "when employee is congress member" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
-    let(:checkbook_url) {"https://dc.checkbookhealth.org/congress/dc/2018/"}
 
     it "should generate congressional url" do
      if plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
-       expect(subject.generate_url).to eq checkbook_url
+       expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/#{hbx_enrollment.effective_on.year}/")
       end
     end
   end
