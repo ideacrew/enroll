@@ -1,3 +1,7 @@
+#This service can be used for all eligibilities related projects.
+#Currently the development is done only for passive renewals.
+#Further enhancements can be made for this service based on the projects - plan shopping controller, APTC tool, mixed household eligibility
+
 module Services
   class EligibilityService
 
