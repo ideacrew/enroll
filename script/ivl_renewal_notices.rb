@@ -36,6 +36,7 @@ report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%
 event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
+
 def valid_enrollments(person)
   renewing_hbx_enrollments = []
   active_hbx_enrollments = []
@@ -60,33 +61,42 @@ def valid_enrollments(person)
   return renewing_hbx_enrollments, active_hbx_enrollments
 end
 
-def future_date
-  TimeKeeper.date_of_record + 95.days
-end
-
 def get_family(dependents)
   dep_families = dependents.inject({}) do |dep_families, dependent|
-    dep_families[dependent] = get_families_for(dependent).pluck(:id)
-  end rescue nil
-  family_ids = dep_families.values.inject(:&)
-  Family.find(family_ids.first.to_s) if family_ids.count == 1
+    families = get_families_for(dependent)
+    dep_families[dependent] = families.map(&:id) if families.present?
+  end
+  family_ids = dep_families.values.compact.inject(:&)
+  (return Family.find(family_ids.first.to_s)) if family_ids.count == 1
 end
 
 def get_families_for(dependent)
-  Person.where(:hbx_id => dependent["member_id"]).first.families
+  person = Person.by_hbx_id(dependent["member_id"]).first
+  person.families.to_a if person.present?
+end
+
+def get_family_by_policy_id(policy_hbx_id)
+  HbxEnrollment.by_hbx_id(policy_hbx_id).first.family.primary_person
 end
 
 def get_primary_person(members, subscriber)
-  primary_person = (HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person) rescue nil
+  primary_person = get_family_by_policy_id(members.first["policy.id"]) if members.first["policy.id"].present?
   return primary_person if primary_person
-  subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
-  primary_person = (subscriber_person if subscriber_person.primary_family) rescue nil
+
+  subscriber_person = Person.by_hbx_id(subscriber["subscriber_id"]).first
+  primary_person = subscriber_person if (subscriber_person && subscriber_person.primary_family)
   return primary_person if primary_person
-  primary_person = Family.where(e_case_id: members.first["ic_number"]).first.primary_person rescue nil
+
+  families = Family.where(e_case_id: /#{members.first["ic_number"]}/)
+  primary_person = families.first.primary_person if families.count = 1
   return primary_person if primary_person
-  primary_person = get_family(members).primary_person rescue nil
+
+  family = get_family(members)
+  primary_person = family.primary_person if family.present?
   return primary_person if primary_person
-  primary_person = subscriber_person.families.first.primary_applicant.person rescue nil
+
+  families = subscriber_person.families
+  primary_person = families.first.primary_applicant.person if families.count == 1
   return primary_person
 end
 
