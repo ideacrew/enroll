@@ -273,7 +273,7 @@ module BenefitSponsors
           (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
         end
 
-        (benefit_application.present? && benefit_application.external_benefit_application?) ? renewing_published_benefit_application : benefit_application
+        (benefit_application.present? && benefit_application.imported?) ? renewing_published_benefit_application : benefit_application
       end
 
       def enrollments_for_billing(billing_date = nil)

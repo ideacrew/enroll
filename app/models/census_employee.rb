@@ -611,7 +611,7 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion? && !Rails.env.test?
       # we do not want to create employer role durig census employee saving for conversion
       return if self.employer_profile.is_a_conversion_employer?
 
@@ -832,13 +832,8 @@ class CensusEmployee < CensusMember
 
       if employer_profiles.size > 0
         employer_profile_ids = employer_profiles.map(&:_id)
-        query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
-                                    where(
-                                      :employment_terminated_on.gte => date_range.first,
-                                      :employment_terminated_on.lte => date_range.last
-                                    ) if employer_profiles[0].is_a?(EmployerProfile)
 
-        query ||= unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
+        query = unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last
