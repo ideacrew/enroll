@@ -159,6 +159,15 @@ module BenefitSponsors
     # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
     # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
 
+    scope :renewing_published_state,        ->{
+      where(
+        "$and" => [
+          {:aasm_state.in => PUBLISHED_STATES },
+          {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
+
     scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
       where(
         "$and" => [
@@ -351,6 +360,10 @@ module BenefitSponsors
 
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
+    end
+
+    def can_be_migrated?
+      imported?
     end
 
     # TODO: Refer to benefit_sponsorship instead of employer profile.

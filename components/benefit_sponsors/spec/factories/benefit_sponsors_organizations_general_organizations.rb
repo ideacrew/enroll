@@ -13,7 +13,7 @@ FactoryGirl.define do
 
     trait :with_site do
       after :build do |organization, evaluator|
-        organization.site = create(:benefit_sponsors_site, :as_hbx_profile, :cca)
+        organization.site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :cca)
       end
     end
 
