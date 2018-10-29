@@ -2903,6 +2903,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[0])
+            family.reload
           end
 
           let(:family) { employee_A.person.primary_family }
@@ -2921,6 +2922,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[1])
+            family.reload
           end
 
           let(:family) { employee_B.person.primary_family }
@@ -2938,6 +2940,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[2])
+            family.reload
           end
 
           let(:family) { employee_C.person.primary_family }
@@ -2955,6 +2958,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
 
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[3])
+            family.reload
           end
 
           let(:family) { employee_D.person.primary_family }
@@ -2973,6 +2977,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
          
           before do
             renewal_benefit_package.renew_member_benefit(census_employees[4])
+            family.reload
           end
 
           let(:family) { employee_E.person.primary_family }
@@ -2988,7 +2993,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
         def create_person(ce, employer_profile)
           person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
           employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-          ce.update_attributes({employee_role: employee_role})
+          ce.update_attributes!({employee_role_id: employee_role.id})
           Family.find_or_build_from_employee_role(employee_role)
           employee_role
         end
