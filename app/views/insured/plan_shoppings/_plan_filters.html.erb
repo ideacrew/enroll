@@ -23,15 +23,15 @@
     <div class="modal-dialog">
        <div class="modal-content">
           <div class="modal-header" style="border-bottom:none">
-           <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="javascript:window.location='<%=home_insured_families_url%>'" <span aria-hidden="true">&times;</span></button>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
            <hr>
           </div> 
           <div style="margin-left:20px;">
             <p><%= l10n("modal_onscreen") %></p>
           </div>
           <div class="modal-footer" style="margin-right:190px">
-            <button type="button" class="btn btn-default btn-default" data-dismiss="modal" onclick="javascript:window.location='<%=home_insured_families_url%>'">Cancel</button>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_url,target: "_blank", class: "btn btn-primary  mtz" %>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary  mtz" %>
           </div>
        </div>
     </div>
@@ -42,15 +42,15 @@
     <div class="modal-dialog">
        <div class="modal-content">
           <div class="modal-header" style="border-bottom:none">
-           <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="javascript:window.location='<%=home_insured_families_url%>'" <span aria-hidden="true">&times;</span></button>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
            <hr>
           </div> 
           <div style="margin-left:20px;">
             <p><%= l10n("modal_onscreen") %></p>
           </div>
           <div class="modal-footer" style="margin-right:190px">
-            <button type="button" class="btn btn-default btn-default" data-dismiss="modal" onclick="javascript:window.location='<%=home_insured_families_url%>'">Cancel</button>
-            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/',target: "_blank", class: "btn btn-primary  mtz" %>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
+            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz" %>
           </div>
        </div>
     </div>

@@ -5,7 +5,7 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
     it "should return link for shop" do
       @market_kind="individual"
       @coverage_kind = "health"
-      expect(find_my_doctor).to eq "<a target=\"_blank\" href=\"https://dc.checkbookhealth.org/dc/\">Find Your Doctor</a>"
+      expect(find_my_doctor).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_family\" href=\"\">Find Your Doctor</a>"
     end
     
     it "should return link for individual" do
