@@ -85,7 +85,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
-  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", coverage_year: TimeKeeper.date_of_record.year, effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
@@ -467,6 +467,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:family).and_return(family)
       allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
 
       sign_in user
     end
@@ -475,7 +476,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       before :each do
         allow(plan3).to receive(:total_employee_cost).and_return(3333)
         allow(plan3).to receive(:deductible).and_return("$998")
-        get :show, id: "hbx_id"
+        get :show, id: "hbx_id", market_kind: "shop"
       end
 
       it "should be success" do
@@ -496,6 +497,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "should get plans which order by premium" do
         expect(assigns(:plans)).to eq [plan1, plan2, plan3]
+      end
+
+      it "should get the checkbook_url" do
+        expect(assigns(:dc_checkbook_url)).to eq Settings.checkbook_services.congress_url+"#{hbx_enrollment.coverage_year}/"
       end
     end
 
