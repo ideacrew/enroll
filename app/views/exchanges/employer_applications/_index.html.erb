@@ -71,7 +71,7 @@
               <input type="text" class="form-control date py-end-date" style="width:120px" id="date_picker_<%= application.id %>" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
-              <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true, disabled: true  %> TRANSMIT TO CARRIER
+              <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true  %> TRANSMIT TO CARRIER
             </td>
             <td colspan="1">
               <button class="btn btn-primary btn-sm plan-year-submit disabled" onclick="submitPlanActions()">Submit</button>
