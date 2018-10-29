@@ -9,6 +9,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
   include_context "setup employees with benefits"
 
   let(:dental_sponsored_benefit) { true }
+  let(:product_kinds)  { [:health, :dental] }
   let(:roster_size) { 2 }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
   let(:effective_period) { start_on..start_on.next_year.prev_day }
