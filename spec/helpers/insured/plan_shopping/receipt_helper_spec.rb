@@ -25,7 +25,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
           allow(helper).to receive(:pay_now_button_timed_out?).and_return true
-          expect(helper.show_pay_now?).to eq market.in?(['individual', 'coverall'])
+          expect(helper.show_pay_now?).to eq false
         end
       end
     end
