@@ -28,7 +28,6 @@ class PlanSelection
   end
 
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
-
     hbx_enrollment.update_current(plan_id: plan.id)
     # hbx_enrollment.inactive_related_hbxs
     # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)

@@ -60,23 +60,6 @@ def valid_enrollments(person)
   return renewing_hbx_enrollments, active_hbx_enrollments
 end
 
-def set_due_date_on_verification_types(family)
-  family.family_members.each do |family_member|
-    begin
-      person = family_member.person
-      person.consumer_role.verification_types.each do |v_type|
-        next if !(v_type.type_unverified?)
-        v_type.update_attributes(due_date: future_date,
-                                 updated_by: nil,
-                                 due_date_type:  "notice" )
-        person.save!
-      end
-    rescue Exception => e
-      puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
-    end
-  end
-end
-
 def future_date
   TimeKeeper.date_of_record + 95.days
 end
@@ -135,7 +118,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       if consumer_role.present?
         if InitialEvents.include? event
           family = primary_person.primary_family
-          set_due_date_on_verification_types(family)
+          family.set_due_date_on_verification_types
           family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
         end
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {

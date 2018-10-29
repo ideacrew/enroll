@@ -21,9 +21,14 @@ class ConsumerRole
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
   INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
+  #ridp
+  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
+
   SSN_VALIDATION_STATES = %w(na valid outstanding pending expired)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending expired)
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending expired) #attested state is used for people with active enrollments before locale residency verification was turned on
+
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -65,6 +70,11 @@ class ConsumerRole
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
+
+  # This is utilized to store the url where Admin last visited. Used to build logic as to where the consumer
+  # should land next after completing RIDP or Identify Verifications.
+  field :admin_bookmark_url, type: String, default: nil
+
   field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
@@ -80,6 +90,18 @@ class ConsumerRole
   field :local_residency_validation, type: String, default: nil #move to verification type
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true #move to verification type
 
+  # Identity
+  field :identity_validation, type: String, default: "na"
+  validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
+
+  # Application
+  field :application_validation, type: String, default: "na"
+  validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
+
+  #ridp update reason fields
+  field :identity_update_reason, type: String
+  field :application_update_reason, type: String
+
   field :ssn_update_reason, type: String #move to verification type
   field :lawful_presence_update_reason, type: Hash #move to verification type
   field :native_update_reason, type: String #move to verification type
@@ -90,6 +112,10 @@ class ConsumerRole
   field :native_rejected, type: Boolean, default: false #move to verification type
   field :lawful_presence_rejected, type: Boolean, default: false #move to verification type
   field :residency_rejected, type: Boolean, default: false #move to verification type
+
+  #ridp rejection flags
+  field :identity_rejected, type: Boolean, default: false
+  field :application_rejected, type: Boolean, default: false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -106,6 +132,7 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
+  embeds_many :ridp_documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable do #move to verification type
     def uploaded
       @target.select{|document| document.identifier }
@@ -115,7 +142,7 @@ class ConsumerRole
   embeds_many :special_verifications, cascade_callbacks: true, validate: true #move to verification type
   embeds_many :verification_type_history_elements
 
-  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
+  accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents, :ridp_documents
 
   validates_presence_of :dob, :gender, :is_applicant
   #validate :ssn_or_no_ssn
@@ -218,6 +245,10 @@ class ConsumerRole
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
 
+  def has_ridp_docs_for_type?(type)
+    self.ridp_documents.any?{ |doc| doc.ridp_verification_type == type && doc.identifier }
+  end
+  
   def has_outstanding_documents?
     self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
   end
@@ -265,6 +296,14 @@ class ConsumerRole
 
   def lawful_presence_verified?
     self.lawful_presence_determination.verification_successful?
+  end
+
+  def identity_verified?
+    ['valid'].include?(self.identity_validation)
+  end
+
+  def application_verified?
+    ['valid'].include?(self.application_validation)
   end
 
   def is_hbx_enrollment_eligible?
@@ -677,6 +716,22 @@ class ConsumerRole
     end
   end
 
+  def find_ridp_document_by_key(key)
+    candidate_vlp_documents = ridp_documents
+    if person.consumer_role.present?
+        candidate_vlp_documents << person.consumer_role.ridp_documents
+        candidate_vlp_documents.uniq!
+    end
+
+    return nil if candidate_vlp_documents.nil?
+
+    candidate_vlp_documents.detect do |document|
+      next if document.identifier.blank?
+      doc_key = document.identifier.split('#').last
+      doc_key == key
+    end
+  end
+
   def latest_active_tax_household_with_year(year, family)
     family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
@@ -712,9 +767,18 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def identity_unverified?
+    self.identity_validation == "na"
+  end
+
+  def application_unverified?
+    self.application_validation == "na"
+  end
+
   def native_with_ssn?
     is_native? && ssn_applied?
   end
+
 
   def sensitive_information_changed?(person_params)
     person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
@@ -744,6 +808,25 @@ class ConsumerRole
       mark_residency_pending
       start_residency_verification_process
     end
+  end
+
+  def move_identity_documents_to_outstanding
+    if identity_unverified? && application_unverified?
+      update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
+    end
+  end
+
+  def move_identity_documents_to_verified(app_type=nil)
+    case app_type
+    when 'Curam'
+      type = 'Curam'
+    when 'Mobile'
+      type = 'Mobile'
+    else
+      type = 'Experian'
+    end
+    update_attributes(identity_validation: 'valid', application_validation: 'valid',
+                      identity_update_reason: "Verified from #{type}", application_update_reason: "Verified from #{type}")
   end
 
   def verification_types
@@ -841,6 +924,30 @@ class ConsumerRole
     citizen_status == "indian_tribe_member"
   end
 
+  def mark_doc_type_uploaded(v_type)
+    case v_type
+      when "Social Security Number"
+        update_attributes(:ssn_rejected => false)
+      when "Citizenship"
+        update_attributes(:lawful_presence_rejected => false)
+      when "Immigration status"
+        update_attributes(:lawful_presence_rejected => false)
+      when "American Indian Status"
+        update_attributes(:native_rejected => false)
+      when "DC Residency"
+        update_attributes(:residency_rejected => false)
+    end
+  end
+
+  def mark_ridp_doc_uploaded(ridp_type)
+    case ridp_type
+      when 'Identity'
+        update_attributes(:identity_rejected => false, :identity_validation => 'pending')
+      when 'Application'
+        update_attributes(:application_rejected => false, :application_validation => 'pending')
+    end
+  end
+
   def invoke_ssa
     lawful_presence_determination.start_ssa_process
   end
@@ -916,6 +1023,15 @@ class ConsumerRole
     end
   end
 
+  def admin_ridp_verification_action(admin_action, ridp_type, update_reason)
+    case admin_action
+      when 'verify'
+        update_ridp_verification_type(ridp_type, update_reason)
+      when 'return_for_deficiency'
+        return_ridp_doc_for_deficiency(ridp_type, update_reason)
+    end
+  end
+
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     v_type.update_attributes(:validation_status => "outstanding", :update_reason => update_reason, :rejected => true)
     if  v_type.type_name == "DC Residency"
@@ -925,6 +1041,24 @@ class ConsumerRole
     end
     reject!(verification_attr(authority.first))
     "#{v_type.type_name} was rejected."
+  end
+
+  def return_ridp_doc_for_deficiency(ridp_type, update_reason)
+    if ridp_type == 'Identity'
+      update_attributes(:identity_validation => 'outstanding', :identity_update_reason => update_reason, :identity_rejected => true)
+    elsif  ridp_type == 'Application'
+      update_attributes(:application_validation => 'outstanding', :application_update_reason => update_reason, :application_rejected => true)
+    end
+    "#{ridp_type} was rejected."
+  end
+
+  def update_ridp_verification_type(ridp_type, update_reason)
+    if ridp_type == 'Identity'
+      update_attributes(:identity_validation => 'valid', :identity_update_reason => update_reason)
+    elsif ridp_type == 'Application'
+      update_attributes(:application_validation => 'valid', :application_update_reason => update_reason)
+    end
+    "#{ridp_type} successfully verified."
   end
 
   def update_verification_type(v_type, update_reason, *authority)
