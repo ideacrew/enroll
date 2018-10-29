@@ -1518,6 +1518,11 @@ class HbxEnrollment
     is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
   end
 
+  def is_any_member_outstanding?
+    active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
+    active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
