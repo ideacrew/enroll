@@ -32,9 +32,11 @@ module BenefitSponsors
 
       validates_presence_of :market_kind, if: :is_broker_profile?
       validates_presence_of :ach_routing_number, if: :is_broker_profile?
+      validates_presence_of :referred_by, if: :is_site_cca?
 
       validate :validate_profile_office_locations
       validate :validate_routing_information, if: :is_broker_profile?
+      validates_presence_of :referred_reason, if: :is_referred_by_other?
 
       def persisted?
         false
@@ -50,6 +52,18 @@ module BenefitSponsors
 
       def is_employer_profile?
         profile_type == "benefit_sponsor"
+      end
+
+      def is_cca_profile?
+        is_employer_profile? && is_site_cca?
+      end
+
+      def is_site_cca?
+        Settings.site.key == :cca
+      end
+
+      def is_referred_by_other?
+        referred_by == "Other"
       end
 
       def validate_routing_information

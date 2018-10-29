@@ -172,8 +172,6 @@ module BenefitSponsors
       end
 
       def store!(form)
-        binding.pry
-
         factory_obj = Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
         if factory_obj.errors.present?
           map_errors_for(factory_obj, onto: form)
