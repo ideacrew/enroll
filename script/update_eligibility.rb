@@ -74,7 +74,7 @@ def check_and_run
 
     person_by_hbx = Person.by_hbx_id(hbx_id).first rescue nil
 
-    if ssn && hbx_id && person.id != person_by_hbx.id
+    if ssn && hbx_id && person && person_by_hbx && person.id != person_by_hbx.id
       not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data(ssn/hbx_id)"}
       puts "Person with ssn: #{ssn} and person with hbx_id: #{hbx_id} are not same"
       next
