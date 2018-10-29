@@ -756,6 +756,7 @@ class Family
     end
 
     def expire_individual_market_enrollments
+      @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
           :effective_on.lt => current_benefit_period.start_on,
@@ -763,18 +764,25 @@ class Family
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
       }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
-      families.each do |family|
+      families.no_timeout.each do |family|
         begin
+          @logger.info "--------------- Processing family_id: #{family.id} ---------------"
           family.active_household.hbx_enrollments.where(query).each do |enrollment|
-            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+            if enrollment.may_expire_coverage?
+              enrollment.expire_coverage!
+              @logger.info "Processed enrollment: #{enrollment.hbx_id}"
+            end
           end
         rescue Exception => e
           Rails.logger.error "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
+          @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         end
       end
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
     end
 
     def begin_coverage_for_ivl_enrollments
+      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
           :effective_on => current_benefit_period.start_on,
@@ -783,19 +791,26 @@ class Family
         }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
 
-      families.each do |family|
+      families.no_timeout.each do |family|
         begin
+          @logger.info "--------------- Processing family_id: #{family.id} ---------------"
           family.active_household.hbx_enrollments.where(query).each do |enrollment|
-            enrollment.begin_coverage! if enrollment.may_begin_coverage?
+            if enrollment.may_begin_coverage?
+              enrollment.begin_coverage!
+              @logger.info "Processed enrollment: #{enrollment.hbx_id}"
+            end
           end
         rescue Exception => e
           Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+          @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
         end
       end
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
     end
 
     # Manage: SEPs, FamilyMemberAgeOff
     def advance_day(new_date)
+      @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
       send_enrollment_notice_for_ivl(new_date)
