@@ -32,7 +32,7 @@ module BenefitSponsors
 
       validates_presence_of :market_kind, if: :is_broker_profile?
       validates_presence_of :ach_routing_number, if: :is_broker_profile?
-      validates_presence_of :referred_by, if: :is_site_cca?
+      validates_presence_of :referred_by, if: :is_cca_profile?
 
       validate :validate_profile_office_locations
       validate :validate_routing_information, if: :is_broker_profile?
