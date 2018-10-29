@@ -5,7 +5,9 @@ module BenefitSponsors
       include BenefitSponsors::Concerns::EmployerProfileConcern
       include BenefitSponsors::Concerns::Observable
 
-      field :sic_code,  type: String
+      field :sic_code,            type: String
+      field :referred_by,         type: String
+      field :referred_reason,     type: String
 
       # TODO use SIC code validation
       validates_presence_of :sic_code
@@ -20,6 +22,10 @@ module BenefitSponsors
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
         employer_attestation.present? && employer_attestation.is_eligible?
+      end
+
+      def referred_options
+        ::BenefitMarkets::REFERRED_KIND_ARRAY
       end
 
       private

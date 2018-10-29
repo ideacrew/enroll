@@ -70,6 +70,7 @@ module BenefitSponsors
       def load_profile_form(form)
         form.organization.profile.grouped_sic_code_options = Caches::SicCodesCache.load
         form.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
+        form.organization.profile.referred_by_options = ::BenefitMarkets::REFERRED_KIND_ARRAY
         form
       end
 
@@ -130,7 +131,7 @@ module BenefitSponsors
           form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours, :ach_routing_number, :ach_account_number)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
-            form.attributes.slice(:contact_method, :id, :sic_code)
+            form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
           else
             form.attributes.slice(:contact_method, :id)
           end
@@ -171,6 +172,8 @@ module BenefitSponsors
       end
 
       def store!(form)
+        binding.pry
+
         factory_obj = Organizations::Factories::ProfileFactory.call(form_attributes_to_params(form))
         if factory_obj.errors.present?
           map_errors_for(factory_obj, onto: form)

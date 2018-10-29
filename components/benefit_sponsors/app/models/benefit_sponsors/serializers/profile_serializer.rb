@@ -3,8 +3,9 @@ module BenefitSponsors
     class ProfileSerializer < ActiveModel::Serializer
       attributes :id, :contact_method, :sic_code,
                    :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
-                    :market_kind, :language_options, :home_page, :grouped_sic_code_options, :ach_routing_number, :ach_account_number
+                    :market_kind, :language_options, :home_page, :grouped_sic_code_options, :ach_routing_number, :ach_account_number, :referred_by, :referred_reason
       attribute :contact_method_options
+      attribute :referred_by_options
       # attribute :rating_area_id, if: :is_cca_employer_profile?
       attribute :sic_code, if: :is_cca_employer_profile?
       attribute :grouped_sic_code_options, if: :is_cca_employer_profile?
@@ -48,6 +49,10 @@ module BenefitSponsors
 
       def contact_method_options
         object.contact_methods
+      end
+
+      def referred_by_options
+        object.referred_options
       end
 
       def grouped_sic_code_options

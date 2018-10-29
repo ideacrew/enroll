@@ -24,6 +24,9 @@ module BenefitSponsors
       attribute :ach_account_number, String
       attribute :ach_routing_number, String
       attribute :ach_routing_number_confirmation, String
+      attribute :referred_by, String
+      attribute :referred_reason, String
+      attribute :referred_by_options, Array
 
       attribute :office_locations, Array[OrganizationForms::OfficeLocationForm]
 
