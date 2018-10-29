@@ -41,12 +41,12 @@
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.health_plan_kind.to_s.upcase %>
+            <%= sponsored_benefit.reference_product.product_type.to_s.upcase %>
           </p>
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.metal_level_kind.to_s.humanize %>
+            <%= sponsored_benefit.reference_product.metal_level.to_s.humanize %>
           </p>
         </td>
         <td>
@@ -57,6 +57,8 @@
               One Level
             <% elsif sponsored_benefit.product_package_kind == :single_product %>
               A Single Plan
+             <% elsif sponsored_benefit.product_package_kind == :multi_product %>
+              Custom
             <% end %>
           </p>
         </td>

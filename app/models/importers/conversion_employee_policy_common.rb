@@ -24,7 +24,8 @@ module Importers
       :subscriber_city,
       :subscriber_state,
       :default_hire_date,
-      :market
+      :market,
+      :sponsored_benefit_kind
 
       (1..8).to_a.each do |num|
         attr_converter "dep_#{num}_ssn".to_sym, :as => :optimistic_ssn

@@ -184,6 +184,7 @@ module EnrollmentShopping
 			enrollment.coverage_household_id = @coverage_household.id
 			enrollment.kind = enrollment_kind
 			enrollment.employee_role = @employee_role
+      enrollment.coverage_kind = @coverage_kind
 			enrollment
 		end
 

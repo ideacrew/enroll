@@ -1,11 +1,13 @@
+<% kind ||= "health" %>
+<% benefit_group_costs ||= @benefit_group_costs %>
 <div class="row">
   <div id="scroll_container" class="col-xs-12">
     <div>
-      <label class="plan-offerings">Plan Offerings - <%= render_plan_offerings(benefit_group, 'health') %></label>
+      <label class="plan-offerings">Plan Offerings - <%= render_plan_offerings(benefit_group, kind) %></label>
     </div>
     <div>
       <% unless benefit_group.sole_source? %>
-        <label>Employer Lowest/Reference/Highest - <%= number_to_currency(@benefit_group_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_costs[:highest_plan_employer_cost]) %></label>
+        <label>Employer Lowest/Reference/Highest - <%= number_to_currency(benefit_group_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_costs[:highest_plan_employer_cost]) %></label>
       <% end %>
     </div>
     <br />
@@ -14,18 +16,18 @@
         <tr>
           <th>Employee</th>
           <th>Dependent Count</th>
-          <% unless benefit_group.single_plan_type? %>
+          <% if (!benefit_group.single_plan_type? && kind == "health") %>
             <th>Lowest Cost Available Plan</th>
           <% end %>
           <th>Reference Plan</th>
-          <% unless benefit_group.single_plan_type? %>
+          <% if (!benefit_group.single_plan_type? && kind == "health") %>
             <th>Highest Cost Available Plan</th>
           <% end %>
         </tr>
       </thead>
       <tbody id="employee_index_scroll">
         <% if benefit_group.census_employees.any? %>
-          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_costs', benefit_group: benefit_group %>
+          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_costs', benefit_group: benefit_group, benefit_group_costs: benefit_group_costs, kind: kind %>
         <% else %>
         <tr> <td> No employees enrolled.</td></tr>
         <% end %>

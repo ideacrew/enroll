@@ -2,16 +2,20 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:aasm_state)              { :active }
   let(:package_kind)            { :single_issuer }
   let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
-  let(:open_enrollment_period)  { effective_period.min.prev_month..(effective_period.min - 10.days) }
+  let(:open_enrollment_start_on){ effective_period.min.prev_month }
+  let(:open_enrollment_period)  { open_enrollment_start_on..(effective_period.min - 10.days) }
 
   let!(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)             { abc_organization.employer_profile }
+
   let!(:benefit_sponsorship)    { 
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
     benefit_sponsorship.save
     benefit_sponsorship
   }
+  let(:dental_sponsored_benefit) { false }
 
+  let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { 
     benefit_sponsorship.service_areas_on(effective_period.min) 
   }
@@ -39,10 +43,12 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   #                                     recorded_rating_area: benefit_sponsorship.rating_area,
   #                                     recorded_service_areas: recorded_service_areas
   #                                   ) }
-  # let(:recorded_service_areas)         { benefit_sponsorship.service_areas_for(effective_period.min) }
+
+  # let(:recorded_service_areas) { benefit_sponsorship.service_areas_for(effective_period.min) }
 
   let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
+  let(:dental_product_package)    { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.product_kind == :dental } }
+  let(:current_benefit_package)   { build(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, dental_sponsored_benefit: dental_sponsored_benefit, product_package: product_package, dental_product_package: dental_product_package, benefit_application: initial_application) }
 
   # before { binding.pry; benefit_sponsorship.save!; initial_application.save! }
 
@@ -50,6 +56,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     initial_application.benefit_packages = [current_benefit_package]
     benefit_sponsorship.benefit_applications = [initial_application]
     benefit_sponsorship.save!
+    benefit_sponsor_catalog.save!
   end
 
   it 'should create a valid benefit sponsorship' do
@@ -72,9 +79,11 @@ RSpec.shared_context "setup employees", :shared_context => :metadata do
 end
 
 RSpec.shared_context "setup employees with benefits", :shared_context => :metadata do
-  include_context "setup employees"
+  # include_context "setup employees"
+  let(:roster_size) { 5 }
+  let(:enrollment_kinds) { ['health'] }
+  let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
 
-  let!(:census_employees) { create_list(:census_employee, 5, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
 end
 
 RSpec.shared_context "setup renewal application", :shared_context => :metadata do

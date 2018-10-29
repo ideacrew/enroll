@@ -175,4 +175,3 @@ class ModifyBenefitApplication< MongoidMigrationTask
     benefit_application.trigger_model_event(:group_advance_termination_confirmation)
   end
 end
-
