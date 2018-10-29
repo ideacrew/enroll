@@ -8,8 +8,8 @@ describe "qhp builder" do
   before :all do
     bcbs_issuer_profile = FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: ["42690"])
 
-    FactoryGirl.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS001", active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id)
-    FactoryGirl.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id)
+    FactoryGirl.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS001", active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id, issuer_hios_id: "42690")
+    FactoryGirl.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", active_year: 2019, issuer_profile_id: bcbs_issuer_profile.id, issuer_hios_id: "42690")
     @files = Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/plans/*.xml'))
   end
 
