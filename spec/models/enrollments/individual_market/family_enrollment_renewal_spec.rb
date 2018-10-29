@@ -225,9 +225,12 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       end
 
       it "should append APTC values" do
-        service = subject.assisted_enrollment(subject.clone_enrollment.hbx_enrollment)
-        renewel_enrollment = service.hbx_enrollment
+        renewel_enrollment = subject.assisted_enrollment(subject.clone_enrollment)
         expect( renewel_enrollment.applied_aptc_amount.to_f).to eq (renewel_enrollment.total_premium * renewel_enrollment.plan.ehb).round(2)
+      end
+
+      it "should append APTC values" do
+        expect( subject.can_renew_assisted_plan?(subject.clone_enrollment)).to eq true
       end
     end
   end

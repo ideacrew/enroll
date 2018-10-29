@@ -84,6 +84,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
 
     def process_aqhp_renewals(renewal_benefit_coverage_period)
+      puts "Assisted Renewing Started..." unless Rails.env.test?
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
         :kind => 'individual',
@@ -129,11 +130,13 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         end
       end
 
-      puts count unless Rails.env.test?
+      puts "Total assisted renewal processed #{count}" unless Rails.env.test?
     end
 
 
     def process_uqhp_renewals(renewal_benefit_coverage_period)
+      puts "*"*60 unless Rails.env.test?
+      puts "Un-Assisted Renewing Started..." unless Rails.env.test?
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
 
       query = {
@@ -179,7 +182,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
         end
       end
-      puts count unless Rails.env.test?
+      puts "Total unassisted renewal processed #{count}" unless Rails.env.test?
     end
 
     def process_enrollment_renewal(enrollment, renewal_benefit_coverage_period)
@@ -245,7 +248,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           csv << (row.to_h.values + status)
         end
 
-        puts count
+        puts count unless Rails.env.test?
       end
     end
 

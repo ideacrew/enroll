@@ -61,7 +61,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     eligibility_service = Services::EligibilityService.new( renewal_enrollment)
     eligibility_service.process
     eligibility_service.assign(@aptc_values)
-    eligibility_service
+    eligibility_service.hbx_enrollment
   end
 
   def is_dependent_dropped?
