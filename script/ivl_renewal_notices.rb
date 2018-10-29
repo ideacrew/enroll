@@ -129,7 +129,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
-      renewing_enrollments, active_enrollments = valid_enrollments(person)
+      renewing_enrollments, active_enrollments = valid_enrollments(primary_person)
       next if renewing_enrollments.empty?
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
@@ -156,7 +156,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           primary_person.first_name,
           primary_person.last_name
         ]
-        puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
+        puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?
       else
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end

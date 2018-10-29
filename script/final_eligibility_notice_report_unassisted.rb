@@ -47,7 +47,11 @@ def document_due_date(family)
 end
 
 def is_family_renewing(family)
-  family.active_household.hbx_enrollments.where(:aasm_state.in => ["coverage_selected", "enrolled_contingent"], kind: "individual", :effective_on => { :"$gte" => Date.new(2018,1,1), :"$lte" =>  Date.new(2018,11,1)}).present?
+  family.active_household.hbx_enrollments.where(
+    :aasm_state.in => ["coverage_selected", "enrolled_contingent"],
+    kind: "individual",
+    :effective_on => {:"$gte" => Date.new(2018,1,1), :"$lte" =>  Date.new(2018,12,31)}
+  ).present?
 end
 
 def check_for_outstanding_verification_types(person)
