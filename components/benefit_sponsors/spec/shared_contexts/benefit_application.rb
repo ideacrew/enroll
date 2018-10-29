@@ -7,17 +7,18 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
 
   let!(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)             { abc_organization.employer_profile }
+
   let!(:benefit_sponsorship)    { 
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
     benefit_sponsorship.save
     benefit_sponsorship
   }
+  let(:dental_sponsored_benefit) { false }
 
+  let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { 
     benefit_sponsorship.service_areas_on(effective_period.min) 
   }
-
-  let(:dental_sponsored_benefit) { false }
 
   let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
   

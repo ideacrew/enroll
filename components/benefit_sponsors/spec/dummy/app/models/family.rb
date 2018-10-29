@@ -174,7 +174,6 @@ class Family
                                                       }
                                                   })}
 
-
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
