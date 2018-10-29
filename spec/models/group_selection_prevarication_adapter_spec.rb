@@ -128,7 +128,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
       end
 
       context "employer not offering dental" do
-        let(:dental_sponsored_benefit) { true }
+        let(:dental_sponsored_benefit) { false }
 
         it "returns false" do 
           result = adapter.is_eligible_for_dental?(employee_role, 'change_by_qle', nil)
