@@ -81,7 +81,8 @@ module BenefitSponsors
           permitted = params.permit(:id)
           @id = permitted[:id]
           if current_user.has_broker_role?
-            find_broker_agency_profile(current_user.person.broker_role.broker_agency_profile_id)
+            id = BSON::ObjectId(params[:id]) || current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id
+            find_broker_agency_profile(id)
           elsif current_user.has_hbx_staff_role?
             find_broker_agency_profile(BSON::ObjectId.from_string(@id))
           else
@@ -176,8 +177,7 @@ module BenefitSponsors
           @commission_statement = @broker_agency_profile.documents.find(params[:statement_id])
         end
 
-        def find_broker_agency_profile(broker_agency_profile_id = nil)
-          id = broker_agency_profile_id || BSON::ObjectId(params[:id])
+        def find_broker_agency_profile(id = nil)
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
           @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
           authorize @broker_agency_profile, :access_to_broker_agency_profile?
