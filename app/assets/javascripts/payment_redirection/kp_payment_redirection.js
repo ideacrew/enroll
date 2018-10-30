@@ -44,9 +44,7 @@ var KpPaymentRedirection = (function(){
                 url: "/saml/redirection_test",
                 data: {"SAMLResponse": saml_response},
                 success: function(data, textStatus, jqXHR){
-                    // function to only represents the payment redirection data for TEST
-                    // DELETE before PRODUCTION Release!!!
-                    showPaymentDataTest(data);
+                    //response handler
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     //error handler
@@ -55,57 +53,6 @@ var KpPaymentRedirection = (function(){
         } else {
             generatePaymentData();
         }
-    }
-
-    // function to only represents the payment redirection data for TEST
-    // DELETE before PRODUCTION Release!!!
-    function formatXml(xml) {
-        var formatted = '';
-        var reg = /(>)(<)(\/*)/g;
-        xml = xml.replace(reg, '$1\r\n$2$3');
-        var pad = 0;
-        jQuery.each(xml.split('\r\n'), function(index, node) {
-            var indent = 0;
-            if (node.match( /.+<\/\w[^>]*>$/ )) {
-                indent = 0;
-            } else if (node.match( /^<\/\w/ )) {
-                if (pad != 0) {
-                    pad -= 1;
-                }
-            } else if (node.match( /^<\w[^>]*[^\/]>.*$/ )) {
-                indent = 1;
-            } else {
-                indent = 0;
-            }
-
-            var padding = '';
-            for (var i = 0; i < pad; i++) {
-                padding += '  ';
-            }
-
-            formatted += padding + node + '\r\n';
-            pad += indent;
-        });
-
-        return formatted;
-    }
-
-    // function to only represents the payment redirection data for TEST
-    // DELETE before PRODUCTION Release!!!
-    function showPaymentDataTest(data) {
-        var mydiv = document.createElement('div');
-        var head = document.createElement('h1');
-        var head2 = document.createElement('h2');
-        var $pcont = $('#payment-payload-container');
-        xml_raw = data.SAMLresponse;
-        xml_formatted = formatXml(xml_raw);
-        xml_escaped = xml_formatted.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g, '&nbsp;').replace(/\n/g,'<br />');
-        head.innerText = "SAML Request";
-        head2.innerText = "This is the SAML payment request generated to send to the carrier.";
-        mydiv.innerHTML = xml_escaped;
-        $pcont.prepend(head2);
-        $pcont.prepend(head);
-        $('#payment-redirection-test-payload').append(mydiv);
     }
 
     return {
