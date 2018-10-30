@@ -48,6 +48,8 @@ describe "load_benefit_market_catalogs" do
   let!(:bmpm) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA Composite Price Model")}
   let!(:bmcm2) {FactoryGirl.create(:benefit_markets_contribution_models_contribution_model, title: "MA List Bill Shop Contribution Model")}
   let!(:bmpm2) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA List Bill Shop Pricing Model")}
+  let!(:bmcm3) {FactoryGirl.create(:benefit_markets_contribution_models_contribution_model, title: "MA Shop Simple List Bill Contribution Model")}
+  let!(:bmpm3) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA Shop Simple List Bill Pricing Model")}
   let!(:catalogs) {bm.benefit_market_catalogs}
   let!(:packages) {catalogs.map(&:product_packages).flatten}
 
@@ -76,7 +78,7 @@ describe "load_benefit_market_catalogs" do
     it "should have only 6 packages for two catalogs" do
       invoke_bmc_task
       bm.reload
-      expect(bm.benefit_market_catalogs.map(&:product_packages).flatten.count).to eq 6
+      expect(bm.benefit_market_catalogs.map(&:product_packages).flatten.count).to eq 7
     end
 
     it "should have only 11 products for 6 packages" do

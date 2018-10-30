@@ -169,8 +169,16 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
-    @metal_levels = @products.map(&:metal_level).uniq
-    @plan_types = @products.map(&:health_plan_kind).uniq
+    if @hbx_enrollment.coverage_kind == 'health'
+      @metal_levels = @products.map(&:metal_level).uniq
+      @plan_types = @products.map(&:product_type).uniq
+    elsif @hbx_enrollment.coverage_kind == 'dental'
+      @metal_levels = @products.map(&:metal_level).uniq
+      @plan_types = @products.map(&:product_type).uniq
+    else
+      @plan_types = []
+      @metal_levels = []
+    end
     # @networks = []
     @carrier_names = @issuer_profiles.map{|ip| ip.legal_name}
     @use_family_deductable = (@hbx_enrollment.hbx_enrollment_members.count > 1)

@@ -77,7 +77,7 @@ class ProductBuilder
     @qhp.qhp_cost_share_variances.each do |cost_share_variance|
       hios_base_id, csr_variant_id = cost_share_variance.hios_plan_and_variant_id.split("-")
       if csr_variant_id != "00"
-        csr_variant_id = parse_metal_level == "dental" ? "" : csr_variant_id
+        csr_variant_id = retrieve_metal_level == "dental" ? "" : csr_variant_id
         product = ::BenefitMarkets::Products::Product.where(
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id
@@ -87,7 +87,7 @@ class ProductBuilder
           benefit_market_kind: "aca_#{parse_market}",
           title: cost_share_variance.plan_marketing_name.squish!,
           issuer_profile_id: get_issuer_profile_id,
-          hios_id: cost_share_variance.hios_plan_and_variant_id,
+          hios_id: is_health_product? ? cost_share_variance.hios_plan_and_variant_id : hios_base_id,
           hios_base_id: hios_base_id,
           csr_variant_id: csr_variant_id,
           application_period: (Date.new(@qhp.active_year, 1, 1)..Date.new(@qhp.active_year, 12, 31)),
@@ -95,16 +95,20 @@ class ProductBuilder
           deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
           family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
           is_reference_plan_eligible: true,
+          metal_level_kind: retrieve_metal_level.to_sym,
         }
 
         all_attributes = if is_health_product?
           {
             health_plan_kind: @qhp.plan_type.downcase,
-            metal_level_kind: parse_metal_level.to_sym,
             ehb: @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
           }
         else
-          { product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS}
+          {
+            dental_plan_kind: @qhp.plan_type.downcase,
+            dental_level: @qhp.metal_level.downcase,
+            product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+          }
         end.merge(shared_attributes)
 
         if product.present?
@@ -137,7 +141,7 @@ class ProductBuilder
     exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     exempt_organizations.each do |exempt_organization|
       issuer_profile = exempt_organization.issuer_profile
-      issuer_profile.issuer_hios_ids.join.split(",").each do |issuer_hios_id|
+      issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
         @issuer_profile_hash[issuer_hios_id] = issuer_profile.id.to_s
       end
     end
@@ -145,13 +149,13 @@ class ProductBuilder
   end
 
   def mapped_service_area_id
-    @service_area_map[[get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
   end
 
   def set_service_areas
     @service_area_map = {}
     ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
-      @service_area_map[[sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
     end
   end
 
@@ -159,10 +163,8 @@ class ProductBuilder
     @qhp.dental_plan_only_ind.downcase == "no"
   end
 
-  def parse_metal_level
-    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
-    return @qhp.metal_level.downcase unless ["high","low"].include?(@qhp.metal_level.downcase)
-    @qhp.metal_level = "dental"
+  def retrieve_metal_level
+    is_health_product? ? @qhp.metal_level.downcase : "dental"
   end
 
   def parse_market

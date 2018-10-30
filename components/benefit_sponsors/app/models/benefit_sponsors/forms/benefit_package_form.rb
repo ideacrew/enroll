@@ -13,6 +13,7 @@ module BenefitSponsors
       attribute :sponsored_benefits, Array[BenefitSponsors::Forms::SponsoredBenefitForm]
       attribute :parent, BenefitSponsors::Forms::BenefitApplicationForm
       attribute :probation_period_display_name, String
+      attribute :has_dental_sponsored_benefits, Boolean
 
       attribute :is_new_package, Boolean
 
@@ -158,6 +159,14 @@ module BenefitSponsors
         when "metal_level"
           catalog.plan_options[:metal_level][sponsored_benefits.first.reference_product.metal_level_kind.to_sym].count
         end
+      end
+
+      def has_dental_sponsored_benefits?
+        self.has_dental_sponsored_benefits
+      end
+
+      def is_dental_products_available?
+        service.is_dental_products_available?(self)
       end
     end
   end

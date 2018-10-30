@@ -25,7 +25,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
 
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                         household: family.active_household, 
-                        aasm_state: "shopping",
+                        aasm_state: "coverage_selected",
                         effective_on: benefit_application.start_on,
                         rating_area_id: benefit_application.recorded_rating_area_id,
                         sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
@@ -60,8 +60,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.initial_employee_plan_selection_confirmation"
-          expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
-          expect(payload[:event_object_id]).to eq hbx_enrollment.id.to_s
+          expect(payload[:event_object_kind]).to eq 'CensusEmployee'
+          expect(payload[:event_object_id]).to eq census_employee.id.to_s
         end
         subject.notifications_send(hbx_enrollment, model_event)
       end
@@ -83,10 +83,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload)   { {
-        "event_object_kind" => "HbxEnrollment",
-        "event_object_id" => hbx_enrollment.id
+        "event_object_kind" => "CensusEmployee",
+        "event_object_id" => census_employee.id
     } }
-    let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+    let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: "initial_employee_plan_selection_confirmation") }
     let(:merge_model) { subject.construct_notice_object }
 
     before do

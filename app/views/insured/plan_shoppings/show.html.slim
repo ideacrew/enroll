@@ -86,7 +86,7 @@ javascript:
   var filterType = String;
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
   var carrierLogos = JSON.parse('#{raw(digest_logos.to_json)}');
-  
+
   // Grabs available products as JSON for filtering onload
   (function() {
     document.getElementById('filteredPlans').classList.add('hidden');
@@ -218,7 +218,7 @@ javascript:
     if (planTypes) {
       planTypes.forEach(function(plan) {
         availableEnrollments.forEach(function(enrollment) {
-          if (enrollment.product.health_plan_kind.toLowerCase() == plan.toLowerCase()) {
+          if (enrollment.product.product_type.toLowerCase() == plan.toLowerCase()) {
             resultsArray.push(enrollment);
           }
         })
@@ -286,7 +286,14 @@ javascript:
   function showFilteredResults() {
     var element = document.getElementById('filteredPlans');
     filteredArray.forEach(function(result) {
+      console.log(result)
       var logo = carrierLogos[result.product.issuer_name];
+      if (result.product.kind == 'health') {
+        var plan_kind = result.product.health_plan_kind
+      }
+      else if (result.product.dental_plan_kind){
+        var plan_kind = result.product.dental_plan_kind
+      }
       // Used to show deductible for plan
       if (result.member_enrollments.length > 1) {
         var deductible = result.product.family_deductible;
@@ -295,6 +302,13 @@ javascript:
         var deductible = result.product.deductible;
         var deductibeType = "DEDUCTIBLE"
       }
+      if (result.product.sbc_document) {
+        var sbc_url = '/document/download/' + result.product.sbc_document.identifier.split("#")[0].split(":").pop() + '/' + result.product.sbc_document.identifier.split("#")[1] + '?content_type=application/pdf&amp;filename=' + result.product.title.replace(/[^0-9a-z]/gi,'') + '.pdf&amp;disposition=inline';
+      }
+      else {
+        var sbc_url = "";
+      }
+
       var div = document.createElement('div')
       div.setAttribute('class', 'myfilteredPlans')
       div.innerHTML =
@@ -336,7 +350,7 @@ javascript:
                       </thead>
                       <tbody>
                         <tr>
-                          <td>${result.product.health_plan_kind.toUpperCase()}</td>
+                          <td>${plan_kind.toUpperCase()}</td>
                           <td><span class="${result.product.metal_level_kind}-icon">${result.product.metal_level_kind.toUpperCase()}</td>
                           <td>
                             NETWORK NOTES
@@ -360,7 +374,7 @@ javascript:
                     </div>
                   </div>
                   <div class="col-xs-4">
-                    <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" href="/document/download/${result.product.sbc_document.identifier.split("#")[0].split(":").pop()}/${result.product.sbc_document.identifier.split("#")[1]}?content_type=application/pdf&amp;filename=${result.product.title.replace(/[^0-9a-z]/gi,'')}.pdf&amp;disposition=inline">
+                    <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" href= '${sbc_url}'>
                       Summary of Benefits and Coverage
                     </a>
                   </div>

@@ -342,6 +342,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       before :each do
         user = FactoryGirl.create(:user, person: FactoryGirl.create(:person))
         sign_in user
+        allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
         allow(hbx_enrollments).to receive(:build).and_return(hbx_enrollment)
         allow(hbx_enrollment).to receive(:save).and_return(true)
         allow(hbx_enrollment).to receive(:plan=).and_return(true)
@@ -364,6 +365,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     it "should render group selection page if not valid" do
       user = FactoryGirl.create(:user, id: 96, person: FactoryGirl.create(:person))
       sign_in user
+      allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
       allow(person).to receive(:employee_roles).and_return([employee_role])
       allow(hbx_enrollment).to receive(:save).and_return(false)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
@@ -381,6 +383,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
       allow(census_employee).to receive(:cobra_begin_date).and_return(TimeKeeper.date_of_record + 1.day)
+      allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match /You may not enroll for cobra after/

@@ -149,6 +149,10 @@ module Config::AcaHelper
     Settings.plan_option_titles.single_carrier
   end
 
+  def fetch_plan_title_for_single_plan
+    Settings.plan_option_titles.single_plan
+  end
+
   def fetch_invoices_addendum
     Settings.invoices.addendum
   end
@@ -231,4 +235,7 @@ module Config::AcaHelper
     Settings.contact_center.payment_phone_number
   end
 
+  def dental_offers_single_plan?
+    Settings.aca.dental_plan_options_available.include?("single_plan")
+  end
 end

@@ -4,7 +4,7 @@ namespace :load_service_reference do
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
     puts "*"*80 unless Rails.env.test?
     # CarrierServiceArea.delete_all # delete and recreate all carrier service areas.
-    files.each do |file|
+    files.sort.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
       # old model
       Rake::Task['load_service_reference:update_service_areas'].invoke(file)
@@ -36,49 +36,67 @@ namespace :load_service_reference do
         serves_entire_state = to_boolean(sheet.cell(i,3))
         serves_partial_county = to_boolean(to_boolean(sheet.cell(i,5)))
         if serves_entire_state
-          ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
+          sa = ::BenefitMarkets::Locations::ServiceArea.where(
             active_year: @year,
             issuer_provided_code: sheet.cell(i,1),
             covered_states: ["MA"],
             issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
             issuer_provided_title: sheet.cell(i,2)
-          })
-          total+=1
+          ).first
+          if sa.present?
+            sa.issuer_hios_id = issuer_hios_id
+            sa.save
+          else
+            ::BenefitMarkets::Locations::ServiceArea.create(
+              active_year: @year,
+              issuer_provided_code: sheet.cell(i,1),
+              covered_states: ["MA"],
+              issuer_hios_id: issuer_hios_id,
+              issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
+              issuer_provided_title: sheet.cell(i,2)
+            )
+          end
         elsif serves_entire_state == false
           existing_state_wide_areas = ::BenefitMarkets::Locations::ServiceArea.where(
             active_year: @year,
             issuer_provided_code: sheet.cell(i,1),
             issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
+            # issuer_hios_id: issuer_hios_id,
             # covered_states: nil
           )
-          next if existing_state_wide_areas.count > 0 &&
-          existing_state_wide_areas.first.covered_states.present? &&
-          existing_state_wide_areas.first.covered_states.include?("MA")
-
-          county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
-
-          records = ::BenefitMarkets::Locations::CountyZip.where({county_name: county_name})
-
-          if sheet.cell(i,6).present?
-            extracted_zips = extracted_zip_codes(sheet.cell(i,6)).each {|t| t.squish!}
-            records = records.where(:zip.in => extracted_zips)
-          end
-
-          location_ids = records.map(&:_id).uniq.compact
-
-          if existing_state_wide_areas.count > 0
+          if existing_state_wide_areas.count > 0 && existing_state_wide_areas.first.covered_states.present? && existing_state_wide_areas.first.covered_states.include?("MA")
             v = existing_state_wide_areas.first
-            v.county_zip_ids << location_ids
+            v.issuer_hios_id = issuer_hios_id
             v.save
           else
-            ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
-              active_year: @year,
-              issuer_provided_code: sheet.cell(i,1),
-              issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
-              issuer_provided_title: sheet.cell(i,2),
-              county_zip_ids: location_ids
-            })
-            total+=1
+
+            county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
+
+            records = ::BenefitMarkets::Locations::CountyZip.where({county_name: county_name})
+
+            if sheet.cell(i,6).present?
+              extracted_zips = extracted_zip_codes(sheet.cell(i,6)).each {|t| t.squish!}
+              records = records.where(:zip.in => extracted_zips)
+            end
+
+            location_ids = records.map(&:_id).uniq.compact
+
+            if existing_state_wide_areas.count > 0
+              v = existing_state_wide_areas.first
+              v.county_zip_ids << location_ids
+              v.county_zip_ids = v.county_zip_ids.flatten.uniq
+              v.issuer_hios_id = issuer_hios_id
+              v.save
+            else
+              ::BenefitMarkets::Locations::ServiceArea.create({
+                active_year: @year,
+                issuer_provided_code: sheet.cell(i,1),
+                issuer_profile_id: @issuer_profile_hash[issuer_hios_id],
+                issuer_hios_id: issuer_hios_id,
+                issuer_provided_title: sheet.cell(i,2),
+                county_zip_ids: location_ids
+              })
+            end
           end
 
         end
@@ -89,7 +107,6 @@ namespace :load_service_reference do
       puts " --------- " unless Rails.env.test?
       puts e.backtrace unless Rails.env.test?
     end
-    puts "created #{total} service areas in new model" unless Rails.env.test?
 
   end
 
@@ -212,7 +229,7 @@ namespace :load_service_reference do
     exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     exempt_organizations.each do |exempt_organization|
       issuer_profile = exempt_organization.issuer_profile
-      issuer_profile.issuer_hios_ids.join.split(",").each do |issuer_hios_id|
+      issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
         @issuer_profile_hash[issuer_hios_id] = issuer_profile.id.to_s
       end
     end
