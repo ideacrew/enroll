@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller, dbclean: :after_each do
@@ -6,7 +7,8 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
 
     let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+#     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
                                             title: "SHOP Benefits for #{current_effective_date.year}",

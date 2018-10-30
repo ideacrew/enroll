@@ -1,6 +1,8 @@
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
+
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
-  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:site)                    { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
   let(:benefit_market)          { site.benefit_markets.first }
   let(:rating_area)             { create_default(:benefit_markets_locations_rating_area) }
   # let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }

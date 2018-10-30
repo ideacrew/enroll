@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support", "benefit_sponsors_site_spec_helpers")
 
 module BenefitSponsors
   module Factories
@@ -67,7 +68,7 @@ module BenefitSponsors
       end
 
       describe '##for_edit', dbclean: :after_each do
-        let(:site) { create :benefit_sponsors_site, :as_hbx_profile, :cca }
+        let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile }
         subject { BenefitSponsors::Forms::Site.for_edit site.id.to_s }
 
         it 'loads the existing Site in to the Site Form' do
@@ -82,7 +83,7 @@ module BenefitSponsors
       describe '##for_update', dbclean: :after_each do
         include_context 'params'
 
-        let(:site) { create :benefit_sponsors_site, :as_hbx_profile, :cca }
+        let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile }
 
         subject { BenefitSponsors::Forms::Site.for_update site.id.to_s }
 
