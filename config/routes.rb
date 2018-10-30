@@ -26,10 +26,13 @@ Rails.application.routes.draw do
   resources :saml, only: [] do
     collection do
       post :login
+      post :redirection_test
       get :logout
       get :navigate_to_assistance
     end
   end
+
+  get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
 
