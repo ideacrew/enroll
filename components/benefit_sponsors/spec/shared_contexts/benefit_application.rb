@@ -1,20 +1,23 @@
 RSpec.shared_context "setup initial benefit application", :shared_context => :metadata do
   let(:aasm_state)              { :active }
+  let(:benefit_sponsorship_state) { :active }
+
   let(:package_kind)            { :single_issuer }
   let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
-  let(:open_enrollment_start_on){ effective_period.min.prev_month }
-  let(:open_enrollment_period)  { open_enrollment_start_on..(effective_period.min - 10.days) }
+  let(:open_enrollment_start_on){ current_effective_date.prev_month }
+  let(:open_enrollment_period)  { open_enrollment_start_on..Date.new(open_enrollment_start_on.year, open_enrollment_start_on.month, 20) }
 
   let!(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)             { abc_organization.employer_profile }
 
   let!(:benefit_sponsorship)    { 
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
+    benefit_sponsorship.aasm_state = benefit_sponsorship_state
     benefit_sponsorship.save
     benefit_sponsorship
   }
+  
   let(:dental_sponsored_benefit) { false }
-
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { 
     benefit_sponsorship.service_areas_on(effective_period.min) 

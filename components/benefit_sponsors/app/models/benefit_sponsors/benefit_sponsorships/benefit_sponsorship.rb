@@ -605,19 +605,19 @@ module BenefitSponsors
     end
 
     def extend_open_enrollment(aasm)
-      if aasm.from_state == :enrollment_ineligible
-        if initial_enrollment_ineligible?
+      if aasm.from_state == :enrollment_ineligible || aasm.from_state == :enrollment_closed
+        if initial_enrollment_ineligible? || initial_enrollment_closed?
           update_state_without_event(:initial_enrollment_open)
         end
       else
-        transition = workflow_state_transitions[0]
+        if transition = workflow_state_transitions[0]
+          if transition.from_state == 'initial_enrollment_ineligible' && transition.to_state == 'applicant'
+            update_state_without_event(:initial_enrollment_open)
+          end
 
-        if transition.from_state == 'initial_enrollment_ineligible' && transition.to_state == 'applicant'
-          update_state_without_event(:initial_enrollment_open)
-        end
-
-        if transition.from_state == 'active' && transition.to_state == 'applicant'
-          update_state_without_event(:active)
+          if transition.from_state == 'active' && transition.to_state == 'applicant'
+            update_state_without_event(:active)
+          end
         end
       end
     end
