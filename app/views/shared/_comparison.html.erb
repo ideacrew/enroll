@@ -2,7 +2,7 @@
   <div id="printArea">
     <h1 class="heading-text"> Choose Plan - Compare Selected Plans </h1>
     <h4> Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget. </h4>
-    <%= render "shared/plan_shoppings/more_plan_details" %>
+     <%= render "shared/plan_shoppings/more_plan_details" %>
     <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
       <tr>
         <th class="row-title">Plans</th>
@@ -19,8 +19,8 @@
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
-          <%= qhp.product.product_type.upcase %>
+          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level_kind.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
+          <%= qhp.product.health_plan_kind.upcase %>
           </th>
         <% end %>
       </tr>
@@ -48,14 +48,13 @@
       </tr>
 
       <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
-
-      <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
+      <% if qhps.map(&:product).map(&:rx_formulary_url).compact.present? %>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
               <% if qhp.product.kind == "health" && qhp.product.rx_formulary_url.present? %>
-                <%= link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank" %>
+                <%= link_to "DRUG LIST", qhp.product.rx_formulary_url, target: "_blank" %>
               <% end %>
             </th>
           <% end %>
