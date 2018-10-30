@@ -3,7 +3,7 @@ module Insured::PlanFilterHelper
 
   def find_my_doctor
     if @market_kind == "individual" && @coverage_kind == "health"
-      link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dc/', target: '_blank')
+      link_to('Find Your Doctor','',data: {toggle: "modal", target: "#plan_match_family"})
     elsif @market_kind == "shop" && @coverage_kind == "health"
       link_to('Find Your Doctor', 'https://dc.checkbookhealth.org/dcshopnationwide/', target: '_blank')
     end
