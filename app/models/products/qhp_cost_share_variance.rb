@@ -59,7 +59,7 @@ class Products::QhpCostShareVariance
 
   def self.find_qhp_cost_share_variances(ids, year, coverage_kind)
     csvs = find_qhp(ids, year).map(&:qhp_cost_share_variances).flatten
-    ids = ids.map{|a| a+"-01" } if coverage_kind == "dental"
+    ids = ids.map{|a| a+"-01"} if coverage_kind == "dental"
     csvs.select{ |a| ids.include?(a.hios_plan_and_variant_id) }
   end
 
@@ -74,8 +74,8 @@ class Products::QhpCostShareVariance
     if product_id.present?
       ::BenefitMarkets::Products::Product.find(product_id)
     else
-      Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
-        BenefitMarkets::Products::Product.where(hios_id: hios_plan_and_variant_id).select{|a| a.active_year == qhp.active_year}.first
+      Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
+        BenefitMarkets::Products::Product.where(hios_id: /#{hios_plan_and_variant_id}/).select{|a| a.active_year == qhp.active_year}.first
       end
     end
   end

@@ -10,8 +10,8 @@ namespace :load_rate_reference do
       puts "processing file #{file}" unless Rails.env.test?
       Rake::Task['load_rate_reference:update_rating_areas'].invoke(file)
       Rake::Task['load_rate_reference:update_rating_areas'].reenable
-      puts "created #{RatingArea.all.size} service areas in old model for all years" unless Rails.env.test?
-      puts "created #{BenefitMarkets::Locations::RatingArea.all.size} service areas in new model for all years" unless Rails.env.test?
+      puts "created #{RatingArea.all.size} rating areas in old model for all years" unless Rails.env.test?
+      puts "created #{BenefitMarkets::Locations::RatingArea.all.size} rating areas in new model for all years" unless Rails.env.test?
     end
     puts "*"*80 unless Rails.env.test?
   end
@@ -55,11 +55,20 @@ namespace :load_rate_reference do
           county_zip._id
         end
 
-        ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
-                                                                     active_year: file_year,
-                                                                     exchange_provided_code: rating_area_id,
-                                                                     county_zip_ids: location_ids
-                                                                   })
+        ra = ::BenefitMarkets::Locations::RatingArea.where({
+                                                       active_year: file_year,
+                                                       exchange_provided_code: rating_area_id,
+                                                     }).first
+        if ra.present?
+          ra.county_zip_ids = location_ids
+          ra.save
+        else
+          ::BenefitMarkets::Locations::RatingArea.create({
+                                                       active_year: file_year,
+                                                       exchange_provided_code: rating_area_id,
+                                                       county_zip_ids: location_ids
+                                                     })
+        end
       end
         # end of new model
     rescue => e

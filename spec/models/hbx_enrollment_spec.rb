@@ -1,5 +1,7 @@
 require 'rails_helper'
 require 'aasm/rspec'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -2775,4 +2777,248 @@ describe HbxEnrollment, dbclean: :after_each do
     #   end
     # end
 end
+end
+
+describe HbxEnrollment, type: :model, :dbclean => :after_each do
+  let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+
+  include_context "setup benefit market with market catalogs and product packages" do
+    let(:product_kinds)  { [:health, :dental] }
+  end
+
+  include_context "setup initial benefit application" do
+    let(:dental_sponsored_benefit) { true }
+  end
+
+  describe ".renew_benefit" do
+    describe "given an renewing employer just entered open enrollment" do
+      describe "with employees who have made the following plan selections previous year:
+        - employee A has purchased:
+          - One health enrollment (Enrollment 1)         
+          - One dental enrollment (Enrollment 2)
+        - employee B has purchased:
+          - One health enrollment (Enrollment 3)
+          - One dental waiver (Enrollment 4)
+        - employee C has purchased:
+          - One health waiver (Enrollment 5)
+          - One dental enrollment (Enrollment 6)
+        - employee D has purchased:
+          - One health waiver (Enrollment 7)
+          - One dental waiver (Enrollment 8)
+        - employee E has none
+      " do
+
+
+        let(:census_employees) {
+          create_list(:census_employee, 5, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+        }
+
+        let(:employee_A) {
+          ce = census_employees[0]
+          create_person(ce, abc_profile)
+        }
+
+        let!(:enrollment_1) {
+          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
+            submitted_at: current_effective_date - 10.days)
+        }
+
+        let!(:enrollment_2) {
+          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A, 
+            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
+        }
+
+        let(:employee_B) {
+          ce = census_employees[1]
+          create_person(ce, abc_profile)
+        }
+
+        let!(:enrollment_3) {
+          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B,
+            submitted_at: current_effective_date - 10.days)
+        }
+
+        let!(:enrollment_4) {
+          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B, 
+            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
+        }
+
+        let(:employee_C) {
+          ce = census_employees[2]
+          create_person(ce, abc_profile)
+        }
+
+        let!(:enrollment_5) {
+          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C,
+            submitted_at: current_effective_date - 10.days, status: 'inactive')
+        }
+
+        let!(:enrollment_6) {
+          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, 
+            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
+        }
+
+        let(:employee_D) {
+          ce = census_employees[3]
+          create_person(ce, abc_profile)
+        }
+
+        let!(:enrollment_7) {
+          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D,
+            submitted_at: current_effective_date - 10.days, status: 'inactive')
+        }
+
+        let!(:enrollment_8) {
+          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, 
+            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
+        }
+
+        let!(:employee_E) {
+          ce = census_employees[3]
+          create_person(ce, abc_profile)
+        }
+
+        let(:renewal_application) { 
+          renewal_effective_date = current_effective_date.next_year
+          service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
+          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
+          r_application = initial_application.renew(benefit_sponsor_catalog)
+          r_application.save
+          r_application
+        }
+
+        let(:renewal_benefit_package) {
+          renewal_application.benefit_packages[0]
+        }
+
+        before do 
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+          renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
+            allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
+          end
+          renewal_application
+        end
+
+        context 'renewing employee A' do 
+
+          before do
+            renewal_benefit_package.renew_member_benefit(census_employees[0])
+            family.reload
+          end
+
+          let(:family) { employee_A.person.primary_family }
+          let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
+          let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
+
+          it 'does renew both health and dental enrollment' do
+            expect(health_renewals.size).to eq 1
+            expect(health_renewals[0].product).to eq enrollment_1.product.renewal_product
+            expect(dental_renewals.size).to eq 1
+            expect(dental_renewals[0].product).to eq enrollment_2.product.renewal_product
+          end
+        end
+
+        context 'renewing employee B' do 
+
+          before do
+            renewal_benefit_package.renew_member_benefit(census_employees[1])
+            family.reload
+          end
+
+          let(:family) { employee_B.person.primary_family }
+          let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
+          let(:dental_renewals) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
+
+          it 'does renew health coverage and waive dental coverage' do
+            expect(health_renewals.size).to eq 1
+            expect(health_renewals[0].product).to eq enrollment_3.product.renewal_product
+            expect(dental_renewals.size).to eq 1
+          end
+        end
+
+        context 'renewing employee C' do
+
+          before do
+            renewal_benefit_package.renew_member_benefit(census_employees[2])
+            family.reload
+          end
+
+          let(:family) { employee_C.person.primary_family }
+          let(:health_renewals) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
+          let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
+
+          it 'does renew health coverage and waive dental coverage' do
+            expect(health_renewals.size).to eq 1
+            expect(dental_renewals.size).to eq 1
+            expect(dental_renewals[0].product).to eq enrollment_6.product.renewal_product
+          end
+        end
+
+        context 'renewing employee D' do 
+
+          before do
+            renewal_benefit_package.renew_member_benefit(census_employees[3])
+            family.reload
+          end
+
+          let(:family) { employee_D.person.primary_family }
+          let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
+          let(:health_waivers) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
+          let(:dental_waivers) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
+
+          it 'does renew health coverage and waive dental coverage' do
+            expect(passive_renewals).to be_empty
+            expect(health_waivers.size).to eq 1
+            expect(dental_waivers.size).to eq 1
+          end
+        end
+
+        context 'renewing employee E' do
+         
+          before do
+            renewal_benefit_package.renew_member_benefit(census_employees[4])
+            family.reload
+          end
+
+          let(:family) { employee_E.person.primary_family }
+          let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
+          let(:passive_waivers) { family.active_household.hbx_enrollments.select{|en| en.renewing_waived?} }
+
+          it 'does renew health coverage and waive dental coverage' do
+            expect(passive_renewals).to be_empty
+            expect(passive_waivers).to be_empty
+          end
+        end
+
+        def create_person(ce, employer_profile)
+          person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+          ce.update_attributes!({employee_role_id: employee_role.id})
+          Family.find_or_build_from_employee_role(employee_role)
+          employee_role
+        end
+
+        def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health')
+          benefit_package = benefit_group_assignment.benefit_package
+          sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind.to_sym)
+          FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+            enrollment_members: [family.primary_applicant],
+            household: family.active_household,
+            coverage_kind: coverage_kind,
+            effective_on: benefit_package.start_on,
+            enrollment_kind: enrollment_kind,
+            kind: "employer_sponsored",
+            submitted_at: submitted_at,
+            employee_role_id: employee_role.id,
+            benefit_sponsorship: benefit_package.benefit_sponsorship,
+            sponsored_benefit_package: benefit_package,
+            sponsored_benefit: sponsored_benefit,
+            benefit_group_assignment_id: benefit_group_assignment.id,
+            product: sponsored_benefit.reference_product,
+            aasm_state: status
+            )
+        end
+      end
+    end
+  end
 end
