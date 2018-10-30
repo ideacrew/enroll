@@ -30,16 +30,9 @@ module OneLogin
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
 
-        # if Rails.env.production?
-        #   @private_key = OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_LOCATION))
-        #   @cert = OpenSSL::X509::Certificate.new(File.read(X509_CERT_LOCATION))
-        # end
-
-        # only for local TEST
-        # DELETE before PRODUCTION Release!!!
         if Rails.env.production?
-          @private_key = OpenSSL::PKey::RSA.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_wfpk.pem"))
-          @cert = OpenSSL::X509::Certificate.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_x509.pem"))
+          @private_key = OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_LOCATION))
+          @cert = OpenSSL::X509::Certificate.new(File.read(X509_CERT_LOCATION))
         end
       end
 
