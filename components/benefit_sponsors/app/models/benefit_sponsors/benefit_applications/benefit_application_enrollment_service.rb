@@ -175,6 +175,18 @@ module BenefitSponsors
       end
     end
 
+    def schedule_termination(end_on, termination_date)
+      if business_policy_satisfied_for?(:terminate_benefit)
+        if benefit_application.may_schedule_enrollment_termination?
+            updated_dates = benefit_application.effective_period.min.to_date..end_on
+            benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
+            benefit_application.schedule_enrollment_termination!
+          end
+      else
+        [false, benefit_application, business_policy.fail_results]
+      end
+    end
+
     # validate :open_enrollment_date_checks
     ## Trigger events can be dates or from UI
     def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)

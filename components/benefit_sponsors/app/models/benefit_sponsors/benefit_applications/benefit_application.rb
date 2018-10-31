@@ -809,6 +809,10 @@ module BenefitSponsors
         transitions from: [:active, :suspended], to: :terminated
       end
 
+      event :schedule_enrollment_termination do
+        transitions from: [:active, :suspended], to: :termination_pending
+      end
+
       # Coverage reinstated
       event :reinstate_enrollment do
         transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
