@@ -170,7 +170,9 @@ class Insured::PlanShoppingsController < ApplicationController
       @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.current_year
-        @dc_individual_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+        plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+        plan_comparision_obj.elected_aptc =  session[:elected_aptc]
+        @dc_individual_checkbook_url = plan_comparision_obj.generate_url
       elsif @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.previous_year 
         @dc_individual_checkbook_previous_year = Settings.consumer_checkbook_services.checkbook_previous_year
       end
