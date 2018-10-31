@@ -62,12 +62,20 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
 
     previous_health_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == "2018"}
     previous_dental_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == "2018"}
+
     renewal_health_plan_id = (previous_health_enrollments.plan.renewal_plan_id) rescue nil
+    renewal_health_plan_hios_base_id = (previous_health_enrollments.plan.hios_base_id) rescue nil
     future_health_plan_id = (health_enrollments.plan.id) rescue nil
+    future_health_plan_hios_base_id = (health_enrollments.plan.hios_base_id) rescue nil
+
     renewal_dental_plan_id = (previous_dental_enrollments.plan.renewal_plan_id) rescue nil
+    renewal_dental_plan_hios_base_id = (previous_dental_enrollments.plan.hios_base_id) rescue nil
     future_dental_plan_id = (dental_enrollments.plan.id) rescue nil
-    notice.same_plan_health_enrollment = (renewal_health_plan_id && future_health_plan_id) ? (renewal_health_plan_id == future_health_plan_id) : false
-    notice.same_plan_dental_enrollment = (renewal_dental_plan_id && future_dental_plan_id) ? (renewal_dental_plan_id == future_dental_plan_id) : false
+    future_dental_plan_hios_base_id = (dental_enrollments.plan.hios_base_id) rescue nil
+
+    notice.same_plan_health_enrollment = (renewal_health_plan_id && future_health_plan_id) ? ((renewal_health_plan_id == future_health_plan_id) && (renewal_health_plan_hios_base_id == future_health_plan_hios_base_id )) : false
+    notice.same_plan_dental_enrollment = (renewal_dental_plan_id && future_dental_plan_id) ? ((renewal_dental_plan_id == future_dental_plan_id) && (renewal_dental_plan_hios_base_id == future_dental_plan_hios_base_id) ) : false
+
     hbx_enrollments << health_enrollments
     hbx_enrollments << dental_enrollments
     return nil if hbx_enrollments.flatten.compact.empty?
