@@ -12,6 +12,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_total_employee_cost, 1000)
       assign(:max_deductible, 998)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:market_kind, "shop")
       assign(:coverage_kind, "health")
@@ -109,6 +110,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       assign(:hbx_enrollment, hbx_enrollment)
 
     end
@@ -163,6 +165,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:selected_aptc_pct, 0.85)
       assign(:elected_aptc, 280.50)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
@@ -207,6 +210,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:selected_aptc_pct, 0.85)
       assign(:elected_aptc, 280.50)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
@@ -232,6 +236,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:benefit_group, benefit_group)
       assign(:tax_household, nil)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
