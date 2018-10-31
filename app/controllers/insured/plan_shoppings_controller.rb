@@ -171,7 +171,7 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.current_year
         @dc_individual_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
       elsif @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.previous_year 
-        @dc_individual_checkbook_url = Settings.consumer_checkbook_services.checkbook_previous_year
+        @dc_individual_checkbook_previous_year = Settings.consumer_checkbook_services.checkbook_previous_year
       end
    end
     @carriers = @carrier_names_map.values
