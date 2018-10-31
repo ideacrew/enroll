@@ -14,14 +14,25 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
+  
+  resources :users do
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
+      put :confirm_reset_password, :confirm_change_username_and_email, :update
+      post :unlock, :change_password
+    end
+  end
 
   resources :saml, only: [] do
     collection do
       post :login
+      post :redirection_test
       get :logout
       get :navigate_to_assistance
     end
   end
+
+  get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
 
@@ -81,6 +92,9 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :get_user_info
+        get :identity_verification
+        post :identity_verification_datatable
+        get :user_account_index
         get :new_eligibility
       end
 
@@ -128,6 +142,11 @@ Rails.application.routes.draw do
     get 'paper_applications/upload', to: 'paper_applications#upload'
     post 'paper_applications/upload', to: 'paper_applications#upload'
     get 'paper_applications/download/:key', to: 'paper_applications#download'
+    get 'ridp_documents/upload', to: 'ridp_documents#upload'
+    post 'ridp_documents/upload', to: 'ridp_documents#upload'
+    get 'ridp_documents/download/:key', to: 'ridp_documents#download'
+    resources :ridp_documents, only: [:destroy]
+
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -142,7 +161,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -189,6 +213,8 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      post :update_application_type
+      get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
@@ -500,6 +526,7 @@ Rails.application.routes.draw do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
+      put :update_ridp_verification_type
       get :enrollment_verification
       put :extend_due_date
       post :fed_hub_request

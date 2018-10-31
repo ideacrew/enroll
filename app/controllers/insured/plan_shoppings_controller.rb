@@ -67,6 +67,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
@@ -147,6 +148,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_admin_bookmark_url if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
@@ -166,7 +168,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      @dc_checkbook_url = is_congress_employee ? (Settings.checkbook_services.congress_url + "#{@hbx_enrollment.coverage_year}") : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
@@ -181,6 +183,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def plans
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
     if @tax_household.present?

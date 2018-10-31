@@ -51,6 +51,7 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  has_many :payment_transactions
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -1042,6 +1043,10 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
+  def has_curam_or_mobile_application_type?
+    ['Curam', 'Mobile'].include? application_type
+  end
+  
   def self.min_verification_due_date_range(start_date,end_date)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
@@ -1082,6 +1087,19 @@ class Family
   def has_valid_e_case_id?
     return false if !e_case_id
     e_case_id.split('#').last.scan(/\D/).empty?
+  end
+
+  def set_due_date_on_verification_types
+    family_members.each do |family_member|
+      person = family_member.person
+      person.consumer_role.verification_types.each do |v_type|
+        next if !(v_type.type_unverified?)
+        v_type.update_attributes(due_date: (TimeKeeper.date_of_record + 95.days),
+                                 updated_by: nil,
+                                 due_date_type:  "notice" )
+        person.save!
+      end
+    end
   end
 
 private
