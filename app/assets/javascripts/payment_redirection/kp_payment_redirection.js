@@ -41,7 +41,7 @@ var KpPaymentRedirection = (function(){
         if (saml_response){
             $.ajax({
                 type: "POST",
-                url: "/saml/redirection_test",
+                url: "KP/URI",
                 data: {"SAMLResponse": saml_response},
                 success: function(data, textStatus, jqXHR){
                     //response handler
