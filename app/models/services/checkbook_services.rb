@@ -4,7 +4,7 @@ module Services
   module CheckbookServices
     class PlanComparision
 
-      attr_accessor :hbx_enrollment, :is_congress
+      attr_accessor :hbx_enrollment, :is_congress, :elected_aptc
 
       BASE_URL = Rails.application.config.checkbook_services_base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
@@ -77,6 +77,7 @@ module Services
         end
       end
 
+
       private
 
       def construct_body_shop
@@ -103,7 +104,7 @@ module Services
           "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
           "enrollment_year": 2019,
           "family": consumer_build_family,
-          "aptc": aptc_value.to_s,
+          "aptc": elected_aptc.to_s,
           "csr": csr_value,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
@@ -137,6 +138,7 @@ module Services
           "Metal"
         end
       end
+
 
       def employer_contributions
         premium_benefit_contributions = {}
