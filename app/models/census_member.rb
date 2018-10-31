@@ -32,10 +32,11 @@ class CensusMember
     allow_blank: false,
     inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
-  validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
-    allow_blank: true,
-    numericality: true
+  # validates :ssn,
+  #   length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+  #   allow_blank: true,
+  #   numericality: true
+
 
   validate :date_of_birth_is_past
 
