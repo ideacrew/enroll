@@ -70,7 +70,6 @@ module BenefitSponsors
       def load_profile_form(form)
         form.organization.profile.grouped_sic_code_options = Caches::SicCodesCache.load
         form.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
-        form.organization.profile.referred_by_options = ::BenefitMarkets::REFERRED_KIND_ARRAY
         form
       end
 

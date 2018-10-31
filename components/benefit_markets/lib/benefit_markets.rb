@@ -28,8 +28,6 @@ module BenefitMarkets
       :"Only Paper and Electronic communications" => :paper_and_electronic
     }
 
-    REFERRED_KIND_ARRAY = ['New England Benefits Association', 'Radio', 'Internet', 'Insurance Carrier', 'Chamber of Commerce', 'Broker', 'Employer Association ', 'Friend', 'Other']
-
     class << self
       attr_writer :configuration
     end

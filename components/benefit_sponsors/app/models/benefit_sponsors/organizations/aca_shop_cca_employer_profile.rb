@@ -18,6 +18,8 @@ module BenefitSponsors
 
       after_update :notify_observers
 
+      REFERRED_KIND_ARRAY = ['New England Benefits Association', 'Radio', 'Internet', 'Insurance Carrier', 'Chamber of Commerce', 'Broker', 'Employer Association ', 'Friend', 'Other']
+
       # TODO: Temporary fix until we move employer_attestation to benefit_sponsorship
       def is_attestation_eligible?
         return true unless enforce_employer_attestation?
@@ -25,7 +27,7 @@ module BenefitSponsors
       end
 
       def referred_options
-        ::BenefitMarkets::REFERRED_KIND_ARRAY
+        REFERRED_KIND_ARRAY
       end
 
       private
