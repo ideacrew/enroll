@@ -255,17 +255,21 @@ class HbxEnrollment
 
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
-      families = Family.where("households.hbx_enrollments" => {
-        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
-      })
+      begin
+        families = Family.where("households.hbx_enrollments" => {
+                                    :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
+                                })
 
-      enrollments_for_termination = families.inject([]) do |enrollments, family|
-        enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
-                                                                     :terminated_on.lt => as_of_date).to_a
-      end
+        enrollments_for_termination = families.inject([]) do |enrollments, family|
+          enrollments += family.active_household.hbx_enrollments.where(:aasm_state => "coverage_termination_pending",
+                                                                       :terminated_on.lt => as_of_date).to_a
+        end
 
-      enrollments_for_termination.each do |hbx_enrollment|
-        hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        enrollments_for_termination.each do |hbx_enrollment|
+          hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        end
+      rescue Exception => e
+        Rails.logger.error e.to_s
       end
     end
 
@@ -425,7 +429,7 @@ class HbxEnrollment
 
   def future_enrollment_termination_date
     return "" unless coverage_termination_pending?
-    employee_role && employee_role.census_employee && employee_role.census_employee.coverage_terminated_on
+    terminated_on
   end
 
   def benefit_sponsored?
@@ -1292,7 +1296,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                          :unverified],
+                          :unverified, :coverage_expired],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1521,6 +1525,23 @@ class HbxEnrollment
   def is_any_member_outstanding?
     active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
     active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+  end
+
+  def notify_enrollment_cancel_or_termination_event(transmit_flag)
+
+    return unless transmit_flag
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+
+    config = Rails.application.config.acapi
+    notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+            "hbx_enrollment_id" => self.hbx_id,
+            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+            "is_trading_partner_publishable" => transmit_flag
+        }
+    )
   end
 
   private
