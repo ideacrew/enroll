@@ -2,7 +2,7 @@ glue_report_filename = ''
 
 enrollment_ids = []
 
-enrolled_status = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending enrolled_contingent unverified)
+enrolled_status = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending  unverified)
 
 terminated_status = %w(coverage_terminated unverified coverage_expired void)
 
