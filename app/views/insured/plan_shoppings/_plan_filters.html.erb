@@ -31,7 +31,11 @@
           </div>
           <div class="modal-footer" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
+            <%if @hbx_enrollment.effective_on.year == 2018%>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary  mtz" %>
+            <% elsif @hbx_enrollment.effective_on.year == 2019%>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary  mtz", target: '_blank' %>
+            <% end %>
           </div>
        </div>
     </div>
@@ -50,7 +54,7 @@
           </div>
           <div class="modal-footer" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz" %>
+            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'  %>
           </div>
        </div>
     </div>
