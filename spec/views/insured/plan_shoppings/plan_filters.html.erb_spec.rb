@@ -109,6 +109,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:benefit_group, benefit_group)
       assign(:hbx_enrollment, hbx_enrollment)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
+      assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       assign :market_kind, "individual"
