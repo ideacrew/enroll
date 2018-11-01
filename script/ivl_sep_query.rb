@@ -17,7 +17,7 @@ class IvlEnrollmentsPublisher
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
-active_statuses = %w(coverage_selected auto_renewing unverified)
+active_statuses = %w(coverage_selected auto_renewing unverified renewing_coverage_selected auto_renewing_contingent renewing_contingent_selected)
 
 purchases = Family.collection.aggregate([
   {"$match" => {
@@ -92,7 +92,7 @@ purchases.each do |rec|
   pol_id = rec["_id"]
   Rails.logger.info "-----publishing #{pol_id}"
 
-  if rec["enrollment_state"] == 'auto_renewing'
+  if rec["enrollment_state"] == 'auto_renewing' || rec["enrollment_state"] == 'auto_renewing_contingent'
     IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#auto_renew")
   else
     IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
