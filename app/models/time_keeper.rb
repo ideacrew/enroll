@@ -80,9 +80,13 @@ class TimeKeeper
     instance.date_of_record
   end
 
+  # DO NOT USE THIS METHOD UNTIL
+  # 15263 has been corrected.
+  # UNTIL THEN - 
+  # It is patched to make sure timestamps are not wrong
+  # in the code where it was used.
   def self.datetime_of_record
-    instant = Time.current
-    instance.date_of_record.to_datetime + instant.hour.hours + instant.min.minutes + instant.sec.seconds
+    Time.now
   end
 
   def set_date_of_record(new_date)
