@@ -70,7 +70,7 @@ module BenefitSponsors
       def load_profile_form(form)
         form.organization.profile.grouped_sic_code_options = Caches::SicCodesCache.load
         form.organization.profile.contact_method_options = ::BenefitMarkets::CONTACT_METHODS_HASH
-        form.organization.profile.referred_by_options = Organizations::AcaShopCcaEmployerProfile::REFERRED_KINDS
+        form.organization.profile.referred_by_options = BenefitSponsors::Organizations::AcaShopCcaEmployerProfile::REFERRED_KINDS
         form
       end
 
