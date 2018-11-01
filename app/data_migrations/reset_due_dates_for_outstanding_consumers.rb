@@ -7,10 +7,9 @@ class ResetDueDatesForOutstandingConsumers < MongoidMigrationTask
         :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}).each do |family|
       begin
         family.active_household.hbx_enrollments.individual_market.where(aasm_state: "coverage_selected").each do |hbx_enrollment|
-          if hbx_enrollment.is_any_member_outstanding? && hbx_enrollment.may_move_to_contingent?
+          if hbx_enrollment.is_any_member_outstanding?
             family.set_due_date_on_verification_types
-            hbx_enrollment.move_to_contingent!
-            puts "enrollment with #{hbx_enrollment.hbx_id} associated to #{family.id} moved to contingent" unless Rails.env.test?
+            puts "Due dates have been set for family associated with id: #{family.id} " unless Rails.env.test?
           end
         end
       rescue Exception => e

@@ -17,11 +17,14 @@ module RuleSet
       end
 
       def determine_next_state
-        return :do_nothing if (any_outstanding? || verification_ended?) && hbx_enrollment.enrolled_contingent?
-        return(:move_to_contingent!) if (any_outstanding? || verification_ended?) && hbx_enrollment.may_move_to_contingent?
-        return(:move_to_pending!) if (any_pending? && hbx_enrollment.may_move_to_pending?)
-        return(:move_to_enrolled!) if hbx_enrollment.may_move_to_enrolled?
-        :do_nothing
+        return true, :move_to_enrolled! if (any_outstanding? || verification_ended?) && hbx_enrollment.may_move_to_enrolled?
+        member_outstanding = any_outstanding? || verification_ended?
+        if any_pending?
+          return member_outstanding, :move_to_pending! if hbx_enrollment.may_move_to_pending?
+        else
+          return member_outstanding, :move_to_enrolled! if hbx_enrollment.may_move_to_enrolled?
+        end
+        return member_outstanding, :do_nothing
       end
 
       def any_outstanding?
@@ -33,7 +36,7 @@ module RuleSet
       end
 
       def any_pending?
-        roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?)
+        roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?) || roles_for_determination.any?(&:sci_verified?)
       end
     end
   end

@@ -34,7 +34,7 @@ def is_dc_resident(person)
 end
 
 def document_due_date(family)
-  enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
+  enrolled_contingent_enrollment = family.enrollments.outstanding_enrollments.first
   if enrolled_contingent_enrollment.present?
     if enrolled_contingent_enrollment.special_verification_period.present?
       enrolled_contingent_enrollment.special_verification_period.strftime("%m/%d/%Y")
@@ -48,7 +48,7 @@ end
 
 def is_family_renewing(family)
   family.active_household.hbx_enrollments.where(
-    :aasm_state.in => ["coverage_selected", "enrolled_contingent"],
+    :aasm_state => "coverage_selected",
     kind: "individual",
     :effective_on => {:"$gte" => Date.new(2018,1,1), :"$lte" =>  Date.new(2018,12,31)}
   ).present?
@@ -78,7 +78,7 @@ while offset <= family_count
       next if policy.plan.nil?
       next if !plan_ids.include?(policy.plan_id)
       next if policy.effective_on < Date.new(2019, 01, 01)
-      next if !(["auto_renewing", "coverage_selected", "enrolled_contingent"].include?(policy.aasm_state))
+      next if !(["auto_renewing", "coverage_selected"].include?(policy.aasm_state))
       next if !(['01', '03', ''].include?(policy.plan.csr_variant_id))#includes dental plans - csr_variant_id - ''
       next if policy.plan.market != 'individual'
       next if (!(['unassisted_qhp', 'individual'].include? policy.kind)) || has_current_aptc_hbx_enrollment(policy.family)

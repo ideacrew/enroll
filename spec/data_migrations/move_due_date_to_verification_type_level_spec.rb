@@ -17,7 +17,7 @@ describe MoveDueDateToVerificationTypeLevel do
     let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, 
       household: person.primary_family.active_household, 
       special_verification_period: TimeKeeper.date_of_record - 5.days,
-      aasm_state: "enrolled_contingent"
+      is_any_enrollment_member_outstanding: true
     )}
 
     let!(:enrollment2) { FactoryGirl.create(:hbx_enrollment,
