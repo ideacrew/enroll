@@ -22,6 +22,16 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "payment_transactions" do
+    it "should match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).to eq :has_many
+    end
+
+    it "should not match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).not_to eq :embeds_many
+    end
+  end
+
   context "with enrolled hbx enrollments" do
     let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
     before do
@@ -1214,7 +1224,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 end
 
-
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
   let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
@@ -1263,8 +1272,12 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: two_years_old_plan.id
     )
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with current & previous year coverages' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.expire_individual_market_enrollments
       family.reload
     end
@@ -1318,8 +1331,12 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     )
 
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with passive renewals ' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.begin_coverage_for_ivl_enrollments
       family.reload
     end

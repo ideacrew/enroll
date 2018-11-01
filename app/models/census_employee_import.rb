@@ -209,6 +209,7 @@ class CensusEmployeeImport
     address = Address.new({kind: 'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
                            state: record[:state], zip: record[:zip]})
     member.address = address if address.valid?
+    member.no_ssn_allowed = true if @employer_profile.no_ssn
     member
   end
 

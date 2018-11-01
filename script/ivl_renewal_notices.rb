@@ -41,7 +41,7 @@ def valid_enrollments(person)
   renewing_hbx_enrollments = []
   active_hbx_enrollments = []
   family = person.primary_family
-  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
+  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
   return [] if enrollments.blank?
   renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
   renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
