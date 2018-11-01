@@ -3,6 +3,15 @@ require "#{Rails.root}/script/ivl_sep_query.rb"
 
 describe "ivl sep query" do
   describe "given consumers under open enrollment" do
+
+    let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
+    let(:plan) { FactoryGirl.create(:plan) }
+
+    let(:start_time) { Time.now - 17.minutes }
+    let(:end_time) { Time.now }
+
+    subject{ IvlEnrollmentsQuery.new(start_time, end_time) }
+
     describe "and made the following plan selections:
        - consumer A has purchased:
          - new health coverage (state: coverage selected)
@@ -13,9 +22,6 @@ describe "ivl sep query" do
        - consumer D has:
          - passive renewal outside time boundary(state: auto_renewing)
     " do
-
-      let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
-      let(:plan) { FactoryGirl.create(:plan) }
 
       let(:consumer_A) {
         FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
@@ -65,29 +71,84 @@ describe "ivl sep query" do
         create_enrollment(family: family_D, consumer_role: consumer_D.consumer_role, plan: plan, status: 'auto_renewing', submitted_at: Time.now - 30.minutes, enrollment_kind: 'open_enrollment', effective_date: effective_on, coverage_kind: 'health')
       }
 
-      let(:start_time) { Time.now - 17.minutes }
-      let(:end_time) { Time.now }
-
-      subject{ IvlEnrollmentsQuery.new(start_time, end_time) }
-
       it "includes enrollment 1" do
         purchase_ids = subject.purchases.map{|rec| rec["_id"]}
         expect(purchase_ids).to include(enrollment_1.hbx_id)
+
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).not_to include(enrollment_1.hbx_id)
       end
 
       it "includes enrollment 2" do
         purchase_ids = subject.purchases.map{|rec| rec["_id"]}
         expect(purchase_ids).to include(enrollment_2.hbx_id)
+
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).not_to include(enrollment_2.hbx_id)
       end
 
       it "includes enrollment 3" do
         purchase_ids = subject.purchases.map{|rec| rec["_id"]}
         expect(purchase_ids).to include(enrollment_3.hbx_id)
+
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).not_to include(enrollment_3.hbx_id)
       end
 
       it "does not include enrollment 4" do
         purchase_ids = subject.purchases.map{|rec| rec["_id"]}
         expect(purchase_ids).not_to include(enrollment_4.hbx_id)
+
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).not_to include(enrollment_4.hbx_id)
+      end
+    end
+
+    describe "and made following term/cancel of their coverage:
+       - consumer A has:
+         - canceled their coverage (state: coverage canceled)
+       - consumer B has:
+         - termed thier coverage (state: coverage_terminated)
+    " do
+
+      let(:consumer_A) {
+        FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+      }
+
+      let(:family_A) {
+        FactoryGirl.create(:family, :with_primary_family_member, :person => consumer_A)
+      }
+
+      let!(:enrollment_1){ 
+         create_enrollment(family: family_A, consumer_role: consumer_A.consumer_role, plan: plan, status: 'coverage_canceled', submitted_at: Time.now - 5.minutes, enrollment_kind: 'open_enrollment', effective_date: effective_on, coverage_kind: 'health')
+      }
+
+      let(:consumer_B) {
+        FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
+      }
+
+      let(:family_B) {
+        FactoryGirl.create(:family, :with_primary_family_member, :person => consumer_B)
+      }   
+
+      let!(:enrollment_2) {
+        create_enrollment(family: family_B, consumer_role: consumer_B.consumer_role, plan: plan, status: 'coverage_terminated', submitted_at: Time.now - 5.minutes, enrollment_kind: 'open_enrollment', effective_date: TimeKeeper.date_of_record.beginning_of_month, coverage_kind: 'health')
+      }
+
+      it "includes enrollment 1" do
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).to include(enrollment_1.hbx_id)
+
+        purchase_ids = subject.purchases.map{|rec| rec["_id"]}
+        expect(purchase_ids).not_to include(enrollment_1.hbx_id)
+      end
+
+      it "includes enrollment 2" do
+        term_ids = subject.terminations.map{|rec| rec["_id"]}
+        expect(term_ids).to include(enrollment_2.hbx_id)
+
+        purchase_ids = subject.purchases.map{|rec| rec["_id"]}
+        expect(purchase_ids).not_to include(enrollment_2.hbx_id)
       end
     end
   end
