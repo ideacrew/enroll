@@ -8,7 +8,7 @@ class Insured::PlanShoppingsController < ApplicationController
   extend Acapi::Notifiers
   include Aptc
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt,:set_elected_aptc]
 
   def checkout
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
@@ -170,7 +170,7 @@ class Insured::PlanShoppingsController < ApplicationController
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.current_year
         plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-        plan_comparision_obj.elected_aptc =  session[:elected_aptc]
+        plan_comparision_obj.elected_aptc = session[:elected_aptc]
         @dc_individual_checkbook_url = plan_comparision_obj.generate_url
       elsif @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.previous_year 
         @dc_individual_checkbook_previous_year = Settings.consumer_checkbook_services.checkbook_previous_year
@@ -194,7 +194,11 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def set_elected_aptc
     session[:elected_aptc] = params[:elected_aptc].to_f
-    render json: 'ok'
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc =  session[:elected_aptc]
+    checkbook_url = plan_comparision_obj.generate_url
+    render json: {message: 'ok',checkbook_url: "#{checkbook_url}" }
   end
 
   def plans

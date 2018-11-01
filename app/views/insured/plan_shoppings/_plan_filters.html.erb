@@ -40,7 +40,7 @@
           <div class="modal-footer" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%if @hbx_enrollment.effective_on.year == 2019%>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary  mtz" %>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url mtz" %>
             <% elsif @hbx_enrollment.effective_on.year == 2018%>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary  mtz", target: '_blank' %>
             <% end %>
@@ -241,6 +241,8 @@
           </div>
         </div>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
+        <%= hidden_field_tag :market_kind, @market_kind %>
+        <%= hidden_field_tag :coverage_kind, @coverage_kind %>
         <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
           <input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'/>
