@@ -23,7 +23,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
       puts "#{enrollment.hbx_id}---#{e.inspect}" unless Rails.env.test?
-      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
+      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
     end
   end
 
@@ -37,6 +37,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.plan_id = ( can_renew_assisted_plan?(renewal_enrollment) ? assisted_renewal_plan : renewal_plan)
+    renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
