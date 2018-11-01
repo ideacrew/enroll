@@ -95,7 +95,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
         ENV['action'] = "update_employee_role_id_to_ce"
         employee_role.person.save!
       end
-      it "should update the ee_role_id on hbx_enrollment with the correct one" do
+      it "should update the ee_role_id on census_employee with the EE Role id" do
         person.active_employee_roles.first.census_employee.update_attributes!(:employee_role_id => "111111111111111111111111")
         expect(person.active_employee_roles.first.id).not_to eq person.active_employee_roles.first.census_employee.employee_role_id
         subject.migrate
@@ -103,7 +103,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
         expect(person.active_employee_roles.first.id).to eq person.active_employee_roles.first.census_employee.employee_role_id
       end
 
-      it "should not change the ee_role_id of hbx_enrollment if the EE Role id matches with the correct one" do
+      it "should not change the ee_role_id of census_employee if the EE Role id" do
         expect(person.active_employee_roles.first.id).not_to eq person.active_employee_roles.first.census_employee.employee_role_id
         subject.migrate
         person.employee_roles.first.census_employee.reload
