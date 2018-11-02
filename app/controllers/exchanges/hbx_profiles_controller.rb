@@ -75,7 +75,7 @@ class Exchanges::HbxProfilesController < ApplicationController
           flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
         else
           org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
-          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+          flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
         end
       else
         if org.employer_profile.no_ssn.to_s == "false"
@@ -83,7 +83,7 @@ class Exchanges::HbxProfilesController < ApplicationController
           flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
         else
           org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
-          flash["success"] = "SSN/TIN requirement has been successfully enalbled for the roster of selected employer"
+          flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
         end
       end
     end

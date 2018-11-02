@@ -8,7 +8,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @no_ssn = @employer_profile.no_ssn || false
 
     if @no_ssn
-      flash[:notice] = "SSN requirement is current disabled. This means you are not required to input SSN for your employees."
+      flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time."
     end
 
     if params[:modal].present?
@@ -204,7 +204,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @status = params[:status] || ''
 
     if @no_ssn && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.nil?
-      flash[:notice] = "This employee does not require a SSN because he/she was created at a time when the employer did not require SSN input."
+      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
     end
 
   end

@@ -38,9 +38,9 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         consumer_role.verification_types.map(&:reload)
       end
 
-      it "should update the aasm_state to enrolled_contingent" do
+      it "should return is_any_member_outstanding? as true" do
         expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
-        expect(hbx_enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
       end
 
       it "should update the verifcation_types" do
@@ -48,7 +48,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
       end
     end
 
-    context "it should not update the due date and enrollment state if it's not a enrolled_contingent enr" do 
+    context "it should not update the due date if none of the enrolled members are outstanding" do
 
       before :each do
         consumer_role.update_attributes!(aasm_state: "verified")
@@ -57,7 +57,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         consumer_role.verification_types.map(&:reload)
       end
 
-      it "should not update the aasm_state to enrolled_contingent" do
+      it "should change the aasm_state" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
       end
 
@@ -74,7 +74,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         dep_consumer_role.verification_types.map(&:reload)
       end
 
-      it "should update the aasm_state to enrolled_contingent" do
+      it "should update the aasm_state to verification type's due date" do
         dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         dep_consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
         expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy

@@ -8,7 +8,7 @@
         <% if @market_kind == "individual" && @coverage_kind == "health" %>
           <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
           <% elsif @market_kind == "individual" && @coverage_kind == "dental" %>
-          <%= link_to l10n("estimate_your_cost"), 'https://staging.checkbookhealth.org/sadpi/DC/2019/', target: '_blank' %>
+          <%= link_to l10n("estimate_your_cost"), 'https://dc.checkbookhealth.org/sadpi/dc/2019/', target: '_blank' %>
           <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
         <% end %>
         </br>

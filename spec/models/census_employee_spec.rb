@@ -233,6 +233,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 expect(initial_census_employee.may_link_employee_role?).to be_truthy
               end
 
+              context "and a roster match by dob lname and fname is performed" do
+                context "using non-matching dob lname and fname" do
+                  let(:invalid_person)   { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 5.days, first_name: "john", last_name: "doe") }
+                  let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, person: invalid_person) }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(invalid_person.dob, invalid_person.first_name, invalid_person.last_name)).to eq []
+                  end
+                end
+
+                context "using matching dob lname and fname" do
+                  let(:valid_person) { FactoryGirl.create(:person, first_name: 'Lynyrd', last_name: 'Skynyrd') }
+                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, dob: initial_census_employee.dob, person: valid_person) }
+
+                  it "should return the roster instance" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(valid_employee_role.person.dob, valid_employee_role.person.first_name, valid_employee_role.person.last_name).collect(&:id)).to eq [initial_census_employee.id]
+                  end
+                end
+              end
+
               context "and a roster match by SSN and DOB is performed" do
                 context "using non-matching ssn and dob" do
                   let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }

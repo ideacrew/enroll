@@ -133,7 +133,7 @@ describe ChangeEnrollmentDetails do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
         allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
         allow(ENV).to receive(:[]).with("new_aasm_state").and_return "move_to_enrolled"
-        hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
+        hbx_enrollment.update_attribute("aasm_state","unverified")
         hbx_enrollment.reload
       end
 

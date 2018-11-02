@@ -236,7 +236,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
-      expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(hbx_enrollment.termination_submitted_on.to_time).to be_within(5.seconds).of(TimeKeeper.datetime_of_record)
       expect(response).to redirect_to(family_account_path)
     end
 

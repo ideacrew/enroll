@@ -309,7 +309,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(employer_profile.disable_ssn_date).to be_nil
       expect(subject).to redirect_to employer_invoice_exchanges_hbx_profiles_path
       expect(employer_profile.reload.no_ssn).to be_truthy
-      expect(employer_profile.disable_ssn_date).to eq(date)
+      expect(employer_profile.disable_ssn_date.to_time).to be_within(5.seconds).of(date)
     end
   end
 
