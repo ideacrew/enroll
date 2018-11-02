@@ -1,6 +1,10 @@
 require 'rails_helper'
+require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
+  before do
+    DatabaseCleaner.clean
+  end
 
   context "Given a database of Families" do
 
@@ -143,5 +147,63 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
     end
   end
 
+  describe "To test passive renewals with only ivl health plans" do
+    include_context "setup families enrollments"
 
+    context "Given a database of Families" do
+      it "at least one Family with an active 'Individual Market Health plan Enrollment only'" do
+        expect(family_unassisted.active_household.hbx_enrollments.first.kind).to eq "individual"
+      end
+
+      it "at least one Family with an active 'Assisted Individual Market Health plan Enrollment only'" do
+        expect(family_assisted.active_household.hbx_enrollments.first.applied_aptc_amount).not_to eq 0
+      end
+
+      context "when OE script is executed" do
+
+        before do
+          hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(renewal_calender_date.beginning_of_year)}.update_attributes!(slcsp_id: renewal_csr_87_plan.id)
+          hbx_profile.reload
+          renewal_individual_health_plan.reload
+          active_individual_health_plan.reload
+          family_assisted.active_household.reload
+          allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+        end
+
+        it "should generate renewal enrollment for assisted family" do
+          invoke_oe_script
+          family_assisted.active_household.reload
+          enrollments = family_assisted.active_household.hbx_enrollments
+          expect(enrollments.size).to eq 2
+          expect(enrollments[1].applied_aptc_amount.to_f).to eq (enrollments[1].total_premium * enrollments[1].plan.ehb).round(2)
+        end
+
+        it "should generate renewal enrollment for unassisted family" do
+          invoke_oe_script
+          family_unassisted.active_household.reload
+          expect(family_unassisted.active_household.hbx_enrollments.count).to eq 2
+        end
+      end
+    end
+  end
+end
+
+private
+
+def invoke_oe_script
+  field_names =
+      ["Icnumber", "Ssn", "Subscriber", "Member", "Firstname", "Lastname", "Dob",
+       "#{renewal_calender_year - 1.year} Applied", "#{renewal_calender_year - 1.year} Max", "Unadjustedapplied", "Applied Pct",
+       "#{renewal_calender_year} Aptc", "#{renewal_calender_year} Applied", "#{renewal_calender_year} Csr", "Error Msg"]
+  Dir.mkdir("pids") unless File.exists?("pids")
+  file_name = "#{Rails.root}/pids/#{renewal_calender_year}_FA_Renewals.csv"
+
+  CSV.open(file_name, "w") do |csv|
+    csv << field_names
+    person = family_assisted.primary_family_member.person
+    csv << ["", person.ssn, person.hbx_id, person.hbx_id, person.first_name, person.last_name, person.dob, 100, 200, "", 0, 400, 150, 73]
+  end
+
+  oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+  oe_begin.process_renewals
 end
