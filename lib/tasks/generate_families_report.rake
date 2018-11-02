@@ -29,16 +29,17 @@ namespace :generate_report do
         tax_households = f.active_household.tax_households
         primary_person = f.primary_family_member.person
 
-        thh_2019 = tax_households.tax_household_with_year(next_year).active_tax_household.first
+        thh_2019 = tax_households.tax_household_with_year(next_year).active_tax_household.order_by(:'created_at'.desc).first
+
         next unless thh_2019.present?
 
         thhs_2018 = tax_households.tax_household_with_year(current_year)
-        thh_2018 = thhs_2018.last
+        thh_2018 = thhs_2018.order_by(:'created_at'.desc).first
         next unless thhs_2018.present?
 
         active_thh_2018 = thhs_2018.active_tax_household
 
-        if active_thh_2018.count == 0
+        if active_thh_2018.count == 0 && thh_2018.effective_ending_on == thh_2019.effective_starting_on
 
           csv << [
               primary_person.hbx_id,

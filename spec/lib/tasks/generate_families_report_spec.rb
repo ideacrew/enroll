@@ -4,7 +4,7 @@ require 'rake'
 RSpec.describe 'generate_families_report' do
   let!(:eligibility_date) {TimeKeeper.datetime_of_record}
   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-  let!(:tax_household) {FactoryGirl.create(:tax_household, household: family.active_household, effective_starting_on: Date.new(2018, 1, 1), effective_ending_on: Date.new(2018, 12, 31))}
+  let!(:tax_household) {FactoryGirl.create(:tax_household, household: family.active_household, effective_starting_on: Date.new(2018, 1, 1), effective_ending_on: Date.new(2019, 1, 1))}
   let!(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household, max_aptc: {"cents" => 283.00, "currency_iso" => "USD"})}
   let!(:tax_household2) {FactoryGirl.create(:tax_household, household: family.active_household, effective_starting_on: Date.new(2019, 1, 1), effective_ending_on: nil)}
   let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2, max_aptc: {"cents" => 50.00, "currency_iso" => "USD"})}
@@ -16,6 +16,13 @@ RSpec.describe 'generate_families_report' do
   let!(:family3) {FactoryGirl.create(:family, :with_primary_family_member)}
   let!(:tax_household4) {FactoryGirl.create(:tax_household, household: family3.active_household, effective_starting_on: Date.new(2018, 1, 1), effective_ending_on: Date.new(2017, 1, 31))}
   let!(:eligibility_determination4) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household4, max_aptc: {"cents" => 3.00, "currency_iso" => "USD"})}
+
+  let!(:family4) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let!(:tax_household5) {FactoryGirl.create(:tax_household, household: family4.active_household, effective_starting_on: Date.new(2018, 1, 1), effective_ending_on: Date.new(2018, 12, 31))}
+  let!(:eligibility_determination5) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household5, max_aptc: {"cents" => 283.00, "currency_iso" => "USD"})}
+  let!(:tax_household6) {FactoryGirl.create(:tax_household, household: family4.active_household, effective_starting_on: Date.new(2019, 1, 1), effective_ending_on: nil)}
+  let!(:eligibility_determination6) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household6, max_aptc: {"cents" => 50.00, "currency_iso" => "USD"})}
+
 
   before do
     load File.expand_path("#{Rails.root}/lib/tasks/generate_families_report.rake", __FILE__)
@@ -31,6 +38,7 @@ RSpec.describe 'generate_families_report' do
       data = CSV.read files.first
       expect(data[0]).to eq result
       expect(data[1].present?).to eq true
+      expect(data.count).to eq 2
     end
 
     after(:all) do
