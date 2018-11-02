@@ -1116,7 +1116,6 @@ def self.to_csv
   end
 
   def enrollments_for_display
-
     enrollments = []
 
     coverages_selected = lambda do |enrollments|
