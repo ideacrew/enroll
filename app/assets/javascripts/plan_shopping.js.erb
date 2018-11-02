@@ -210,16 +210,22 @@ $(function() {
 
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
-
+      var coverage_kind = $("input#coverage_kind").val();
+      var market_kind = $("input#market_kind").val();
       updatePlanCost(elected_aptc);
       $.ajax({
         type: "POST",
         url: $('#set_elected_aptc_url').val(),
-        dataType: 'script',
         data: {
-          'elected_aptc': elected_aptc
-        }
-      });
+          'elected_aptc': elected_aptc,
+          'market_kind': market_kind,
+          'coverage_kind': coverage_kind
+        },
+        success: function(data){
+          response = jQuery.parseJSON(JSON.stringify(data))
+          $("#plan_match_redirection .modal-footer a").attr("href",response.checkbook_url);
+        },
+        });
     };
   });
 
