@@ -16,7 +16,7 @@ FactoryGirl.define do
       if default_effective_period.present?
         default_effective_period
       else
-        start_on  = TimeKeeper.date_of_record.end_of_month + 1.day + 1.month
+        start_on  = TimeKeeper.date_of_record.beginning_of_month
         end_on    = start_on + 1.year - 1.day
         start_on..end_on
       end
