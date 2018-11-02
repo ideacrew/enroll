@@ -764,4 +764,8 @@ module ApplicationHelper
       member_group_hash
     end.to_json
   end
+  
+  def products_available
+    return true
+  end
 end
