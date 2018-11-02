@@ -31,6 +31,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
         change_benefit_group
       when "change_enrollment_status"
         change_enrollment_status
+      when "move_enrollment_to_shopping"
+        move_enr_to_shopping
     end
   end
 
@@ -151,6 +153,19 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       end
     end
   end
+
+  def move_enr_to_shopping
+    @enrollments.each do |enrollment|
+      state = enrollment.aasm_state
+      enrollment.update_attributes(aasm_state: "shopping")
+      puts "Updated enrollment" unless Rails.env.test?
+      enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+            from_state: state,
+            to_state: "shopping"
+        )
+    end
+  end
+
 
   def change_enrollment_status
     new_aasm_state = ENV['new_aasm_state'].to_s

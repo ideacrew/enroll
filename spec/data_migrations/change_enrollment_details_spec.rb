@@ -195,6 +195,20 @@ describe ChangeEnrollmentDetails do
       end
     end
 
+    context "move enr to shopping" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "move_enrollment_to_shopping"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should move enr to shopping state" do
+        expect(hbx_enrollment.aasm_state).to eq "shopping"
+      end
+    end
+
+
     context "change the plan of enrollment" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
