@@ -1,3 +1,6 @@
+# This rake task is to generate families report
+# RAILS_ENV=production bundle exec rake generate_report:families
+
 namespace :generate_report do
   desc "families with inactive tax household for current year and active tax_households for next year"
 
