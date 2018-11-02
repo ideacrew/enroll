@@ -38,8 +38,8 @@
                   Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" style="padding:10px">
-                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_s %>')" class="cancel-py">CANCEL</li>
-                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_s %>')" class="terminate-py">TERMINATE</li>
+                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="cancel-py">CANCEL</li>
+                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="terminate-py">TERMINATE</li>
                     <!-- <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @benefit_sponsorship.id %>', '<%= application.terminated_on %>', '')" class="reinstate-py">REINSTATE</li> -->
                 </ul>
               </div>
