@@ -121,6 +121,11 @@ class HbxProfilePolicy < ApplicationPolicy
     return false  
   end
 
+  def can_access_user_account_tab?
+    return @user.person.hbx_staff_role.permission.can_access_user_account_tab if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
+
   def can_add_pdc?
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_add_pdc
