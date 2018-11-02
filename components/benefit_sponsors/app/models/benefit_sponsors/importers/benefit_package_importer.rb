@@ -35,25 +35,27 @@ module BenefitSponsors
       def construct_sponsored_benefit(benefit_package, sponsored_benefit_attrs)
         if sponsored_benefit_attrs[:product_kind] == :health
           sponsored_benefit  = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
-          sponsored_benefit.product_package_kind = map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
-          sponsored_benefit.benefit_package = benefit_package
-        
-          if sponsored_benefit.product_package.present?
-            
-            sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
-            raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
-            sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
-            if sole_source?
-              sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
-            else
-              sponsor_contribution_attrs = sponsored_benefit_attrs[:relationship_benefits]
-            end
+        else
+          sponsored_benefit  = BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
+        end
 
-            build_sponsor_contribution(sponsored_benefit, sponsor_contribution_attrs)
-            build_pricing_determinations(sponsored_benefit, sponsor_contribution_attrs) if sole_source?
+        sponsored_benefit.product_package_kind = map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
+        sponsored_benefit.benefit_package = benefit_package
+        
+        if sponsored_benefit.product_package.present?
+          sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
+          raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
+          sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
+          if sole_source? && sponsored_benefit_attrs[:product_kind] == :health
+            sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
           else
-            raise StandardError, "Unable to map product_package for sponsored_benefit!!"
+            sponsor_contribution_attrs = sponsored_benefit_attrs[:relationship_benefits]
           end
+
+          build_sponsor_contribution(sponsored_benefit, sponsor_contribution_attrs)
+          build_pricing_determinations(sponsored_benefit, sponsor_contribution_attrs) if sole_source? && sponsored_benefit_attrs[:product_kind] == :health
+        else
+          raise StandardError, "Unable to map product_package for sponsored_benefit!!"
         end
       end
 
@@ -122,7 +124,7 @@ module BenefitSponsors
       def product_package_choice_for(sponsored_benefit)
         case sponsored_benefit.product_package_kind
         when :single_product, :single_issuer
-          sponsored_benefit.reference_product.issuer_profile.id
+          sponsored_benefit.reference_product.issuer_profile.id if sponsored_benefit.reference_product.issuer_profile.present?
         when :metal_level
           sponsored_benefit.reference_product.metal_level_kind
         end
@@ -156,8 +158,12 @@ module BenefitSponsors
           sponsored_benefit_attrs = attributes.slice(:plan_option_kind, :reference_plan_hios_id, (sole_source? ? :composite_tier_contributions : :relationship_benefits))
           sponsored_benefit_attrs[:product_kind] = :health
         elsif product_kind == :dental
-          sponsored_benefit_attrs = attributes.slice(:dental_reference_plan_hios_id, :dental_relationship_benefits)
-          sponsored_benefit_attrs[:product_kind] = :dental
+          sponsored_benefit_attrs = {
+            product_kind: :dental,
+            plan_option_kind: attributes[:dental_plan_option_kind],
+            reference_plan_hios_id: attributes[:dental_reference_plan_hios_id],
+            relationship_benefits: attributes[:dental_relationship_benefits]
+          }
         end
 
         sponsored_benefit_attrs

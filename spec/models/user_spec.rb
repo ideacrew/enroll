@@ -166,15 +166,18 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
         expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end
     end
+
     context "roles" do
       let(:params){valid_params.deep_merge({roles: ["employee", "broker", "hbx_staff"]})}
+      let(:person) { FactoryGirl.create(:person) }
+      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:employer_profile)    { benefit_sponsor.employer_profile }
+      let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, person: person, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+
       it "should return proper roles" do
         user = User.new(**params)
-        person = FactoryGirl.create(:person)
         allow(user).to receive(:person).and_return(person)
-        employer_staff_role =FactoryGirl.create(:employer_staff_role, person: person)
-        #allow(person).to receive(:employee_roles).and_return([role])
-        FactoryGirl.create(:employer_staff_role, person: person)
         #Deprecated. DO NOT USE.  Migrate to person.active_employee_roles.present?
         #expect(user.has_employee_role?).to be_truthy
         expect(user.has_employer_staff_role?).to be_truthy

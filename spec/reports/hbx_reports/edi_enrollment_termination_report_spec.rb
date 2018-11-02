@@ -4,7 +4,7 @@ require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_t
 require "#{Rails.root}/app/helpers/config/aca_helper"
 include Config::AcaHelper
 
-describe TerminatedHbxEnrollments do
+describe TerminatedHbxEnrollments, dbclean: :after_each do
 
   let(:given_task_name) { "enrollment_termination_on" }
   let(:person1) {FactoryGirl.create(:person,

@@ -6,6 +6,6 @@ namespace :seed do
       carrier.delete
     end
 
-    require File.join(Rails.root, "db/seedfiles/carriers_seed")
+    require File.join(Rails.root, "db/seedfiles/carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
   end
 end

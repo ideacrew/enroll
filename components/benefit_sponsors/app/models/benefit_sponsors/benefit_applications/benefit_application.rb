@@ -27,7 +27,7 @@ module BenefitSponsors
     IMPORTED_STATES               = [:imported].freeze
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
-
+    TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
     # Deprecated - Use SUBMITTED_STATES
     PUBLISHED_STATES = SUBMITTED_STATES
 
@@ -112,6 +112,7 @@ module BenefitSponsors
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
+    scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -157,6 +158,15 @@ module BenefitSponsors
     # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
     # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
     # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
+
+    scope :renewing_published_state,        ->{
+      where(
+        "$and" => [
+          {:aasm_state.in => PUBLISHED_STATES },
+          {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
 
     scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
       where(
@@ -350,6 +360,10 @@ module BenefitSponsors
 
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
+    end
+
+    def can_be_migrated?
+      imported?
     end
 
     # TODO: Refer to benefit_sponsorship instead of employer profile.

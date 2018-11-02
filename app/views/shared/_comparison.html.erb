@@ -20,7 +20,7 @@
         <th></th>
         <% qhps.each do |qhp|%>
           <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
-          <%= qhp.product.health_plan_kind.upcase %>
+          <%= qhp.product.product_type.upcase %>
           </th>
         <% end %>
       </tr>

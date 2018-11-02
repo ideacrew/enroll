@@ -5,6 +5,15 @@ function getCostDetails(min,max,cost) {
 
 function showCostDetails(cost,min,max) {
   document.getElementById('rpEstimatedMonthlyCost').innerHTML = ('$ '+cost);
+
+  if (min == 'NaN') {
+    min = "0.00"
+  }
+
+  if (max == 'NaN') {
+    max = "0.00"
+  }
+
   document.getElementById('rpMin').innerHTML = ('$ '+ min);
   document.getElementById('rpMax').innerHTML = ('$ '+ max);
   if (document.getElementById('estimatedEEMin')) {
@@ -58,15 +67,15 @@ function debounceRequest(func, wait, immediate) {
 }
 
 
-function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId)  {
-  var thing = $("input[name^='benefit_package['").serializeArray();
+function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
+  var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = {};
   for (item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
   // to product package kind.
-  submitData['benefit_package'] = {
+  submitData[referenceModel] = {
     sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } }
   };
   $.ajax({
@@ -81,15 +90,15 @@ function calculateEmployeeCostsImmediate(productOptionKind,referencePlanID, spon
 
 const calculateEmployeeCosts = debounceRequest(calculateEmployeeCostsImmediate, 1000);
 
-function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId)  {
-  var thing = $("input[name^='benefit_package['").serializeArray();
+function calculateEmployerContributionsImmediate(productOptionKind,referencePlanID, sponsoredBenefitId, referenceModel = "benefit_package")  {
+  var thing = $("input[name^='"+referenceModel+"['").serializeArray();
   var submitData = { };
   for (item in thing) {
     submitData[thing[item].name] = thing[item].value;
   }
   // We have to append this afterwards because somehow, somewhere, there is an empty field corresponding
   // to product package kind.
-  submitData['benefit_package'] = {
+  submitData[referenceModel] = {
     sponsored_benefits_attributes: { "0": { product_package_kind: productOptionKind,reference_plan_id: referencePlanID, id: sponsoredBenefitId } }
   };
   $.ajax({

@@ -1,3 +1,6 @@
+#Run below rake, if loading data through fixtures
+##bundle exec rake db:seed type=fixtures
+
 ENV["ENROLL_SEEDING"] = "true"
 
 reset_tasks = %w(
@@ -49,36 +52,44 @@ if use_plan_dumps
 end
 
 
-if missing_plan_dumps
+if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "Running full seed"
 
-  puts "*"*80
-  puts "Loading carriers and plans"
-  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
-  puts "::: complete :::"
-
-  puts "*"*80
-  puts "Loading QLE kinds."
-  require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
-  system "bundle exec rake update_seed:qualifying_life_event"
-  puts "::: complete :::"
+  system "bundle exec rake import:county_zips"
 
   if Settings.aca.employer_has_sic_field
-    puts "*"*80
-    puts "Loading SIC Codes."
     system "bundle exec rake load_sic_code:update_sic_codes"
     puts "::: complete :::"
   end
 
+  puts "*"*80
+  puts "Loading Site seed"
+  glob_pattern = File.join(Rails.root, "db/seedfiles/cca/site_seed.rb")
+  load glob_pattern
+  load_cca_site_seed
+  puts "Loading benefit market seed"
+  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/benefit_markets_seed.rb")
+  load bm_glob_pattern
+  load_cca_benefit_markets_seed
+  puts "complete"
+
   unless Settings.aca.use_simple_employer_calculation_model
     puts "*"*80
-    puts "Loading Rating Factors."
-    system "bundle exec rake load_rating_factors:run_all_rating_factors"
-    puts "::: complete :::"
-
-    puts "*"*80
     puts "Loading Rating Areas."
-    system "bundle exec rake load_rate_reference:update_rating_areas"
+    system "bundle exec rake load_rate_reference:run_all_rating_areas"
+    puts "::: complete :::"
+  end
+
+  puts "*"*80
+  puts "Loading carriers"
+  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
+  system "bundle exec rake migrations:load_issuer_profiles"
+  puts "::: complete :::"
+
+  unless Settings.aca.use_simple_employer_calculation_model
+    puts "*"*80
+    puts "Importing Rating Factors."
+    system "bundle exec rake load_rating_factors:run_all_rating_factors"
     puts "::: complete :::"
   end
 
@@ -87,11 +98,6 @@ if missing_plan_dumps
     puts "Loading Carrier Service Areas."
     system "bundle exec rake load_service_reference:run_all_service_areas"
     puts "::: complete :::"
-
-    puts "*"*80
-    puts "Updating Carrier Service Areas."
-    system "bundle exec rake update_service_reference:update_service_areas['UPDATED_SHOP_SA_FCHP.xlsx',2017,'88806']"
-    puts "::: complete :::"
   end
 
   puts "*"*80
@@ -99,12 +105,6 @@ if missing_plan_dumps
   Products::Qhp.delete_all
   system "bundle exec rake xml:plans"
   puts "::: complete :::"
-
-  puts "*"*80
-  puts "Loading SERFF PLAN RATE data"
-  system "bundle exec rake xml:rates"
-  puts "::: complete :::"
-  puts "*"*80
 
   puts "Loading super group ids ..."
   system "bundle exec rake supergroup:update_plan_id"
@@ -121,10 +121,30 @@ if missing_plan_dumps
   puts "completed"
   puts "*"*80
 
+  puts "*"*80
+  puts "Loading SERFF PLAN RATE data"
+  system "bundle exec rake xml:rates"
+  puts "::: complete :::"
+  puts "*"*80
 
-  # puts "Marking plans as standard ..."
-  # system "bundle exec rake xml:standard_plans"
-  # puts "Marking plans as standard completed"
+  puts "Loading Contribution and Pricing models"
+  pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/cca/pricing_and_contribution_models_seed.rb")
+  load pricing_and_contribution_models_seed_glob_pattern
+  load_cca_pricing_models_seed
+  load_cca_contribution_models_seed
+  puts "Loading Contribution and Pricing models done"
+
+  puts "*"*80
+  system "bundle exec rake load:benefit_market_catalog[2018]"
+  system "bundle exec rake load:benefit_market_catalog[2019]"
+  puts "::: complete :::"
+  puts "*"*80
+
+  puts "*"*80
+  puts "Loading QLE kinds."
+  require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
+  system "bundle exec rake update_seed:qualifying_life_event"
+  puts "::: complete :::"
 
   # puts "*"*80
   # puts "updating cost share variance deductibles"
@@ -132,26 +152,10 @@ if missing_plan_dumps
   # puts "updating cost share variance deductibles complete"
   # puts "*"*80
 
-  # puts "*"*80
-  # puts "importing provider_directory_urls and rx_formulary_urls for plans"
-  # system "bundle exec rake import:provider_and_rx_formulary_url"
-  # puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
-  # puts "*"*80
-
   puts "*"*80
   puts "::: Mapping Plans to SBC pdfs in S3 :::"
   system "bundle exec rake sbc:map"
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
-
-  puts "*"*80
-  puts "::: Updating network info for 2017 plans :::"
-  system "bundle exec rake import:network_information"
-  puts "::: Updating network info for 2017 plans complete:::"
-
-  # Needs to be a setting catastrophic plans on/off
-  # puts "*"*80
-  # system "bundle exec rake migrations:cat_age_off_renewal_plan"
-  # puts "*"*80
 
   require File.join(File.dirname(__FILE__),'seedfiles', 'shop_2015_sbc_files')
   puts "::: complete :::"
@@ -205,10 +209,12 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
 puts "importing security questions complete"
 puts "*"*80
 
-require File.join(File.dirname(__FILE__),'seedfiles', 'sic_codes_seed')
+if Settings.site.key.to_s == "cca" && (ENV["type"] == "fixtures")
+  require File.join(File.dirname(__FILE__), 'seedfiles', 'sic_codes_seed')
 
-if Settings.site.key.to_s == "cca"
-  require File.join(File.dirname(__FILE__),'seedfiles', 'cca','cca_seed')
+  puts "*"*80
+  puts "loading plan fixtures"
+  require File.join(File.dirname(__FILE__), 'seedfiles', 'cca', 'cca_seed')
 end
 
 puts "*"*80
