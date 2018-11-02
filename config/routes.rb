@@ -14,6 +14,14 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
+  
+  resources :users do
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
+      put :confirm_reset_password, :confirm_change_username_and_email, :update
+      post :unlock, :change_password
+    end
+  end
 
   resources :saml, only: [] do
     collection do
@@ -82,6 +90,7 @@ Rails.application.routes.draw do
         get :get_user_info
         get :identity_verification
         post :identity_verification_datatable
+        get :user_account_index
         get :new_eligibility
       end
 
