@@ -34,7 +34,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
 
       it "sets is_any_enrollment_member_outstanding field to true" do
-        enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+        enroll = HbxEnrollment.by_hbx_id(enrollment11.hbx_id).first
         expect(enroll.aasm_state).to eql "coverage_selected"
         expect(enroll.is_any_enrollment_member_outstanding).to eql true
       end
@@ -47,7 +47,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
       end
 
       it "does not change the state of the enrollment" do
-        enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+        enroll = HbxEnrollment.by_hbx_id(enrollment11.hbx_id).first
         expect(enroll.aasm_state).to eql "coverage_terminated"
       end
     end
