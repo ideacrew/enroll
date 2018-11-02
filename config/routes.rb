@@ -272,8 +272,14 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
+
+    # Redirect from Enroll old model to Enroll new model
+    match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    #match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
+    #match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
+    match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+
     post 'search', to: 'employers#search'
-    root 'employer_profiles#new'
 
     resources :premium_statements, :only => [:show]
 
@@ -309,6 +315,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
 
       member do
+        #match '/:id/*path' , to: redirect('/'), via: [:get, :post]
         get "download_invoice"
         get 'new_document'
         post 'download_documents'
@@ -371,7 +378,7 @@ Rails.application.routes.draw do
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
 
-  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
+  match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do

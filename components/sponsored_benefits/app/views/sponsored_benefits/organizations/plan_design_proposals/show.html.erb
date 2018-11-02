@@ -12,7 +12,7 @@
         </div>
         <div class="panel-body">
           <% if @plan %>
-            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved' } %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved', plan: @plan, plan_option_kind: @benefit_group.plan_option_kind.to_sym, kind: "health" } %>
           <% else %>
             <div class="row">
               <div class="col-xs-12">
@@ -22,14 +22,13 @@
           <% end %>
         </div>
       </div>
-      <!--Employer Costs End-->
-      <!--Employee Costs Start-->
+
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-body">
               <div class="col-md-3">
-                <h3>Employee Costs</h3>
+                <h3>Employee Costs - Health Benefits</h3>
               </div>
               <div class="col-md-7">
                 <br />
@@ -37,7 +36,7 @@
               </div>
               <div class="col-md-2">
                 <br />
-                <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+                <a class="text-center employee-details-text btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
               </div>
 
               <div class="collapse" id="collapseExample">
@@ -46,12 +45,65 @@
                     <% if @benefit_group.sole_source? %>
                       <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs", locals: {benefit_group: @benefit_group} %>
                     <% else %>
-                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group} %>
+                      <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: "health"} %>
                     <% end %>
                   <% else %>
                     <div class="row">
                       <div class="col-md-3">
                         No Reference Plan Assigned
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default table">
+        <div class="panel-heading">
+          <h3 class="panel-title">Dental Plan Information</h3>
+        </div>
+        <div class="panel-body">
+          <% if @dental_plan %>
+            <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details", locals: { plan_export_default_class: 'plan-saved', plan: @dental_plan, plan_option_kind: @benefit_group.dental_plan_option_kind.to_sym, kind: "dental" } %>
+          <% else %>
+            <div class="row">
+              <div class="col-xs-12">
+                No Dental Reference Plan Assigned
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!--Employer Costs End-->
+      <!--Employee Costs Start-->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="col-md-3">
+                <h3>Employee Costs - Dental Benefits </h3>
+              </div>
+              <div class="col-md-7">
+                <br />
+                <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
+              </div>
+              <div class="col-md-2">
+                <br />
+                <a class="text-center employee-details-text btn btn-primary" data-toggle="collapse" href="#collapseDentalCosts" aria-expanded="true" >Show Details</a>
+              </div>
+
+              <div class="collapse" id="collapseDentalCosts">
+                <div class="employee-costs">
+                  <% if @benefit_group.dental_reference_plan.present? %>
+                    <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: 'dental', benefit_group_costs: @benefit_group_dental_costs } %>
+                  <% else %>
+                    <div class="row">
+                      <div class="col-md-3">
+                        No Dental Reference Plan Assigned
                       </div>
                     </div>
                   <% end %>
@@ -74,4 +126,7 @@
   </div>
 </div>
 
-<script>$(".employer-cost-text").append("<br /> <%= number_to_currency(@employer_contribution_amount.to_f) %>");</script>
+<script>
+  $(".health-kind.employer-cost-text").append("<br /> <%= number_to_currency(@employer_health_contribution_amount.to_f) %>");
+  $(".dental-kind.employer-cost-text").append("<br /> <%= number_to_currency(@employer_dental_contribution_amount.to_f) %>");
+</script>

@@ -8,6 +8,7 @@ module BenefitMarkets
       field :issuer_provided_title, type: String
       field :issuer_provided_code, type: String
       field :issuer_profile_id, type: BSON::ObjectId
+      field :issuer_hios_id, type: String
 
       # The list of county-zip pairs covered by this service area
       field :county_zip_ids, type: Array

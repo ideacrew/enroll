@@ -82,6 +82,10 @@ module BenefitMarkets
         metal_level_kind.to_s
       end
 
+      def product_type
+        health_plan_kind.to_s
+      end
+
       private
 
       def validate_product_package_kinds

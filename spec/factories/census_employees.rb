@@ -16,7 +16,7 @@ FactoryGirl.define do
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
-      instance.employer_profile = instance.benefit_sponsorship.profile
+      instance.employer_profile = instance.benefit_sponsorship.profile if instance.benefit_sponsorship
     end
 
     transient do

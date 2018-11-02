@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-	RSpec.describe SponsoredBenefits::TieredRosterEligibilityOptimizer, :dbclean => :after_each do
+	RSpec.describe BenefitSponsors::SponsoredBenefits::TieredRosterEligibilityOptimizer, :dbclean => :after_each do
 		subject { ::BenefitSponsors::SponsoredBenefits::TieredRosterEligibilityOptimizer.new }
 
 		let(:employee_dob) { Date.new(1990, 6, 1) }
@@ -41,7 +41,9 @@ module BenefitSponsors
         previous_product: nil,
         product: product
       )
-    end
+		end
+		let(:sponsored_benefit) { double("::BenefitMarkets::SponsoredBenefits::SponsoredBenefit", pricing_model: pricing_model)}
+		let(:pricing_model) { double("BenefitMarkets::PricingModels::PricingModel")}
 
 		describe "given:
 			- a sponsor which offers composite rating and contributions
@@ -130,6 +132,10 @@ module BenefitSponsors
         let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment, nibling_member_enrollment] }
 
 				before(:each) do
+					allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+					allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+					allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+					allow(pricing_model).to receive(:map_relationship_for).with("nephew", nibling_age, false).and_return(nil)
 					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
 					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
 					allow(contribution_model).to receive(:map_relationship_for).with("nephew", nibling_age, false).and_return(nil)
@@ -242,6 +248,9 @@ module BenefitSponsors
         let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment] }
 
 				before(:each) do
+					allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+					allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+					allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
 					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
 					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(family_contribution_unit).to receive(:match?).with({"employee" => 1, "spouse" => 1}).and_return(true)
@@ -403,6 +412,10 @@ module BenefitSponsors
 				let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment, child_member_enrollment] }
 
 				before(:each) do
+					allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+					allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+					allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+					allow(pricing_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
 					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
 					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
 					allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
@@ -518,6 +531,11 @@ module BenefitSponsors
         let(:member_enrollments) { [employee_enrollment, spouse_member_enrollment, child1_member_enrollment, child2_member_enrollment] }
 
 				before(:each) do
+					allow(sponsor_contribution).to receive(:sponsored_benefit).and_return(sponsored_benefit)
+					allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
+					allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
+					allow(pricing_model).to receive(:map_relationship_for).with("child", child1_age, false).and_return("dependent")
+					allow(pricing_model).to receive(:map_relationship_for).with("child", child2_age, false).and_return("dependent")
 					allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
 					allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
 					allow(contribution_model).to receive(:map_relationship_for).with("child", child1_age, false).and_return("dependent")

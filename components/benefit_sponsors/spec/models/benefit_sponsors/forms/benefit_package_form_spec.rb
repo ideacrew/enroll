@@ -55,7 +55,8 @@ module BenefitSponsors
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-          "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+          "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
+          "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
       }
     end
@@ -93,7 +94,8 @@ module BenefitSponsors
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => nil},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
-          "2" => {:is_offered => "true", :display_name => "Dependent", :contribution_factor => "0.75"}
+          "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
+          "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
       }
     end
