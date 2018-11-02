@@ -1,7 +1,7 @@
 require "rails_helper"
-require "#{Rails.root}/script/ivl_sep_query.rb"
 
-describe "ivl sep query" do
+describe Queries::IvlEnrollmentsQuery, "IVL enrollments query", dbclean: :after_each do
+
   describe "given consumers under open enrollment" do
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
@@ -10,7 +10,7 @@ describe "ivl sep query" do
     let(:start_time) { Time.now - 17.minutes }
     let(:end_time) { Time.now }
 
-    subject{ IvlEnrollmentsQuery.new(start_time, end_time) }
+    subject{ Queries::IvlEnrollmentsQuery.new(start_time, end_time) }
 
     describe "and made the following plan selections:
        - consumer A has purchased:
