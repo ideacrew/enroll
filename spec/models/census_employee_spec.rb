@@ -60,13 +60,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no ssn" do
-      let(:params) {valid_params.except(:ssn)}
-
-      it "should fail validation" do
-        expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
-      end
-    end
+    # No longer valid with NO SSN feature
+    # context "with no ssn" do
+    #   let(:params) {valid_params.except(:ssn)}
+    #
+    #   it "should fail validation" do
+    #     expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+    #   end
+    # end
 
     context "with no dob" do
       let(:params) {valid_params.except(:dob)}
@@ -232,6 +233,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 expect(initial_census_employee.may_link_employee_role?).to be_truthy
               end
 
+              context "and a roster match by dob lname and fname is performed" do
+                context "using non-matching dob lname and fname" do
+                  let(:invalid_person)   { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 5.days, first_name: "john", last_name: "doe") }
+                  let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, person: invalid_person) }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(invalid_person.dob, invalid_person.first_name, invalid_person.last_name)).to eq []
+                  end
+                end
+
+                context "using matching dob lname and fname" do
+                  let(:valid_person) { FactoryGirl.create(:person, first_name: 'Lynyrd', last_name: 'Skynyrd') }
+                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, dob: initial_census_employee.dob, person: valid_person) }
+
+                  it "should return the roster instance" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(valid_employee_role.person.dob, valid_employee_role.person.first_name, valid_employee_role.person.last_name).collect(&:id)).to eq [initial_census_employee.id]
+                  end
+                end
+              end
+
               context "and a roster match by SSN and DOB is performed" do
                 context "using non-matching ssn and dob" do
                   let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
@@ -260,8 +281,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { 
-                        initial_census_employee.employee_role = valid_employee_role 
+                      before {
+                        initial_census_employee.employee_role = valid_employee_role
                       }
 
                       it "should link the roster instance and employer role" do
@@ -887,7 +908,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "generate_and_deliver_checkbook_url" do 
+  context "generate_and_deliver_checkbook_url" do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
@@ -907,23 +928,23 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title",:event_name => "OutOfPocketNotice"}))
       allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
     end
-    context "#generate_and_deliver_checkbook_url" do 
+    context "#generate_and_deliver_checkbook_url" do
       it "should create a builder and deliver without expection" do
         expect{census_employee.generate_and_deliver_checkbook_url}.not_to raise_error
       end
-     
-      it 'should trigger deliver' do 
+
+      it 'should trigger deliver' do
         expect(builder).to receive(:deliver)
         census_employee.generate_and_deliver_checkbook_url
       end
     end
 
-    context "#generate_and_save_to_temp_folder " do 
+    context "#generate_and_save_to_temp_folder " do
       it "should builder and save without expection" do
         expect{census_employee.generate_and_save_to_temp_folder}.not_to raise_error
       end
 
-       it 'should not trigger deliver' do 
+       it 'should not trigger deliver' do
         expect(builder).not_to receive(:deliver)
         census_employee.generate_and_save_to_temp_folder
       end
@@ -1485,10 +1506,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_cobra_coverage_eligible?" do 
+  context "is_cobra_coverage_eligible?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:hbx_enrollment) { HbxEnrollment.new aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record , coverage_kind: 'health'}
-  
+
     it "should return true when employement is terminated and " do
       allow(Family).to receive(:where).and_return([hbx_enrollment])
       allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
@@ -1502,16 +1523,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "cobra_eligibility_expired?" do 
+  context "cobra_eligibility_expired?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-  
+
     it "should return true when coverage is terminated more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months)
       expect(census_employee.cobra_eligibility_expired?).to be_truthy
     end
 
     it "should return false when coverage is terminated not more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
 

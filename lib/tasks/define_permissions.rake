@@ -77,6 +77,11 @@ namespace :permissions do
 end
 
 namespace :permissions do
+  desc 'hbx_admin_can_access_pay_now'
+  DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
+end
+
+namespace :permissions do
   desc 'hbx admin can transition family members'
   DefinePermissions.define_task :hbx_admin_can_transition_family_members => :environment
 end

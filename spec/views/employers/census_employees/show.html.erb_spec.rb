@@ -298,7 +298,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
     context "Hiding Address in CensusEmployee page if linked and populated" do
-      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile_id: employer_profile.id) }
       before :each do
         census_employee.aasm_state="employee_role_linked"
         census_employee.save!
