@@ -701,7 +701,7 @@ module BenefitSponsors
       state :expired,    :after_enter => :transition_benefit_package_members  # Non-published plans are expired following their end on date
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
 
-      state :termination_pending
+      state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
       after_all_transitions :publish_state_transition

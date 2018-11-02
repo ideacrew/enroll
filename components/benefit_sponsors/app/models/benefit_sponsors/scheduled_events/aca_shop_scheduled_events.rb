@@ -27,6 +27,7 @@ module BenefitSponsors
         process_events_for { benefit_begin }
         process_events_for { benefit_end }
         process_events_for { benefit_termination }
+        process_events_for { benefit_termination_pending }
         process_events_for { benefit_renewal }
       end
 
@@ -67,6 +68,14 @@ module BenefitSponsors
 
         benefit_sponsorships.each do |benefit_sponsorship|
           execute_sponsor_event(benefit_sponsorship, :terminate_sponsor_benefit)
+        end
+      end
+
+      def benefit_termination_pending
+        benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_terminate_pending_benefit_coverage?(new_date)
+
+        benefit_sponsorships.each do |benefit_sponsorship|
+          execute_sponsor_event(benefit_sponsorship, :terminate_pending_sponsor_benefit)
         end
       end
 

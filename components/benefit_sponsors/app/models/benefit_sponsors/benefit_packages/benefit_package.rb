@@ -313,9 +313,32 @@ module BenefitSponsors
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
             
-            if hbx_enrollment && hbx_enrollment.may_terminate_coverage?
-              hbx_enrollment.terminate_coverage!
-              hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+            if hbx_enrollment
+              if hbx_enrollment.effective_on > benefit_application.end_on
+                hbx_enrollment.cancel_coverage!
+              elsif hbx_enrollment && hbx_enrollment.may_terminate_coverage?
+                hbx_enrollment.terminate_coverage!
+                hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+              end
+            end
+          end
+        end
+      end
+
+      def termination_pending_member_benefits
+        enrolled_families.each do |family|
+          enrollments = family.enrollments.by_benefit_package(self).enrolled_and_waived
+
+          sponsored_benefits.each do |sponsored_benefit|
+            hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+
+            if hbx_enrollment
+              if hbx_enrollment.effective_on > benefit_application.end_on
+                hbx_enrollment.cancel_coverage!
+              elsif hbx_enrollment.may_schedule_coverage_termination?
+                hbx_enrollment.schedule_coverage_termination!
+                hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+              end
             end
           end
         end

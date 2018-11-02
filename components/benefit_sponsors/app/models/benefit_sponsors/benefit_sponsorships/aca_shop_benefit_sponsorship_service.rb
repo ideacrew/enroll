@@ -66,6 +66,14 @@ module BenefitSponsors
       end
     end
 
+    def terminate_pending_sponsor_benefit
+      benefit_application = benefit_sponsorship.pending_application_may_terminate_on(new_date)
+
+      if benefit_application.present?
+        application_service_for(benefit_application).terminate
+      end
+    end
+
     def renew_sponsor_benefit
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       renewal_application_begin = (new_date + months_prior_to_effective.months)

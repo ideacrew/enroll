@@ -2,7 +2,7 @@ module BenefitSponsors
   module Services
     class BenefitApplicationActionService
 
-      attr_reader :benefit_application, :args
+      attr_reader :benefit_application, :args, :benefit_sponsorship
 
       def initialize(benefit_application, args)
         @benefit_application = benefit_application
@@ -23,14 +23,14 @@ module BenefitSponsors
           # Terminates current application
           service = initialize_service(benefit_application)
           result, ba, errors = if args[:end_on] >= TimeKeeper.date_of_record
-            service.schedule_enrollment_termination
+            service.schedule_termination(args[:end_on], TimeKeeper.date_of_record)
           else
-            service.terminate
+            service.terminate(args[:end_on], TimeKeeper.date_of_record)
           end
           map_errors_for(errors, onto: failed_results) if errors.present?
           [result, ba, failed_results]
         rescue Exception => e
-          Rails.logger.error { "Error terminating #{benefit_application.benefit_sponsorship.organization.legal_name}'s benefit application due to #{e.backtrace}" }
+          Rails.logger.error { "Error terminating #{benefit_sponsorship.organization.legal_name}'s benefit application due to #{e.backtrace}" }
         end
       end
 
@@ -40,7 +40,7 @@ module BenefitSponsors
           result, ba, errors = service.cancel
           [result, ba, errors]
         rescue Exception => e
-          Rails.logger.error { "Error canceling #{benefit_application.benefit_sponsorship.organization.legal_name}'s benefit application due to #{e.backtrace}" }
+          Rails.logger.error { "Error canceling #{benefit_sponsorship.organization.legal_name}'s benefit application due to #{e.backtrace}" }
         end
       end
 

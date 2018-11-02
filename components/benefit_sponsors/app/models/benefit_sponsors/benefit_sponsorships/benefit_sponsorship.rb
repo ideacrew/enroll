@@ -154,6 +154,12 @@ module BenefitSponsors
       )
     }
 
+    scope :may_terminate_pending_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :termination_pending }}
+      )
+    }
+
     scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
@@ -260,6 +266,10 @@ module BenefitSponsors
 
     def application_may_terminate_on(terminated_on)
       benefit_applications.benefit_terminate_on(terminated_on).first
+    end
+
+    def pending_application_may_terminate_on(end_on)
+      benefit_applications.effective_date_end_on(end_on).termination_pending.first
     end
 
     def application_may_auto_submit(effective_date)
@@ -593,6 +603,8 @@ module BenefitSponsors
         begin_coverage! if may_begin_coverage?
       when :expired
         cancel! if may_cancel?
+      when :terminated
+        terminate! if may_terminate?
       when :canceled
         if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
           cancel! if may_cancel?
