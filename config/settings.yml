@@ -134,10 +134,8 @@ paper_notice: 'paper-notices'
 consumer_checkbook_services:
 
     consumer_remote_access_key: 'cd535a89-49ea-4ea6-862f-e9558e8bef50'
-    # consumer_remote_access_key: '881db54c-44a9-11e8-98e2-fc4dd43da58e'  #This should be used in the production as remote_access_key
     consumer_reference_id: "9F03A78ADF324AFDBFBEF8E838770132"
     base_url: "https://staging.checkbookhealth.org/hie/dc/api?environment=production"
-    # base_url: "https://dc.checkbookhealth.org/hie/dc/api?environment=production" #Production Environment should be updated with this url
     current_year: 2019
     previous_year: 2018
     dental_prod_url: "https://dc.checkbookhealth.org/sadpi/dc/2019/"
