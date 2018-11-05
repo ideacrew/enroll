@@ -22,7 +22,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       @dependent_age_off = nil
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
-      puts "#{enrollment.hbx_id}---#{e.inspect}"
+      puts "#{enrollment.hbx_id}---#{e.inspect}" unless Rails.env.test?
       @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
     end
   end
@@ -37,22 +37,33 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
+    renewal_enrollment.plan_id = ( can_renew_assisted_plan?(renewal_enrollment) ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     if @assisted
-      ehb_premium = (renewal_enrollment.total_premium * renewal_enrollment.plan.ehb)
-      applied_aptc_amt = [@aptc_values[:applied_aptc].to_f, ehb_premium].min
-      renewal_enrollment.applied_aptc_amount = applied_aptc_amt
-
-      if applied_aptc_amt == @aptc_values[:applied_aptc].to_f
-        renewal_enrollment.elected_aptc_pct = (@aptc_values[:applied_percentage].to_f/100.0)
-      else
-        renewal_enrollment.elected_aptc_pct = (applied_aptc_amt / @aptc_values[:"max_aptc"].to_f)
-      end
+      renewal_enrollment = assisted_enrollment(renewal_enrollment)
     end
 
     renewal_enrollment
+  end
+
+  def can_renew_assisted_plan?(renewal_enrollment)
+    if @assisted
+      tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
+      members = tax_household.tax_household_members
+      enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
+      enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
+    else
+      return false
+    end
+  end
+
+  def assisted_enrollment(renewal_enrollment)
+    eligibility_service = Services::EligibilityService.new( renewal_enrollment)
+    eligibility_service.process
+    eligibility_service.assign(@aptc_values)
+    eligibility_service.hbx_enrollment
   end
 
   def is_dependent_dropped?
@@ -103,21 +114,21 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_renewal_plan
-    # TODO: Make sure tax households create script treats 0 as 100 
-    if is_csr?
-      if @aptc_values[:csr_amt] == '0'
-        csr_variant = '01'
-      else
-        csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
-      end
+    # TODO: Make sure tax households create script treats 0 as 100
+      if is_csr?
+        if @aptc_values[:csr_amt] == '0'
+          csr_variant = '01'
+        else
+          csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
+        end
 
-      Plan.where({
-        :active_year => renewal_coverage_start.year, 
-        :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
-      }).first.id
-    else
-      @enrollment.plan.renewal_plan_id
-    end
+        Plan.where({
+                       :active_year => renewal_coverage_start.year,
+                       :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
+                   }).first.id
+      else
+        @enrollment.plan.renewal_plan_id
+      end
   end
 
   def has_catastrophic_plan?

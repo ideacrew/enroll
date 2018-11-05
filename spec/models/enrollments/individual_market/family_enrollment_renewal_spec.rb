@@ -1,4 +1,5 @@
 require 'rails_helper'
+require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model do
 
@@ -202,8 +203,35 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     end
 
     context "Assisted enrollment" do
+      include_context "setup families enrollments"
+
+      subject {
+        enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+        enrollment_renewal.enrollment = enrollment_assisted
+        enrollment_renewal.assisted = true
+        enrollment_renewal.aptc_values = {applied_percentage: 87,
+                                          applied_aptc: 150,
+                                          csr_amt: 87,
+                                          max_aptc: 200}
+        enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+        enrollment_renewal
+      }
+
+      before do
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(renewal_calender_date.beginning_of_year)}.update_attributes!(slcsp_id: renewal_csr_87_plan.id)
+        hbx_profile.reload
+        family_assisted.active_household.reload
+        allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+      end
+
       it "should append APTC values" do
-      end 
+        renewel_enrollment = subject.assisted_enrollment(subject.clone_enrollment)
+        expect( renewel_enrollment.applied_aptc_amount.to_f).to eq (renewel_enrollment.total_premium * renewel_enrollment.plan.ehb).round(2)
+      end
+
+      it "should append APTC values" do
+        expect( subject.can_renew_assisted_plan?(subject.clone_enrollment)).to eq true
+      end
     end
   end
 end

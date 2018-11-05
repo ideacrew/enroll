@@ -36,7 +36,6 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
 
   def call
     file_name = "#{Rails.root}/pids/#{calender_year}_FA_Renewals.csv"
-
     @assisted_individuals = {}
 
     CSV.foreach(file_name, headers: true, header_converters: :symbol) do |row|

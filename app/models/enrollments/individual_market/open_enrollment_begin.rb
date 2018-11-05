@@ -84,6 +84,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
 
     def process_aqhp_renewals(renewal_benefit_coverage_period)
+      puts "Assisted Renewing Started..." unless Rails.env.test?
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
         :kind.in => ['individual', 'coverall'],
@@ -102,7 +103,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
         puts "Processing #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
 
-        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+        active_household = family.active_household
+        coverage_period_tax_household = active_household.latest_active_thh_with_year(renewal_benefit_coverage_period.start_on.year)
+
+        enrollments = active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
         enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
         if enrollments.size > 1
@@ -115,7 +119,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
             count += 1    
             enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
             enrollment_renewal.enrollment = enrollments.first
-            enrollment_renewal.assisted = true
+            enrollment_renewal.assisted = coverage_period_tax_household.present? ? true : false
             enrollment_renewal.aptc_values = aptc_values
             enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
 
@@ -126,11 +130,13 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         end
       end
 
-      puts count
+      puts "Total assisted renewal processed #{count}" unless Rails.env.test?
     end
 
 
     def process_uqhp_renewals(renewal_benefit_coverage_period)
+      puts "*"*60 unless Rails.env.test?
+      puts "Un-Assisted Renewing Started..." unless Rails.env.test?
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
 
       query = {
@@ -176,7 +182,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
         end
       end
-      puts count
+      puts "Total unassisted renewal processed #{count}" unless Rails.env.test?
     end
 
     def process_enrollment_renewal(enrollment, renewal_benefit_coverage_period)
@@ -242,7 +248,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           csv << (row.to_h.values + status)
         end
 
-        puts count
+        puts count unless Rails.env.test?
       end
     end
 
