@@ -19,7 +19,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       :carrier_profile_id => "a carrier profile id",
       :issuer_profile => mock_issuer_profile,
       :metal_level_kind => "Silver",
-      :plan_type => "A plan type",
+      :product_type => "A plan type",
       :nationwide => true,
       :network_information => "This is a test",
       :deductible => 0,
@@ -59,15 +59,18 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   context "with no rx_formulary_url and provider urls for coverage_kind = dental" do
     before :each do
       assign :coverage_kind, "dental"
+      allow(mock_product).to receive(:kind).and_return("dental")
+      allow(mock_product).to receive(:dental_level).and_return("high")
+      allow(mock_product).to receive(:rx_formulary_url).and_return nil
       render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
     end
 
     it "should not have coinsurance text" do
-      expect(rendered).not_to have_selector('th', text: 'COINSURANCE')
+      expect(rendered).to have_selector('th', text: 'COINSURANCE')
     end
 
     it "should not have copay text" do
-      expect(rendered).not_to have_selector('th', text: 'CO-PAY')
+      expect(rendered).to have_selector('th', text: 'CO-PAY')
     end
   end
 
