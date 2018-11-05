@@ -31,7 +31,7 @@ module Services
                 :body => construct_body.to_json,
                 :headers => { 'Content-Type' => 'application/json' } )
 
-          uri = @result.parsed_response["URL"]
+          uri = JSON.parse(@result.parsed_response)["URL"]
           if uri.present?
             return uri
           else
