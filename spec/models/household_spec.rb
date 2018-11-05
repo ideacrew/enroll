@@ -248,7 +248,6 @@ describe "multiple taxhouseholds for a family", type: :model, dbclean: :after_ea
     latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year-1)
     expect(latest_active_thh).to be tax_household7
   end
-
 end
 
 describe "financial assistance eligibiltiy for a family", type: :model, dbclean: :after_each do
@@ -273,7 +272,6 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
     2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
     expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
   end
-
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do

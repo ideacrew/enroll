@@ -38,7 +38,7 @@ notice_trigger = event_kind.notice_triggers.first
 def valid_enrollments(person)
   hbx_enrollments = []
   family = person.primary_family
-  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
+  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
   return [] if enrollments.blank?
   health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
   dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
@@ -48,24 +48,6 @@ def valid_enrollments(person)
 
   hbx_enrollments.flatten!.compact!
   hbx_enrollments
-end
-
-def set_due_date_on_verification_types(family)
-  family.family_members.each do |family_member|
-    begin
-      person = family_member.person
-      person.verification_types.each do |v_type|
-        next if !type_unverified?(v_type, person)
-        person.consumer_role.special_verifications << SpecialVerification.new(due_date: future_date,
-                                                                              verification_type: v_type,
-                                                                              updated_by: nil,
-                                                                              type: "notice")
-        person.consumer_role.save!
-      end
-    rescue Exception => e
-      puts "Exception in family ID #{primary_person.primary_family.id}: #{e}"
-    end
-  end
 end
 
 def future_date
@@ -101,7 +83,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       if consumer_role.present?
         if InitialEvents.include? event
           family = person.primary_family
-          set_due_date_on_verification_types(family)
+          family.set_due_date_on_verification_types
           family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
         end
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {

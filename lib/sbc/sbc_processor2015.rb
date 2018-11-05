@@ -26,9 +26,9 @@ class SbcProcessor2015
       hios_id = row[0].gsub(/\A\p{Space}*|\p{Space}*\z/, '')
 
       if hios_id.include? '-'
-        plans = Plan.where(active_year:'2018').and(hios_id:hios_id)
+        plans = Plan.where(active_year: row[2].strip.to_i).and(hios_id:hios_id)
       else
-        plans = Plan.where(active_year:'2018').and(hios_id:/#{hios_id}/)
+        plans = Plan.where(active_year: row[2].strip.to_i).and(hios_id:/#{hios_id}/)
       end
 
       plans.each do |plan|
@@ -44,7 +44,7 @@ class SbcProcessor2015
         plan.sbc_document.save!
         plan.save!
         counter += 1
-        puts "Plan #{plan.name} #{plan.hios_id}updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
+        puts "Plan #{plan.name} #{plan.hios_id} updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
       end
     end
     puts "Total #{counter} plans updated."

@@ -19,7 +19,7 @@
             </div>
           </div>
         </div>
-      </div
+      </div>
 
       <%#= form_tag(:insured_plan_shopping) do %>
       <%= hidden_field_tag 'id', @hbx_enrollment_id %>
@@ -50,11 +50,21 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><%= l10n("insured.families.outside_open_enrollment") %></h4>
+        <% if @market_kind == ('individual' || 'coverall') && is_under_open_enrollment? %>
+          <h4 class="modal-title"><%= l10n("insured.families.open_enrollment") %></h4>
+        <% else %>
+          <h4 class="modal-title"><%= l10n("insured.families.outside_open_enrollment") %></h4>
+        <% end %>
       </div>
-      <div class="modal-body">
-        <p><%= l10n("insured.families.final_sep_open_enrollment_body", next_ivl_open_enrollment_date: @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y"), next_ivl_open_enrollment_period: @next_ivl_open_enrollment_date.try(:strftime, "%B %e") ) %>.</p>
-      </div>
+      <% if @market_kind == ('individual' || 'coverall') && is_under_open_enrollment? %>
+        <div class="modal-body">
+          <p><%= l10n("insured.families.final_sep_open_enrollment_body") %></p>
+        </div>
+      <% else %>
+          <div class="modal-body">
+            <p><%= l10n("insured.families.final_sep_outside_open_enrollment_body", next_ivl_open_enrollment_date: @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y"), next_ivl_open_enrollment_period: @next_ivl_open_enrollment_date.try(:strftime, "%B %e") ) %>.</p>
+          </div>
+      <% end %>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
         <%= link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary' %>
