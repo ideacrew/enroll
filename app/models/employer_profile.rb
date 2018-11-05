@@ -296,7 +296,7 @@ class EmployerProfile
   end
 
   def dt_display_plan_year
-    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
+    plan_years.where(:aasm_state.nin => ['canceled','renewing_canceled']).order_by(:"start_on".desc).first || latest_plan_year
   end
 
   def plan_year_drafts
