@@ -47,6 +47,26 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
+  Scenario: Consumer work flow if he selects special enrollment period link during open enrollment
+    Given Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping #TODO re-write this step
+    Then Individual should see a form to enter personal information
+    When Individual clicks on Save and Exit
+    Then Individual resumes enrollment
+    Then Individual sees previously saved address
+    Then Individual agrees to the privacy agreeement
+    Then Individual should see identity verification page and clicks on submit
+    Then Individual should see the dependents form
+    And Individual clicks on add member button
+    And Individual again clicks on add member button
+    And I click on continue button on household info form
+    And I click Special Enrollment Period Link on Coverage Household page
+    When I click on none of the situations listed above apply checkbox during open enrollment
+    Then I should see pop up with message It is currently open enrollment
+
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
     And Individual click on sign in existing account

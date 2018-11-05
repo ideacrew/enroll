@@ -5,7 +5,7 @@ describe EmployeeRole do
     subject.valid?
   end
 
-  [:hired_on, :dob, :gender, :ssn, :employer_profile_id].each do |property|
+  [:hired_on, :dob, :gender, :employer_profile_id].each do |property|
     it "should require #{property}" do
       expect(subject).to have_errors_on(property)
     end
@@ -47,7 +47,7 @@ end
 
 describe ".coverage_effective_on" do
 
-  context 'when both active and renewal benefit groups present' do 
+  context 'when both active and renewal benefit groups present' do
 
     let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
 
@@ -91,7 +91,7 @@ describe ".coverage_effective_on" do
 
       it 'should calculate effective date based on active benefit group' do
         expect(employee_role.coverage_effective_on).to eq hired_on
-      end 
+      end
     end
   end
 end
@@ -665,7 +665,7 @@ describe "#benefit_group", dbclean: :after_each do
 
     before do
       census_employee.benefit_group_assignments.each do |bga|
-        bga.delete 
+        bga.delete
       end
       active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
       expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first

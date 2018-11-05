@@ -41,9 +41,14 @@ class PlanSelection
     end
     hbx_enrollment.aasm_state = 'auto_renewing' if hbx_enrollment.is_active_renewal_purchase?
     if enrollment_members_verification_status(market_kind)
-      hbx_enrollment.move_to_contingent!
-    else
-      hbx_enrollment.select_coverage!(qle: qle)
+      hbx_enrollment.update_attributes!(is_any_enrollment_member_outstanding: true)
+    end
+    hbx_enrollment.select_coverage!(qle: qle)
+    if market_kind == 'shop'
+      plan_year = hbx_enrollment.benefit_group.plan_year
+      if plan_year.termination_pending?
+        plan_year.terminate_employee_enrollments(plan_year.end_on, transmit_xml:true)
+      end
     end
   end
   

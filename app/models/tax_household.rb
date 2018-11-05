@@ -236,6 +236,11 @@ class TaxHousehold
     household.family
   end
 
+  #usage: filtering through group_by criteria
+  def group_by_year
+    effective_starting_on.year
+  end
+
   def is_eligibility_determined?
     if self.elegibility_determinizations.size > 0
       true
