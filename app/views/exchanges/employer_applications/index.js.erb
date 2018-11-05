@@ -77,6 +77,8 @@ function initDatePicker() {
   $('input.date').datepicker({dateFormat: "mm/dd/yy"})
 }
 
+var inputsChecked = false;
+
 function validateFormat(element, pyStartOn, pyEndOn) {
   pyEndDate = element.value;
   
@@ -157,12 +159,22 @@ function addDatePicker() {
 
 function validTerminatePy() {
   var endDates = document.querySelectorAll('.py-end-date')
-
+  validateTermActions()
   for (date of endDates) {
-    if (date.value.length > 0) {
+    if (date.value.length > 0 && inputsChecked) {
       enableSubmitButton()
     } else {
-      console.log("Missing Info")
+      disableSubmitButton();
+    }
+  }
+}
+
+function validateTermActions() {
+  inputsChecked = false;
+  inputs = document.querySelector('.py-end-date').closest('tr').querySelector('.term_action_radios').getElementsByTagName('input');
+  for (input of inputs) {
+    if (input.checked) {
+      inputsChecked = true;
     }
   }
 }
