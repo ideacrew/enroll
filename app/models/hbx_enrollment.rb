@@ -1415,7 +1415,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                         :enrolled_contingent, :unverified],
+                         :enrolled_contingent, :unverified, :coverage_expired],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1707,6 +1707,21 @@ class HbxEnrollment
       roster_members,
       group_id: self.id,
       group_enrollment: group_enrollment
+    )
+  end
+
+  def notify_enrollment_cancel_or_termination_event(transmit_flag)
+    return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
+
+    config = Rails.application.config.acapi
+    notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+            "hbx_enrollment_id" => self.hbx_id,
+            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+            "is_trading_partner_publishable" => transmit_flag
+        }
     )
   end
 

@@ -8,6 +8,10 @@ module BenefitSponsors
       def notifications_send(model_instance, new_model_event)
         if new_model_event.present? && new_model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
 
+          if BenefitSponsors::ModelEvents::BenefitApplication::EMPLOYER_EVENTS.include?(new_model_event.event_key)
+            notify_employer_event(new_model_event)  # notifies employer events
+          end
+
           if BenefitSponsors::ModelEvents::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
             benefit_application = new_model_event.klass_instance
 
@@ -153,6 +157,21 @@ module BenefitSponsors
               end
             end
           end
+        end
+      end
+
+      def notify_employer_event(new_model_event)
+        benefit_application = new_model_event.klass_instance
+        if new_model_event.event_key == :benefit_coverage_renewal_carrier_dropped
+          notify(BenefitApplications::BenefitApplication::INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: benefit_application.sponsor_profile.hbx_id, benefit_application_id: benefit_application.id.to_s, is_trading_partner_publishable: benefit_application.is_trading_partner_publishable?, event_name: BenefitApplications::BenefitApplication::INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+        end
+
+        if new_model_event.event_key == :benefit_coverage_period_terminated_nonpayment
+          notify(BenefitApplications::BenefitApplication::NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: benefit_application.sponsor_profile.hbx_id, benefit_application_id: benefit_application.id.to_s, is_trading_partner_publishable: benefit_application.is_trading_partner_publishable?, event_name: BenefitApplications::BenefitApplication::NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+        end
+
+        if new_model_event.event_key == :benefit_coverage_period_terminated_voluntary
+          notify(BenefitApplications::BenefitApplication::VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: benefit_application.sponsor_profile.hbx_id, benefit_application_id: benefit_application.id.to_s, is_trading_partner_publishable: benefit_application.is_trading_partner_publishable?, event_name: BenefitApplications::BenefitApplication::VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
         end
       end
 

@@ -35,8 +35,18 @@ module BenefitSponsors
                                                   active:     :effectuate,
                                                   expired:    :expire,
                                                   terminated: :terminate,
+                                                  termination_pending: :termination_pending,
                                                   canceled:   :cancel
                                                 }
+
+    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
+    VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
+
+    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_nonpayment"
+    NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment"
+
+    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
+    INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
 
 
     # The date range when this application is active
@@ -77,6 +87,8 @@ module BenefitSponsors
     field :recorded_service_area_ids,   type: Array, default: []
 
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId
+
+    field :termination_kind,       type: String
 
     delegate :benefit_market, to: :benefit_sponsorship
 
@@ -704,7 +716,7 @@ module BenefitSponsors
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
-      after_all_transitions :publish_state_transition
+      after_all_transitions [:publish_state_transition, :notify_application]
 
       event :import_application do
         transitions from: :draft, to: :imported
@@ -806,7 +818,7 @@ module BenefitSponsors
 
       # Coverage terminated due to non-payment
       event :terminate_enrollment do
-        transitions from: [:active, :suspended], to: :terminated
+        transitions from: [:active, :suspended, :expired], to: :terminated
       end
 
       event :schedule_enrollment_termination do
@@ -852,6 +864,14 @@ module BenefitSponsors
       end
     end
 
+    def notify_application(publish = false)
+     @publish = publish
+    end
+
+    def is_trading_partner_publishable?
+      return @publish if defined? @publish
+      return false
+    end
 
     ### TODO FIX Move these methods to domain logic
             def employee_participation_ratio_minimum

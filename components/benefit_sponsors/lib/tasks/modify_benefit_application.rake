@@ -2,8 +2,8 @@ require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_mig
 
 # This rake task is to modify benefit applications - canceling, terminating, re-instating and updating aasm state.
 # pass termination_notice="true" in order to send termination notice to both employer and employees
-# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=531828 termination_date="12/01/2016" end_on="12/01/2016" action="terminate" termination_notice="true"
-# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="cancel"
+# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=531828 termination_date="12/01/2016" end_on="12/01/2016" action="terminate" termination_notice="true" notify_trading_partner="true", termination_kind='voluntary/non-payment'
+# RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="cancel" notify_trading_partner="true"
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="reinstate"
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="begin_open_enrollment" effective_date="09/01/2018"
 # RAILS_ENV=production bundle exec rake migrations:modify_benefit_application fein=640826 action="force_submit_application" effective_date="09/01/2018"

@@ -312,13 +312,17 @@ module BenefitSponsors
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            
+
             if hbx_enrollment
               if hbx_enrollment.effective_on > benefit_application.end_on
-                hbx_enrollment.cancel_coverage!
+                if hbx_enrollment.may_cancel_coverage?
+                  hbx_enrollment.cancel_coverage!
+                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                end
               elsif hbx_enrollment && hbx_enrollment.may_terminate_coverage?
                 hbx_enrollment.terminate_coverage!
                 hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
               end
             end
           end
@@ -334,10 +338,14 @@ module BenefitSponsors
 
             if hbx_enrollment
               if hbx_enrollment.effective_on > benefit_application.end_on
-                hbx_enrollment.cancel_coverage!
+                if hbx_enrollment.may_cancel_coverage?
+                  hbx_enrollment.cancel_coverage!
+                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                end
               elsif hbx_enrollment.may_schedule_coverage_termination?
                 hbx_enrollment.schedule_coverage_termination!
                 hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
+                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
               end
             end
           end
@@ -352,7 +360,14 @@ module BenefitSponsors
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.cancel_coverage! if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+             if hbx_enrollment && hbx_enrollment.may_cancel_coverage?
+               if hbx_enrollment.inactive?
+                 hbx_enrollment.cancel_coverage!
+               else
+                 hbx_enrollment.cancel_coverage!
+                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+               end
+             end
           end
         end
 
