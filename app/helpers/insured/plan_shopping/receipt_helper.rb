@@ -13,7 +13,7 @@ module Insured::PlanShopping::ReceiptHelper
   end
 
   def pay_now_button_timed_out?
-    @enrollment.submitted_at + 15.minutes > TimeKeeper.datetime_of_record
+    @enrollment.submitted_at + 15.minutes > Time.now
   end
 
   def has_any_previous_kaiser_enrollments?

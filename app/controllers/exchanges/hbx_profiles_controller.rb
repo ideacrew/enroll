@@ -67,18 +67,18 @@ class Exchanges::HbxProfilesController < ApplicationController
       # logic for both Bulk Action drop down and action column drop down under data table
       if params[:can_update].present?
         if params[:can_update] == "disable"
-          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: Time.now)
           flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
         else
-          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: Time.now)
           flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
         end
       else
         if org.employer_profile.no_ssn.to_s == "false"
-          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: Time.now)
           flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
         else
-          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: Time.now)
           flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
         end
       end
