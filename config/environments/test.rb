@@ -51,6 +51,8 @@ Rails.application.configure do
 
   #Environment URL stub
   config.checkbook_services_base_url = Settings.checkbook_services.base_url
+  config.checkbook_services_ivl_path = "/hie/dc/api?environment=production"
+  config.checkbook_services_shop_path = "/shop/dc/api/"
 
   #Queue adapter
   config.active_job.queue_adapter = :test
