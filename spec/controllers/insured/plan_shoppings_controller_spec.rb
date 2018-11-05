@@ -85,7 +85,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
-  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", coverage_year: TimeKeeper.date_of_record.year, effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
@@ -368,7 +368,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(enrollment.termination_submitted_on).to eq nil
       post :terminate, id: "hbx_id"
-      expect(enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
+      expect(enrollment.termination_submitted_on.to_time).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
     end
   end
@@ -442,7 +442,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:plans) {[plan1, plan2, plan3]}
     let(:coverage_kind){"health"}
     let (:individual_market_transition) { double ("IndividualMarketTransition") }
-
+    #let(:person) { FactoryGirl.create(:person, :with_family)}
+    let(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
+    #let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
 
     before :each do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
@@ -450,6 +452,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:kind).and_return("employer_sponsored")
+      allow(hbx_enrollment).to receive(:consumer_role).and_return(consumer_person.consumer_role)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
       allow(user).to receive(:person).and_return(person)
@@ -467,6 +471,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:family).and_return(family)
       allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return(nil)
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
 
       sign_in user
     end
@@ -475,7 +480,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       before :each do
         allow(plan3).to receive(:total_employee_cost).and_return(3333)
         allow(plan3).to receive(:deductible).and_return("$998")
-        get :show, id: "hbx_id"
+        get :show, id: "hbx_id", market_kind: "shop"
       end
 
       it "should be success" do
@@ -496,6 +501,10 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "should get plans which order by premium" do
         expect(assigns(:plans)).to eq [plan1, plan2, plan3]
+      end
+
+      it "should get the checkbook_url" do
+        expect(assigns(:dc_checkbook_url)).to eq "http://checkbook_url"
       end
     end
 
