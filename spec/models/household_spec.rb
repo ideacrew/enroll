@@ -309,3 +309,77 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
     end
   end
 end
+
+describe "build_or_update_tax_household_from_primary" do
+
+  before do
+    DatabaseCleaner.clean
+  end
+
+  let!(:hbx_profile) {FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)}
+  let!(:slcsp) {HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id}
+
+  let(:message) {{"body" => xml}}
+  let(:xml) {File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample2.xml"))}
+  let(:user) {FactoryGirl.create(:user)}
+
+  let(:parser) {Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(xml).first}
+  let(:primary) {parser.family_members.detect {|fm| fm.id == parser.primary_family_member_id}}
+  let(:dependent) {parser.family_members.last}
+  let!(:existing_dep) {Person.create(
+      first_name: dependent.person.name_first,
+      last_name: dependent.person.name_last,
+      middle_name: dependent.person.name_middle,
+      name_pfx: dependent.person.name_pfx,
+      name_sfx: dependent.person.name_sfx,
+      dob: dependent.person_demographics.birth_date,
+      ssn: dependent.person_demographics.ssn == "999999999" ? "" : dependent.person_demographics.ssn,
+      gender: dependent.person_demographics.sex.split('#').last
+  )}
+  let(:person) {consumer_role.person}
+  let(:ua_params) do
+    {
+        addresses: [],
+        phones: [],
+        emails: [],
+        person: {
+            "first_name" => primary.person.name_first,
+            "last_name" => primary.person.name_last,
+            "middle_name" => primary.person.name_middle,
+            "name_pfx" => primary.person.name_pfx,
+            "name_sfx" => primary.person.name_sfx,
+            "dob" => primary.person_demographics.birth_date,
+            "ssn" => primary.person_demographics.ssn,
+            "no_ssn" => "",
+            "gender" => primary.person_demographics.sex.split('#').last
+        }
+    }
+  end
+
+  let!(:consumer_role) {Factories::EnrollmentFactory.construct_consumer_role(ua_params, user)}
+  let!(:family_update) {consumer_role.person.primary_family.update_attributes(e_case_id: parser.integrated_case_id)}
+
+  let!(:family_db) {consumer_role.person.primary_family}
+  let!(:tax_household_db) {family_db.active_household.tax_households.first}
+
+  let!(:tax_household2) {FactoryGirl.create(:tax_household, household: family_db.active_household, effective_starting_on: Date.new(2014, 9, 30), effective_ending_on: nil)}
+  let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2, max_aptc: {"cents" => 283.00, "currency_iso" => "USD"})}
+
+  let!(:tax_household3) {FactoryGirl.create(:tax_household, household: family_db.active_household, effective_starting_on: Date.new(2014, 1, 30), effective_ending_on: nil)}
+  let!(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3, max_aptc: {"cents" => 283.00, "currency_iso" => "USD"})}
+
+  let!(:person_db) {family_db.primary_applicant.person}
+  let!(:consumer_role_db) {person_db.consumer_role}
+
+  it "should have only one active tax household for year 2015" do
+    active_household = family_db.active_household
+    active_household.build_or_update_tax_household_from_primary(parser.family_members.first, person_db, parser.households.first)
+    expect(active_household.tax_households.tax_household_with_year(2015).active_tax_household.count).to be 1
+  end
+
+  it "should not end 2014 active tax household when loading tax_household for 2015" do
+    active_household = family_db.active_household
+    active_household.build_or_update_tax_household_from_primary(parser.family_members.first, person_db, parser.households.first)
+    expect(active_household.tax_households.tax_household_with_year(2014).active_tax_household.count).to be 2
+  end
+end
