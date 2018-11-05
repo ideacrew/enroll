@@ -168,7 +168,8 @@ private
   end
 
   def set_submitted_at
-    self.submitted_at ||= TimeKeeper.datetime_of_record
+    # Not used as a timestamp, used to determine date of submission
+    self.submitted_at ||= TimeKeeper.date_of_record
   end
 
   def set_date_period

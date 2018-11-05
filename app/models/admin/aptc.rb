@@ -84,7 +84,7 @@ class Admin::Aptc < ApplicationController
       applied_aptc = 0.0
       if applied_aptc_array.present?
         #if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
-        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date # Following the 15 day rule for calculations
+        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.date_of_record).to_date # Following the 15 day rule for calculations
           applied_aptc_array.each do |one_hbx|
             applied_aptc = one_hbx[1]["aptc_applied"].to_f if current_hbx.id.to_s == one_hbx[1]["hbx_id"].gsub("aptc_applied_","")
           end
@@ -143,11 +143,11 @@ class Admin::Aptc < ApplicationController
       if max_aptc.present?
         effective_starting_on = ed.tax_household.effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
-          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
+          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.date_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
           max_aptc_value = first_of_month_num_current_year >= effective_starting_on ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
         else
-          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.datetime_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
-          max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).to_date ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
+          max_aptc_value = first_of_month_num_current_year >= TimeKeeper.date_of_record ? max_aptc : ed.max_aptc.to_f  if hbxs.blank?
+          max_aptc_value = first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.date_of_record).to_date ? max_aptc : ed.max_aptc.to_f  if hbxs.present? # Incase there are active enrollments, follow 15th of the month rule.
         end
       else
         max_aptc_value = ed.max_aptc.to_f
@@ -182,7 +182,7 @@ class Admin::Aptc < ApplicationController
       #csr_percentage_value = csr_percentage.present? ? csr_percentage : ed.csr_percent_as_integer
       if csr_percentage.present?
         # this is when we check available aptc. We only want to update the current and future fields with the updated value.
-        if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
+        if first_of_month_num_current_year >= TimeKeeper.date_of_record
           csr_percentage_value = csr_percentage
         else
           # leave past values as-is
@@ -213,7 +213,7 @@ class Admin::Aptc < ApplicationController
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
       #date = Date.new(year, 1, 1)
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       if member_ids.present?
         aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
@@ -221,7 +221,7 @@ class Admin::Aptc < ApplicationController
         aptc_members = family.active_household.latest_active_tax_household.aptc_members
       end
       cost = aptc_members.map do |member|
-        slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
+        slcsp.premium_for(TimeKeeper.date_of_record, member.age_on_effective_date)
       end.inject(:+) || 0
       return '%.2f' % cost
     end
@@ -279,7 +279,7 @@ class Admin::Aptc < ApplicationController
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on
         else
-          eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
+          eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.date_of_record) : TimeKeeper.date_of_record # Follow 15th of month rule if active enrollment.
         end
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_at" timestamp and the corresponsing csr/aptc update.
         tax_household = family.active_household.latest_active_tax_household_with_year(year)
@@ -300,7 +300,7 @@ class Admin::Aptc < ApplicationController
 
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
     def update_aptc_applied_for_enrollments(family, params, year)
-      current_datetime = TimeKeeper.datetime_of_record
+      current_datetime = TimeKeeper.date_of_record
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       #family = Family.find(params[:person][:family_id])
@@ -387,17 +387,14 @@ class Admin::Aptc < ApplicationController
         month = month - 12
       end
       day = 1
-      hour = hbx_created_datetime.hour
-      min = hbx_created_datetime.min
-      sec = hbx_created_datetime.sec
-      return DateTime.new(year, month, day, hour, min, sec)
+      return Date.new(year, month, day)
       #return DateTime.new(year, month, day)
     end
 
     def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year, hbxs)
       sum_of_all_applied = 0.0
       aptc_errors = Hash.new
-      if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
+      if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.date_of_record).year != year
         aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = Settings.aptc_errors.effective_date_overflow
       end
 
