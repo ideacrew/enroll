@@ -8,16 +8,18 @@ module Services
 
       BASE_URL = Rails.application.config.checkbook_services_base_url
       CONGRESS_URL = Settings.checkbook_services.congress_url
+      IVL_PATH = Rails.application.config.checkbook_services_ivl_path
+      SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
       def initialize(hbx_enrollment, is_congress=false)
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"
           @person = @hbx_enrollment.consumer_role.person
-          @url = Settings.consumer_checkbook_services.base_url
+          @url = BASE_URL+IVL_PATH
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+"/shop/dc/api/"
+          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+SHOP_PATH
         end
       end
 
