@@ -33,7 +33,7 @@ end
           puts "Enrollment #{enr.hbx_id} is pointing towards the right Employee"  unless Rails.env.test?
         else
           enr.update_attributes!(employee_role_id: active_employee_role_id)
-           puts "Fixed Enrollment #{enr.hbx_id} by pointing the Enrollment towards the right Employee of hbx id #{person_hbx_id}"  unless Rails.env.test?
+           puts "Fixed Enrollment #{enr.hbx_id} by pointing the Enrollment towards the right Employee of hbx id #{person.hbx_id}"  unless Rails.env.test?
         end
       end
       else
@@ -49,7 +49,7 @@ end
           puts "Census Employee is pointing towards the right Employee Role id"  unless Rails.env.test?
         else
           census_employee.update_attributes!(employee_role_id: active_employee_role_id)
-           puts "Fixed Census Employee by pointing the Enrollment towards the right Employee Role id for hbx id #{person_hbx_id}"  unless Rails.env.test?
+           puts "Fixed Census Employee by pointing the Enrollment towards the right Employee Role id for hbx id #{person.hbx_id}"  unless Rails.env.test?
         end
       else
        puts "Please check the hbx id the id given is not present or has no active employee roles"  unless Rails.env.test?
