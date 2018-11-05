@@ -86,11 +86,12 @@ class Household
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
 
-      active_tax_household = tax_households.tax_household_with_year(verified_tax_household.start_date.year).active_tax_household if tax_households.present?
+      active_tax_households = tax_households.tax_household_with_year(verified_tax_household.start_date.year).active_tax_household if tax_households.present?
 
-      if active_tax_household.present?
-        active_tax_household.update_all(effective_ending_on: verified_tax_household.start_date)
+      if active_tax_households.present?
+        active_tax_households.update_all(effective_ending_on: verified_tax_household.start_date)
       end
+
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
