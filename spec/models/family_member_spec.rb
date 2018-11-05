@@ -208,7 +208,7 @@ describe FamilyMember, "aptc_benchmark_amount" do
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
 
   before do
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.date_according_to_exchange_at(Time.now))}.update_attributes!(slcsp_id: plan.id)
   end
   
   it "should return valid benchmark value" do

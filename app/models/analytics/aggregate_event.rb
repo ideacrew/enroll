@@ -39,7 +39,7 @@ module Analytics
                                             ).sort(date: 1).to_a
     end
 
-    def self.increment_time(topic: nil, moment: TimeKeeper.datetime_of_record, site: "dchbx")
+    def self.increment_time(topic: nil, moment: Time.now, site: "dchbx")
       month     = moment.month
       week      = moment.to_date.cweek
       year      = moment.to_date.year

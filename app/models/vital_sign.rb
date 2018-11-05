@@ -6,7 +6,7 @@ class VitalSign
   # DateTime that DCHL Enroll App went live
   ZERO_HOUR = DateTime.new(2015,10,27,23,43,0,'-4')
 
-  def initialize(start_at: ZERO_HOUR, end_at: TimeKeeper.datetime_of_record)
+  def initialize(start_at: ZERO_HOUR, end_at: Time.now)
     @start_at = start_at
     @end_at = end_at
   end

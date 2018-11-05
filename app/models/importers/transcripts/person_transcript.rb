@@ -388,8 +388,8 @@ module Importers::Transcripts
       begin
         if match_person.blank?
           person = Person.new(@transcript[:other])
-          person.created_at = TimeKeeper.datetime_of_record
-          person.updated_at = TimeKeeper.datetime_of_record
+          person.created_at = TimeKeeper.now
+          person.updated_at = TimeKeeper.now
           person.save!
 
           @updates[:new][:new]['ssn'] = ["Success", "Created new person record"]

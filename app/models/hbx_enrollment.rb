@@ -1556,7 +1556,7 @@ class HbxEnrollment
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
-    self.update_attribute(:created_at, TimeKeeper.datetime_of_record) unless self.created_at.present?
+    self.update_attribute(:created_at, Time.now) unless self.created_at.present?
   end
 
   def previous_enrollments(year)
