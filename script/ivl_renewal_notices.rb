@@ -106,16 +106,16 @@ end
 
 #need to exlude this list from UQHP_FEL data set.
 
-# @excluded_list = []
-# CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
-#   @excluded_list << d["Subscriber"]
-# end
+@excluded_list = []
+CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
+  @excluded_list << d["subscriber_id"]
+end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
+      next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
