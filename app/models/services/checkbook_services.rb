@@ -31,7 +31,7 @@ module Services
                 :body => construct_body.to_json,
                 :headers => { 'Content-Type' => 'application/json' } )
 
-          uri = JSON.parse(@result.parsed_response)["URL"]
+          uri = @result.parsed_response["URL"]
           if uri.present?
             return uri
           else
@@ -169,7 +169,7 @@ module Services
         family = []
         # family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
         # @census_employee.census_dependents.each do |dependent|
-          @hbx_enrollment.hbx_enrollment_members.each do |dependent|
+        @hbx_enrollment.hbx_enrollment_members.each do |dependent|
           next if dependent.primary_relationship == "nephew_or_niece"
           family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
         end
