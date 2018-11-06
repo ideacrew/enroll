@@ -11,7 +11,8 @@ module BenefitSponsors
       metal_level,
       service_area_id,
       rating_area_id,
-      pp_kinds
+      pp_kinds,
+      renewal_product_id = nil
     )
       product_id = BSON::ObjectId.new
       product_ptable_id = BSON::ObjectId.new
@@ -53,7 +54,8 @@ module BenefitSponsors
               cost: 208.51
             }]
           }
-        ]
+        ],
+        renewal_product_id: renewal_product_id
       }
     end
 
@@ -65,7 +67,8 @@ module BenefitSponsors
       metal_level,
       service_area_id,
       rating_area_id,
-      pp_kinds
+      pp_kinds,
+      renewal_product_id = nil
     )
       product_id = BSON::ObjectId.new
       product_ptable_id = BSON::ObjectId.new
@@ -107,14 +110,16 @@ module BenefitSponsors
               cost: 208.51
             }]
           }
-        ]
+        ],
+        renewal_product_id: renewal_product_id
       }
     end
 
     def self.create_cca_dental_only_carrier_plan_samples(
       issuer_profile_id,
       effective_period,
-      rating_area_id
+      rating_area_id,
+      renewal_product_props = []
     )
 
       county_zip_id = BSON::ObjectId.new
@@ -147,6 +152,8 @@ module BenefitSponsors
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
+      renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
+      renewal_id_2 = renewal_product_props.blank? ? nil : renewal_product_props[1]["_id"]
       product_1_props = dental_shop_product_props_for(
         issuer_profile_id,
         "Carrier 3 Dental Only - Dental - State",
@@ -155,7 +162,8 @@ module BenefitSponsors
         "bronze",
         state_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_1
       )
       product_2_props = dental_shop_product_props_for(
         issuer_profile_id,
@@ -165,7 +173,8 @@ module BenefitSponsors
         "gold",
         local_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_2
       )
       product_props = [
         product_1_props,
@@ -178,7 +187,8 @@ module BenefitSponsors
     def self.create_cca_health_and_dental_carrier_plan_samples(
       issuer_profile_id,
       effective_period,
-      rating_area_id
+      rating_area_id,
+      renewal_product_props = []
     )
 
       county_zip_id = BSON::ObjectId.new
@@ -211,6 +221,11 @@ module BenefitSponsors
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
+      renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
+      renewal_id_2 = renewal_product_props.blank? ? nil : renewal_product_props[1]["_id"]
+      renewal_id_3 = renewal_product_props.blank? ? nil : renewal_product_props[2]["_id"]
+      renewal_id_4 = renewal_product_props.blank? ? nil : renewal_product_props[3]["_id"]
+      renewal_id_5 = renewal_product_props.blank? ? nil : renewal_product_props[4]["_id"]
 
       product_1_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -220,7 +235,8 @@ module BenefitSponsors
         "bronze",
         state_service_area_id,
         rating_area_id,
-        ["metal_level","single_issuer"]
+        ["metal_level","single_issuer"],
+        renewal_id_1
       )
       product_2_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -230,7 +246,8 @@ module BenefitSponsors
         "gold",
         local_service_area_id,
         rating_area_id,
-        ["metal_level","single_issuer"]
+        ["metal_level","single_issuer"],
+        renewal_id_2
       )
       product_3_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -240,7 +257,8 @@ module BenefitSponsors
         "silver",
         state_service_area_id,
         rating_area_id,
-        ["metal_level","single_product"]
+        ["metal_level","single_product"],
+        renewal_id_3
       )
       product_4_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -250,7 +268,8 @@ module BenefitSponsors
         "bronze",
         state_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_4
       )
       product_5_props = dental_shop_product_props_for(
         issuer_profile_id,
@@ -260,7 +279,8 @@ module BenefitSponsors
         "bronze",
         state_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_5
       )
       product_props = [
         product_1_props,
@@ -276,7 +296,8 @@ module BenefitSponsors
     def self.create_cca_health_only_carrier_plan_samples(
       issuer_profile_id,
       effective_period,
-      rating_area_id
+      rating_area_id,
+      renewal_product_props = []
     )
 
       county_zip_id = BSON::ObjectId.new
@@ -309,6 +330,12 @@ module BenefitSponsors
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
+      renewal_id_1 = renewal_product_props.blank? ? nil : renewal_product_props[0]["_id"]
+      renewal_id_2 = renewal_product_props.blank? ? nil : renewal_product_props[1]["_id"]
+      renewal_id_3 = renewal_product_props.blank? ? nil : renewal_product_props[2]["_id"]
+      renewal_id_4 = renewal_product_props.blank? ? nil : renewal_product_props[3]["_id"]
+      renewal_id_5 = renewal_product_props.blank? ? nil : renewal_product_props[4]["_id"]
+      renewal_id_6 = renewal_product_props.blank? ? nil : renewal_product_props[5]["_id"]
 
       product_1_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -318,7 +345,8 @@ module BenefitSponsors
         "bronze",
         state_service_area_id,
         rating_area_id,
-        ["metal_level","single_issuer"]
+        ["metal_level","single_issuer"],
+        renewal_id_1
       )
       product_2_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -328,7 +356,8 @@ module BenefitSponsors
         "gold",
         state_service_area_id,
         rating_area_id,
-        ["metal_level"]
+        ["metal_level"],
+        renewal_id_2
       )
       product_3_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -338,7 +367,8 @@ module BenefitSponsors
         "silver",
         state_service_area_id,
         rating_area_id,
-        ["single_issuer"]
+        ["single_issuer"],
+        renewal_id_3
       )
       product_4_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -348,7 +378,8 @@ module BenefitSponsors
         "gold",
         local_service_area_id,
         rating_area_id,
-        ["single_issuer"]
+        ["single_issuer"],
+        renewal_id_4
       )
       product_5_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -358,7 +389,8 @@ module BenefitSponsors
         "gold",
         state_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_5
       )
       product_6_props = health_shop_product_props_for(
         issuer_profile_id,
@@ -368,7 +400,8 @@ module BenefitSponsors
         "platinum",
         local_service_area_id,
         rating_area_id,
-        ["single_product"]
+        ["single_product"],
+        renewal_id_6
       )
       product_props = [
         product_1_props,
@@ -553,6 +586,101 @@ module BenefitSponsors
 
     def self.construct_cca_simple_benefit_market_catalog(site, benefit_market, effective_period)
       product_list = build_cca_carriers_and_plans_for_effective_period_at(site, effective_period)
+      benefit_market_catalog_id = BSON::ObjectId.new
+      benefit_market_catalog_props = {
+        "_id": benefit_market_catalog_id,
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
+          "date_of_hire",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
+          "first_of_month_after_60_days"
+        ],
+        application_period: {
+          min: effective_period.min,
+          max: effective_period.max
+        },
+        title: "MA Health Connector SHOP Benefit Catalog",
+        benefit_market_id: benefit_market._id,
+        product_packages: [
+         sole_source_health_product_package_from_product_props(product_list, effective_period),
+         single_issuer_health_product_package_from_product_props(product_list, effective_period)
+        ]
+      }
+      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
+    end
+
+    def self.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      carrier_id_1, carrier_id_2, carrier_id_3 = BenefitSponsors::ProductSpecHelpers.create_cca_issuer_profiles(site._id)
+
+      renewal_ep_min = effective_period.min + 1.year
+      renewal_ep_max = effective_period.max + 1.year
+      renewal_effective_period = (renewal_ep_min..renewal_ep_max)
+
+      renewal_rating_area_id = BenefitSponsors::ProductSpecHelpers.create_cca_rating_areas(renewal_effective_period)
+
+      carrier_1_renewal_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_health_only_carrier_plan_samples(
+        carrier_id_1,
+        renewal_effective_period,
+        renewal_rating_area_id
+      )
+      carrier_2_renewal_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_health_and_dental_carrier_plan_samples(
+        carrier_id_2,
+        renewal_effective_period,
+        renewal_rating_area_id
+      )
+      carrier_3_renewal_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_dental_only_carrier_plan_samples(
+        carrier_id_3,
+        renewal_effective_period,
+        renewal_rating_area_id
+      )
+      renewal_product_list = carrier_1_renewal_product_props + carrier_2_renewal_product_props + carrier_3_renewal_product_props
+
+      renewal_benefit_market_catalog_id = BSON::ObjectId.new
+      renewal_benefit_market_catalog_props = {
+        "_id": renewal_benefit_market_catalog_id,
+        probation_period_kinds: [ 
+          "first_of_month_before_15th", 
+          "date_of_hire",
+          "first_of_month", 
+          "first_of_month_after_30_days", 
+          "first_of_month_after_60_days"
+        ],
+        application_period: {
+          min: renewal_effective_period.min,
+          max: renewal_effective_period.max
+        },
+        title: "MA Health Connector SHOP Benefit Catalog",
+        benefit_market_id: benefit_market._id,
+        product_packages: [
+         sole_source_health_product_package_from_product_props(renewal_product_list, renewal_effective_period),
+         single_issuer_health_product_package_from_product_props(renewal_product_list, renewal_effective_period)
+        ]
+      }
+      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
+
+      rating_area_id = BenefitSponsors::ProductSpecHelpers.create_cca_rating_areas(effective_period)
+
+      carrier_1_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_health_only_carrier_plan_samples(
+        carrier_id_1,
+        effective_period,
+        rating_area_id,
+        carrier_1_renewal_product_props
+      )
+      carrier_2_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_health_and_dental_carrier_plan_samples(
+        carrier_id_2,
+        effective_period,
+        rating_area_id,
+        carrier_2_renewal_product_props
+      )
+      carrier_3_product_props = BenefitSponsors::ProductSpecHelpers.create_cca_dental_only_carrier_plan_samples(
+        carrier_id_3,
+        effective_period,
+        rating_area_id,
+        carrier_3_renewal_product_props
+      )
+      product_list = carrier_1_product_props + carrier_2_product_props + carrier_3_product_props
+
       benefit_market_catalog_id = BSON::ObjectId.new
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
