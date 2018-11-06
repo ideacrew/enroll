@@ -2,16 +2,16 @@ module BenefitSponsors
   class SiteSpecHelpers
     def self.create_cca_site_with_hbx_profile_and_benefit_market(market_kind = :aca_shop)
       site = create_cca_site_with_hbx_profile
-#      case market_kind
-#      when :aca_shop
-#        site.benefit_markets << create_cca_shop_benefit_market(site.id)
-#      else
-        site.benefit_markets << FactoryGirl.create(:benefit_markets_benefit_market, kind: market_kind)
-#      end
+      site.benefit_markets << FactoryGirl.create(:benefit_markets_benefit_market, kind: market_kind)
       site
     end
 
-=begin
+    def self.create_cca_site_with_hbx_profile_and_empty_benefit_market(market_kind = :aca_shop)
+      site = create_cca_site_with_hbx_profile
+      create_cca_shop_benefit_market(site._id)
+      site
+    end
+
     def self.create_cca_shop_benefit_market(site_id)
       b_market_id = BSON::ObjectId.from_string('5bd8988aec969cf76b1386da')
       config_id = BSON::ObjectId.from_string('5bd8989cec969cf76b1386db')
@@ -77,7 +77,6 @@ module BenefitSponsors
       BenefitMarkets::BenefitMarket.collection.insert_one(b_market_props)
       BenefitMarkets::BenefitMarket.find(b_market_id)
     end
-=end
 
     def self.create_cca_site_with_hbx_profile
       site_id = BSON::ObjectId.from_string('5bd88acbec969cca691386da')
