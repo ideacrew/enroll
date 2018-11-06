@@ -10,7 +10,6 @@ describe Services::CheckbookServices::PlanComparision do
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
   let(:person) { FactoryGirl.create(:person, :with_family)}
-  # let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
   let!(:consumer_person) { FactoryGirl.create(:person, :with_consumer_role) }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
   let(:plan_year){ FactoryGirl.create(:next_month_plan_year, :with_benefit_group)}
@@ -22,6 +21,10 @@ describe Services::CheckbookServices::PlanComparision do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
     let(:checkbook_url) {"http://checkbook_url"}
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => "http://checkbook_url"})}
+
+    before :each do
+      allow(Rails).to receive_message_chain('env.test?').and_return(false)
+    end
 
     it "should generate non-congressional link" do
       if ApplicationHelperModStubber.plan_match_dc
