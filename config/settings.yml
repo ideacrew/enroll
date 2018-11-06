@@ -2,6 +2,7 @@ site:
   key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
+  site_title: "Massachusetts Health Connector for Business"
   home_url: "https://business.mahealthconnector.org/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
@@ -37,6 +38,7 @@ site:
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
+  certification_url: "https://www.mahealthconnector.org/business/brokers/certification"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
