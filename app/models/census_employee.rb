@@ -371,8 +371,8 @@ class CensusEmployee < CensusMember
 
   def active_benefit_package
     if active_benefit_group_assignment.present?
-      if active_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-        active_benefit_group_assignment.benefit_group
+      if active_benefit_group_assignment.benefit_package.plan_year.employees_are_matchable?
+        active_benefit_group_assignment.benefit_package
       end
     end
   end
