@@ -16,7 +16,7 @@ module BenefitSponsors
           # Cancels renewal application
           if benefit_sponsorship.renewal_benefit_application
             service = initialize_service(benefit_sponsorship.renewal_benefit_application)
-            result, ba, errors = service.cancel(false)
+            result, ba, errors = service.cancel
             map_errors_for(errors, onto: failed_results) if errors.present?
           end
 

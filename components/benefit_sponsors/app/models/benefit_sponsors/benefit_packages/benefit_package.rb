@@ -317,12 +317,12 @@ module BenefitSponsors
               if hbx_enrollment.effective_on > benefit_application.end_on
                 if hbx_enrollment.may_cancel_coverage?
                   hbx_enrollment.cancel_coverage!
-                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_application_trading_partner_publishable?)
                 end
               elsif hbx_enrollment && hbx_enrollment.may_terminate_coverage?
                 hbx_enrollment.terminate_coverage!
                 hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
-                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_application_trading_partner_publishable?)
               end
             end
           end
@@ -340,12 +340,12 @@ module BenefitSponsors
               if hbx_enrollment.effective_on > benefit_application.end_on
                 if hbx_enrollment.may_cancel_coverage?
                   hbx_enrollment.cancel_coverage!
-                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                  hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_application_trading_partner_publishable?)
                 end
               elsif hbx_enrollment.may_schedule_coverage_termination?
                 hbx_enrollment.schedule_coverage_termination!
                 hbx_enrollment.update_attributes!(terminated_on: benefit_application.end_on, termination_submitted_on: benefit_application.terminated_on)
-                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_application_trading_partner_publishable?)
               end
             end
           end
@@ -365,7 +365,7 @@ module BenefitSponsors
                  hbx_enrollment.cancel_coverage!
                else
                  hbx_enrollment.cancel_coverage!
-                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_trading_partner_publishable?)
+                 hbx_enrollment.notify_enrollment_cancel_or_termination_event(benefit_application.is_application_trading_partner_publishable?)
                end
              end
           end

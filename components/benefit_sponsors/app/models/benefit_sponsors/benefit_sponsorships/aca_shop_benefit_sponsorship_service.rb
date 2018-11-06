@@ -70,7 +70,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.pending_application_may_terminate_on(new_date)
 
       if benefit_application.present?
-        application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind, false)
+        application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind)
       end
     end
 

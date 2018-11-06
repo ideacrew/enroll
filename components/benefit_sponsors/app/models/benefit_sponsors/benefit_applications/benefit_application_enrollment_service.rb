@@ -139,7 +139,7 @@ module BenefitSponsors
       end
     end
 
-    def cancel(notify_trading_partner)
+    def cancel(notify_trading_partner = false)
       if business_policy_satisfied_for?(:cancel_benefit)
         if benefit_application.may_cancel?
           # update end of canceled to start date here...
@@ -164,7 +164,7 @@ module BenefitSponsors
       end
     end
 
-    def terminate(end_on, termination_date, termination_kind, notify_trading_partner)
+    def terminate(end_on, termination_date, termination_kind, notify_trading_partner = false)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_terminate_enrollment?
           updated_dates = benefit_application.effective_period.min.to_date..end_on
@@ -176,7 +176,7 @@ module BenefitSponsors
       end
     end
 
-    def schedule_termination(end_on, termination_date, termination_kind, notify_trading_partner)
+    def schedule_termination(end_on, termination_date, termination_kind, notify_trading_partner = false)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_schedule_enrollment_termination?
           updated_dates = benefit_application.effective_period.min.to_date..end_on

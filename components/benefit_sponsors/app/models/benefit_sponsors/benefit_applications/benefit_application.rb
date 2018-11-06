@@ -864,12 +864,12 @@ module BenefitSponsors
       end
     end
 
-    def notify_application(publish = false)
-     @publish = publish
+    def notify_application(notify = false)
+     @notify = notify
     end
 
-    def is_trading_partner_publishable?
-      return @publish if defined? @publish
+    def is_application_trading_partner_publishable?
+      return @notify if defined? @notify
       return false
     end
 
