@@ -179,4 +179,8 @@ module Config::SiteHelper
   def mail_address
     Settings.site.mail_address
   end
+
+  def site_title
+    Settings.site.site_title
+  end
 end

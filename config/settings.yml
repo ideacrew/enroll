@@ -2,6 +2,7 @@ site:
   key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
+  site_title: "Massachusetts Health Connector for Business"
   home_url: "https://business.mahealthconnector.org/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
