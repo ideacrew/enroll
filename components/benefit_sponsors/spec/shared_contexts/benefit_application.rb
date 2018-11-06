@@ -58,20 +58,6 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     benefit_sponsorship.save!
     benefit_sponsor_catalog.save!
   end
-
-  it 'should create a valid benefit sponsorship' do
-    expect(benefit_sponsorship).to be_valid
-  end
-
-  it 'should create a valid benefit application' do
-    expect(initial_application).to be_valid
-  end
-
-  it 'should create a valid package with sponsored benefit' do
-    expect(current_benefit_package).to be_valid
-    expect(current_benefit_package.sponsored_benefits).to be_present
-    expect(current_benefit_package.sponsored_benefits.first.product_package).to eq product_package
-  end
 end
 
 RSpec.shared_context "setup employees", :shared_context => :metadata do
@@ -118,18 +104,4 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
 
   let(:product_package)           { renewal_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
   let(:benefit_package)   { renewal_application.benefit_packages[0] }
-
-  it 'should create a valid benefit sponsorship' do
-    expect(benefit_sponsorship).to be_valid
-  end
-
-  it 'should create a valid benefit application' do
-    expect(renewal_application).to be_valid
-  end
-
-  it 'should create a valid package with sponsored benefit' do
-    expect(benefit_package).to be_valid
-    expect(benefit_package.sponsored_benefits).to be_present
-    expect(benefit_package.sponsored_benefits.first.product_package).to eq product_package
-  end
 end

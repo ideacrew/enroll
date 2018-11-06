@@ -73,9 +73,4 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
       end
     end
   end
-
-  it "should create valid benefit market catalogs" do
-    expect(current_benefit_market_catalog).to be_valid
-    expect(renewal_benefit_market_catalog).to be_valid
-  end
 end
