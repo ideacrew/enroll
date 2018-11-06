@@ -78,7 +78,7 @@ while offset <= family_count
       next if policy.plan.nil?
       next if !plan_ids.include?(policy.plan_id)
       next if policy.effective_on < Date.new(2019, 01, 01)
-      next if !(["auto_renewing", "coverage_selected", "unverified"].include?(policy.aasm_state))
+      next if !(["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"].include?(policy.aasm_state))
       next if !(['01', '03', ''].include?(policy.plan.csr_variant_id))#includes dental plans - csr_variant_id - ''
       next if policy.plan.market != 'individual'
       next if (!(['unassisted_qhp', 'individual'].include? policy.kind)) || has_current_aptc_hbx_enrollment(policy.family)
