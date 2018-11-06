@@ -4,7 +4,7 @@
 namespace :generate_report do
   desc "families with inactive tax household for current year and active tax_households for next year"
 
-  task :families do
+  task :families => :environment do
     current_year = ENV['tax_household_year'].to_i
     next_year = current_year + 1
     field_names = %w(
