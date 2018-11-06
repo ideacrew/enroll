@@ -1,6 +1,7 @@
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller, dbclean: :after_each do
@@ -8,7 +9,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:current_effective_date)  { effective_period_start_on }
     let(:product_package) { current_benefit_market_catalog.product_packages.first }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
@@ -67,6 +68,8 @@ module BenefitSponsors
 
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
     end
+
+
 
     describe "GET new", dbclean: :after_each do
       include_context 'shared_stuff'
@@ -212,17 +215,10 @@ module BenefitSponsors
     describe "POST publish" do
 
       include_context 'shared_stuff'
+      include_context "setup initial benefit application"
 
-      let!(:benefit_application) {
-        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
-        application.benefit_sponsor_catalog.save!
-        application
-      }
-      let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
-
-      before do
-        benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
-      end
+      let(:aasm_state) { :draft }
+      let(:benefit_application) { initial_application }
 
       def sign_in_and_submit_application
         sign_in user
@@ -264,7 +260,7 @@ module BenefitSponsors
       end
 
       context "benefit application is not submitted" do
-        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :denied) }
+        let(:aasm_state) { :denied }
 
         it "should redirect with errors" do
           sign_in user
@@ -276,12 +272,10 @@ module BenefitSponsors
 
     describe "POST force publish", dbclean: :after_each do
       include_context 'shared_stuff'
+      include_context "setup initial benefit application"
 
-      before do
-        benefit_sponsorship.benefit_applications = [ben_app]
-        ben_app.save
-        benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
-      end
+      let(:aasm_state) { :draft }
+      let(:ben_app) { initial_application }
 
       def sign_in_and_force_submit_application
         sign_in user
@@ -308,11 +302,9 @@ module BenefitSponsors
 
     describe "POST revert", dbclean: :after_each do
       include_context 'shared_stuff'
-      let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+      include_context "setup initial benefit application"
 
-      before do
-        benefit_sponsorship.update_attributes(:profile_id => benefit_sponsorship.organization.profiles.first.id)
-      end
+      let(:benefit_application) { initial_application }
 
       def sign_in_and_revert
         sign_in user
@@ -320,6 +312,8 @@ module BenefitSponsors
       end
 
       context "when there is no eligible application to revert" do
+        let(:aasm_state) { :draft }
+
         it "should redirect" do
           sign_in_and_revert
           expect(response).to have_http_status(:success)
@@ -332,7 +326,7 @@ module BenefitSponsors
       end
 
       context "when there is an eligible application to revert" do
-        let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :approved) }
+        let(:aasm_state) { :approved }
 
         it "should revert benefit application" do
           sign_in_and_revert
