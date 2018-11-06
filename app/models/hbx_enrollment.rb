@@ -300,7 +300,11 @@ class HbxEnrollment
       end
 
       enrollments_for_termination.each do |hbx_enrollment|
-        hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        begin
+          hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
+        rescue Exception => e
+          Rails.logger.error { "Error terminating scheduled enrollment hbx_id - #{hbx_enrollment.hbx_id} due to #{e.backtrace}" }
+        end
       end
     end
 
