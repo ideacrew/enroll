@@ -30,8 +30,12 @@ module Services
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
                 :headers => { 'Content-Type' => 'application/json' } )
-
-          uri = @result.parsed_response["URL"]
+          uri=""
+          if @result.parsed_response.is_a?(String)
+            uri = JSON.parse(@result.parsed_response)["URL"]
+          else
+            uri = @result.parsed_response["URL"]
+          end
           if uri.present?
             return uri
           else
