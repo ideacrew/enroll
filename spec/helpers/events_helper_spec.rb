@@ -1,5 +1,8 @@
 require "rails_helper"
 
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
 class EventsHelperSlug
   include EventsHelper
 end
@@ -425,6 +428,58 @@ describe EventsHelper, "selecting plan years to be exported" do
 
       it "should not return the plan year" do
         expect(subject.plan_years_for_manual_export(ren_employer_profile)).to eq [act_plan_year]
+      end
+    end
+  end
+end
+
+describe EventsHelper, "employer_plan_years" do
+  subject { EventsHelperSlug.new }
+
+  describe "should export valid plan years" do
+
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup renewal application"
+
+
+    context "employer with active and renewing enrolled plan year" do
+
+      before do
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
+      end
+
+      it "should return active and renewing plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [renewal_application,predecessor_application]
+      end
+    end
+
+    context "employer with active and canceled plan year" do
+
+      before do
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        renewal_application.update_attributes({:aasm_state => "canceled"})  # renewal application cancelled
+      end
+
+      it "should return active plan year when canceled plan id not passed to export" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
+      end
+
+      context "when canceled plan year id passed to export" do
+        it "should return active & canceled plan year" do
+          expect(subject.employer_plan_years(abc_profile, renewal_application.id.to_s)).to eq [renewal_application, predecessor_application]        end
+      end
+    end
+
+    context "employer with terminated plan year" do
+      before do
+        predecessor_application.update_attributes({:aasm_state => "terminated"}) # active application terminated
+        renewal_application.update_attributes({:aasm_state => "canceled"})
+      end
+
+      it "should return terminated plan year" do
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
       end
     end
   end
