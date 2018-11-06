@@ -175,7 +175,7 @@ class Insured::PlanShoppingsController < ApplicationController
         plan_comparision_obj.elected_aptc = session[:elected_aptc]
         @dc_individual_checkbook_url = plan_comparision_obj.generate_url
       elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year 
-        @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + "/hie/dc/"+ Settings.checkbook_services.previous_year + "/"
+        @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + "/hie/dc/"+ Settings.checkbook_services.previous_year.to_s + "/"
       end
    end
     @carriers = @carrier_names_map.values
