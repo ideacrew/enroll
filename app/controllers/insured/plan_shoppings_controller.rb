@@ -168,14 +168,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      @dc_checkbook_url = is_congress_employee  ? Rails.application.config.checkbook_services_congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
     elsif @hbx_enrollment.kind == "individual"
-      if @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.current_year
+      if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
         plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
         plan_comparision_obj.elected_aptc = session[:elected_aptc]
         @dc_individual_checkbook_url = plan_comparision_obj.generate_url
-      elsif @hbx_enrollment.effective_on.year == Settings.consumer_checkbook_services.previous_year 
-        @dc_individual_checkbook_previous_year = Settings.consumer_checkbook_services.checkbook_previous_year
+      elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year 
+        @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + "/hie/dc/"+ Settings.checkbook_services.previous_year + "/"
       end
    end
     @carriers = @carrier_names_map.values
@@ -185,7 +185,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plan_selection_callback
-    selected_plan= Plan.where(:hios_id=> params[:hios_id], active_year: Settings.consumer_checkbook_services.current_year).first
+    selected_plan= Plan.where(:hios_id=> params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
       redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id], market_kind: "individual"})
     else

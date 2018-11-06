@@ -7,7 +7,7 @@ module Services
       attr_accessor :hbx_enrollment, :is_congress, :elected_aptc
 
       BASE_URL = Rails.application.config.checkbook_services_base_url
-      CONGRESS_URL = Settings.checkbook_services.congress_url
+      CONGRESS_URL = Rails.application.config.checkbook_services_congress_url
       IVL_PATH = Rails.application.config.checkbook_services_ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
@@ -85,7 +85,7 @@ module Services
       def construct_body_shop
         {
           "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
-          "reference_id": Settings.checkbook_services.reference_id,
+          "reference_id": Rails.application.config.checkbook_services_reference_id,
           "employer_effective_date": employer_effective_date,
           "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
           "employer": {
@@ -102,8 +102,8 @@ module Services
 
       def construct_body_ivl
         {
-          "remote_access_key":  Settings.consumer_checkbook_services.consumer_remote_access_key,
-          "reference_id": Settings.consumer_checkbook_services.consumer_reference_id,
+          "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
+          "reference_id": Rails.application.config.checkbook_services_reference_id,
           "enrollment_year": 2019,
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
