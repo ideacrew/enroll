@@ -1,26 +1,16 @@
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller, dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
 
     routes { BenefitSponsors::Engine.routes }
 
     let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
-#     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                          }
-    let(:benefit_market)      { site.benefit_markets.first }
-    let!(:product_package) { benefit_market_catalog.product_packages.first }
-
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let(:product_package) { current_benefit_market_catalog.product_packages.first }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
-
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
     let(:person) { FactoryGirl.create(:person) }
     let!(:user) { FactoryGirl.create_default :user, person: person}
@@ -38,12 +28,12 @@ module BenefitSponsors
         benefit_market: site.benefit_markets[0],
         employer_attestation: employer_attestation) 
     end
+
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
     let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
-
 
     let(:benefit_application_params) {
 
@@ -76,12 +66,6 @@ module BenefitSponsors
       }
 
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
-    end
-
-    before do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
-      benefit_sponsorship.benefit_market.site_urn = site.site_key
-      benefit_sponsorship.save
     end
 
     describe "GET new", dbclean: :after_each do

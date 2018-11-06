@@ -43,14 +43,14 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
           renewal_service_area: renewal_service_area, 
           metal_level_kind: :dental) }
 
-  let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let!(:current_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
 
-  let!(:renewal_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{renewal_effective_date.year}",
