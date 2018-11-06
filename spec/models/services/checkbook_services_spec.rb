@@ -1,5 +1,8 @@
 require 'rails_helper'
-include ApplicationHelper
+
+class ApplicationHelperModStubber
+  extend ApplicationHelper
+end
 
 describe Services::CheckbookServices::PlanComparision do
 
@@ -21,7 +24,7 @@ describe Services::CheckbookServices::PlanComparision do
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => "http://checkbook_url"})}
 
     it "should generate non-congressional link" do
-      if plan_match_dc
+      if ApplicationHelperModStubber.plan_match_dc
         allow(subject).to receive(:construct_body_shop).and_return({})
         allow(HTTParty).to receive(:post).with("https://staging.checkbookhealth.org/shop/dc/api/",
           {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
@@ -38,7 +41,7 @@ describe Services::CheckbookServices::PlanComparision do
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => checkbook_url})}
 
     it "should generate consumer link" do
-        if plan_match_dc
+        if ApplicationHelperModStubber.plan_match_dc
           allow(subject).to receive(:construct_body_ivl).and_return({})
           allow(HTTParty).to receive(:post).with(Settings.consumer_checkbook_services.base_url,
             {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
@@ -96,7 +99,7 @@ describe Services::CheckbookServices::PlanComparision do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
 
     it "should generate congressional url" do
-     if plan_match_dc
+     if ApplicationHelperModStubber.plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
        expect(subject.generate_url).to eq("https://dc.checkbookhealth.org/congress/dc/#{hbx_enrollment.effective_on.year}/")
       end
