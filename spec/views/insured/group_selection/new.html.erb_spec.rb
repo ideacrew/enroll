@@ -60,7 +60,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
         allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, nil, hbx_enrollment).and_return(false)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(false)
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member1, employee_role, effective_on).and_return([true, true])
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member2, employee_role, effective_on).and_return([false, true])
         allow(adapter).to receive(:shop_health_and_dental_attributes).with(family_member3, employee_role, effective_on).and_return([true, true])
@@ -255,10 +254,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_members){[new_family_member, new_family_member_1]}
     let(:person) { instance_double("Person", id: "Person.id") }
     # let(:coverage_household) { instance_double("CoverageHousehold", family_members: family_members) }
-
     let(:coverage_household_members) {[double("new coverage household member", family_member: new_family_member), double("new coverage household member 1", family_member: new_family_member_1)]}
     let(:coverage_household) { instance_double("CoverageHousehold", coverage_household_members: coverage_household_members) }
-
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group, person: person) }
     let(:hbx_enrollment) {HbxEnrollment.new}
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }
@@ -369,6 +366,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
     let(:employer_profile) { benefit_sponsorship.profile }
+    let(:current_user) { FactoryGirl.create(:user) }
+
 
     before :each do
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
@@ -386,12 +385,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       allow(view).to receive(:can_employee_shop?).and_return(false)
+      allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
-      allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, nil, hbx_enrollment).and_return(false)
-      allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
+      allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
+      sign_in current_user
     end
 
     it "should display title" do
@@ -487,6 +487,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
+      allow(adapter).to receive(:is_eligible_for_dental?).and_return(true)
     end
 
     it "should have the waive confirmation modal" do
@@ -510,6 +511,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
       assign :adapter, adapter
+      assign :change_plan, true
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
@@ -517,6 +519,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
+      allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
+
     end
 
     it "when present" do
@@ -545,43 +549,43 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   end
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  context "change plan with consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+    context "change plan with consumer role" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let(:employee_role) { FactoryGirl.create(:employee_role) }
+      let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+      let(:coverage_household) { double("coverage household", coverage_household_members: []) }
+      let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
-    before :each do
-      allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
-      assign :person, person
-      assign :employee_role, employee_role
-      assign :coverage_household, coverage_household
-      assign :market_kind, 'individual'
-      assign :change_plan, true
-      assign :hbx_enrollment, hbx_enrollment
-      allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
-      allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
-      allow(view).to receive(:can_employee_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-    end
+      before :each do
+        allow(employee_role).to receive(:benefit_group).and_return(benefit_group)
+        assign :person, person
+        assign :employee_role, employee_role
+        assign :coverage_household, coverage_household
+        assign :market_kind, 'individual'
+        assign :change_plan, true
+        assign :hbx_enrollment, hbx_enrollment
+        allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+        allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
+        allow(view).to receive(:can_employee_shop?).and_return(false)
+        allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
+        allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      end
 
-    it "shouldn't see dental radio option" do
-      render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector('#coverage_kind_dental')
-    end
+      it "shouldn't see dental radio option" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to have_selector('#coverage_kind_dental')
+      end
 
-    it "should see health radio option" do
-      render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector('#coverage_kind_health')
-    end
+      it "should see health radio option" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to have_selector('#coverage_kind_health')
+      end
 
-    it "shouldn't see marketplace options" do
-      render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+      it "shouldn't see marketplace options" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+      end
     end
-  end
   end
 
   context "change plan with ee role" do
@@ -597,7 +601,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
       assign :market_kind, 'shop'
-      assign :change_plan, 'change_by_qle'
+      assign :change_plan, nil
       assign :hbx_enrollment, hbx_enrollment
       assign(:adapter, adapter)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
@@ -607,6 +611,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
+      allow(adapter).to receive(:can_shop_resident?).with(person).and_return(true)
+      allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, nil, hbx_enrollment).and_return(true)
     end
 
     it "shouldn't see waiver button" do
@@ -645,7 +651,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should render coverage_household partial to display chm's" do
       # allow(view).to receive(:is_eligible_for_dental?).with(employee_role, nil, enrollment).and_return false
-      # allow(employee_role).to receive(:is_dental_offered?).and_return false
       render file: "insured/group_selection/new.html.erb"
       expect(response).to render_template(:partial => 'coverage_household', :locals => {:coverage_household => nil})
     end
@@ -667,7 +672,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
-        allow(employee_role).to receive(:is_dental_offered?).and_return(true)
         assign :person, person
         assign :employee_role, employee_role
         assign :coverage_household, coverage_household
@@ -687,7 +691,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "should see dental radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_dental')
       end
@@ -695,7 +698,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "should see health radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_health')
       end
@@ -703,7 +705,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "should see employer-sponsored coverage radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#market_kind_shop')
       end
@@ -711,7 +712,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "should see individual coverage radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#market_kind_individual')
       end
@@ -720,7 +720,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
-        allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(true)
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).not_to have_selector('h3', text: 'Marketplace')
       end
@@ -742,7 +741,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         before(:each) do 
           allow(adapter).to receive(:can_shop_shop?).and_return(true)
           allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-          allow(adapter).to receive(:is_dental_offered?).with(employee_role).and_return(false)
         end
 
         it "dental option should have a class of dn" do
