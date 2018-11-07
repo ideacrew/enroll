@@ -12,7 +12,25 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
-  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", product: product, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.households.first,
+                      kind: "individual",
+                      product: product,
+                      aasm_state: "auto_renewing",
+                      effective_on: Date.new(year,1,1))
+  end
+
+  let!(:hbx_enrollment2) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.households.first,
+                      kind: "individual", product: product,
+                      aasm_state: "auto_renewing",
+                      effective_on: Date.new(year,1,1))
+  end
+
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Eligibility Notice for AQHP individuals',
                             :notice_template => 'notices/ivl/final_eligibility_notice_aqhp',
@@ -107,10 +125,10 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
   end
 
   describe "for recipient, recipient_document_store", dbclean: :after_each do
-    let!(:person100)          { FactoryGirl.create(:person, :with_consumer_role, :with_work_email) }
-    let!(:dep_family1)        { FactoryGirl.create(:family, :with_primary_family_member, person: FactoryGirl.create(:person, :with_consumer_role, :with_work_email)) }
-    let!(:dep_family_member)  { FactoryGirl.create(:family_member, family: dep_family1, person: person100) }
-    let!(:family100)          { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:person100)          { FactoryBot.create(:person, :with_consumer_role, :with_work_email) }
+    let!(:dep_family1)        { FactoryBot.create(:family, :with_primary_family_member, person: FactoryBot.create(:person, :with_consumer_role, :with_work_email)) }
+    let!(:dep_family_member)  { FactoryBot.create(:family_member, family: dep_family1, person: person100) }
+    let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
     let(:dep_fam_primary)     { dep_family1.primary_applicant.person }
 
     before :each do

@@ -109,10 +109,10 @@ RSpec.describe IvlNotices::SecondIvlRenewalNotice, :dbclean => :after_each do
   end
 
   describe "for recipient, recipient_document_store", dbclean: :after_each do
-    let!(:person100)          { FactoryGirl.create(:person, :with_consumer_role, :with_work_email) }
-    let!(:dep_family1)        { FactoryGirl.create(:family, :with_primary_family_member, person: FactoryGirl.create(:person, :with_consumer_role, :with_work_email)) }
-    let!(:dep_family_member)  { FactoryGirl.create(:family_member, family: dep_family1, person: person100) }
-    let!(:family100)          { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:person100)          { FactoryBot.create(:person, :with_consumer_role, :with_work_email) }
+    let!(:dep_family1)        { FactoryBot.create(:family, :with_primary_family_member, person: FactoryBot.create(:person, :with_consumer_role, :with_work_email)) }
+    let!(:dep_family_member)  { FactoryBot.create(:family_member, family: dep_family1, person: person100) }
+    let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
     let(:dep_fam_primary)     { dep_family1.primary_applicant.person }
 
     before :each do
