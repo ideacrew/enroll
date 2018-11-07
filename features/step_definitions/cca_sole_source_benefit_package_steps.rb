@@ -63,7 +63,7 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
   factory = BenefitSponsors::BenefitPackages::BenefitPackageFactory
   benefit_package_attributes = {
     title: "My Sole-Source Package",
-    probation_period_kind: :date_of_hire,
+    probation_period_kind: :first_of_month,
     sponsored_benefits_attributes: [{
       kind: :health,
       product_package_kind: :single_product,
