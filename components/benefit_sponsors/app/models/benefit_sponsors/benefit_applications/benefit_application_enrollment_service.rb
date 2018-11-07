@@ -142,7 +142,6 @@ module BenefitSponsors
     def cancel(notify_trading_partner = false)
       if business_policy_satisfied_for?(:cancel_benefit)
         if benefit_application.may_cancel?
-          # update end of canceled to start date here...
           benefit_application.cancel!(notify_trading_partner)
         else
           raise StandardError, "Benefit cancel state transition failed"
