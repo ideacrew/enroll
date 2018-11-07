@@ -3,9 +3,6 @@ require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-
 RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
   describe HbxEnrollment do
@@ -1729,9 +1726,15 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean
   end
 
   describe "in the SHOP market, purchased outside of open enrollment" do
-    let(:reference_date) {Date.today}
-    let(:open_enrollment_start) {reference_date - 15.days}
-    let(:open_enrollment_end) {reference_date - 5.days}
+
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:reference_date) { current_effective_date }
+    # let(:open_enrollment_start) {reference_date - 15.days}
+    # let(:open_enrollment_end) {reference_date - 5.days}
+
     let(:purchase_time) {Time.now - 20.days}
     let(:hired_on) {reference_date - 21.days}
 
@@ -1744,16 +1747,9 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean
          })
         })
 
-      benefit_group = BenefitGroup.new({
-       :plan_year => PlanYear.new({
-        :open_enrollment_start_on => open_enrollment_start,
-        :open_enrollment_end_on => open_enrollment_end
-        })
-       })
-
-      subject.benefit_group = benefit_group
-      allow(subject).to receive(:benefit_group).and_return(benefit_group)
+      allow(subject).to receive(:sponsored_benefit_package).and_return(current_benefit_package)
     end
+
     it "should have an eligibility event date" do
       expect(subject.eligibility_event_has_date?).to eq true
     end
@@ -1772,11 +1768,13 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean
   end
 
   describe "in the SHOP market, purchased during open enrollment" do
-    let(:reference_date) {Time.now}
-    let(:coverage_start) {(reference_date + 15.days).to_date}
-    let(:open_enrollment_start) {(reference_date - 15.days).to_date}
-    let(:open_enrollment_end) {(reference_date - 5.days).to_date}
-    let(:purchase_time) {(reference_date - 5.days).midnight + 200.minutes}
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+    let(:reference_date) { current_effective_date }
+
+    let(:purchase_time) { initial_application.open_enrollment_end_on.prev_day }
     let(:hired_on) {(reference_date - 21.days).to_date}
 
     before :each do
@@ -1784,25 +1782,18 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean
       subject.submitted_at = purchase_time
       subject.benefit_group_assignment = BenefitGroupAssignment.new({
         :census_employee => CensusEmployee.new({
-         :hired_on => hired_on
+         :hired_on => hired_on,
+         :created_at => hired_on
          })
         })
 
-      benefit_group = BenefitGroup.new({
-       :plan_year => PlanYear.new({
-        :open_enrollment_start_on => open_enrollment_start,
-        :open_enrollment_end_on => open_enrollment_end,
-        :start_on => coverage_start
-        })
-       })
-
-      subject.benefit_group = benefit_group
-      allow(subject).to receive(:benefit_group).and_return(benefit_group)
+      allow(subject).to receive(:sponsored_benefit_package).and_return(current_benefit_package)
     end
 
     describe "when coverage start is the same as the plan year" do
       before(:each) do
-        subject.effective_on = coverage_start
+        subject.effective_on = reference_date
+        subject.submitted_at = purchase_time
       end
 
       it "should NOT have an eligibility event date" do
@@ -1820,7 +1811,7 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean
 
     describe "when coverage start is the different from the plan year" do
       before(:each) do
-        subject.effective_on = coverage_start + 12.days
+        subject.effective_on = reference_date + 12.days
       end
 
       it "should have an eligibility event date" do
