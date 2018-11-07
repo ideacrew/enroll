@@ -1,13 +1,34 @@
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationsController, type: :controller, dbclean: :after_each do
-    include_context "setup benefit market with market catalogs and product packages"
+#    include_context "setup benefit market with market catalogs and product packages"
 
     routes { BenefitSponsors::Engine.routes }
+    let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
+    let(:benefit_market) { site.benefit_markets.first }
+    let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+    let!(:current_benefit_market_catalog) do
+      BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      benefit_market.benefit_market_catalogs.where(
+        "application_period.min" => effective_period_start_on
+      ).first
+    end
+
+    let(:service_areas) do
+      ::BenefitMarkets::Locations::ServiceArea.where(
+        :active_year => current_benefit_market_catalog.application_period.min.year
+      ).all.to_a
+    end
+
+    let(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.where(
+        :active_year => current_benefit_market_catalog.application_period.min.year
+      ).first
+    end
 
     let(:current_effective_date)  { effective_period_start_on }
     let(:product_package) { current_benefit_market_catalog.product_packages.first }
@@ -23,7 +44,7 @@ module BenefitSponsors
         :with_rating_area,
         :with_service_areas,
         supplied_rating_area: rating_area,
-        service_area_list: [service_area],
+        service_area_list: service_areas,
         organization: organization,
         profile_id: organization.profiles.first.id,
         benefit_market: site.benefit_markets[0],
@@ -57,7 +78,7 @@ module BenefitSponsors
       let(:params) {
         {
           recorded_rating_area: rating_area,
-          recorded_service_areas: [service_area],
+          recorded_service_areas: service_areas,
           effective_period: effective_period,
           open_enrollment_period: open_enrollment_period,
           fte_count: "5",
