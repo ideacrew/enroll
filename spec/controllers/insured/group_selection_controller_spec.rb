@@ -1,13 +1,35 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
+require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
-RSpec.describe Insured::GroupSelectionController, :type => :controller do
-  before do
-    DatabaseCleaner.clean
+RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
+    #include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
+  let(:benefit_market) { site.benefit_markets.first }
+  let!(:current_benefit_market_catalog) do
+    BenefitSponsors::ProductSpecHelpers.construct_cca_simple_benefit_market_catalog(site, benefit_market, effective_period)
+    benefit_market.benefit_market_catalogs.where(
+      "application_period.min" => effective_period.min
+    ).first
   end
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
+
+  let(:current_effective_date) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+
+  let(:service_areas) do
+    ::BenefitMarkets::Locations::ServiceArea.where(
+      :active_year => current_benefit_market_catalog.application_period.min.year
+    ).all.to_a
+  end
+
+  let(:rating_area) do
+    ::BenefitMarkets::Locations::RatingArea.where(
+      :active_year => current_benefit_market_catalog.application_period.min.year
+    ).first
+  end
 
     let!(:person) {FactoryGirl.create(:person, :with_consumer_role)}
     let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, :person => person)}
