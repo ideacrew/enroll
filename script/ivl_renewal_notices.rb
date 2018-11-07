@@ -115,7 +115,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
+      (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if event == "final_eligibility_notice_uqhp"
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
