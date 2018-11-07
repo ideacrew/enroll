@@ -223,7 +223,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
       it "should include canceled plan year" do
         expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_start", "x" => "http://openhbx.org/api/terms/1.0")[0].text).to eq benefit_application.start_on.strftime("%Y%m%d")
-        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_end", "x" => "http://openhbx.org/api/terms/1.0")[0].text).to eq benefit_application.end_on.strftime("%Y%m%d")
+        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_end", "x" => "http://openhbx.org/api/terms/1.0")[0].text).to eq benefit_application.start_on.strftime("%Y%m%d")
       end
 
     end
