@@ -1,9 +1,25 @@
 require "rails_helper"
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"    
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"    
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
+require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers"
+require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
 RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each do
-  include_context "setup benefit market with market catalogs and product packages"
+  let(:site) { BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market }
+  let(:benefit_market) { site.benefit_markets.first }
+  let(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+  let!(:current_benefit_market_catalog) do
+    BenefitSponsors::ProductSpecHelpers.construct_cca_simple_benefit_market_catalog(site, benefit_market, effective_period)
+    benefit_market.benefit_market_catalogs.where(
+      "application_period.min" => effective_period_start_on
+    ).first
+  end
+
+  let(:effective_period_start_on) { current_effective_date }
+  let(:effective_period_end_on) { effective_period_start_on + 1.year - 1.day }
+
+  let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
+
   include_context "setup initial benefit application"
   let(:person) {FactoryGirl.create(:person)}
   let(:family){ FactoryGirl.create(:family, :with_primary_family_member) }
