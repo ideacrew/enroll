@@ -23,16 +23,18 @@ module Subscribers
         consumer_role = person.consumer_role
         event_response_record = EventResponse.new({received_at: Time.now, body: xml})
         consumer_role.lawful_presence_determination.vlp_responses << event_response_record
-        if consumer_role.person.verification_types.include? "Citizenship"
-          type = "Citizenship"
-        elsif consumer_role.person.verification_types.include? "Immigration status"
-          type = "Immigration status"
+        if person.verification_types.active.map(&:type_name).include? "Citizenship"
+          type_name = "Citizenship"
+        elsif person.verification_types.active.map(&:type_name).include? "Immigration status"
+          type_name = "Immigration status"
         end
-        consumer_role.add_type_history_element(verification_type: type,
-                                               action: "DHS Hub response",
-                                               modifier: "external Hub",
-                                               update_reason: "Hub response",
-                                               event_response_record_id: event_response_record.id)
+        type = person.verification_types.active.where(type_name:type_name).first
+        if type
+          type.add_type_history_element(action: "DHS Hub response",
+                                        modifier: "external Hub",
+                                        update_reason: "Hub response",
+                                        event_response_record_id: event_response_record.id)
+        end
         if "503" == return_status
           args = OpenStruct.new
           args.determined_at = Time.now
