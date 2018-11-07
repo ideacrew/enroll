@@ -25,6 +25,7 @@ module Services
 
       def generate_url
         return @url if is_congress
+        return "http://checkbook_url" if Rails.env.test?
         begin
           construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
 

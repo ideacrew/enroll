@@ -22,9 +22,9 @@ describe Services::CheckbookServices::PlanComparision do
     let(:checkbook_url) {"http://checkbook_url"}
     let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => "http://checkbook_url"})}
 
-#    before :each do
-#      allow(Rails).to receive_message_chain('env.test?').and_return(false)
-#    end
+    before :each do
+      allow(Rails).to receive_message_chain('env.test?').and_return(false)
+    end
 
     it "should generate non-congressional link" do
       if ApplicationHelperModStubber.plan_match_dc
@@ -46,7 +46,7 @@ describe Services::CheckbookServices::PlanComparision do
     it "should generate consumer link" do
         if ApplicationHelperModStubber.plan_match_dc
           allow(subject).to receive(:construct_body_ivl).and_return({})
-          allow(HTTParty).to receive(:post).with("https://checkbook_url/ivl/",
+          allow(HTTParty).to receive(:post).with(Rails.application.config.checkbook_services_base_url,
             {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
             and_return(result)
           expect(subject.generate_url).to eq checkbook_url
