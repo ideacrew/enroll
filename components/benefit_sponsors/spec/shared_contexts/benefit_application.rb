@@ -85,11 +85,11 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
 
   let(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)            { abc_organization.employer_profile }
-  let(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
+  let!(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
 
   let(:recorded_service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
   
-  let(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+  let!(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                       :with_benefit_package, :with_predecessor_application,
                                       predecessor_application_state: predecessor_state,
                                       benefit_sponsorship: benefit_sponsorship,
