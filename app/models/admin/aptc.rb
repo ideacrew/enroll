@@ -84,7 +84,7 @@ class Admin::Aptc < ApplicationController
       applied_aptc = 0.0
       if applied_aptc_array.present?
         #if first_of_month_num_current_year >= TimeKeeper.datetime_of_record
-        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.date_of_record).to_date # Following the 15 day rule for calculations
+        if first_of_month_num_current_year >= find_enrollment_effective_on_date(TimeKeeper.date_of_record) # Following the 15 day rule for calculations
           applied_aptc_array.each do |one_hbx|
             applied_aptc = one_hbx[1]["aptc_applied"].to_f if current_hbx.id.to_s == one_hbx[1]["hbx_id"].gsub("aptc_applied_","")
           end
