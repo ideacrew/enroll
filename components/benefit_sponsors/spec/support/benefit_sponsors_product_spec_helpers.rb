@@ -137,18 +137,20 @@ module BenefitSponsors
 
       local_service_area_props = {
         "_id": local_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS001",
         issuer_provided_title: "Dental Only Issuer Local Service Area",
+        issuer_profile_id: issuer_profile_id,
         county_zip_ids: [county_zip_id]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(local_service_area_props)
 
       state_service_area_props = {
         "_id": state_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Dental Only Issuer State Service Area",
+        issuer_profile_id: issuer_profile_id,
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
@@ -206,18 +208,20 @@ module BenefitSponsors
 
       local_service_area_props = {
         "_id": local_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS001",
         issuer_provided_title: "Health and Dental Issuer Local Service Area",
+        issuer_profile_id: issuer_profile_id,
         county_zip_ids: [county_zip_id]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(local_service_area_props)
 
       state_service_area_props = {
         "_id": state_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Health and Dental Issuer State Service Area",
+        issuer_profile_id: issuer_profile_id,
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
@@ -315,18 +319,20 @@ module BenefitSponsors
 
       local_service_area_props = {
         "_id": local_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS001",
         issuer_provided_title: "Health Only Issuer Local Service Area",
+        issuer_profile_id: issuer_profile_id,
         county_zip_ids: [county_zip_id]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(local_service_area_props)
 
       state_service_area_props = {
         "_id": state_service_area_id,
-        active_year: effective_period.min,
+        active_year: effective_period.min.year,
         issuer_provided_code: "MAS002",
         issuer_provided_title: "Health Only Issuer State Service Area",
+        issuer_profile_id: issuer_profile_id,
         covered_states: ["MA"]
       }
       BenefitMarkets::Locations::ServiceArea.collection.insert_one(state_service_area_props)
