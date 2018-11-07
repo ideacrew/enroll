@@ -275,6 +275,10 @@ class Family
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
 
+  def primary_person
+    primary_applicant.person if primary_applicant
+  end
+
   def primary_family_member=(new_primary_family_member)
     self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
 
@@ -1121,13 +1125,17 @@ class Family
 
   def set_due_date_on_verification_types
     family_members.each do |family_member|
-      person = family_member.person
-      person.consumer_role.verification_types.each do |v_type|
-        next if !(v_type.type_unverified?)
-        v_type.update_attributes(due_date: (TimeKeeper.date_of_record + 95.days),
-                                 updated_by: nil,
-                                 due_date_type:  "notice" )
-        person.save!
+      begin
+        person = family_member.person
+        person.consumer_role.verification_types.each do |v_type|
+          next if !(v_type.type_unverified?)
+          v_type.update_attributes(due_date: (TimeKeeper.date_of_record + 95.days),
+                                   updated_by: nil,
+                                   due_date_type:  "notice" )
+          person.save!
+        end
+      rescue Exception => e
+        puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
       end
     end
   end
