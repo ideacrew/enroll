@@ -1,5 +1,6 @@
 RSpec.shared_context "setup initial benefit application", :shared_context => :metadata do
-  let(:aasm_state)              { :active }
+  let(:aasm_state)                { :active }
+  let(:benefit_sponsorship_state) { :active }
   let(:package_kind)            { :single_issuer }
   let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
   let(:open_enrollment_start_on){ effective_period.min.prev_month }
@@ -10,9 +11,11 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
 
   let!(:benefit_sponsorship)    { 
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
+    benefit_sponsorship.aasm_state = benefit_sponsorship_state
     benefit_sponsorship.save
     benefit_sponsorship
   }
+
   let(:dental_sponsored_benefit) { false }
 
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }

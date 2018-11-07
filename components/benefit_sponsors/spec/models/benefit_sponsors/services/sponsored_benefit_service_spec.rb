@@ -191,6 +191,9 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
     let(:dental_product_package) { current_benefit_market_catalog.product_packages.by_product_kind(:dental).first }
     let(:dental_reference_product) { dental_product_package.products[0] }
 
+    let(:benefit_market_catalog) { current_benefit_market_catalog }
+    let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind, product_kind: :dental).first }
+
     let(:sponsored_benefit_attributes) { {
       benefit_package_id: initial_application.benefit_packages[0].id,
       benefit_application_id: initial_application.id,
