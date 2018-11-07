@@ -351,7 +351,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -369,7 +369,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_deliver_checkbook_url
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {

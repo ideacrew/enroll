@@ -50,7 +50,12 @@ Rails.application.configure do
   }
 
   #Environment URL stub
-  config.checkbook_services_base_url = Settings.checkbook_services.base_url
+  config.checkbook_services_base_url = "https://checkbook_url"
+  config.checkbook_services_ivl_path = "/ivl/"
+  config.checkbook_services_shop_path = "/shop/"
+  config.checkbook_services_congress_url = "https://checkbook_url/congress/"
+  config.checkbook_services_remote_access_key = "9876543210"
+  config.checkbook_services_reference_id = "0123456789"
 
   #Queue adapter
   config.active_job.queue_adapter = :test
