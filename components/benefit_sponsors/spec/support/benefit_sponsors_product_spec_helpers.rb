@@ -22,7 +22,7 @@ module BenefitSponsors
         "_type": "BenefitMarkets::Products::DentalProducts::DentalProduct",
         ehb: 0.9942,
         dental_plan_kind: "hmo",
-        metal_level_kind: metal_level.to_sym,
+        metal_level_kind: :dental,
         benefit_market_kind: "aca_shop",
         title: title,
         issuer_profile_id: issuer_profile_id,
@@ -620,6 +620,7 @@ module BenefitSponsors
       benefit_market_catalog_id = BSON::ObjectId.new
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
@@ -671,6 +672,7 @@ module BenefitSponsors
       renewal_benefit_market_catalog_id = BSON::ObjectId.new
       renewal_benefit_market_catalog_props = {
         "_id": renewal_benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
@@ -717,6 +719,7 @@ module BenefitSponsors
       benefit_market_catalog_id = BSON::ObjectId.new
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
@@ -768,6 +771,7 @@ module BenefitSponsors
       renewal_benefit_market_catalog_id = BSON::ObjectId.new
       renewal_benefit_market_catalog_props = {
         "_id": renewal_benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
@@ -814,6 +818,7 @@ module BenefitSponsors
       benefit_market_catalog_id = BSON::ObjectId.new
       benefit_market_catalog_props = {
         "_id": benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
@@ -864,6 +869,7 @@ module BenefitSponsors
       previous_benefit_market_catalog_id = BSON::ObjectId.new
       previous_benefit_market_catalog_props = {
         "_id": previous_benefit_market_catalog_id,
+        application_interval_kind: :monthly,
         probation_period_kinds: [ 
           "first_of_month_before_15th", 
           "date_of_hire",
