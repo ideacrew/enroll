@@ -19,7 +19,6 @@ module BenefitSponsors
             result, ba, errors = service.cancel
             map_errors_for(errors, onto: failed_results) if errors.present?
           end
-
           # Terminates current application
           service = initialize_service(benefit_application)
           result, ba, errors = if args[:end_on] >= TimeKeeper.date_of_record
@@ -53,8 +52,6 @@ module BenefitSponsors
           onto.add(k, v)
         end
       end
-
-
     end
   end
 end
