@@ -57,7 +57,7 @@ fieldset.mt-2
       br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
       h4.mt-1 Referred By *
-      = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How were you referred?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
+      = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How did you find out about the Massachusetts Health Connector?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
       .invalid-feedback
         |
           Please select referred by.
