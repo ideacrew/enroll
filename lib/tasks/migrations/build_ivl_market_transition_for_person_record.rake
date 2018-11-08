@@ -4,6 +4,6 @@
 require File.join(Rails.root, "app", "data_migrations", "build_ivl_market_transition_for_person_record")
 
 namespace :migrations do
-  desc "build individual market transitions for missing consumers"
-  BuildIvlMarketTransitionForMissingConsumer.define_task :build_individual_market_transition_for_person_record => :environment
+  desc "build individual market transitions for person record"
+  BuildIvlMarketTransitionForPersonRecord.define_task :build_individual_market_transition_for_person_record => :environment
 end
