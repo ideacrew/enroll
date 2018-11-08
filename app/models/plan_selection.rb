@@ -46,7 +46,7 @@ class PlanSelection
     hbx_enrollment.select_coverage!(qle: qle)
     if market_kind == 'shop'
       plan_year = hbx_enrollment.benefit_group.plan_year
-      if plan_year.termination_pending? && hbx_enrollment.effective_on < plan_year.end_on
+      if plan_year.termination_pending? && hbx_enrollment.effective_on <= plan_year.end_on
         hbx_enrollment.schedule_coverage_termination!(plan_year.end_on)
       end
     end
