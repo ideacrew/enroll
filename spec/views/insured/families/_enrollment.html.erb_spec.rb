@@ -31,8 +31,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         kind: plan_coverage_kind,
         active_year: plan_active_year,
         metal_level_kind: :gold,
-        id: "some product id",
-        hios_id: "some product hios id",
+        product_type: "A plan type",
+        id: "Productid",
+        hios_id: "producthiosid",
         health_plan_kind: :hmo,
         sbc_document: sbc_document
     )
@@ -52,8 +53,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:hbx_enrollment) do
       instance_double(
         HbxEnrollment,
-        id: "some hbx enrollment id",
-        hbx_id: "some hbx enrollment hbx id",
+        id: "hbxenrollmentid",
+        hbx_id: "hbxenrollmenthbxid",
         enroll_step: 1,
         aasm_state: "coverage_selected",
         product: product,
@@ -89,7 +90,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_legal_name)
-      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
+      expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -115,8 +117,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     let(:hbx_enrollment) do
       instance_double(
         HbxEnrollment,
-        id: "some hbx enrollment id",
-        hbx_id: "some hbx enrollment hbx id",
+        id: "hbxenrollmentid",
+        hbx_id: "hbxenrollmenthbxid",
         enroll_step: 1,
         aasm_state: enrollment_aasm_state,
         product: product,
@@ -153,8 +155,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         kind: plan_coverage_kind,
         active_year: plan_active_year,
         metal_level_kind: :gold,
-        id: "some product id",
-        hios_id: "some product hios id",
+        product_type: "A plan type",
+        id: "productid",
+        hios_id: "producthiosid",
         health_plan_kind: :hmo,
         sbc_document: sbc_document
       )
