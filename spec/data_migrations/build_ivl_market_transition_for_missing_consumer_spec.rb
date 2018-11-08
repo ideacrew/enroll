@@ -26,4 +26,23 @@ describe BuildIvlMarketTransitionForMissingConsumer do
       expect(person.individual_market_transitions.present?).to eq true
     end
   end
+
+  describe "build consumer individual market transitions for multiple consumers" do
+
+    let!(:person1) {FactoryGirl.create(:person, :with_consumer_role,:with_employee_role)}
+    let!(:person2) {FactoryGirl.create(:person, :with_consumer_role,:with_employee_role)}
+    before(:each) do
+      allow(ENV).to receive(:[]).with("action").and_return "clear_all_cases"
+    end
+
+    it "should build individual market transitions for only people with consumer role" do
+      expect(person1.individual_market_transitions.present?).to eq false
+      expect(person2.individual_market_transitions.present?).to eq false
+      subject.migrate
+      person1.reload
+      person2.reload
+      expect(person1.individual_market_transitions.present?).to eq true
+      expect(person2.individual_market_transitions.present?).to eq true
+    end
+  end
 end
