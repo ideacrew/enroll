@@ -95,6 +95,27 @@ module BenefitSponsors
       end
     end
 
+    describe '.terminate_pending_sponsor_benefit' do
+
+      let(:initial_application_state)   { :termination_pending }
+
+      it 'terminate pending benefit application should be terminated when the end on is reached' do
+        april_sponsors.each do |sponsor|
+          sponsor.benefit_applications.each do |ba|
+            ba.update_attributes!(effective_period: ba.start_on..current_date.prev_day, terminated_on: current_date.prev_month)
+          end
+          benefit_application = sponsor.benefit_applications.termination_pending.first
+
+          service = subject.new(benefit_sponsorship: sponsor)
+          service.terminate_pending_sponsor_benefit
+          sponsor.reload
+          benefit_application.reload
+
+          expect(benefit_application.aasm_state).to eq :terminated
+        end
+      end
+    end
+
     describe '.end_open_enrollment' do 
       let(:sponsorship_state)               { :initial_enrollment_open }
       let(:business_policy) { double(success_results: [], fail_results: []) }

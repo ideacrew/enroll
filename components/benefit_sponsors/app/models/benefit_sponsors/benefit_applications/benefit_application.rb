@@ -818,7 +818,7 @@ module BenefitSponsors
 
       # Coverage terminated due to non-payment
       event :terminate_enrollment do
-        transitions from: [:active, :suspended, :expired], to: :terminated
+        transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated
       end
 
       event :schedule_enrollment_termination do
