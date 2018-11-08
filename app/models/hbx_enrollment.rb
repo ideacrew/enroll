@@ -1718,13 +1718,6 @@ class HbxEnrollment
 
     return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
 
-    unless transmit_flag
-      # make transaction loud for the enrollment that purchased from termination pending plan year. When terminating, termination pending plan year and pending enrollment from scheduler.
-      if is_transition_matching?(to: [:coverage_terminated],  from: [:coverage_selected, :coverage_enrolled], event: :terminate_coverage)
-        transmit_flag = true
-      end
-    end
-
     config = Rails.application.config.acapi
     notify(
         "acapi.info.events.hbx_enrollment.terminated",
