@@ -12,7 +12,6 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
     end
   end
 
-
   describe "update_terminated_on" do
     let(:census_employee)     { FactoryGirl.create(:census_employee, :employment_terminated_on => TimeKeeper.date_of_record - 1.month)}
     let(:terminated_on)     { TimeKeeper.date_of_record }
@@ -130,6 +129,15 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
       subject.send(:link_or_construct_employee_role)
       census_employee.reload
       expect(census_employee.aasm_state).to eq "employee_role_linked"
+    end
+
+    it "should return true on linking the employee role" do
+      allow(ENV).to receive(:[]).with("action").and_return "link_or_construct_employee_role"
+      allow(ENV).to receive(:[]).with("census_employee_id").and_return census_employee.id
+      census_employee.update_attributes(employee_role_id: employer_profile.id)
+      subject.migrate
+      expect(subject.instance_variable_get(:@census_employee)).to eql(census_employee)
+      expect(subject.send(:link_or_construct_employee_role)).to be_truthy
     end
   end
 
