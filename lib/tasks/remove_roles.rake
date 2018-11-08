@@ -13,14 +13,14 @@ namespace :role do
         if person.present?
           case role
           when "assister"
-            if person.assister_role.present?
+            if person.try(:assister_role)
               person.assister_role.destroy
               person.update(is_disabled:true)
             else
               puts "Person #{person.full_name} nolonger has #{role}"
             end
           when "cac"
-            if person.csr_role.present?
+            if person.try(:csr_role)
               person.csr_role.destroy
               person.update(is_disabled:true)
             else
@@ -34,14 +34,14 @@ namespace :role do
             if person.present?
               case role
               when "assister"
-                if person.assister_role.present?
+                if person.try(:assister_role)
                   person.assister_role.destroy
                   person.update(is_disabled:true)
                 else
                   puts "Person #{person.full_name} nolonger has #{role}"
                 end
               when "cac"
-                if person.csr_role.present?
+                if person.try(:csr_role)
                   person.csr_role.destroy
                   person.update(is_disabled:true)
                 else
