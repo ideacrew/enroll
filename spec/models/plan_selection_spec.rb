@@ -186,7 +186,7 @@ describe PlanSelection do
       end
     end
 
-    context "when plan year is in termination pending" do
+    context "when plan year is in termination pending" do  #spec for enrollment purchase on termination pending plan year
       subject { PlanSelection.new(hbx_enrollment_shop, hbx_enrollment_shop.plan) }
       it "enrollment should be moved to termination pending" do
         allow(family).to receive(:earliest_effective_shop_sep).and_return special_enrollment_period
