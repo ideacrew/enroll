@@ -11,25 +11,48 @@ namespace :role do
       if hbx.present?
         person = Person.where(hbx_id:hbx).first
         if person.present?
-          if role == "assister" && person.assister_role.present?
-            person.assister_role.destroy
-            person.update(is_disabled:true)
-          elsif role == "cac" && person.csr_role.present?
-            person.csr_role.destroy
-            person.update(is_disabled:true)
+          case role
+          when "assister"
+            if person.try(:assister_role)
+              person.assister_role.destroy
+              person.update(is_disabled:true)
+            else
+              puts "Person #{person.full_name} nolonger has #{role}"
+            end
+          when "cac"
+            if person.try(:csr_role)
+              person.csr_role.destroy
+              person.update(is_disabled:true)
+            else
+              puts "Person #{person.full_name} nolonger has #{role}"
+            end
           end
-        else
-          puts "No person found for HBX ID: #{hbx}"
-        end
-      elsif email.present?
-        user = User.where(email:email).first
-        if user.person.present?
-          if role == "assister" && user.person.assister_role.present?
-            user.person.assister_role.destroy
-            user.person.update(is_disabled:true)
-          elsif role == "cac" && user.person.csr_role.present?
-            user.person.csr_role.destroy
-            user.person.update(is_disabled:true)
+        elsif email.present?
+          user = User.where(email:email).first
+          if user.present?
+            person = user.person
+            if person.present?
+              case role
+              when "assister"
+                if person.try(:assister_role)
+                  person.assister_role.destroy
+                  person.update(is_disabled:true)
+                else
+                  puts "Person #{person.full_name} nolonger has #{role}"
+                end
+              when "cac"
+                if person.try(:csr_role)
+                  person.csr_role.destroy
+                  person.update(is_disabled:true)
+                else
+                  puts "Person #{person.full_name} nolonger has #{role}"
+                end
+              end
+            else
+              puts "user with email: #{email} has no person record"
+            end
+          else
+            puts "User not found with email: #{email}"
           end
         end
       end
