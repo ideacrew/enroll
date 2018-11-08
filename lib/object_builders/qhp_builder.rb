@@ -1,10 +1,10 @@
 class QhpBuilder
-  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
-  LOGGER = Logger.new(LOG_PATH)
-  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
-  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
+  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003", "92479DC0020005", "92479DC0010003", "92479DC0010005"] # These plan ids are suppressed and we dont save these while importing.
+  BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005", "92479DC0020005", "92479DC0010003", "92479DC0010005"]
 
   def initialize(qhp_hash)
+    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
+    @logger = Logger.new(@log_path)
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -39,7 +39,7 @@ class QhpBuilder
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")
-      "United Health Care"
+      "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
@@ -97,15 +97,20 @@ class QhpBuilder
   def iterate_plans
     update_dental_plans
     # @qhp_hash[:packages_list][:packages].each do |plans|
+    counter = 0
+    total_qhp = @qhp_array.count
     @qhp_array.each do |plans|
+      counter = counter + 1
       @plans = plans
       @xml_plan_counter += plans[:plans_list][:plans].size
       plans[:plans_list][:plans].each do |plan|
         @plan = plan
         @carrier_name = plans[:plans_list][:carrier_name]
         build_qhp_params
+        print "\r#{(counter.to_f/total_qhp).round(1)*100}% complete" unless Rails.env.test?
       end
     end
+    puts "" unless Rails.env.test?
   end
 
   def build_qhp_params
@@ -119,10 +124,10 @@ class QhpBuilder
     puts "*"*80
     puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
-    puts "Check the log file #{LOG_PATH}"
+    puts "Check the log file #{@log_path}"
     puts "*"*80
-    LOGGER.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
-    LOGGER.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
+    @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
+    @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
   end
 
   def validate_and_persist_qhp
@@ -130,9 +135,9 @@ class QhpBuilder
       associate_plan_with_qhp
       @qhp.save!
       @success_plan_counter += 1
-      LOGGER.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
+      @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
-      LOGGER.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
     end
   end
 
@@ -150,7 +155,7 @@ class QhpBuilder
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plans_to_update.each do |up_plan|
-      nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
+      # nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
           # name: @qhp.plan_marketing_name.squish!,
           hios_id: up_plan.coverage_kind == "dental" ? up_plan.hios_id.split("-").first : up_plan.hios_id,
@@ -160,8 +165,8 @@ class QhpBuilder
           plan_type: @qhp.plan_type.downcase,
           deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_individual,
           family_deductible: @qhp.qhp_cost_share_variances.first.qhp_deductable.in_network_tier_1_family,
-          nationwide: nation_wide,
-          dc_in_network: dc_in_network,
+          # nationwide: nation_wide,
+          # dc_in_network: dc_in_network,
           dental_level: @dental_metal_level
       )
       up_plan.save!
@@ -169,7 +174,7 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
-      puts "Plan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
+      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Market: #{plan.market}, Coverage kind: #{plan.coverage_kind}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
   end
@@ -215,6 +220,7 @@ class QhpBuilder
   end
 
   def parse_metal_level
+    return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
     return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end

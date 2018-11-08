@@ -129,6 +129,7 @@ module Insured::FamiliesHelper
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
+    return false if !hbx_enrollment.is_shop?
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
@@ -164,8 +165,10 @@ module Insured::FamiliesHelper
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
+    elsif enrollment.is_ivl_actively_outstanding?
+      false
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
   end
 
@@ -192,12 +195,13 @@ module Insured::FamiliesHelper
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
+    return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
+      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default"
     end
   end
 
@@ -205,8 +209,12 @@ module Insured::FamiliesHelper
     QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
   end
 
-  def dual_role_without_shop_sep?
-    @family.primary_applicant.person.has_multiple_roles? && @family.earliest_effective_shop_sep.blank?
+  def person_has_any_roles?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
+  end
+
+  def is_strictly_open_enrollment_case?
+    is_under_open_enrollment? && @family.active_seps.blank?
   end
 
   def tax_info_url
@@ -222,8 +230,65 @@ module Insured::FamiliesHelper
       false
     elsif @person.consumer_role.blank?
       false
-    elsif @person.consumer_role.present? 
+    elsif @person.consumer_role.present?
       true
+    end
+  end
+  def is_applying_coverage_value_personal(person)
+    first_checked = true
+    second_checked = false
+    if person.consumer_role.present?
+      first_checked = person.consumer_role.is_applying_coverage
+      second_checked = !person.consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
+  end
+
+  def current_market_kind(person)
+    if person.is_consumer_role_active? || person.is_resident_role_active?
+      person.active_individual_market_role
+    else
+      "No Consumer/CoverAll Market"
+    end
+  end
+
+  def new_market_kind(person)
+    if person.is_consumer_role_active?
+      "resident"
+    elsif person.is_resident_role_active?
+      "consumer"
+    else
+      " - "
+    end
+  end
+
+  def build_consumer_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_consumer_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_consumer_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def build_resident_role(person, family)
+    if family.primary_applicant.person == person
+      person.build_resident_role({:is_applicant => true})
+      person.save!
+    else
+      person.build_resident_role({:is_applicant => false})
+      person.save!
+    end
+  end
+
+  def transition_reason(person)
+    if person.is_consumer_role_active?
+    @qle = QualifyingLifeEventKind.where(reason: 'eligibility_failed_or_documents_not_received_by_due_date').first
+      { @qle.title => @qle.reason }
+    elsif person.is_resident_role_active?
+     @qle = QualifyingLifeEventKind.where(reason: 'eligibility_documents_provided').first
+     { @qle.title => @qle.reason }
     end
   end
 end

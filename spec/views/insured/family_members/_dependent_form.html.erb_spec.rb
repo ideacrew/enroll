@@ -14,7 +14,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       person.save
       sign_in user
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
-      allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:is_consumer_role_active?).and_return true
       assign :person, person
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
@@ -28,6 +28,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).not_to have_selector('input[placeholder="SOCIAL SECURITY *"]')
     end
 
+    it "should display the is_applying_coverage field option" do
+      expect(rendered).to match /Is this person applying for coverage?/
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
+    end
+
     it "should have consumer_fields area" do
       expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
       expect(rendered).to have_selector("div#consumer_fields")
@@ -39,7 +47,6 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should have no_ssn label" do
-      #allow(person).to receive(:has_active_consumer_role?).and_return true
       expect(rendered).to have_selector('span.no_ssn')
       expect(rendered).to match /have an SSN/
     end
@@ -65,7 +72,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     before :each do
       sign_in user
       @request.env['HTTP_REFERER'] = ''
-      allow(person).to receive(:has_active_consumer_role?).and_return false
+      allow(person).to receive(:is_consumer_role_active?).and_return false
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign :person, person
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
@@ -91,6 +98,14 @@ describe "insured/family_members/_dependent_form.html.erb" do
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+    end
+
+    it "should not display the is_applying_coverage field option" do
+      expect(rendered).not_to match /Is this person applying for coverage?/
+    end
+
+    it "should display the affirmative message" do
+      expect(rendered).not_to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
     end
 
     it "should have address info area" do

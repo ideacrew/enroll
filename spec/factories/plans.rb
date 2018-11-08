@@ -13,6 +13,8 @@ FactoryGirl.define do
     carrier_profile     { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
+    deductible          "$500"
+    family_deductible   "$500 per person | $1000 per group"
 
     # association :premium_tables, strategy: :build
 
@@ -77,11 +79,11 @@ FactoryGirl.define do
     end
 
     trait :this_year do
-      active_year TimeKeeper.datetime_of_record.year
+      active_year Time.now.year
     end
 
     trait :next_year do
-      active_year TimeKeeper.datetime_of_record.year
+      active_year Time.now.year
     end
 
     trait :premiums_for_2015 do

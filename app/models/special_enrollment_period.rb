@@ -2,6 +2,7 @@ class SpecialEnrollmentPeriod
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include TimeHelper
 
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
@@ -61,6 +62,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -136,10 +138,28 @@ class SpecialEnrollmentPeriod
 
   def self.find(id)
     family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id)).first
-    family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
+    family.special_enrollment_periods.detect() { |sep| sep._id.to_s == id.to_s } unless family.blank?
   end
 
 private
+  def next_poss_effective_date_within_range
+    return if next_poss_effective_date.blank?
+    return true unless is_shop?
+    min_date = sep_optional_date family, 'min', self.market_kind
+    max_date = sep_optional_date family, 'max', self.market_kind
+    errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
+  end
+
+  def optional_effective_on_dates_within_range
+    return true unless is_shop?
+    optional_effective_on.each_with_index do |date_option, index|
+      date_option = Date.strptime(date_option, "%m/%d/%Y")
+      min_date = sep_optional_date family, 'min', self.market_kind
+      max_date = sep_optional_date family, 'max', self.market_kind
+      errors.add(:optional_effective_on, "Date #{index+1} option out of range.") if not date_option.between?(min_date, max_date)
+    end
+  end
+
   def set_sep_dates
     return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
     set_submitted_at
@@ -163,7 +183,6 @@ private
 
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
-
     self.effective_on = case effective_on_kind
     when "date_of_event"
       qle_on
@@ -204,9 +223,15 @@ private
       qualifying_life_event_kind.employee_gaining_medicare(qle_on, selected_effective_on)
     elsif qualifying_life_event_kind.is_moved_to_dc?
       calculate_effective_on_for_moved_qle
+    elsif is_eligible_to_get_effective_on_based_plan_shopping?
+      TimeKeeper.date_of_record.next_month.beginning_of_month
     else
       is_shop? ? first_of_next_month_effective_date_for_shop : first_of_next_month_effective_date_for_individual
     end
+  end
+
+  def is_eligible_to_get_effective_on_based_plan_shopping?
+    qualifying_life_event_kind.is_loss_of_other_coverage? && !is_shop? && qle_on < TimeKeeper.date_of_record
   end
 
   def first_of_next_month_effective_date_for_individual
@@ -243,11 +268,12 @@ private
 
 
   def is_eligible?
+    return true unless is_active?
     return true unless is_shop?
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date
+      eligible_date = employee_role.census_employee.earliest_eligible_date 
       eligible_date <= TimeKeeper.date_of_record
     end
   end

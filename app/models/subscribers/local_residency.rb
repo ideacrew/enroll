@@ -20,10 +20,15 @@ module Subscribers
         person = find_person(person_hbx_id)
         return if person.nil? || person.consumer_role.nil?
         consumer_role = person.consumer_role
-        consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
+        event_response_record = EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.local_residency_responses << event_response_record
+        person.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Response",
+                                                                                         modifier: "external Hub",
+                                                                                         update_reason: "Hub response",
+                                                                                         event_response_record_id: event_response_record.id)
 
         if "503" == return_status.to_s
-          consumer_role.deny_residency!
+          consumer_role.fail_residency!
           consumer_role.save
           return
         end
@@ -43,9 +48,9 @@ module Subscribers
 
     def update_consumer_role(consumer_role, xml_hash)
       if xml_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
-        consumer_role.deny_residency!
+        consumer_role.fail_residency!
       else
-        consumer_role.authorize_residency!
+        consumer_role.pass_residency!
       end
 
       consumer_role.save

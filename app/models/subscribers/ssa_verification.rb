@@ -22,12 +22,19 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
 
         consumer_role = person.consumer_role
-        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
+        event_response_record = EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.lawful_presence_determination.ssa_responses << event_response_record
+        person.verification_types.active.reject{|type| ["DC Residency", "American Indian Status", "Immigration status"].include? type.type_name}.each do |type|
+          type.add_type_history_element(action: "SSA Hub Response",
+                                        modifier: "external Hub",
+                                        update_reason: "Hub response",
+                                        event_response_record_id: event_response_record.id)
+        end
 
         #TODO change response handler
         if "503" == return_status.to_s
           args = OpenStruct.new
-          args.determined_at = TimeKeeper.datetime_of_record
+          args.determined_at = Time.now
           args.vlp_authority = 'ssa'
           consumer_role.ssn_invalid!(args)
           consumer_role.save
@@ -51,16 +58,16 @@ module Subscribers
       args = OpenStruct.new
 
       if xml_hash[:ssn_verification_failed].eql?("true")
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         consumer_role.ssn_invalid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("true")
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         args.citizenship_result = ::ConsumerRole::US_CITIZEN_STATUS
         consumer_role.ssn_valid_citizenship_valid!(args)
       elsif xml_hash[:ssn_verified].eql?("true") && xml_hash[:citizenship_verified].eql?("false")
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'ssa'
         args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.ssn_valid_citizenship_invalid!(args)

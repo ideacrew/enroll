@@ -6,14 +6,14 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record  ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
       allow(@enrollment).to receive(:is_shop?).and_return(true)
@@ -51,14 +51,14 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do
       @person = employee_role.person
       @plan = plan
       @enrollment = hbx_enrollment
-      @benefit_group = @enrollment.benefit_group
+      @benefit_group = benefit_group
       @reference_plan = @benefit_group.reference_plan
       @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)

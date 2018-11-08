@@ -7,7 +7,8 @@ class Plan
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
   REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
-  PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
+  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
+  PLAN_TYPE_KINDS = %w[pos hmo epo ppo indemnity]
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
 
 
@@ -166,6 +167,11 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
+  scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
+
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -270,6 +276,7 @@ class Plan
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_carrier_profile_for_bqt,            ->(carrier_profile_id) { where(:carrier_profile_id.in => carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
@@ -278,9 +285,17 @@ class Plan
 
   scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
 
+  scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
+  scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
+
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)
+  end
+
+  def is_same_plan_by_hios_id_and_active_year?(plan)
+    #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
+    ((self.hios_id.split("-")[0] == plan.hios_id.split("-")[0]) && self.active_year == plan.active_year )
   end
 
   def metal_level=(new_metal_level)
@@ -451,12 +466,14 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:)
+    def individual_plans(coverage_kind:, active_year:, tax_household:, hbx_enrollment:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
+        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
+        csr_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind rescue nil
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else
@@ -492,18 +509,18 @@ class Plan
       plans = shop_plans coverage_kind, year
       selectors = {}
       if coverage_kind == 'dental'
-        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.append('any')
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.unshift('any')
       else
-        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.append('any')
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.unshift('any')
       end
       selectors[:carriers] = plans.map{|p|
         id = p.carrier_profile_id
         carrier_profile = CarrierProfile.find(id)
         [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
-        }.uniq.append(['any','any'])
-      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.append('any')
-      selectors[:dc_network] =  ['true', 'false', 'any']
-      selectors[:nationwide] =  ['true', 'false', 'any']
+        }.uniq.unshift(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+      selectors[:dc_network] =  ['any', 'true', 'false']
+      selectors[:nationwide] =  ['any', 'true', 'false']
       selectors
     end
 

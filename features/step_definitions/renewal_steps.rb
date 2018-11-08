@@ -33,18 +33,18 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
   effective_date = ce.employer_profile.renewing_plan_year.start_on
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Auto Renewing') &&
-    (e.find('.enrollment-effective').text() == "Effective Date: " + effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Effective Date: " + (effective_date - 1.year).strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Plan Start: " + (effective_date - 1.year).strftime('%m/%d/%Y'))
   }).to be_truthy
 end
 
 When(/(.*) proceed with continue on the group selection page/) do |named_person|
   sleep(1)
-  
+
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
@@ -61,9 +61,8 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
 
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Effective Date: " + effective_date.strftime('%m/%d/%Y'))
+    (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
   }).to be_truthy
-
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
 end
 
@@ -103,6 +102,6 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
 end
 
 When(/^.+ clicks continue on family members page/) do
-  page.find('#dependent_buttons').find('.interaction-click-control-continue').click 
+  page.find('#dependent_buttons').find('.interaction-click-control-continue').click
 end
 

@@ -1,7 +1,8 @@
 module PortalHeaderHelper
+  include L10nHelper
   def portal_display_name(controller)
     if current_user.nil?
-      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+      "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
@@ -19,11 +20,11 @@ module PortalHeaderHelper
     elsif current_user.try(:has_broker_agency_staff_role?)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
     elsif current_user.try(:has_employer_staff_role?)
-      link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.employer_profile_id), class: "portal"
+      link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.employer_profile_id, :tab=>'home'), class: "portal"
     elsif current_user.has_general_agency_staff_role?
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
     else
-      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+      "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe
     end
   end
 

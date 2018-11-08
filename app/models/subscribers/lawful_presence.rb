@@ -21,10 +21,23 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
 
         consumer_role = person.consumer_role
-        consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
+        event_response_record = EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.lawful_presence_determination.vlp_responses << event_response_record
+        if person.verification_types.active.map(&:type_name).include? "Citizenship"
+          type_name = "Citizenship"
+        elsif person.verification_types.active.map(&:type_name).include? "Immigration status"
+          type_name = "Immigration status"
+        end
+        type = person.verification_types.active.where(type_name:type_name).first
+        if type
+          type.add_type_history_element(action: "DHS Hub response",
+                                        modifier: "external Hub",
+                                        update_reason: "Hub response",
+                                        event_response_record_id: event_response_record.id)
+        end
         if "503" == return_status
           args = OpenStruct.new
-          args.determined_at = TimeKeeper.datetime_of_record
+          args.determined_at = Time.now
           args.vlp_authority = 'dhs'
           consumer_role.fail_dhs!(args)
           consumer_role.save      
@@ -47,16 +60,16 @@ module Subscribers
     def update_consumer_role(consumer_role, xml_hash)
       args = OpenStruct.new
       if xml_hash[:lawful_presence_indeterminate].present?
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'dhs'
         consumer_role.fail_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("lawfully_present")
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'dhs'
         args.citizenship_result = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.pass_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
-        args.determined_at = TimeKeeper.datetime_of_record
+        args.determined_at = Time.now
         args.vlp_authority = 'dhs'
         args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.fail_dhs!(args)

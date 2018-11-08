@@ -16,7 +16,7 @@ class V2GroupXmlGenerator
   XML_NS = "http://openhbx.org/api/terms/1.0"
 
   CARRIER_ABBREVIATIONS = {
-      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
+      "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthcare": "UHIC", "Delta Dental": "DDPA",
       "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
 
   # Inputs
@@ -45,7 +45,7 @@ class V2GroupXmlGenerator
 # 3 using remove_other_carrier_nodes, remove the carrier plans of carriers other then 'carrier'
 # create a hash with key as carrier and value as array [organization_xml, carrier, plan year end date, plan year start date]
 # 4 if carrier-switch then generate xml for each of the dropped carrier and add to hash.
-    @feins.each do |fein|
+    @feins.uniq.each do |fein|
 
       begin
         employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
@@ -65,7 +65,7 @@ class V2GroupXmlGenerator
 
         cv_xml = nil
         carrier_profiles.each do |carrier|
-          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile}
+          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile, manual_gen: true}
 
           organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
 

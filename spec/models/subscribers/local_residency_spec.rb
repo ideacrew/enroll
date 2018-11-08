@@ -11,33 +11,56 @@ describe Subscribers::LocalResidency do
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "residency_verification_payloads", "response.xml")) }
     let(:xml_hash) { {residency_verification_response: 'ADDRESS_NOT_IN_AREA'} }
     let(:xml_hash2) { {residency_verification_response: 'ADDRESS_IN_AREA'} }
-    let(:person) { person = FactoryGirl.build(:person);
-    consumer_role = person.build_consumer_role;
-    consumer_role = FactoryGirl.build(:consumer_role);
-    person.consumer_role = consumer_role;
-    person.consumer_role.aasm_state=:verifications_pending;
-    person
-    }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+    let(:history_elements_DC) {consumer_role.verification_types.by_name("DC Residency").first.type_history_elements}
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
+    context "stores Local Hub response in verification history" do
+      it "stores verification history element" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements_DC.count).to be > 0
+      end
+
+      it "stores verification history element for right verification type" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements_DC.first.action).to eq "Local Hub Response"
+      end
+
+      it "stores reference to EventResponse in verification history element" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(BSON::ObjectId.from_string(
+            history_elements_DC.first.event_response_record_id
+        )).to eq consumer_role.local_residency_responses.first.id
+      end
+    end
+
     context "ADDRESS_NOT_IN_AREA" do
-      xit "should deny local residency" do
+      it "should deny local residency" do
+        person.consumer_role.aasm_state = "sci_verified"
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_pending')
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
         expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
     end
 
     context "ADDRESS_IN_AREA" do
-      xit "should approve local residency" do
+      it "should approve local residency" do
+        person.consumer_role.aasm_state = "sci_verified"
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_pending') #since lawful_presence_verified? is false
+        expect(person.consumer_role.aasm_state).to eq('fully_verified')
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
         expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
@@ -54,12 +77,12 @@ describe Subscribers::LocalResidency do
     let(:payload) { "lsjdfioennnklsjdfe" }
 
     it "should store responses correctly" do
-      consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: payload})
+      consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: payload})
       consumer_role.person.save!
       found_person = Person.find(person_id)
       ssa_response = found_person.consumer_role.local_residency_responses.first
       expect(ssa_response.body).to eq payload
-      consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: payload})
+      consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: payload})
       found_person = Person.find(person_id)
       expect(found_person.consumer_role.local_residency_responses.length).to eq(2)
     end

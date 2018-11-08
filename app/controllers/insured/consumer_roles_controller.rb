@@ -7,6 +7,10 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   #before_action :authorize_for, except: [:edit, :update]
 
+  # generate initial individual_market_transition as a placeholder for initial enrollment in IVL
+  after_action :create_initial_market_transition, only: [:create]
+
+
   def ssn_taken
   end
 
@@ -54,9 +58,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
-
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
+    @use_person = true #only used to manupulate form data
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
@@ -84,11 +88,10 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-
           @resident_candidate = Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
-            if found_person.present?
+            if found_person.present? && found_person.resident_role.present?
               begin
                 @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
                 if @resident_role.present?
@@ -101,13 +104,18 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               rescue Exception => e
                 flash[:error] = set_error_message(e.message)
-                redirect_to search_exchanges_consumers_path
+                redirect_to search_exchanges_residents_path
                 return
               end
               create_sso_account(current_user, @person, 15, "resident") do
-                format.html { redirect_to family_account_path }
+                respond_to do |format|
+                  format.html {
+                    redirect_to family_account_path
+                  }
+                end
               end
             end
+            return
           end
 
           found_person = @consumer_candidate.match_person
@@ -152,6 +160,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to search_insured_consumer_role_index_path
       return
     end
+    @person.primary_family.create_dep_consumer_role if @person
     is_assisted = session["individual_assistance_path"]
     role_for_user = (is_assisted) ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
@@ -186,7 +195,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -197,12 +206,21 @@ class Insured::ConsumerRolesController < ApplicationController
     save_and_exit =  params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
+      @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        redirect_to ridp_agreement_insured_consumer_role_index_path
+        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+          redirect_to upload_ridp_document_insured_consumer_role_index_path
+        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+          redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+        else
+          redirect_to ridp_agreement_insured_consumer_role_index_path
+        end
       end
     else
       if save_and_exit
@@ -222,14 +240,50 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def ridp_agreement
     set_current_person
-    if @person.completed_identity_verification?
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    consumer = @person.consumer_role
+    if @person.completed_identity_verification? || consumer.identity_verified?
+      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
     end
   end
 
+  def upload_ridp_document
+    set_consumer_bookmark_url
+    set_current_person
+    @person.consumer_role.move_identity_documents_to_outstanding
+  end
+
+  def update_application_type
+    set_current_person
+    application_type = params[:consumer_role][:family][:application_type]
+    @person.primary_family.update_attributes(application_type: application_type)
+    if @person.primary_family.has_curam_or_mobile_application_type?
+      @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    else
+      redirect_to :back
+    end
+  end
+
   private
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    if current_user.has_consumer_role?
+      respond_to do |format|
+        format.html { redirect_to edit_insured_consumer_role_path(current_user.person.consumer_role.id) }
+      end
+    else
+      flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
+      respond_to do |format|
+        format.json { redirect_to destroy_user_session_path }
+        format.html { redirect_to destroy_user_session_path }
+        format.js   { redirect_to destroy_user_session_path }
+      end
+    end
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
@@ -258,27 +312,39 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :is_applying_coverage
     ]
   end
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 
   def check_consumer_role
     set_current_person(required: false)
     # need this check for cover all
-    if @person.try(:has_active_resident_role?)
+    if @person.try(:is_resident_role_active?)
       redirect_to @person.resident_role.bookmark_url || family_account_path
-    elsif @person.try(:has_active_consumer_role?)
+    elsif @person.try(:is_consumer_role_active?)
       redirect_to @person.consumer_role.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_consumer_role_index_path
       current_user.save!
       # render 'privacy'
     end
+  end
+
+  def create_initial_market_transition
+    transition = IndividualMarketTransition.new
+    transition.role_type = "consumer"
+    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.reason_code = "generating_consumer_role"
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.user_id = current_user.id
+    Person.find(session[:person_id]).individual_market_transitions << transition
   end
 
   def set_error_message(message)

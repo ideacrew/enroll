@@ -6,10 +6,14 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include Mongoid::Attributes::Dynamic
+  include Mongoid::History::Trackable
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
+  embeds_many :ssa_requests, class_name:"EventRequest"
+  embeds_many :vlp_requests, class_name:"EventRequest"
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
@@ -18,6 +22,16 @@ class LawfulPresenceDetermination
   field :citizenship_result, type: String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
+
+  track_history   :on => [:vlp_verified_at,
+                          :vlp_authority,
+                          :citizen_status,
+                          :citizenship_result,
+                          :aasm_state],
+                  :scope => :consumer_role,
+                  :track_create  => false,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => false     # track document destruction, default is false
 
   aasm do
     state :verification_pending, initial: true
@@ -39,6 +53,7 @@ class LawfulPresenceDetermination
     event :revert, :after => :record_transition do
       transitions from: :verification_pending, to: :verification_pending, after: :record_denial_information
       transitions from: :verification_outstanding, to: :verification_pending, after: :record_denial_information
+      transitions from: :expired, to: :verification_pending
       transitions from: :verification_successful, to: :verification_pending
     end
   end
@@ -60,6 +75,10 @@ class LawfulPresenceDetermination
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
   end
 
+  def assign_citizen_status(new_status)
+    update_attributes(citizen_status: new_status)
+  end
+
   private
   def record_approval_information(*args)
     approval_information = args.first
@@ -75,6 +94,7 @@ class LawfulPresenceDetermination
         if self.ivl_role.person
           unless self.ivl_role.person.ssn.blank?
             self.ivl_role.ssn_validation = "valid"
+            self.ivl_role.person.verification_types.active.where(type_name:"Social Security Number").first.validation_status = "verified"
           end
         end
       end
@@ -92,7 +112,8 @@ class LawfulPresenceDetermination
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      transition_at: TimeKeeper.datetime_of_record
+      event: aasm.current_event,
+      transition_at: Time.now
     )
   end
 end

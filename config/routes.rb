@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
-  mount Resque::Server, at: '/jobs'
+  require 'resque/server'
+#  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -14,6 +14,14 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
+  
+  resources :users do
+    member do
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
+      put :confirm_reset_password, :confirm_change_username_and_email, :update
+      post :unlock, :change_password
+    end
+  end
 
   resources :saml, only: [] do
     collection do
@@ -22,6 +30,8 @@ Rails.application.routes.draw do
       get :navigate_to_assistance
     end
   end
+
+  get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
 
@@ -47,6 +57,7 @@ Rails.application.routes.draw do
       collection do
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -54,6 +65,7 @@ Rails.application.routes.draw do
         get :employer_invoice
         post :employer_invoice_datatable
         post :generate_invoice
+        post :disable_ssn_requirement
         get :broker_agency_index
         get :general_agency_index
         get :issuer_index
@@ -68,8 +80,6 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
-        get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -80,6 +90,11 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :get_user_info
+        get :identity_verification
+        post :identity_verification_datatable
+        get :user_account_index
+        get :new_eligibility
       end
 
       member do
@@ -93,6 +108,12 @@ Rails.application.routes.draw do
       resources :hbx_staff_roles do
         # root 'hbx_profiles/hbx_staff_roles#show'
       end
+    end
+
+    resources :employer_applications do
+      put :terminate
+      put :cancel
+      put :reinstate
     end
 
     resources :agents do
@@ -126,6 +147,11 @@ Rails.application.routes.draw do
     get 'paper_applications/upload', to: 'paper_applications#upload'
     post 'paper_applications/upload', to: 'paper_applications#upload'
     get 'paper_applications/download/:key', to: 'paper_applications#download'
+    get 'ridp_documents/upload', to: 'ridp_documents#upload'
+    post 'ridp_documents/upload', to: 'ridp_documents#upload'
+    get 'ridp_documents/download/:key', to: 'ridp_documents#download'
+    resources :ridp_documents, only: [:destroy]
+
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -137,16 +163,23 @@ Rails.application.routes.draw do
         post 'waive'
         post 'terminate'
         post 'set_elected_aptc'
+        get 'plan_selection_callback'
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
       get 'new'
       member do
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -163,10 +196,13 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
+        get 'transition_family_members'
+        post 'transition_family_members_update'
       end
 
       resources :people do
@@ -183,6 +219,8 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      post :update_application_type
+      get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
@@ -206,7 +244,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -248,6 +286,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        post 'generate_checkbook_urls'
       end
       collection do
         get 'welcome'
@@ -337,6 +376,7 @@ Rails.application.routes.draw do
         get :new_staff_member
         get :new_broker_agency
         get :search_broker_agency
+        post :email_guide
       end
       member do
         get :favorite
@@ -366,6 +406,8 @@ Rails.application.routes.draw do
           get :download_pdf
           get :dental_plans_data
           get :my_quotes
+          get :employees_list
+          get :employee_type
         end
         member do
           get :upload_employee_roster
@@ -458,6 +500,7 @@ Rails.application.routes.draw do
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+  match "hbx_profiles/create_eligibility" => "exchanges/hbx_profiles#create_eligibility", as: :create_eligibility, via: [:post], defaults: { format: 'js' }
 
   resources :families do
     get 'page/:page', :action => :index, :on => :collection
@@ -489,10 +532,10 @@ Rails.application.routes.draw do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
+      put :update_ridp_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
-      get :fed_hub_request
+      post :fed_hub_request
     end
   end
 

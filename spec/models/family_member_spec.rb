@@ -29,6 +29,18 @@ describe FamilyMember, "given a person" do
   end
 end
 
+
+describe FamilyMember, "given a person" do
+  let(:person) { create :person ,:with_family }
+
+  it "should error when trying to save duplicate family member" do
+    family_member = FamilyMember.new(:person => person) 
+    person.families.first.family_members << family_member
+    person.families.first.family_members << family_member
+    expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
+  end
+end
+
 describe FamilyMember, dbclean: :after_each do
   context "a family with members exists" do
     include_context "BradyBunchAfterAll"
@@ -186,5 +198,21 @@ describe FamilyMember, "given a relationship to update" do
     expect(subject.primary_relationship).not_to eq relationship
     subject.update_relationship(relationship)
     expect(subject.primary_relationship).to eq relationship
+  end
+end
+
+describe FamilyMember, "aptc_benchmark_amount" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+
+  before do
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+  end
+  
+  it "should return valid benchmark value" do
+    family_member = FamilyMember.new(:person => person) 
+    expect(family_member.aptc_benchmark_amount.round(2)).to eq 508.70
   end
 end

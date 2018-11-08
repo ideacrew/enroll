@@ -1,38 +1,40 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_verification_types")
 
-describe "UpdateVerificationTypes data migration" do
-  let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+describe "UpdateVerificationTypes data migration", dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   subject { UpdateVerificationTypes.new("fix me task", double(:current_scope => nil)) }
-  shared_examples_for "update verification types for fully verified people" do |result, old_authority, new_authority|
+  shared_examples_for "update residency type for verified people" do |consumer_state, old_validation, attr_to_check, result|
     before do
-      result == true ? person.consumer_role.aasm_state = "fully_verified" : person.consumer_role.aasm_state = "outstanding"
-      person.consumer_role.ssn_validation = "invalid"
-      person.save(:validate => false)
-      person.consumer_role.lawful_presence_determination.deny!(verification_attr)
-      person.consumer_role.lawful_presence_determination.update_attributes(:vlp_authority => old_authority)
+      person.consumer_role.aasm_state = consumer_state
+      person.consumer_role.update_attributes(:is_state_resident => nil, :residency_determined_at => Time.now, :local_residency_validation => old_validation)
       subject.migrate
       person.reload
     end
-    it "verification types updated? #{result == true}" do
-      expect(person.consumer_role.all_types_verified?).to eq result
-    end
-    it "doesn't overwite existing curam vlp_authority" do
-      expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq new_authority
+    it "updates verification type" do
+      expect(person.consumer_role.send(attr_to_check)).to eq result
     end
   end
 
   context "fully verified person" do
-    it_behaves_like "update verification types for fully verified people", true, "hbx", "hbx"
-    it_behaves_like "update verification types for fully verified people", true, "curam", "curam"
-    it_behaves_like "update verification types for fully verified people", true, "any", "hbx"
+    it_behaves_like "update residency type for verified people", "fully_verified", nil, "is_state_resident", true
+    it_behaves_like "update residency type for verified people", "fully_verified", nil, "local_residency_validation", "valid"
+  end
+
+  context "sci verified person" do
+    it_behaves_like "update residency type for verified people", "sci_verified", nil, "is_state_resident", true
+    it_behaves_like "update residency type for verified people", "sci_verified", nil, "local_residency_validation", "valid"
   end
 
   context "not fully verified person" do
-    it_behaves_like "update verification types for fully verified people", false, "hbx", "hbx"
-    it_behaves_like "update verification types for fully verified people", false, "curam", "curam"
-    it_behaves_like "update verification types for fully verified people", false, "any", "any"
+    it_behaves_like "update residency type for verified people", "verification_outstanding", nil, "is_state_resident", nil
+    it_behaves_like "update residency type for verified people", "verification_outstanding", nil, "local_residency_validation", nil
+    it_behaves_like "update residency type for verified people", "dhs_pending", nil, "is_state_resident", nil
+    it_behaves_like "update residency type for verified people", "dhs_pending", nil, "local_residency_validation", nil
+    it_behaves_like "update residency type for verified people", "ssa_pending", nil, "is_state_resident", nil
+    it_behaves_like "update residency type for verified people", "ssa_pending", nil, "local_residency_validation", nil
+    it_behaves_like "update residency type for verified people", "unverified", nil, "is_state_resident", nil
+    it_behaves_like "update residency type for verified people", "unverified", nil, "local_residency_validation", nil
   end
 end
 

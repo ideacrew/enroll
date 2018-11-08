@@ -25,7 +25,7 @@ class Message
 
 private
   def set_timestamp
-    self.created_at = TimeKeeper.datetime_of_record.utc
+    self.created_at = Time.now.utc
   end
 
   def message_has_content

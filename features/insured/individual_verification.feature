@@ -25,9 +25,6 @@ Feature: Consumer verification process
     * I should see Documents link
     * I click on verification link
     * I should see page for documents verification
-    * I upload the file as vlp document
-    * I click the upload file button
-
 
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
@@ -37,8 +34,6 @@ Feature: Consumer verification process
     Then consumer should see Verification Due date label
     And consumer should see Documents FAQ link
     And the consumer should see documents verification page
-    Then the consumer can expand the table by clicking on caret sign
-
 
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
@@ -48,6 +43,20 @@ Feature: Consumer verification process
     And the consumer should see documents verification page
     Then verification types have to be visible
 
+  Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
+    Given a consumer exists
+    And the consumer is logged in
+    When the consumer is completely verified from curam
+    Then the consumer visits verification page
+    And the consumer should see documents verification page
+    Then verification types should display as verified state
 
-
-
+  Scenario: Admin clicks on documents tab for Curam verified person
+    Given a consumer exists
+    And the consumer is logged in
+    When the consumer is completely verified from curam
+    Then the consumer visits verification page
+    And consumer logs out
+    When an HBX admin exists
+    And clicks on the person in families tab
+    Then verification types should display as external source

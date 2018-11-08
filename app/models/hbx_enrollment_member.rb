@@ -2,6 +2,9 @@ class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include BelongsToFamilyMember
+  include Insured::GroupSelectionHelper
+  include Insured::EmployeeRolesHelper
+  include ApplicationHelper
 
   embedded_in :hbx_enrollment
 
@@ -64,16 +67,21 @@ class HbxEnrollmentMember
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
     return unless coverage_start_on.present?
-    age = coverage_start_on.year - dob.year
-
-    # Shave off one year if coverage starts before birthday
-    if coverage_start_on.month == dob.month
-      age -= 1 if coverage_start_on.day < dob.day
-    else
-      age -= 1 if coverage_start_on.month < dob.month
-    end
-
+    
+    age = calculate_age(coverage_start_on,dob)
     @age_on_effective_date = age
+  end
+
+  def calculate_age(calculation_date,dob)
+    age = calculation_date.year - dob.year
+
+    # Shave off one year if the calculation date is before the birthday.
+    if calculation_date.month == dob.month
+      age -= 1 if calculation_date.day < dob.day
+    else
+      age -= 1 if calculation_date.month < dob.month
+    end
+    return age
   end
 
   def is_subscriber?
@@ -93,6 +101,17 @@ class HbxEnrollmentMember
     else
       true
     end
+  end
+
+  def valid_enrolling_member?
+    return true unless self.hbx_enrollment.employee_role.present?
+    health_offered_relationship_benefits, dental_offered_relationship_benefits =  shop_health_and_dental_relationship_benfits(self.hbx_enrollment.employee_role,self.hbx_enrollment.benefit_group)
+    if self.hbx_enrollment.coverage_kind == "health"
+      return false unless coverage_relationship_check(health_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
+    else
+      return false unless coverage_relationship_check(dental_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
+    end
+    return true
   end
 
   private

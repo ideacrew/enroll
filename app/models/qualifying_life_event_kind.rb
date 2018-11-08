@@ -17,7 +17,7 @@ class QualifyingLifeEventKind
   ## renamed property: kind to action_kind (also renamed associated constant)
 
 
-  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative]
+  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
   MarketKinds = %w[shop individual]
 
   # first_of_next_month: not subject to 15th of month effective date rule
@@ -56,7 +56,9 @@ class QualifyingLifeEventKind
     "exceptional_circumstances_system_outage",
     "exceptional_circumstances_domestic_abuse",
     "exceptional_circumstances_civic_service",
-    "exceptional_circumstances"
+    "exceptional_circumstances",
+    "eligibility_failed_or_documents_not_received_by_due_date",
+    "eligibility_documents_provided"
   ]
 
   field :event_kind_label, type: String
@@ -166,9 +168,17 @@ class QualifyingLifeEventKind
     market_kind == "individual"
   end
 
+  def shop?
+    market_kind == "shop"
+  end
+
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
     %w(birth adoption marriage divorce domestic_partnership).include? reason
+  end
+
+  def is_loss_of_other_coverage?
+    reason == "lost_access_to_mec"
   end
 
   class << self
@@ -194,6 +204,10 @@ class QualifyingLifeEventKind
 
     def individual_market_events_admin
       where(:market_kind => "individual").active.to_a
+    end
+
+    def individual_market_events_without_transition_member_action
+      where(:market_kind => "individual").active.to_a.reject {|qle| qle.action_kind == "transition_member"}
     end
   end
 

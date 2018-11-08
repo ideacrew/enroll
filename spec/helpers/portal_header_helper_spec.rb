@@ -17,7 +17,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
       let(:employee_role) { FactoryGirl.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/employers/employer_profiles/"+ emp_id.to_s + "\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/employers/employer_profiles/"+ emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
       end
 
         it "should have I'm an Employee link when user has active employee_staff_role" do
@@ -35,7 +35,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
     end
 
     context "has_consumer_role?" do
-      let(:current_user) { FactoryGirl.build(:user, :identity_verified_date => TimeKeeper.datetime_of_record)}
+      let(:current_user) { FactoryGirl.build(:user, :identity_verified_date => Time.now)}
       before(:each) do
         allow(current_user).to receive(:has_consumer_role?).and_return(true)
         allow(controller).to receive(:controller_path).and_return("insured")

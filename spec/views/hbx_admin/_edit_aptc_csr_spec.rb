@@ -1,4 +1,3 @@
-require 'pry'
 require 'rails_helper'
 
 RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do

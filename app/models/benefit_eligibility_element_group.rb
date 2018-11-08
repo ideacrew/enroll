@@ -16,6 +16,24 @@ class BenefitEligibilityElementGroup
       guardian
       unrelated
       other_tax_dependent
+      aunt_or_uncle
+      nephew_or_niece
+      grandchild
+      grandparent
+    )
+
+  Relationships_UI = %w(
+      self
+      spouse
+      domestic_partner
+      child
+      parent
+      sibling
+      unrelated
+      aunt_or_uncle
+      nephew_or_niece
+      grandchild
+      grandparent
     )
 
   SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
@@ -40,6 +58,7 @@ class BenefitEligibilityElementGroup
   field :ethnicity,              type: Array, default: ["any"]   # %w[any indian_tribe_member],
   field :cost_sharing,           type: String, default: ""
   field :lawful_presence_status, type: String, default: ""
+  field :active_individual_role, type: Boolean, default: false
 
 
   # validates :eligible_relationship_categories,

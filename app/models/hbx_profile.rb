@@ -101,7 +101,7 @@ class HbxProfile
       employer_profile_ids.each do |empr_id|
         empr = EmployerProfile.find(empr_id)
         hbx_ids << empr.hbx_id
-        empr.update_attribute(:xml_transmitted_timestamp, TimeKeeper.datetime_of_record.utc)
+        empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
       end
       notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
     end
@@ -129,10 +129,10 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  # IndividualEnrollmentDueDayOfMonth = 15
-  # Temporary change for Dec 2015 extension
-  IndividualEnrollmentDueDayOfMonth = 19
-  IndividualEnrollmentTerminationMinimum = 14.days
+  IndividualEnrollmentDueDayOfMonth = 15
+
+  #New Rule There is no 14 days rule for termination
+  # IndividualEnrollmentTerminationMinimum = 14.days
 
   ## Carriers
   # hbx_id, hbx_carrier_id, name, abbrev,

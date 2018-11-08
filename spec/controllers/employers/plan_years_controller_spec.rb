@@ -439,6 +439,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(plan_year_proxy).to receive(:draft?).and_return(false)
+      allow(plan_year_proxy).to receive(:is_application_eligible?).and_return(true)
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
@@ -472,7 +473,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     context "plan year did not publish due to warnings" do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
-        allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
+        allow(plan_year_proxy).to receive(:is_application_eligible?).and_return(false)
         allow(plan_year_proxy).to receive(:application_eligibility_warnings)
       end
 
@@ -556,7 +557,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:save_result) { true }
     let(:plan_year_id) { "plan_year_id"}
     let(:benefit_group_id) { "benefit_group_id"}
-    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', destroy!: true, title: 'bg_one'), double('bg_two')]) }
+    let(:plan_year_proxy) { double("plan_year", benefit_groups: [double('bg_one', disable_benefits: true, title: 'bg_one'), double('bg_two')]) }
 
     before :each do
       sign_in user

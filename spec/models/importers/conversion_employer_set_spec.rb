@@ -31,7 +31,7 @@ describe ::Importers::ConversionEmployerSet do
       let(:record_save_result) { true }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n") 
+        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n")
       end
     end
 
@@ -39,7 +39,7 @@ describe ::Importers::ConversionEmployerSet do
       let(:record_save_result) { false }
       let(:record_errors) { {"some_errors" => "about_a_thing" } }
 
-      it "should write the initial data and the results to the output stream" do  
+      it "should write the initial data and the results to the output stream" do
         expect(out_stream.string).to eql(base_output_result + ",\"[\"\"import failed\"\", \"\"{\\\"\"some_errors\\\"\":\\\"\"about_a_thing\\\"\"}\"\"]\"\n")
       end
     end
@@ -69,7 +69,7 @@ describe ::Importers::ConversionEmployerSet do
       let(:record_save_result) { true }
 
       it "should write the initial data and the results to the output stream" do
-        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n") 
+        expect(out_stream.string).to eql(base_output_result + ",imported,\"\"\n")
       end
     end
 

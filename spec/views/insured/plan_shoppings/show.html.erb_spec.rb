@@ -9,7 +9,7 @@ RSpec.describe "insured/show" do
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member_one],
     employee_role: employee_role,
-    effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record  ) }
+    effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
   let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: 98)}
   let(:broker_person){ FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
   let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
@@ -24,7 +24,7 @@ RSpec.describe "insured/show" do
     allow(hbx_enrollment).to receive_message_chain("household.family").and_return(family)
     @person = person
     @hbx_enrollment = hbx_enrollment
-    @benefit_group = hbx_enrollment.benefit_group
+    @benefit_group = benefit_group
     @reference_plan = @benefit_group.reference_plan
     @plan = PlanCostDecorator.new(plan, hbx_enrollment, @benefit_group, @reference_plan)
     @plans=[]

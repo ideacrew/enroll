@@ -57,6 +57,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
     allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
   end
 
   it "should show the address of census employee" do
@@ -92,6 +93,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     hbx_enrollment.update_attributes(:aasm_state => 'inactive', )
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     allow(hbx_enrollment).to receive(:plan).and_return(nil)
+    allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
     render template: "employers/census_employees/show.html.erb"
     expect(rendered).to match /Waived Date/i
     expect(rendered).to match /#{hbx_enrollment.waiver_reason}/
@@ -237,6 +239,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       aasm_state: 'coverage_terminated' ) }
 
     before :each do
+      allow(dental_hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(past_enrollments).to receive(:benefit_group).and_return(benefit_group)
       allow(census_employee).to receive_message_chain("active_benefit_group_assignment.active_and_waived_enrollments").and_return([hbx_enrollment, dental_hbx_enrollment])
       assign(:past_enrollments, [past_enrollments])
     end
@@ -273,7 +277,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
     context "Employee status" do
-        let(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", hired_on: TimeKeeper.datetime_of_record-15.days, employer_profile: employer_profile) }
+        let(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible", hired_on: Time.now-15.days, employer_profile: employer_profile) }
       before :each do
         census_employee.terminate_employment(TimeKeeper.date_of_record - 10.days) && census_employee.save
         census_employee.coverage_terminated_on = nil
@@ -294,7 +298,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
 
     context "Hiding Address in CensusEmployee page if linked and populated" do
-      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.datetime_of_record-15.days, employer_profile: employer_profile, employer_profile_id: employer_profile.id) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: Time.now-15.days, employer_profile_id: employer_profile.id) }
       before :each do
         census_employee.aasm_state="employee_role_linked"
         census_employee.save!

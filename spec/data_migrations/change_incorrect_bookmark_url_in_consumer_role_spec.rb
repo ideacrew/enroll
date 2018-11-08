@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_incorrect_bookmark_url_in_consumer_role")
-describe ChangeIncorrectBookmarkUrlInConsumerRole do
+describe ChangeIncorrectBookmarkUrlInConsumerRole, dbclean: :after_each do
 
     let(:given_task_name) { "change_incorrect_bookmark_url_in_consumer_role" }
     subject { ChangeIncorrectBookmarkUrlInConsumerRole.new(given_task_name, double(:current_scope => nil)) }
@@ -13,7 +13,7 @@ describe ChangeIncorrectBookmarkUrlInConsumerRole do
   end
 
   describe "changing the incorrect bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, :with_active_consumer_role) }
     let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
     before(:each) do
@@ -28,7 +28,7 @@ describe ChangeIncorrectBookmarkUrlInConsumerRole do
       person.reload
       expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
-    
+
     it "should not change the bookmark_url if they don't have addresses" do
       person.user = FactoryGirl.create(:user, :consumer)
       person.user.update_attributes(:idp_verified => true)
