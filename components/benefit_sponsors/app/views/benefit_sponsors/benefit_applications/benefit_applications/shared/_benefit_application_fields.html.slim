@@ -131,7 +131,6 @@ javascript:
   })
 
   function plansForDate(date) {
-    console.log()
     $.ajax({
       type: "GET",
       data:{
@@ -140,6 +139,10 @@ javascript:
       success: function(res) {
         if (res != true) { // late rate scenario
           $('.alert-info').removeClass('hide');
+          $("#benefitContinueBtn").val("Save");
+        }else if (res == true) {
+          $('.alert-info').addClass('hide');
+          $("#benefitContinueBtn").val("Continue");
         }
       },
       url: "/benefit_sponsors/benefit_sponsorships/#{@benefit_application_form.benefit_sponsorship_id}/benefit_applications/late_rates_check"
