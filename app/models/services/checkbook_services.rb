@@ -162,7 +162,7 @@ module Services
 
       def consumer_build_family
         family = []
-        today = TimeKeeper.date_of_record
+        today = @hbx_enrollment.effective_on
         tribal_id = @hbx_enrollment.consumer_role.person.tribal_id.present?
         @hbx_enrollment.hbx_enrollment_members.each do |member|
           age = member.family_member.person.age_on(today)
