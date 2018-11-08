@@ -1,5 +1,6 @@
 include VerificationHelper
 
+puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 InitialEvents = ["final_eligibility_notice_uqhp", "final_eligibility_notice_renewal_uqhp"]
 unless ARGV[0].present? && ARGV[1].present?
   puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
@@ -35,18 +36,29 @@ report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%
 event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
+
 def valid_enrollments(person)
-  hbx_enrollments = []
+  renewing_hbx_enrollments = []
+  active_hbx_enrollments = []
   family = person.primary_family
-  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"], :kind => "individual")
   return [] if enrollments.blank?
-  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
-  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+  renewing_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2019}
+  renewing_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2019}
 
-  hbx_enrollments << health_enrollments
-  hbx_enrollments << dental_enrollments
+  active_health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
+  active_dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
 
-  hbx_enrollments.flatten.compact
+  active_hbx_enrollments <<  active_health_enrollments
+  active_hbx_enrollments << active_dental_enrollments
+
+  active_hbx_enrollments.flatten!.compact!
+
+  renewing_hbx_enrollments << renewing_health_enrollments
+  renewing_hbx_enrollments << renewing_dental_enrollments
+
+  renewing_hbx_enrollments.flatten!.compact!
+  return renewing_hbx_enrollments, active_hbx_enrollments
 end
 
 def future_date
@@ -55,27 +67,40 @@ end
 
 def get_family(dependents)
   dep_families = dependents.inject({}) do |dep_families, dependent|
-    dep_families[dependent] = get_families_for(dependent).pluck(:id)
-  end rescue nil
-  family_ids = dep_families.values.inject(:&)
-  Family.find(family_ids.first.to_s) if family_ids.count == 1
+    families = get_families_for(dependent)
+    dep_families[dependent] = families.map(&:id) if families.present?
+  end
+  family_ids = dep_families.values.compact.inject(:&)
+  (return Family.find(family_ids.first.to_s)) if family_ids.count == 1
 end
 
 def get_families_for(dependent)
-  Person.where(:hbx_id => dependent["member_id"]).first.families
+  person = Person.by_hbx_id(dependent["member_id"]).first
+  person.families.to_a if person.present?
+end
+
+def get_family_by_policy_id(policy_hbx_id)
+  HbxEnrollment.by_hbx_id(policy_hbx_id).first.family.primary_person
 end
 
 def get_primary_person(members, subscriber)
-  primary_person = (HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person) rescue nil
+  primary_person = get_family_by_policy_id(members.first["policy.id"]) if members.first["policy.id"].present?
   return primary_person if primary_person
-  subscriber_person = Person.where(:hbx_id => subscriber["subscriber_id"]).first
-  primary_person = (subscriber_person if subscriber_person.primary_family) rescue nil
+
+  subscriber_person = Person.by_hbx_id(subscriber["subscriber_id"]).first
+  primary_person = subscriber_person if (subscriber_person && subscriber_person.primary_family)
   return primary_person if primary_person
-  primary_person = Family.where(e_case_id: members.first["ic_number"]).first.primary_person rescue nil
+
+  families = Family.where(e_case_id: /#{members.first["ic_number"]}/)
+  primary_person = families.first.primary_person if families.count = 1
   return primary_person if primary_person
-  primary_person = get_family(members).primary_person rescue nil
+
+  family = get_family(members)
+  primary_person = family.primary_person if family.present?
   return primary_person if primary_person
-  primary_person = subscriber_person.families.first.primary_applicant.person rescue nil
+
+  families = subscriber_person.families
+  primary_person = families.first.primary_applicant.person if families.count == 1
   return primary_person
 end
 
@@ -85,26 +110,24 @@ end
 
 #need to exlude this list from UQHP_FEL data set.
 
-# @excluded_list = []
-# CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
-#   @excluded_list << d["Subscriber"]
-# end
+@excluded_list = []
+CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
+  @excluded_list << d["subscriber_id"]
+end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      #next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
-      subscriber = members.detect{ |m| (m["dependent"] && m["dependent"].upcase == "NO")}
+      (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if event == "final_eligibility_notice_uqhp"
+      subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
       # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
-
-      next if !primary_person.present?
-      enrollments = valid_enrollments(primary_person)
-      next if enrollments.empty?
+      renewing_enrollments, active_enrollments = valid_enrollments(primary_person)
+      next if renewing_enrollments.empty?
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
         if InitialEvents.include? event
@@ -118,7 +141,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: primary_person,
-            enrollments: enrollments,
+            renewing_enrollments: renewing_enrollments,
+            active_enrollments: active_enrollments,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
@@ -129,6 +153,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           primary_person.first_name,
           primary_person.last_name
         ]
+        puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?
       else
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end
@@ -137,3 +162,4 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
     end
   end
 end
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
