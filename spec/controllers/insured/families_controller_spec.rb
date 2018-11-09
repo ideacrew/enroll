@@ -930,7 +930,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "should transition resident to consumer" do
-      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role)}
+      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role, :with_consumer_role)}
       let(:resident_family) { FactoryGirl.create(:family, :with_primary_family_member, person: resident_person) }
       let(:user){ FactoryGirl.create(:user, person: resident_person) }
       let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :resident, person: resident_person) }
