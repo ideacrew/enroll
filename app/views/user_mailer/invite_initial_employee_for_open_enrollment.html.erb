@@ -1,13 +1,14 @@
 <html>
+<span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span><br><br>
 <body>
-  <b>Enroll Now: Your Health Plan Open Enrollment Period has Begun </b>
+  <b>Enroll Now: Your Plan Open Enrollment Period has Begun </b>
   <br/>
   <br/>
   <div>
-   Dear <%= census_employee.first_name.humanize.titleize %>,</div>
+   Dear <%= census_employee.full_name.humanize.titleize %>,</div>
   <br/>
   <div>
-    Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer of health insurance coverage to its employees through the <%= site_short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.
+    Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer of insurance coverage to its employees through the <%= site_short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.
   </div>
   <br/>
   <div>
@@ -16,7 +17,7 @@
     <br/>
     <b> What is New Hire Open Enrollment? </b>
     <br/>
-    New Hire Open Enrollment is a one-time opportunity to enroll in health plans offered by your new employer based on your status as a new employee. After this one-time new hire open enrollment, you will have an annual open enrollment period where you will have the opportunity to make plan changes or drop coverage.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
+    New Hire Open Enrollment is a one-time opportunity to enroll in plans offered by your new employer based on your status as a new employee. After this one-time new hire open enrollment, you will have an annual open enrollment period where you will have the opportunity to make plan changes or drop coverage.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
     <br><br/>
     <b>To See Plan Options and Enroll: </b>
     <br/>

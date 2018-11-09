@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe ContributionCalculators::TieredPercentContributionCalculator do
+  RSpec.describe ContributionCalculators::TieredPercentContributionCalculator, :dbclean => :after_each do
     let(:contribution_calculator) do
       ::BenefitSponsors::ContributionCalculators::TieredPercentContributionCalculator.new
     end

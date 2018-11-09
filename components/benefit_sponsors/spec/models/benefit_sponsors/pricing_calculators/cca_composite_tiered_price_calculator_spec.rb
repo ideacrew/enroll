@@ -1,7 +1,7 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe PricingCalculators::CcaCompositeTieredPriceCalculator do
+  RSpec.describe PricingCalculators::CcaCompositeTieredPriceCalculator, :dbclean => :after_each do
     let(:price_calculator) do
       ::BenefitSponsors::PricingCalculators::CcaCompositeTieredPriceCalculator.new
     end

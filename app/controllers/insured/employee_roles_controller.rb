@@ -28,14 +28,14 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
-        first_name = @person_params[:first_name]
+        full_name = @person_params[:first_name] + " " + @person_params[:last_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
         respond_to do |format|
           format.html { render 'no_match' }
         end
         # Sends an external email to EE when the EE match fails
-        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now unless current_user.email.blank?
+        UserMailer.send_employee_ineligibility_notice(current_user.email, full_name).deliver_now unless current_user.email.blank?
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|
@@ -64,7 +64,7 @@ class Insured::EmployeeRolesController < ApplicationController
                        end
 
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
-    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
+    if @employee_role.present? && @employee_role.census_employee.present? && (current_user.has_hbx_staff_role? || @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do

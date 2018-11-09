@@ -48,7 +48,7 @@
                   | DEDUCTIBLE
           tbody
             tr
-              td = plan.health_plan_kind ? plan.health_plan_kind.upcase : ""
+              td = plan.product_type ? plan.product_type.upcase : ""
               td 
                 - plan_level = plan.metal_level_kind.to_s.humanize
                 span class="#{plan_level.downcase}-icon"

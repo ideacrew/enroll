@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "app/views/events/v2/employers/_elected_plan.xml.haml" do
+describe "app/views/events/v2/employers/_elected_plan.xml.haml", dbclean: :after_each do
   let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:carrier_special_plan_id)  { "abcde" }
   let!(:application_period)  { TimeKeeper.date_of_record.beginning_of_month..TimeKeeper.date_of_record.beginning_of_month + 1.year }
