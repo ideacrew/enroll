@@ -47,6 +47,7 @@ module PdfTemplates
     attribute :no_csr_because_of_tax, Boolean, :default => false
     attribute :no_csr_because_of_mec, Boolean, :default => false
     attribute :has_access_to_affordable_coverage, Boolean, :default => false
+    attribute :non_applicant, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]
     # attribute :ineligible_members_due_to_residency, Array[String]
