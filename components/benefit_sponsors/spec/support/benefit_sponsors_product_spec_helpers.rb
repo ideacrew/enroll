@@ -182,7 +182,7 @@ module BenefitSponsors
         product_1_props,
         product_2_props
       ]
-      BenefitMarkets::Products::Product.collection.insert_many(product_props)
+      #BenefitMarkets::Products::Product.collection.insert_many(product_props)
       product_props
     end
 
@@ -293,7 +293,7 @@ module BenefitSponsors
         product_4_props,
         product_5_props
       ]
-      BenefitMarkets::Products::Product.collection.insert_many(product_props)
+      #BenefitMarkets::Products::Product.collection.insert_many(product_props)
       product_props
     end
 
@@ -417,7 +417,7 @@ module BenefitSponsors
         product_5_props,
         product_6_props
       ]
-      BenefitMarkets::Products::Product.collection.insert_many(product_props)
+      #BenefitMarkets::Products::Product.collection.insert_many(product_props)
       product_props
     end
 
@@ -641,6 +641,7 @@ module BenefitSponsors
         ]
       }
       BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
+      BenefitMarkets::Products::Product.collection.insert_many(product_list)
     end
 
     def self.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
@@ -692,7 +693,7 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
       }
-      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
+      #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
 
       rating_area_id = BenefitSponsors::ProductSpecHelpers.create_cca_rating_areas(effective_period)
 
@@ -739,7 +740,10 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(product_list, effective_period)
         ]
       }
-      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
+      #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
+      BenefitMarkets::BenefitMarketCatalog.collection.insert_many([renewal_benefit_market_catalog_props, benefit_market_catalog_props])
+
+      BenefitMarkets::Products::Product.collection.insert_many(renewal_product_list + product_list)
     end
 
     def self.construct_cca_benefit_market_catalog_with_renewal_and_previous_catalog(site, benefit_market, effective_period)
@@ -791,7 +795,7 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(renewal_product_list, renewal_effective_period)
         ]
       }
-      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
+      #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(renewal_benefit_market_catalog_props)
 
       rating_area_id = BenefitSponsors::ProductSpecHelpers.create_cca_rating_areas(effective_period)
 
@@ -838,7 +842,7 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(product_list, effective_period)
         ]
       }
-      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
+      #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(benefit_market_catalog_props)
 
       previous_ep_min = effective_period.min - 1.year
       previous_ep_max = effective_period.max - 1.year
@@ -889,7 +893,10 @@ module BenefitSponsors
          dental_single_product_product_package_from_product_props(previous_product_list, previous_effective_period)
         ]
       }
-      BenefitMarkets::BenefitMarketCatalog.collection.insert_one(previous_benefit_market_catalog_props)
+      #BenefitMarkets::BenefitMarketCatalog.collection.insert_one(previous_benefit_market_catalog_props)
+
+      BenefitMarkets::BenefitMarketCatalog.collection.insert_many([renewal_benefit_market_catalog_props, benefit_market_catalog_props, previous_benefit_market_catalog_props])
+      BenefitMarkets::Products::Product.collection.insert_many(renewal_product_list + product_list + previous_product_list)
     end
   end
 end

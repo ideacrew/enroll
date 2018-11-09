@@ -113,7 +113,7 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
-  gem 'parallel_tests'
+  gem 'parallel_tests', '2.26.2'
   gem 'puma'
   gem 'railroady', '~> 1.5.2'
   gem 'rspec-rails', '~> 3.4.2'

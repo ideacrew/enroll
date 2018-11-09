@@ -517,7 +517,7 @@ GEM
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
     parallel (1.12.1)
-    parallel_tests (2.21.3)
+    parallel_tests (2.26.2)
       parallel
     parser (2.5.0.5)
       ast (~> 2.4.0)
@@ -845,7 +845,7 @@ DEPENDENCIES
   notifier!
   openhbx_cv2!
   overcommit
-  parallel_tests
+  parallel_tests (= 2.26.2)
   poltergeist
   prawn!
   puma
