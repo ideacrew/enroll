@@ -73,8 +73,10 @@ FactoryGirl.define do
           benefit_sponsorship: benefit_application.benefit_sponsorship,
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
-          aasm_state: evaluator.predecessor_application_state
+          aasm_state: evaluator.predecessor_application_state # ,
+#          recorded_service_areas: benefit_application.benefit_sponsorship.service_areas_on(benefit_application.effective_period.begin - 1.year)
         )
+
         benefit_application.predecessor = predecessor_application
         benefit_application.benefit_packages.first.predecessor = predecessor_application.benefit_packages.first
       end

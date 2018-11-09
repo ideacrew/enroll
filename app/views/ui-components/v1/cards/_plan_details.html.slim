@@ -13,8 +13,10 @@
             = l10n("standard_plan").to_s.upcase
     .row.mt-1
       - if @enrolled_hbx_enrollment_plan_ids.include?(plan.id)
-        h5.col-md-12.current.bg-title
-          i.fa.fa-star.fa-lg.enrolling = l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase
+        link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous"
+        .col-md-12
+          span.fas.fa-star.fa-lg.enrolling style=("color: gold")
+          h5.current.bg-title = l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase
     .row
       .col-md-2.col-sm-2 = display_carrier_logo(Maybe.new(plan), {width: 80})
       .col-md-7
@@ -46,7 +48,7 @@
                   | DEDUCTIBLE
           tbody
             tr
-              td = plan.health_plan_kind ? plan.health_plan_kind.upcase : ""
+              td = plan.product_type ? plan.product_type.upcase : ""
               td 
                 - plan_level = plan.metal_level_kind.to_s.humanize
                 span class="#{plan_level.downcase}-icon"

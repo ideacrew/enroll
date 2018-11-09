@@ -33,9 +33,9 @@ module BenefitSponsors
         def map_ce_relationship(rel)
           {
             "spouse" => "spouse",
-            "domestic_partner" => "domestic partner",
+            "domestic_partner" => "domestic_partner",
             "child_under_26" => "child",
-            "disabled_child_26_and_over" => "disabled child"
+            "disabled_child_26_and_over" => "child"
           }[rel]
         end
 

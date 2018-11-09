@@ -32,6 +32,14 @@ module Queries
         query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
         Plan.for_service_areas_and_carriers(query,  start_on).shop_market.check_plan_offerings_for_sole_source.health_coverage.and(hios_id: /-01/)
       end
+
+      def single_option_offered_dental_plans(carrier_id, start_on)
+        carrier_profile = CarrierProfile.find(carrier_id)
+        profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, start_on)
+        query = profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile.id }
+        # toDO - why check for hios-id above
+        Plan.for_service_areas_and_carriers(query,  start_on, nil, 'dental').shop_market.dental_coverage
+      end
     end
   end
 end

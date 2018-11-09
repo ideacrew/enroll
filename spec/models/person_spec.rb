@@ -569,6 +569,7 @@ describe Person, :dbclean => :after_each do
     end
   end
 
+=begin
   describe '#find_all_staff_roles_by_employer_profile' do
     employer_profile = FactoryGirl.build(:employer_profile)
     person = FactoryGirl.build(:person)
@@ -579,6 +580,7 @@ describe Person, :dbclean => :after_each do
     end
 
   end
+=end
 
   describe "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
     include_context "BradyBunchAfterAll"

@@ -96,6 +96,7 @@ plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'One Level'
   single_carrier: 'One Carrier'
+  single_plan: 'One Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
 notices:
@@ -126,7 +127,7 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   broker_carrier_appointments_enabled: true
-  dental_market_enabled: false
+  dental_market_enabled: true
   calendar_enabled: true
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
@@ -137,6 +138,7 @@ aca:
   security_questions: true
   user_accounts_enabled: true
   plan_options_available: ["sole_source", "single_carrier", "metal_level"]
+  dental_plan_options_available: ["single_plan"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
   enabled_metal_levels_for_single_carrier: ["silver", "gold", "dental"]
   carrier_hios_logo_variant:
@@ -144,9 +146,9 @@ aca:
   ## acceptable options are ["platinum", "gold", "silver", "dental"]
 
   plan_option_years:
-    single_carriers_available: ['2018']
-    sole_source_carriers_available: ['2017','2018']
-    metal_level_carriers_available: ['2018']
+    single_carriers_available: ['2018', '2019']
+    sole_source_carriers_available: ['2017','2018', '2019']
+    metal_level_carriers_available: ['2018', '2019']
 
   qle:
     with_in_sixty_days: 60
@@ -193,7 +195,7 @@ aca:
       advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 24
+        day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
@@ -206,7 +208,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 24
+        day_of_month: 0
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
       application_submission_soft_deadline: 10

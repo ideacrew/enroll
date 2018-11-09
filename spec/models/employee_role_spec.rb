@@ -47,7 +47,7 @@ end
 
 describe ".coverage_effective_on" do
 
-  context 'when both active and renewal benefit groups present' do 
+  context 'when both active and renewal benefit groups present', dbclean: :after_each do 
 
     let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
 
@@ -60,16 +60,17 @@ describe ".coverage_effective_on" do
     #   FactoryGirl.create :benefit_group, plan_year: renewal_plan_year
     #   employer
     # }
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-      :with_site,
-      :with_aca_shop_dc_employer_profile_renewal_application
+      :with_aca_shop_dc_employer_profile_renewal_application,
+      site: site
     )}
 
     let(:employer_profile)        { organization.employer_profile }
     let!(:rating_area)            { FactoryGirl.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)           { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+#    let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
 
 
@@ -124,10 +125,11 @@ describe EmployeeRole, dbclean: :after_each do
     let(:saved_person) {FactoryGirl.create(:person, first_name: "Annie", last_name: "Lennox", addresses: [address])}
     let(:new_person) {FactoryGirl.build(:person, first_name: "Carly", last_name: "Simon")}
     # let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-      :with_site,
-      :with_aca_shop_dc_employer_profile_initial_application
+      :with_aca_shop_dc_employer_profile_initial_application,
+      site: site
     )}
     let(:employer_profile) { organization.employer_profile }
 
@@ -303,14 +305,15 @@ describe EmployeeRole, dbclean: :after_each do
   let(:gender) { "male" }
   let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
   let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
-  let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+  let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :cca, :as_hbx_profile) }
 
   context "when created" do
     # let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-      :with_site,
-      :with_aca_shop_dc_employer_profile_initial_application
+    let(:organization) { 
+      FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_cca_employer_profile_initial_application,
+        site: site
     )}
 
     let(:employer_profile) { organization.employer_profile }
@@ -335,10 +338,6 @@ describe EmployeeRole, dbclean: :after_each do
         }
       )
     }
-
-    before do
-      benefit_sponsorship
-    end
 
     it "parent created_at should be right" do
       expect(person.created_at).to eq person_created_at
@@ -478,10 +477,11 @@ describe EmployeeRole, dbclean: :after_each do
     let(:non_match_size)              { 3 }
     # let(:match_employer_profile)      { FactoryGirl.create(:employer_profile) }
     # let(:non_match_employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
     let(:organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-      :with_site,
-      :with_aca_shop_dc_employer_profile_initial_application
+      :with_aca_shop_dc_employer_profile_initial_application,
+      site: site
     )}
 
     let(:match_employer_profile) { organization1.employer_profile }
@@ -536,9 +536,11 @@ describe EmployeeRole, dbclean: :after_each do
   let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:middle_of_prev_year) { Date.new(calendar_year - 1, 6, 10) }
 
+  let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
+
   let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-    :with_site,
-    :with_aca_shop_dc_employer_profile_initial_application
+    :with_aca_shop_dc_employer_profile_initial_application,
+    site: site
   )}
 
   let(:employer_profile) { organization.employer_profile }
@@ -739,10 +741,11 @@ describe "#benefit_group", dbclean: :after_each do
   subject { EmployeeRole.new(:person => person, :employer_profile => employer_profile, :census_employee => census_employee) }
   let(:person) { FactoryGirl.create(:person, :with_ssn) }
   # let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+  let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
   let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-    :with_site,
-    :with_aca_shop_dc_employer_profile_renewal_application
+    :with_aca_shop_dc_employer_profile_renewal_application,
+    site: site
   )}
 
   let(:employer_profile) { organization.employer_profile  }
@@ -798,10 +801,11 @@ describe "#benefit_group", dbclean: :after_each do
   end
 
   context "plan shop through qle and having active & expired plan years" do
+    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :cca, :as_hbx_profile) }
 
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
-      :with_site,
-      :with_aca_shop_cca_employer_profile_expired_application
+      :with_aca_shop_cca_employer_profile_expired_application,
+      site: site
     )}
 
     let(:employer_profile) { organization.employer_profile  }

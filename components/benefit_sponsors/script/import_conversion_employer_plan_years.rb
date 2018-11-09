@@ -10,8 +10,7 @@ module BenefitSponsors
         config = YAML.load_file("#{Rails.root}/conversions.yml")
         result_file = File.open(File.join(Rails.root, "conversion_employer_plan_year_results", "RESULT_PLAN_YEARS_" + File.basename(in_file) + ".csv"), 'wb')
 
-        # get site key from new model
-        if Settings.site.key == :cca
+        if BenefitSponsors::Site.by_site_key(:cca).present?
           importer = BenefitSponsors::Importers::Mhc::ConversionEmployerPlanYearSet.new(in_file, result_file, config)
         else
           importer = ::Importers::ConversionEmployerPlanYearSet.new(in_file, result_file, config["conversions"]["plan_year_date"])

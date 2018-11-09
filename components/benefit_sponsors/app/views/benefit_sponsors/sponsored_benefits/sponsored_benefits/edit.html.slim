@@ -1,0 +1,48 @@
+= content_for :navigation do
+  = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
+
+.container
+  h1.heading-text Dental - Edit Benefit Package
+  h4 Let's start by creating a benefit package. As you complete the fields below, you can scroll up or down to change your choices at any time to see how it impacts your costs.
+  .row#change_reference_product
+  .row.dental#edit_dental_form
+    = form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "update"}, method: :patch do |f|
+      = f.hidden_field :kind, value: f.object.kind
+      = f.hidden_field :id, value: f.object.id if f.object.id.present?
+      = f.hidden_field :product_option_choice, value: f.object.product_option_choice
+      = f.hidden_field :product_package_kind, value: f.object.product_package_kind      
+      = render "sponsored_benefit", f: f
+      = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary"
+      = link_to "Remove Dental Benefits <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br'
+      = f.submit "Save Benefit Package", class: "btn btn-default btn-primary pull-right"
+      = pundit_span EmployerProfile, :updateable?
+
+
+
+javascript:
+
+  // var form = #{@sponsored_benefit_form.to_json.html_safe}
+
+  // function setEditSliderInput(element) {
+  //   document.querySelector(".edit_slider-"+element.dataset.unitId).value = element.value
+  // }
+
+  // function setEditNumberInput(element) {
+  //   document.querySelector(".edit_cl-input-"+element.dataset.unitId).value = element.value
+  // }
+
+  function setSliderInput(element) {
+    document.querySelector(".slider-"+element.dataset.unitId).value = element.value
+  }
+
+  function setNumberInput(element) {
+    document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value
+  }
+
+  function loadSingleProductSponsorContribution(element) {
+    document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {
+      key.classList.add("hidden")
+    })
+    document.getElementById("carrierProducts"+element.dataset.issuername).classList.remove('hidden')
+    document.getElementById("referencePlans").classList.remove('hidden')
+  }

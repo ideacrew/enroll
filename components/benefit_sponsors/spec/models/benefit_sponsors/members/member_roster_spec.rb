@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Members::MemberRoster, type: :model do
+  RSpec.describe Members::MemberRoster, type: :model, :dbclean => :after_each do
 
     let(:employee_1)    { FactoryGirl.build(:benefit_sponsors_members_employee_member, :as_male) }
 

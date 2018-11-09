@@ -57,7 +57,7 @@ spec/vocabularies
 components/**/spec/dummy/tmp
 components/**/spec/examples.txt
 plan_xmls.zip
-
+fixture_dumps
 # Ignore byebug history
 .byebug_history
 

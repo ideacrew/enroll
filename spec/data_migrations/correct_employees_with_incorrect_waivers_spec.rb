@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "correct_employees_with_incorrect_waivers")
 
-describe CorrectEmployeesWithIncorrectWaivers do
+describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
 
   let(:given_task_name) { "correct_employees_with_incorrect_waivers" }
   subject { CorrectEmployeesWithIncorrectWaivers.new(given_task_name, double(:current_scope => nil)) }

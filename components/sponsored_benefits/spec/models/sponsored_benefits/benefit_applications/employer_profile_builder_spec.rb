@@ -17,7 +17,7 @@ module SponsoredBenefits
       }
     end
 
-    context "add_benefit_sponsors_benefit_application" do
+    context "add_benefit_sponsors_benefit_application", dbclean: :after_each do
       let(:benefit_application)       { SponsoredBenefits::BenefitApplications::BenefitApplication.new(params) }
       let(:benefit_sponsorship)       { SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(
         benefit_market: "aca_shop_cca",

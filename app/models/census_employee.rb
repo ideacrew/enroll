@@ -290,6 +290,15 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def employee_record_claimed?(new_employee_role = nil)
+    if new_employee_role.present?
+      new_employee_role.person.user.present?
+    else
+      return false unless employee_role
+      employee_role.person.user.present?
+    end
+  end
+
   def employee_role=(new_employee_role)
     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
     return false unless self.may_link_employee_role?
@@ -298,7 +307,7 @@ class CensusEmployee < CensusMember
     if (self.benefit_sponsors_employer_profile_id == new_employee_role.benefit_sponsors_employer_profile_id) || slug
       self.employee_role_id = new_employee_role._id
       @employee_role = new_employee_role
-      self.link_employee_role! if self.may_link_employee_role?
+      self.link_employee_role! if employee_record_claimed?(new_employee_role)
     else
       message =  "Identifying information mismatch error linking employee role: "\
                  "#{new_employee_role.inspect} "\
@@ -360,21 +369,29 @@ class CensusEmployee < CensusMember
   #   end
   # end
 
-  def active_benefit_group
+  def active_benefit_package
     if active_benefit_group_assignment.present?
-      active_benefit_group_assignment.benefit_group
+      if active_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+        active_benefit_group_assignment.benefit_group
+      end
     end
   end
+
+  alias_method :active_benefit_group, :active_benefit_package
 
   def published_benefit_group
     published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
   end
 
-  def renewal_published_benefit_group
-    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-      renewal_benefit_group_assignment.benefit_group
+  def renewal_published_benefit_package
+    if renewal_benefit_group_assignment.present?
+      if renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+        renewal_benefit_group_assignment.benefit_group
+      end
     end
   end
+
+  alias_method :renewal_published_benefit_group, :renewal_published_benefit_package
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
@@ -594,12 +611,12 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+      send_invite! if _id_changed? && !Rails.env.test?
       # we do not want to create employer role durig census employee saving for conversion
-      return if self.employer_profile.is_a_conversion_employer?
+      # return if self.employer_profile.is_a_conversion_employer? ### this check needs to be re-done when loading mid_PY conversion and needs to have more specific check.
 
       if employee_role.present?
-        self.link_employee_role! if may_link_employee_role?
+        self.link_employee_role! if may_link_employee_role? && employee_record_claimed?
       else
         construct_employee_role_for_match_person if has_benefit_group_assignment?
       end
@@ -815,13 +832,8 @@ class CensusEmployee < CensusMember
 
       if employer_profiles.size > 0
         employer_profile_ids = employer_profiles.map(&:_id)
-        query = unscoped.terminated.any_in(employer_profile_id: employer_profile_ids).
-                                    where(
-                                      :employment_terminated_on.gte => date_range.first,
-                                      :employment_terminated_on.lte => date_range.last
-                                    ) if employer_profiles[0].is_a?(EmployerProfile)
 
-        query ||= unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
+        query = unscoped.terminated.any_in(benefit_sponsors_employer_profile_id: employer_profile_ids).
                                     where(
                                       :employment_terminated_on.gte => date_range.first,
                                       :employment_terminated_on.lte => date_range.last

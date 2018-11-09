@@ -18,6 +18,7 @@ module BenefitSponsors
           @participation_percent_factor = pp_factor
           @sic_code_factor = sc_factor
           @previous_product = r_coverage.previous_product
+          @discount_kid_count = 0
         end
 
         def add(member)
@@ -25,14 +26,14 @@ module BenefitSponsors
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
-          # TODO: make this more configurable, this is an awful hack.
-          # The literal string value of "child" makes me uneasy.
-          # This value should either be stored or tested for in the pricing model.
-          too_many_kids_make_you_crazy = if (rel.to_s == "child")  && (@relationship_totals["child"] > 3)
-                                           0.0
-                                         else
-                                           1.0
-                                         end
+          if (rel.to_s == "dependent") && (coverage_age < 21)
+            @discount_kid_count = @discount_kid_count + 1
+          end
+          too_many_kids_make_you_crazy = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3)
+            0.0
+          else
+            1.0
+          end
           member_plan_price =  ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
                                   @product,
                                   @rate_schedule_date,

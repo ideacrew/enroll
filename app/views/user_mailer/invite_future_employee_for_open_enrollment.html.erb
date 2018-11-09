@@ -1,11 +1,12 @@
 <html>
+<span class="wid50" align="left"><%= TimeKeeper.date_of_record.strftime('%m/%d/%Y') %></span><br><br>
 <body>
   <b>You Have Been Invited to Sign Up for Employer-Sponsored Coverage through the Massachusetts <%= site_short_name %></b>
 <br/>
 <br/>
-<div>Dear <%= census_employee.first_name.humanize.titleize %>,</div>
+<div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
 <br/><br/>
-  Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored health insurance through the <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+  Congratulations! <%= census_employee.employer_profile.legal_name %> has invited you to sign up for employer-sponsored insurance through the <%= site_short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
 <br/>
 <div>
@@ -14,7 +15,7 @@
   <br/>
   <b> What is New Hire Open Enrollment? </b>
   <br/>
-  New Hire Open Enrollment is a one-time opportunity to enroll in health plans offered by your new employer based on your status as a new employee.   After this one-time new hire open enrollment, you will have an annual open enrollment period where you will have the opportunity to make plan changes or drop coverage.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
+  New Hire Open Enrollment is a one-time opportunity to enroll in plans offered by your new employer based on your status as a new employee.   After this one-time new hire open enrollment, you will have an annual open enrollment period where you will have the opportunity to make plan changes or drop coverage.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
   <br/>
   <b>To See Plan Options and Enroll: </b>
   <br/>
@@ -46,7 +47,7 @@
   <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Instructions for how to waive coverage are included in our <b>Employee guide to waiving coverage</b>, also available in the <%= link_to_site_business_resource_center %>.
 
   <b>What If I Already Have Coverage through the <%= site_short_name %>?</b>
-  If you currently have individual market coverage through the <%= site_short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored health coverage, you will need to contact the <%= site_short_name %> at <%= contact_center_ivl_number %>.
+  If you currently have individual market coverage through the <%= site_short_name %> and would like to terminate that coverage when you enroll in your employer-sponsored coverage, you will need to contact the <%= site_short_name %> at <%= contact_center_ivl_number %>.
 
   <h2 style="color: #007bc4;">
     For Questions or Assistance:

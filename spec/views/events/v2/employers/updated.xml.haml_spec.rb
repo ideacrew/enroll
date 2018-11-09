@@ -17,6 +17,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     }
     let(:benefit_application) { employer_profile.latest_benefit_application }
     let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
+    let!(:dental_product_package) {benefit_market_catalog.product_packages.where(product_kind: :dental).first}
     let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
     let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
     let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
@@ -95,7 +96,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
       end
 
       it "should have benefit group id" do
-        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_group.id.to_s
+        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_package.id.to_s
       end
 
       it "should be schema valid" do
@@ -104,24 +105,24 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     end
 
     context "with dental plans" do
+      context "is_offering_dental? is true" do
 
-      # TODO No dental for MA fix for DC.
+        let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package,dental_sponsored_benefit:true,  dental_product_package:dental_product_package) }
+        let!(:dental_sponsored_benefit) {benefit_package.dental_sponsored_benefit}
+        let!(:update_dental_product) {dental_sponsored_benefit.reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
+        let(:dental_sponsor_contribution) {FactoryGirl.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
 
-      # context "is_offering_dental? is true" do
-      #
-      #   before do
-      #     dental_plan = FactoryGirl.create(:plan, name: "new dental plan", coverage_kind: 'dental',
-      #                                      dental_level: 'high')
-      #     benefit_group.elected_dental_plans = [dental_plan]
-      #     benefit_group.dental_reference_plan_id = dental_plan.id
-      #     plan_year.save!
-      #   end
-      #
-      #   it "shows the dental plan in output" do
-      #     render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
-      #     expect(rendered).to include "new dental plan"
-      #   end
-      # end
+        before do
+          allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+          allow(dental_sponsor_contribution).to receive(:contribution_model).and_return(dental_product_package.contribution_model)
+        end
+
+        it "shows the dental plan in output" do
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: false}
+          @doc2 = Nokogiri::XML(rendered)
+          expect(@doc2.xpath("//x:benefit_groups/x:benefit_group/x:elected_plans/x:elected_plan/x:is_dental_only", "x"=>"http://openhbx.org/api/terms/1.0").detect {|node| node.text == "true" }.present?).to eq true
+        end
+      end
 
 
       context "is_offering_dental? is false" do
@@ -129,9 +130,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
         end
         it "does not show the dental plan in output" do
-
           render :template => "events/v2/employers/updated", :locals => {:employer => employer_profile, manual_gen: false}
-          expect(rendered).not_to include "new dental plan"
+          @doc2 = Nokogiri::XML(rendered)
+          expect(@doc2.xpath("//x:benefit_groups/x:benefit_group/x:elected_plans/x:elected_plan/x:is_dental_only", "x"=>"http://openhbx.org/api/terms/1.0").detect {|node| node.text == "true" }.present?).to eq false
         end
       end
     end
