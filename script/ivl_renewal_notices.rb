@@ -88,7 +88,7 @@ def get_primary_person(members, subscriber)
   return primary_person if primary_person
 
   families = Family.where(e_case_id: /#{members.first["ic_number"]}/)
-  primary_person = families.first.primary_person if families.count = 1
+  primary_person = families.first.primary_person if families.count == 1
   return primary_person if primary_person
 
   family = get_family(members)
