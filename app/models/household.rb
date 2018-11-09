@@ -85,10 +85,13 @@ class Household
     if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
-      if tax_households.present?
-        latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
+
+      active_tax_households = tax_households.tax_household_with_year(verified_tax_household.start_date.year).active_tax_household if tax_households.present?
+
+      if active_tax_households.present?
+        active_tax_households.update_all(effective_ending_on: verified_tax_household.start_date)
       end
+
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
@@ -103,24 +106,6 @@ class Household
         is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false,
         is_medicaid_chip_eligible: verified_primary_tax_household_member.is_medicaid_chip_eligible ? verified_primary_tax_household_member.is_medicaid_chip_eligible : false
       )
-
-      # verified_primary_family_member.financial_statements.each do |fs|
-      #   th.tax_household_members.first.financial_statements.build(
-      #     tax_filing_status: fs.tax_filing_status.split('#').last,
-      #     is_tax_filing_together: fs.is_tax_filing_together
-      #   )
-
-      #   th.tax_household_members.first.financial_statements.last.incomes.each do |i|
-      #     th.tax_household_members.first.financial_statements.last.incomes.build(
-      #       amount:
-      #       end_date:
-      #       frequency:
-      #       start_date:
-      #       submitted_date:
-      #       type:
-      #     )
-      #   end
-      # end
 
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
 
