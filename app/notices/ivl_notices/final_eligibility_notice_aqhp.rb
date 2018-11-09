@@ -130,6 +130,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :no_csr_because_of_income => datum["noncsr_reason"].downcase == "over income" ? true : false,
         :no_csr_because_of_tax => datum["noncsr_reason"].downcase == "tax" ? true : false,
         :no_csr_because_of_mec => datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
+        :non_applicant => datum["nonaptc_reason"].downcase == "non-applicant" ? true : false,
         :tax_household => append_tax_household_information(primary_member)
       })
     end
