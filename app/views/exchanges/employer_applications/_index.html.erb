@@ -31,7 +31,7 @@
             <td><%= TimeKeeper.format_date(application.open_enrollment_period.end) %></td>
             <td><%= TimeKeeper.format_date_time(application.created_at) %></td>
             <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
-            <td><%= application.aasm_state.to_s %></td>
+            <td><%= benefit_application_summarized_state(application) %></td>
             <td colspan="1">
               <div class="btn-group" id="plan-year-btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle disabled py-btn-grp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
