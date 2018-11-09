@@ -176,6 +176,10 @@ module Config::SiteHelper
     Settings.site.invoice_bill_url
   end
 
+  def site_user_sign_in_url
+    Settings.site.user_sign_in_url
+  end
+
   def mail_address
     Settings.site.mail_address
   end
