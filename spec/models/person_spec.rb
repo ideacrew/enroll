@@ -424,6 +424,24 @@ describe Person do
         end
       end
 
+      context "is_resident_role_active?" do
+        let(:person) {FactoryGirl.create(:person, :with_resident_role, :with_active_resident_role)}
+
+        it "should return true" do
+          expect(person.is_resident_role_active?).to eq true
+        end
+
+        it "should return false as person doesn't have resident_role imt" do
+          allow(person).to receive(:is_resident_role_active?).and_return(false)
+          expect(person.is_resident_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have resident_role" do
+          allow(person).to receive(:resident_role).and_return(nil)
+          expect(person.is_resident_role_active?).to eq false
+        end
+      end
+
       context "has_multiple_roles?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
