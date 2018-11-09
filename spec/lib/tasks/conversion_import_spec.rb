@@ -16,8 +16,10 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
     end
 
     it 'should generate csv with given headers' do
-      expected_csv_headers = %w(fein dba legal_name sic_code physical_address_1 physical_address_2 city county state zip mailing_address_1 mailing_address_2 city state zip contact_first_name contact_last_name contact_email contact_phone
-                                 Enrolled_Employee_count New_Hire_Coverage_Policy coverage_start_date)
+      expected_csv_headers = %w(Action FEIN Doing\ Business\ As Legal\ Name Issuer\ Assigned\ Employer\ ID SIC\ code Physical\ Address\ 1 Physical\ Address\ 2 City County County\ FIPS\ code State Zip Mailing\ Address\ 1 Mailing\ Address\ 2
+                     City State Zip Contact\ First\ Name Contact\ Last\ Name Contact\ Email Contact\ Phone Contact\ Phone\ Extension Enrolled\ Employee\ Count New\ Hire\ Coverage\ Policy Contact\ Address\ 1 Contact\ Address\ 2
+                     City State Zip Broker\ Name Broker\ NPN TPA\ Name TPA\ Fein Coverage\ Start\ Date Carrier\ Selected Plan\ Selection\ Category Plan\ Name Plan\ HIOS\ ID Employer\ Contribution\ -\ Employee Employer\ Contribution\ -\ Spouse
+                     Employer\ Contribution\ -\ Domestic\ Partner Employer\ Contribution\ -\ Child\ under\ 26)
       Rake::Task["conversion_import:employers"].invoke("")
       data = CSV.read "#{Rails.root}/public/employers_export_conversion.csv"
       expect(data).to eq [expected_csv_headers]
@@ -36,8 +38,8 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
     end
 
     it 'should generate csv with given headers' do
-      headers = %w(sponsor_name fein hired_on benefit_begin_date premium_total employer_contribution subscriber_ssn subscriber_dob subscriber_gender subscriber_first_name subscriber_middle_initial subscriber_last_name subscriber_email subscriber_phone
-                     subscriber_address_1 subscriber_address_2 subscriber_city subscriber_state subscriber_zip)
+      headers = %w(Action Type\ Of\ Enrollment Market Sponsor\ Name FEIN Issuer\ Assigned\ Employer\ ID  HIRED\ ON Benefit\ Begin\ Date Plan\ Name HIOS\ ID Premium\ Total Employer\ Contribution Employee\ Responsible\ Amount  Subscriber\ SSN Subscriber\ DOB Subscriber\ Gender Subscriber\ First\ Name Subscriber\ Middle\ Name Subscriber\ Last\ Name Subscriber\ Email Subscriber\ Phone
+                     Subscriber\ Address\ 1 Subscriber\ Address\ 2 Subscriber\ City Subscriber\ State Subscriber\ Zip SELF)
       dep_headers = []
       7.times do |i|
         ["SSN", "DOB", "Gender", "First Name", "Middle Name", "Last Name", "Email", "Phone", "Address 1", "Address 2", "City", "State", "Zip", "Relationship"].each do |h|
