@@ -14,6 +14,7 @@ namespace :reports do
       file_name = "#{Rails.root}/public/employers_failing_minimum_participation.csv"
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
+      j = 0 # flush counter
       CSV.open(file_name, "w") do |csv|
         csv << field_names
 
@@ -26,7 +27,7 @@ namespace :reports do
           end
 
           enrollment_errors = plan_year.enrollment_errors
-          
+
           if enrollment_errors.any?
             csv << [
               employer.fein,
@@ -40,6 +41,13 @@ namespace :reports do
             ]
           end
 
+          j += 1
+
+          if j % 100
+            puts "Buffer flushed at #{j} records"
+            csv.flush
+          end
+
         end
 
       end
@@ -51,7 +59,7 @@ namespace :reports do
       errors << "Non-Owner" if json_errors["non_business_owner_enrollment_count"].present?
       errors << "At least one Employee" if json_errors["eligible_to_enroll_count"].present?
       return errors.join(" & ")
-    end  
+    end
 
   end
 end
