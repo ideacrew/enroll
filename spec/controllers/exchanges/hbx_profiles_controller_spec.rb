@@ -704,8 +704,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "POST update_dob_ssn" do
 
-    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:person1) { FactoryBot.create(:person) }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person1) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:family1) {FactoryBot.create(:family, :with_primary_family_member, person: person1) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryBot.create(:hbx_profile)}
@@ -726,6 +728,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     it "should render update_enrollment if the save is successful" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      allow(person).to receive(:primary_family).and_return family
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
@@ -753,6 +756,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     it "should render update enrollment if the save is successful" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      allow(person1).to receive(:primary_family).and_return family1
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person1.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
