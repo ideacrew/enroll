@@ -106,17 +106,20 @@ end
 
 #need to exlude this list from UQHP_FEL data set.
 
-@excluded_list = []
-CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
-  @excluded_list << d["subscriber_id"]
-end
+# if event == "final_eligibility_notice_uqhp"
+#   @excluded_list = []
+#   CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
+#     @excluded_list << d["subscriber_id"]
+#   end
+# end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if event == "final_eligibility_notice_uqhp"
+      # (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if event == "final_eligibility_notice_uqhp"
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
+      next if subscriber.nil?
       primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
       # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
