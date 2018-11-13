@@ -111,11 +111,20 @@ if InitialEvents.include?(event)
   end
 end
 
+
+# if event == "final_eligibility_notice_uqhp"
+#   @excluded_list = []
+#   CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
+#     @excluded_list << d["subscriber_id"]
+#   end
+# end
+
+
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      (next if members.any?{ |m| @excluded_list.include?(m["member_id"]) }) if InitialEvents.include?(event)
+      #(next if members.any?{ |m| @excluded_list.include?(m["member_id"]) }) if InitialEvents.include?(event)
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       next if subscriber.nil?
 
