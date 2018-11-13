@@ -7,8 +7,6 @@ class Exchanges::ResidentsController < ApplicationController
   before_action :find_resident_role, only: [:edit, :update]
   before_action :authorize_user
 
-  after_action :create_initial_market_transition, only: [:create]
-
   def index
     @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
 
@@ -200,16 +198,6 @@ class Exchanges::ResidentsController < ApplicationController
       :no_dc_address,
       :no_dc_address_reason
     ]
-  end
-
-  def create_initial_market_transition
-    transition = IndividualMarketTransition.new
-    transition.role_type = "resident"
-    transition.submitted_at = TimeKeeper.datetime_of_record
-    transition.reason_code = "generating_resident_role"
-    transition.effective_starting_on = TimeKeeper.datetime_of_record
-    transition.user_id = current_user.id
-    Person.find(session[:person_id]).individual_market_transitions << transition
   end
 
 
