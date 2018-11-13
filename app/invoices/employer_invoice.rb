@@ -115,7 +115,7 @@ class EmployerInvoice
   end
 
   def invoice_file_name
-    "#{@organization.hbx_id}_#{Time.now.strftime("%m%d%Y")}_INVOICE_R.pdf"
+    "#{@organization.hbx_id}_#{TimeKeeper.date_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
   end
 
 end
