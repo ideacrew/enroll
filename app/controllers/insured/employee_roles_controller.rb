@@ -24,6 +24,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
     @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
+    check_and_update_for_staff_role_person(@employee_candidate)
     @person = @employee_candidate
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
@@ -211,4 +212,13 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
+
+  def check_and_update_for_staff_role_person(employee_candidate)
+    # staff Role person record do not have SSN and Gender on it. but while building employee role
+    # we need those as part of validation on employee role
+    person = employee_candidate.match_person
+    if (person.ssn.blank? || person.gender.blank?)
+      person.update_attributes(encrypted_ssn: CensusMember.encrypt_ssn(employee_candidate.ssn), gender:employee_candidate.gender) if person.has_active_employer_staff_role?
+    end
+   end
 end
