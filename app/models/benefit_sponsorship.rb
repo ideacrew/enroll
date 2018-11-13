@@ -85,7 +85,7 @@ class BenefitSponsorship
 
   class << self
     def advance_day(new_date)
-
+      @logger = Logger.new("#{Rails.root}/log/benefit_sponsorship_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       hbx_sponsors = Organization.exists("hbx_profile.benefit_sponsorship": true).reduce([]) { |memo, org| memo << org.hbx_profile }
 
       hbx_sponsors.each do |hbx_sponsor|
@@ -94,13 +94,13 @@ class BenefitSponsorship
         hbx_sponsor.advance_quarter if new_date.day == 1 && [1, 4, 7, 10].include?(new_date.month)
         hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
       end
-
+      @logger.info "Done with hbx_sponsors advance_year, advance_day, advance_month, advance_quarter"
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
       if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date && !Rails.env.test?
         oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
         oe_begin.process_renewals
       end
-
+      @logger.info "Done with renewal_benefit_coverage_period for IVL"
       # # Find families with events today and trigger their respective workflow states
       # orgs = Organization.or(
       #   {:"employer_profile.plan_years.start_on" => new_date},

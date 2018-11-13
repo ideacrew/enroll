@@ -817,8 +817,11 @@ class Family
     def advance_day(new_date)
       @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       expire_individual_market_enrollments
+      @logger.info "Done with expire_individual_market_enrollments"
       begin_coverage_for_ivl_enrollments
+      @logger.info "Done with begin_coverage_for_ivl_enrollments"
       send_enrollment_notice_for_ivl(new_date)
+      @logger.info "Done with send_enrollment_notice_for_ivl"
     end
 
     def send_enrollment_notice_for_ivl(new_date)
