@@ -37,6 +37,9 @@ module Factories
     end
 
     def end
+      @logger.debug "Processing #{employer_profile.legal_name}"
+      result = @employer_profile.plan_years.any?{ |plan_year| plan_year.benefit_groups.any?{|bg| bg.is_congress?}}
+      @logger.debug "Is congresstional employer? #{result}"
       expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.each do |expiring_plan_year|
         expiring_plan_year.hbx_enrollments.each do |enrollment|
