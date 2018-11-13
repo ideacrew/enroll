@@ -652,11 +652,11 @@ class Person
   end
 
   def is_consumer_role_active?
-    self.active_individual_market_role == "consumer" ? true : false
+    (self.consumer_role.present? && self.active_individual_market_role == "consumer") ? true : false
   end
 
   def is_resident_role_active?
-     self.active_individual_market_role == "resident" ? true : false
+    (self.resident_role.present? && self.active_individual_market_role == "resident") ? true : false
   end
 
   class << self
