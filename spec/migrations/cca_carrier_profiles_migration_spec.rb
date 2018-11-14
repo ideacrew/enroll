@@ -23,7 +23,7 @@ describe "CcaCarrierProfilesMigration" do
 
       @employer_profile = FactoryGirl.create(:employer_profile)
       FactoryGirl.create(:inbox, :with_message, recipient: @employer_profile)
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id)
       FactoryGirl.create(:employee_role, employer_profile: @employer_profile)
 
       @migrated_organizations = BenefitSponsors::Organizations::Organization.issuer_profiles
