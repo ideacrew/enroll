@@ -51,9 +51,26 @@ When(/^the consumer is completely verified$/) do
   user.person.consumer_role.import!(OpenStruct.new({:determined_at => Time.now, :vlp_authority => "hbx"}))
 end
 
+When(/^the consumer is completely verified from curam$/) do
+  user.person.consumer_role.update_attributes(OpenStruct.new({:determined_at => Time.now, :vlp_authority => 'curam'}))
+  user.person.consumer_role.import!
+end
+
 Then(/^verification types have to be visible$/) do
   expect(page).to have_content('Social Security Number')
   expect(page).to have_content('Citizenship')
+end
+
+Then(/^verification types should display as verified state$/) do
+  expect(page).to have_content('Social Security Number')
+  expect(page).to have_content('Citizenship')
+  expect(page).to have_content('Verified')
+end
+
+Then(/^verification types should display as external source$/) do
+  expect(page).to have_content('Social Security Number')
+  expect(page).to have_content('Citizenship')
+  expect(page).to have_content('External Source')
 end
 
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
@@ -70,12 +87,11 @@ Given(/^consumer has outstanding verification and unverified enrollments$/) do
                                                         eligibility_date: TimeKeeper.date_of_record - 2.months,
                                                         coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enr.save!
-  family.enrollments.first.move_to_contingent!
-  family.active_family_members.first.person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+  user.person.consumer_role.fail_residency!
 end
 
 Then(/^consumer should see Verification Due date label$/) do
-  expect(page).to have_content('Document Due Date:')
+  expect(page).to have_content('Due Date')
 end
 
 Then(/^consumer should see Documents FAQ link$/) do

@@ -4,6 +4,7 @@ FactoryGirl.define do
     sequence(:last_name) {|n| "Vedder#{n}" }
     dob "1964-10-23".to_date
     gender "male"
+    employer_profile_id "12345"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
@@ -52,7 +53,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

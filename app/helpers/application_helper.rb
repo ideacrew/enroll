@@ -428,7 +428,7 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
+    relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
@@ -438,7 +438,7 @@ module ApplicationHelper
     progress_bar_width = 0
     progress_bar_class = ''
     return if plan_year.nil?
-    return if plan_year.employer_profile.census_employees.count > 100
+    return if plan_year.employer_profile.census_employees.active.count > 200
 
     eligible = plan_year.eligible_to_enroll_count
     enrolled = plan_year.total_enrolled_count
@@ -494,7 +494,7 @@ module ApplicationHelper
   def calculate_participation_minimum
     if @current_plan_year.present?
       return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return ((@current_plan_year.eligible_to_enroll_count * 2 / 3) + 0.999).to_i
+      return (@current_plan_year.eligible_to_enroll_count * 2.0 / 3.0).ceil
     end
   end
 
@@ -514,7 +514,7 @@ module ApplicationHelper
   end
 
   def is_under_open_enrollment?
-    HbxProfile.current_hbx.try(:under_open_enrollment?)
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_enrollment_effective_date
@@ -660,6 +660,38 @@ module ApplicationHelper
 
   def previous_year
     TimeKeeper.date_of_record.prev_year.year
+  end
+
+  def resident_application_enabled?
+    if Settings.aca.individual_market.dc_resident_application
+      policy(:family).hbx_super_admin_visible?
+    else
+      false
+    end
+  end
+
+  def transition_family_members_link_type row, allow
+    if Settings.aca.individual_market.transition_family_members_link
+      allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
+    else
+      "disabled"
+    end
+  end
+
+  def convert_to_bool(val)
+    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
+    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
+  end
+
+  def plan_match_dc
+    Settings.checkbook_services.plan_match == "DC"
+  end
+
+  def can_access_pay_now_button
+    hbx_staff_role = current_user.person.hbx_staff_role
+    return true unless hbx_staff_role.present?
+    hbx_staff_role.permission.can_access_pay_now
   end
 end
 
