@@ -85,12 +85,10 @@ class Household
     if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
-
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
         latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       end
-
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
@@ -132,7 +130,6 @@ class Household
         csr_percent_as_integer: latest_eligibility_determination.csr_percent,
         determined_on: latest_eligibility_determination.determination_date
       )
-
       th.save!
     end
   end
@@ -238,7 +235,7 @@ class Household
     th.tax_household_members.build(
         family_member: family.primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: true,
+        is_ia_eligible: true
     )
 
     deter = th.eligibility_determinations.build(
@@ -255,7 +252,7 @@ class Household
 
     th.save!
 
-    family.dependents.each do |fm|
+    family.active_dependents.each do |fm|
       ath = latest_active_thh
       ath.tax_household_members.build(
           family_member: fm,
@@ -399,5 +396,40 @@ class Household
       end
     end
     eds
+  end
+
+  def create_new_tax_household(params)
+    effective_date = params["effective_date"].to_date
+    slcsp_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id
+
+    th = tax_households.create(
+      allocated_aptc: 0.0,
+      effective_starting_on: Date.new(effective_date.year, effective_date.month, effective_date.day),
+      is_eligibility_determined: true,
+      submitted_at: TimeKeeper.datetime_of_record
+    )
+
+    determination = th.eligibility_determinations.create(
+      source: "Admin_Script",
+      benchmark_plan_id: slcsp_id,
+      max_aptc: params["max_aptc"].to_f,
+      csr_percent_as_integer: params["csr"].to_i,
+      determined_on: TimeKeeper.datetime_of_record
+    )
+
+    params["family_members"].each do |person_hbx_id, thhm_info|
+      person_id = Person.by_hbx_id(person_hbx_id).first.id
+      family_member = family.family_members.where(person_id: person_id).first
+      th.tax_household_members.create(
+        :applicant_id => family_member.id,
+        :is_subscriber => family_member.is_primary_applicant,
+        thhm_info["pdc_type"].to_sym => true,
+        :reason => thhm_info["reason"]
+      )
+    end
+
+    end_multiple_thh
+
+    self.save!
   end
 end

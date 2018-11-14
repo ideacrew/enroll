@@ -2,6 +2,10 @@ $(document).ready(function() {
  setGroupSelectionHandlers();
 });
 
+$(document).on('change', '#market_kind_coverall', function() {
+  $("#WarningOnCoverAllSelection").modal();
+});
+
 function setGroupSelectionHandlers(){
 
   var employers = $("[id^=census_employee_]");
@@ -46,7 +50,12 @@ function setGroupSelectionHandlers(){
       disableIvlIneligible();
       setPrimaryForIvl();
     }
+    if ( $('#market_kind_coverall').is(':checked') ) {
+     
+    }
+
     $('#market_kind_individual').on('change', function() {
+      //debugger;
       disableEmployerSelection();
 
       $('#dental-radio-button').slideDown();
@@ -57,6 +66,21 @@ function setGroupSelectionHandlers(){
       setPrimaryForIvl();
 
     });
+
+    $('#market_kind_coverall').on('change', function() {
+      //debugger;
+      disableEmployerSelection();
+
+      $('#dental-radio-button').slideDown();
+      hideShopErrors();
+      $('.ivl_errors').hide();
+
+      //disableIvlIneligible();
+      //setPrimaryForIvl();
+      enableIvlEligibleForCoverall();
+
+    });
+
 
     $('#market_kind_shop').on('change', function() {
       employers.each( function() {
@@ -107,6 +131,11 @@ function hideIvlErrors() {
   $('#coverage-household tr td.ivl_errors').hide();
 }
 
+function showIvlErrors() {
+  $('#coverage-household tr td.ivl_errors').show();
+}
+
+
 function errorsForChangeInEmployer(element) {
   var employer_id = $(element).attr("value")
 
@@ -126,7 +155,7 @@ function errorsForChangeInCoverageKind(employer_id){
   $('#coverage_kind_health').on('change', function() {
     hideAllErrors();
     if ($("#employer-selection .n-radio-group .n-radio-row input[checked^= 'checked']:enabled").length) {
-      
+
       $(".health_errors_" + employer_id ).show();
       disableShopHealthIneligible(employer_id);
 
@@ -141,12 +170,12 @@ function errorsForChangeInCoverageKind(employer_id){
   $('#coverage_kind_dental').on('change', function() {
     hideAllErrors();
     if ($("#employer-selection .n-radio-group .n-radio-row input[checked^= 'checked']:enabled").length) {
-      
+
       $(".dental_errors_" + employer_id ).show();
       disableShopDentalIneligible(employer_id);
 
     } else {
-      
+
       $(".ivl_errors").show();
       disableIvlIneligible();
     }
@@ -156,6 +185,12 @@ function errorsForChangeInCoverageKind(employer_id){
 function disableIvlIneligible() {
   $('#coverage-household tr').filter("[class^=ineligible_]").not(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
   $('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': false, 'disabled': true});
+}
+
+function enableIvlEligibleForCoverall() {
+  //debugger;
+  $('#coverage-household tr').filter("[class^=ineligible_]").not(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
+  $('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
 }
 
 function disableShopDentalIneligible(employer_id) {

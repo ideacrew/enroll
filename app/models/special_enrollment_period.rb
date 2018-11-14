@@ -138,7 +138,7 @@ class SpecialEnrollmentPeriod
 
   def self.find(id)
     family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id)).first
-    family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
+    family.special_enrollment_periods.detect() { |sep| sep._id.to_s == id.to_s } unless family.blank?
   end
 
 private
@@ -268,11 +268,12 @@ private
 
 
   def is_eligible?
+    return true unless is_active?
     return true unless is_shop?
 
     person = family.primary_applicant.person
     person.active_employee_roles.any? do |employee_role|
-      eligible_date = employee_role.census_employee.earliest_eligible_date
+      eligible_date = employee_role.census_employee.earliest_eligible_date 
       eligible_date <= TimeKeeper.date_of_record
     end
   end

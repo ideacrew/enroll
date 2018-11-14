@@ -24,6 +24,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
       allow(ENV).to receive(:[]).with("update_current_enrollment").and_return(true)
       allow(ENV).to receive(:[]).with("update_renewal_enrollment").and_return(true)
+      allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(true)
     end
 
     context "when reinstating active plan year plan year" do
@@ -66,6 +67,16 @@ describe ReinstatePlanYear, dbclean: :after_each do
         plan_year.reload
         expect(plan_year.aasm_state).to eq 'canceled'
         expect(plan_year.end_on).to eq end_on
+        expect(plan_year.terminated_on).to eq terminated_on
+      end
+
+      it "should pick the correct plan year" do
+        end_on = plan_year.end_on
+        terminated_on = plan_year.terminated_on
+        plan_year.update_attributes!(aasm_state:'expired')
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq 'expired'
         expect(plan_year.terminated_on).to eq terminated_on
       end
 
@@ -124,6 +135,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
 
       it "renewing plan year, enrollments & benefit_group_assignment should be active " do
 
+        allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
         expect(renewing_plan_year.aasm_state).to eq 'renewing_canceled'   # before update
         expect(canceled_enrollment.aasm_state).to eq 'coverage_canceled'
         subject.migrate
@@ -143,6 +155,15 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(renewal_benefit_group_assignment.end_on).to eq nil
         expect(renewal_benefit_group_assignment.aasm_state).to eq "coverage_selected"
         expect(renewal_benefit_group_assignment.is_active).to eq true
+      end
+
+      it "renewing plan year not force published, plan year should be moved to renewing draft state " do
+        allow(ENV).to receive(:[]).with("renewing_force_publish").and_return(false)
+        expect(renewing_plan_year.aasm_state).to eq 'renewing_canceled'   # before update
+        subject.migrate
+
+        renewing_plan_year.reload
+        expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'    # after update
       end
     end
   end
