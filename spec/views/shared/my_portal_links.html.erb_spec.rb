@@ -39,6 +39,7 @@ describe "shared/_my_portal_links.html.haml" do
       expect(rendered).to have_selector('.dropdown-menu')
       expect(rendered).to match(/Insured/)
     end
+
   end
 
   context "with employer roles & employee role" do
@@ -61,6 +62,30 @@ describe "shared/_my_portal_links.html.haml" do
       expect(rendered).to have_selector('.dropdown-menu')
       expect(rendered).to match(/Insured/)
     end
+
+    it "should have Add Employee Role link" do
+      sign_in(user)
+      allow(user).to receive(:person).and_return(person)
+      render 'shared/my_portal_links'
+      expect(rendered).to have_content('Add Employee Role')
+    end
+  end
+
+  context "with employer employer_staff role" do
+    # let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ["employer_staff"]) }
+    let(:person) { FactoryGirl.create(:person, :with_employer_staff_role)}
+
+    before :each do
+      sign_in(user)
+      allow(user).to receive(:person).and_return(person)
+      render 'shared/my_portal_links'
+    end
+
+    it "should have Add Employee Role link" do
+      expect(rendered).to have_content('Add Employee Role')
+    end
+
   end
 
 end

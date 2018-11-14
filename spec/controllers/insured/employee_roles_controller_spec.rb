@@ -241,16 +241,18 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
 
   describe "POST match" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975", gender: "male") }
     let(:census_employee) { instance_double("CensusEmployee")}
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
     let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
+    let(:found_person) { FactoryGirl.create(:person, :with_employer_staff_role)}
 
     before(:each) do
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
+      allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
       allow(census_employee).to receive(:is_active?).and_return(true)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
