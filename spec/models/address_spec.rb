@@ -82,7 +82,7 @@ describe Address, "with proper validations" do
     end
   end
 
-  context "embedded in another object", type: :model do
+  context "embedded in another object", type: :model, dbclean: :after_each do
     it { should validate_presence_of :address_1 }
     it { should validate_presence_of :city }
     it { should validate_presence_of :state }

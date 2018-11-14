@@ -545,7 +545,7 @@ class PlanYear
 
   def is_publish_date_valid?
     event_name = aasm.current_event.to_s.gsub(/!/, '')
-    event_name == "force_publish" ? true : (TimeKeeper.datetime_of_record <= due_date_for_publish.end_of_day)
+    event_name == "force_publish" ? true : (TimeKeeper.date_of_record <= due_date_for_publish)
   end
 
   def open_enrollment_date_errors
