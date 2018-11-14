@@ -200,7 +200,9 @@
    heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
 
 <% notice.individuals.each do |ivl|%>
-  <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
+  <% if !ivl.non_applicant %>
+    <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
+  <% end %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
