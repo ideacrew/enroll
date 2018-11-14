@@ -19,7 +19,7 @@ describe ChangeGender, dbclean: :after_each do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("id").and_return(census_employee.id)
+      allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)
       allow(ENV).to receive(:[]).with("gender").and_return("female")
     end
 
@@ -39,7 +39,7 @@ describe ChangeGender, dbclean: :after_each do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("id").and_return("")
+      allow(ENV).to receive(:[]).with("ce_id").and_return("")
       allow(ENV).to receive(:[]).with("gender").and_return("female")
     end
 
