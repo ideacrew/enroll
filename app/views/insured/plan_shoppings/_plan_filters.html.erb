@@ -7,7 +7,7 @@
         <%= find_my_doctor %>
         <% if @market_kind == "individual" && @coverage_kind == "health" %>
           <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
-          <% elsif @market_kind == "individual" && @coverage_kind == "dental" %>
+          <% elsif @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.current_year %>
           <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
           <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
         <% end %>
@@ -69,10 +69,8 @@
             <p><%= l10n("modal_onscreen9") %></p>
           </div>
           <div class="modal-footer" style="margin-right:190px">
-            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%if @hbx_enrollment.effective_on.year == Settings.current_year%>
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button> 
             <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary  mtz", target: '_blank'  %>
-            <% end %>
           </div>
        </div>
     </div>
