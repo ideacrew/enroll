@@ -1,12 +1,18 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe "_waived_coverage_widget.html.erb" do
+RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
 
-  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let!(:sponsored_benefit_package) { initial_application.benefit_packages[0] }
+  let!(:employer_profile) {benefit_sponsorship.profile}
+  let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, benefit_sponsorship: benefit_sponsorship, sponsored_benefit_package:sponsored_benefit_package ,household: household) }
   let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
   let(:family) { FactoryGirl.build_stubbed(:family, person: person) }
   let(:person) { FactoryGirl.build_stubbed(:person) }
-  let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
 
   before :each do
     assign(:person, person)
