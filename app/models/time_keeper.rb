@@ -80,6 +80,7 @@ class TimeKeeper
   end
 
   def self.datetime_of_record
+    warn "[DEPRECATION] TimeKeeper.datetime_of_record gives incorrect results.  Do not use this method."
     instant = Time.current
     instance.date_of_record.to_datetime + instant.hour.hours + instant.min.minutes + instant.sec.seconds
   end

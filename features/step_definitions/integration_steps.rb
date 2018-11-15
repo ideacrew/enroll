@@ -849,7 +849,6 @@ And(/^clicks on the person in families tab$/) do
   wait_for_ajax(10,2)
   family_member = page.find('a', :text => "#{user.person.full_name}")
   family_member.trigger('click')
-  visit verification_insured_families_path
   find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 

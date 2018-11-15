@@ -25,6 +25,10 @@ class SpecialEnrollmentPeriod
   field :effective_on, type: Date
 
   # Timestamp when SEP was reported to HBX
+  # TODO: Fix the type of this field and its usage.
+  # This is TYPED as a timestamp, but it is used in all behaviour as
+  # as the exchange based day the sep was reported.
+  # Probably rename to 'reported_on' and refactor usage.
   field :submitted_at, type: DateTime
 
   field :title, type: String
@@ -168,7 +172,8 @@ private
   end
 
   def set_submitted_at
-    self.submitted_at ||= TimeKeeper.datetime_of_record
+    # Not used as a timestamp, used to determine date of submission
+    self.submitted_at ||= TimeKeeper.date_of_record
   end
 
   def set_date_period

@@ -771,7 +771,7 @@ class Family
     end
 
     def expire_individual_market_enrollments
-      @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Started expire_individual_market_enrollments process at #{Time.now.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
           :effective_on.lt => current_benefit_period.start_on,
@@ -793,11 +793,11 @@ class Family
           @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         end
       end
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{Time.now.to_s}"
     end
 
     def begin_coverage_for_ivl_enrollments
-      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{Time.now.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query = {
           :effective_on => current_benefit_period.start_on,
@@ -820,7 +820,7 @@ class Family
           @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
         end
       end
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{Time.now.to_s}"
     end
 
     # Manage: SEPs, FamilyMemberAgeOff
@@ -907,9 +907,9 @@ class Family
     person.build_consumer_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "consumer"
-    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.submitted_at = Time.now
     transition.reason_code = "generating_consumer_role"
-    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.effective_starting_on = TimeKeeper.date_according_to_exchange_at(Time.now)
     person.individual_market_transitions << transition
     person.save!
   end
@@ -928,9 +928,9 @@ class Family
     person.build_resident_role({:is_applicant => false}.merge(opts))
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
-    transition.submitted_at = TimeKeeper.datetime_of_record
+    transition.submitted_at = Time.now
     transition.reason_code = "generating_resident_role"
-    transition.effective_starting_on = TimeKeeper.datetime_of_record
+    transition.effective_starting_on = TimeKeeper.date_according_to_exchange_at(Time.now)
     person.individual_market_transitions << transition
     person.save!
   end
