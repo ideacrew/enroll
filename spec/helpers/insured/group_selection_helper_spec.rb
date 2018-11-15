@@ -6,12 +6,21 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   describe "#can shop individual" do
     let(:person) { FactoryGirl.create(:person) }
 
+    before(:each) do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+    end
+
+
     it "should not have an active consumer role" do
       expect(subject.can_shop_individual?(person)).not_to be_truthy
     end
 
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+
+      before(:each) do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      end
       it "should have active consumer role" do
         expect(subject.can_shop_individual?(person)).to be_truthy
       end
@@ -57,6 +66,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
@@ -68,6 +78,8 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       before do
         allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).to be_truthy
@@ -159,6 +171,26 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
   end
 
+  describe "#view_market_places" do
+    let(:person) { FactoryGirl.create(:person) }
+
+    it "should return shop & individual if can_shop_both_markets? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_employer_benefits?).and_return(true)
+      expect(helper.view_market_places(person)).to eq Plan::MARKET_KINDS
+      expect(helper.view_market_places(person)).to eq ["shop", "individual"]
+    end
+
+    it "should return individual & coverall if can_shop_individual? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_resident? return true" do
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+  end
 
   describe "#selected_enrollment" do
 
@@ -264,22 +296,38 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
   end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+    let(:primary) { FactoryGirl.create(:person)}
 
     context "#is_market_kind_disabled?" do
 
       context "when user clicked on 'make changes' on the enrollment in open enrollment" do
         context "when user clicked on IVL enrollment" do
+          describe "family with IVL and resident roles" do
+            before do
+              helper.instance_variable_set("@mc_market_kind", "individual")
+              allow(helper).to receive(:can_shop_individual_or_resident?).and_return true
+            end
+
+            it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("shop", primary)).to eq nil
+            end
+
+            it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+              expect(helper.is_market_kind_disabled?("individual", primary)).to eq nil
+            end
+
+          end
 
           before do
             helper.instance_variable_set("@mc_market_kind", "individual")
           end
 
           it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
 
@@ -290,16 +338,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
       end
 
       context "when user selected a QLE" do
+        let(:primary) { FactoryGirl.create(:person)}
 
         context "when user selected shop QLE" do
 
@@ -308,11 +357,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the IVL market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq true
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq false
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq false
           end
         end
 
@@ -323,11 +372,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should disable the shop market if user selected IVL based QLE" do
-            expect(helper.is_market_kind_disabled?("shop")).to eq true
+            expect(helper.is_market_kind_disabled?("shop", primary)).to eq true
           end
 
           it "should not disable the shop market if user selected shop based QLE" do
-            expect(helper.is_market_kind_disabled?("individual")).to eq false
+            expect(helper.is_market_kind_disabled?("individual", primary)).to eq false
           end
         end
       end
@@ -343,11 +392,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq false
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq false
           end
 
           it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq true
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq true
           end
         end
 
@@ -358,11 +407,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           end
 
           it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("individual")).to eq false
+            expect(helper.is_market_kind_checked?("individual", nil)).to eq false
           end
 
           it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
-            expect(helper.is_market_kind_checked?("shop")).to eq true
+            expect(helper.is_market_kind_checked?("shop", nil)).to eq true
           end
         end
       end

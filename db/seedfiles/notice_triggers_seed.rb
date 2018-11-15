@@ -753,7 +753,7 @@ shop_notice_triggers = [
         name: 'Denial of SEP Requested by EE outside of allowable time frame',
         notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
         notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'MPI_SHOP35',
+        mpi_indicator: 'SHOP_D035',
                 notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -1050,6 +1050,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
         notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
         mpi_indicator: 'SHOP_D092',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {                
+    hbx_id: 'SHOP_D064',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
+    resource_name: 'employee_role',
+    event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written', 
+    notice_triggers: [
+      {
+        name: "Notice to EEs that ER’s plan year will not be written",
+        notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
+        notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
+        mpi_indicator: 'SHOP_D064',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -1597,6 +1618,51 @@ ivl_notice_triggers = [
           }
       ]
   },
+
+  {
+      hbx_id: 'IVL_CDC',
+      title: 'Your Insurance through DC Health Link Has Changed to Cover All DC',
+      description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
+      resource_name: 'consumer_role',
+      event_name: 'ivl_to_coverall_transition_notice',
+      notice_triggers: [
+          {
+              name: 'Ivl to Coverall Transition Notice',
+              notice_template: 'notices/ivl/ivl_to_coverall_notice',
+              notice_builder: 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+              mpi_indicator: 'IVL_CDC',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
+
+  {
+      hbx_id: 'IVL_DCH',
+      title: 'Your Insurance through Cover All DC Has Changed to DC Health Link',
+      description: 'This is an Transition Notice and is sent for people who are moved to DC HEALTH LINK',
+      resource_name: 'consumer_role',
+      event_name: 'coverall_to_ivl_transition_notice',
+      notice_triggers: [
+          {
+              name: 'Coverall to IVL Transition Notice',
+              notice_template: 'notices/ivl/coverall_to_ivl_notice',
+              notice_builder: 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+              mpi_indicator: 'IVL_DCH',
+              notice_trigger_element_group: {
+                  market_places: ['individual'],
+                  primary_recipients: ["consumer"],
+                  primary_recipient_delivery_method: ["secure_message", "paper"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
+
 ]
 
 shop_notice_triggers.each do |trigger_params|

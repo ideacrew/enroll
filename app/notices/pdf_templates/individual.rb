@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :citizen_status, String
     attribute :tax_household, PdfTemplates::TaxHousehold
     attribute :documents_due_date, Date
+    attribute :past_due_text, String
     # attribute :household_size, String
     attribute :projected_amount, String
     attribute :actual_income, String
@@ -46,6 +47,7 @@ module PdfTemplates
     attribute :no_csr_because_of_tax, Boolean, :default => false
     attribute :no_csr_because_of_mec, Boolean, :default => false
     attribute :has_access_to_affordable_coverage, Boolean, :default => false
+    attribute :non_applicant, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]
     # attribute :ineligible_members_due_to_residency, Array[String]

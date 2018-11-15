@@ -2,7 +2,7 @@ module Factories
   class FamilyEnrollmentRenewalFactory
     include Mongoid::Document
 
-    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :disable_notifications, :active_plan_year, :coverage_kind
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :disable_notifications, :active_plan_year, :coverage_kind, :is_congressional_employer
 
     def initialize
       @disable_notifications = false
@@ -13,6 +13,7 @@ module Factories
 
       @plan_year_start_on = renewing_plan_year.start_on
       @active_plan_year = employer.plan_years.published_and_expired_plan_years_by_date(@plan_year_start_on.prev_day).first
+      @is_congressional_employer = renewing_plan_year.benefit_groups.any?{ |bg| bg.is_congress? }
 
       raise FamilyEnrollmentRenewalFactoryError, 'Active plan year missing' if @active_plan_year.blank?
 
@@ -108,10 +109,11 @@ module Factories
     end
 
     def trigger_notice
+      return true if is_congressional_employer
       if !disable_notifications && coverage_kind == 'health'
         notice_name = yield
         begin
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, "acapi_trigger" => true)# unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
@@ -119,12 +121,13 @@ module Factories
     end
 
     def trigger_notice_dental(enrollment_id: nil)
+      return true if is_congressional_employer
       if !disable_notifications
         notice_name = yield
         begin
           hbx_enrollment = HbxEnrollment.by_hbx_id(enrollment_id).first
           census_employee.update_attributes!(employee_role_id: hbx_enrollment.employee_role.id.to_s ) if !census_employee.employee_role.present? && hbx_enrollment.present?
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id) unless Rails.env.test?
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id, :acapi_trigger =>  true) unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
