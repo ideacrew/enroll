@@ -52,7 +52,7 @@ module Services
         @hbx_enrollment.effective_on.year
       end
 
-      def csr_values
+      def csr_value
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "-01"
