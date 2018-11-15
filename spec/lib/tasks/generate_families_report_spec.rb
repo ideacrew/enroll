@@ -33,7 +33,7 @@ RSpec.describe 'generate_families_report' do
 
   context "should generate report" do
     it 'with one family having inactive THH with current year and active THH with next year ' do
-      result = ['hbx_id', 'first_name', 'last_name', 'ssn', '2018_thh_effective_start_date', '2018_thh_effective_end_date', '2018_e_pdc_id', '2018_created_source', '2019_thh_effective_start_date', '2019_thh_effective_end_date', '2019_e_pdc_id', '2019_created_source']
+      result = ['hbx_id', 'first_name', 'last_name', 'ssn', '2018_max_aptc', '2018_csr', '2018_thh_effective_start_date', '2018_thh_effective_end_date', '2018_e_pdc_id', '2018_created_source', '2019_thh_effective_start_date', '2019_thh_effective_end_date', '2019_e_pdc_id', '2019_created_source']
       files = Dir.glob(File.join(Rails.root, "hbx_report", "families_with_inactive_tax_household_*.csv"))
       data = CSV.read files.first
       expect(data[0]).to eq result
