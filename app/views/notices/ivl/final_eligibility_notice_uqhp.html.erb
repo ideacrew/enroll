@@ -7,7 +7,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %></h3></td>
+      <td><h3>YOUR FINAL ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -27,11 +27,11 @@
       listings: ["What’s new this year", "Your final eligibility results for #{notice.coverage_year}", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["While there’s been a lot of news about the repeal and replacement of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents. We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in #{notice.coverage_year}. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
-   heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
+  contents: ["#{Settings.site.short_name} is proud to build on our award-winning reputation as one of the best health exchange websites in the nation. This year, in a global competition among government agencies, we received our second AWS Best Practices Award for innovative use of technology in how we deliver services to District residents.", "There are 25 plans available from CareFirst BlueCross BlueShield and Kaiser Permanente for #{notice.coverage_year}. To find the best prices and plans that meet your medical needs and budget, we encourage you to use our Plan Match tool to shop, compare and enroll in coverage for #{notice.coverage_year}. Plan Match will also tell you if you may be eligible for cost savings to lower your premiums. Free expert enrollment assistance, and online support tools including the new DCHealthSmarts<sup>(SM)</sup> Glossary are available to help you and your family make informed decisions."],
+    heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "For the best prices and plans that meet your medical needs and budget, we encourage you to shop, compare and enroll in coverage for #{notice.coverage_year}. Free expert enrollment assistance, and online support tools are available to help you and your family make informed decisions. You may also be eligible for reduced monthly premiums."} %>
+  content: "Having quality affordable health insurance is important for you and your family. It can give you peace of mind if something unexpected happens like you get sick or have an accident. The #{Settings.aca.state_name} has recently established an individual responsibility requirement. This means that if you don't have health coverage and don’t qualify for an exemption, you may have to pay a penalty on your DC taxes. The penalty is up to $695 or 2.5 percent of income above the tax filing threshold, whichever is greater. So, be sure to get covered and stay covered!"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
@@ -66,35 +66,31 @@
  contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
    heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
-<% if notice.enrollments.size > 1 %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-     contents: ["The people listed will be enrolled in the plan(s) shown below for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan. The plan you have now will not be offered in #{notice.coverage_year}, but the plan shown is similar to it.", "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different. "],
-       heading: 'Your Plan', sub_heading: '', bottom_margin: '5px'} %>
-
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
-
-  <% notice.enrollments.each do |enrollment| %>
-    <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
-        col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+<% if notice.health_enrollments.present? && notice.dental_enrollments.present? %>
+  <% if (notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
+  <% elsif (notice.same_plan_health_enrollment && !notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
+  <% elsif (!notice.same_plan_health_enrollment && notice.same_plan_dental_enrollment) %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments} %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments} %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.enrollments} %>
   <% end %>
-
-<% else %>
-  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["The people listed will be enrolled in the same plan you have now for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan.", "Copayments, coinsurance, and deductibles for #{notice.coverage_year} may be different. Your insurance company will send you a letter about any changes."],
-     heading: 'Your Plan', sub_heading: '', bottom_margin: '3px'} %>
-
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
-
-  <% notice.enrollments.each do |enrollment| %>
-    <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
-          col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
-  <% end%>
-
-<% end%>
+<% elsif notice.health_enrollments.present? && notice.dental_enrollments.blank? %>
+  <% if notice.same_plan_health_enrollment %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.health_enrollments  } %>
+  <% end %>
+<% elsif notice.health_enrollments.blank? && notice.dental_enrollments.present? %>
+  <% if notice.same_plan_dental_enrollment %>
+    <%= render partial: 'notices/ivl/fel_same_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
+  <% else %>
+    <%= render partial: 'notices/ivl/fel_different_plan', :locals => {coverage_year: notice.coverage_year, enrollments: notice.dental_enrollments  } %>
+  <% end %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You must continue to pay your premium for your #{notice.current_year} plan to automatically be enrolled in the plan shown for #{notice.coverage_year}. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed</strong>. If your #{notice.current_year} plan is no longer active, and you want to enroll in plan for #{notice.coverage_year}, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}.", "Your monthly premium amount will be different in #{notice.coverage_year}. <strong>If you have autopay set up through your health and/or dental insurance plan(s), you must contact your insurance company to update your autopay. The same is true if you set-up autopay through another method, such as through your bank</strong>. If you do not make an update, your plan may be terminated."],
