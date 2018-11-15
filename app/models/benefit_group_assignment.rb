@@ -217,7 +217,7 @@ class BenefitGroupAssignment
       end
     end
 
-    update_attributes(is_active: true, activated_at: Time.now) unless is_active?
+    update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
   end
 
   private

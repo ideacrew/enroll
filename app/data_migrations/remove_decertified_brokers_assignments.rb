@@ -19,7 +19,7 @@ class RemoveDecertifiedBrokersAssignments < MongoidMigrationTask
         if employers.present?
           employers.each do |e|
             e.remove_decertified_broker_agency
-            e.remove_general_agency_when_broker_decertified!(Time.now)
+            e.remove_general_agency_when_broker_decertified!(TimeKeeper.datetime_of_record)
           end
         end
       end

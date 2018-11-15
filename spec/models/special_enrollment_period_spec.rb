@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe SpecialEnrollmentPeriod, :type => :model, dbclean: :after_each do
+RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
   let(:family)        { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
@@ -201,7 +201,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, dbclean: :after_each do
       expect(ivl_qle_sep.effective_on).to be_nil
     end
 
-    after :each do
+    after :all do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 

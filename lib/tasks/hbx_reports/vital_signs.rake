@@ -3,7 +3,7 @@ namespace :hbx_reports do
 
     desc "IVL Assisted Enrollment report"
     task assistance_eligible_families: :environment do
-      families = Family.active_assistance_receiving.by_datetime_range(VitalSign::ZERO_HOUR, Time.now)
+      families = Family.active_assistance_receiving.by_datetime_range(VitalSign::ZERO_HOUR, TimeKeeper.datetime_of_record)
 
       # puts "Found #{families.size} families who qualified for assistance"
       puts "Found #{families.size} families"

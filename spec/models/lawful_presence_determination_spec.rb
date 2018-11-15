@@ -29,16 +29,15 @@ describe LawfulPresenceDetermination do
     end
 
     it "returns the latest received response date" do
-      determination_date = Time.now - 1.month
       args = OpenStruct.new
-      args.determined_at = determination_date
+      args.determined_at = TimeKeeper.datetime_of_record - 1.month
       args.vlp_authority = "dhs"
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: args.determined_at, body: payload})
       consumer_role.ssn_invalid!(args)
       consumer_role.person.save!
       found_person = Person.find(person_id)
       lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
-      expect(lawful_presence_determination.latest_denial_date.to_time).to be_within(1.second).of(determination_date)
+      expect(lawful_presence_determination.latest_denial_date).to be_within(1.second).of(TimeKeeper.datetime_of_record - 1.month)
     end
   end
 
@@ -56,15 +55,14 @@ describe LawfulPresenceDetermination do
 
     it "returns the latest received response date" do
       args = OpenStruct.new
-      determination_date = Time.now - 1.month
-      args.determined_at = determination_date
+      args.determined_at = TimeKeeper.datetime_of_record - 1.month
       args.vlp_authority = "dhs"
       consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: args.determined_at, body: payload})
       consumer_role.ssn_invalid!(args)
       consumer_role.person.save!
       found_person = Person.find(person_id)
       lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
-      expect(lawful_presence_determination.latest_denial_date.to_time).to be_within(1.second).of(determination_date)
+      expect(lawful_presence_determination.latest_denial_date).to be_within(1.second).of(TimeKeeper.datetime_of_record - 1.month)
     end
   end
 end

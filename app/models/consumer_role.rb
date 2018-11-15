@@ -60,7 +60,7 @@ class ConsumerRole
   field :is_barred, type: Boolean, default: nil
   field :bar_met, type: Boolean, default: nil
 
-  field :requested_coverage_start_date, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
   field :aasm_state
 
   delegate :citizen_status, :citizenship_result, :vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
@@ -1096,7 +1096,7 @@ class ConsumerRole
     status = authority.first == "curam" ? "curam" : "verified"
     self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
-      update_attributes(:is_state_resident => true, :residency_determined_at => Time.now)
+      update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name
       lawful_presence_determination.authorize!(verification_attr(authority.first))
     end

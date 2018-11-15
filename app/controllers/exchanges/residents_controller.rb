@@ -206,9 +206,9 @@ class Exchanges::ResidentsController < ApplicationController
   def create_initial_market_transition
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
-    transition.submitted_at = Time.now
+    transition.submitted_at = TimeKeeper.datetime_of_record
     transition.reason_code = "generating_resident_role"
-    transition.effective_starting_on = Time.now
+    transition.effective_starting_on = TimeKeeper.datetime_of_record
     transition.user_id = current_user.id
     Person.find(session[:person_id]).individual_market_transitions << transition
   end

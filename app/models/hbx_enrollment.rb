@@ -36,6 +36,8 @@ class HbxEnrollment
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
+  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
+
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   WAIVER_REASONS = [
@@ -1687,7 +1689,7 @@ class HbxEnrollment
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
-    self.update_attribute(:created_at, Time.now) unless self.created_at.present?
+    self.update_attribute(:created_at, TimeKeeper.datetime_of_record) unless self.created_at.present?
   end
 
   def previous_enrollments(year)

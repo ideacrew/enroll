@@ -394,7 +394,7 @@ class Household
       allocated_aptc: 0.0,
       effective_starting_on: Date.new(effective_date.year, effective_date.month, effective_date.day),
       is_eligibility_determined: true,
-      submitted_at: Time.now
+      submitted_at: TimeKeeper.datetime_of_record
     )
 
     determination = th.eligibility_determinations.create(
@@ -402,7 +402,7 @@ class Household
       benchmark_plan_id: slcsp_id,
       max_aptc: params["max_aptc"].to_f,
       csr_percent_as_integer: params["csr"].to_i,
-      determined_on: Time.now
+      determined_on: TimeKeeper.datetime_of_record
     )
 
     params["family_members"].each do |person_hbx_id, thhm_info|

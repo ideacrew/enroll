@@ -19,7 +19,7 @@ class PaymentTransaction
   end
 
   def set_submitted_at
-    self.submitted_at ||= Time.now
+    self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
   def update_enrollment_details(enrollment)

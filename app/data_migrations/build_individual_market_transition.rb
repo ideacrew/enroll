@@ -23,7 +23,7 @@ class BuildIndividualMarketTransition < MongoidMigrationTask
           person.individual_market_transitions << IndividualMarketTransition.new(role_type: 'consumer',
                                                      reason_code: 'initial_individual_market_transition_created_using_data_migration',
                                                      effective_starting_on:  person.consumer_role.created_at.to_date,
-                                                     submitted_at: ::Time.now)
+                                                     submitted_at: ::TimeKeeper.datetime_of_record)
           puts "Individual market transitions with role type as consumer added for person with HBX_ID: #{person.hbx_id}" unless Rails.env.test?
         rescue => e
           puts "unable to add individual market transition for person with hbx_id #{person.hbx_id}" + e.message unless Rails.env.test?
@@ -41,7 +41,7 @@ class BuildIndividualMarketTransition < MongoidMigrationTask
         person.individual_market_transitions << IndividualMarketTransition.new(role_type: 'resident',
                                                    reason_code: 'initial_individual_market_transition_created_using_data_migration',
                                                    effective_starting_on: person.resident_role.created_at.to_date,
-                                                   submitted_at: ::Time.now)
+                                                   submitted_at: ::TimeKeeper.datetime_of_record)
         puts "Individual market transitions with role type as resident added for person with HBX_ID: #{person.hbx_id}" unless Rails.env.test?
       rescue => e
         puts "unable to add individual market transition for person with hbx_id #{person.hbx_id}" + e.message unless Rails.env.test?

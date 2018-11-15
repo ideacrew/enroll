@@ -16,8 +16,8 @@ RSpec.describe VitalSign, :dbclean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "employer_sponsored",
-                          submitted_at: Time.now - 3.day,
-                          created_at: Time.now - 3.day
+                          submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                          created_at: TimeKeeper.datetime_of_record - 3.day
                         )
     end
   end
@@ -28,8 +28,8 @@ RSpec.describe VitalSign, :dbclean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "employer_sponsored",
-                          submitted_at: Time.now - 5.days,
-                          created_at: Time.now - 5.days
+                          submitted_at: TimeKeeper.datetime_of_record - 5.days,
+                          created_at: TimeKeeper.datetime_of_record - 5.days
                         )
     end
   end
@@ -45,8 +45,8 @@ RSpec.describe VitalSign, :dbclean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "individual",
-                          submitted_at: Time.now - 3.day,
-                          created_at: Time.now - 3.day
+                          submitted_at: TimeKeeper.datetime_of_record - 3.day,
+                          created_at: TimeKeeper.datetime_of_record - 3.day
                         )
     end
   end
@@ -57,8 +57,8 @@ RSpec.describe VitalSign, :dbclean => :around_each do
       FactoryGirl.create(:hbx_enrollment,
                           household: families[i].active_household,
                           kind: "individual",
-                          submitted_at: Time.now - 5.days,
-                          created_at: Time.now - 5.days
+                          submitted_at: TimeKeeper.datetime_of_record - 5.days,
+                          created_at: TimeKeeper.datetime_of_record - 5.days
                         )
     end
   end

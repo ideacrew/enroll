@@ -36,7 +36,7 @@ class IndividualMarketTransition
   before_validation :set_submitted_at
 
   def set_submitted_at
-    self.submitted_at ||= Time.now
+    self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
   def set_submitted_by

@@ -60,7 +60,7 @@ class TranscriptGenerator
         csv << ['Enrollment HBX ID', 'Subscriber HBX ID','SSN', 'Last Name', 'First Name', 'HIOS_ID:PlanName', 'Other Effective On','Effective On', 'AASM State', 'Terminated On', 'Employer FEIN', 'Employer Legalname', 'Action', 'Section:Attribute', 'Value']
       end
 
-      starting = Time.now.to_i
+      starting = TimeKeeper.datetime_of_record.to_i
       # Dir.glob("#{TRANSCRIPT_PATH}/*.bin").each do |file_path|
       Dir.glob("#{Rails.root}/sample_xmls/*.xml").each do |file_path|
 
@@ -110,9 +110,9 @@ class TranscriptGenerator
           end
 
           if count % 100 == 0
-            ending = Time.now.to_i
+            ending = TimeKeeper.datetime_of_record.to_i
             puts "processed #{count}--time lapse #{ending - starting}"
-            starting = Time.now.to_i
+            starting = TimeKeeper.datetime_of_record.to_i
           end
         rescue Exception => e
           puts "Failed.....#{file_path}--#{e.inspect}"

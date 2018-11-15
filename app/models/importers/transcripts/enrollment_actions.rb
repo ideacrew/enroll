@@ -60,9 +60,9 @@ module Importers::Transcripts
         coverage_kind: @enrollment.coverage_kind,
         effective_on: @other_enrollment.effective_on,
         terminated_on: @other_enrollment.terminated_on,
-        submitted_at: Time.now,
-        created_at: Time.now,
-        updated_at: Time.now
+        submitted_at: TimeKeeper.datetime_of_record,
+        created_at: TimeKeeper.datetime_of_record,
+        updated_at: TimeKeeper.datetime_of_record
       })
 
       if @market == 'shop'

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe PlanSelection, dbclean: :after_each do
+describe PlanSelection do
 
   subject { PlanSelection.new(hbx_enrollment, hbx_enrollment.plan) }
 

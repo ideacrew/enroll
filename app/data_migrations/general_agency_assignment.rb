@@ -16,7 +16,7 @@ class GeneralAgencyAssignment < MongoidMigrationTask
 
         broker_agency_profile_id = broker_agency_profile.primary_broker_role_id
 
-        employer_profile.general_agency_accounts.build(general_agency_profile: general_agency_profile, start_on: Time.now, broker_role_id: broker_agency_profile_id)
+        employer_profile.general_agency_accounts.build(general_agency_profile: general_agency_profile, start_on: TimeKeeper.datetime_of_record, broker_role_id: broker_agency_profile_id)
 
         employer_profile.save!
 
