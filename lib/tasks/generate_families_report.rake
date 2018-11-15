@@ -12,6 +12,8 @@ namespace :generate_report do
           first_name
           last_name
           ssn
+          2018_max_aptc
+          2018_csr
           2018_thh_effective_start_date
           2018_thh_effective_end_date
           2018_e_pdc_id
@@ -49,6 +51,8 @@ namespace :generate_report do
               primary_person.first_name,
               primary_person.last_name,
               primary_person.ssn,
+              thh_2018.eligibility_determinations.first.max_aptc.to_f,
+              thh_2018.eligibility_determinations.first.csr_percent_as_integer,
               thh_2018.effective_starting_on,
               thh_2018.effective_ending_on,
               thh_2018.eligibility_determinations.first.e_pdc_id,
