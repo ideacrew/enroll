@@ -70,7 +70,9 @@
           </div>
           <div class="modal-footer" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
+            <%if @hbx_enrollment.effective_on.year == Settings.current_year%>
             <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary  mtz", target: '_blank'  %>
+            <% end %>
           </div>
        </div>
     </div>
