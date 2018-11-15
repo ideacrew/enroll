@@ -155,6 +155,10 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 puts "::: complete :::"
 
 puts "*"*80
+puts "Loading English translations"
+system "bundle exec rake seed:translations[db/seedfiles/english_translations_seed.rb]"
+
+puts "*"*80
 puts "Loading benefit packages."
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
