@@ -21,7 +21,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     end
 
     it 'should terminate plan year & enrollment and update plan year & enrollment end_on and terminated date' do
-      expect_any_instance_of(Object).to receive(:send_termination_notice_to_employer).with(organization)
+      expect_any_instance_of(Object).to receive(:send_termination_notice).with(organization)
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
       active_plan_year.reload
       enrollment.reload
@@ -34,7 +34,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     end
    
     it 'should not terminate published plan year' do
-      expect_any_instance_of(Object).not_to receive(:send_termination_notice_to_employer).with(organization)
+      expect_any_instance_of(Object).not_to receive(:send_termination_notice).with(organization)
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
       active_plan_year.update_attribute(:aasm_state,'published')
       active_plan_year.reload
