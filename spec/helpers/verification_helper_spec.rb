@@ -229,11 +229,12 @@ RSpec.describe VerificationHelper, :type => :helper do
  
   describe '#has_active_consumer_dependent?' do
     let(:person1) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
-    let(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, :person => person) }
-    let(:dependent){ double(family_member: double) }
+    let(:dependent){ double(family_member: double(person: double(:is_consumer_role_active? => false))) }
+    let(:dependent1){ double(family_member: double(person: double(:is_consumer_role_active? => true))) }
     it 'returns true the person has active consumer dependent' do
-      expect(helper.has_active_consumer_dependent?(person1, dependent)).to eq true
+      expect(helper.has_active_consumer_dependent?(person1, dependent1)).to eq true
     end
     it 'returns false the person has no active consumer dependent' do
       expect(helper.has_active_consumer_dependent?(person2, dependent)).to eq false
