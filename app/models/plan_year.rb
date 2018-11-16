@@ -1194,6 +1194,13 @@ class PlanYear
   def trigger_notice_for_voluntary_termination
     if (self.termination_pending? || self.terminated?) && self.termination_kind == 'voluntary'
       self.employer_profile.trigger_notices("group_advance_termination_confirmation", "acapi_trigger" =>  true)
+      self.employer_profile.census_employees.non_terminated.each do |census_employee|
+        begin
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "voluntary_termination_notice_to_employee", "acapi_trigger" =>  true)
+        rescue Exception => e
+          Rails.logger.error { "Unable to trigger voluntary_termination_notice_to_employee notice to #{census_employee.full_name} - employer -> #{self.employer_profile.legal_name} due to #{e.inspect}" }
+        end
+      end
     end
   end
 
