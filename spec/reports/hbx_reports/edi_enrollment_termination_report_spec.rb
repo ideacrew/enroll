@@ -28,16 +28,21 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
   let(:valid_params2) { {from_state: from_state, to_state: to_state2, transition_at: transition_at} }
   let(:params2) { valid_params2 }
   let(:workflow_state_transition2) { WorkflowStateTransition.new(params2) }
-  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
-  let(:hbx_enrollment1) { FactoryGirl.create(:hbx_enrollment,
+  let!(:family1) { FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
+  let!(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+  let!(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
+  let!(:hbx_enrollment1) { FactoryGirl.create(:hbx_enrollment,
                                              household: family1.active_household,
+                                              product: product,
                                              aasm_state:"coverage_terminated",
                                              hbx_enrollment_members: [hbx_enrollment_member1],
                                              termination_submitted_on: Date.yesterday.midday,
                                              workflow_state_transitions: [workflow_state_transition1])}
-  let(:family2) { FactoryGirl.create(:family, :with_primary_family_member, :person => person2)}
-  let(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment,
+  let!(:family2) { FactoryGirl.create(:family, :with_primary_family_member, :person => person2)}
+  let!(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment,
                                              household: family2.active_household,
+                                              product: product,
                                              aasm_state:"coverage_termination_pending",
                                              hbx_enrollment_members: [hbx_enrollment_member2],
                                              termination_submitted_on: Date.yesterday.midday,
