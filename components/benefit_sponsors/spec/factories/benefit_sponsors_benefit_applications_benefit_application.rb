@@ -41,6 +41,7 @@ FactoryGirl.define do
       imported_application_state :imported
       default_effective_period nil
       default_open_enrollment_period nil
+      package_kind :single_issuer
     end
 
     trait :with_benefit_sponsor_catalog do
@@ -62,7 +63,8 @@ FactoryGirl.define do
     trait :with_benefit_package do
       association :benefit_sponsor_catalog, factory: :benefit_markets_benefit_sponsor_catalog
       after(:build) do |benefit_application, evaluator|
-        benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application)]
+        product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.package_kind).first
+        benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package)]
       end
     end
 

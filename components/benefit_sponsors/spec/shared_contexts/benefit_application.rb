@@ -100,7 +100,8 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
                                       aasm_state: renewal_state,
                                       open_enrollment_period: open_enrollment_period,
                                       recorded_rating_area: benefit_sponsorship.rating_area,
-                                      recorded_service_areas: recorded_service_areas
+                                      recorded_service_areas: recorded_service_areas,
+                                      package_kind: package_kind
                                     ) }
 
   let(:predecessor_application) { renewal_application.predecessor }
