@@ -35,7 +35,6 @@ describe BuildIvlMarketTransitionForPersonRecord do
     end
 
     it "should build individual market transitions for only people with resident role" do
-      expect(person.individual_market_transitions.present?).to eq false
       subject.migrate
       person.reload
       expect(person.individual_market_transitions.present?).to eq true

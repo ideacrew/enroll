@@ -41,6 +41,7 @@ class ResidentRole
   embeds_many :local_residency_responses, class_name:"EventResponse"
 
   after_initialize :setup_lawful_determination_instance
+  after_create :create_initial_market_transition
 
   alias_method :is_incarcerated?,   :is_incarcerated
 
@@ -134,6 +135,18 @@ class ResidentRole
     self.residency_determined_at = Time.now
     self.is_state_resident = false
   end
+
+  def create_initial_market_transition
+    return if person.individual_market_transitions.present?
+    transition = IndividualMarketTransition.new
+    transition.role_type = "resident"
+    transition.submitted_at = Time.now
+    transition.reason_code = "generating_resident_role"
+    transition.effective_starting_on = Time.now
+    transition.user_id = SAVEUSER[:current_user_id]
+    self.person.individual_market_transitions << transition
+  end
+
 
   def mark_residency_authorized(*args)
     self.residency_determined_at = Time.now
