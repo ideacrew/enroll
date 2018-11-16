@@ -111,8 +111,6 @@ class TimeKeeper
     @logger.info "Done with HbxEnrollment"
     CensusEmployee.advance_day(self.date_of_record)
     @logger.info "Done with CensusEmployee"
-    ConsumerRole.advance_day(self.date_of_record)
-    @logger.info "Done with ConsumerRole"
     @logger.info "Done with push_date_of_record"
   end
 
