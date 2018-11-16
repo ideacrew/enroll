@@ -151,6 +151,7 @@ class PlanYear
       if self.may_schedule_termination?
         self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
         notify_employer_py_terminate(transmit_xml)
+        trigger_notice_for_voluntary_termination
       end
     else
      if self.may_terminate?
@@ -159,6 +160,7 @@ class PlanYear
        notify_employer_py_terminate(transmit_xml)
        self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
        employer_profile.revert_application! if employer_profile.may_revert_application?
+       trigger_notice_for_voluntary_termination
      end
     end
   end
@@ -1187,6 +1189,12 @@ class PlanYear
 
   def notify_employer_py_cancellation
     notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id.to_s, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+  end
+
+  def trigger_notice_for_voluntary_termination
+    if (self.termination_pending? || self.terminated?) && self.termination_kind == 'voluntary'
+      self.employer_profile.trigger_notices("group_advance_termination_confirmation", "acapi_trigger" =>  true)
+    end
   end
 
   def notify_employer_py_terminate(transmit_xml)

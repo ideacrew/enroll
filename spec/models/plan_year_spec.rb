@@ -2752,3 +2752,29 @@ describe "notify_employer_py_cancellation" do
     end
   end
 end
+
+describe "#trigger_notice_for_voluntary_termination" do
+
+  let(:plan_year) { FactoryGirl.build(:plan_year, aasm_state:'active') }
+  let(:renewal_plan_year) { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.beginning_of_month.next_month, aasm_state: 'renewing_enrolled') }
+  let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year, renewal_plan_year]) }
+
+  context "when employer is terminated due to voluntary termination " do
+    it "with future date - should trigger notice" do
+      expect(employer_profile).to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.next_month, TimeKeeper.date_of_record, "voluntary", false)
+    end
+
+    it "with past date - should trigger notices" do
+      expect(employer_profile).to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "voluntary", false)
+    end
+  end
+
+  context 'when employer is terminated due to non-payment' do
+    it "should not trigger notice" do
+      expect(employer_profile).not_to receive(:trigger_notices).with("group_advance_termination_confirmation", "acapi_trigger" =>  true)
+      plan_year.terminate_plan_year(TimeKeeper.date_of_record.prev_month, TimeKeeper.date_of_record, "nonpayment", false)
+    end
+  end
+end
