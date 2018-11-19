@@ -9,23 +9,21 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
   let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
   let(:dob) { employee_role.dob }
   let(:ssn) { employee_role.ssn }
+  let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+  let(:employer_profile)      {  benefit_sponsorship.profile }
+  let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+  let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package)}
 
-  let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let!(:plan_year) {
-    FactoryGirl.create(:plan_year,
-      employer_profile: employer_profile,
-      aasm_state: "published"
-    )
-  }
-
-  let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let!(:census_employee) {
     FactoryGirl.create(:census_employee,
       hired_on: hired_on,
       employment_terminated_on: terminated_on,
       dob: dob,
       ssn: ssn,
-      employer_profile: employer_profile
+      employer_profile: employer_profile,
+      benefit_group_assignments:[benefit_group_assignment]
     )
   }
 
@@ -44,7 +42,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     end
 
     it "should set employer profile id on the employee_role" do
-      expect(employee_role.employer_profile_id).to eq employer_profile.id
+      expect(employee_role.benefit_sponsors_employer_profile_id).to eq employer_profile.id
     end
 
     it "should set census employee id on the employee_role" do
