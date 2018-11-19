@@ -42,7 +42,7 @@ module Factories
       @logger.debug "Is congresstional employer? #{result}"
       expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.no_timeout.each do |expiring_plan_year|
-        bg_ids = plan_year.benefit_groups.collect(&:_id).uniq
+        bg_ids = expiring_plan_year.benefit_groups.collect(&:_id).uniq
         query = { :benefit_group_id.in => bg_ids }
         families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
 
