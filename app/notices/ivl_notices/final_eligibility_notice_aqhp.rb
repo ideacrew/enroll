@@ -104,7 +104,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :last_name => datum["last_name"].titleize,
         :full_name => datum["full_name"].titleize,
         :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
-        :incarcerated => datum["incarcerated"].upcase == "N" ? "No" : "Yes",
+        :incarcerated => (datum["incarcerated"].present? && datum["incarcerated"].upcase == "N") ? "No" : "Yes",
         :citizen_status => citizen_status(datum["citizen_status"]),
         :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
         :actual_income => datum["actual_income"],
@@ -121,15 +121,16 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
         :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
         :has_access_to_affordable_coverage => check(datum ["mec"]),
-        :no_medicaid_because_of_income => (datum["nonmedi_reason"].downcase == "over income") ? true : false,
-        :no_medicaid_because_of_immigration => (datum["nonmedi_reason"].downcase == "immigration") ? true : false,
-        :no_medicaid_because_of_age => (datum["nonmedi_reason"].downcase == "age") ? true : false,
-        :no_aptc_because_of_income => (datum["nonaptc_reason"].downcase == "over income") ? true : false,
-        :no_aptc_because_of_tax => datum["nonaptc_reason"].downcase == "tax" ? true : false,
-        :no_aptc_because_of_mec => datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
-        :no_csr_because_of_income => datum["noncsr_reason"].downcase == "over income" ? true : false,
-        :no_csr_because_of_tax => datum["noncsr_reason"].downcase == "tax" ? true : false,
-        :no_csr_because_of_mec => datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
+        :no_medicaid_because_of_income => (datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "over income") ? true : false,
+        :no_medicaid_because_of_immigration => (datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "immigration") ? true : false,
+        :no_medicaid_because_of_age => (datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "age") ? true : false,
+        :no_aptc_because_of_income => (datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "over income") ? true : false,
+        :no_aptc_because_of_tax => (datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "tax") ? true : false,
+        :no_aptc_because_of_mec => (datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "medicare eligible") ? true : false,
+        :no_csr_because_of_income => (datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "over income") ? true : false,
+        :no_csr_because_of_tax => (datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "tax") ? true : false,
+        :no_csr_because_of_mec => (datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "medicare eligible") ? true : false,
+        :non_applicant => (datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "non-applicant") ? true : false,
         :tax_household => append_tax_household_information(primary_member)
       })
     end
@@ -181,7 +182,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
 
   def append_tax_household_information(primary_member)
     PdfTemplates::TaxHousehold.new({
-      :csr_percent_as_integer => (primary_member["csr"].upcase == "YES") ? primary_member["csr_percent"] : "100",
+      :csr_percent_as_integer => (primary_member["csr"].present? && primary_member["csr"].upcase == "YES") ? primary_member["csr_percent"] : "100",
       :max_aptc => primary_member["aptc"].present? ? primary_member["aptc"].to_f.round(2) : 0.0,
       :aptc_csr_annual_household_income => primary_member["actual_income"].present? ? primary_member["actual_income"].to_f.round(2) : nil,
       :aptc_csr_monthly_household_income => primary_member["monthly_hh_income"].present? ? primary_member["monthly_hh_income"].to_f.round(2) : nil,

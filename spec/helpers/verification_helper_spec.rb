@@ -216,6 +216,19 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
   end
+ 
+  describe '#has_active_consumer_dependent?' do
+    let(:person1) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, :person => person) }
+    let(:dependent){ double(family_member: double) }
+    it 'returns true the person has active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person1, dependent)).to eq true
+    end
+    it 'returns false the person has no active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person2, dependent)).to eq false
+    end
+  end
 
   describe '#get_person_v_type_status' do
     let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
