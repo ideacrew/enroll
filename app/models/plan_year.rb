@@ -91,7 +91,7 @@ class PlanYear
   scope :published_plan_years_by_date, ->(date) {
     where(
       "$and" => [
-        {:aasm_state.in => PUBLISHED },
+        {:aasm_state.in => PUBLISHED + ['termination_pending'] },
         {:"start_on".lte => date, :"end_on".gte => date}
       ]
     )
