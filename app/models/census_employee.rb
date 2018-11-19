@@ -483,7 +483,7 @@ class CensusEmployee < CensusMember
     return false if person.blank? || (person.present? &&
                                       person.has_active_employee_role_for_census_employee?(self))
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
-    self.trigger_notices("employee_eligibility_notice") if employee_role.valid?
+    self.trigger_notices("employee_eligibility_notice") if employee_role.present? && employee_role.valid?
     return true
   end
 
