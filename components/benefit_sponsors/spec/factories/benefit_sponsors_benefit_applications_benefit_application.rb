@@ -42,6 +42,8 @@ FactoryGirl.define do
       default_effective_period nil
       default_open_enrollment_period nil
       package_kind :single_issuer
+      dental_package_kind :single_product
+      dental_sponsored_benefit false
     end
 
     trait :with_benefit_sponsor_catalog do
@@ -63,8 +65,19 @@ FactoryGirl.define do
     trait :with_benefit_package do
       association :benefit_sponsor_catalog, factory: :benefit_markets_benefit_sponsor_catalog
       after(:build) do |benefit_application, evaluator|
-        product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.package_kind).first
-        benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package)]
+        product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.package_kind).by_product_kind(:health).first
+        if evaluator.dental_sponsored_benefit
+          dental_product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.dental_package_kind).by_product_kind(:dental).first
+          benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package,
+                                                         benefit_application: benefit_application,
+                                                         product_package: product_package,
+                                                         dental_product_package: dental_product_package,
+                                                         dental_sponsored_benefit: true)]
+        else
+          benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package,
+                                                         product_package: product_package,
+                                                         benefit_application: benefit_application)]
+        end
       end
     end
 
@@ -75,6 +88,7 @@ FactoryGirl.define do
           benefit_sponsorship: benefit_application.benefit_sponsorship,
           effective_period: (benefit_application.effective_period.begin - 1.year)..(benefit_application.effective_period.end - 1.year),
           open_enrollment_period: (benefit_application.open_enrollment_period.begin - 1.year)..(benefit_application.open_enrollment_period.end - 1.year),
+           dental_sponsored_benefit: evaluator.dental_sponsored_benefit,
           aasm_state: evaluator.predecessor_application_state # ,
 #          recorded_service_areas: benefit_application.benefit_sponsorship.service_areas_on(benefit_application.effective_period.begin - 1.year)
         )

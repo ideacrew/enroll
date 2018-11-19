@@ -5,26 +5,20 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:effective_period)        { current_effective_date..current_effective_date.next_year.prev_day }
   let(:open_enrollment_start_on){ effective_period.min.prev_month }
   let(:open_enrollment_period)  { open_enrollment_start_on..(effective_period.min - 10.days) }
-
   let!(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)             { abc_organization.employer_profile }
-
   let!(:benefit_sponsorship)    { 
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
     benefit_sponsorship.aasm_state = benefit_sponsorship_state
     benefit_sponsorship.save
     benefit_sponsorship
   }
-
   let(:dental_sponsored_benefit) { false }
-
   let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
   let!(:service_areas) { 
     benefit_sponsorship.service_areas_on(effective_period.min) 
   }
-
   let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min) }
-  
   let(:initial_application)     { BenefitSponsors::BenefitApplications::BenefitApplication.new(
                                       # benefit_sponsorship: benefit_sponsorship,
                                       benefit_sponsor_catalog: benefit_sponsor_catalog,
@@ -81,6 +75,7 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let(:renewal_state)           { :draft }
 
   let(:package_kind)            { :single_issuer }
+  let(:dental_package_kind)     { :single_product }
   let(:renewal_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:current_effective_date)  { renewal_effective_date.prev_year }
   let(:effective_period)        { renewal_effective_date..renewal_effective_date.next_year.prev_day }
@@ -91,7 +86,12 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let!(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
 
   let(:recorded_service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
-  
+
+  let(:dental_sponsored_benefit) { false }
+  let(:current_dental_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
+  let(:predeccesor_dental_product_package)    { current_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
+
+
   let!(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                       :with_benefit_package, :with_predecessor_application,
                                       predecessor_application_state: predecessor_state,
@@ -101,7 +101,9 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
                                       open_enrollment_period: open_enrollment_period,
                                       recorded_rating_area: benefit_sponsorship.rating_area,
                                       recorded_service_areas: recorded_service_areas,
-                                      package_kind: package_kind
+                                       package_kind: package_kind,
+                                       dental_package_kind: dental_package_kind,
+                                       dental_sponsored_benefit: dental_sponsored_benefit
                                     ) }
 
   let(:predecessor_application) { renewal_application.predecessor }
