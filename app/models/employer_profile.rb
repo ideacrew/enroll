@@ -659,12 +659,11 @@ class EmployerProfile
     end
 
     def advance_day(new_date)
-      @logger = Logger.new("#{Rails.root}/log/employer_profile_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       if !Rails.env.test?
 
         # Terminates scheduled plan years
         EmployerProfile.terminate_scheduled_plan_years
-        @logger.info "--------------- Start of terminate_scheduled_plan_years ---------------"
+
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           begin
@@ -672,21 +671,18 @@ class EmployerProfile
             plan_year_renewal_factory.is_congress = false # TODO handle congress differently
             plan_year_renewal_factory.renew
           rescue Exception => e
-            @logger.info "Unable to renew plan year organizations_eligible_for_renewal for #{organization.legal_name} due to #{e.backtrace}"
             Rails.logger.error { "Unable to renew plan year organizations_eligible_for_renewal for #{organization.legal_name} due to #{e}" }
           end
         end
-        @logger.info "--------------- Done with terminate_scheduled_plan_years ---------------"
 
         open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
         open_enrollment_factory.date = new_date
-        @logger.info "--------------- Start of EmployerOpenEnrollmentFactory ---------------"
+
         organizations_for_open_enrollment_begin(new_date).each do |organization|
           begin
             open_enrollment_factory.employer_profile = organization.employer_profile
             open_enrollment_factory.begin_open_enrollment
           rescue Exception => e
-            @logger.info "Unable to begin_open_enrollment begin_open_enrollment begin_open_enrollment #{organization.legal_name} due to #{e.backtrace}"
             Rails.logger.error { "Unable to begin_open_enrollment begin_open_enrollment begin_open_enrollment #{organization.legal_name} due to #{e}" }
           end
         end
@@ -696,21 +692,17 @@ class EmployerProfile
             open_enrollment_factory.employer_profile = organization.employer_profile
             open_enrollment_factory.end_open_enrollment
           rescue Exception => e
-            @logger.info "Unable to end_open_enrollment end_open_enrollment end_open_enrollment #{organization.legal_name} due to #{e.backtrace}"
             Rails.logger.error { "Unable to end_open_enrollment end_open_enrollment end_open_enrollment #{organization.legal_name} due to #{e}" }
           end
         end
-        @logger.info "--------------- Done with EmployerOpenEnrollmentFactory ---------------"
 
         # Reminder notices to renewing employers to publish thier plan years.
         start_on = new_date.next_month.beginning_of_month
-        @logger.info "--------------- Start of new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7 ---------------"
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
           renewal_employers_reminder_to_publish(start_on).each do |organization|
             begin
               organization.employer_profile.trigger_notices("renewal_employer_first_reminder_to_publish_plan_year", "acapi_trigger" => true)
             rescue Exception => e
-              @logger.info "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e.backtrace}"
               Rails.logger.error { "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
@@ -719,7 +711,6 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_second_reminder_to_publish_plan_year", "acapi_trigger" => true)
             rescue Exception => e
-              @logger.info "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e.backtrace}"
               Rails.logger.error { "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
@@ -728,18 +719,14 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_final_reminder_to_publish_plan_year", "acapi_trigger" => true)
             rescue Exception => e
-              @logger.info "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e.backtrace}"
               Rails.logger.error { "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         end
-        @logger.info "--------------- Done with new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7 ---------------"
 
-
-        @logger.info "Start of Factories::EmployerEnrollFactory.new"
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = new_date
-        @logger.info " Start of organizations_for_plan_year_begin(new_date)"
+
         organizations_for_plan_year_begin(new_date).each do |organization|
           begin
             puts "START START FOR #{organization.legal_name} - #{Time.now}"
@@ -747,13 +734,10 @@ class EmployerProfile
             employer_enroll_factory.begin
             puts "PROCESSED START FOR #{organization.legal_name} - #{Time.now}"
           rescue Exception => e
-            @logger.info "Error found for employer - #{organization.legal_name} during plan year begin"
             Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year begin" }
           end
         end
-        @logger.info "Done with organizations_for_plan_year_begin(new_date)"
 
-        @logger.info "Start of organizations_for_plan_year_end(new_date)"
         organizations_for_plan_year_end(new_date).each do |organization|
           begin
             puts "START END FOR #{organization.legal_name} - #{Time.now}"
@@ -764,10 +748,7 @@ class EmployerProfile
             Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year end" }
           end
         end
-        @logger.info "Done with organizations_for_plan_year_end(new_date)"
-        @logger.info "Done with Factories::EmployerEnrollFactory.new"
 
-        @logger.info "Start of new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month"
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             begin
@@ -775,14 +756,11 @@ class EmployerProfile
               plan_year.force_publish!
               Rails.logger.info { "FORCE PUBLISHED PY FOR #{organization.legal_name} --- #{plan_year.aasm_state}"  }
             rescue Exception => e
-              @logger.info "Error force publishing renewing plan year for #{organization.legal_name} due to #{e.backtrace}"
               Rails.logger.error { "Error force publishing renewing plan year for #{organization.legal_name} due to #{e}" }
             end
           end
         end
-        @logger.info "Done with new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month"
 
-        @logger.info "Start of organizations_for_low_enrollment_notice(new_date)"
         organizations_for_low_enrollment_notice(new_date).each do |organization|
           begin
             plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
@@ -795,23 +773,18 @@ class EmployerProfile
             Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
           end
         end
-        @logger.info "Done with organizations_for_low_enrollment_notice(new_date)"
 
-        @logger.info "Start of Settings.aca.shop_market.transmit_scheduled_employers"
         if Settings.aca.shop_market.transmit_scheduled_employers
           if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
             begin
               transmit_scheduled_employers(new_date)
             rescue Exception => e
-              @logger.info "Error transmitting scheduled employers due to #{e.backtrace}"
               Rails.logger.error { "Error transmitting scheduled employers due to #{e}" }
             end
           end
         end
-        @logger.info "End of Settings.aca.shop_market.transmit_scheduled_employers"
 
         #Initial employer reminder notices to publish plan year.
-        @logger.info "Start of Initial employer reminder notices to publish plan year"
         start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
         if new_date+2.days == start_on.last_month
@@ -827,7 +800,6 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year", "acapi_trigger" => true)
             rescue Exception => e
-              @logger.info "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e.backtrace}"
               Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
@@ -838,22 +810,17 @@ class EmployerProfile
               begin
                 organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year", "acapi_trigger" => true)
               rescue Exception => e
-                @logger.info "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e.backtrace}"
                 Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
               end
             end
           end
         end
-        @logger.info "Done with Initial employer reminder notices to publish plan year"
 
-        @logger.info "Start of new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on"
         if new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on
           effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
-        @logger.info "Done with new_date.prev_day.day == Settings.aca.shop_market.initial_application.quiet_period_end_on"
 
-        @logger.info "Start of initial Employer's missing binder payment due date notices to Employer's and active Employee's."
        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
         start_on_for_missing_binder_payments = TimeKeeper.date_of_record.next_month.beginning_of_month
         binder_next_day = PlanYear.calculate_open_enrollment_date(start_on_for_missing_binder_payments)[:binder_payment_due_date].next_day
@@ -864,10 +831,8 @@ class EmployerProfile
             end
           end
         end
-        @logger.info "End of initial Employer's missing binder payment due date notices to Employer's and active Employee's."
       end       
 
-      @logger.info "Start of Employer activities that take place monthly - on first of month"
       # Employer activities that take place monthly - on first of month
       if new_date.day == 1
         orgs = Organization.exists(:"employer_profile.employer_profile_account._id" => true).not_in(:"employer_profile.employer_profile_account.aasm_state" => %w(canceled terminated))
@@ -878,7 +843,6 @@ class EmployerProfile
           # end
         end
       end
-      @logger.info "End of Employer activities that take place monthly - on first of month"
 
       # Find employers with events today and trigger their respective workflow states
       appeal_period = (Settings.
@@ -918,7 +882,6 @@ class EmployerProfile
         }
       )
 
-      @logger.info "Start of employer_profile advance_date, today, plan_year advance_date"
       orgs.each do |org|
         org.employer_profile.today = new_date
         org.employer_profile.advance_date! if org.employer_profile.may_advance_date?
@@ -926,7 +889,6 @@ class EmployerProfile
         plan_year.advance_date! if plan_year && plan_year.may_advance_date?
         plan_year
       end
-      @logger.info "Done with employer_profile advance_date, today, plan_year advance_date"
     end
   end
 
