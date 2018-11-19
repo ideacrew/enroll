@@ -93,7 +93,7 @@ module Eligibility
     end
 
     def has_benefit_group_assignment?
-      (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
+      (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED + ['termination_pending']).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
       (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
     end
   end

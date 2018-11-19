@@ -218,6 +218,11 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                                   end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
                                                   aasm_state: 'renewing_draft') }
 
+      let(:terminated_plan_year)  { FactoryGirl.build(:plan_year,
+                                            start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                            end_on: TimeKeeper.date_of_record.beginning_of_month + 2.months,
+                                            aasm_state: 'termination_pending') }
+
 
       let(:relationship_benefits) do
         [
@@ -231,7 +236,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                                     plan_years: [expired_plan_year, active_plan_year, draft_plan_year]) }
 
       before do 
-        [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year, published_plan_year].each do |py|
+        [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year, published_plan_year, terminated_plan_year].each do |py|
           bg = py.benefit_groups.build({
             title: 'DC benefits',
             plan_option_kind: "single_plan",

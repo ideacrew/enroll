@@ -750,7 +750,7 @@ class PlanYear
   end
 
   def employees_are_matchable?
-    %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
+    %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active termination_pending).include? aasm_state
   end
 
   def application_warnings
