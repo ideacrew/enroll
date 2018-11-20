@@ -44,7 +44,6 @@ module BenefitSponsors
       end
 
       def submit_application
-        binding.pry
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.fetch(params.permit(:benefit_application_id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
         if @benefit_application_form.submit_application
