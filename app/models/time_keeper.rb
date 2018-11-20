@@ -100,18 +100,11 @@ class TimeKeeper
   end
 
   def push_date_of_record
-    @logger = Logger.new("#{Rails.root}/log/push_date_of_record_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     BenefitSponsorship.advance_day(self.date_of_record)
-    @logger.info "Done with BenefitSponsorship"
     EmployerProfile.advance_day(self.date_of_record)
-    @logger.info "Done with EmployerProfile"
     Family.advance_day(self.date_of_record)
-    @logger.info "Done with Family"
     HbxEnrollment.advance_day(self.date_of_record)
-    @logger.info "Done with HbxEnrollment"
     CensusEmployee.advance_day(self.date_of_record)
-    @logger.info "Done with CensusEmployee"
-    @logger.info "Done with push_date_of_record"
   end
 
   def self.with_cache
