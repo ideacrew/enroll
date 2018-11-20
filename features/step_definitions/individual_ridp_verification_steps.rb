@@ -229,3 +229,37 @@ end
 And(/^I click on Continue button$/) do
   find(:xpath, "//*[@id='btn-continue']").click
 end
+
+And(/^I should see Individual and RIDP verification types$/) do
+  expect(page).to have_content "Documents FAQ"
+  find('.btn', text: 'Documents FAQ').click
+  expect(page).to have_content('School identification card')
+  expect(page).to have_content('Employer identification card')
+  expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
+end
+
+And(/^HBX admin click on verification link$/) do
+  click_link "Documents"
+end
+
+Then(/^HBX admin should see Individual and RIDP verification types$/) do
+  expect(page).to have_content "Documents FAQ"
+  find('.btn', text: 'Documents FAQ').click
+  expect(page).to have_content('School identification card')
+  expect(page).to have_content('Employer identification card')
+  expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
+end
+
+And(/^HBX admin rejects RIDP Identity Verification Document$/) do
+  expect(page).to have_content('Identity')
+  find(:xpath, "//*[@id='Identity']/div/div[5]/div").click
+  find('.interaction-choice-control-verification-reason-2').click
+  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  select('Document Expired', :from => 'verification_reason')
+  find('.v-type-confirm-button').click
+  expect(page).to have_content('Identity was rejected.')
+end

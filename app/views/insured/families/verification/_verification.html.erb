@@ -110,16 +110,12 @@
         <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
     <% end %>
   </div>
-  <div class="col-xs-6">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
-      <%= l10n("insured.families.verification.documents_FAQ") %>
-    </a>
-  </div>
 </div>
-
-<div class="collapse" id="docs-verification-faq">
-  <%= render partial: "insured/families/verification/documents_verification_list" %>
+<!-- <h4 class="starter">
+  For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.
+</h4> -->
 </div>
+<%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
 
 <script>
   $(document).ready(function() {

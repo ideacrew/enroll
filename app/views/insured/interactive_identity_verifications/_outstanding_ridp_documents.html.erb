@@ -14,13 +14,19 @@
                       <div class="v-type-name col-md-2">
                         <%= ridp_type %>
                       </div>
-                      <div class="v-type-status col-md-3">
+                       <% families = controller_name == 'families' %>
+                      <div class='v-type-status <%= families ? "col-md-2" : "col-md-3" %>'>
                       <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>" id="status">
                         <%= show_ridp_type(ridp_type, @person) %>
                       </span>&nbsp;
                         <%= pundit_span Family, :updateable? %>
                       </div>
-                      <div class="v-type-upload col-md-4">
+                      <%if families %>
+                        <div class="v-type-due-date col-md-3">
+                          <span class="text-danger"></span>
+                        </div>
+                      <% end %>
+                      <div class='v-type-upload <%= families ? "col-md-3" : "col-md-4" %>'>
                         <% if ridp_type_unverified?(ridp_type, @person) %>
                           <% if ridp_type == 'Identity' %>
                               <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
@@ -41,7 +47,7 @@
                         <% end %>
                       </div>
                       <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
-                          <div class="v-type-actions col-md-3">
+                          <div class='v-type-actions <%= families ? "col-md-2" : "col-md-3"%>'>
                             <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Action'} %>
                           </div>
                       <% end %>

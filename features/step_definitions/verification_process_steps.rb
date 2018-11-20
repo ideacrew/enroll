@@ -20,12 +20,15 @@ end
 
 Given(/^I should see page for documents verification$/) do
   expect(page).to have_content "Documents FAQ"
-  expect(page).to have_content('Social Security Number')
   find('.btn', text: 'Documents FAQ').click
-  expect(page).to have_content('DC Residency')
-  find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications').visible?
-  new_window = window_opened_by { click_link 'https://dmv.dc.gov/page/proof-dc-residency-certifications' }
-  switch_to_window new_window
+  expect(page).to have_content('School identification card')
+  expect(page).to have_content('Employer identification card')
+end
+
+Given(/^I should see page for Identity And Application Documents$/) do
+  expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
 end
 
 Given(/^a consumer exists$/) do
