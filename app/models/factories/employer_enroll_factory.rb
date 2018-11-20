@@ -107,7 +107,7 @@ module Factories
           family.active_household.hbx_enrollments.enrolled_and_renewing.where(query).each do |enrollment|
             begin
               enrollment.expire_coverage! if enrollment.may_expire_coverage?
-              if !enrollment.benefit_group_assignment_id.blank?
+              if enrollment.benefit_group_assignment_id.present?
                 assignment = enrollment.benefit_group_assignment
                 assignment.expire_coverage! if assignment.may_expire_coverage?
                 assignment.update_attributes(is_active: false) if assignment.is_active?
