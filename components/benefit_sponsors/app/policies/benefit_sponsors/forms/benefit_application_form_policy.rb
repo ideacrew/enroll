@@ -24,7 +24,7 @@ module BenefitSponsors
       def is_broker_for_employer?
         broker_role = user.person.broker_role
         return false unless broker_role
-        employer = benefit_application_form.service.benefit_sponsorship.employer_profile
+        employer = benefit_application_form.service.benefit_sponsorship.profile
         return false unless employer
         employer.broker_agency_accounts.any? { |account| account.writing_agent_id == broker_role.id }
       end
