@@ -41,7 +41,7 @@ module Factories
       expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.no_timeout.each do |expiring_plan_year|
         begin
-          expire_enrollments_and_bgas(expiring_plan_year)
+          expire_plan_year_enrollments_and_bgas(expiring_plan_year)
         rescue => e
           @logger.debug "Cannot process plan_year with id: #{expiring_plan_year.id.to_s}"
         end
@@ -97,7 +97,7 @@ module Factories
       end
     end
 
-    def expire_enrollments_and_bgas(expiring_plan_year)
+    def expire_plan_year_enrollments_and_bgas(expiring_plan_year)
       bg_ids = expiring_plan_year.benefit_groups.collect(&:_id).uniq
       query = { :benefit_group_id.in => bg_ids }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
