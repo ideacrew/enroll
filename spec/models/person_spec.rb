@@ -287,6 +287,7 @@ describe Person do
         let(:census_employee) { double }
         let(:employee_role1) { FactoryGirl.build(:employee_role) }
         let(:employee_role2) { FactoryGirl.build(:employee_role) }
+        let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
 
         before do
           allow(employee_roles).to receive(:census_employee).and_return(census_employee)
@@ -297,25 +298,25 @@ describe Person do
         it "should return true" do
           allow(person).to receive(:employee_roles).and_return([employee_roles])
           allow(employee_roles).to receive(:benefit_group).and_return(benefit_group)
-          expect(person.has_employer_benefits?).to eq true
+          expect(person.has_employer_benefits?(effective_on)).to eq true
         end
 
         it "should return false" do
           allow(person).to receive(:employee_roles).and_return([])
-          expect(person.has_employer_benefits?).to eq false
+          expect(person.has_employer_benefits?(effective_on)).to eq false
         end
 
         it "should return true" do
           allow(person).to receive(:employee_roles).and_return([employee_roles])
           allow(employee_roles).to receive(:benefit_group).and_return(nil)
-          expect(person.has_employer_benefits?).to eq false
+          expect(person.has_employer_benefits?(effective_on)).to eq false
         end
 
         it "should return true when person has multiple employee_roles and one employee_role has benefit_group" do
           allow(person).to receive(:active_employee_roles).and_return([employee_role1, employee_role2])
           allow(employee_role1).to receive(:benefit_group).and_return(nil)
           allow(employee_role2).to receive(:benefit_group).and_return(benefit_group)
-          expect(person.has_employer_benefits?).to be_truthy
+          expect(person.has_employer_benefits?(effective_on)).to be_truthy
         end
       end
 
