@@ -32,6 +32,10 @@ FactoryGirl.define do
       end
     end
 
+    trait :old_case do
+      benefit_sponsorship_id nil
+      benefit_sponsors_employer_profile_id nil
+    end
 
     trait :owner do
       is_business_owner  true
