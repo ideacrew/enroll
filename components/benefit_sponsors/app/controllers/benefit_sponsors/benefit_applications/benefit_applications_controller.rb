@@ -83,6 +83,7 @@ module BenefitSponsors
       def late_rates_check
         date = params[:start_on_date].to_date rescue nil
         # render json: Plan.has_rates_for_all_carriers?(date)
+        render json: false #fixme
       end
 
       private
