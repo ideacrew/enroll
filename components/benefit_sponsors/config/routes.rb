@@ -78,6 +78,7 @@ BenefitSponsors::Engine.routes.draw do
       post 'revert'
       post 'submit_application'
       post 'force_submit_application'
+      get 'late_rates_check'
 
       resources :benefit_packages, controller: "benefit_packages/benefit_packages" do
         get :calculate_employer_contributions, on: :collection

@@ -80,6 +80,11 @@ module BenefitSponsors
         render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
 
+      def late_rates_check
+        date = params[:start_on_date].to_date rescue nil
+        # render json: Plan.has_rates_for_all_carriers?(date)
+      end
+
       private
 
       def error_messages(instance)

@@ -293,6 +293,21 @@ module BenefitMarkets
       new_product
     end
 
+    def self.has_rates_for_all_carriers?(start_on_date=nil)
+      no_rates_products_count = 0
+      date = start_on_date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
+      return false if date.blank?
+
+      products = ::BenefitMarkets::Products::Product.all.select{|a| a.active_year == date.year }
+
+      products.each do |product|
+        count = product.premium_tables.select{|a| a.effective_period.min <= date && a.effective_period.max >= date }.count
+        no_rates_products_count+=1 if count == 0
+      end
+
+      no_rates_products_count == 0
+    end
+
     def health?
       kind == :health
     end
