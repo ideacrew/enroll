@@ -823,10 +823,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
 
   context "construct_employee_role_for_match_person" do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-    let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
-    let(:census_employee1) { FactoryGirl.build(:census_employee) }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', gender: 'male') }
+    let!(:census_employee1) { FactoryGirl.build(:census_employee) }
 
     it "should return false when not match person" do
       expect(census_employee1.construct_employee_role_for_match_person).to eq false
@@ -842,16 +842,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     it "should return true when match person has no active employee roles for current census employee" do
-      person.employee_roles.create!(ssn: census_employee.ssn,
-                                    employer_profile_id: census_employee.employer_profile.id,
-                                    hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
 
     it "should return true when match person has no active employee roles for current census employee" do
-      person.employee_roles.create!(ssn: census_employee.ssn,
-                                    employer_profile_id: census_employee.employer_profile.id,
-                                    hired_on: census_employee.hired_on)
+      allow(census_employee).to receive(:has_benefit_group_assignment?).and_return(true)
       expect(census_employee).to receive(:trigger_notices)
       census_employee.construct_employee_role_for_match_person
     end

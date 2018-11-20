@@ -240,7 +240,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "POST match" do
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING", ssn: "333224444", gender: "male" } }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975", gender: "male") }
     let(:census_employee) { instance_double("CensusEmployee")}
     let(:hired_on) { double }
@@ -295,6 +295,23 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
             expect(assigns[:employment_relationships]).to eq employment_relationships
           end
+        end
+      end
+
+      context "staff Role existing person claiming" do
+        let(:validation_result) {true}
+        let(:found_census_employees) {[census_employee]}
+
+        before(:each) do
+         allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
+         post :match, :person => person_parameters
+        end
+
+        it "should update ssn and gender on staff role person record" do
+         expect(response).to have_http_status(:success)
+         expect(response).to render_template("match")
+         expect(found_person.reload.ssn).to eq person_parameters[:ssn]
+         expect(found_person.reload.gender).to eq person_parameters[:gender]
         end
       end
     end
