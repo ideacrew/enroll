@@ -15,7 +15,7 @@ var termReason = "";
 
 if ( $parent_row.next().hasClass('child-row') ) {
 //
-} 
+}
 else {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "index"%></td></tr>');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
@@ -77,9 +77,11 @@ function initDatePicker() {
   $('input.date').datepicker({dateFormat: "mm/dd/yy"})
 }
 
+var inputsChecked = false;
+
 function validateFormat(element, pyStartOn, pyEndOn) {
   pyEndDate = element.value;
-  
+
   setTimeout(function() {
     if (element.value.length != 10 || element.value.indexOf("/") != 2) {
       element.value = "";
@@ -157,15 +159,35 @@ function addDatePicker() {
 
 function validTerminatePy() {
   var endDates = document.querySelectorAll('.py-end-date')
-
+  validateTermActions()
   for (date of endDates) {
-    if (date.value.length > 0) {
+    if (date.value.length > 0 && inputsChecked) {
       enableSubmitButton()
     } else {
-      console.log("Missing Info")
+      disableSubmitButton();
     }
   }
 }
+
+function validateTermActions() {
+  inputsChecked = false;
+  inputs = document.querySelector('.py-end-date').closest('tr').querySelector('.term_action_radios').getElementsByTagName('input');
+  for (input of inputs) {
+    if (input.checked) {
+      inputsChecked = true;
+    }
+  }
+}
+
+(function() {
+  $('input.py-end-date').click(function() {
+    if (!inputsChecked) {
+      alert('Please select termination reason');
+      $(this).val('');
+      $('#ui-datepicker-div').hide();
+    }
+  })
+})();
 
 function pyAction(action, id, employer_id, term_date, start_on) {
   applicationId = id;
@@ -180,13 +202,13 @@ function pyAction(action, id, employer_id, term_date, start_on) {
     hideTerminationRadios();
     enableSubmitButton()
   }
-  
+
   if (action == 'terminate') {
     showTerminationRadios();
     clearDatePickerValue();
     disableSubmitButton();
   }
-  
+
   if (action == 'cancel') {
     hideEndDateField(pyStartDate, applicationId);
     hideTerminationRadios();
@@ -194,7 +216,7 @@ function pyAction(action, id, employer_id, term_date, start_on) {
   }
   // Clears all end dates from previous rows
   var endDates = document.querySelectorAll('.py-end-date');
-  
+
   for (date of endDates) {
     date.value = "";
   }
