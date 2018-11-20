@@ -588,8 +588,8 @@ class Person
     active_employee_roles.any?
   end
 
-  def has_employer_benefits?
-    active_employee_roles.present? && active_employee_roles.any?{|r| r.benefit_group.present?}
+  def has_employer_benefits?(effective_on)
+    active_employee_roles.present? && active_employee_roles.any?{ |r| r.benefit_group.present? && effective_on < r.benefit_group.end_on }
   end
 
   def active_employee_roles

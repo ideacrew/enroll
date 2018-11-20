@@ -4,12 +4,12 @@ module Insured
       person.present? && person.is_consumer_role_active?
     end
 
-    def can_shop_shop?(person)
-      person.present? && person.has_employer_benefits?
+    def can_shop_shop?(person, effective_on)
+      person.present? && person.has_employer_benefits?(effective_on)
     end
 
-    def can_shop_both_markets?(person)
-      can_shop_individual?(person) && can_shop_shop?(person)
+    def can_shop_both_markets?(person, effective_on)
+      can_shop_individual?(person) && can_shop_shop?(person, effective_on)
     end
 
     def can_shop_resident?(person)
@@ -44,8 +44,8 @@ module Insured
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
     end
 
-    def  view_market_places(person)
-      if can_shop_both_markets?(person)
+    def view_market_places(person, effective_on)
+      if can_shop_both_markets?(person, effective_on)
         Plan::MARKET_KINDS
       elsif can_shop_individual_or_resident?(person)
         Plan::INDIVIDUAL_MARKET_KINDS

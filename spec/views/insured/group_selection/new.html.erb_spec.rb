@@ -543,9 +543,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
   end
 
-
-
-
   context "change plan with ee role" do
     let(:person) { FactoryGirl.create(:person, :with_employee_role) }
     let(:employee_role) { FactoryGirl.create(:employee_role) }
@@ -581,13 +578,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: benefit_group)}
     let(:employee_role) { double("EmployeeRole", id: 'er_id', person: person, census_employee: census_employee)}
     let(:benefit_group) { double("BenefitGroup")}
+    let(:new_effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
     before do
       assign(:person, person)
       assign(:hbx_enrollment, enrollment)
       assign(:employee_role, employee_role)
+      assign(:new_effective_on, new_effective_on)
       assign(:coverage_household, double("CoverageHousehold", coverage_household_members: []))
-      allow(view).to receive(:can_shop_shop?).with(person).and_return true
+      allow(view).to receive(:can_shop_shop?).with(person, new_effective_on).and_return true
       allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(person).to receive(:active_employee_roles).and_return [employee_role]

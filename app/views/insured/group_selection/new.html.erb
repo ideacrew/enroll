@@ -18,7 +18,7 @@
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
           <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
 
-          <% if can_shop_shop?(@person) || can_shop_individual?(@person) || can_shop_resident?(@person) %>
+          <% if can_shop_shop?(@person, @optional_effective_on || @effective_on_date || @new_effective_on) || can_shop_individual?(@person) || can_shop_resident?(@person) %>
             <div id="coverage-household">
               <div class="module group-selection-table">
                 <div class="table-responsive table-border">
@@ -29,13 +29,13 @@
             </div>
           <% end %>
 
-          <% if can_shop_both_markets?(@person) || can_shop_individual?(@person) || can_shop_resident?(@person) %>
+          <% if can_shop_both_markets?(@person, @optional_effective_on || @effective_on_date || @new_effective_on) || can_shop_individual?(@person) || can_shop_resident?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
                 <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
               <span class="clear" style="display: il"></span>
 
               <div class="n-radio-group">
-                <% view_market_places(@person).each_with_index do |kind, index| %>
+                <% view_market_places(@person, @optional_effective_on || @effective_on_date || @new_effective_on).each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
                       <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind, @person) %>
@@ -78,7 +78,7 @@
                 <% end %>
               </div>
             </div>
-          <% elsif can_shop_shop?(@person) %>
+          <% elsif can_shop_shop?(@person, @optional_effective_on || @effective_on_date || @new_effective_on) %>
              <%= hidden_field_tag 'market_kind', 'shop' %>
           <% elsif can_shop_individual?(@person) && !can_shop_resident?(@person) %>
              <%= hidden_field_tag 'market_kind', 'individual' %>
@@ -90,7 +90,7 @@
             <% end %>
           <% end %>
 
-          <% if can_shop_shop?(@person) %>
+          <% if can_shop_shop?(@person, @optional_effective_on || @effective_on_date || @new_effective_on) %>
             <%= render 'select_employer' %>
           <% end %>
 
@@ -107,7 +107,7 @@
                   </label>
                 </div>
 
-                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
+                <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person, @optional_effective_on || @effective_on_date || @new_effective_on) && !@employee_role.is_dental_offered? %>">
                   <label class="n-radio" for="coverage_kind_dental">
                     <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
