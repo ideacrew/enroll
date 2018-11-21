@@ -515,7 +515,7 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-      let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "enrolled_contingent",
+      let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected",
                                           household: family.active_household, kind: "individual") }
       let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
       let(:active_year)               {TimeKeeper.date_of_record.year}
@@ -528,8 +528,8 @@ describe HbxEnrollment, dbclean: :after_all do
       it "should check for outstanding members" do
         person.consumer_role.update_attribute("aasm_state","verification_outstanding")
         person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
-        hbx_enrollment.reload
-        expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
+        hbx_enrollment.save!
+        expect(hbx_enrollment.is_ivl_actively_outstanding?).to be_truthy
       end
     end
 

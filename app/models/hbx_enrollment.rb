@@ -1514,17 +1514,8 @@ class HbxEnrollment
     ENROLLED_STATUSES.include?(aasm_state)
   end
 
-  def is_effective_in_current_year?
-    (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).include?(effective_on)
-  end
-
   def is_ivl_actively_outstanding?
-    is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_effective_in_current_year? && is_any_enrollment_member_outstanding?
-  end
-
-  def is_any_member_outstanding?
-    active_consumer_role_people =  hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
-    active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
+    is_ivl_by_kind? && is_enrolled_by_aasm_state? && is_any_enrollment_member_outstanding?
   end
 
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
