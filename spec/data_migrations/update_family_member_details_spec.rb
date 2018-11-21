@@ -10,8 +10,8 @@ describe UpdateFamilyMemberDetails, dbclean: :after_each do
   subject { UpdateFamilyMemberDetails.new(given_task_name, double(:current_scope => nil)) }
 
   before do
-    allow(ENV).to receive(:[]).with('hbx1_id').and_return person1.hbx_id
-    allow(ENV).to receive(:[]).with('hbx2_id').and_return person2.hbx_id
+    allow(ENV).to receive(:[]).with('hbx_id_1').and_return person1.hbx_id
+    allow(ENV).to receive(:[]).with('hbx_id_2').and_return person2.hbx_id
     allow(ENV).to receive(:[]).with("id").and_return(family.family_members.where(is_primary_applicant: false).first.id)
   end
 
