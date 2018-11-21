@@ -529,7 +529,7 @@ describe HbxEnrollment, dbclean: :after_all do
         person.consumer_role.update_attribute("aasm_state","verification_outstanding")
         person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
         hbx_enrollment.save!
-        expect(hbx_enrollment.is_ivl_actively_outstanding?).to be_truthy
+        expect(hbx_enrollment.is_any_enrollment_member_outstanding?).to be_truthy
       end
     end
 

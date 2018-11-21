@@ -39,8 +39,8 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         consumer_role.verification_types.map(&:reload)
       end
 
-      it "should return is_ivl_actively_outstanding? as true" do
-        expect(hbx_enrollment.is_ivl_actively_outstanding?).to be_truthy
+      it "should return is_any_enrollment_member_outstanding? as true" do
+        expect(hbx_enrollment.is_any_enrollment_member_outstanding?).to be_truthy
         expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
       end
 
@@ -81,7 +81,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
       it "should update the aasm_state to verification type's due date" do
         dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         dep_consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
-        expect(hbx_enrollment.is_ivl_actively_outstanding?).to be_truthy
+        expect(hbx_enrollment.is_any_enrollment_member_outstanding?).to be_truthy
       end
 
       it "should update the verifcation_types" do
