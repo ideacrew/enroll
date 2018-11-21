@@ -36,8 +36,6 @@ class HbxEnrollment
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
-  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected enrolled_contingent unverified coverage_enrolled)
-
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   WAIVER_REASONS = [

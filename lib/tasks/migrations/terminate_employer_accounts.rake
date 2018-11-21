@@ -52,10 +52,7 @@ namespace :migrations do
       if plan_year.may_terminate?
           plan_year.terminate!(end_on)
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
-          if generate_termination_notice
-            employer_terminated_from_shop(organization)
-          end
-          send_termination_notice_to_employer(organization) if generate_termination_notice
+          send_termination_notice(organization) if generate_termination_notice
           bg_ids = plan_year.benefit_groups.map(&:id)
           census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
              census_employees.each do |census_employee|
@@ -132,21 +129,13 @@ def enrollments_for_plan_year(plan_year)
   end
 end
 
-def employer_terminated_from_shop(org)
-  org.employer_profile.census_employees.active.each do |ce|
-    begin
-      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
-      puts "Notification generated for #{ce.full_name}"
-    rescue Exception => e
-      (Rails.logger.error { "Unable to deliver employer terminated from shop notice to #{ce.full_name} " }) unless Rails.env.test?
-    end
-  end
-end
-
-def send_termination_notice_to_employer(org)
+def send_termination_notice(org)
   begin
     ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
     puts "Termination notice sent to #{org.legal_name}" unless Rails.env.test?
+    org.employer_profile.census_employees.non_terminated.each do |census_employee|
+      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "voluntary_termination_notice_to_employee", "acapi_trigger" =>  true)
+    end
   rescue Exception => e
     (Rails.logger.error { "Unable to deliver termination notice to #{org.legal_name} due to #{e}" }) unless Rails.env.test?
   end

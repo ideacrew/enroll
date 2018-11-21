@@ -683,7 +683,29 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'DRG023',
+    hbx_id: 'SHOP_D044',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
+    resource_name: 'employee_role',
+    event_name: 'voluntary_termination_notice_to_employee',
+    notice_triggers: [
+      {
+        name: 'Notice to EEs that active ER is terminated from SHOP',
+        notice_template: 'notices/shop_employee_notices/voluntary_termination_notice_to_employee',
+        notice_builder: 'ShopEmployeeNotices::VoluntaryTerminationNoticeToEmployee',
+        mpi_indicator: 'SHOP_D044',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
+    hbx_id: 'SHOP31',
     title: 'Group Renewal – First Reminder to Publish',
     description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer soft deadline.',
     resource_name: 'employer',
@@ -1351,28 +1373,6 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',
         notice_builder: 'ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop',
         mpi_indicator: 'SHOP_D093',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-
-  {
-    hbx_id: 'SHOP_D044',
-    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
-    description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
-    resource_name: 'employee_role',
-    event_name: 'notify_employee_when_employer_requests_advance_termination',
-    notice_triggers: [
-      {
-        name: 'Notice to EEs that active ER is terminated from SHOP',
-        notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
-        notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
-        mpi_indicator: 'SHOP_D044',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

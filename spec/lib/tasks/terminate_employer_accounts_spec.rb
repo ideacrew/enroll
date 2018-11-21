@@ -32,7 +32,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     end
 
     it 'should terminate plan year & enrollment and update plan year & enrollment end_on and terminated date' do
-      expect_any_instance_of(Object).to receive(:send_termination_notice_to_employer).with(organization)
+      expect_any_instance_of(Object).to receive(:send_termination_notice).with(organization)
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
       active_plan_year.reload
       enrollment.reload
@@ -45,25 +45,13 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     end
    
     it 'should not terminate published plan year' do
-      expect_any_instance_of(Object).not_to receive(:send_termination_notice_to_employer).with(organization)
+      expect_any_instance_of(Object).not_to receive(:send_termination_notice).with(organization)
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
       active_plan_year.update_attribute(:aasm_state,'published')
       active_plan_year.reload
       expect(active_plan_year.end_on).to eq active_plan_year.end_on
       expect(active_plan_year.terminated_on).to eq nil
       expect(active_plan_year.aasm_state).to eq "published"
-    end
-
-    it 'should send notification when we pass true in generate_termination_notice attribute' do
-      Rake::Task["migrations:terminate_employer_account"].reenable
-      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
-      expect($stdout.string).to match("Notification generated for #{census_employee.full_name}\n")
-    end
-
-    it 'should not send notification when we pass false in generate_termination_notice attribute' do
-      Rake::Task["migrations:terminate_employer_account"].reenable
-      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
-      expect($stdout.string).not_to match("Notification generated for #{census_employee.full_name}\n")
     end
   end
 end
