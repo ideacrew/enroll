@@ -87,7 +87,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
       context "when the family member had an 'outstanding' state" do
 
-        let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, is_any_enrollment_member_outstanding: true)}
+        let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: "individual", is_any_enrollment_member_outstanding: true)}
 
         before do
           fm = family.primary_family_member
