@@ -29,7 +29,7 @@ namespace :reports do
 
           if benefit_application.present?
             enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
-            policy = enrollment_policy.business_policies_for(benefit_application, :passes_open_enrollment_period_policy)
+            policy = enrollment_policy.business_policies_for(benefit_application, :enrollment_elgibility_policy)
             if policy.present?
               policy.is_satisfied?(benefit_application)
               enrollment_errors = policy.fail_results
