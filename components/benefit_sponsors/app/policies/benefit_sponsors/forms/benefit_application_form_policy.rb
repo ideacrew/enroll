@@ -12,6 +12,7 @@ module BenefitSponsors
       def updateable?
         return false unless user.present?
         return true if (is_broker_for_employer? || is_general_agency_staff_for_employer?)
+        return true if user.person.employer_staff_roles.any? { |r| r.profile.most_recent_benefit_sponsorship.id.to_s == benefit_application_form.benefit_sponsorship_id }
         return true unless role = user && user.person && user.person.hbx_staff_role
         role.permission.modify_employer
       end

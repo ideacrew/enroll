@@ -20,11 +20,20 @@ module BenefitSponsors
     let!(:security_question)  { FactoryGirl.create_default :security_question }
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
-    let(:person) { FactoryGirl.create(:person) }
+
+    let!(:permission)               { FactoryGirl.create(:permission, :hbx_staff) }
+    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
+    let!(:hbx_person)               { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+
     let!(:person1) { FactoryGirl.create(:person, :with_broker_role) }
     let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person1 ) }
     let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+    let!(:employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
+    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[employer_staff_role]) }
     let!(:user) { FactoryGirl.create_default :user, person: person}
+
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
@@ -83,27 +92,29 @@ module BenefitSponsors
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
       benefit_sponsorship.benefit_market.site_urn = site.site_key
       benefit_sponsorship.save
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
     end
 
     describe "GET new", dbclean: :after_each do
       include_context 'shared_stuff'
 
       it "should initialize the form" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_new(login_user)
           expect(assigns(:benefit_application_form).class).to eq form_class
         end
       end
 
       it "should be a success" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_new(login_user)
           expect(response).to have_http_status(:success)
         end
       end
 
       it "should render new template" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_new(login_user)
           expect(response).to render_template("new")
         end
@@ -119,21 +130,21 @@ module BenefitSponsors
       include_context 'shared_stuff'
 
       it "should redirect" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
           expect(response).to have_http_status(:redirect)
         end
       end
 
       it "should redirect to benefit packages new" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
           expect(response.location.include?("benefit_packages/new")).to be_truthy
         end
       end
 
       it "should initialize form" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
           expect(assigns(:benefit_application_form).class).to eq form_class
         end
@@ -148,14 +159,14 @@ module BenefitSponsors
         end
 
         it "should redirect to new" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_create(login_user)
             expect(response).to render_template("new")
           end
         end
 
         it "should return error messages" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_create(login_user)
             expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
           end
@@ -176,7 +187,7 @@ module BenefitSponsors
       end
 
       it "should be a success" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
           xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
           expect(response).to have_http_status(:success)
@@ -184,7 +195,7 @@ module BenefitSponsors
       end
 
       it "should render edit template" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
           xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
           expect(response).to render_template("edit")
@@ -192,7 +203,7 @@ module BenefitSponsors
       end
 
       it "should initialize form" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in login_user
           xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
           expect(form_class).to respond_to(:for_edit)
@@ -209,21 +220,21 @@ module BenefitSponsors
       end
 
       it "should be a success" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_update(login_user)
           # expect(response).to have_http_status(:success)
         end
       end
 
       it "should initialize form" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_update(login_user)
           expect(assigns(:benefit_application_form).class).to eq form_class
         end
       end
 
       it "should redirect to benefit packages index" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_update(login_user)
           expect(response.location.include?("benefit_packages")).to be_truthy
         end
@@ -238,14 +249,14 @@ module BenefitSponsors
         end
 
         it "should redirect to edit" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_update(login_user)
             expect(response).to render_template("edit")
           end
         end
 
         it "should return error messages" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_update(login_user)
             expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
           end
@@ -280,7 +291,7 @@ module BenefitSponsors
 
       context "benefit application published sucessfully" do
         it "should redirect with success message" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_submit_application(login_user)
             expect(flash[:notice]).to eq "Plan Year successfully published."
           end
@@ -294,7 +305,7 @@ module BenefitSponsors
         end
 
         it "should redirect with success message" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
             xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:notice]).to eq "Plan Year successfully published."
@@ -310,7 +321,7 @@ module BenefitSponsors
         end
 
         it "should display warnings" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
             xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
             have_http_status(:success)
@@ -322,7 +333,7 @@ module BenefitSponsors
         let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :denied) }
 
         it "should redirect with errors" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
             xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:error]).to match(/Plan Year failed to publish/)
@@ -346,7 +357,7 @@ module BenefitSponsors
       end
 
       it "should redirect" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_force_submit_application(login_user)
           expect(response).to have_http_status(:redirect)
         end
@@ -354,7 +365,7 @@ module BenefitSponsors
 
       # TODO: FIX ME - Add below test after adding business rules engine
       it "should expect benefit application state to be pending" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_force_submit_application(login_user)
           ben_app.reload
           # expect(ben_app.aasm_state).to eq :pending
@@ -362,7 +373,7 @@ module BenefitSponsors
       end
 
       it "should display errors" do
-        [user, user_with_broker_role].each do |login_user|
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_force_submit_application(login_user)
           expect(flash[:error]).to match(/this application is ineligible for coverage/)
         end
@@ -384,14 +395,14 @@ module BenefitSponsors
 
       context "when there is no eligible application to revert" do
         it "should redirect" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(response).to have_http_status(:success)
           end
         end
 
         it "should display error message" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(flash[:error]).to match(/Plan Year could not be reverted to draft state/)
           end
@@ -402,14 +413,14 @@ module BenefitSponsors
         let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :approved) }
 
         it "should revert benefit application" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(ben_app.aasm_state).to eq :draft
           end
         end
 
         it "should display flash messages" do
-          [user, user_with_broker_role].each do |login_user|
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
           end
