@@ -290,8 +290,20 @@ module BenefitSponsors
       end
 
       context "benefit application published sucessfully" do
-        it "should redirect with success message" do
-          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+        it "should redirect with success message for broker" do
+          [user_with_broker_role].each do |login_user|
+            sign_in_and_submit_application(login_user)
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+          end
+        end
+        it "should redirect with success message for amdin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in_and_submit_application(login_user)
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+          end
+        end
+        it "should redirect with success message for employer" do
+          [user].each do |login_user|
             sign_in_and_submit_application(login_user)
             expect(flash[:notice]).to eq "Plan Year successfully published."
           end
@@ -304,8 +316,26 @@ module BenefitSponsors
           allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain('non_owner_employee_present?').and_return(false)
         end
 
-        it "should redirect with success message" do
-          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+        it "should redirect with success message for employer" do
+          [user].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+            expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+          end
+        end
+
+        it "should redirect with success message for admin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+            expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+          end
+        end
+
+        it "should redirect with success message for broker" do
+          [user_with_broker_role].each do |login_user|
             sign_in login_user
             xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:notice]).to eq "Plan Year successfully published."
@@ -412,19 +442,45 @@ module BenefitSponsors
       context "when there is an eligible application to revert" do
         let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :approved) }
 
-        it "should revert benefit application" do
-          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+        it "employer should revert benefit application" do
+          [user].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(ben_app.aasm_state).to eq :draft
+          end
+        end
+        it "broker should revert benefit application" do
+          [user_with_broker_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(ben_app.aasm_state).to eq :draft
+          end
+        end
+        it "admin should revert benefit application" do
+          [user_with_hbx_staff_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(ben_app.aasm_state).to eq :draft
           end
         end
 
-        it "should display flash messages" do
-          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+        it "should display flash messages for employer" do
+          [user].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+          end
+
+        end
+        it "should display flash messages for broker" do
+          [user_with_broker_role].each do |login_user|
             sign_in_and_revert(login_user)
             expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
           end
         end
+        it "should display flash messages for admin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+          end
+        end
+
       end
     end
   end
