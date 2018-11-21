@@ -23,7 +23,7 @@ describe "a monthly shop enrollment query" do
       }
 
       let(:initial_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_assignment, 3, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
+        FactoryGirl.create_list(:census_employee_with_active_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
           benefit_group: initial_employer.published_plan_year.benefit_groups.first)
       }
 
@@ -76,40 +76,40 @@ describe "a monthly shop enrollment query" do
         [initial_employer.fein]
       }
 
-      # it "includes enrollment 1" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_1.hbx_id)
-      # end
+      it "includes enrollment 1" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_1.hbx_id)
+      end
 
-      # it "does not include enrollment 2" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_2.hbx_id)
-      # end
+      it "does not include enrollment 2" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_2.hbx_id)
+      end
 
-      # it "does not include enrollment 3" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_3.hbx_id)
-      # end
+      it "does not include enrollment 3" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_3.hbx_id)
+      end
 
-      # it "does not include enrollment 4" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_4.hbx_id)
-      # end
+      it "does not include enrollment 4" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_4.hbx_id)
+      end
 
-      # it "includes enrollment 5" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_5.hbx_id)
-      # end
+      it "includes enrollment 5" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_5.hbx_id)
+      end
 
-      # it "does not include enrollment 6" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_6.hbx_id)
-      # end
+      it "does not include enrollment 6" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_6.hbx_id)
+      end
 
-      # it "includes enrollment 7" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_7.hbx_id)
-      # end
+      it "includes enrollment 7" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_7.hbx_id)
+      end
     end
   end
 
@@ -135,7 +135,7 @@ describe "a monthly shop enrollment query" do
       }
 
       let(:renewing_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 3, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
           benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
           renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
       }
@@ -194,45 +194,45 @@ describe "a monthly shop enrollment query" do
       }
 
 
-      # it "does not include enrollment 1" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_1.hbx_id)
-      # end
+      it "does not include enrollment 1" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_1.hbx_id)
+      end
 
-      # it "includes enrollment 2" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_2.hbx_id)
-      # end
+      it "includes enrollment 2" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_2.hbx_id)
+      end
 
-      # it "does not include enrollment 3" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_3.hbx_id)
-      # end
+      it "does not include enrollment 3" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_3.hbx_id)
+      end
 
-      # it "does not include enrollment 4" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_4.hbx_id)
-      # end
+      it "does not include enrollment 4" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_4.hbx_id)
+      end
 
-      # it "does not include enrollment 5" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_5.hbx_id)
-      # end
+      it "does not include enrollment 5" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_5.hbx_id)
+      end
 
-      # it "does not include enrollment 7" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).not_to include(enrollment_7.hbx_id)
-      # end
+      it "does not include enrollment 7" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).not_to include(enrollment_7.hbx_id)
+      end
 
-      # it "includes enrollment 6" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_6.hbx_id)
-      # end
+      it "includes enrollment 6" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_6.hbx_id)
+      end
 
-      # it "includes enrollment 8" do
-      #   result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-      #   expect(result).to include(enrollment_8.hbx_id)
-      # end
+      it "includes enrollment 8" do
+        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+        expect(result).to include(enrollment_8.hbx_id)
+      end
     end
   end
 
