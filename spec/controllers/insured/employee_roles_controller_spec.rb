@@ -240,19 +240,17 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "POST match" do
-    let(:person_parameters) { { :first_name => "SOMDFINKETHING", ssn: "333224444", gender: "male" } }
-    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975", gender: "male") }
+    let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
+    let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
     let(:census_employee) { instance_double("CensusEmployee")}
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
     let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
-    let(:found_person) { FactoryGirl.create(:person, :with_employer_staff_role)}
 
     before(:each) do
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
-      allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
       allow(census_employee).to receive(:is_active?).and_return(true)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
@@ -295,23 +293,6 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
             expect(assigns[:employment_relationships]).to eq employment_relationships
           end
-        end
-      end
-
-      context "staff Role existing person claiming" do
-        let(:validation_result) {true}
-        let(:found_census_employees) {[census_employee]}
-
-        before(:each) do
-         allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
-         post :match, :person => person_parameters
-        end
-
-        it "should update ssn and gender on staff role person record" do
-         expect(response).to have_http_status(:success)
-         expect(response).to render_template("match")
-         expect(found_person.reload.ssn).to eq person_parameters[:ssn]
-         expect(found_person.reload.gender).to eq person_parameters[:gender]
         end
       end
     end
