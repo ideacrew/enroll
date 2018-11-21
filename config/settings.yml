@@ -218,7 +218,7 @@ aca:
           days: 5
       quiet_period:
         month_offset: -1
-        mday: 26
+        mday: 25
 
     benefit_period:
       length_minimum:
@@ -247,7 +247,7 @@ aca:
       minimum_commission_statement_year: 2017
 
     transmit_scheduled_employers: true
-    employer_transmission_day_of_month: 27
+    employer_transmission_day_of_month: 26
   transmit_employers_immediately: false
   employer_has_sic_field: true
   validate_county: true
