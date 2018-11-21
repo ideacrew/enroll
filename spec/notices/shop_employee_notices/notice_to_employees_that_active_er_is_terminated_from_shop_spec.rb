@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop, :dbclean => :after_each do
+  let(:hbx_profile) {double}
+  let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
+  let(:renewal_bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.next_year.year,11,1), open_enrollment_end_on: Date.new((TimeKeeper.date_of_record+2.years).year,1,31)) }
+  let(:bcp) { double(service_market: "individual",earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year.next_year, end_on: TimeKeeper.date_of_record.end_of_year.next_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.year,11,1), open_enrollment_end_on: Date.new(TimeKeeper.date_of_record.next_year.year,1,31),) }
   let(:plan) { FactoryGirl.create(:plan) }
   let(:plan2) { FactoryGirl.create(:plan) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
@@ -65,6 +69,8 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
       @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)
     end
     it "should append data" do
+      allow(HbxProfile).to receive_message_chain("current_hbx").and_return(hbx_profile)
+      allow(hbx_profile).to receive_message_chain("benefit_sponsorship.benefit_coverage_periods").and_return([bcp])
       @employee_notice.append_data
       expect(@employee_notice.notice.plan_year.terminated_on).to eq plan_year.terminated_on
     end
@@ -81,6 +87,8 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
     end
 
     it "should generate pdf" do
+      allow(HbxProfile).to receive_message_chain("current_hbx").and_return(hbx_profile)
+      allow(hbx_profile).to receive_message_chain("benefit_sponsorship.benefit_coverage_periods").and_return([bcp])
       @employee_notice.build
       @employee_notice.append_data
       file = @employee_notice.generate_pdf_notice
