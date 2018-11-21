@@ -38,7 +38,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
 
   context "provided with employer date" do
     before :each do
-      # BenefitSponsors::Observers::EmployerStaffRoleObserver.any_instance.stub(:contact_changed?).and_return(true)
+      BenefitSponsors::Observers::EmployerStaffRoleObserver.any_instance.stub(:contact_changed?).and_return(true)
       @employer_profile = EmployerProfile.find_by_fein(fein)
     end
 
