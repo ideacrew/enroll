@@ -9,7 +9,7 @@
           <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
           <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
         <% end %>
-        <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.current_year %>
+        <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
           <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
         <% end %>
         </br>
