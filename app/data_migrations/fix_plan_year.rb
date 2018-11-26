@@ -29,7 +29,7 @@ class FixPlanYear < MongoidMigrationTask
         plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: prev_state, to_state: ENV['aasm_state'])
         puts "plan year updated" unless Rails.env.test?
 
-        return unless ENV['update_enrollments'].present? && ENV['update_enrollments'] == true
+        return unless ENV['update_enrollments'].present? && ENV['update_enrollments'] == "true"
 
         if plan_year.aasm_state == "active"
           prev_enrollments.each do |enrollment|
@@ -46,7 +46,7 @@ class FixPlanYear < MongoidMigrationTask
 
         elsif plan_year.aasm_state == "terminated"
           prev_enrollments.each do |enrollment|
-            enrollment.update_attributes(aasm_state: "coverage_terminated")
+            enrollment.update_attributes!(aasm_state: "coverage_terminated", terminated_on: plan_year.terminated_on)
             puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
             enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: plan_year.end_on)}
           end

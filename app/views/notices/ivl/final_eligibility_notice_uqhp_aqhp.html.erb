@@ -1,4 +1,3 @@
-<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <br>
@@ -268,6 +267,8 @@
     <%= render partial: 'notices/shared/custom_listing', :locals => {
         listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
+
+<br>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>

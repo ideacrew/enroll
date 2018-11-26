@@ -1,4 +1,3 @@
-
 Given (/a matched Employee exists with multiple employee roles/) do
   org1 = FactoryGirl.create :organization, :with_active_plan_year
   org2 = FactoryGirl.create :organization, :with_active_plan_year_and_without_dental
@@ -10,28 +9,30 @@ Given (/a matched Employee exists with multiple employee roles/) do
   @person = FactoryGirl.create(:person, :with_family, first_name: "Employee", last_name: "E", user: user)
   employee_role1 = FactoryGirl.create :employee_role, person: @person, employer_profile: org1.employer_profile
   employee_role2 = FactoryGirl.create :employee_role, person: @person, employer_profile: org2.employer_profile
-  ce1 =  FactoryGirl.create(:census_employee, 
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce1 =  FactoryGirl.build(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role1.id,
           employer_profile: org1.employer_profile
         )
-  ce2 =  FactoryGirl.create(:census_employee, 
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce2 =  FactoryGirl.build(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role2.id,
           employer_profile: org2.employer_profile
         )
 
   ce1.benefit_group_assignments << bga1
   ce1.link_employee_role!
+  ce1.save!
 
   ce2.benefit_group_assignments << bga2
   ce2.link_employee_role!
+  ce2.save!
 
   employee_role1.update_attributes(census_employee_id: ce1.id, employer_profile_id: org1.employer_profile.id)
   employee_role2.update_attributes(census_employee_id: ce2.id, employer_profile_id: org2.employer_profile.id)
@@ -42,19 +43,20 @@ Given (/a matched Employee exists with consumer role/) do
   benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group
   FactoryGirl.create(:user)
-  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
+  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, :with_active_consumer_role, first_name: "Employee", last_name: "E", user: user)
   employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
-  ce =  FactoryGirl.create(:census_employee, 
-          first_name: @person.first_name, 
-          last_name: @person.last_name, 
-          dob: @person.dob, 
-          ssn: @person.ssn, 
+  ce =  FactoryGirl.build(:census_employee,
+          first_name: @person.first_name,
+          last_name: @person.last_name,
+          dob: @person.dob,
+          ssn: @person.ssn,
           employee_role_id: employee_role.id,
           employer_profile: org.employer_profile
         )
 
   ce.benefit_group_assignments << bga
   ce.link_employee_role!
+  ce.save!
 
   employee_role.update_attributes!(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
   ce.employee_role.reload
@@ -68,9 +70,9 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   if role == "employee"
     dependent = FactoryGirl.create :person, dob: dob
   elsif role == "Resident"
-    dependent = FactoryGirl.create :person, :with_resident_role, dob: dob
+    dependent = FactoryGirl.create :person, :with_resident_role, :with_active_resident_role, dob: dob
   else
-    dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
+    dependent = FactoryGirl.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
   end
   fm = FactoryGirl.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
@@ -82,7 +84,7 @@ end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryGirl.create :special_enrollment_period, family: @family
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -105,7 +107,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryGirl.create(:hbx_enrollment,
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
@@ -133,11 +135,11 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
 
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.create(:census_employee, 
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
+  ce =  FactoryGirl.build(:census_employee,
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          ssn: person.ssn,
           employee_role_id: @employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -146,6 +148,7 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   end
 
   ce.link_employee_role!
+  ce.save!
 
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
@@ -296,7 +299,7 @@ end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
   if market_kind == "individual"
-    find(:xpath, '//*[@id="market_kinds"]/div/div[2]/label').click
+    find(:xpath, '//*[@id="market_kinds"]/div/div[3]/label').click
   else
     find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
   end
@@ -348,4 +351,3 @@ end
 And(/Resident clicked on "Married" qle/) do
   click_link "Married"
 end
-
