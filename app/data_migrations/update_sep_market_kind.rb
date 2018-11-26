@@ -14,7 +14,7 @@ class UpdateSepMarketKind < MongoidMigrationTask
       Family.no_timeout.exists(:special_enrollment_periods => true).each do |family|
         begin
           person = family.primary_applicant.person
-          seps = family.special_enrollment_periods.select{ |sep| sep if sep.is_shop? }
+          seps = family.special_enrollment_periods.select{ |sep| sep if sep.is_shop? && sep.market_kind == 'ivl'}
           seps.each do |sep|
             sep.update_attribute(:market_kind, "shop")
             csv << [family.id,
