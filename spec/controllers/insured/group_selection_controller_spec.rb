@@ -29,6 +29,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
         ethnicity:            ["any"]
     ))}
     let(:bcp) { double }
+    let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
   before do
     allow(Person).to receive(:find).and_return(person)
@@ -37,9 +38,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(user).to receive(:has_hbx_staff_role?).and_return false
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
+    allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
+    allow(individual_market_transition).to receive(:role_type).and_return(nil)
   end
 
   context "GET new" do
@@ -133,11 +137,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     context "it should set the instance variables" do
+      let(:census_employee) {FactoryGirl.build(:census_employee)}
 
       before do
         controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        allow(employee_role).to receive(:census_employee).and_return census_employee
         sign_in user
         get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
       end
@@ -149,6 +155,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       it "should set the coverage kind when user click on make changes in open enrollment" do
         expect(assigns(:mc_coverage_kind)).to eq hbx_enrollment.coverage_kind
       end
+
+      it "should set effective on date" do
+        expect(assigns(:effective_on)).to eq hbx_enrollment.effective_on
+      end
     end
 
     context "individual" do
@@ -158,7 +168,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
         allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package]
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:has_active_employee_role?).and_return false
         allow(HbxEnrollment).to receive(:find).and_return nil
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
@@ -211,7 +221,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
-      expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(hbx_enrollment.termination_submitted_on.to_time).to be_within(5.seconds).of(TimeKeeper.datetime_of_record)
       expect(response).to redirect_to(family_account_path)
     end
 
@@ -325,10 +335,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(person).to receive(:employee_roles).and_return([employee_role])
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
-      expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
+      expect(flash[:error]).to eq "You must select the primary applicant to enroll in the healthcare plan"
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-    
+
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user

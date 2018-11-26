@@ -125,7 +125,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     states = ["coverage_selected", "coverage_canceled", "coverage_terminated", "shopping", "inactive", "unverified", "coverage_enrolled", "auto_renewing", "any_state"]
-    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing"]
+    show_for_ivl = ["coverage_selected", "coverage_canceled", "coverage_terminated", "auto_renewing", "renewing_coverage_selected"]
 
     context "IVL market" do
       before :each do
@@ -220,6 +220,26 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         allow(ENV).to receive(:[]).with("AWS_ENV").and_return("preprod")
         expect(helper.tax_info_url).to eq "https://staging.dchealthlink.com/individuals/tax-documents"
       end
+    end
+  end
+
+  context "build consumer role" do
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_consumer_role(person,family)
+      expect(person.consumer_role.present?). to eq true
+    end
+  end
+
+  context "build resident role " do
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+
+    it "should build consumer role for a person" do
+      helper.build_resident_role(person,family)
+      expect(person.resident_role.present?). to eq true
     end
   end
 

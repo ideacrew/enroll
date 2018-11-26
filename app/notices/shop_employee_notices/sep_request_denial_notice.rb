@@ -2,6 +2,12 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
 
   attr_accessor :census_employee
 
+  def initialize(census_employee, args = {})
+    @qle_reported_date = Date.strptime(args[:options][:qle_reported_date].to_s,"%m/%d/%Y")
+    @qle_title = args[:options][:qle_title]
+    super(census_employee, args)
+  end
+
   def deliver
     build
     append_data
@@ -13,27 +19,29 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   end
 
   def append_data
-    sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-    notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
-      :qle_on => sep.qle_on,
-      :end_on => sep.end_on,
-      :title => sep.title
-      })
+    notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({:start_on => @qle_reported_date,
+                                                            :end_on => @qle_reported_date + 30.day,
+                                                            :title => @qle_title
+                                                           })
 
-    active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED || PlanYear::RENEWING).first
-    renewing_plan_year_start_on = active_plan_year.end_on+1
+    active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+    renewing_plan_year = census_employee.employer_profile.renewing_published_plan_year
+
+    if renewing_plan_year.present?
+      future_py_start_on,open_enrollment_end_date_py = if renewing_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
+                                                         [renewing_plan_year.start_on, active_plan_year]
+                                                       else
+                                                         [renewing_plan_year.end_on + 1, renewing_plan_year]
+                                                       end
+    end
+
+    open_enrollment_py = open_enrollment_end_date_py.present? ? open_enrollment_end_date_py : active_plan_year
+    upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : active_plan_year.end_on.next_day
+
     notice.plan_year = PdfTemplates::PlanYear.new({
-      :open_enrollment_end_on => active_plan_year.open_enrollment_end_on,
-      :start_on => renewing_plan_year_start_on
+      :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on,
+      :open_enrollment_start_on => open_enrollment_py.start_on,
+      :start_on => upcoming_plan_year_start_on
       })
-
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.enrollment = PdfTemplates::Enrollment.new({
-              :effective_on => bc_period.start_on,
-              :plan_year => bc_period.start_on.year,
-              :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
-              :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
-              })
   end
 end
