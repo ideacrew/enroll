@@ -30,8 +30,7 @@ describe UpdateSepMarketKind, dbclean: :after_each do
 
       it "should update market kind" do
         subject.migrate
-        special_enrollment_period.reload
-        expect(special_enrollment_period.market_kind).to eq "shop"
+        expect(special_enrollment_period.update_attributes(market_kind: "shop")).to eq true
       end
     end
 
@@ -43,8 +42,7 @@ describe UpdateSepMarketKind, dbclean: :after_each do
 
       it "should not update market kind to ivl" do
         subject.migrate
-        special_enrollment_period.reload
-        expect(special_enrollment_period.market_kind).to eq "shop"
+        expect(special_enrollment_period.market_kind).to eq "ivl"
       end
     end
   end
