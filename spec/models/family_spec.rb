@@ -1471,7 +1471,7 @@ context "verifying employee_role is active?" do
   end
 
   it "should return true" do
-    expect(family100.is_primary_an_active_employee?).to eq true
+    expect(family100.has_primary_active_employee?).to eq true
   end
 end
 
