@@ -1514,7 +1514,7 @@ class HbxEnrollment
     ENROLLED_STATUSES.include?(aasm_state)
   end
 
-  def is_ivl_and_oustanding?
+  def is_ivl_and_outsanding?
     is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
   end
 
