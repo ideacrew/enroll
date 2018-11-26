@@ -1078,6 +1078,7 @@ class Family
     end
   end
 
+
   def set_admin_dt_enrollments(enrollment_set)
     @admin_dt_enrollments = enrollment_set
   end
@@ -1086,7 +1087,7 @@ class Family
     @admin_dt_enrollments || []
   end
 
-  def is_primary_an_active_employee?
+  def has_primary_active_employee?
     primary_applicant.person.has_active_employee_role?
   end
 
