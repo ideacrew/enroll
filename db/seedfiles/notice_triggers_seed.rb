@@ -171,7 +171,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP5',
+    hbx_id: 'DRG004',
     title: 'Group Renewal Available',
     description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
     resource_name: 'employer',
@@ -181,7 +181,7 @@ shop_notice_triggers = [
         name: 'Group Renewal Notice',
         notice_template: 'notices/shop_employer_notices/5_employer_renewal_notice',
         notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-        mpi_indicator: 'MPI_SHOP5',
+        mpi_indicator: 'SHOP_D004',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -1134,6 +1134,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
         notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
         mpi_indicator: 'SHOP_D042',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DRE076',
+    title: 'Employee Enrollment Confirmation',
+    description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
+    resource_name: 'employee_role',
+    event_name: 'renewal_employee_enrollment_confirmation',
+    notice_triggers: [
+      {
+        name: 'Notify Employees Enrollment confirmation',
+        notice_template: 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
+        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
+        mpi_indicator: 'SHOP_D076',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],

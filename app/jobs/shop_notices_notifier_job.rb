@@ -4,7 +4,7 @@ class ShopNoticesNotifierJob < ActiveJob::Base
 
   def perform(id, event, options = {})
     recipient = EmployerProfile.find(id) || GeneralAgencyProfile.find(id) || CensusEmployee.where(id: id).first
-    if  options['acapi_trigger'].present? && options['acapi_trigger']
+    if options['acapi_trigger'].present? && options['acapi_trigger']
       begin
         resource = ApplicationEventMapper.map_resource(recipient.class)
         event_name = ApplicationEventMapper.map_event_name(resource, event)
