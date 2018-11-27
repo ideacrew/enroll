@@ -1,5 +1,5 @@
 namespace :seed do
-  task :load_plans, [:year] => :environment do |task, args|
+  task :load_plans, [:year, :hios_id, :coverage_kind, :market] => :environment do |task, args|
 
     def build_premium_tables(premium_tables)
       results = premium_tables
@@ -15,6 +15,7 @@ namespace :seed do
       end
       results
     end
+
     def dump_plan_for_enroll(plan)
       plan_json = {
         :id => plan.id.to_s,
@@ -48,8 +49,16 @@ namespace :seed do
       end
       puts JSON.dump(plan_json.merge({:premium_tables => build_premium_tables(premium_tables).uniq}))
     end
+
+    year = args[:year].present? ? args[:year] : ""
+    hios_id = args[:hios_id].present? ? args[:hios_id].first(5).to_i : ""
+    coverage_kind = args[:coverage_kind].present? ? args[:coverage_kind] : ""
+    market = args[:market].present? ? args[:market] : ""
+
+    plans = Plan.by_active_year(year).where(hios_id: /#{hios_id}/, coverage_kind: /#{coverage_kind}/, market: /#{market}/)
+
     puts "["
-    Plan.where(active_year: 2018).each do |pln|
+    plans.each do |pln|
       dump_plan_for_enroll(pln)
       puts(",")
     end
