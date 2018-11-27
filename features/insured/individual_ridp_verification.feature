@@ -216,43 +216,40 @@ Feature: Consumer RIDP verification process
   Scenario: RIDP Documents in Consumer Account Rejected by HBX Admin
     Given that the consumer has “Disagreed” to AUTH & CONSENT
     And the consumer is on the DOCUMENT UPLOAD page
-    And an uploaded identity verification in REVIEW status is present
-    And an uploaded application in REVIEW status is present
+    And an uploaded identity and application in REVIEW status is present
     And Individual logs out
     When an HBX admin exists
     And an uploaded Identity verification in VERIFIED status is present
     And an uploaded application in VERIFIED status is present
     And HBX admin clicks continue after approving Identity document
     And HBX admin click on continue button on household info form
-    Then HBX admin click on none of the situations listed above apply checkbox
+    And HBX admin click on none of the situations listed above apply checkbox
     And HBX admin click on back to my account button
-    And HBX admin should land on home page
+    Then HBX admin should land on home page
     And HBX admin click on verification link
-    Then HBX admin should see Individual and RIDP verification types
-    And HBX admin rejects RIDP Identity Verification Document
+    And HBX admin should see Individual and RIDP verification types
+    Then HBX admin rejects RIDP Identity Verification Document
 
   Scenario: RIDP Documents in Consumer account Documents page
     Given that the consumer has “Disagreed” to AUTH & CONSENT
     And the consumer is on the DOCUMENT UPLOAD page
-    And an uploaded identity verification in REVIEW status is present
-    And an uploaded application in REVIEW status is present
+    And an uploaded identity and application in REVIEW status is present
     And Individual logs out
     When an HBX admin exists
     And an uploaded Identity verification in VERIFIED status is present
     And an uploaded application in VERIFIED status is present
     And HBX admin logs out
-    And Individual resumes enrollment
+    Then Individual resumes enrollment
     And I click on sign in existing account
     And I signed in
-    Then the CONTINUE button is functionally ENABLED
-    And visibly ENABLED
-    Then user clicks on continue button
+    When the CONTINUE button is functionally and Visibly ENABLED
+    And user clicks on continue button
     Then I should see the dependents form
-    Then I click on continue button on household info form
-    Then HBX admin click on none of the situations listed above apply checkbox
+    And I click on continue button on household info form
+    And HBX admin click on none of the situations listed above apply checkbox
     And HBX admin click on back to my account button
     Then I should see Documents link
-    And I click on verification link
-    And I should see Individual and RIDP verification types
-    Then Individual logs out
+    When I click on verification link
+    Then I should see Individual and RIDP verification types
+    And Individual logs out
 

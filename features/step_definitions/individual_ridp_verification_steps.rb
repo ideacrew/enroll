@@ -62,6 +62,22 @@ And(/^an uploaded application in REVIEW status is present$/) do
 	expect(person.consumer_role.application_validation).to eq('pending')
 end
 
+And(/^an uploaded identity and application in REVIEW status is present$/) do
+  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  file_path = File.dirname(__FILE__)
+  allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
+  allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
+  find('#upload_application').click
+  within '#upload_application' do
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+  end
+  wait_for_ajax(2)
+  expect(page).to have_content('File Saved')
+  expect(page).to have_content('In Review')
+  person = Person.all.first
+  expect(person.consumer_role.application_validation).to eq('pending')
+end
+
 And(/^an uploaded identity verification in REVIEW status is present$/) do
   doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
@@ -118,6 +134,10 @@ Then(/^the CONTINUE button is functionally ENABLED$/) do
 end
 
 Then(/^visibly ENABLED$/) do
+  find('.interaction-click-control-continue').visible?
+end
+
+Then(/^the CONTINUE button is functionally and Visibly ENABLED$/) do
   find('.interaction-click-control-continue').visible?
 end
 
@@ -235,7 +255,7 @@ And(/^I should see Individual and RIDP verification types$/) do
   find('.btn', text: 'Documents FAQ').click
   expect(page).to have_content('School identification card')
   expect(page).to have_content('Employer identification card')
-  expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
+  #expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
   expect(page).to have_content('Identity')
   expect(page).to have_content('Application')
 end
@@ -249,7 +269,7 @@ Then(/^HBX admin should see Individual and RIDP verification types$/) do
   find('.btn', text: 'Documents FAQ').click
   expect(page).to have_content('School identification card')
   expect(page).to have_content('Employer identification card')
-  expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
+  #expect(page).to have_content('For your security, we also confirmed your identity when you applied. If you provided any documents to apply or confirm your identity, those are stored here.')
   expect(page).to have_content('Identity')
   expect(page).to have_content('Application')
 end
