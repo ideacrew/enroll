@@ -78,6 +78,7 @@ function initDatePicker() {
 }
 
 var inputsChecked = false;
+var inputsPresent = false;
 
 function validateFormat(element, pyStartOn, pyEndOn) {
   pyEndDate = element.value;
@@ -161,7 +162,12 @@ function validTerminatePy() {
   var endDates = document.querySelectorAll('.py-end-date')
   validateTermActions()
   for (date of endDates) {
-    if (date.value.length > 0 && inputsChecked) {
+    if (date.value.length > 0 && inputsPresent == false) {
+      enableSubmitButton()
+    } else {
+      disableSubmitButton();
+    }
+    if (date.value.length > 0 && inputsPresent && inputsChecked) {
       enableSubmitButton()
     } else {
       disableSubmitButton();
@@ -171,10 +177,12 @@ function validTerminatePy() {
 
 function validateTermActions() {
   inputsChecked = false;
+  inputsPresent = false;
   inputs = document.querySelector('.py-end-date').closest('tr').querySelector('.term_action_radios').getElementsByTagName('input');
   for (input of inputs) {
     if (input.checked) {
       inputsChecked = true;
+      inputsPresent = true;
     }
   }
 }
