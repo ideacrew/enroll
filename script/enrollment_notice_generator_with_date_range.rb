@@ -43,7 +43,7 @@ families = Family.where({
     "$elemMatch" => {
       "kind" => "individual",
       "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
-      "created_at" => { "$gte" => start_time, "$lte" => end_time }
+      "created_at" => { "$gte" => @start_time, "$lte" => @end_time }
       }
     }
   })
