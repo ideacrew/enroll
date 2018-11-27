@@ -1078,7 +1078,6 @@ class Family
     end
   end
 
-
   def set_admin_dt_enrollments(enrollment_set)
     @admin_dt_enrollments = enrollment_set
   end
