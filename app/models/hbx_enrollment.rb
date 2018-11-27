@@ -738,7 +738,7 @@ class HbxEnrollment
   end
 
   def set_coverage_termination_date(coverage_terminated_on=TimeKeeper.date_of_record)
-    self.terminated_on = coverage_terminated_on
+    self.terminated_on = coverage_terminated_on unless terminated_on
   end
 
   def select_applicable_broker_account(broker_accounts)
