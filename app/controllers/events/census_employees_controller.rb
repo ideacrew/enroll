@@ -3,33 +3,25 @@ module Events
     include Acapi::Amqp::Responder
 
     def resource(connection, delivery_info, properties, body)
-      #TODO Temporary shim to always return 403 code
-      #TODO update once all sides fuctionality will bo done
-      reply_to = properties.reply_to
-      census_employees=[]
-      response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
+      begin
+        reply_to = properties.reply_to
+        headers = properties.headers || {}
+        census_employees=[]
 
-      reply_with(connection, reply_to, "403", response_payload)
+        dob =  Date.parse(headers["dob"]) rescue nil
+        if headers["ssn"].present? && dob.kind_of?(Date)
+          census_employees = find_census_employee({ssn: headers["ssn"], dob: Date.parse(headers["dob"])})
+          return_status = "200"
+        end
 
-      # begin
-      #   reply_to = properties.reply_to
-      #   headers = properties.headers || {}
-      #   census_employees=[]
-      #
-      #   dob =  Date.parse(headers["dob"]) rescue nil
-      #   if headers["ssn"].present? && dob.kind_of?(Date)
-      #     census_employees = find_census_employee({ssn: headers["ssn"], dob: Date.parse(headers["dob"])})
-      #     return_status = "200"
-      #   end
-      #
-      #   return_status = "404" if census_employees.empty?
-      #
-      #   response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
-      #
-      #   reply_with(connection, reply_to, return_status, response_payload)
-      # rescue Exception => e
-      #   reply_with(connection, reply_to, "500", JSON.dump({exception: e.inspect, backtrace: e.backtrace.inspect}))
-      # end
+        return_status = "404" if census_employees.empty?
+
+        response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
+
+        reply_with(connection, reply_to, return_status, response_payload)
+      rescue Exception => e
+        reply_with(connection, reply_to, "500", JSON.dump({exception: e.inspect, backtrace: e.backtrace.inspect}))
+      end
     end
 
     private
