@@ -175,7 +175,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       # FIXME: This is no better than mocking the controller itself on the
       # #selected_enrollment method - and we need to actually mock out the items
       # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      #allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
+      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', hbx_enrollment_id: hbx_enrollment.id
@@ -204,7 +204,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       # FIXME: This is no better than mocking the controller itself on the
       # #selected_enrollment method - and we need to actually mock out the items
       # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      #allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
+      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id, hbx_enrollment_id: hbx_enrollment.id
@@ -222,7 +222,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       # FIXME: This is no better than mocking the controller itself on the
       # #selected_enrollment method - and we need to actually mock out the items
       # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      #allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
+      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
 
       sign_in user
