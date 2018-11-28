@@ -33,15 +33,17 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
     context "it should update the due. date and enrollment state" do 
       before :each do
         consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        hbx_enrollment.save!
         subject.migrate
         hbx_enrollment.reload
         consumer_role.verification_types.map(&:reload)
       end
 
-      it "should return is_any_member_outstanding? as true" do
-        expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
+      it "should return is_any_enrollment_member_outstanding? as true" do
+        expect(hbx_enrollment.is_any_enrollment_member_outstanding?).to be_truthy
         expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
       end
+
 
       it "should update the verifcation_types" do
         expect(consumer_role.verification_types[0].due_date).to be_truthy
@@ -52,6 +54,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
 
       before :each do
         consumer_role.update_attributes!(aasm_state: "verified")
+        hbx_enrollment.save!
         subject.migrate
         hbx_enrollment.reload
         consumer_role.verification_types.map(&:reload)
@@ -69,6 +72,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
     context "it should consider only dep in verification outstanding" do
       before :each do
         dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        hbx_enrollment.save!
         subject.migrate
         hbx_enrollment.reload
         dep_consumer_role.verification_types.map(&:reload)
@@ -77,7 +81,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
       it "should update the aasm_state to verification type's due date" do
         dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         dep_consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
-        expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
+        expect(hbx_enrollment.is_any_enrollment_member_outstanding?).to be_truthy
       end
 
       it "should update the verifcation_types" do
