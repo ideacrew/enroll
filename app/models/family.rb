@@ -794,7 +794,7 @@ class Family
           @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         end
       end
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{Time.now.to_s}"
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{Time.now.to_s}" if @logger
     end
 
     def begin_coverage_for_ivl_enrollments
