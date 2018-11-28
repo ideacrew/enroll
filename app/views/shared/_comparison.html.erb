@@ -19,8 +19,8 @@
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level_kind.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
-          <%= qhp.product.health_plan_kind.upcase %>
+          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
+          <%= qhp.product.product_type.upcase %>
           </th>
         <% end %>
       </tr>
@@ -48,13 +48,14 @@
       </tr>
 
       <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
-      <% if qhps.map(&:product).map(&:rx_formulary_url).compact.present? %>
+
+      <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
               <% if qhp.product.kind == "health" && qhp.product.rx_formulary_url.present? %>
-                <%= link_to "DRUG LIST", qhp.product.rx_formulary_url, target: "_blank" %>
+                <%= link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank" %>
               <% end %>
             </th>
           <% end %>
