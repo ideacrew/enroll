@@ -94,6 +94,7 @@ module BenefitSponsors
       benefit_sponsorship.save
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
+      user_with_broker_role.person.broker_role.update_attributes!(aasm_state: 'active')
     end
 
     describe "GET new", dbclean: :after_each do
