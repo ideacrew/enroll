@@ -14,6 +14,10 @@ module ApplicationHelper
     employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
   end
 
+  def product_rates_available?(benefit_sponsorship, date=nil)
+    benefit_sponsorship.applicant? && (::BenefitMarkets::Products::Product.has_rates_for_all_carriers?(date) == false) ? "blocking" : ""
+  end
+
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
       plan.family_deductible.split("|").last.squish
