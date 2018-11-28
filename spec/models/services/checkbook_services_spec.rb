@@ -65,7 +65,9 @@ describe Services::CheckbookServices::PlanComparision do
       it "should return correct csr percentage" do
         allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
-        expect(subject.csr_value).to eq "-05"
+        # allow(tax_household).to receive(:tax_households).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:flatten,:any?).and_return("false")
+        expect(subject.csr_value).to eq "-01"
       end
     end
      context "when active household not present" do 
