@@ -13,7 +13,14 @@ describe CorrectDueDateAffectedByFELNotice do
   end
 
   describe "change due date" do
-    let(:person){FactoryGirl.create(:person, :with_family)}
+    let!(:person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:aasm_state)             {person.consumer_role.update_attributes(aasm_state: "verification_outstanding")}
+    let!(:family)             { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: family.active_household,
+                                  kind: "individual", aasm_state: "coverage_selected", is_any_enrollment_member_outstanding: true) }
+    let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+                                  applicant_id: family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
+                                  eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
 
     it "should not change due date if family does not have min_verification_due_date" do
       expect(person.families.first.min_verification_due_date).to eq(nil)
@@ -37,6 +44,9 @@ describe CorrectDueDateAffectedByFELNotice do
     end
 
     it "should not change due date if primary applicant receives FEL  notices after certain date" do
+      person.consumer_role.verification_types.each do |type|
+        type.update_attributes(validation_status: "outstanding")
+      end
       family = Family.where(min_verification_due_date: Date.new(2019,2,10))
       person.inbox.messages.first.update_attributes!(subject:"Reminder - You Must Submit Documents by the Deadline to Keep Your Insurance",created_at:Date.new(2018,11,18))
       person.families.first.update_attributes!(min_verification_due_date: Date.new(2019,2,10))
