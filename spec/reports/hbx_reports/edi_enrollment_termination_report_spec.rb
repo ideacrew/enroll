@@ -51,6 +51,10 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
 
   let(:publisher) { double }
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   describe "correct data input" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
