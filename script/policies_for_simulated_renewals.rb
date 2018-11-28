@@ -18,17 +18,19 @@ clean_feins = feins.map do |f|
   f.gsub(/\D/,"")
 end
 
-qs = Queries::PolicyAggregationPipeline.new
-qs.filter_to_shop.filter_to_active.filter_to_employers_feins(clean_feins).with_effective_date({"$gt" => (start_on_date - 1.day)}).eliminate_family_duplicates
-enroll_pol_ids = []
-excluded_ids = []
-qs.evaluate.each do |r|
-  enroll_pol_ids << r['hbx_id']
-end
 
-glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
-enroll_pol_ids = enroll_pol_ids - (glue_list + excluded_ids)
-clean_pol_ids = enroll_pol_ids
+  enroll_pol_ids = [
+
+
+
+  ]
+
+puts enroll_pol_ids.count
+# # old_is = File.read("hbx_ids.txt").split("\n").map(&:strip)
+# enroll_pol_ids = enroll_pol_ids 
+# clean_pol_ids = enroll_pol_ids
+
+# puts clean_pol_ids.count
 
 plan_cache = {}
 Plan.all.each do |plan|

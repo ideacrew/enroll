@@ -3,6 +3,10 @@ require File.join(Rails.root, "script", "force_publish_plan_years.rb")
 
 
 describe ForcePublishPlanYears, dbclean: :after_each do
+
+  before :each do
+    TimeKeeper.set_date_of_record_unprotected!(current_date)
+  end
   
   let(:current_date)      { Date.new(2018,10,9) }
   let(:publish_date)      { Date.new(2018,12,1) }
@@ -45,6 +49,9 @@ describe ForcePublishPlanYears, dbclean: :after_each do
     bg = FactoryGirl.create(:benefit_group, plan_year: py)
     PlanYear.find(py.id)
   end
+
+
+
   
   subject {ForcePublishPlanYears.new(publish_date, current_date)}
   
@@ -69,7 +76,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
 
       expect(File).to exist(unassigned_file)
       expect(census_employee_1.benefit_group_assignments).not_to be_empty
-      `rm -rf #{unassigned_file}`
+      # `rm -rf #{unassigned_file}`
     end
 
     it 'sets back the OE date for renewing draft employers with a OE date greater than current date' do
@@ -89,7 +96,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
       renewing_draft_plan_year_2.reload
 
       expect(renewing_draft_plan_years.count).to eq 0
-      expect(renewing_enrolling_plan_years.count).to eq 2
+      expect(renewing_enrolling_plan_years.count).to eq 1
     end
 
     it 'logs plan years not in renewing enrolling to a csv not_enrolling_file' do
