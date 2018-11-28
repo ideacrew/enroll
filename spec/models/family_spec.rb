@@ -1506,6 +1506,19 @@ describe "set_due_date_on_verification_types" do
   end
 end
 
+context "verifying employee_role is active?" do
+  let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+
+  before :each do
+    allow(person100).to receive(:has_active_employee_role?).and_return(true)
+  end
+
+  it "should return true" do
+    expect(family100.has_primary_active_employee?).to eq true
+  end
+end
+
 describe "active dependents" do
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
