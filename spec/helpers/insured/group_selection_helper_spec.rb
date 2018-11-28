@@ -192,19 +192,22 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
                          aasm_state: 'renewing_coverage_selected'
       )}
 
+      let(:active_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first }
+      let(:renewal_benefit_group) { organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first }
+
       before do
         allow(family).to receive(:current_sep).and_return sep
-        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
-        renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
         active_enrollment.update_attribute(:benefit_group_id, active_benefit_group.id)
         renewal_enrollment.update_attribute(:benefit_group_id, renewal_benefit_group.id)
       end
 
       it "should return active enrollment if the coverage effective on covers active plan year" do
+        allow(employee_role.census_employee).to receive(:active_benefit_group).and_return(active_benefit_group)
         expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
       end
 
       it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
+        allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return(renewal_benefit_group)
         renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
         sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
         expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
