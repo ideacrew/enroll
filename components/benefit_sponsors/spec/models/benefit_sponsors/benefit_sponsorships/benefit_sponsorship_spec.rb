@@ -756,5 +756,97 @@ module BenefitSponsors
     end
 
 
+    describe "Finding benefit applications for Open Enrollment extension" do
+      let(:aasm_state) { :active }
+      let(:sponsorship_state)               { :active }
+
+      let(:this_year)                       { TimeKeeper.date_of_record.year }
+      let(:april_effective_date)            { Date.new(this_year,4,1) }
+
+      let!(:april_sponsor)                  { create(:benefit_sponsors_benefit_sponsorship,
+                                                     :with_organization_cca_profile, :with_initial_benefit_application,
+                                                     default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                                                     site: site, aasm_state: sponsorship_state, initial_application_state: aasm_state)
+                                            }
+
+      let(:april_application) { april_sponsor.benefit_applications.detect{|app| app.start_on == april_effective_date} }
+
+ 
+      context '.oe_extendable_benefit_applications' do
+
+        let(:current_date)  { Date.new(this_year, 5, 10) }
+        before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
+
+        context "when overlapping benefit application present with status as" do
+          let(:march_effective_date)            { Date.new(this_year,3,1) }
+
+          let!(:march_application)              { create(:benefit_sponsors_benefit_application,
+                                                         benefit_sponsorship: april_sponsor,
+                                                         effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)),
+                                                         aasm_state: :canceled) }
+
+          context "terminted" do
+            let(:aasm_state) { :terminated }
+
+            it "should not return application for enrollment extension" do
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end 
+          end
+
+          context "approved" do
+            let(:aasm_state) { :approved }
+            let(:sponsorship_state) { :initial_application_approved  }
+
+            it "should not return application for enrollment extension" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end
+          end
+
+          context "enrollment_extended" do
+            let(:aasm_state) { :enrollment_extended }
+            let(:sponsorship_state) { :initial_enrollment_open  }
+
+            it "should return only already extended application" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+              expect(april_sponsor.oe_extendable_benefit_applications).to eq [april_application]
+            end
+          end
+
+          context "expired" do
+            let(:aasm_state) { :expired }
+
+            it "should not return application for enrollment extension" do
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end
+          end
+
+          context "draft" do
+            let(:aasm_state) { :draft }
+            let(:sponsorship_state) { :applicant }
+
+            it "should return application for enrollment extension" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+              expect(april_sponsor.oe_extendable_benefit_applications).to eq [march_application]
+            end
+          end
+        end
+
+        context "when overlapping benefit application not present" do
+
+          let(:april_effective_date)            { Date.new(this_year - 1,4,1) }
+          let(:may_effective_date)            { Date.new(this_year,5,1) }
+
+          let!(:may_application)              { create(:benefit_sponsors_benefit_application,
+                                                         benefit_sponsorship: april_sponsor,
+                                                         effective_period: (may_effective_date..(may_effective_date + 1.year - 1.day)),
+                                                         aasm_state: :canceled) }
+
+          it "should return may application for enrollment extension" do
+            expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+            expect(april_sponsor.oe_extendable_benefit_applications).to eq [may_application]
+          end
+        end 
+      end 
+    end
   end
 end

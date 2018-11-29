@@ -23,7 +23,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def oe_extendable_applications
-    @benefit_applications  = @benefit_sponsorship.benefit_applications.select{|application| application.may_extend_open_enrollment?}
+    @benefit_applications  = @benefit_sponsorship.oe_extendable_benefit_applications
     @element_to_replace_id = params[:employer_actions_id]
   end
 

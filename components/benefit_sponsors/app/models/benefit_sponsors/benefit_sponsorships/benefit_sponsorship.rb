@@ -386,6 +386,21 @@ module BenefitSponsors
       benefit_applications.find(ids)
     end
 
+    # Open enrollment can be extended only for recent applications (i.e, upto 6 months old)
+    # Benefit Application's with overlapping coverage can't be extended
+    def oe_extendable_benefit_applications
+      extend_from = (TimeKeeper.date_of_record - 3.months).beginning_of_month
+      benefit_applications.where(:"effective_period.min".gte => extend_from).select do |benefit_application|
+        benefit_application.may_extend_open_enrollment? && !overlapping_coverage_exists?(benefit_application)
+      end
+    end
+
+    def overlapping_coverage_exists?(benefit_application)
+      benefit_applications.approved_and_terminated
+       .by_overlapping_effective_period(benefit_application.effective_period)
+       .reject{|result| result == benefit_application}.present?
+    end
+
     def benefit_application_successors_for(benefit_application)
       benefit_applications.select { |sponsorship_benefit_application| sponsorship_benefit_application.predecessor_id == benefit_application._id}
     end
