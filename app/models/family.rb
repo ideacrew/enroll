@@ -1140,6 +1140,10 @@ class Family
     end
   end
 
+  def has_primary_active_employee?
+    primary_applicant.person.has_active_employee_role?
+  end
+
 private
   def build_household
     if households.size == 0
