@@ -23,7 +23,7 @@ RSpec.describe 'The employees of MA new groups received a notice in their accoun
   end
 
   context "create employee messages" do
-	  it 'should create secure inbox message for employe' do
+	  it 'should create secure inbox message for employee' do
       allow(Organization).to receive(:where).with(hbx_id: "3382429").and_return(organization1)
       allow(Organization).to receive(:where).with(hbx_id: "3504641").and_return(organization2)
 
