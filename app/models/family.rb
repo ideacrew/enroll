@@ -1133,13 +1133,13 @@ class Family
     end
   end
 
-  def set_due_date_on_verification_types
+  def set_due_date_on_verification_types(date=nil)
     family_members.each do |family_member|
       begin
         person = family_member.person
         person.consumer_role.verification_types.each do |v_type|
           next if !(v_type.type_unverified?)
-          v_type.update_attributes(due_date: (TimeKeeper.date_of_record + 95.days),
+          v_type.update_attributes(due_date: date.present? ? date : (TimeKeeper.date_of_record + 95.days),
                                    updated_by: nil,
                                    due_date_type:  "notice" )
           person.save!
