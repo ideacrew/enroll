@@ -77,6 +77,7 @@ describe TerminatedHbxEnrollments, dbclean: :after_each do
     let!(:fixed_time) { Time.parse("Jan 1 2018 10:00:00") }
 
     before :each do
+      ENV['start_date'] = nil
       allow(TimeKeeper).to receive(:date_of_record).and_return(date)
       allow(TimeKeeper).to receive(:datetime_of_record).and_return(fixed_time)
      @file = File.expand_path("#{Rails.root}/public/CCA_test_EDIENROLLMENTTERMINATION_2018_01_01_10_00_00.csv")
