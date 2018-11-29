@@ -299,6 +299,7 @@ module BenefitMarkets
       return false if date.blank?
 
       products = ::BenefitMarkets::Products::Product.all.select{|a| a.active_year == date.year }
+      return false if products.empty?
 
       products.each do |product|
         count = product.premium_tables.select{|a| a.effective_period.min <= date && a.effective_period.max >= date }.count
