@@ -13,7 +13,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     household: family.active_household,
     product_id: product.id,
     benefit_sponsorship_id: benefit_sponsorship.id,
-    sponsored_benefit_package_id: product_package.id
+    sponsored_benefit_package_id: current_benefit_package.id
   )}
 
   let(:primary_family_member) { family.family_members.first }
