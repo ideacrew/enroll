@@ -401,6 +401,10 @@ module BenefitSponsors
        .reject{|result| result == benefit_application}.present?
     end
 
+    def oe_extended_applications
+      benefit_applications.select{|application| application.enrollment_extended?}
+    end
+
     def benefit_application_successors_for(benefit_application)
       benefit_applications.select { |sponsorship_benefit_application| sponsorship_benefit_application.predecessor_id == benefit_application._id}
     end
