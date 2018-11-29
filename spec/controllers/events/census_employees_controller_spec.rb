@@ -54,17 +54,6 @@ describe Events::CensusEmployeesController do
         })
         controller.resource(connection, reply_to_key, properties, rendered_template)
       end
-
-      #TODO uncomment spec when service will be turned on
-      it "should return return_status = 403" do
-        expect(exchange).to receive(:publish).with(rendered_template, {
-            :routing_key => reply_to_key,
-            :headers => {
-                :return_status => "403",
-            }
-        })
-        controller.resource(connection, reply_to_key, properties, rendered_template)
-      end
     end
   end
 
