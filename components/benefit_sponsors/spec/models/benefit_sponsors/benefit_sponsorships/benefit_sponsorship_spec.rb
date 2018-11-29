@@ -774,15 +774,15 @@ module BenefitSponsors
  
       context '.oe_extendable_benefit_applications' do
 
-        let(:current_date)  { Date.new(this_year, 5, 10) }
+        let(:current_date)  { Date.new(this_year, 4, 10) }
         before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 
         context "when overlapping benefit application present with status as" do
-          let(:march_effective_date)            { Date.new(this_year,3,1) }
+          let(:new_effective_date)            { Date.new(this_year,4,1) }
 
-          let!(:march_application)              { create(:benefit_sponsors_benefit_application,
+          let!(:new_application)              { create(:benefit_sponsors_benefit_application,
                                                          benefit_sponsorship: april_sponsor,
-                                                         effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)),
+                                                         effective_period: (new_effective_date..(new_effective_date + 1.year - 1.day)),
                                                          aasm_state: :canceled) }
 
           context "terminted" do
@@ -826,24 +826,24 @@ module BenefitSponsors
 
             it "should return application for enrollment extension" do 
               expect(april_sponsor.oe_extendable_benefit_applications).to be_present
-              expect(april_sponsor.oe_extendable_benefit_applications).to eq [march_application]
+              expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
             end
           end
         end
 
         context "when overlapping benefit application not present" do
 
-          let(:april_effective_date)            { Date.new(this_year - 1,4,1) }
-          let(:may_effective_date)            { Date.new(this_year,5,1) }
+          let(:april_effective_date)          { Date.new(this_year - 1,4,1) }
+          let(:new_effective_date)            { Date.new(this_year,5,1) }
 
-          let!(:may_application)              { create(:benefit_sponsors_benefit_application,
+          let!(:new_application)              { create(:benefit_sponsors_benefit_application,
                                                          benefit_sponsorship: april_sponsor,
-                                                         effective_period: (may_effective_date..(may_effective_date + 1.year - 1.day)),
+                                                         effective_period: (new_effective_date..(new_effective_date + 1.year - 1.day)),
                                                          aasm_state: :canceled) }
 
           it "should return may application for enrollment extension" do
             expect(april_sponsor.oe_extendable_benefit_applications).to be_present
-            expect(april_sponsor.oe_extendable_benefit_applications).to eq [may_application]
+            expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
           end
         end 
       end 

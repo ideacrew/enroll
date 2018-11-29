@@ -619,6 +619,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     context '.oe_extendable_applications' do 
       let(:benefit_applications) { [ double(may_extend_open_enrollment?: true) ]}
 
+      before do 
+        allow(benefit_sponsorship).to receive(:oe_extendable_benefit_applications).and_return(benefit_applications)
+      end
+
       it "renders open enrollment extendable applications" do
         xhr :get, :oe_extendable_applications
 
@@ -629,6 +633,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context '.oe_extended_applications' do
       let(:benefit_applications) { [ double(enrollment_extended?: true) ]}
+
+      before do 
+        allow(benefit_sponsorship).to receive(:oe_extended_applications).and_return(benefit_applications)
+      end
 
       it "renders open enrollment extended applications" do
         xhr :get, :oe_extended_applications
