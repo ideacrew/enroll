@@ -587,6 +587,10 @@ class PlanYear
     covered.count
   end
 
+  def progressbar_covered_count
+    find_census_employees.covered_progressbar.count
+  end
+
   def benefit_group_ids
     benefit_groups.collect(&:id)
   end
