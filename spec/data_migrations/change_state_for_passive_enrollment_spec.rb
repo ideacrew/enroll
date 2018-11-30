@@ -19,14 +19,13 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
     let(:organization)                { FactoryGirl.create :organization, legal_name: "Corp 1" }
     let(:employer_profile)            { FactoryGirl.create :employer_profile, organization: organization }
     let!(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state:'terminated' ,start_on:start_on, benefit_groups:[benefit_group], employer_profile: employer_profile) }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state:'terminated', start_on: start_on, benefit_groups:[benefit_group], employer_profile: employer_profile) }
 
     let!(:renewing_benefit_group) { FactoryGirl.create(:benefit_group)}
     let!(:renewing_plan_year) { FactoryGirl.create(:plan_year, start_on: start_on.next_year, aasm_state:'renewing_draft', benefit_groups: [renewing_benefit_group], employer_profile: employer_profile) }
 
-
     let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: benefit_group.id, is_active: true, census_employee: census_employee) }
-    let!(:renewal_benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: renewing_benefit_group.id, is_active: false, census_employee: census_employee) }
+    let!(:renewal_benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: renewing_benefit_group.id, is_active: false, census_employee: census_employee, start_on: renewing_benefit_group.start_on) }
 
     let(:census_employee)             { FactoryGirl.create :census_employee, employer_profile: employer_profile }
     let(:person)                      { FactoryGirl.create(:person, :with_family) }
