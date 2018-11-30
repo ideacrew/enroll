@@ -154,12 +154,12 @@ module BenefitSponsors
       before { sign_in user }
 
       it "should return true if rates are available" do
-        xhr :get, :late_rates_check, :start_on_date => TimeKeeper.date_of_record.to_s, benefit_sponsorship_id: "123", :benefit_application_id => "123"
+        xhr :get, :late_rates_check, :start_on_date => "#{TimeKeeper.date_of_record.year}-11-01", benefit_sponsorship_id: "123"
         expect(response.body).to eq "true"
       end
 
       it "should return false if rates are not available" do
-        xhr :get, :late_rates_check, :start_on_date => (TimeKeeper.date_of_record - 1.year).to_s, benefit_sponsorship_id: "123", :benefit_application_id => "123"
+        xhr :get, :late_rates_check, :start_on_date => "#{TimeKeeper.date_of_record.year - 1.year}-11-01", benefit_sponsorship_id: "123"
         expect(response.body).to eq "false"
       end
     end
