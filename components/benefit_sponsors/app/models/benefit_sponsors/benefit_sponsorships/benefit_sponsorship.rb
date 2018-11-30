@@ -364,9 +364,18 @@ module BenefitSponsors
       ["ineligible", "terminated"].exclude?(aasm_state)
     end
 
+    def benefit_market_catalog_for(effective_date)
+      benefit_market.benefit_market_catalog_effective_on(effective_date)
+    end
+
     def benefit_sponsor_catalog_for(recorded_service_areas, effective_date)
-      benefit_market_catalog = benefit_market.benefit_market_catalog_effective_on(effective_date)
+      benefit_market_catalog = benefit_market_catalog_for(effective_date)
       benefit_market_catalog.benefit_sponsor_catalog_for(service_areas: recorded_service_areas, effective_date: effective_date)
+    end
+
+    def open_enrollment_period_for(effective_date)
+      benefit_market_catalog = benefit_market_catalog_for(effective_date)
+      benefit_market_catalog.open_enrollment_period_on(effective_date)
     end
 
     def published_benefit_application
@@ -401,7 +410,9 @@ module BenefitSponsors
     end
 
     def oe_extended_applications
-      benefit_applications.select{|application| application.enrollment_extended?}
+      benefit_applications.select do |application| 
+        application.enrollment_extended? && TimeKeeper.date_of_record > open_enrollment_period_for(application.effective_date).max
+      end
     end
 
     def benefit_application_successors_for(benefit_application)

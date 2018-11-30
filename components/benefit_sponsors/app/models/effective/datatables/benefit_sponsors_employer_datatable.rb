@@ -85,7 +85,10 @@ module Effective
           end
 
           if row.oe_extended_applications.present?
-            dropdown.insert(4,['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+            dropdown.insert(4, ['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(
+              id: @employer_profile.latest_benefit_sponsorship.id, 
+              employer_actions_id: "employer_actions_#{@employer_profile.id}"
+            ), 'ajax'])
           end
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html

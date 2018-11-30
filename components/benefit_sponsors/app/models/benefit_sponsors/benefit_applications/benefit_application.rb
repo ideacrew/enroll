@@ -373,6 +373,13 @@ module BenefitSponsors
       (open_enrollment_period.end - open_enrollment_period.begin).to_i
     end
 
+    def open_enrollment_date_bounds
+      { 
+        min: [TimeKeeper.date_of_record, benefit_sponsorship.open_enrollment_period_for(effective_date).max].max,
+        max: effective_date.end_of_month
+      }
+    end
+
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
     end
