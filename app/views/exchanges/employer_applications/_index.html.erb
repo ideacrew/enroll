@@ -57,7 +57,7 @@
               <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
-              <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
+              <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, disabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
             </td>
             <td colspan="1">
               <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>

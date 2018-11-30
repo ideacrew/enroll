@@ -59,6 +59,11 @@ function populateDropDown(status) {
     $('li.terminate-py').addClass('blocking');
     $('li.reinstate-py').removeClass('blocking');
   }
+  else {
+    $('li.cancel-py').removeClass('blocking');
+    $('li.terminate-py').removeClass('blocking');
+    $('li.reinstate-py').removeClass('blocking');
+  }
 }
 
 function hidePlanYearActions() {
