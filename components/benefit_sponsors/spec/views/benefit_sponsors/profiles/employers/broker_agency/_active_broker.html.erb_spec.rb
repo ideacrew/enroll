@@ -36,7 +36,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
       allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record - 10.days)
       render "benefit_sponsors/profiles/employers/broker_agency/active_broker", direct_terminate: true
       link = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id}/broker_agency/#{employer_profile.broker_agency_profile.id}/terminate?direct_terminate=true&termination_date=#{date.month}%2F#{date.day}%2F#{date.year}"
-      expect(rendered).to have_link('Terminate Broker', href: link)
+      expect(rendered).to have_link('Terminate Broker')
     end
   end
 
