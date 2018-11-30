@@ -98,7 +98,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
         person.verification_types.by_name(citizenship_type.type_name).first.due_date = special_verification.due_date
         person.consumer_role.save!
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, citizenship_type.type_name)).to eq special_verification.due_date
+        expect(@eligibility_notice.document_due_date(person, citizenship_type)).to eq special_verification.due_date
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
         person.verification_types.by_name(ssn_type.type_name).first.due_date = special_verification.due_date
         person.consumer_role.save!
         @eligibility_notice.build
-        date = @eligibility_notice.document_due_date(person, ssn_type.type_name)
+        date = @eligibility_notice.document_due_date(person, ssn_type)
         expect(date).to eq special_verification.due_date
       end
     end
@@ -123,7 +123,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
         person.consumer_role.coverage_purchased!
         person.consumer_role.ssn_valid_citizenship_valid!(args)
         @eligibility_notice.build
-        expect(@eligibility_notice.document_due_date(person, "Social Security Number")).to eq nil
+        expect(@eligibility_notice.document_due_date(person, ssn_type)).to eq nil
       end
     end
   end
