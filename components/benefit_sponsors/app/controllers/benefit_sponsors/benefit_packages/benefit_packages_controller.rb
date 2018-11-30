@@ -9,7 +9,6 @@ module BenefitSponsors
       layout "two_column"
 
       def new
-        @benefit_package_form ||= BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
         authorize @benefit_package_form, :updateable?
       end
 

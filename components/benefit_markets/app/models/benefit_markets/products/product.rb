@@ -302,7 +302,7 @@ module BenefitMarkets
       return false if products.empty?
 
       products.each do |product|
-        count = product.premium_tables.select{|a| a.effective_period.min <= date && a.effective_period.max >= date }.count
+        count = product.premium_tables.select{|a| a.effective_period.include?(date) }.count
         no_rates_products_count+=1 if count == 0
       end
 
