@@ -22,8 +22,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
     assign(:employer_profile, employer_profile)
     assign(:broker_agency_account, broker_agency_account)
     assign(:broker_agency_accounts, benefit_sponsorship.broker_agency_accounts)
-    # allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true))
-    # allow(user).to receive(:can_change_broker?).and_return(true)
   end
 
   context "terminate time" do
@@ -37,7 +35,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
     it "set date to the day before current" do
       allow(broker_agency_account).to receive(:start_on).and_return(TimeKeeper.date_of_record - 10.days)
       render "benefit_sponsors/profiles/employers/broker_agency/active_broker", direct_terminate: true
-      link = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id}/broker_agency/#{employer_profile.broker_agency_profile.id}/terminate?direct_terminate=true&termination_date=#{date.to_s}"
+      link = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id}/broker_agency/#{employer_profile.broker_agency_profile.id}/terminate?direct_terminate=true&termination_date=#{date.month}%2F#{date.day}%2F#{date.year}"
       expect(rendered).to have_link('Terminate Broker', href: link)
     end
   end
