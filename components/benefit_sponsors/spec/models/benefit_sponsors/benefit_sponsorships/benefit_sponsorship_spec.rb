@@ -756,7 +756,7 @@ module BenefitSponsors
     end
 
 
-    describe "Finding benefit applications for Open Enrollment extension" do
+    describe "Benefit Application Open Enrollment Extension", :dbclean => :after_each do
       let(:aasm_state) { :active }
       let(:sponsorship_state)               { :active }
 
@@ -846,6 +846,45 @@ module BenefitSponsors
             expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
           end
         end 
+      end
+
+      context '.oe_extended_applications' do
+
+        before { 
+          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_effective_date - 20.days..april_effective_date - 10.days)
+          TimeKeeper.set_date_of_record_unprotected!(current_date)
+        }
+
+        context "when open enrollment extended application present" do
+          let(:aasm_state) { :enrollment_extended }
+
+          context "and monthly open enrollment end date not passed" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max - 2.days }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+
+          context "and monthly open enrollment end date reached" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+
+          context "and monthly open enrollment end date passed" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max + 2.days }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+        end
       end 
     end
   end
