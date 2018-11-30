@@ -184,6 +184,10 @@ module Config::SiteHelper
     Settings.site.mail_address
   end
 
+  def certification_url
+    Settings.site.certification_url
+  end
+
   def site_title
     Settings.site.site_title
   end
