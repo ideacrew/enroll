@@ -1450,11 +1450,12 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       let(:special_enrollment_period) {
         FactoryGirl.create(:special_enrollment_period, family: shop_family)
       }
+      let(:new_enrollment_eff_on)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
       let(:new_enrollment) { FactoryGirl.create(:hbx_enrollment,
                                                 household: shop_family.latest_household,
                                                 coverage_kind: "health",
-                                                effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                                                effective_on: new_enrollment_eff_on,
                                                 enrollment_kind: enrollment_kind,
                                                 kind: "employer_sponsored",
                                                 submitted_at: TimeKeeper.date_of_record,
@@ -1468,14 +1469,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
                                                 aasm_state: 'shopping'
       )
       }
+      let(:terminated_date)  { new_enrollment_eff_on - 1.day }
 
       it 'should terminate existing coverage' do
         expect(enrollment.coverage_selected?).to be_truthy
         expect(enrollment.terminated_on).to be_nil
         new_enrollment.select_coverage!
         enrollment.reload
-        expect(enrollment.coverage_termination_pending?).to be_truthy
-        expect(enrollment.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+        if terminated_date <= TimeKeeper.date_of_record
+          expect(enrollment.coverage_terminated?).to be_truthy
+        else
+          expect(enrollment.coverage_termination_pending?).to be_truthy
+        end
+        expect(enrollment.terminated_on).to eq(terminated_date)
       end
     end
 
