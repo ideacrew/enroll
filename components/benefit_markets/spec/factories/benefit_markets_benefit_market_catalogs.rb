@@ -10,7 +10,7 @@ FactoryGirl.define do
     member_market_policy      { build(:benefit_markets_market_policies_member_market_policy) }
 
     transient do
-      health_product_package_kinds { [:single_issuer, :metal_level, :single_product] }
+      health_product_package_kinds { [:single_product, :single_issuer, :metal_level] }
       dental_product_package_kinds { [:single_product] }
       number_of_products 5
       product_kinds { [:health, :dental] }
