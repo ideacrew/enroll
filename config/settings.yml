@@ -99,6 +99,14 @@ plan_option_titles:
   single_plan: 'One Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
 
+plan_option_descriptions:
+  sole_source: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  metal_level: "Choose a benefit level and your contribution amount. Your employees will be able to choose a plan offered by any insurance carrier at that benefit level."
+  single_carrier: "Choose an insurance carrier and your contribution amount. Your employees will be able to choose a plan from that carrier at any benefit level."
+  single_plan: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  dental:
+    single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
+
 notices:
   mailing_address:
     address_1:

@@ -38,7 +38,8 @@
               | One Plan
         .tab-content
           .tab-pane.fade#carrier role="tabpanel"
-            h4 Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.
+            h4
+              = fetch_health_product_option_choice_description_for_single_carrier
             br
             - @benefit_package_form.catalog.single_issuer_options.each do |issuer_name, issuer_id|
               .col-xs-3.carriers
@@ -50,7 +51,8 @@
                     span.checkmark
 
           .tab-pane.fade#level role="tabpanel"
-            h4 Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Silver means the plan is expected to pay 70% of expenses for an average population of consumers, and Gold 80%.
+            h4
+              = fetch_health_product_option_choice_description_for_metal_level
             br
             - @benefit_package_form.catalog.metal_levels.each do |kind|
               .col-xs-3.metals
@@ -61,7 +63,8 @@
                     span.checkmark
 
           .tab-pane.fade#plan role="tabpanel"
-            h4 Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.
+            h4
+              = fetch_health_product_option_choice_description_for_single_plan
             br
             - @benefit_package_form.catalog.single_product_options.each do |carrier_name, carrier_id|
               .col-xs-3.plans
