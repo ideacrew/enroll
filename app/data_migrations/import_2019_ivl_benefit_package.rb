@@ -1,7 +1,7 @@
 class Import2019IvlBenefitPackage < MongoidMigrationTask
 
   def migrate
-    puts "::: Creating IVL 2019 benefit packages :::"
+    puts "::: Creating IVL 2019 benefit packages :::" unless Rails.env.test?
 
     # BenefitPackages - HBX 2019
     hbx = HbxProfile.current_hbx
