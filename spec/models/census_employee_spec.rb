@@ -872,6 +872,40 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  describe 'construct_employee_role' do
+    let(:user)  { FactoryGirl.create(:user) }
+    context 'when employee_role present' do
+      let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, employer_profile: employer_profile ) }
+      let(:census_employee) do
+        FactoryGirl.create :benefit_sponsors_census_employee, employer_profile: employer_profile,
+                           benefit_sponsorship: organization.active_benefit_sponsorship,
+                           employee_role_id: employee_role.id
+      end
+      before do
+        person = employee_role.person
+        person.user = user
+        person.save
+        census_employee.construct_employee_role
+        census_employee.reload
+      end
+      it "should return true when link_employee_role!" do
+        expect(census_employee.aasm_state).to eq('employee_role_linked')
+      end
+    end
+
+    context 'when employee_role not present' do
+      let(:census_employee) do
+        FactoryGirl.create :benefit_sponsors_census_employee, employer_profile: employer_profile,
+                           benefit_sponsorship: organization.active_benefit_sponsorship
+      end
+      before do
+        census_employee.construct_employee_role
+        census_employee.reload
+      end
+      it { expect(census_employee.aasm_state).to eq('eligible') }
+    end
+  end
+
   context "construct_employee_role_for_match_person" do
     let(:census_employee) { FactoryGirl.create :benefit_sponsors_census_employee,
       employer_profile: employer_profile,
