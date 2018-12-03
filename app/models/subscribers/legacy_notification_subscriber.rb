@@ -11,8 +11,8 @@ module Subscribers
           "info.events.general_agent_profile.#",
           "info.events.employee_role.#",
           "info.events.consumer_role.#",
-          "info.events.census_employee.#",
-          "info.events.employer.#"
+          "info.events.employer.#",
+          "info.events.census_employee.#"
         ]
       )
     end
