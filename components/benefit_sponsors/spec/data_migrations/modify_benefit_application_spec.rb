@@ -278,6 +278,13 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       let(:renewing_effective_period)  { start_on.next_month.beginning_of_month..start_on.end_of_month + 1.year }
       let!(:renewing_benefit_application) {
+        unless benefit_market.benefit_market_catalogs.map(&:product_active_year).include?(new_start_date.year)
+          create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+                 benefit_market: benefit_market,
+                 title: "SHOP Benefits for #{effective_date.year}",
+                 application_period: (new_start_date.beginning_of_year..new_start_date.end_of_year))
+
+        end
         application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: renewing_effective_period, aasm_state: :renewing_enrolling, predecessor_id: old_benefit_application.id)
         application.benefit_sponsor_catalog.save!
         application
