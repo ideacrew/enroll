@@ -81,7 +81,7 @@ class UserMailer < ApplicationMailer
 
   def broker_invitation_email(email, person_name, invitation)
     if email.present?
-      mail({to: email, subject: "Congratulations! Your Broker Application for the #{site_short_name} for Business has been Approved!"}) do |format|
+      mail({to: email, subject: "Important information for accessing your new broker account through the #{site_short_name}"}) do |format|
         format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
       end
     end
@@ -163,7 +163,7 @@ class UserMailer < ApplicationMailer
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?
-      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: " Welcome! You've Submitted a Broker Application on the #{site_short_name} for Business"}) do |format|
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application through the #{site_short_name} for Business"}) do |format|
         format.html { render "broker_application_confirmation", :locals => { :person => person }}
       end
     end

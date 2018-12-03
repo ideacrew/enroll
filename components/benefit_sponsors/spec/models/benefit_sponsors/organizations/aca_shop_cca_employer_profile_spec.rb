@@ -35,6 +35,8 @@ module BenefitSponsors
     let(:office_locations)  { [office_location] }
 
     let(:sic_code)          { '1111' }
+    let(:referred_by)       { 'Other' }
+    let(:referred_reason)   { 'Other reason' }
     let(:rating_area)       { ::BenefitMarkets::Locations::RatingArea.new }
 
 
@@ -42,7 +44,9 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code
+        sic_code: sic_code,
+        referred_by: referred_by,
+        referred_reason: referred_reason
       }
     end
 
