@@ -21,15 +21,14 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_sho
     view.extend BenefitSponsors::Engine.routes.url_helpers
     @employer_profile = employer_profile
     assign(:census_employees, [census_employee1, census_employee2, census_employee3])
-    # @current_plan_year = initial_application
     sign_in user
-    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
+    allow(view).to receive(:benefit_sponsor_display_families_tab).and_return(false)
+    allow(view).to receive(:employer_attestation_is_enabled?).and_return(false)
   end
 
   it "should display the dashboard content" do
     @tab = 'home'
-    # allow(reference_product).to receive(:issuer_profile).and_return(issuer_profile)
-    render template: "benefit_sponsors/profiles/employers/employer_profiles/show"
+    render template: "benefit_sponsors/profiles/employers/employer_profiles/show.html.erb"
     expect(rendered).to have_selector('h1', text: 'My Health Benefits Program')
   end
 
