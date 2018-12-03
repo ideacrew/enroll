@@ -291,12 +291,17 @@ function toggleSliders(plan_kind) {
 }
 
 function calcPlanDesignContributions() {
+  effectiveDate = $("#forms_plan_design_proposal_effective_date").val()
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
-    disableActionButtons();
-  } else {
-    enableActionButtons();
-  }
+   if (effectiveDate !== undefined && effectiveDate.slice(5) =='01-01')
+       enableActionButtons();
+   else {
+       if (proposalIsInvalid(data)) {
+           disableActionButtons();
+       } else {
+           enableActionButtons();
+       }
+   }
 
   if (data == undefined || data == {} || !('benefit_group' in data)) {
     return;
@@ -511,8 +516,9 @@ function proposalIsInvalid(data) {
 }
 
 function saveProposal(event) {
-  var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
+  data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
     // handle error messaging
     return;
   } else {
@@ -533,8 +539,9 @@ function saveProposal(event) {
 }
 
 function saveProposalAndCopy(event) {
-  var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
+  data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     url = $("#benefit_groups_url").val();
@@ -560,8 +567,9 @@ function saveProposalAndCopy(event) {
 }
 
 function saveProposalAndPublish(event) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     var url = $("#benefit_groups_url").val();
@@ -593,8 +601,9 @@ function AddDentalToPlanDesignProposal(event) {
 }
 
 function saveProposalAndNavigateToReview(event) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
   var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     var url = $("#benefit_groups_url").val();
