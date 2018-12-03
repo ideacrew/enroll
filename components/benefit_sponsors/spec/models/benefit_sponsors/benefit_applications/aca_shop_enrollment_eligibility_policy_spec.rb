@@ -6,7 +6,7 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    include_context "setup employees"
+    include_context "setup employees with benefits"
 
     let!(:subject) {BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new}
     let!(:benefit_application) {initial_application}
