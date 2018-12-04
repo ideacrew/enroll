@@ -218,6 +218,10 @@ describe "#build_nested_models_for_person" do
   end
 end
 
+describe "#types_include_to_notices" do 
+
+end 
+
 describe "#latest_active_tax_household_with_year" do
   include_context "BradyBunchAfterAll"
   let(:family) { FactoryGirl.build(:family)}
@@ -235,7 +239,15 @@ describe "#latest_active_tax_household_with_year" do
   it "should rerturn nil when can not found taxhousehold" do
     expect(consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, family)).to eq nil
   end
-end
+  context "vlp exist but document is NOT uploaded" do
+      let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+        it "returns false for vlp doc without uploaded copy" do
+          unverified_types= person.verification_types.active.where(applied_roles: "consumer_role")
+          unverify_count= unverified_types.reject{|a| a.type_verified? == true}.size
+          expect(person.consumer_role.types_include_to_notices.count).to eq(unverify_count)
+        end   
+      end
+  end
 
 context "Verification process and notices" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
