@@ -218,10 +218,6 @@ describe "#build_nested_models_for_person" do
   end
 end
 
-describe "#types_include_to_notices" do 
-
-end 
-
 describe "#latest_active_tax_household_with_year" do
   include_context "BradyBunchAfterAll"
   let(:family) { FactoryGirl.build(:family)}
