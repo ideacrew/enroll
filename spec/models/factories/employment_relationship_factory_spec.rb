@@ -38,7 +38,7 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
     person = census_employee.employee_role.person
     employee_candidate = Forms::EmployeeCandidate.new(user_id: person.id)
     employment_relationship = Factories::EmploymentRelationshipFactory.new
-    employmentrelationship = employment_relationship.build(employee_candidate, census_employee)
+    employmentrelationship = employment_relationship.build(employee_candidate, census_employee)    
     expect(employmentrelationship.eligible_for_coverage_on).to eq census_employee.hired_on
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
