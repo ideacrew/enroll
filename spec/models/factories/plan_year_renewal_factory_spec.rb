@@ -113,8 +113,10 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         let(:renewal_factory) {
           Factories::PlanYearRenewalFactory.new
         }
-        let(:start_on) {Date.new(2018,1,1)}
-        let(:end_on) {Date.new(2018,12,31)}
+        let(:start_on) { Date.new(2018,1,1) }
+        let(:end_on)   { Date.new(2018,12,31) }
+        let(:renewing_plan_year_start) { renewing_employer.active_plan_year.start_on.next_year }
+        let(:notice_end_date)         { Date.new(2019,1,1) }
 
         before :each do
           renewal_factory.employer_profile = renewing_employer
@@ -122,8 +124,10 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         end
 
         it "should trigger notice to employer" do
-          expect(renewal_factory).to receive(:trigger_notice)
-          renewal_factory.renew
+          if renewing_plan_year_start < notice_end_date
+            expect(renewal_factory).to receive(:trigger_notice)
+            renewal_factory.renew
+          end
         end
 
         it "should not trigger notice to employer if plan year doesn't start in 2018" do
