@@ -57,6 +57,7 @@ module SponsoredBenefits
     end
 
     def new
+      session[:action] = "new"
       if @plan_design_organization.employer_profile.present?
         begin
           plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
