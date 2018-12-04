@@ -59,7 +59,9 @@ describe "CcaCarrierProfilesMigration" do
     end
 
     it "should match phone" do
-      expect(@migrated_organizations.first.issuer_profile.office_locations.first.phone.full_phone_number).to eq @old_organizations.first.office_locations.first.phone.full_phone_number
+      hbx_id = @old_organizations.first.hbx_id
+      expect(@migrated_organizations.where(hbx_id: hbx_id).first.issuer_profile.office_locations.first.phone.full_phone_number).to eq @old_organizations.where(hbx_id: hbx_id).first.office_locations.first.phone.full_phone_number
+      expect(@old_organizations.map(&:office_locations).flatten.map(&:phone).map(&:full_phone_number).include?(@migrated_organizations.first.issuer_profile.office_locations.first.phone.full_phone_number)).to eq true
     end
   end
   after(:all) do
