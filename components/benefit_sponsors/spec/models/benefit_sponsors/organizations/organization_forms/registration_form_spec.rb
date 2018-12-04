@@ -72,6 +72,8 @@ module BenefitSponsors
                    "languages_spoken"=>["", "en"],
                    "working_hours"=>"1",
                    "accept_new_clients"=>"1",
+                   "referred_by"=>"Other",
+                   "referred_reason"=>"other reason",
                    "office_locations_attributes"=>
                        {"0"=>
                             {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA","zip"=>"01026", "county"=>"Berkshire"},
