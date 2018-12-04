@@ -101,9 +101,10 @@ class DefinePermissions < MigrationTask
     raise "User Email Argument expected!!"if ENV['user_email'].blank?
 
     user_emails = ENV['user_email'].split(',')
+    hbx_organization = BenefitSponsors::Organizations::Organization.hbx_profiles.first
     users = User.where(:email.in => user_emails)
     users.each do |user|
-      HbxStaffRole.create!( person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: user.person.hbx_id)
+      HbxStaffRole.create!( person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
   end
 end
