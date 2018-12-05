@@ -25,7 +25,7 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
       modify_admin_tabs: false, view_admin_tabs: true)
-    Permission.create(name: 'hbx_csr_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
+    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
       modify_admin_tabs: false, view_admin_tabs: true)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
@@ -66,7 +66,7 @@ class DefinePermissions < MigrationTask
     HbxStaffRole.create!( person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p6, permission_id: Permission.developer.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p7, permission_id: Permission.hbx_csr_tier3.id, subrole: 'hbx_csr_tier3', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!( person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p8, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile_id)
   end
 
