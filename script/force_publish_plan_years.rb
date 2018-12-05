@@ -136,7 +136,7 @@ end
 
 
 
-ar.each do |fein|
+feins.each do |fein|
   org= Organization.where(fein: fein).first
   py = org.employer_profile.plan_years.last
     puts "#{py.aasm_state}"
