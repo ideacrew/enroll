@@ -81,7 +81,7 @@ FactoryGirl.define do
       view_admin_tabs  false
     end
 
-    trait :hbx_csr_tier3 do
+    trait :hbx_tier3 do
       modify_family true
       modify_employer false
       revert_application false

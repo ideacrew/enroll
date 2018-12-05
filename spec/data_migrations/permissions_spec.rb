@@ -3,7 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "define_permissions")
 
 describe DefinePermissions, dbclean: :after_each do
   subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
-  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
+  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
     before do
@@ -106,7 +106,7 @@ describe DefinePermissions, dbclean: :after_each do
       allow(Permission).to receive_message_chain('hbx_csr_tier2.id'){FactoryGirl.create(:permission,  :hbx_csr_tier2).id}
       allow(Permission).to receive_message_chain('hbx_csr_tier1.id'){FactoryGirl.create(:permission,  :hbx_csr_tier1).id}
       allow(Permission).to receive_message_chain('developer.id'){FactoryGirl.create(:permission,  :developer).id}
-      allow(Permission).to receive_message_chain('hbx_csr_tier3.id'){FactoryGirl.create(:permission,  :hbx_csr_tier3).id}
+      allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryGirl.create(:permission,  :hbx_tier3).id}
       allow(Permission).to receive_message_chain('super_admin.id'){FactoryGirl.create(:permission,  :super_admin).id}
       subject.build_test_roles
     end
