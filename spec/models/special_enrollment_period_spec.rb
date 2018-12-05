@@ -556,10 +556,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   context "where employee role is not active" do
-    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person100)  { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:primary_applicant) { double }
-    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
-    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:family100)  { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryBot.create(:qualifying_life_event_kind) }
     let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
                                           start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
                                           qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
@@ -576,10 +576,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   context "where sep is ivl but QLE is shop" do
-    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person100)  { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:primary_applicant) { double }
-    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
-    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:family100)  { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryBot.create(:qualifying_life_event_kind) }
     let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
                                           start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
                                           qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
@@ -601,10 +601,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   context "where employee role is active" do
-    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:person100)  { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
     let!(:primary_applicant) { double }
-    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
-    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:family100)  { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryBot.create(:qualifying_life_event_kind) }
     let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
                                           start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
                                           qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
