@@ -1,8 +1,9 @@
 module ApplicationHelper
 
-  def can_employee_shop?(date)
+  def can_employee_shop?(date, original_action = nil)
     return false if date.blank?
     date = Date.strptime(date.to_s,"%m/%d/%Y")
+    return false if ((Plan.has_rates_for_all_carriers?(date) == false) && (original_action == 'edit'))
     Plan.has_rates_for_all_carriers?(date) == false
   end
 
