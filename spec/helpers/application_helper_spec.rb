@@ -2,6 +2,17 @@ require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#can_employee_shop??" do
+    it "should return false if date is empty" do
+      expect(helper.can_employee_shop?(nil)).to eq false
+    end
+
+    it "should return true if date is present and rates are present" do
+      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
+      expect(helper.can_employee_shop?("10/01/2018", "edit")).to eq false
+    end
+  end
+
   describe "#rates_available?" do
     let(:employer_profile){ double("EmployerProfile") }
 
