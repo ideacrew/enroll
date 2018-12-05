@@ -1,6 +1,6 @@
-<% session[:action] = "" if params[:original_action].present? && params[:original_action] == "edit" %>
+<%= hidden_field_tag :original_action, @original_action %>
 
-<% if can_employee_shop?(f.object.effective_date.try(:to_date)) && session[:action] == "new" %>
+<% if can_employee_shop?(f.object.effective_date.try(:to_date)) && @original_action != "edit" %>
  <div class="alert alert-info" role="alert">
    <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
       <%= Settings.site.late_rates_message %>
@@ -38,7 +38,7 @@
     <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization), class:'btn btn-primary' %>
   </div>
     <div class="pull-right">
-      <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), remote: true, class:'btn btn-primary', disabled: can_employee_shop?(f.object.effective_date.try(:to_date)) && session[:action] == "new" %>
+      <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id), remote: true, class:'btn btn-primary', disabled: can_employee_shop?(f.object.effective_date.try(:to_date), @original_action)%>
     </div>
 </div>
 </div>

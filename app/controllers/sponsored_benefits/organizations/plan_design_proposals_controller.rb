@@ -57,7 +57,6 @@ module SponsoredBenefits
     end
 
     def new
-      session[:action] = "new"
       if @plan_design_organization.employer_profile.present?
         begin
           plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
@@ -91,6 +90,7 @@ module SponsoredBenefits
     end
 
     def edit
+      @original_action = params["original_action"]
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization, proposal_id: params[:id])
       init_employee_datatable
     end
@@ -112,6 +112,7 @@ module SponsoredBenefits
     end
 
     def update
+      @original_action = params["original_action"]
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization, proposal_id: params[:id]
         }.merge(plan_design_proposal_params))
