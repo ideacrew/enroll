@@ -393,7 +393,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
     it "should not return true" do
       allow(person100).to receive(:active_employee_roles).and_return person100.employee_roles
-      expect{shop_sep.valid?}.to raise_error(ArgumentError)
+      expect(shop_sep.send(:next_poss_effective_date_within_range)).to eq ["No active plan years present"]
     end
   end
 end
