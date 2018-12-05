@@ -1,9 +1,12 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_state_for_passive_enrollment")
+
 describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
-  let(:calendar_year) { TimeKeeper.date_of_record.year }
+
   let(:given_task_name) { "deactivate_consumer_role" }
+
   subject { ChangeStateForPassiveEnrollment.new(given_task_name, double(:current_scope => nil)) }
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -11,60 +14,57 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
   end
 
   describe "changing passive enrollment aasm state" do
-    let(:organization) {
-      org = FactoryGirl.create :organization, legal_name: "Corp 1"
-      employer_profile = FactoryGirl.create :employer_profile, organization: org
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 3, 1), :end_on => Date.new(calendar_year+1, 2, 28),
-      :open_enrollment_start_on => Date.new(calendar_year, 2, 1), :open_enrollment_end_on => Date.new(calendar_year, 2, 10), fte_count: 5
-      renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-      census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years
-      employer_profile.census_employees.each do |census_employee|
-        census_employee.add_renew_benefit_group_assignment([renewing_benefit_group])
-        person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)
-        census_employee.update_attributes({:employee_role =>  employee_role })
-        family = Family.find_or_build_from_employee_role(employee_role)
 
-        enrollment_one = HbxEnrollment.create_from(
-          employee_role: employee_role,
-          coverage_household: family.households.first.coverage_households.first,
-          benefit_group_assignment: census_employee.renewal_benefit_group_assignment,
-          benefit_group: renewing_benefit_group,
-          )
-        enrollment_one.update_attributes(:aasm_state => 'coverage_selected', coverage_kind: "dental")
+    let(:start_on)                    { TimeKeeper.date_of_record.beginning_of_month+2.months - 1.year }
+    let(:organization)                { FactoryGirl.create :organization, legal_name: "Corp 1" }
+    let(:employer_profile)            { FactoryGirl.create :employer_profile, organization: organization }
+    let!(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state:'terminated', start_on: start_on, benefit_groups:[benefit_group], employer_profile: employer_profile) }
 
-        enrollment_two = HbxEnrollment.create_from(
-          employee_role: employee_role,
-          coverage_household: family.households.first.coverage_households.first,
-          benefit_group_assignment: census_employee.renewal_benefit_group_assignment,
-          benefit_group: renewing_benefit_group,
-          )
-        enrollment_two.update_attributes(:aasm_state => 'coverage_canceled', coverage_kind: "health")
-      end
+    let!(:renewing_benefit_group) { FactoryGirl.create(:benefit_group)}
+    let!(:renewing_plan_year) { FactoryGirl.create(:plan_year, start_on: start_on.next_year, aasm_state:'renewing_draft', benefit_groups: [renewing_benefit_group], employer_profile: employer_profile) }
 
-    }
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: benefit_group.id, is_active: true, census_employee: census_employee) }
+    let!(:renewal_benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: renewing_benefit_group.id, is_active: false, census_employee: census_employee, start_on: renewing_benefit_group.start_on) }
+
+    let(:census_employee)             { FactoryGirl.create :census_employee, employer_profile: employer_profile }
+    let(:person)                      { FactoryGirl.create(:person, :with_family) }
+
+    let!(:employee_role)              { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile) }
+    let(:family)                      { person.primary_family }  
+    let!(:enrollment_one)              { FactoryGirl.create(:hbx_enrollment,
+                                             household: family.active_household,
+                                             coverage_kind: "dental",
+                                             effective_on: renewing_plan_year.start_on.next_month,
+                                             enrollment_kind: "open_enrollment",
+                                             benefit_group_assignment: renewal_benefit_group_assignment,
+                                             kind: "employer_sponsored",
+                                             benefit_group: renewing_benefit_group,
+                                             submitted_at: TimeKeeper.date_of_record,
+                                             aasm_state: 'coverage_selected') }
+    let!(:enrollment_two)              { FactoryGirl.create(:hbx_enrollment,
+                                             household: family.active_household,
+                                             coverage_kind: "health",
+                                             effective_on: renewing_plan_year.start_on.next_month,
+                                             enrollment_kind: "open_enrollment",
+                                             benefit_group_assignment: renewal_benefit_group_assignment,
+                                             benefit_group: renewing_benefit_group,
+                                             kind: "employer_sponsored",
+                                             submitted_at: TimeKeeper.date_of_record,
+                                             aasm_state: 'coverage_canceled') }
 
     it "should change the passive enrollment aasm state" do
-      employer_profile = organization.first.employer_profile
-      census_employee = employer_profile.census_employees.first
-      renewing_plan_year = organization.first.employer_profile.plan_years.last
-      enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.last
-      expect(enrollment.aasm_state).to eq "coverage_canceled"
+      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
       subject.migrate
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq "coverage_enrolled"
+      enrollment_two.reload
+      expect(enrollment_two.aasm_state).to eq "coverage_enrolled"
     end
 
-    it "should not change the passive enrollment aasm state" do
-      employer_profile = organization.first.employer_profile
-      census_employee = employer_profile.census_employees.first
-      renewing_plan_year = organization.first.employer_profile.plan_years.last
-      enrollment = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.last
-      enrollment.update_attribute(:coverage_kind, "dental")
-      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    it "should not change the active enrollment aasm state" do
+      expect(enrollment_one.aasm_state).to eq "coverage_selected"
       subject.migrate
-      enrollment.reload
-      expect(enrollment.aasm_state).to eq "coverage_canceled"
+      enrollment_one.reload
+      expect(enrollment_one.aasm_state).to eq "coverage_selected"
     end
   end
 end

@@ -11,7 +11,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
 
     let(:initial_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
+      FactoryGirl.create_list(:census_employee_with_active_assignment, 5, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
         benefit_group: initial_employer.published_plan_year.benefit_groups.first,
         created_at: TimeKeeper.date_of_record.prev_year)
     }
@@ -21,7 +21,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
 
     let(:renewing_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
         benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
         renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first,
         created_at: TimeKeeper.date_of_record.prev_year)
@@ -35,7 +35,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
     
     let!(:cobra_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
                               benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
                               renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first,
                               created_at: TimeKeeper.date_of_record.prev_year)
@@ -90,7 +90,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
       employee_role
     end
 
-    def create_enrollment(family: nil, benefit_group_assignment: nil, kind:"employer_sponsored",employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil)
+    def create_enrollment(family: nil, benefit_group_assignment: nil, kind:"employer_sponsored",employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, predecessor_enrollment_id: nil)
        benefit_group = benefit_group_assignment.benefit_group
        FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
           enrollment_members: [family.primary_applicant],
@@ -104,7 +104,8 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
           employee_role_id: employee_role.id,
           benefit_group_assignment_id: benefit_group_assignment.id,
           plan_id: benefit_group.reference_plan.id,
-          aasm_state: status
+          aasm_state: status,
+          predecessor_enrollment_id: predecessor_enrollment_id
         )
     end
 
@@ -199,11 +200,14 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
         context 'When EE created waivers' do
 
           let!(:active_waivers) {
-            renewing_employees[0..4].inject([]) do |enrollments, ce|
-              enrollment= create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
-              enrollment.waive_coverage!
+            enrollments = renewing_employees[0..4].inject([]) do |enrollments, ce|
+              family = ce.employee_role.person.primary_family
+              parent_enrollment = family.active_household.hbx_enrollments.detect{|enrollment| enrollment.effective_on == effective_on}
+              enrollment = create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'inactive', predecessor_enrollment_id: parent_enrollment.id)
+              enrollment.propogate_waiver
               enrollments << enrollment
             end
+            enrollments
           }
 
           it 'should return their previous enrollments as terminations' do

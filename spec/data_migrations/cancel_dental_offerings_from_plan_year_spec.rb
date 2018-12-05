@@ -2,6 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "cancel_dental_offerings_from_plan_year")
 
 describe CancelDentalOfferingsFromPlanYear, dbclean: :after_each do
+  skip "ToDo rake was never updated to new model, check if we can remove it" do
 
   let(:given_task_name) { "cancel_dental_offerings_from_plan_year" }
   subject { CancelDentalOfferingsFromPlanYear.new(given_task_name, double(:current_scope => nil)) }
@@ -94,5 +95,6 @@ describe CancelDentalOfferingsFromPlanYear, dbclean: :after_each do
       active_benefit_group = BenefitGroup.find(id)
       expect(active_benefit_group.dental_reference_plan_id).not_to eq nil
     end
+  end
   end
 end
