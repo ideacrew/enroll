@@ -83,6 +83,8 @@ module SponsoredBenefits
                                              application_period: (effective_period_start_on.beginning_of_year..effective_period_start_on.end_of_year))
 
       }
+      let!(:product)      { benefit_market_catalog.product_packages.where(package_kind:'single_product').first.products.first}
+      let!(:plan) {benefit_group.reference_plan}
       let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area, active_year: effective_period_start_on.year }
       let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area, active_year: effective_period_start_on.year }
       let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
@@ -94,6 +96,8 @@ module SponsoredBenefits
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
 
       before(:each) do
+        plan.hios_id = product.hios_id
+        plan.save
         sponsor_benefit_sponsorship.rating_area = rating_area
         sponsor_benefit_sponsorship.service_areas = [service_area]
         sponsor_benefit_sponsorship.save
