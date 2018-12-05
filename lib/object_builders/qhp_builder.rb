@@ -1,10 +1,17 @@
 class QhpBuilder
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003", "92479DC0020005", "92479DC0010003", "92479DC0010005"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005", "92479DC0020005", "92479DC0010003", "92479DC0010005"]
+  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
 
   def initialize(qhp_hash)
-    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
+    @log_path = LOG_PATH
+    # @issuer_profile_hash = {}
+    # set_issuer_profile_hash
+    # @service_area_map = {}
+    # set_service_areas
+    FileUtils.mkdir_p(File.dirname(@log_path)) unless File.directory?(File.dirname(@log_path))
     @logger = Logger.new(@log_path)
+
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -28,6 +35,8 @@ class QhpBuilder
       "Aetna"
     elsif file_path.include?("dentegra")
       "Dentegra"
+    elsif file_path.include?("altus")
+      "Altus"
     elsif file_path.include?("delta")
       "Delta Dental"
     elsif file_path.include?("dominion")
@@ -42,6 +51,8 @@ class QhpBuilder
       "UnitedHealthcare"
     elsif file_path.include?("kaiser")
       "Kaiser"
+    elsif file_path.include?("united")
+      "UnitedHealthcare"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
       "CareFirst"
     end
@@ -132,12 +143,14 @@ class QhpBuilder
 
   def validate_and_persist_qhp
     begin
-      associate_plan_with_qhp
-      @qhp.save!
-      @success_plan_counter += 1
+      if !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
+        associate_plan_with_qhp
+        @qhp.save!
+        @success_plan_counter += 1
+      end
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
-      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
     end
   end
 
@@ -147,10 +160,11 @@ class QhpBuilder
     @qhp.plan_effective_date = effective_date.beginning_of_year
     @qhp.plan_expiration_date = effective_date.end_of_year
     @plan_year = effective_date.year
-    if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
-      @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
-      create_plan_from_serff_data
-    end
+
+    @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
+    create_plan_from_serff_data
+    # create_product_from_serff_data
+
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
@@ -174,8 +188,9 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
-      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Market: #{plan.market}, Coverage kind: #{plan.coverage_kind}, Plan Name: #{@qhp.plan_marketing_name}"
-      @qhp.plan = nil
+      puts "Plan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
+      @qhp.plan_id = nil
+      # @qhp.plan = nil
     end
   end
 
@@ -195,33 +210,125 @@ class QhpBuilder
           plan = Plan.where(active_year: @plan_year,
             hios_id: /#{@qhp.standard_component_id.strip}/,
             hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-            csr_variant_id: csr_variant_id).to_a
-          next if plan.present?
-          new_plan = Plan.new(
-            name: cost_share_variance.plan_marketing_name.squish!,
-            hios_id: cost_share_variance.hios_plan_and_variant_id,
-            hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
-            csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
-            active_year: @plan_year,
-            metal_level: parse_metal_level,
-            market: parse_market,
-            ehb: @qhp.ehb_percent_premium,
-            # carrier_profile_id: "53e67210eb899a460300000d",
-            carrier_profile_id: get_carrier_id(@carrier_name),
-            coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
-            dental_level: @dental_metal_level
-            )
-          if new_plan.valid?
-            new_plan.save!
+            csr_variant_id: csr_variant_id).to_a.first
+          if plan.present?
+            plan.update_attributes(name: cost_share_variance.plan_marketing_name.squish!)
+          else
+            issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+            carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+            carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
+            new_plan = Plan.new(
+              name: cost_share_variance.plan_marketing_name.squish!,
+              hios_id: cost_share_variance.hios_plan_and_variant_id,
+              hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+              csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+              active_year: @plan_year,
+              metal_level: parse_metal_level,
+              market: parse_market,
+              ehb: @qhp.ehb_percent_premium,
+              carrier_profile_id: carrier_profile_id,
+              coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+              dental_level: @dental_metal_level,
+              service_area_id: @qhp.service_area_id
+              )
+            if new_plan.valid?
+              new_plan.save!
+            else
+              @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
+            end
           end
         end
       end
     end
   end
 
+  def create_product_from_serff_data
+    @qhp.qhp_cost_share_variances.each do |cost_share_variance|
+      if cost_share_variance.hios_plan_and_variant_id.split("-").last != "00"
+        if cost_share_variance.plan_marketing_name[-2..-1] != "RE" # dont import plans ending with RE (Religious Exemption)
+          csr_variant_id = parse_metal_level == "dental" ? "" : /#{cost_share_variance.hios_plan_and_variant_id.split('-').last}/
+          product = ::BenefitMarkets::Products::Product.where(
+            hios_id: /#{@qhp.standard_component_id.strip}/,
+            hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
+            csr_variant_id: csr_variant_id).select{|a| a.active_year == @plan_year}.first
+          if product.present?
+            product.update_attributes(title: cost_share_variance.plan_marketing_name.squish!)
+          else
+            issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+            carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+            carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
+            shared_attributes ={
+              benefit_market_kind: "aca_#{parse_market}",
+              title: cost_share_variance.plan_marketing_name.squish!,
+              issuer_profile_id: get_issuer_profile_id,
+              hios_id: cost_share_variance.hios_plan_and_variant_id,
+              hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+              csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+              application_period: (Date.new(@plan_year, 1, 1)..Date.new(@plan_year, 12, 31)),
+              service_area_id: mapped_service_area_id,
+              # sbc_document: plan.sbc_document, # pending
+              deductible: cost_share_variance.qhp_deductable.in_network_tier_1_individual,
+              family_deductible: cost_share_variance.qhp_deductable.in_network_tier_1_family,
+              is_reference_plan_eligible: true,
+            }
+            if is_health_product?
+              new_product = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
+                health_plan_kind: @qhp.plan_type.downcase,
+                metal_level_kind: parse_metal_level.to_sym,
+                ehb: set_ehb,
+              }.merge(shared_attributes))
+            else
+              new_product = ::BenefitMarkets::Products::DentalProducts::DentalProduct.new({
+                product_package_kinds: ::BenefitMarkets::Products::DentalProducts::DentalProduct::PRODUCT_PACKAGE_KINDS
+              }.merge(shared_attributes))
+            end
+            if new_product.valid?
+              new_product.save!
+            else
+              @logger.error "\n Failed to create product: #{new_product.title}, \n hios product id: #{new_product.hios_id}\n Errors: #{new_product.errors.full_messages}\n ******************** \n"
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def set_ehb
+    @qhp.ehb_percent_premium.present? ? @qhp.ehb_percent_premium : 1.0
+  end
+
+  def get_issuer_profile_id
+    @issuer_profile_hash[@qhp.standard_component_id[0..4]]
+  end
+
+  def set_issuer_profile_hash
+    exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
+    exempt_organizations.each do |exempt_organization|
+      issuer_profile = exempt_organization.issuer_profile
+      issuer_profile.issuer_hios_ids.join.split(",").each do |issuer_hios_id|
+        @issuer_profile_hash[issuer_hios_id] = issuer_profile.id.to_s
+      end
+    end
+    @issuer_profile_hash
+  end
+
+  def mapped_service_area_id
+    @service_area_map[[get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+  end
+
+  def set_service_areas
+    ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
+      @service_area_map[[sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+    end
+  end
+
+  def is_health_product?
+    @qhp.dental_plan_only_ind.downcase == "no"
+  end
+
   def parse_metal_level
     return "expanded_bronze" if @qhp.metal_level.downcase == "expanded bronze"
-    return @qhp.metal_level unless ["high","low"].include?(@qhp.metal_level.downcase)
+    return @qhp.metal_level.downcase unless ["high","low"].include?(@qhp.metal_level.downcase)
     @qhp.metal_level = "dental"
   end
 

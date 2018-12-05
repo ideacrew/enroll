@@ -6,18 +6,27 @@ class DefinePermissions < MigrationTask
 
   def initial_hbx
     Permission.where(name: /^hbx/).delete_all
-  	Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-  	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-  	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true)
-    Permission.create(name: 'hbx_read_only', modify_family: true, list_enrollments: true, view_admin_tabs: true)
-  	Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true)
-  	Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-  	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-  	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true)
-  	Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
-    Permission.create(name: 'hbx_csr_tier1', modify_family: true)
-    Permission.create(name: 'developer', list_enrollments: true, view_admin_tabs: true)
-  	permission = Permission.hbx_staff
+    Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
+      can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+      view_admin_tabs: true)
+    Permission.create(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: true)
+    Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
+    Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
+    Permission.create(name: 'hbx_csr_tier1', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
+    Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: true)
+
+    permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
 
@@ -72,6 +81,10 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_add_pdc
     Permission.hbx_staff.update_attributes!(can_add_pdc: true)
+  end
+
+  def hbx_admin_can_lock_unlock
+    Permission.hbx_staff.update_attributes(can_lock_unlock: true)
   end
 
   def hbx_admin_can_view_username_and_email
@@ -133,5 +146,9 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_access_user_account_tab
     Permission.hbx_staff.update_attributes!(can_access_user_account_tab: true)
     Permission.hbx_tier3.update_attributes!(can_access_user_account_tab: true)
+  end
+
+  def hbx_admin_can_reset_password
+    Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 end

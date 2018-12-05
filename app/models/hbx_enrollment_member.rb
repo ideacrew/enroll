@@ -25,12 +25,13 @@ class HbxEnrollmentMember
   validate :check_primary_applicant_selected_during_enrollment
 
   validate :end_date_gt_start_date
-  delegate :ivl_coverage_selected, to: :family_member
+
+  delegate :ivl_coverage_selected, :is_disabled, to: :family_member
 
   def family
     hbx_enrollment.family if hbx_enrollment.present?
   end
-
+  
   def covered?
     (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
   end
@@ -105,7 +106,7 @@ class HbxEnrollmentMember
 
   def valid_enrolling_member?
     return true unless self.hbx_enrollment.employee_role.present?
-    health_offered_relationship_benefits, dental_offered_relationship_benefits =  shop_health_and_dental_relationship_benfits(self.hbx_enrollment.employee_role,self.hbx_enrollment.benefit_group)
+    health_offered_relationship_benefits, dental_offered_relationship_benefits =  shop_health_and_dental_relationship_benefits(self.hbx_enrollment.employee_role,self.hbx_enrollment.benefit_group)
     if self.hbx_enrollment.coverage_kind == "health"
       return false unless coverage_relationship_check(health_offered_relationship_benefits, self.family_member, self.hbx_enrollment.benefit_group.effective_on_for(self.hbx_enrollment.employee_role.hired_on))
     else

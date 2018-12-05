@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   let(:person) do
     person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
@@ -168,4 +169,5 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       end
     end
   end
+end
 end

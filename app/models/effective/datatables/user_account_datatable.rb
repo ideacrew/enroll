@@ -1,6 +1,8 @@
 module Effective
   module Datatables
     class UserAccountDatatable < Effective::MongoidDatatable
+      include Config::AcaModelConcern
+
       datatable do
         table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
@@ -13,13 +15,13 @@ module Effective
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                    if row.email.present?
-                                     ['Reset Password', reset_password_user_path(row), 'disabled']
+                                     ['Reset Password', reset_password_user_path(row), is_reset_password_action_enabled?]
                                    else
-                                     ['Reset Password', edit_user_path(row.id), 'disabled']
+                                     ['Reset Password', edit_user_path(row.id), is_reset_password_action_enabled?]
                                    end,
-                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'disabled'],
-                                   ['View Login History',login_history_user_path(id: row.id), 'disabled'],
-                                   ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax']
+                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), is_unlock_or_lock_account_action_enabled?],
+                                   ['View Login History',login_history_user_path(id: row.id), is_view_login_history_action_enabled?],
+                                   ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), is_edit_user_action_enabled?]
                                ]
                                render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
                              }, :filter => false, :sortable => false

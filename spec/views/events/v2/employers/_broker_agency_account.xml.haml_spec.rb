@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml" do
+RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml", dbclean: :after_each do
 
   describe "broker_agency_account xml" do
     let(:general_agency_account) {  FactoryGirl.create(:general_agency_account) }
@@ -22,6 +22,7 @@ RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml" d
       context "with ga_assignment" do
         before :each do
           allow(general_agency_account).to receive(:for_broker_agency_account?).with(broker_agency_account).and_return(true)
+          allow(general_agency_account.employer_profile).to receive(:general_agency_enabled?).and_return(true)
           render :template => "events/v2/employers/_broker_agency_account.xml.haml",
                  locals: {broker_agency_account: broker_agency_account, employer_profile: general_agency_account.employer_profile}
           @doc = Nokogiri::XML(rendered)

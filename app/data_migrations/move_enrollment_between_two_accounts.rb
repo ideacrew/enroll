@@ -17,13 +17,13 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     end
 
     if hbx_enrollment.is_shop?
-      employee_role = gp.employee_roles.detect { |er| er.employer_profile_id == hbx_enrollment.employee_role.employer_profile.id}
+      employee_role = gp.employee_roles.detect { |er| er.benefit_sponsors_employer_profile_id == hbx_enrollment.employee_role.employer_profile.id}
       if employee_role.blank?
         puts "New person don't have ER sponsored benefits related to Enrollment" unless Rails.env.test?
         return
       end
 
-      benefit_group_assignment = employee_role.census_employee.benefit_group_assignments.detect { |bga| bga.benefit_group_id == hbx_enrollment.benefit_group_id}
+      benefit_group_assignment = employee_role.census_employee.benefit_group_assignments.detect { |bga| bga.benefit_package_id == hbx_enrollment.sponsored_benefit_package_id}
       if benefit_group_assignment.blank?
         puts "No Benefit Group Assignment Found" unless Rails.env.test?
         return
@@ -55,7 +55,14 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
                                     is_active: hbx_enrollment.is_active, waiver_reason: hbx_enrollment.waiver_reason,
                                     published_to_bus_at: hbx_enrollment.published_to_bus_at, review_status: hbx_enrollment.review_status,
                                     special_verification_period: hbx_enrollment.special_verification_period, termination_submitted_on: hbx_enrollment.termination_submitted_on,
-                                    external_enrollment: hbx_enrollment.external_enrollment
+                                    external_enrollment: hbx_enrollment.external_enrollment,
+                                    benefit_sponsorship_id: hbx_enrollment.benefit_sponsorship_id,
+                                    sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id,
+                                    sponsored_benefit_id: hbx_enrollment.sponsored_benefit_id,
+                                    product_id:hbx_enrollment.product_id,
+                                    rating_area_id:hbx_enrollment.rating_area_id,
+                                    issuer_profile_id: hbx_enrollment.issuer_profile_id,
+                                    created_at:hbx_enrollment.created_at,
                                   )
 
     family_members = gp.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }

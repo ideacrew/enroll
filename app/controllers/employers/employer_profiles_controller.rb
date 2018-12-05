@@ -1,7 +1,11 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
+  include ::Config::AcaConcern
+
+  before_action :redirect_new_model, only: [:show, :welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
+
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -11,6 +15,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
+
+  def redirect_new_model
+    redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"
+  end
 
   def link_from_quote
     claim_code = params[:claim_code].upcase
@@ -33,27 +41,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 
+  #Deprecated. Use new model version instead.
   def index
-    if params[:broker_agency_id].blank?
-      @q = params.permit(:q)[:q]
-      @orgs = Organization.search(@q).exists(employer_profile: true)
-    else
-      @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
-
-    end
-
-    if @q.blank?
-      @page_alphabets = page_alphabets(@orgs, "legal_name")
-      page_no = cur_page_no(@page_alphabets.first)
-      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
-      @employer_profiles = @organizations.map {|o| o.employer_profile}
-    else
-      @employer_profiles = @orgs.map {|o| o.employer_profile}
-    end
-
-    @profile = find_mailbox_provider
   end
 
+  #Deprecated. Use new model version instead.
   def welcome
   end
 
@@ -102,97 +94,36 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+  #Deprecated. Use new model version instead.
   def my_account
   end
 
+  #Deprecated. Use new model version instead.
   def show
-    @tab = params['tab']
-    if params[:q] || params[:page] || params[:commit] || params[:status]
-      paginate_employees
-    else
-      case @tab
-      when 'benefits'
-        @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-        sort_plan_years(@employer_profile.plan_years)
-      when 'documents'
-      when 'employees'
-        @current_plan_year = @employer_profile.show_plan_year
-        paginate_employees
-      when 'brokers'
-        @broker_agency_accounts = @employer_profile.broker_agency_accounts
-      when 'inbox'
-
-      else
-        @broker_agency_accounts = @employer_profile.broker_agency_accounts
-        @current_plan_year = @employer_profile.show_plan_year
-        collect_and_sort_invoices(params[:sort_order])
-        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-
-        set_flash_by_announcement if @tab == 'home'
-      end
-    end
   end
 
+  #Deprecated. Use new model version instead.
   def show_profile
-    @tab ||= params[:tab]
-    if @tab == 'benefits'
-      @current_plan_year = @employer_profile.active_plan_year
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
-    elsif @tab == 'employees'
-      paginate_employees
-    elsif @tab == 'families'
-      #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families
-    elsif @tab == "inbox"
-      @folder = params[:folder] || 'Inbox'
-      @sent_box = false
-      respond_to do |format|
-        format.js { render 'employers/employer_profiles/inbox' }
-      end
-    end
   end
+
+
 
   def new
-    @organization = Forms::EmployerProfile.new
   end
 
   def edit
-    @organization = Organization.find(params[:id])
-    @employer_profile = @organization.employer_profile
-    @staff = Person.staff_for_employer_including_pending(@employer_profile)
-    @add_staff = params[:add_staff]
-    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
+  #Deprecated. Use new model version instead.
   def create
-
-    params.permit!
-    @organization = Forms::EmployerProfile.new(params[:organization])
-    organization_saved = false
-    begin
-      organization_saved, pending = @organization.save(current_user, params[:employer_id])
-    rescue Exception => e
-      flash[:error] = e.message
-      render action: "new"
-      return
-    end
-    if organization_saved
-      @person = current_user.person
-      create_sso_account(current_user, current_user.person, 15, "employer") do
-        if pending
-          # flash[:notice] = 'Your Employer Staff application is pending'
-          render action: 'show_pending'
-        else
-          employer_account_creation_notice if @organization.employer_profile.present?
-          redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
-        end
-      end
-    else
-      render action: "new"
-    end
   end
 
   def show_pending
+  end
+
+  def generate_sic_tree
+    sic_tree = SicCode.generate_sic_array
+    render :json => sic_tree
   end
 
   def update
@@ -279,7 +210,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       render "employers/employer_profiles/employee_csv_upload_errors"
     end
     rescue Exception => e
-      if e.message == "Unrecognized Employee Census spreadsheet format. Contact DC Health Link for current template."
+      if e.message == "Unrecognized Employee Census spreadsheet format. Contact #{site_short_name} for current template."
         render "employers/employer_profiles/_download_new_template"
       else
         @census_employee_import.errors.add(:base, e.message)
@@ -294,27 +225,80 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
-  def employer_account_creation_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
+  def new_document # Should be in ER attestations controller
+    @document = @employer_profile.documents.new
+    respond_to do |format|
+      format.js #{ render "new_document" }
     end
   end
 
+  def upload_document # Should be in ER attestations controller
+    @employer_profile.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
+    redirect_to employers_employer_profile_path(:id => @employer_profile) + '?tab=documents'
+  end
+
+  def download_documents # Should be in ER attestations controller
+    @employer_profile = EmployerProfile.find(params[:id])
+    #begin
+      doc = @employer_profile.documents.find(params[:ids][0])
+    send_file doc.identifier, file_name: doc.title,content_type:doc.format
+
+      #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+    #rescue => e
+    #  render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+    #end
+
+    #render json: { status: 200, message: 'Successfully Downloaded.' }
+
+  end
+
+  def delete_documents
+    @employer_profile = EmployerProfile.find(params[:id])
+    begin
+      @employer_profile.documents.any_in(:_id =>params[:ids]).destroy_all
+      render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+    rescue => e
+      render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+    end
+  end
+
+  #Deprecated. Use new model version instead.
+  def counties_for_zip_code
+  end
+
+  # def employer_account_creation_notice
+  #   begin
+  #     ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
+  #   rescue Exception => e
+  #     Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
+  #   end
+  # end
+
   private
+
+  def file_path(file)
+    file.tempfile.path
+  end
+
+  def file_name(file)
+    file.original_filename
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
   end
 
   def collect_and_sort_invoices(sort_order='ASC')
-    @invoices = @employer_profile.organization.try(:documents)
+    @invoices = []
+    @invoices << @employer_profile.organization.try(:documents).to_a
+    invoice_documents = @employer_profile.documents.select{ |invoice| ["invoice", "initial_invoice"].include? invoice.subject }
+    @invoices << invoice_documents if invoice_documents.present?
+    @invoices.flatten!
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
   def check_and_download_invoice
-    @invoice = @employer_profile.organization.documents.find(params[:invoice_id])
+    @invoice = @employer_profile.organization.invoices.select{ |inv| inv.id.to_s == params[:invoice_id]}.first
   end
 
   def sort_plan_years(plans)
@@ -418,22 +402,23 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def find_employer
     id_params = params.permit(:id, :employer_profile_id)
     id = id_params[:id] || id_params[:employer_profile_id]
-    @employer_profile = EmployerProfile.find(id)
+    # Deprecate this after moving attestation actions to ER attestations controller
+    @employer_profile = EmployerProfile.find(id) || BenefitSponsors::Organizations::Profile.find(id)
     render file: 'public/404.html', status: 404 if @employer_profile.blank?
   end
 
   def organization_profile_params
     params.require(:organization).permit(
       :id,
-      :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
+      :employer_profile_attributes => [:legal_name, :entity_kind, :dba, :sic_code]
     )
   end
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name, :sic_code],
       :office_locations_attributes => [
-        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
+        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
         {:email_attributes => [:kind, :address]},
         :is_primary
@@ -486,5 +471,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def check_origin?
     request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
+  end
+
+  def get_sic_codes
+    @grouped_options = Caches::SicCodesCache.load
   end
 end

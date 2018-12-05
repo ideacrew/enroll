@@ -1,6 +1,8 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryGirl.create(:user, person: person) }
     let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
@@ -35,7 +37,7 @@ RSpec.describe Insured::FamiliesController do
   end
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
@@ -44,17 +46,20 @@ RSpec.describe Insured::FamiliesController do
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
-  let(:employee_roles) { [double("EmployeeRole")] }
+  let(:census_employee) { FactoryGirl.create(:census_employee)}
+  let(:employee_roles) { [double("EmployeeRole", :census_employee => census_employee)] }
   let(:resident_role) { FactoryGirl.create(:resident_role) }
   let(:consumer_role) { double("ConsumerRole", bookmark_url: "/families/home") }
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
   let(:sep) { double("SpecialEnrollmentPeriod") }
 
+
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
+    allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
     allow(user).to receive(:person).and_return(person)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
@@ -162,7 +167,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "for SHOP market" do
+    context "for SHOP market", dbclean: :after_each do
 
       let(:employee_roles) { double }
       let(:employee_role) { FactoryGirl.create(:employee_role, bookmark_url: "/families/home") }
@@ -265,7 +270,7 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
-    context "for both ivl and shop" do
+    context "for both ivl and shop", dbclean: :after_each do
       let(:employee_roles) { double }
       let(:employee_role) { double("EmployeeRole", bookmark_url: "/families/home") }
       let(:enrollments) { double }
@@ -284,6 +289,7 @@ RSpec.describe Insured::FamiliesController do
         allow(employee_roles).to receive(:active).and_return([employee_role])
         allow(family).to receive(:coverage_waived?).and_return(true)
         allow(hbx_enrollments).to receive(:waived).and_return([waived_hbx])
+        allow(enrollments).to receive(:non_external).and_return(enrollments)
         allow(family).to receive(:enrollments).and_return(enrollments)
         allow(enrollments).to receive(:order).and_return([display_hbx])
         allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
@@ -603,12 +609,11 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "GET check_qle_date" do
+  describe "GET check_qle_date", dbclean: :after_each do
 
     before(:each) do
       sign_in(user)
       allow(person).to receive(:resident_role?).and_return(false)
-      allow(controller).to receive(:is_ee_sep_request_accepted?).and_return false
     end
 
     it "renders the 'check_qle_date' template" do
@@ -625,6 +630,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     describe "with invalid params" do
+
       it "returns qualified_date as false for invalid future date" do
         xhr :get, 'check_qle_date', {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}
         expect(assigns['qualified_date']).to eq(false)
@@ -655,13 +661,6 @@ RSpec.describe Insured::FamiliesController do
         expect(assigns(:future_qualified_date)).to eq(false)
       end
 
-      it "trigger sep_request_denial_notice for unqualified date when qle market kind is shop" do
-        qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
-        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
-        expect(controller).to receive(:sep_request_denial_notice)
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
-      end
-
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
@@ -671,22 +670,25 @@ RSpec.describe Insured::FamiliesController do
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
       end
-      it "should not trigger sep_request_denial_notice unqualified date  when qle market kind is individual" do
-        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
-        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
-        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
-        expect(controller).not_to receive(:sep_request_denial_notice)
-        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
-      end
     end
 
-    context "GET check_qle_date" do
-      let(:user) { FactoryGirl.create(:user) }
-      let(:person) { FactoryGirl.build(:person) }
-      let(:family) { FactoryGirl.build(:family) }
+    context "GET check_qle_date", dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+
+      let!(:user) { FactoryGirl.create(:user) }
+      let!(:person1) { FactoryGirl.create(:person) }
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
+
+      let(:employee_role) {FactoryGirl.create(:employee_role, person: person1, employer_profile: abc_profile)}
+      let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
+
       before :each do
-        allow(user).to receive(:person).and_return person
-        allow(person).to receive(:primary_family).and_return family
+        allow(user).to receive(:person).and_return person1
+        allow(person1).to receive(:primary_family).and_return family
+        allow(employee_role).to receive(:census_employee).and_return census_employee
       end
 
       context "normal qle event" do
@@ -707,8 +709,13 @@ RSpec.describe Insured::FamiliesController do
       end
 
       context "special qle events which can not have future date" do
+        subject { Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
         it "should return true" do
-          sign_in user
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
           xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
           expect(response).to have_http_status(:success)
@@ -716,15 +723,29 @@ RSpec.describe Insured::FamiliesController do
         end
 
         it "should return false" do
-          sign_in user
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
           xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
 
+        it "should return false and also notify sep request denied" do
+          date = TimeKeeper.date_of_record.prev_month.strftime("%m/%d/%Y")
+          xhr :get, :check_qle_date, qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js
+          expect(assigns(:qualified_date)).to eq false
+
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_sep_denial"
+            expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+            expect(payload[:event_object_id]).to eq initial_application.id.to_s
+            expect(payload[:notice_params][:qle_title]).to eq qle.title
+            expect(payload[:notice_params][:qle_reporting_deadline]).to eq date
+            expect(payload[:notice_params][:qle_event_on]).to eq date
+          end
+          subject.deliver(recipient: employee_role, event_object: initial_application, notice_event: "employee_notice_for_sep_denial", notice_params: {qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date})
+        end
+
         it "should have effective_on_options" do
-          sign_in user
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
           effective_on_options = [TimeKeeper.date_of_record, TimeKeeper.date_of_record - 10.days]
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
@@ -742,7 +763,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
-            FactoryGirl.build(:broker_agency_account, family: family)
+          FactoryGirl.build(:broker_agency_account, family: family, employer_profile: nil)
         ]
         allow(Family).to receive(:find).and_return family
         delete :delete_consumer_broker , :id => family.id
@@ -755,7 +776,7 @@ RSpec.describe Insured::FamiliesController do
     end
   end
 
-  describe "GET upload_notice_form" do
+  describe "GET upload_notice_form", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff"]) }
     let(:person) { FactoryGirl.create(:person) }
 
@@ -972,7 +993,7 @@ RSpec.describe Insured::FamiliesController do
 
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET purchase" do
     let(:hbx_enrollment) { HbxEnrollment.new }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }

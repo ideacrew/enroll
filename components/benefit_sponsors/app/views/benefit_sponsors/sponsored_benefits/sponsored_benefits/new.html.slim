@@ -1,0 +1,34 @@
+= content_for :navigation do
+  = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
+.container style="max-width: 100%"
+  h1.heading-text Dental - Set up Benefit Package
+  
+  h1.heading-text Select Your Plan Offering
+
+  h4 Let your plan participants choose any plan offered by one carrier, any plan availablr within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+
+  .benefit-package-dental
+    = form_for @sponsored_benefit_form, as: :sponsored_benefits, url: {action: "create"} do |benefit_builder|
+      = benefit_builder.hidden_field :kind, value: benefit_builder.object.kind
+      = benefit_builder.hidden_field :product_package_kind, value: benefit_builder.object.product_package_kind
+      = render "sponsored_benefit", f: benefit_builder
+      = link_to "Cancel", profiles_employers_employer_profile_path(benefit_builder.object.service.profile, :tab=>'benefits'), class: "btn btn-default btn-primary pull-left"
+      = benefit_builder.submit "Submit Dental Benefits", class: "btn btn-default pull-right", id: "submitDentalBenefits"
+
+javascript:
+  function loadSingleProductSponsorContribution(element) {
+    document.querySelectorAll("[id^='carrierProducts']").forEach(function(key) {
+      key.classList.add("hidden")
+    })
+    document.getElementById("carrierProducts"+element.dataset.issuername).classList.remove('hidden')
+    document.getElementById("referencePlans").classList.remove('hidden')
+  }
+
+  function setSliderInput(element) {
+    document.querySelector(".slider-"+element.dataset.unitId).value = element.value
+  }
+
+  function setNumberInput(element) {
+    document.querySelector(".cl-input-"+element.dataset.unitId).value = element.value
+  }
+

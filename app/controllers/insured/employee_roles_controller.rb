@@ -28,14 +28,14 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
-        first_name = @person_params[:first_name]
+        full_name = @person_params[:first_name] + " " + @person_params[:last_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
         respond_to do |format|
           format.html { render 'no_match' }
         end
         # Sends an external email to EE when the EE match fails
-        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now unless current_user.email.blank?
+        UserMailer.send_employee_ineligibility_notice(current_user.email, full_name).deliver_now unless current_user.email.blank?
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|
@@ -52,9 +52,19 @@ class Insured::EmployeeRolesController < ApplicationController
   def create
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
-    census_employees = actual_user.person.present? ? CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a : []
+
+    census_employees = if actual_user && actual_user.person.present?
+                         CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a
+                       else
+                         if params[:census_employee_id] && match = CensusEmployee.where("census_employee_id" => params[:census_employee_id]).first
+                           CensusEmployee.matchable(match.person.ssn, match.person.dob).to_a
+                         else
+                           []
+                         end
+                       end
+
     census_employees.each { |ce| ce.construct_employee_role_for_match_person }
-    if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
+    if @employee_role.present? && @employee_role.census_employee.present? && (current_user.has_hbx_staff_role? || @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
       create_sso_account(current_user, @employee_role.person, 15,"employee") do
@@ -78,6 +88,9 @@ class Insured::EmployeeRolesController < ApplicationController
       @family = @person.primary_family
       build_nested_models
     end
+    
+    notifier = BenefitSponsors::Services::NoticeService.new
+    notifier.deliver(recipient: @employee_role, event_object: @employee_role.census_employee, notice_event: "employee_matches_employer_rooster", notice_params: {})
   end
 
   def update
@@ -86,7 +99,6 @@ class Insured::EmployeeRolesController < ApplicationController
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
     @person = Forms::EmployeeRole.new(person, @employee_role)
-    @person.addresses = [] #fix unexpected duplicates issue
     if @person.update_attributes(object_params)
       set_notice_preference(@person, @employee_role)
       if save_and_exit
@@ -95,7 +107,7 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         # set_employee_bookmark_url
-        @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
+        # @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
         redirect_path = insured_family_members_path(employee_role_id: @employee_role.id)
         if @person.primary_family && @person.primary_family.active_household
           if @person.primary_family.active_household.hbx_enrollments.any?
@@ -158,9 +170,9 @@ class Insured::EmployeeRolesController < ApplicationController
   def person_parameters_list
     [
       :employee_role_id,
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id] },
-      { :phones_attributes => [:kind, :full_phone_number, :id] },
-      { :emails_attributes => [:kind, :address, :id] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+      { :emails_attributes => [:kind, :address, :id, :_destroy] },
       { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
       :first_name,
       :last_name,
@@ -204,8 +216,8 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def check_employee_role
     set_current_person(required: false)
-    if @person.try(:employee_roles).try(:last)
-      redirect_to @person.employee_roles.last.bookmark_url || family_account_path
+    if @person.present? && @person.has_active_employee_role?
+      redirect_to @person.active_employee_roles.first.bookmark_url || family_account_path
     else
       current_user.last_portal_visited = search_insured_employee_index_path
       current_user.save!

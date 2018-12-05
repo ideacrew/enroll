@@ -1,4 +1,27 @@
 GIT
+  remote: https://github.com/adacosta/mongoid_rails_migrations.git
+  revision: 11e4438405de715495631bc8a7b06625ad4d97b1
+  branch: master
+  specs:
+    mongoid_rails_migrations (1.2.0)
+      activesupport (>= 4.2.0)
+      bundler (>= 1.0.0)
+      mongoid (>= 4.0.0)
+      rails (>= 4.2.0)
+      railties (>= 4.2.0)
+
+GIT
+  remote: https://github.com/brianweiner/recurring_select
+  revision: 68cb143d47bcb167f7bd3d9907014020a5514f73
+  specs:
+    recurring_select (2.0.0)
+      coffee-rails (>= 3.1)
+      ice_cube (>= 0.11)
+      jquery-rails (>= 3.0)
+      rails (>= 3.2)
+      sass-rails (>= 4.0)
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: 698345afa15dd2679ba864796e2c2abcb0ade03d
   branch: 1.3.1
@@ -10,12 +33,19 @@ GIT
 
 GIT
   remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: 72cc8143fd147acfb0c462c49bd82e7b60c57807
+  revision: 630e2b4e201ea331c0104694c8e1434d7e1c4bc8
   branch: master
   specs:
     openhbx_cv2 (0.0.1)
       activesupport (>= 3.2)
       nokogiri-happymapper (~> 0.5)
+
+GIT
+  remote: https://github.com/harshared/simple_calendar
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  specs:
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
 
 GIT
   remote: https://github.com/prawnpdf/prawn.git
@@ -39,10 +69,97 @@ PATH
       sass-rails
       simple_form
 
+PATH
+  remote: components/benefit_markets
+  specs:
+    benefit_markets (0.0.1)
+      aasm (~> 4.8.0)
+      active_model_serializers
+      config
+      mongoid (~> 5.4.0)
+      pundit (~> 1.0.1)
+      rails (~> 4.2.7.1)
+      slim (~> 3.0.9)
+      symmetric-encryption (~> 3.6.0)
+      virtus
+
+PATH
+  remote: components/benefit_sponsors
+  specs:
+    benefit_sponsors (0.0.1)
+      aasm (~> 4.8.0)
+      active_model_serializers
+      config
+      devise (~> 3.5.4)
+      interactor (= 3.1.0)
+      interactor-rails (= 2.0.2)
+      language_list (~> 1.1.0)
+      money-rails (~> 1.3.0)
+      mongoid (~> 5.4.0)
+      mongoid-autoinc
+      pundit (~> 1.0.1)
+      rails (~> 4.2.7.1)
+      roo (~> 2.1.0)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+      virtus (~> 1.0.5)
+
+PATH
+  remote: components/notifier
+  specs:
+    notifier (0.0.1)
+      aasm (~> 4.8.0)
+      acapi
+      ckeditor (= 4.2.4)
+      combine_pdf
+      config
+      curl
+      money-rails (~> 1.3.0)
+      mongoid (~> 5.4.0)
+      non-stupid-digest-assets
+      rails (~> 4.2.3)
+      redcarpet (~> 3.4.0)
+      roo (~> 2.1.0)
+      slim (= 3.0.9)
+      virtus (~> 1.0.5)
+      wicked_pdf (= 1.0.6)
+      wkhtmltopdf-binary-edge (~> 0.12.3.0)
+
+PATH
+  remote: components/sponsored_benefits
+  specs:
+    sponsored_benefits (0.0.1)
+      aasm (~> 4.8.0)
+      config
+      mongoid (~> 5.4.0)
+      rails (~> 4.2.7.1)
+      roo (~> 2.1.0)
+      slim (~> 3.0.8)
+      symmetric-encryption (~> 3.6.0)
+
+PATH
+  remote: components/transport_gateway
+  specs:
+    transport_gateway (0.0.1)
+      aws-sdk (>= 2.2.4)
+      net-sftp (~> 2.1, >= 2.1.2)
+      rails (>= 4.2.0)
+
+PATH
+  remote: components/transport_profiles
+  specs:
+    transport_profiles (0.0.1)
+      acapi
+      mongoid (= 5.4.0)
+      rails (>= 4.2.0)
+      rubyzip (>= 1.2.1)
+      symmetric-encryption (~> 3.6.0)
+      transport_gateway
+
 GEM
   remote: https://rubygems.org/
   specs:
-    Ascii85 (1.0.2)
+    Ascii85 (1.0.3)
     aasm (4.8.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
@@ -65,6 +182,11 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    active_model_serializers (0.10.8)
+      actionpack (>= 4.1, < 6)
+      activemodel (>= 4.1, < 6)
+      case_transform (>= 0.2)
+      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (4.2.7.1)
       activesupport (= 4.2.7.1)
       globalid (>= 0.3.0)
@@ -87,6 +209,10 @@ GEM
     animate-rails (1.0.10)
       rails
     arel (6.0.4)
+    ast (2.4.0)
+    astrolabe (1.3.1)
+      parser (~> 2.2)
+    awesome_print (1.8.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
     aws-sdk-core (2.2.4)
@@ -97,14 +223,14 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.11)
-    binding_of_caller (0.7.3)
+    bcrypt (3.1.12)
+    binding_of_caller (0.8.0)
       debug_inspector (>= 0.0.1)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
     bootstrap-slider-rails (6.0.17)
       railties (>= 3.2, < 5.0)
-    bson (3.2.6)
+    bson (4.3.0)
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -114,7 +240,7 @@ GEM
       i18n
       rake (>= 10.0.0)
       sshkit (~> 1.3)
-    capistrano-bundler (1.3.0)
+    capistrano-bundler (1.4.0)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
     capistrano-rails (1.1.6)
@@ -128,17 +254,19 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    capybara-screenshot (1.0.18)
-      capybara (>= 1.0, < 3)
+    capybara-screenshot (1.0.22)
+      capybara (>= 1.0, < 4)
       launchy
-    carrierwave (1.2.1)
+    carrierwave (1.2.3)
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
       mime-types (>= 1.16)
-    carrierwave-mongoid (1.0.0)
+    carrierwave-mongoid (1.1.0)
       carrierwave (>= 0.8, < 1.3)
-      mongoid (>= 3.0, < 7.0)
+      mongoid (>= 3.0, < 8.0)
       mongoid-grid_fs (>= 1.3, < 3.0)
+    case_transform (0.2)
+      activesupport
     celluloid (0.17.3)
       celluloid-essentials
       celluloid-extras
@@ -160,9 +288,20 @@ GEM
       timers (>= 4.1.1)
     celluloid-supervision (0.20.6)
       timers (>= 4.1.1)
-    childprocess (0.8.0)
+    certified (1.0.0)
+    childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
+    chosen-rails (1.8.7)
+      coffee-rails (>= 3.2)
+      railties (>= 3.0)
+      sass-rails (>= 3.2)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
     cliver (0.3.2)
+    cocaine (0.6.0)
+      terrapin (= 0.6.0)
     coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -173,13 +312,15 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    combine_pdf (1.0.7)
+    combine_pdf (1.0.15)
       ruby-rc4 (>= 0.1.5)
     commonjs (0.2.7)
     config (1.0.0)
       activesupport (>= 3.0)
       deep_merge (~> 1.0.0)
-    crass (1.0.3)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
+    crass (1.0.4)
     cucumber (2.3.3)
       builder (>= 2.1.2)
       cucumber-core (~> 1.4.0)
@@ -197,12 +338,15 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5)
     cucumber-wire (0.0.1)
+    curl (0.0.9)
+      awesome_print (>= 0.2.1)
+      unidecoder (>= 1.1.1)
     database_cleaner (1.5.3)
     debug_inspector (0.0.3)
     deep_merge (1.0.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (3.4.1)
+    devise (3.5.10)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -210,6 +354,7 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.3)
+    docile (1.1.5)
     easy_diff (1.0.0)
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
@@ -229,12 +374,10 @@ GEM
     factory_girl_rails (4.6.0)
       factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
-    fakeredis (0.6.0)
-      redis (~> 3.2)
-    ffi (1.9.18)
-    font-awesome-rails (4.5.0.1)
-      railties (>= 3.2, < 5.1)
-    forgery (0.6.0)
+    fakeredis (0.7.0)
+      redis (>= 3.2, < 5.0)
+    ffi (1.9.25)
+    forgery (0.7.0)
     gherkin (3.2.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
@@ -247,27 +390,29 @@ GEM
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
+    hashdiff (0.3.7)
     hashery (2.1.2)
     hike (1.2.3)
-    hitimes (1.2.6)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
-    httparty (0.15.6)
+    httparty (0.16.2)
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
+    ice_cube (0.16.3)
     ice_nine (0.11.2)
+    iniparse (1.4.4)
     interactor (3.1.0)
     interactor-rails (2.0.2)
       interactor (~> 3.0)
       rails (>= 3, < 5.1)
-    jbuilder (2.7.0)
+    jbuilder (2.8.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
-    jmespath (1.3.1)
+    jmespath (1.4.0)
     jquery-datatables-rails (3.4.0)
       actionpack (>= 3.1)
       jquery-rails
@@ -283,10 +428,11 @@ GEM
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
     json (1.8.6)
+    jsonapi-renderer (0.2.0)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    kgio (2.11.0)
+    kgio (2.11.2)
     language_list (1.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -298,16 +444,16 @@ GEM
     less-rails-bootstrap (3.3.1.0)
       less-rails (~> 2.6.0)
     libv8 (3.16.14.19)
-    loofah (2.1.1)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
-    method_source (0.9.0)
+    method_source (0.9.2)
     mime-types (2.99.3)
     mini_portile2 (2.0.0)
-    minitest (5.10.3)
+    minitest (5.11.3)
     monetize (1.1.0)
       money (~> 6.5.0)
     money (6.5.1)
@@ -317,14 +463,14 @@ GEM
       monetize (~> 1.1.0)
       money (~> 6.5.0)
       railties (>= 3.0)
-    mongo (2.1.2)
-      bson (~> 3.0)
+    mongo (2.5.1)
+      bson (>= 4.3.0, < 5.0.0)
     mongo_session_store-rails4 (6.0.0)
       actionpack (>= 3.1)
-    mongoid (5.0.1)
+    mongoid (5.4.0)
       activemodel (~> 4.0)
-      mongo (~> 2.1)
-      origin (~> 2.1)
+      mongo (>= 2.5.1, < 3.0.0)
+      origin (~> 2.3)
       tzinfo (>= 0.3.37)
     mongoid-autoinc (5.0.2)
       mongoid (~> 5.0)
@@ -333,14 +479,14 @@ GEM
       mongoid (>= 2.0)
     mongoid-enum (0.4.0)
       mongoid (~> 5.0)
-    mongoid-grid_fs (2.3.0)
+    mongoid-grid_fs (2.4.0)
       mime-types (>= 1.0, < 4.0)
-      mongoid (>= 3.0, < 7.0)
-    mongoid-history (0.7.0)
+      mongoid (>= 3.0, < 8.0)
+    mongoid-history (0.8.1)
       activesupport
       easy_diff
       mongoid (>= 3.0)
-      mongoid-compatibility
+      mongoid-compatibility (>= 0.5.1)
     mongoid-rspec (3.0.0)
       mongoid (~> 5.0)
       rake
@@ -356,46 +502,59 @@ GEM
     multi_xml (0.6.0)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (4.2.0)
-    newrelic_rpm (4.6.0.338)
-    nio4r (2.1.0)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (5.0.2)
+    newrelic_rpm (5.5.0.348)
+    nio4r (2.3.1)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     nokogiri-happymapper (0.6.0)
       nokogiri (~> 1.5)
+    non-stupid-digest-assets (1.0.9)
+      sprockets (>= 2.0)
     origin (2.3.1)
     orm_adapter (0.5.0)
+    overcommit (0.46.0)
+      childprocess (~> 0.6, >= 0.6.3)
+      iniparse (~> 1.4)
     parallel (1.12.1)
     parallel_tests (2.21.3)
       parallel
+    parser (2.5.3.0)
+      ast (~> 2.4.0)
     pdf-reader (1.4.1)
       Ascii85 (~> 1.0.0)
       afm (~> 0.2.1)
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    poltergeist (1.16.0)
-      capybara (~> 2.1)
+    poltergeist (1.18.1)
+      capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
-    pry (0.11.3)
+    powerpack (0.1.2)
+    pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     pry-byebug (3.3.0)
       byebug (~> 8.0)
       pry (~> 0.10)
-    pry-rails (0.3.6)
+    pry-rails (0.3.8)
       pry (>= 0.10.4)
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
-    pry-stack_explorer (0.4.9.2)
+    pry-stack_explorer (0.4.9.3)
       binding_of_caller (>= 0.7)
       pry (>= 0.9.11)
+    puma (3.12.0)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
-    rack (1.6.9)
+    rack (1.6.11)
     rack-protection (1.5.5)
+      rack
+    rack-proxy (0.6.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -413,12 +572,12 @@ GEM
       sprockets-rails
     rails-deprecated_sanitizer (1.0.3)
       activesupport (>= 4.2.0.alpha)
-    rails-dom-testing (1.0.8)
-      activesupport (>= 4.2.0.beta, < 5.0)
+    rails-dom-testing (1.0.9)
+      activesupport (>= 4.2.0, < 5.0)
       nokogiri (~> 1.6)
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.4)
-      loofah (~> 2.0)
+      loofah (~> 2.2, >= 2.2.2)
     rails-i18n (4.0.8)
       i18n (~> 0.7)
       railties (~> 4.0)
@@ -427,32 +586,35 @@ GEM
       activesupport (= 4.2.7.1)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
+    rainbow (2.2.2)
+      rake
     raindrops (0.19.0)
-    rake (12.3.0)
-    rb-fsevent (0.10.2)
+    rake (12.3.1)
+    rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
     rdoc (4.3.0)
-    recaptcha (1.1.0)
+    recaptcha (4.3.1)
       json
-    redis (3.3.5)
+    redcarpet (3.4.0)
+    redis (4.0.3)
     redis-actionpack (5.0.2)
       actionpack (>= 4.0, < 6)
       redis-rack (>= 1, < 3)
       redis-store (>= 1.1.0, < 2)
-    redis-activesupport (5.0.4)
+    redis-activesupport (5.0.7)
       activesupport (>= 3, < 6)
       redis-store (>= 1.3, < 2)
     redis-namespace (1.6.0)
       redis (>= 3.0.4)
-    redis-rack (2.0.3)
+    redis-rack (2.0.5)
       rack (>= 1.5, < 3)
       redis-store (>= 1.2, < 2)
     redis-rails (5.0.2)
       redis-actionpack (>= 5.0, < 6)
       redis-activesupport (>= 5.0, < 6)
       redis-store (>= 1.2, < 2)
-    redis-store (1.4.1)
+    redis-store (1.6.0)
       redis (>= 2.2, < 5)
     ref (2.0.0)
     responders (2.4.0)
@@ -476,6 +638,8 @@ GEM
     rspec-expectations (3.4.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
+    rspec-instafail (1.0.0)
+      rspec
     rspec-mocks (3.4.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
@@ -491,14 +655,21 @@ GEM
     rspec_junit_formatter (0.2.3)
       builder (< 4)
       rspec-core (>= 2, < 4, != 2.12.0)
+    rubocop (0.34.2)
+      astrolabe (~> 1.3)
+      parser (>= 2.2.2.5, < 3.0)
+      powerpack (~> 0.1)
+      rainbow (>= 1.99.1, < 3.0)
+      ruby-progressbar (~> 1.4)
     ruby-progressbar (1.6.0)
     ruby-rc4 (0.1.5)
     ruby-saml (1.3.1)
       nokogiri (>= 1.5.10)
-    ruby_parser (3.10.1)
+    ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
-    rubyzip (1.2.1)
-    sass (3.5.3)
+    rubyzip (1.2.2)
+    safe_yaml (1.0.4)
+    sass (3.7.2)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -512,19 +683,24 @@ GEM
     sdoc (0.4.2)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
-    selenium-webdriver (3.8.0)
+    selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
-      rubyzip (~> 1.0)
+      rubyzip (~> 1.2, >= 1.2.2)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
-    sexp_processor (4.10.0)
+    sexp_processor (4.11.0)
     shoulda-matchers (3.1.1)
       activesupport (>= 4.0.0)
     sigar (0.7.3)
     sigdump (0.2.4)
-    simple_form (3.5.0)
-      actionpack (> 4, < 5.2)
-      activemodel (> 4, < 5.2)
+    simple_form (4.0.0)
+      actionpack (> 4)
+      activemodel (> 4)
+    simplecov (0.14.1)
+      docile (~> 1.1.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.2)
     sinatra (1.4.8)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -532,10 +708,10 @@ GEM
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
-    slim-rails (3.1.3)
+    slim-rails (3.2.0)
       actionpack (>= 3.1)
       railties (>= 3.1)
-      slim (~> 3.0)
+      slim (>= 3.0, < 5.0)
     slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
@@ -543,7 +719,7 @@ GEM
       thor
       thread (~> 0.1.7)
     spring (1.6.3)
-    sprockets (2.12.4)
+    sprockets (2.12.5)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
@@ -552,33 +728,36 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    sshkit (1.15.1)
+    sshkit (1.18.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machine (1.2.0)
     symmetric-encryption (3.6.0)
       coercible (>= 1.0.0)
     temple (0.8.0)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
+    test-prof (0.5.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
-    thor (0.20.0)
+    thor (0.20.3)
     thread (0.1.7)
     thread_safe (0.3.6)
     tilt (1.4.1)
-    timers (4.1.2)
-      hitimes
+    timers (4.2.0)
     ttfunk (1.0.3)
     turbolinks (2.5.3)
       coffee-rails
-    tzinfo (1.2.4)
+    tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    uglifier (4.0.2)
+    uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
     unicorn (4.8.3)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    unidecoder (1.1.2)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)
@@ -588,13 +767,21 @@ GEM
       equalizer (~> 0.0, >= 0.0.9)
     warden (1.2.7)
       rack (>= 1.0)
-    watir (6.10.0)
+    watir (6.13.0)
       selenium-webdriver (~> 3.4, >= 3.4.1)
     web-console (2.3.0)
       activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
+    webmock (3.4.2)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
+    webpacker (3.5.5)
+      activesupport (>= 4.2)
+      rack-proxy (>= 0.6.1)
+      railties (>= 4.2)
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
@@ -602,7 +789,7 @@ GEM
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (2.1.0)
       nokogiri (~> 1.3)
-    yard (0.9.12)
+    yard (0.9.16)
     yard-mongoid (0.1.0)
       yard (>= 0.8.4)
 
@@ -616,28 +803,34 @@ DEPENDENCIES
   addressable (= 2.3.8)
   animate-rails (~> 1.0.7)
   aws-sdk (= 2.2.4)
+  bcrypt (~> 3.1)
+  benefit_markets!
+  benefit_sponsors!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
-  bson (= 3.2.6)
+  bson (~> 4.3.0)
   byebug (= 8.2.2)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  certified
+  chosen-rails
+  ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
   cucumber (= 2.3.3)
   cucumber-rails (= 1.4.3)
+  curl
   database_cleaner (= 1.5.3)
-  devise (~> 3.4.1)
+  devise (>= 3.5.4)
   effective_datatables!
   email_spec (= 2.0.0)
   eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
-  font-awesome-rails (= 4.5.0.1)
   forgery
   haml
   httparty
@@ -654,19 +847,23 @@ DEPENDENCIES
   mail (= 2.6.3)
   maskedinput-rails
   money-rails (~> 1.3.0)
-  mongo (= 2.1.2)
+  mongo (= 2.5.1)
   mongo_session_store-rails4 (~> 6.0.0)
-  mongoid (= 5.0.1)
+  mongoid (~> 5.4.0)
   mongoid-autoinc
   mongoid-enum
   mongoid-history
   mongoid-rspec (= 3.0.0)
   mongoid-versioning
+  mongoid_rails_migrations!
   mongoid_userstamp
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  non-stupid-digest-assets (~> 1.0, >= 1.0.9)
+  notifier!
   openhbx_cv2!
+  overcommit
   parallel_tests (= 2.21.3)
   poltergeist
   prawn!
@@ -675,26 +872,38 @@ DEPENDENCIES
   pry-rails
   pry-remote
   pry-stack_explorer
+  puma
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)
   rails (= 4.2.7.1)
   rails-i18n (= 4.0.8)
-  recaptcha (= 1.1.0)
+  recaptcha (= 4.3.1)
+  recurring_select!
+  redcarpet (= 3.4.0)
   redis-rails
   resque
   roo (~> 2.1.0)
+  rspec-instafail
   rspec-rails (~> 3.4.2)
   rspec_junit_formatter (= 0.2.3)
+  rubocop
   ruby-progressbar (= 1.6.0)
   ruby-saml (~> 1.3.0)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
+  simple_calendar!
+  simplecov (= 0.14.1)
+  slim (~> 3.0.8)
   slim-rails
+  sponsored_benefits!
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)
+  test-prof (= 0.5.0)
   therubyracer
+  transport_gateway!
+  transport_profiles!
   turbolinks (= 2.5.3)
   uglifier (>= 1.3.0)
   unicorn (~> 4.8.3)
@@ -702,10 +911,12 @@ DEPENDENCIES
   warden
   watir
   web-console (= 2.3.0)
+  webmock
+  webpacker
   wicked_pdf (= 1.0.6)
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
   yard (~> 0.9.5)
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.16.0
+   1.17.1

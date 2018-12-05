@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Employers::EmployerHelper, :type => :helper do
+RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each do
   describe "#enrollment_state" do
 
     let(:benefit_group)    { plan_year.benefit_groups.first }
@@ -9,23 +9,25 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       bg = FactoryGirl.create(:benefit_group, plan_year: py)
       PlanYear.find(py.id)
     end
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
     let(:benefit_group_assignment) { double }
-    let(:person) {double}
-    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:person) { FactoryGirl.create(:person, :with_ssn) }
+    let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:dental_plan) { FactoryGirl.create(:plan, coverage_kind: "dental", dental_level: "high" ) }
     let(:health_plan) { FactoryGirl.create(:plan, coverage_kind: "health") }
     let(:dental_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
                                               coverage_kind: 'dental',
-                                              plan: dental_plan
+                                              plan: dental_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
     let(:health_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
-                                              plan: health_plan
+                                              plan: health_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
 
     before do
@@ -122,6 +124,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       context 'when coverage terminated' do
         before do
+          employee_role.update_attributes!(census_employee_id: census_employee.id)
           health_enrollment.terminate_coverage!
           allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
         end
@@ -155,6 +158,58 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       end
     end
 
+    context "humanize_enrollment_states" do
+      context 'when enrollments not present' do
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([])
+        end
+
+        it "should return initialized as default" do
+          expect(helper.humanize_enrollment_states(benefit_group_assignment)).to be_blank
+        end
+      end
+
+      context 'when health coverage present' do
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
+        end
+
+        it "should return health enrollment status" do
+          expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Selected (Health)"
+        end
+      end
+
+      context 'when dental coverage present' do
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([dental_enrollment])
+        end
+
+        it "should return dental enrollment status" do
+          expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Selected (Dental)"
+        end
+      end
+
+      context 'when both health & dental coverage present' do
+        before do
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment, dental_enrollment])
+        end
+
+        it "should return enrollment status for both health & dental" do
+          expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
+        end
+      end
+
+      context 'when coverage waived' do
+        before do
+          health_enrollment.update_attributes(:aasm_state => :inactive)
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
+        end
+
+        it "should return terminated status" do
+          expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Waived (Health)"
+        end
+      end
+    end
 
     context "return coverage kind for a census_employee" do
       it " when coverage kind is nil " do
@@ -200,7 +255,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
 
     context ".get_benefit_groups_for_census_employee" do
-      let(:health_plan)       { FactoryGirl.create(:plan, 
+      let(:health_plan)       { FactoryGirl.create(:plan,
                                                    :with_premium_tables,
                                                    coverage_kind: "health",
                                                    active_year: TimeKeeper.date_of_record.year) }
@@ -225,6 +280,12 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
                                                   end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
                                                   aasm_state: 'published') }
 
+      let(:published_plan_year_with_terminated_on)  { FactoryGirl.build(:plan_year,
+                                                  start_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                                                  end_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  terminated_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.year - 1.day,
+                                                  aasm_state: 'published') }
+
       let(:renewing_plan_year)  { FactoryGirl.build(:plan_year,
                                                   start_on: TimeKeeper.date_of_record.beginning_of_month,
                                                   end_on: TimeKeeper.date_of_record.beginning_of_month + 1.year - 1.day,
@@ -234,15 +295,17 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       let(:relationship_benefits) do
         [
           RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
-          RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),    
+          RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
           RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
         ]
       end
 
-      let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
+      let!(:employer_profile)  { FactoryGirl.create(:employer_profile,
                                                     plan_years: [expired_plan_year, active_plan_year, draft_plan_year]) }
 
-      before do 
+      let!(:employer_profile_1)  { FactoryGirl.create(:employer_profile)}
+
+      before do
         [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year, published_plan_year].each do |py|
           bg = py.benefit_groups.build({
             title: 'DC benefits',
@@ -258,12 +321,43 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         assign(:employer_profile, employer_profile)
       end
 
+      context "#show_or_hide_claim_quote_button" do
+        it "should return true if plan year is in draft status" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if plan year is in renewing_draft status" do
+          employer_profile_1.update_attributes(plan_years: [renewing_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return false if plan year is in published status" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq false
+        end
+
+        it "should return false if plan year is in published status and with future terminated_on" do
+          employer_profile_1.update_attributes(plan_years: [published_plan_year_with_terminated_on])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer does not have any plan years" do
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+
+        it "should return true if employer has both published and draft plan years" do
+          employer_profile_1.update_attributes(plan_years: [draft_plan_year, published_plan_year])
+          expect(helper.show_or_hide_claim_quote_button(employer_profile_1)).to eq true
+        end
+      end
+
       context "for employer with plan years" do
-  
+
         it 'should not return expired benefit groups' do
           current_benefit_groups, renewal_benefit_groups = helper.get_benefit_groups_for_census_employee
           expect(current_benefit_groups.include?(expired_plan_year.benefit_groups.first)).to be_falsey
-        end 
+        end
 
         it 'should return current benefit groups' do
           current_benefit_groups, renewal_benefit_groups = helper.get_benefit_groups_for_census_employee
@@ -273,8 +367,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
       end
 
-      context 'for renewing employer' do 
-        let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
+      context 'for renewing employer' do
+        let!(:employer_profile)  { FactoryGirl.create(:employer_profile,
                                     plan_years: [expired_plan_year, active_plan_year, draft_plan_year, renewing_plan_year]) }
 
         it 'should return both renewing and current benefit groups' do
@@ -287,7 +381,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       end
 
       context "for new initial employer" do
-        let!(:employer_profile)  { FactoryGirl.create(:employer_profile, 
+        let!(:employer_profile)  { FactoryGirl.create(:employer_profile,
                                     plan_years: [draft_plan_year, published_plan_year]) }
 
         it 'should return upcoming draft and published plan year benefit groups' do
@@ -331,16 +425,35 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       it "should return false when employer_profile with active_plan_year not during open enrollment" do
         allow(active_plan_year).to receive(:open_enrollment_contains?).and_return false
-        expect(helper.show_cobra_fields?(employer_profile_with_active_plan_year, user)).to eq false 
+        expect(helper.show_cobra_fields?(employer_profile_with_active_plan_year, user)).to eq false
       end
 
       it "should return false when employer_profile is not conversion and with renewing" do
-        expect(helper.show_cobra_fields?(employer_profile_with_renewing_plan_year, user)).to eq false 
+        expect(helper.show_cobra_fields?(employer_profile_with_renewing_plan_year, user)).to eq false
       end
 
       it "should return false when employer_profile is conversion and has more than 2 plan_years" do
         conversion_employer_profile_with_renewing_plan_year.plan_years << active_plan_year
-        expect(helper.show_cobra_fields?(conversion_employer_profile_with_renewing_plan_year, user)).to eq false 
+        expect(helper.show_cobra_fields?(conversion_employer_profile_with_renewing_plan_year, user)).to eq false
+      end
+    end
+
+    context "employee_state_format" do
+
+      before do
+        census_employee.aasm_state ='cobra_linked'
+        census_employee.cobra_begin_date = TimeKeeper.date_of_record
+        census_employee.save
+      end
+
+      it "when cobra employee has enrollments" do
+        allow(census_employee).to receive(:has_cobra_hbx_enrollment?).and_return true
+        expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra Enrolled"
+      end
+
+      it "when cobra employee has no enrollments" do
+        allow(census_employee).to receive(:has_cobra_hbx_enrollment?).and_return false
+        expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra linked"
       end
     end
   end

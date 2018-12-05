@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::FamilyMembersController do
+RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
@@ -68,6 +68,8 @@ RSpec.describe Insured::FamilyMembersController do
 
     # Some times Effective dates vary even for the next day. So creating a new SEP & re-calculating effective on dates
     context "with sep_id in params" do
+
+       subject { Observers::NoticeObserver.new }
 
       let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }

@@ -4,10 +4,13 @@ Dir.glob('db/seedfiles/translations/en/*').each do |file|
 end
 
 puts "*"*80 unless Rails.env.test?
+
 puts "::: Generating English Translations :::" unless Rails.env.test?
 
 MAIN_TRANSLATIONS = {
-  "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal"
+  "en.shared.my_portal_links.my_insured_portal" => "My Insured Portal",
+  "en.shared.my_portal_links.my_broker_agency_portal" => "My Broker Agency Portal",
+  "en.shared.my_portal_links.my_employer_portal" => "My Employer Portal"
 }
 translations = [
   BOOTSTRAP_EXAMPLE_TRANSLATIONS,
@@ -19,11 +22,14 @@ translations = [
   BUTTON_PANEL_EXAMPLE_TRANSLATIONS,
   INSURED_TRANSLATIONS,
   BROKER_AGENCIES_TRANSLATIONS,
-  DEVISE_TRANSLATIONS
+  DEVISE_TRANSLATIONS,
+  EMPLOYER_TRANSLATIONS
 ].reduce({}, :merge)
 
-puts "TRANSLATIONS" unless Rails.env.test?
-p translations unless Rails.env.test?
+unless Rails.env.test?
+  puts "TRANSLATIONS"
+  p translations
+end
 
 translations.keys.each do |k|
   Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{translations[k]}\"")

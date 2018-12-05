@@ -1,4 +1,5 @@
 module Insured::PlanFilterHelper
+  include Config::SiteHelper
   include L10nHelper
 
   def find_my_doctor

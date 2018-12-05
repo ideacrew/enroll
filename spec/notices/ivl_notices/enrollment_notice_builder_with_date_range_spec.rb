@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
@@ -261,4 +262,5 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
       expect(@notice.to).not_to eq dep_fam_primary.work_email_or_best
     end
   end
+end
 end

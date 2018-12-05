@@ -17,7 +17,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
     upload_and_send_secure_message
     send_generic_notice_alert
   end
-
+  
   def append_data
     notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({:start_on => @qle_reported_date,
                                                             :end_on => @qle_reported_date + 30.day,

@@ -14,53 +14,53 @@ module Queries
     def build_scope()
       user = klass
       users = case @custom_attributes[:users]
-              when "all_consumer_roles"
-                if @custom_attributes[:lock_unlock] == "locked"
-                  user.where(:'roles'.in => ["consumer"], :locked_at.ne => nil)
-                elsif @custom_attributes[:lock_unlock] == "unlocked"
-                  user.where(:'roles'.in => ["consumer"], locked_at: nil)
-                else
-                  user.where(:'roles'.in => ["consumer"])
-                end
-              when "all_employer_staff_roles"
-                if @custom_attributes[:lock_unlock] == "locked"
-                  user.where(:'roles'.in => ["employer_staff"], :locked_at.ne => nil)
-                elsif @custom_attributes[:lock_unlock] == "unlocked"
-                  user.where(:'roles'.in => ["employer_staff"], locked_at: nil)
-                else
-                  user.where(:'roles'.in => ["employer_staff"])
-                end
-              when "all_employee_roles"
-                if @custom_attributes[:lock_unlock] == "locked"
-                  user.where(:'roles'.in => ["employee"], :locked_at.ne => nil)
-                elsif @custom_attributes[:lock_unlock] == "unlocked"
-                  user.where(:'roles'.in => ["employee"], locked_at: nil)
-                else
-                  user.where(:'roles'.in => ["employee"])
-                end
-              when "all_broker_roles"
-                if @custom_attributes[:lock_unlock] == "locked"
-                  user.where(:'roles'.in => ["broker"], :locked_at.ne => nil)
-                elsif @custom_attributes[:lock_unlock] == "unlocked"
-                  user.where(:'roles'.in => ["broker"], locked_at: nil)
-                else
-                  user.where(:'roles'.in => ["broker"])
-                end
-              when "all"
-                if @custom_attributes[:lock_unlock] == "locked"
-                  user.locked
-                elsif @custom_attributes[:lock_unlock] == "unlocked"
-                  user.unlocked
-                else
-                  user.all
-                end
-              else
-                if @search_string.present?
-                  user.datatable_search(@search_string)
-                else
-                  user.all
-                end
-              end
+        when "all_consumer_roles"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["consumer"], :locked_at.ne => nil)
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["consumer"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["consumer"])
+          end
+        when "all_employer_staff_roles"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["employer_staff"], :locked_at.ne => nil)
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["employer_staff"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["employer_staff"])
+          end
+        when "all_employee_roles"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["employee"], :locked_at.ne => nil)
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["employee"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["employee"])
+          end
+        when "all_broker_roles"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["broker"], :locked_at.ne => nil)
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["broker"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["broker"])
+          end
+        when "all"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.locked
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.unlocked
+          else
+            user.all
+          end
+        else
+          if @search_string.present?
+            user.datatable_search(@search_string)
+          else
+            user.all
+          end
+        end
       users
     end
 

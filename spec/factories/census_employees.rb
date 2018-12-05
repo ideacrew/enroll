@@ -5,27 +5,46 @@ FactoryGirl.define do
     dob "1964-10-23".to_date
     gender "male"
     employer_profile_id "12345"
+    expected_selection "enroll"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
     is_business_owner  false
     association :address, strategy: :build
     association :email, strategy: :build
-    association :employer_profile, strategy: :build
+    association :employer_profile, strategy: :create
+    association :benefit_sponsorship, :with_organization_cca_profile, factory: :benefit_sponsors_benefit_sponsorship
 
     before(:create) do |instance|
       FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+      instance.employer_profile = instance.benefit_sponsorship.profile if instance.benefit_sponsorship
     end
 
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }
+      create_with_spouse false
     end
+
+    after(:create) do |census_employee, evaluator|
+      census_employee.created_at = TimeKeeper.date_of_record
+      if evaluator.create_with_spouse
+        census_employee.census_dependents.create(employee_relationship: 'spouse')
+      end
+    end
+
 
     trait :owner do
       is_business_owner  true
     end
 
+    trait :with_spouse do
+
+    end
+
+    trait :blank_email do
+      email nil
+    end
     trait :termination_details do
       # aasm_state "employment_terminated"
       employment_terminated_on {TimeKeeper.date_of_record.last_month}
@@ -48,6 +67,12 @@ FactoryGirl.define do
 
       after :create do |organization, evaluator|
         FactoryGirl.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
+      end
+    end
+
+    trait :with_active_assignment do
+      after(:build) do |census_employee, evaluator|
+        build(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

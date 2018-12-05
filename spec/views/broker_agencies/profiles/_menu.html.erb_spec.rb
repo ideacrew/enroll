@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
+RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_each do
   let(:organization) { FactoryGirl.create(:organization) }
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
 
@@ -18,6 +18,16 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     it "should not have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
       expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
+    end
+
+    context "with general agency disabled" do
+      before :each do
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+      end
+      it "does not show general agency related links" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
+      end
     end
   end
 
@@ -41,6 +51,38 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
       expect(view.content_for(:horizontal_menu)).to include('multi-line')
       expect(rendered).to_not have_text(/Brokers/)
+
+    context "with individual market enabled " do
+      before do
+        allow(view).to receive(:individual_market_is_enabled?).and_return(true)
+      end
+
+      it "should have include Medicaid application" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+        expect(view.content_for(:horizontal_menu)).to include('multi-line')
+      end
+    end
+
+    context "with individual market disabled " do
+      before do
+        allow(view).to receive(:individual_market_is_enabled?).and_return(false)
+      end
+
+      it "should not include Medicaid application" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+        expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
+      end
+    end
+
+
+    context "with general agency disabled" do
+      before :each do
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+      end
+      it "does not show general agency related links" do
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
+      end
     end
   end
 end

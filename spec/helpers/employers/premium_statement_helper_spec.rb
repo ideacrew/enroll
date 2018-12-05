@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Employers::PremiumStatementHelper, :type => :helper do
 
-  describe "#billing_period_options" do
+  describe "#billing_period_options", dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
     before do
       assign(:employer_profile, employer_profile)

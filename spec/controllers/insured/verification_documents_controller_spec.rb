@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
@@ -111,7 +112,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_family)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:send_data).with('', {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
                                                                              @controller.render nothing: true # to prevent a 'missing template' error
                                                                            }
         sign_in user
@@ -122,4 +123,5 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
     end
 
   end
+end
 end

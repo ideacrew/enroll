@@ -5,10 +5,22 @@ class QhpRateBuilder
 
   def initialize
     @rates_array = []
+    @results_array = []
+    @rating_area_id_cache = {}
+    @rating_area_cache = {}
+    @premium_table_cache = Hash.new {|h, k| h[k] = Hash.new}
     @action = "new"
   end
 
+  def set_rating_area_cache
+    ::BenefitMarkets::Locations::RatingArea.all.each do |ra|
+      @rating_area_id_cache[[ra.active_year, ra.exchange_provided_code]] = ra.id
+      @rating_area_cache[ra.id] = ra
+    end
+  end
+
   def add(rates_hash, action, year)
+    set_rating_area_cache
     if year < 2018
       @rates_array = @rates_array + rates_hash[:items]
       @action = action
@@ -25,9 +37,11 @@ class QhpRateBuilder
     @rates_array.each do |rate|
       @rate = rate
       build_premium_tables
+      build_product_premium_tables
     end
     if @action == "new"
       find_plan_and_create_premium_tables
+      find_product_and_create_premium_tables
     else
       find_plan_and_update_premium_tables
     end
@@ -38,11 +52,13 @@ class QhpRateBuilder
     (20..65).each do |metlife_age|
       @metlife_age = metlife_age
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
       @results[key] << {
         age: metlife_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
-        cost: calculate_metlife_cost
+        cost: calculate_metlife_cost,
+        rating_area: rating_area
       }
     end
   end
@@ -60,13 +76,62 @@ class QhpRateBuilder
       calculate_and_build_metlife_premium_tables
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
+      rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
       @results[key] << {
         age: assign_age,
         start_on: @rate[:effective_date],
         end_on: @rate[:expiration_date],
-        cost: @rate[:primary_enrollee]
+        cost: @rate[:primary_enrollee],
+        rating_area: rating_area
       }
     end
+  end
+
+  def find_product_and_create_premium_tables
+    @results_array.uniq.each do |value|
+      hios_id, year = value.split(",")
+      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/).select{|a| a.active_year.to_s == year.to_s}
+      products.each do |product|
+        product.premium_tables = nil
+        product.save
+      end
+    end
+    @premium_table_cache.each_pair do |k, v|
+      product_hios_id, rating_area_id, applicable_range = k
+      premium_tables = []
+      premium_tuples = []
+
+      v.each_pair do |pt_age, pt_cost|
+        premium_tuples << ::BenefitMarkets::Products::PremiumTuple.new(
+          age: pt_age,
+          cost: pt_cost
+        )
+      end
+
+      premium_tables << ::BenefitMarkets::Products::PremiumTable.new(
+        effective_period: applicable_range,
+        rating_area: @rating_area_cache[rating_area_id],
+        rating_area_id: rating_area_id,
+        premium_tuples: premium_tuples
+      )
+
+      active_year = applicable_range.first.year
+      products = ::BenefitMarkets::Products::Product.where(hios_id: /#{product_hios_id}/).select{|a| a.active_year == active_year}
+      products.each do |product|
+        product.premium_tables << premium_tables
+        product.premium_ages = premium_tuples.map(&:age).minmax
+        product.save
+      end
+    end
+  end
+
+  def build_product_premium_tables
+    active_year = @rate[:effective_date].to_date.year
+    applicable_range = @rate[:effective_date].to_date..@rate[:expiration_date].to_date
+    rating_area = Settings.aca.state_abbreviation.upcase == "MA" ? @rate[:rate_area_id].gsub("Rating Area ", "R-MA00") : nil
+    rating_area_id = @rating_area_id_cache[[active_year, rating_area]]
+    @premium_table_cache[[@rate[:plan_id], rating_area_id, applicable_range]][assign_age] = @rate[:primary_enrollee]
+    @results_array << "#{@rate[:plan_id]},#{active_year}"
   end
 
   def assign_age
@@ -115,7 +180,7 @@ class QhpRateBuilder
         @plans.each do |plan|
           pts = plan.premium_tables
           premium_table_hash.each do |value|
-            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on]).first
+            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on], rating_area: value[:rating_area]).first
             pt.cost = value[:cost]
             pt.save
             print "\r#{(counter.to_f/total_premium_tables).round(1)*100}% complete" unless Rails.env.test?

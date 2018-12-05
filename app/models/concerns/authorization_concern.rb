@@ -13,6 +13,7 @@ module AuthorizationConcern
     field :authentication_token
 
     ## Recoverable
+    embeds_many :security_question_responses
     field :reset_password_token,   type: String
     field :reset_password_sent_at, type: Time
     field :identity_confirmed_token, type: String
@@ -73,6 +74,10 @@ module AuthorizationConcern
 
     def password_required?
       !persisted? || !password.nil? || !password_confirmation.nil?
+    end
+
+    def needs_to_provide_security_questions?
+      security_question_responses.length < 3
     end
 
     def password_complexity
@@ -137,9 +142,20 @@ module AuthorizationConcern
       recoverable
     end
 
+    def login_captcha_required?(login)
+      begin
+        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      rescue => e
+        true
+      end
+    end
+
     def logins_before_captcha
       4
     end
 
+    def has_answered_question? security_question_id
+       where(:'security_question_responses.security_question_id' => security_question_id).any?
+    end
   end
 end

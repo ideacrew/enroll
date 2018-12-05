@@ -9,11 +9,10 @@ class SessionIdHistory
 
   index({ session_user_id: 1})
   index({ session_id: 1})
-  
+
   class << self
     def for_user(user_id:)
       self.where(session_user_id: user_id)
     end
   end
-end 
-  
+end

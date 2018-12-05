@@ -11,10 +11,9 @@ class UserPolicy < ApplicationPolicy
     return false unless role.permission
     role.permission.can_reset_password
   end
-  
+
   def change_username_and_email?
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_view_username_and_email
   end
-
 end

@@ -1,13 +1,14 @@
 require "rails_helper"
+include Config::SiteHelper
 
 RSpec.describe Insured::PlanFilterHelper, :type => :helper do
-  context "Shows Find Your Doctor link based on market kind" do 
+  context "Shows Find Your Doctor link based on market kind" do
     it "should return link for shop" do
       @market_kind="individual"
       @coverage_kind = "health"
       expect(find_my_doctor).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_family\" href=\"\">Find Your Doctor</a>"
     end
-    
+
     it "should return link for individual" do
       @market_kind="shop"
       @coverage_kind = "health"

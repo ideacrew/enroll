@@ -45,10 +45,3 @@ describe EmployerProfilePolicy, dbclean: :after_each do
 
   end
 end
-
-
-
-
-
-
-

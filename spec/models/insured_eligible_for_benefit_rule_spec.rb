@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   let(:family) { double }
   let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
@@ -489,4 +490,5 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
 
   end
+end
 end

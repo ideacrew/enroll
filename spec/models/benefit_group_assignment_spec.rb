@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe BenefitGroupAssignment, type: :model do
+describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   it { should validate_presence_of :benefit_group_id }
   it { should validate_presence_of :start_on }
   it { should validate_presence_of :is_active }
@@ -9,6 +9,7 @@ describe BenefitGroupAssignment, type: :model do
   let(:employer_profile)  { benefit_group.plan_year.employer_profile }
   let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:start_on)          { benefit_group.plan_year.start_on }
+
 
   describe ".new" do
     let(:valid_params) do

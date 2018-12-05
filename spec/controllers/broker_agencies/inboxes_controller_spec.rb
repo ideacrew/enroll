@@ -1,9 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
+RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean: :after_each do
   let(:hbx_profile) { double(id: double("hbx_profile_id"))}
   let(:user) { double("user") }
-  let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
+  let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:employer_profile)    { benefit_sponsor.employer_profile }
+  let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+  let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+  let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
 
   describe "Get new" do
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"), inbox: double(messages: double(build: double("inbox"))))}
@@ -17,7 +22,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     end
 
     it "render new template" do
-      xhr :get, :new, :id => inbox_provider.id, profile_id: hbx_profile.id, to: "test", format: :js
+      xhr :get, :new, :id => broker_agency_profile.id.to_s, profile_id: hbx_profile.id, to: "test", format: :js
       expect(response).to render_template("new")
       expect(response).to have_http_status(:success)
     end
@@ -27,11 +32,12 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
     let(:inbox){Inbox.new}
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
     let(:valid_params){{"message"=>{"subject"=>"test", "body"=>"test", "sender_id"=>"558b63ef4741542b64290000", "from"=>"HBXAdmin", "to"=>"Acme Inc."}}}
+    let!(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
     before do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
       allow(Person).to receive(:find).and_return(inbox_provider)
-      allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
+      allow(BrokerAgencyProfile).to receive(:find).and_return(inbox_provider)
       allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
@@ -41,7 +47,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
 
     it "creates new message" do
       allow(inbox_provider.inbox).to receive(:save).and_return(true)
-      post :create, valid_params, id: inbox_provider.id, profile_id: hbx_profile.id
+      post :create, valid_params, id: "558b63ef4741542b642232323"
       expect(response).to have_http_status(:redirect)
     end
 
@@ -110,7 +116,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(user)
-      allow(BrokerAgencyProfile).to receive(:where).and_return(nil)
+      allow(BrokerAgencyProfile).to receive(:find).and_return(nil)
       allow(controller).to receive(:find_message)
       controller.instance_variable_set(:@message, message)
       allow(message).to receive(:update_attributes).and_return(true)

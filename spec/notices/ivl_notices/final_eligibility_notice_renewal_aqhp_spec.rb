@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'csv'
 
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalAqhp, :dbclean => :after_each do
 
   file = "#{Rails.root}/spec/test_data/notices/final_eligibility_notice_aqhp_test_data.csv"
@@ -127,4 +128,5 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalAqhp, :dbclean => :after
       expect(@notice.to).not_to eq dep_fam_primary.work_email_or_best
     end
   end
+end
 end

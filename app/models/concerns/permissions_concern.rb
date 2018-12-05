@@ -87,6 +87,15 @@ module PermissionsConcern
         false
       end
     end
+
+    def has_tier3_subrole?
+      hbx_staff_role = self.try(:person).try(:hbx_staff_role)
+      if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+        true
+      else
+        false
+      end
+    end
   end
 
   class_methods do
