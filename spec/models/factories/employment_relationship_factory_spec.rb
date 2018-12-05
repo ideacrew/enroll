@@ -19,7 +19,7 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
     benefit_group = predecessor_application.benefit_packages[0]
     renewing_benefit_group = benefit_package
 
-    census_employee = FactoryGirl.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile:benefit_sponsorship.profile, benefit_group: renewing_benefit_group, dob: TimeKeeper.date_of_record - 30.years, hired_on: Date.today.end_of_year.next_day)
+    census_employee = FactoryGirl.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile:benefit_sponsorship.profile, benefit_group: renewing_benefit_group, dob: TimeKeeper.date_of_record - 30.years, hired_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month)
 
     employer_profile.census_employees.each do |ce|
       ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
