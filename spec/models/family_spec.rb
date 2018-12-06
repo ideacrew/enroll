@@ -1,5 +1,28 @@
 require 'rails_helper'
 
+describe "when outstanding member and effective enrollment is present", dbclean: :after_each do
+  let(:person10)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:family10)                    { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person10) }
+  let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected", household: family10.active_household, kind: "individual") }
+  let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+  let(:active_year)               {TimeKeeper.date_of_record.year}
+  before :each do
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+  it "should include family with outstanding family member and enrollend or enrolling enrollments" do  
+    person10.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person10.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    person10.reload
+    family10.reload
+    expect(Family.by_enrollment_individual_market.all_enrolled_and_enrolling_enrollments.size).to be(1)
+  end  
+end
+
 describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
@@ -329,7 +352,7 @@ describe Family, type: :model, dbclean: :after_each do
 
 end
 
-describe Family do
+describe Family, dbclean: :after_each do
   let(:family) { Family.new }
 
   describe "with no special enrollment periods" do
@@ -1377,7 +1400,7 @@ describe "min_verification_due_date", dbclean: :after_each do
   end
 end
 
-describe "#all_persons_vlp_documents_status" do
+describe "#all_persons_vlp_documents_status", dbclean: :after_each do
 
   context "vlp documents status for single family member" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -1494,3 +1517,5 @@ describe "active dependents" do
     expect(family.active_dependents.count).to eq 1
   end
 end
+
+
