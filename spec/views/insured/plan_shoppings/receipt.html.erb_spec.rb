@@ -22,7 +22,8 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       coverage_kind: 'health',
       hbx_id: "3939393",
       is_shop?: true,
-      employee_role: double("EmployeeRole")
+      employee_role: double("EmployeeRole"),
+      composite_rated?: true
     )
   end
 
@@ -38,32 +39,40 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   def new_plan
     double(
       "Plan",
-      name: "My Silly Plan",
-      carrier_profile: carrier_profile,
+      title: "My Silly Plan",
+      name: "plan name"
     )
   end
 
   def plan_cost_decorator
     double(
       "PlanCostDecorator",
-      name: new_plan.name,
+      title: new_plan.title,
       premium_for: double("premium_for"),
       employer_contribution_for: double("employer_contribution_for"),
       employee_cost_for: double("employee_cost_for"),
       total_premium: double("total_premium"),
       total_employer_contribution: double("total_employer_contribution"),
       total_employee_cost: double("total_employee_cost"),
-      carrier_profile: double(legal_name: "carefirst"),
+      issuer_profile: double(legal_name: "carefirst"),
       metal_level: "Silver",
-      coverage_kind: "health"
+      coverage_kind: "health",
+      kind: "health",
+      name: new_plan.name,
+      metal_level_kind: ''
     )
   end
 
   let(:members) { [new_member, new_member] }
   let(:carrier_profile){ double("CarrierProfile", legal_name: "my legal name") }
 
+  let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:'',product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
+  let(:group_enrollment) {double(member_enrollments:[member_enrollment], product_cost_total:0.0,sponsor_contribution_total:0.0, employee_cost_total:0.0)}
+  let(:member_group) {double(group_enrollment:group_enrollment)}
+
   before :each do
     assign :enrollment, enrollment
+    assign :member_group, member_group
     @plan = plan_cost_decorator
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     allow(view).to receive(:show_pay_now?).and_return false

@@ -1,16 +1,33 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe "_waived_coverage_widget.html.erb" do
+RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
 
-  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
-  let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-  let(:family) { FactoryGirl.build_stubbed(:family, person: person) }
-  let(:person) { FactoryGirl.build_stubbed(:person) }
-  let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+  
+  let(:person) {FactoryGirl.create(:person)}
+  let(:family){ FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
+  let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
+  let(:household){ family.active_household }
+  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                           household: household,
+                                           hbx_enrollment_members: [hbx_enrollment_member],
+                                           coverage_kind: "health",
+                                           external_enrollment: false,
+                                           sponsored_benefit_id: sponsored_benefit.id,
+                                           rating_area_id: rating_area.id)
+  }
+  let(:benefit_group) { current_benefit_package }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+  let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
+  let!(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
 
   before :each do
     assign(:person, person)
-    allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+    allow(hbx_enrollment).to receive(:employer_profile).and_return(abc_profile)
   end
   # Added in the case of @person not persent
   context 'a person object not passed to widget' do
@@ -41,7 +58,7 @@ RSpec.describe "_waived_coverage_widget.html.erb" do
     end
 
     it "should display employer profiles legal name" do
-      expect(rendered).to match(employer_profile.legal_name)
+      expect(rendered).to match(abc_profile.legal_name)
     end
 
     it "should display make changes button" do

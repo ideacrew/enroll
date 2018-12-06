@@ -1,6 +1,8 @@
+require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
+
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
-  let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:site)                    { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
   let(:benefit_market)          { site.benefit_markets.first }
   let(:rating_area)             { create_default(:benefit_markets_locations_rating_area) }
   # let(:benefit_market)          { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
@@ -41,14 +43,14 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
           renewal_service_area: renewal_service_area, 
           metal_level_kind: :dental) }
 
-  let!(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let!(:current_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
 
-  let!(:renewal_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
+  let!(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
     benefit_market: benefit_market,
     product_kinds: product_kinds,
     title: "SHOP Benefits for #{renewal_effective_date.year}",
@@ -70,10 +72,5 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
         end
       end
     end
-  end
-
-  it "should create valid benefit market catalogs" do
-    expect(current_benefit_market_catalog).to be_valid
-    expect(renewal_benefit_market_catalog).to be_valid
   end
 end

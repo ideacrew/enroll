@@ -6,7 +6,6 @@ class Insured::PlanShoppingsController < ApplicationController
   include ActionView::Context
   include Acapi::Notifiers
   extend Acapi::Notifiers
-  include ApplicationHelper
   include Aptc
 
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]

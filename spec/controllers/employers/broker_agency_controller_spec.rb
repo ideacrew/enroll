@@ -106,12 +106,12 @@ RSpec.describe Employers::BrokerAgencyController do
     context 'with out search string - with modify_employer permission' do
       before(:each) do
         allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+        allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
         sign_in(@user)
         post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
       end
 
       it "should be a success" do
-        post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
         expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
       end
@@ -209,6 +209,7 @@ RSpec.describe Employers::BrokerAgencyController do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     before (:each) do
           allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
+          allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
           sign_in(@user)
           @employer_profile.plan_years=[]
           invalid_plan=FactoryGirl.build(:plan_year, open_enrollment_end_on: Date.today)

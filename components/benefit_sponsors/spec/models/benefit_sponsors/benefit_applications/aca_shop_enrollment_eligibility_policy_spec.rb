@@ -6,7 +6,7 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    include_context "setup employees"
+    include_context "setup employees with benefits"
 
     let!(:subject) {BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new}
     let!(:benefit_application) {initial_application}
@@ -176,9 +176,15 @@ module BenefitSponsors
         end
         }
 
+        # For 1/1 effective date minimum participation rule does not apply
+        # 1+ non-owner rule does apply
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
-          expect(policy.is_satisfied?(benefit_application)).to eq false
+          if benefit_application.start_on.yday == 1
+            expect(policy.is_satisfied?(benefit_application)).to eq true
+          else
+            expect(policy.is_satisfied?(benefit_application)).to eq false
+          end
         end
       end
     end

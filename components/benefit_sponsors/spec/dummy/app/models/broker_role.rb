@@ -69,6 +69,14 @@ class BrokerRole
   def parent
     self.person
   end
+
+  def phone
+    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+  end
+
+  def email
+    parent.emails.detect { |email| email.kind == "work" }
+  end
   
   class << self
     def find(id)
