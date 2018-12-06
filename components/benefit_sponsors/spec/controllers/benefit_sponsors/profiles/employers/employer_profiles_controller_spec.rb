@@ -68,7 +68,7 @@ module BenefitSponsors
         benefit_sponsorship.save!
         allow(controller).to receive(:authorize).and_return(true)
         sign_in user
-        get :coverage_reports, employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month
+        get :coverage_reports, employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime("%m/%d/%Y")
         allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
       end
 

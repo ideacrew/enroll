@@ -1,4 +1,6 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
@@ -117,16 +119,21 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
 
-  describe "#enrollment_progress_bar" do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
+  describe "#enrollment_progress_bar", :dbclean => :after_each  do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application" do
+      let(:aasm_state) { :enrollment_open }
+    end
+
+    let!(:employer_profile)    { abc_profile }
+    let!(:plan_year) { initial_application }
 
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
     context ">200 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      let!(:census_employees) { create_list(:census_employee, 201, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
       context "greater than 200 employees " do
         context "active employees count greater than 200" do
           it "does not display if active census employees > 200" do
@@ -137,7 +144,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
         context "active employees count greater than 200" do
 
           before do
-            employees.take(5).each do |census_employee|
+            census_employees.take(5).each do |census_employee|
               census_employee.terminate_employee_role!
             end
           end

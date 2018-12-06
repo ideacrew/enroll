@@ -23,11 +23,12 @@ module BenefitSponsors
           expect(profile.billing_benefit_application(date)).to eq [nil, date]
         end
       end
+
       context "when billing date is blank" do
         context "For initial employer" do
           it "should return initial published application effective date & initial start on date" do
             application
-            expect(profile.billing_benefit_application).to eq [application, application.start_on.to_date]
+            expect(profile.billing_benefit_application).to eq [application, TimeKeeper.date_of_record.next_month]
           end
         end
 
@@ -39,9 +40,10 @@ module BenefitSponsors
           )}
 
           let(:renewal_application) { application.successors.first }
+
           it "should return renewal published application effective date & renewal start on date" do
             renewal_application
-            expect(profile.billing_benefit_application).to eq [renewal_application, renewal_application.start_on.to_date]
+            expect(profile.billing_benefit_application).to eq [renewal_application, TimeKeeper.date_of_record.next_month]
           end
         end
       end
