@@ -6,6 +6,7 @@ class User
   include Mongoid::Timestamps
 
   attr_accessor :login
+  include PermissionsConcern
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable

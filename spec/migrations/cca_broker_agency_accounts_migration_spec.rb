@@ -22,11 +22,6 @@ describe "CcaBrokerAgencyAccountsMigration" do
   end
 
   describe ".up" do
-    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)}
-    let!(:benefit_market) {FactoryGirl.create(:benefit_markets_benefit_market)}
-    let!(:site_assign) {site.benefit_markets << benefit_market}
-    let!(:saved) {site.save!}
-
 
     before :all do
 
@@ -44,11 +39,11 @@ describe "CcaBrokerAgencyAccountsMigration" do
 
       employer_profile = FactoryGirl.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
       employer_profile.organization.created_at = TimeKeeper.date_of_record - 2.year
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id, benefit_sponsor_employer_profile_id: "12456")
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
 
       employer_profile2 = FactoryGirl.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
       employer_profile2.organization.created_at = TimeKeeper.date_of_record - 2.year
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile2.id, benefit_sponsor_employer_profile_id: "12457")
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile2.id)
 
 
       FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
@@ -69,6 +64,12 @@ describe "CcaBrokerAgencyAccountsMigration" do
       FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 2.year + 1.day, end_on: TimeKeeper.date_of_record - 1.year - 6.months, writing_agent: broker_role3, is_active: false)
 
+      site = BenefitSponsors::Site.all.first
+      benefit_market = FactoryGirl.create(:benefit_markets_benefit_market)
+      site.benefit_markets << benefit_market
+      site.save!
+
+      BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
       @orgs_with_emp_profile = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_orgs_with_emp_profile = Organization.all_employer_profiles
 

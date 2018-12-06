@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
-
-  let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_package) }
+  let(:benefit_sponsorship) {  FactoryGirl.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application }
+  let!(:benefit_application) { benefit_sponsorship.benefit_applications.first }
   let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product,issuer_profile: issuer_profile) }
   let(:census_employee) { FactoryGirl.build(:census_employee, :benefit_group_assignments => [FactoryGirl.build(:benefit_group_assignment)]) }

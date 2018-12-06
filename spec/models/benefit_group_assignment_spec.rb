@@ -1,21 +1,23 @@
 require 'rails_helper'
 
 describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
-  it { should validate_presence_of :benefit_group_id }
+  it { should validate_presence_of :benefit_package_id }
   it { should validate_presence_of :start_on }
   it { should validate_presence_of :is_active }
-
-  let(:benefit_group)     { FactoryGirl.create(:benefit_group)  }
-  let(:employer_profile)  { benefit_group.plan_year.employer_profile }
+  let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
+  let(:employer_profile)      {  benefit_sponsorship.profile }
+  let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
   let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:start_on)          { benefit_group.plan_year.start_on }
+  let(:start_on)          { benefit_package.start_on }
 
 
   describe ".new" do
     let(:valid_params) do
       {
         census_employee: census_employee,
-        benefit_group: benefit_group,
+        benefit_package: benefit_package,
         start_on: start_on
       }
     end
@@ -37,10 +39,10 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     end
 
     context "with no benefit group" do
-      let(:params) {valid_params.except(:benefit_group)}
+      let(:params) {valid_params.except(:benefit_package)}
 
       it "should be invalid" do
-        expect(BenefitGroupAssignment.create(**params).errors[:benefit_group_id].any?).to be_truthy
+        expect(BenefitGroupAssignment.create(**params).errors[:benefit_package_id].any?).to be_truthy
       end
     end
 
@@ -57,7 +59,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
 
       context "start too early" do
-        before { benefit_group_assignment.start_on = benefit_group.plan_year.start_on - 1.day }
+        before { benefit_group_assignment.start_on = benefit_package.plan_year.start_on - 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -67,7 +69,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "start too late" do
-        before { benefit_group_assignment.start_on = benefit_group.plan_year.end_on + 1.day }
+        before { benefit_group_assignment.start_on = benefit_package.plan_year.end_on + 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -77,7 +79,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "end too early" do
-        before { benefit_group_assignment.end_on = benefit_group.plan_year.start_on - 1.day }
+        before { benefit_group_assignment.end_on = benefit_package.plan_year.start_on - 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -87,7 +89,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "end too late" do
-        before { benefit_group_assignment.end_on = benefit_group.plan_year.end_on + 1.day }
+        before { benefit_group_assignment.end_on = benefit_package.plan_year.end_on + 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -103,8 +105,8 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
       context "start and end timely" do
         before do
-          benefit_group_assignment.start_on = benefit_group.plan_year.start_on
-          benefit_group_assignment.end_on   = benefit_group.plan_year.end_on
+          benefit_group_assignment.start_on = benefit_package.plan_year.start_on
+          benefit_group_assignment.end_on   = benefit_package.plan_year.end_on
         end
 
         it "should be valid" do
@@ -162,7 +164,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
           context "with an associated, matching hbx_enrollment" do
             let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
-            let(:hbx_enrollment)  { HbxEnrollment.new(benefit_group: benefit_group, employee_role: census_employee.employee_role ) }
+            let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role ) }
 
             before { benefit_group_assignment.hbx_enrollment = hbx_enrollment }
 
@@ -171,13 +173,16 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
             end
 
             context "and hbx_enrollment is non-matching" do
-              let(:other_benefit_group)     { FactoryGirl.build(:benefit_group) }
-              let(:other_plan_year)         { FactoryGirl.build(:plan_year, benefit_group: benefit_group) }
-              let(:other_employer_profile)  { FactoryGirl.create(:employer_profile, plan_year: plan_year) }
-              let(:other_employee_role)     { FactoryGirl.create(:employee_role, employer_profile: employer_profile) }
+
+              let(:benefit_sponsor2)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+              let(:benefit_sponsorship2)    { benefit_sponsor2.active_benefit_sponsorship }
+              let(:other_employer_profile)      {  benefit_sponsorship2.profile }
+              let!(:other_benefit_application) { benefit_sponsorship2.benefit_applications.first}
+              let!(:other_benefit_package) { benefit_sponsorship2.benefit_applications.first.benefit_packages.first}
+              let(:other_employee_role)     { FactoryGirl.create(:employee_role, employer_profile: employer_profile2) }
 
               context "because it has different benefit group" do
-                before { hbx_enrollment.benefit_group = other_benefit_group }
+                before { hbx_enrollment.sponsored_benefit_package = other_benefit_package }
 
                 it "should be invalid" do
                   expect(benefit_group_assignment.valid?).to be_falsey
@@ -246,11 +251,12 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
     let(:household) { FactoryGirl.create(:household, family: family)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
 
     shared_examples_for "active and waived enrollments" do |state, status, result|
 
       let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: household,
-                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, 
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                           aasm_state: state
                           )}
 

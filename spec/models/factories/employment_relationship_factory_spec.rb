@@ -1,19 +1,25 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application" do
+    let(:renewal_state) { :enrollment_open }
+  end
 
   let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:organization) {
-    org = FactoryGirl.create :organization, legal_name: "Corp 1"
+    org = abc_organization
     TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
-    employer_profile = FactoryGirl.create :employer_profile, organization: org
-    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
-    :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
-    renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
-    :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
-    benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year, effective_on_kind: "date_of_hire"
-    renewing_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year
-    census_employee = FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years, hired_on: Date.new(calendar_year, 3, 12)
+    employer_profile = abc_profile
+    active_plan_year = predecessor_application
+    renewing_plan_year = renewal_application
+
+    benefit_group = predecessor_application.benefit_packages[0]
+    renewing_benefit_group = benefit_package
+
+    census_employee = FactoryGirl.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile:benefit_sponsorship.profile, benefit_group: renewing_benefit_group, dob: TimeKeeper.date_of_record - 30.years, hired_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month)
 
     employer_profile.census_employees.each do |ce|
       ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
@@ -32,7 +38,7 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
     person = census_employee.employee_role.person
     employee_candidate = Forms::EmployeeCandidate.new(user_id: person.id)
     employment_relationship = Factories::EmploymentRelationshipFactory.new
-    employmentrelationship = employment_relationship.build(employee_candidate, census_employee)
+    employmentrelationship = employment_relationship.build(employee_candidate, census_employee)    
     expect(employmentrelationship.eligible_for_coverage_on).to eq census_employee.hired_on
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end

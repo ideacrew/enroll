@@ -52,15 +52,17 @@ module BenefitSponsors
       end
 
       def finalize_hbx_enrollment_members
-        member_group = @renewal_enrollment.as_shop_member_group
-        member_group = member_group.clone_for_coverage(@renewal_enrollment.product)
+        if @renewal_enrollment.hbx_enrollment_members.present?
+          member_group = @renewal_enrollment.as_shop_member_group
+          member_group = member_group.clone_for_coverage(@renewal_enrollment.product)
 
-        optimizer    = BenefitSponsors::SponsoredBenefits::RosterEligibilityOptimizer.new(@sponsored_benefit.contribution_model)
-        member_group = optimizer.optimal_group_for(member_group, @sponsored_benefit)
+          optimizer    = BenefitSponsors::SponsoredBenefits::RosterEligibilityOptimizer.new(@sponsored_benefit.contribution_model)
+          member_group = optimizer.optimal_group_for(member_group, @sponsored_benefit)
 
-        eligible_member_ids = member_group.members.map(&:member_id) 
-        @renewal_enrollment.hbx_enrollment_members = @renewal_enrollment.hbx_enrollment_members.select do |member|
-          eligible_member_ids.include?(member.id)
+          eligible_member_ids = member_group.members.map(&:member_id) 
+          @renewal_enrollment.hbx_enrollment_members = @renewal_enrollment.hbx_enrollment_members.select do |member|
+            eligible_member_ids.include?(member.id)
+          end
         end
       end 
 
