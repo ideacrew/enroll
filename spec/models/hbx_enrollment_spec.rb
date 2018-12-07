@@ -112,8 +112,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       expect{hbx_enrollment100.is_any_enrollment_member_outstanding}.not_to raise_error
     end
   end
-end
-
 
   describe HbxEnrollment, dbclean: :after_each do
 
@@ -1326,58 +1324,57 @@ end
       end
     end
   end
-end
 
-describe HbxEnrollment, "given a set of broker accounts", dbclean: :after_each do
-  let(:submitted_at) {Time.mktime(2008, 12, 13, 12, 34, 00)}
-  subject {HbxEnrollment.new(:submitted_at => submitted_at)}
-  let(:broker_agency_account_1) {double(:start_on => start_on_1, :end_on => end_on_1)}
-  let(:broker_agency_account_2) {double(:start_on => start_on_2, :end_on => end_on_2)}
+  describe HbxEnrollment, "given a set of broker accounts", dbclean: :after_each do
+    let(:submitted_at) {Time.mktime(2008, 12, 13, 12, 34, 00)}
+    subject {HbxEnrollment.new(:submitted_at => submitted_at)}
+    let(:broker_agency_account_1) {double(:start_on => start_on_1, :end_on => end_on_1)}
+    let(:broker_agency_account_2) {double(:start_on => start_on_2, :end_on => end_on_2)}
 
-  describe "with both accounts active before the purchase, and the second one unterminated" do
-    let(:start_on_1) {submitted_at - 12.days}
-    let(:start_on_2) {submitted_at - 5.days}
-    let(:end_on_1) {nil}
-    let(:end_on_2) {nil}
+    describe "with both accounts active before the purchase, and the second one unterminated" do
+      let(:start_on_1) {submitted_at - 12.days}
+      let(:start_on_2) {submitted_at - 5.days}
+      let(:end_on_1) {nil}
+      let(:end_on_2) {nil}
 
-    it "should be able to select the applicable broker" do
-      expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_2
+      it "should be able to select the applicable broker" do
+        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_2
+      end
+    end
+
+    describe "with both accounts active before the purchase, and the later one terminated" do
+      let(:start_on_1) {submitted_at - 12.days}
+      let(:start_on_2) {submitted_at - 5.days}
+      let(:end_on_1) {nil}
+      let(:end_on_2) {submitted_at - 2.days}
+
+      it "should have no applicable broker" do
+        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
+      end
+    end
+
+    describe "with one account active before the purchase, and the other active after" do
+      let(:start_on_1) {submitted_at - 12.days}
+      let(:start_on_2) {submitted_at + 5.days}
+      let(:end_on_1) {nil}
+      let(:end_on_2) {nil}
+
+      it "should be able to select the applicable broker" do
+        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_1
+      end
+    end
+
+    describe "with one account active before the purchase and terminated before the purchase, and the other active after" do
+      let(:start_on_1) {submitted_at - 12.days}
+      let(:start_on_2) {submitted_at + 5.days}
+      let(:end_on_1) {submitted_at - 3.days}
+      let(:end_on_2) {nil}
+
+      it "should have no applicable broker" do
+        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
+      end
     end
   end
-
-  describe "with both accounts active before the purchase, and the later one terminated" do
-    let(:start_on_1) {submitted_at - 12.days}
-    let(:start_on_2) {submitted_at - 5.days}
-    let(:end_on_1) {nil}
-    let(:end_on_2) {submitted_at - 2.days}
-
-    it "should have no applicable broker" do
-      expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
-    end
-  end
-
-  describe "with one account active before the purchase, and the other active after" do
-    let(:start_on_1) {submitted_at - 12.days}
-    let(:start_on_2) {submitted_at + 5.days}
-    let(:end_on_1) {nil}
-    let(:end_on_2) {nil}
-
-    it "should be able to select the applicable broker" do
-      expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_1
-    end
-  end
-
-  describe "with one account active before the purchase and terminated before the purchase, and the other active after" do
-    let(:start_on_1) {submitted_at - 12.days}
-    let(:start_on_2) {submitted_at + 5.days}
-    let(:end_on_1) {submitted_at - 3.days}
-    let(:end_on_2) {nil}
-
-    it "should have no applicable broker" do
-      expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
-    end
-  end
-end
 
 # describe HbxEnrollment, "#save", type: :model do
 #
@@ -2366,68 +2363,69 @@ end
   end
 
   describe HbxEnrollment, 'state machine', dbclean: :after_each do
-    let(:family) {FactoryGirl.build(:individual_market_family)}
-    subject {FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+      let(:family) {FactoryGirl.build(:individual_market_family)}
+      subject {FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
 
-    events = [:move_to_enrolled, :move_to_pending]
+      events = [:move_to_enrolled, :move_to_pending]
 
-    shared_examples_for "state machine transitions" do |current_state, new_state, event|
-      it "transition #{current_state} to #{new_state} on #{event} event" do
-        expect(subject).to transition_from(current_state).to(new_state).on_event(event)
+      shared_examples_for "state machine transitions" do |current_state, new_state, event|
+        it "transition #{current_state} to #{new_state} on #{event} event" do
+          expect(subject).to transition_from(current_state).to(new_state).on_event(event)
+        end
       end
-    end
 
-  context "move_to_enrolled event" do
-    it_behaves_like "state machine transitions", :unverified, :coverage_selected, :move_to_enrolled
-  end
+        context "move_to_enrolled event" do
+          it_behaves_like "state machine transitions", :unverified, :coverage_selected, :move_to_enrolled
+        end
 
-  context "move_to_pending event" do
-    it_behaves_like "state machine transitions", :shopping, :unverified, :move_to_pending!
-    it_behaves_like "state machine transitions", :coverage_selected, :unverified, :move_to_pending!
-    it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
-    it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
+        context "move_to_pending event" do
+          it_behaves_like "state machine transitions", :shopping, :unverified, :move_to_pending!
+          it_behaves_like "state machine transitions", :coverage_selected, :unverified, :move_to_pending!
+          it_behaves_like "state machine transitions", :coverage_enrolled, :unverified, :move_to_pending!
+          it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
+        end
   end
 
   describe HbxEnrollment, 'validate_for_cobra_eligiblity', dbclean: :after_each do
 
     context 'When employee is designated as cobra' do
-    let(:effective_on) {TimeKeeper.date_of_record.beginning_of_month}
-    let(:cobra_begin_date) {TimeKeeper.date_of_record.next_month.beginning_of_month}
-    let(:hbx_enrollment) {HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on)}
-    let(:employee_role) {double(is_cobra_status?: true, census_employee: census_employee)}
-    let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
-    let(:user100) { FactoryGirl.create(:user, person: person100) }
-    let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
+      let(:effective_on) {TimeKeeper.date_of_record.beginning_of_month}
+      let(:cobra_begin_date) {TimeKeeper.date_of_record.next_month.beginning_of_month}
+      let(:hbx_enrollment) {HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on)}
+      let(:employee_role) {double(is_cobra_status?: true, census_employee: census_employee)}
+      let(:person100) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+      let(:user100) { FactoryGirl.create(:user, person: person100) }
+      let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
 
-      before do
-        allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
-      end
-
-      context 'When Enrollment Effectve date is prior to cobra begin date' do
-        it 'should reset enrollment effective date to cobra begin date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
-          expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
-          expect(hbx_enrollment.effective_on).to eq cobra_begin_date
+        before do
+          allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
         end
-      end
 
-      context 'When Enrollment Effectve date is after cobra begin date' do
-        let(:cobra_begin_date) {TimeKeeper.date_of_record.prev_month.beginning_of_month}
-
-        it 'should not update enrollment effective date' do
-          hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
-          expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
-          expect(hbx_enrollment.effective_on).to eq effective_on
+        context 'When Enrollment Effectve date is prior to cobra begin date' do
+          it 'should reset enrollment effective date to cobra begin date' do
+            hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
+            expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+            expect(hbx_enrollment.effective_on).to eq cobra_begin_date
+          end
         end
-      end
 
-      context 'When employee not elgibile for cobra' do
-        let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day)}
+        context 'When Enrollment Effectve date is after cobra begin date' do
+          let(:cobra_begin_date) {TimeKeeper.date_of_record.prev_month.beginning_of_month}
 
-        it 'should raise error' do
-          expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+          it 'should not update enrollment effective date' do
+            hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)
+            expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+            expect(hbx_enrollment.effective_on).to eq effective_on
+          end
         end
-      end
+
+        context 'When employee not elgibile for cobra' do
+          let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day)}
+
+          it 'should raise error' do
+            expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+          end
+        end
     end
   end
 
@@ -2622,316 +2620,317 @@ end
     #   end
     # end
 
-describe HbxEnrollment, type: :model, :dbclean => :after_each do
-  let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+  describe HbxEnrollment, type: :model, :dbclean => :after_each do
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
 
-  include_context "setup benefit market with market catalogs and product packages" do
-    let(:product_kinds)  { [:health, :dental] }
+    include_context "setup benefit market with market catalogs and product packages" do
+      let(:product_kinds)  { [:health, :dental] }
+    end
+
+    include_context "setup initial benefit application" do
+      let(:dental_sponsored_benefit) { true }
+    end
+
+    describe ".renew_benefit" do
+      describe "given an renewing employer just entered open enrollment" do
+        describe "with employees who have made the following plan selections previous year:
+          - employee A has purchased:
+            - One health enrollment (Enrollment 1)         
+            - One dental enrollment (Enrollment 2)
+          - employee B has purchased:
+            - One health enrollment (Enrollment 3)
+            - One dental waiver (Enrollment 4)
+          - employee C has purchased:
+            - One health waiver (Enrollment 5)
+            - One dental enrollment (Enrollment 6)
+          - employee D has purchased:
+            - One health waiver (Enrollment 7)
+            - One dental waiver (Enrollment 8)
+          - employee E has none
+        " do
+
+
+          let(:census_employees) {
+            create_list(:census_employee, 5, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+          }
+
+          let(:employee_A) {
+            ce = census_employees[0]
+            create_person(ce, abc_profile)
+          }
+
+          let!(:enrollment_1) {
+            create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
+              submitted_at: current_effective_date - 10.days)
+          }
+
+          let!(:enrollment_2) {
+            create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A, 
+              submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
+          }
+
+          let(:employee_B) {
+            ce = census_employees[1]
+            create_person(ce, abc_profile)
+          }
+
+          let!(:enrollment_3) {
+            create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B,
+              submitted_at: current_effective_date - 10.days)
+          }
+
+          let!(:enrollment_4) {
+            create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B, 
+              submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
+          }
+
+          let(:employee_C) {
+            ce = census_employees[2]
+            create_person(ce, abc_profile)
+          }
+
+          let!(:enrollment_5) {
+            create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C,
+              submitted_at: current_effective_date - 10.days, status: 'inactive')
+          }
+
+          let!(:enrollment_6) {
+            create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, 
+              submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
+          }
+
+          let(:employee_D) {
+            ce = census_employees[3]
+            create_person(ce, abc_profile)
+          }
+
+          let!(:enrollment_7) {
+            create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D,
+              submitted_at: current_effective_date - 10.days, status: 'inactive')
+          }
+
+          let!(:enrollment_8) {
+            create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, 
+              submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
+          }
+
+          let!(:employee_E) {
+            ce = census_employees[3]
+            create_person(ce, abc_profile)
+          }
+
+          let(:renewal_application) { 
+            renewal_effective_date = current_effective_date.next_year
+            service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
+            benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
+            r_application = initial_application.renew(benefit_sponsor_catalog)
+            r_application.save
+            r_application
+          }
+
+          let(:renewal_benefit_package) {
+            renewal_application.benefit_packages[0]
+          }
+
+          before do 
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+            renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
+              allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
+            end
+            renewal_application
+          end
+
+          context 'renewing employee A' do 
+
+            before do
+              renewal_benefit_package.renew_member_benefit(census_employees[0])
+              family.reload
+            end
+
+            let(:family) { employee_A.person.primary_family }
+            let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
+            let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
+
+            it 'does renew both health and dental enrollment' do
+              expect(health_renewals.size).to eq 1
+              expect(health_renewals[0].product).to eq enrollment_1.product.renewal_product
+              expect(dental_renewals.size).to eq 1
+              expect(dental_renewals[0].product).to eq enrollment_2.product.renewal_product
+            end
+          end
+
+          context 'renewing employee B' do 
+
+            before do
+              renewal_benefit_package.renew_member_benefit(census_employees[1])
+              family.reload
+            end
+
+            let(:family) { employee_B.person.primary_family }
+            let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
+            let(:dental_renewals) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
+
+            it 'does renew health coverage and waive dental coverage' do
+              expect(health_renewals.size).to eq 1
+              expect(health_renewals[0].product).to eq enrollment_3.product.renewal_product
+              expect(dental_renewals.size).to eq 1
+            end
+          end
+
+          context 'renewing employee C' do
+
+            before do
+              renewal_benefit_package.renew_member_benefit(census_employees[2])
+              family.reload
+            end
+
+            let(:family) { employee_C.person.primary_family }
+            let(:health_renewals) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
+            let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
+
+            it 'does renew health coverage and waive dental coverage' do
+              expect(health_renewals.size).to eq 1
+              expect(dental_renewals.size).to eq 1
+              expect(dental_renewals[0].product).to eq enrollment_6.product.renewal_product
+            end
+          end
+
+          context 'renewing employee D' do 
+
+            before do
+              renewal_benefit_package.renew_member_benefit(census_employees[3])
+              family.reload
+            end
+
+            let(:family) { employee_D.person.primary_family }
+            let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
+            let(:health_waivers) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
+            let(:dental_waivers) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
+
+            it 'does renew health coverage and waive dental coverage' do
+              expect(passive_renewals).to be_empty
+              expect(health_waivers.size).to eq 1
+              expect(dental_waivers.size).to eq 1
+            end
+          end
+
+          context 'renewing employee E' do
+           
+            before do
+              renewal_benefit_package.renew_member_benefit(census_employees[4])
+              family.reload
+            end
+
+            let(:family) { employee_E.person.primary_family }
+            let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
+            let(:passive_waivers) { family.active_household.hbx_enrollments.select{|en| en.renewing_waived?} }
+
+            it 'does renew health coverage and waive dental coverage' do
+              expect(passive_renewals).to be_empty
+              expect(passive_waivers).to be_empty
+            end
+          end
+
+          def create_person(ce, employer_profile)
+            person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+            employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+            ce.update_attributes!({employee_role_id: employee_role.id})
+            Family.find_or_build_from_employee_role(employee_role)
+            employee_role
+          end
+
+          def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health')
+            benefit_package = benefit_group_assignment.benefit_package
+            sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind.to_sym)
+            FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+              enrollment_members: [family.primary_applicant],
+              household: family.active_household,
+              coverage_kind: coverage_kind,
+              effective_on: benefit_package.start_on,
+              enrollment_kind: enrollment_kind,
+              kind: "employer_sponsored",
+              submitted_at: submitted_at,
+              employee_role_id: employee_role.id,
+              benefit_sponsorship: benefit_package.benefit_sponsorship,
+              sponsored_benefit_package: benefit_package,
+              sponsored_benefit: sponsored_benefit,
+              benefit_group_assignment_id: benefit_group_assignment.id,
+              product: sponsored_benefit.reference_product,
+              aasm_state: status
+              )
+          end
+        end
+      end
+    end
+
+    describe "#notify_enrollment_cancel_or_termination_event" do
+      let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
+      let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+
+      it "should notify event" do
+        expect(hbx_enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => true})
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(true)
+      end
+
+      it "should not notify event" do
+        expect(hbx_enrollment).to receive(:notify).exactly(0).times
+        hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
+      end
+    end
   end
 
-  include_context "setup initial benefit application" do
-    let(:dental_sponsored_benefit) { true }
-  end
+  describe HbxEnrollment, dbclean: :after_all do
+    let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+    let!(:plan100) { FactoryGirl.create(:plan) }
 
-  describe ".renew_benefit" do
-    describe "given an renewing employer just entered open enrollment" do
-      describe "with employees who have made the following plan selections previous year:
-        - employee A has purchased:
-          - One health enrollment (Enrollment 1)         
-          - One dental enrollment (Enrollment 2)
-        - employee B has purchased:
-          - One health enrollment (Enrollment 3)
-          - One dental waiver (Enrollment 4)
-        - employee C has purchased:
-          - One health waiver (Enrollment 5)
-          - One dental enrollment (Enrollment 6)
-        - employee D has purchased:
-          - One health waiver (Enrollment 7)
-          - One dental waiver (Enrollment 8)
-        - employee E has none
-      " do
-
-
-        let(:census_employees) {
-          create_list(:census_employee, 5, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-        }
-
-        let(:employee_A) {
-          ce = census_employees[0]
-          create_person(ce, abc_profile)
-        }
-
-        let!(:enrollment_1) {
-          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
-            submitted_at: current_effective_date - 10.days)
-        }
-
-        let!(:enrollment_2) {
-          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A, 
-            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
-        }
-
-        let(:employee_B) {
-          ce = census_employees[1]
-          create_person(ce, abc_profile)
-        }
-
-        let!(:enrollment_3) {
-          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B,
-            submitted_at: current_effective_date - 10.days)
-        }
-
-        let!(:enrollment_4) {
-          create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment, employee_role: employee_B, 
-            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
-        }
-
-        let(:employee_C) {
-          ce = census_employees[2]
-          create_person(ce, abc_profile)
-        }
-
-        let!(:enrollment_5) {
-          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C,
-            submitted_at: current_effective_date - 10.days, status: 'inactive')
-        }
-
-        let!(:enrollment_6) {
-          create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, 
-            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental')
-        }
-
-        let(:employee_D) {
-          ce = census_employees[3]
-          create_person(ce, abc_profile)
-        }
-
-        let!(:enrollment_7) {
-          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D,
-            submitted_at: current_effective_date - 10.days, status: 'inactive')
-        }
-
-        let!(:enrollment_8) {
-          create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, 
-            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
-        }
-
-        let!(:employee_E) {
-          ce = census_employees[3]
-          create_person(ce, abc_profile)
-        }
-
-        let(:renewal_application) { 
-          renewal_effective_date = current_effective_date.next_year
-          service_areas = initial_application.benefit_sponsorship.service_areas_on(renewal_effective_date)
-          benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, renewal_effective_date)
-          r_application = initial_application.renew(benefit_sponsor_catalog)
-          r_application.save
-          r_application
-        }
-
-        let(:renewal_benefit_package) {
-          renewal_application.benefit_packages[0]
-        }
-
-        before do 
-          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
-          renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
-            allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
-          end
-          renewal_application
+    describe "is_an_existing_plan?" do
+      context "for checking if a new plan is similar to the given enr's plan " do
+        it "should return true as the compared plan has similar hios_id and same active year" do
+          expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
         end
 
-        context 'renewing employee A' do 
-
-          before do
-            renewal_benefit_package.renew_member_benefit(census_employees[0])
-            family.reload
-          end
-
-          let(:family) { employee_A.person.primary_family }
-          let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
-          let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
-
-          it 'does renew both health and dental enrollment' do
-            expect(health_renewals.size).to eq 1
-            expect(health_renewals[0].product).to eq enrollment_1.product.renewal_product
-            expect(dental_renewals.size).to eq 1
-            expect(dental_renewals[0].product).to eq enrollment_2.product.renewal_product
-          end
-        end
-
-        context 'renewing employee B' do 
-
-          before do
-            renewal_benefit_package.renew_member_benefit(census_employees[1])
-            family.reload
-          end
-
-          let(:family) { employee_B.person.primary_family }
-          let(:health_renewals) { family.active_household.hbx_enrollments.renewing.by_health }
-          let(:dental_renewals) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
-
-          it 'does renew health coverage and waive dental coverage' do
-            expect(health_renewals.size).to eq 1
-            expect(health_renewals[0].product).to eq enrollment_3.product.renewal_product
-            expect(dental_renewals.size).to eq 1
-          end
-        end
-
-        context 'renewing employee C' do
-
-          before do
-            renewal_benefit_package.renew_member_benefit(census_employees[2])
-            family.reload
-          end
-
-          let(:family) { employee_C.person.primary_family }
-          let(:health_renewals) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
-          let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
-
-          it 'does renew health coverage and waive dental coverage' do
-            expect(health_renewals.size).to eq 1
-            expect(dental_renewals.size).to eq 1
-            expect(dental_renewals[0].product).to eq enrollment_6.product.renewal_product
-          end
-        end
-
-        context 'renewing employee D' do 
-
-          before do
-            renewal_benefit_package.renew_member_benefit(census_employees[3])
-            family.reload
-          end
-
-          let(:family) { employee_D.person.primary_family }
-          let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
-          let(:health_waivers) { family.active_household.hbx_enrollments.by_health.select{|en| en.renewing_waived?} }
-          let(:dental_waivers) { family.active_household.hbx_enrollments.by_dental.select{|en| en.renewing_waived?} }
-
-          it 'does renew health coverage and waive dental coverage' do
-            expect(passive_renewals).to be_empty
-            expect(health_waivers.size).to eq 1
-            expect(dental_waivers.size).to eq 1
-          end
-        end
-
-        context 'renewing employee E' do
-         
-          before do
-            renewal_benefit_package.renew_member_benefit(census_employees[4])
-            family.reload
-          end
-
-          let(:family) { employee_E.person.primary_family }
-          let(:passive_renewals) { family.active_household.hbx_enrollments.renewing }
-          let(:passive_waivers) { family.active_household.hbx_enrollments.select{|en| en.renewing_waived?} }
-
-          it 'does renew health coverage and waive dental coverage' do
-            expect(passive_renewals).to be_empty
-            expect(passive_waivers).to be_empty
-          end
-        end
-
-        def create_person(ce, employer_profile)
-          person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-          ce.update_attributes!({employee_role_id: employee_role.id})
-          Family.find_or_build_from_employee_role(employee_role)
-          employee_role
-        end
-
-        def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health')
-          benefit_package = benefit_group_assignment.benefit_package
-          sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind.to_sym)
-          FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
-            enrollment_members: [family.primary_applicant],
-            household: family.active_household,
-            coverage_kind: coverage_kind,
-            effective_on: benefit_package.start_on,
-            enrollment_kind: enrollment_kind,
-            kind: "employer_sponsored",
-            submitted_at: submitted_at,
-            employee_role_id: employee_role.id,
-            benefit_sponsorship: benefit_package.benefit_sponsorship,
-            sponsored_benefit_package: benefit_package,
-            sponsored_benefit: sponsored_benefit,
-            benefit_group_assignment_id: benefit_group_assignment.id,
-            product: sponsored_benefit.reference_product,
-            aasm_state: status
-            )
+        it "should return false as the compared plan has a different hios_id" do
+          expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
         end
       end
     end
   end
 
-  describe "#notify_enrollment_cancel_or_termination_event" do
-    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
-    let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
+  describe HbxEnrollment, dbclean: :after_all do
+    let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
+    let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household,
+                                    kind: "individual", aasm_state: "coverage_selected") }
+    let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+                                    applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
+                                    eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
 
-    it "should notify event" do
-      expect(hbx_enrollment).to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to=>glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id, "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment", "is_trading_partner_publishable" => true})
-      hbx_enrollment.notify_enrollment_cancel_or_termination_event(true)
-    end
-
-    it "should not notify event" do
-      expect(hbx_enrollment).to receive(:notify).exactly(0).times
-      hbx_enrollment.notify_enrollment_cancel_or_termination_event(false)
-    end
-  end
-end
-
-describe HbxEnrollment, dbclean: :after_all do
-  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-  let!(:plan100) { FactoryGirl.create(:plan) }
-
-  describe "is_an_existing_plan?" do
-    context "for checking if a new plan is similar to the given enr's plan " do
-      it "should return true as the compared plan has similar hios_id and same active year" do
-        expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+    context ".is_ivl_actively_outstanding?" do
+      it "should return true" do
+        ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        ivl_enrollment.save!
+        expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_truthy
       end
 
-      it "should return false as the compared plan has a different hios_id" do
-        expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+      it "should return false" do
+        expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
       end
     end
-  end
-end
 
-describe HbxEnrollment, dbclean: :after_all do
-  let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
-  let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
-  let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household,
-                                  kind: "individual", aasm_state: "coverage_selected") }
-  let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
-                                  applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
-                                  eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
+    context "for set_is_any_enrollment_member_outstanding" do
 
-  context ".is_ivl_actively_outstanding?" do
-    it "should return true" do
-      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-      ivl_enrollment.save!
-      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_truthy
-    end
+      it "should return true for is_any_enrollment_member_outstanding" do
+        ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        ivl_enrollment.save!
+        expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
+      end
 
-    it "should return false" do
-      expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
-    end
-  end
-
-  context "for set_is_any_enrollment_member_outstanding" do
-
-    it "should return true for is_any_enrollment_member_outstanding" do
-      ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-      ivl_enrollment.save!
-      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
-    end
-
-    it "should return false for is_any_enrollment_member_outstanding" do
-      ivl_enrollment.save!
-      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
+      it "should return false for is_any_enrollment_member_outstanding" do
+        ivl_enrollment.save!
+        expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
+      end
     end
   end
 end

@@ -42,7 +42,6 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_eac
     end
   end
 
-
   context "without broker role" do
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, person: person) }
@@ -51,6 +50,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_eac
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
       expect(view.content_for(:horizontal_menu)).to include('multi-line')
       expect(rendered).to_not have_text(/Brokers/)
+    end
 
     context "with individual market enabled " do
       before do
@@ -73,7 +73,6 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_eac
         expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
       end
     end
-
 
     context "with general agency disabled" do
       before :each do

@@ -49,12 +49,8 @@ class SbcProcessor2015
         product.sbc_document.save!
         product.save!
         counter += 1
-<<<<<<< HEAD
-        puts "Plan #{plan.name} #{plan.hios_id} updated, SBC #{file_name}, Document uri #{plan.sbc_document.identifier}"
-=======
         puts "Product #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}" unless Rails.env.test?
         # end of new model
->>>>>>> upstream/master
       end
     end
 
