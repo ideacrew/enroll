@@ -2,6 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 require 'csv'
 
 class TerminatedHbxEnrollments < MongoidMigrationTask
+  include Config::AcaHelper
 
   def migrate
     families = get_families

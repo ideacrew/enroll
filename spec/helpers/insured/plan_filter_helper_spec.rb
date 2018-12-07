@@ -1,5 +1,4 @@
 require "rails_helper"
-include Config::SiteHelper
 
 RSpec.describe Insured::PlanFilterHelper, :type => :helper do
   context "Shows Find Your Doctor link based on market kind" do

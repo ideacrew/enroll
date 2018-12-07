@@ -2,7 +2,6 @@ require "rails_helper"
 require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "edi_enrollment_termination_report")
 require "#{Rails.root}/app/helpers/config/aca_helper"
-include Config::AcaHelper
 
 describe TerminatedHbxEnrollments, dbclean: :after_each do
 

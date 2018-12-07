@@ -1,7 +1,13 @@
 require 'rails_helper'
-include Insured::FamiliesHelper
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
+# Our helper slug class so we can use the helper methods in our spec
+module SpecHelperClassesForViews
+  class InsuredFamiliesHelperSlugHostClass
+    extend Insured::FamiliesHelper
+  end
+end
 
 RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_each do
   context 'Employer sponsored coverage' do
@@ -54,7 +60,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     end
 
     it "should show the correct Premium" do
-      dollar_amount = number_to_currency(current_premium(hbx_enrollment), precision: 2)
+      dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugHostClass.current_premium(hbx_enrollment), precision: 2)
       expect(rendered).to match /Premium/
       expect(rendered).to include dollar_amount
     end
