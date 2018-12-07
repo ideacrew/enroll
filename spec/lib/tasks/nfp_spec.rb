@@ -1,6 +1,5 @@
 require 'rails_helper'
 Rake.application.rake_require "tasks/nfp"
-include ActiveJob::TestHelper
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'upload the invoice to s3', :type => :task, dbclean: :after_each do

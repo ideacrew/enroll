@@ -1,7 +1,7 @@
 .row.mt-2
   .alert.alert-info
     h4 Thank you for logging into your #{Settings.site.short_name} employer account.
-  
+
     p.starter
       |
         Before we get started, we need to confirm the primary point of contact for your business. Please confirm that the name and email address listed below are correct, update the information or provide the name and email address for your primary point of contact. When you're finished, select 'Confirm'.
@@ -12,7 +12,7 @@ fieldset.mt-2
 
 fieldset.mt-2
   legend Employer Information
-  
+
   = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
     .row
       .col-md-4.mb-2
@@ -30,7 +30,7 @@ fieldset.mt-2
         .invalid-feedback
           |
             Please provide a fein.
-            
+
     = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f_profile|
       .col-md-4.pl-0
         label for="inputEntityKind"  Kind *
@@ -50,15 +50,35 @@ fieldset.mt-2
             i.fas.fa-question.mt-3.fa-lg style="padding-top:5px"
       #sicHelperWrapper.hidden.row.row-form-wrapper.no-buffer style="margin-top:90px"
         = render "benefit_sponsors/profiles/registrations/sic_help" , sicFieldId: 'organization_sic_code'
-        
+
       br
       br
       br
       br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
+      h4.mt-1 Referred By *
+      = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How did you find out about the Massachusetts Health Connector?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
+      .invalid-feedback
+        |
+          Please select referred by.
+      br
+      = f_profile.text_area :referred_reason, :placeholder => "Other (please describe) *", class: "form-control hidden", id: "other-reason-textarea"
+      br
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
       = f.submit "Confirm", class: "btn btn-primary pull-right mt-2"
 
       input type="hidden" name="employer_id" id="employer_id"
 
+javascript:
+  $("#referred-by-select").on("change", function() {
+    var select_val = $(this).val();
+    if (select_val == 'Other') {
+      $("#other-reason-textarea").removeClass("hidden");
+      $("#other-reason-textarea").prop('required',true);
+    } else {
+      $("#other-reason-textarea").addClass("hidden");
+      $("#other-reason-textarea").prop('required',false);
+      $("#other-reason-textarea").val("");
+    }
+  });

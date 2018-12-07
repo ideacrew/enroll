@@ -1,5 +1,4 @@
 require 'rails_helper'
-include Pundit
 
 RSpec.describe "exchanges/hbx_profiles/show.html.erb", :type => :view do
 
@@ -8,6 +7,7 @@ RSpec.describe "exchanges/hbx_profiles/show.html.erb", :type => :view do
     let(:person) {FactoryGirl.create(:person, :with_employee_role) }
 
     before :each do
+      view.extend Pundit
       sign_in user
     end
     it "does not show general agency related links" do

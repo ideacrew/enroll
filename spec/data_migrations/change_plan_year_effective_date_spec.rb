@@ -14,12 +14,14 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
 
   describe "changing plan year's effective date & reference plan and force publishing the plan year", dbclean: :after_each do
 
-    let(:plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: "draft") }
+    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let(:plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: "draft", employer_profile: employer_profile, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
     let(:plan) { FactoryGirl.create(:plan, :with_premium_tables) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible") }
+    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible", benefit_group_assignments: [benefit_group_assignment]) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
@@ -58,6 +60,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
       allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      allow_any_instance_of(CensusEmployee).to receive(:has_benefit_group_assignment?).and_return(true)
       employer = plan_year.employer_profile
       employer.census_employees << census_employee
       employer.save!

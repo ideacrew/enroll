@@ -194,6 +194,11 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.reject(&:is_active?)
   end
 
+  def waived?
+    bga = renewal_benefit_group_assignment || active_benefit_group_assignment
+    return bga.present? ? bga.aasm_state == 'coverage_waived' : false
+  end
+
   def active_benefit_group_assignment=(benefit_package_id)
     benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
       :"benefit_packages._id" => benefit_package_id

@@ -1,21 +1,18 @@
+require File.join(File.dirname(__FILE__), "..", "..", "components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers")
+require File.join(File.dirname(__FILE__), "..", "..", "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
+
 def products_for(product_package, calender_year)
   puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
   BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
 end
 
 Given (/^.*a configured CCA benefit market, pricing models, and catalog$/) do
-warn "USING DB DUMP AS FIXTURES - REPLACE WITH CORRECTED FACTORY HARNESS"
-db_name = Mongoid::Config.clients[:default][:database]
-db_location = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "components/benefit_sponsors/spec", "fixture_dbs", "dump"))
-tmp_dir = Dir.mktmpdir
-dest_dir = File.join(tmp_dir, "dump")
-db_dump_src_dir = File.join(dest_dir, "fixture_source")
-db_dump_dest_dir = File.join(dest_dir, db_name)
-FileUtils.mkdir(dest_dir)
-FileUtils.cp_r(db_location, tmp_dir)
-FileUtils.mv(db_dump_src_dir, db_dump_dest_dir)
-`cd #{tmp_dir} && mongorestore --drop --quiet`
-FileUtils.rm_r(tmp_dir)
+  @site = ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_empty_benefit_market(:aca_shop)
+  benefit_market = @site.benefit_markets.first
+  effective_year = Time.now.year
+  effective_on_start = Date.new(effective_year, 1,1)
+  effective_on_end = Date.new(effective_year, 12,31)
+  ::BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(@site, benefit_market, (effective_on_start..effective_on_end))
 end
 
 Given (/^.*a CCA sole source employer health benefit package, in open enrollment$/) do
@@ -43,11 +40,12 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
     :fein => "123423444",
     :entity_kind => "c_corporation",
     :profiles => [e_profile],
-    :site => ::BenefitSponsors::Site.first
+    :site => @site
   })
   @employer_profile = @employer_organization.profiles.first
   @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
   @benefit_sponsorship.save!
+  service_areas = @benefit_sponsorship.service_areas_on(Date.new(2018,8,1))
   benefit_application = ::BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
     @benefit_sponsorship,
     effective_period: (Date.new(2018,8,1)..Date.new(2019,7,30)),
@@ -56,17 +54,16 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
     pte_count: 0,
     msp_count: 0
   )
-  benefit_application.save!
-  benefit_application.benefit_sponsor_catalog = @benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
+  benefit_application.benefit_sponsor_catalog = @benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, benefit_application.effective_period.begin)
   benefit_application.save!
   benefit_application.benefit_sponsor_catalog.save!
   @benefit_application = benefit_application
-  p_package = @benefit_application.benefit_sponsor_catalog.product_packages.detect { |p_package| p_package.package_kind == :single_product }
+  p_package = @benefit_application.benefit_sponsor_catalog.product_packages.detect { |p_package| (p_package.package_kind == :single_product) && (p_package.product_kind == :health) }
   @reference_product = p_package.products.first
   factory = BenefitSponsors::BenefitPackages::BenefitPackageFactory
   benefit_package_attributes = {
     title: "My Sole-Source Package",
-    probation_period_kind: :date_of_hire,
+    probation_period_kind: :first_of_month,
     sponsored_benefits_attributes: [{
       kind: :health,
       product_package_kind: :single_product,
@@ -77,6 +74,10 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
     }]
   }
   @benefit_package = factory.call(benefit_application, benefit_package_attributes)
+  cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
+  sb = @benefit_package.sponsored_benefits.first
+  sbenefit, _price, _cont = cost_estimator.calculate(sb, sb.reference_product, sb.product_package, build_new_pricing_determination: true)
+  @benefit_package.save!
   @benefit_sponsorship.update_attributes!({aasm_state: :initial_enrollment_open})
   @benefit_application.update_attributes!({aasm_state: :enrollment_open})
 end
@@ -93,6 +94,11 @@ Given (/^.*an employee eligible for shopping during open enrollment, who is link
     :benefit_sponsorship_id => @benefit_sponsorship.id
   })
   @census_employee.save!
+  sqs = [0,1,2].map do |num|
+    SecurityQuestion.create!(
+      :title => "Question ##{num}"
+    )
+  end
   sqs = SecurityQuestion.all.to_a
   sq_responses = [0,1,2].map do |num|
     SecurityQuestionResponse.new(
