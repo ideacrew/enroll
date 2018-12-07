@@ -1,6 +1,4 @@
 require 'rails_helper'
-# require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
-# require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
@@ -285,14 +283,18 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       let(:ben_app) { initial_application }
 
     before :each do
-      sign_in(user)
       ben_app.update_attributes(aasm_state: "draft")
     end
 
-    it "create new organization if params valid" do
-      binding.pry
+    it "force publish benefit application for employer" do
+      sign_in(user)
       xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
       expect(response).to have_http_status(:success)
+    end
+
+    it "does not force publish benefit application for employer" do
+      xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+      expect(response).to have_http_status(302)
     end
   end
 
