@@ -8,7 +8,7 @@ module Factories
     end
 
     def begin
-      @logger.debug "Processing #{employer_profile.legal_name}"
+      @logger.debug "Processing for begin #{employer_profile.legal_name}"
       published_plan_years = @employer_profile.plan_years.published_or_renewing_published.select do |plan_year|
         (plan_year.start_on..plan_year.end_on).cover?(@date || TimeKeeper.date_of_record)
       end
@@ -37,7 +37,7 @@ module Factories
     end
 
     def end
-      @logger.debug "Processing #{employer_profile.legal_name}"
+      @logger.debug "Processing for end #{employer_profile.legal_name}"
       expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.no_timeout.each do |expiring_plan_year|
         begin
