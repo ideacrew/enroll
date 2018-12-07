@@ -39,11 +39,16 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
 
-# This rake task is to delink broker agency assisting a person
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do
   desc 'grant super admin access for given users'
   DefinePermissions.define_task :grant_super_admin_access => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:grant_hbx_tier3_access user_email="<email address1>,<email address2>"
+namespace :permissions do
+  desc 'grant hbx tier3 access for given users'
+  DefinePermissions.define_task :grant_hbx_tier3_access => :environment
 end
 
 #rake permissions:initial_hbx
