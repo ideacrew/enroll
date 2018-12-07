@@ -128,7 +128,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:family) { double("Family") }
     let(:email){ double("Email", address: "test@example.com", kind: "home") }
     let(:id){ EmployeeRole.new.id }
-    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster"} }
+    let!(:notice_trigger_params) { {recipient: employee_role, event_object: census_employee, notice_event: "employee_matches_employer_rooster", :notice_params=>{}} }
 
     before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
@@ -183,7 +183,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
 
     it "should trigger notice" do
-      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(notice_trigger_params).and_return(true)
+      expect_any_instance_of(BenefitSponsors::Services::NoticeService).to receive(:deliver).with(notice_trigger_params).and_return(true)
       get :edit, id: employee_role.id
     end
   end
@@ -214,6 +214,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         allow(employment_relationship).to receive_message_chain(:census_employee,:employer_profile,:parent,:legal_name).and_return("legal_name")
         post :create, :employment_relationship => employment_relationship_properties
       end

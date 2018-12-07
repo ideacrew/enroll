@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
+RSpec.describe ShopBrokerNotices::BrokerHiredNotice, dbclean: :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:broker_agency_profile) { create :broker_agency_profile }

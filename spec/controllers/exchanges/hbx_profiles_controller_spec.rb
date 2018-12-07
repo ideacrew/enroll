@@ -602,7 +602,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
     let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
     let(:benefit_applications) { [ double ]}
@@ -682,7 +683,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
     let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
     let(:benefit_applications) { [ double ]}

@@ -371,8 +371,8 @@ class CensusEmployee < CensusMember
 
   def active_benefit_package
     if active_benefit_group_assignment.present?
-      if active_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-        active_benefit_group_assignment.benefit_group
+      if active_benefit_group_assignment.benefit_package.plan_year.employees_are_matchable?
+        active_benefit_group_assignment.benefit_package
       end
     end
   end
@@ -611,7 +611,9 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-      send_invite! if _id_changed? && !Rails.env.test?
+      if !Rails.env.test?
+        send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+      end
       # we do not want to create employer role durig census employee saving for conversion
       # return if self.employer_profile.is_a_conversion_employer? ### this check needs to be re-done when loading mid_PY conversion and needs to have more specific check.
 
@@ -1116,7 +1118,6 @@ def self.to_csv
   end
 
   def enrollments_for_display
-
     enrollments = []
 
     coverages_selected = lambda do |enrollments|

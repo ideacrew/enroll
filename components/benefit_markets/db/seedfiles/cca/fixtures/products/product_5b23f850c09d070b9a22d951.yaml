@@ -29,8 +29,8 @@ attributes: !ruby/hash:BSON::Document
   hios_base_id: 88806MA0040051
   csr_variant_id: '01'
   application_period: !ruby/hash:BSON::Document
-    min: 2017-01-01 00:00:00.000000000 Z
-    max: 2017-12-31 00:00:00.000000000 Z
+    min: 2018-01-01 00:00:00.000000000 Z
+    max: 2018-12-31 00:00:00.000000000 Z
   service_area_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
       WxWP9Z+ICzHOaiuJ
@@ -43,16 +43,16 @@ attributes: !ruby/hash:BSON::Document
     raw_data: !binary |-
       Wx2L9+bro5CtEzsC
   kind: :health
-  updated_at: 2018-06-23 22:30:34.846000000 Z
-  created_at: 2018-06-15 17:33:04.235000000 Z
+  updated_at: 2019-06-23 22:30:34.846000000 Z
+  created_at: 2019-06-15 17:33:04.235000000 Z
   premium_tables:
   - !ruby/hash:BSON::Document
     _id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WyP4UMCdBwuaItlS
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVq
@@ -338,8 +338,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItmB
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVm
@@ -625,8 +625,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItmw
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVk
@@ -912,8 +912,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItnf
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVo
@@ -1199,8 +1199,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItoO
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVi
@@ -1486,8 +1486,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaIto9
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVg
@@ -1773,8 +1773,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItps
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-04-01 00:00:00.000000000 Z
-      max: 2017-06-30 00:00:00.000000000 Z
+      min: 2018-04-01 00:00:00.000000000 Z
+      max: 2018-06-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVe
@@ -2060,8 +2060,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItqb
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVq
@@ -2347,8 +2347,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItrK
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVm
@@ -2634,8 +2634,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItr5
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVk
@@ -2921,8 +2921,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItso
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVo
@@ -3208,8 +3208,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaIttX
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVi
@@ -3495,8 +3495,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItuG
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVg
@@ -3782,8 +3782,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItu1
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-07-01 00:00:00.000000000 Z
-      max: 2017-09-30 00:00:00.000000000 Z
+      min: 2018-07-01 00:00:00.000000000 Z
+      max: 2018-09-30 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVe
@@ -4069,8 +4069,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItvk
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVq
@@ -4356,8 +4356,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItwT
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVm
@@ -4643,8 +4643,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItxC
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVk
@@ -4930,8 +4930,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItxx
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4p+ICzHOaeVo
@@ -5217,8 +5217,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItyg
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVi
@@ -5504,8 +5504,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItzP
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVg
@@ -5791,8 +5791,8 @@ attributes: !ruby/hash:BSON::Document
       raw_data: !binary |-
         WyP4UMCdBwuaItz+
     effective_period: !ruby/hash:BSON::Document
-      min: 2017-01-01 00:00:00.000000000 Z
-      max: 2017-03-31 00:00:00.000000000 Z
+      min: 2018-01-01 00:00:00.000000000 Z
+      max: 2018-03-31 00:00:00.000000000 Z
     rating_area_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         WxWP4Z+ICzHOaeVe

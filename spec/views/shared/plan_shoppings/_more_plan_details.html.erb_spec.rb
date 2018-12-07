@@ -8,6 +8,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
   let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: household) }
   let(:hbx_enrollment_member_one) { double("hbx_enrollment_member") }
   let(:hbx_enrollment_member_two) { double("hbx_enrollment_member") }
+  let(:mock_group){double("membergroup", count: 4)}
 
   let(:plan){
     instance_double(
@@ -24,6 +25,7 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
     allow(person).to receive(:has_consumer_role?).and_return(false)
     assign :hbx_enrollment, hbx_enrollment
     assign :plans, plan_count
+    assign :member_groups, mock_group
   end
 
   # it "should match dependent count" do
@@ -39,7 +41,6 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(false)
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([hbx_enrollment_member_one, hbx_enrollment_member_two ])
       render "shared/plan_shoppings/more_plan_details", person: person
-
     end
 
     it "should match person full name" do
