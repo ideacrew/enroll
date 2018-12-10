@@ -139,7 +139,7 @@ module BenefitSponsors
             allow(initial_application).to receive(:may_submit_for_review?).and_return(false)
             subject.force_submit_application
             initial_application.reload
-            expect(subject.messages['notice']).to eq('Employer(s) last Plan Year could not be processed')
+            expect(subject.messages['notice']).to eq('Employer(s) Plan Year could not be processed')
             expect(subject.messages['warnings']).to eq(['Invalid application error'])
             expect(subject.errors).to eq([])
             expect(initial_application.aasm_state).to eq :active
@@ -166,7 +166,7 @@ module BenefitSponsors
               allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
               subject.force_submit_application
               initial_application.reload
-              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year was successfully submitted for review.')
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully submitted for review.')
               expect(subject.messages['warnings']).to eq(['Invalid application error'])
               expect(subject.errors).to eq([])
               expect(initial_application.aasm_state).to eq :pending
@@ -180,7 +180,7 @@ module BenefitSponsors
               allow(initial_application).to receive(:may_approve_application?).and_return(false )
               subject.force_submit_application
               initial_application.reload
-              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year could not be processed')
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year could not be processed')
               expect(subject.errors).to eq([])
               expect(initial_application.aasm_state).to eq :active
             end
@@ -206,7 +206,7 @@ module BenefitSponsors
               subject.force_submit_application
               initial_application.reload
               expect(subject.messages).to eq({})
-              expect(subject.errors).to eq(['Employer(s) last Plan Year date has not matched.'])
+              expect(subject.errors).to eq(['Employer(s) Plan Year date has not matched.'])
               expect(initial_application.aasm_state).to eq :approved
             end
 
@@ -214,7 +214,7 @@ module BenefitSponsors
               allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
               subject.force_submit_application
               initial_application.reload
-              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year was successfully published.')
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully published.')
               expect(subject.errors).to eq([])
               expect(initial_application.aasm_state).to eq :enrollment_open
             end
