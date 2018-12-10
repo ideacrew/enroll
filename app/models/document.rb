@@ -2,14 +2,9 @@ class Document
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Attributes::Dynamic
-  include ModelEvents::Document
   include Config::AcaModelConcern
-  include Concerns::Observable
-
 
   ACCESS_RIGHTS = %w(public pii_restricted)
-
-  after_save :notify_on_save
 
   # Enable polymorphic associations
   embedded_in :documentable, polymorphic: true

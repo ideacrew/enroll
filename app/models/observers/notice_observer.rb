@@ -189,18 +189,6 @@ module Observers
       end
     end
 
-    def document_update(new_model_event)
-      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
-
-      if Document::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        document = new_model_event.klass_instance
-        if new_model_event.event_key == :initial_employer_invoice_available
-          employer_profile = document.documentable
-          deliver(recipient: employer_profile, event_object: employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first, notice_event: "initial_employer_invoice_available")
-        end
-      end
-    end
-
     def vlp_document_update; end
     def paper_application_update; end
     def employer_attestation_document_update; end
