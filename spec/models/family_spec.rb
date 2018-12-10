@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent",  dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -346,7 +346,7 @@ describe Family, type: :model, dbclean: :after_each do
 
 end
 
-describe Family do
+describe Family, dbclean: :after_each do
   let(:family) { Family.new }
 
   describe "with no special enrollment periods" do
@@ -522,7 +522,7 @@ describe Family do
   end
 end
 
-describe "special enrollment periods" do
+describe "special enrollment periods",  dbclean: :after_each do
 =begin
   include_context "BradyBunchAfterAll"
 
@@ -638,7 +638,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
 
 end
 
-describe Family, "given an inactive member" do
+describe Family, "given an inactive member" ,:dbclean => :after_all do
   let(:ssn) { double }
   let(:dependent) {
     double(:id => "123456", :ssn => ssn, :last_name => last_name, :first_name => first_name, :dob => dob)
@@ -675,7 +675,7 @@ describe Family, "given an inactive member" do
   end
 end
 
-describe Family, "with a primary applicant" do
+describe Family, "with a primary applicant", :dbclean => :after_all do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }
     let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
@@ -1133,7 +1133,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, 'coverage_waived?' do
+describe Family, 'coverage_waived?', dbclean: :after_each do
   let(:family) {Family.new}
   let(:household) {double}
   let(:hbx_enrollment) {HbxEnrollment.new}
@@ -1394,7 +1394,7 @@ describe "min_verification_due_date", dbclean: :after_each do
   end
 end
 
-describe "#all_persons_vlp_documents_status" do
+describe "#all_persons_vlp_documents_status", dbclean: :after_each do
 
   context "vlp documents status for single family member" do
     let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -1441,7 +1441,7 @@ describe "#all_persons_vlp_documents_status" do
   end
 end
 
-describe "has_valid_e_case_id" do
+describe "has_valid_e_case_id" ,dbclean: :after_each do
   let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
 
   it "returns false as e_case_id is nil" do
@@ -1486,7 +1486,8 @@ describe Family, "#take_initial_application_snapshot" do
     end
   end
 end
-describe "currently_enrolled_plans_ids" do
+
+describe "currently_enrolled_plans_ids",  dbclean: :after_each do
   let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
   let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
 
@@ -1495,7 +1496,7 @@ describe "currently_enrolled_plans_ids" do
   end
 end
 
-describe "set_due_date_on_verification_types" do
+describe "set_due_date_on_verification_types",  dbclean: :after_each do
   let!(:person)           { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:consumer_role)     { person.consumer_role }
   let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
@@ -1506,7 +1507,7 @@ describe "set_due_date_on_verification_types" do
   end
 end
 
-context "verifying employee_role is active?" do
+context "verifying employee_role is active?",  dbclean: :after_each do
   let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
   let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
 
@@ -1519,7 +1520,7 @@ context "verifying employee_role is active?" do
   end
 end
 
-describe "active dependents" do
+describe "active dependents",  dbclean: :after_each do
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
@@ -1537,4 +1538,92 @@ describe "active dependents" do
     allow(family_member2).to receive(:is_active).and_return(false)
     expect(family.active_dependents.count).to eq 1
   end
+end
+
+describe "#outstanding_verification scope", dbclean: :after_each do
+  let(:person)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:family)                    { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual") }
+  let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+  let(:active_year)               {TimeKeeper.date_of_record.year}
+  before :each do
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+  it "should not include family with no outstanding family member " do  
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with no enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with renewal enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"auto_renewing")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should include family with outstanding family member with enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"coverage_selected")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification.size).to be(1)
+  end 
+end
+
+describe "#outstanding_verification_datatable scope", dbclean: :after_each do
+  let(:person)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:family)                    { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual") }
+  let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+  let(:active_year)               {TimeKeeper.date_of_record.year}
+  before :each do
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+  it "should not include family with no outstanding family member " do  
+    expect(Family.outstanding_verification_datatable.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with no enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    expect(Family.outstanding_verification_datatable.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with renewal enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"auto_renewing")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification_datatable.size).to be(1)
+  end 
+  it "should include family with outstanding family member with enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"coverage_selected")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification_datatable.size).to be(1)
+  end 
 end
