@@ -100,7 +100,7 @@ FactoryGirl.define do
       name 'developer'
     end
 
-    trait :hbx_system_admin do
+    trait :hbx_super_admin do
       modify_family true
       modify_employer false
       revert_application false
@@ -110,8 +110,8 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  true
-      can_access_outstanding_verification_sub_tab false
-      name 'hbx_system_admin'
+      can_access_outstanding_verification_sub_tab true
+      name 'hbx_super_admin'
     end
   end
 end
