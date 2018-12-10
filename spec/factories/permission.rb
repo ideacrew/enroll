@@ -99,5 +99,20 @@ FactoryGirl.define do
       view_admin_tabs  false
       name 'developer'
     end
+
+    trait :hbx_system_admin do
+      modify_family true
+      modify_employer false
+      revert_application false
+      list_enrollments true
+      send_broker_agency_message false
+      approve_broker false
+      approve_ga false
+      modify_admin_tabs false
+      view_admin_tabs  true
+      can_access_outstanding_verification_sub_tab false
+      can_change_fein true
+      name 'hbx_system_admin'
+    end
   end
 end
