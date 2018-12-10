@@ -3,9 +3,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 require File.join(Rails.root, "app/helpers/config/aca_helper")
 require File.join(Rails.root, "app/helpers/config/site_helper")
 require File.join(Rails.root, "app/helpers/config/contact_center_helper")
-include Config::AcaHelper
-include Config::SiteHelper
-include Config::ContactCenterHelper
 
 RSpec.describe 'The employees of MA new groups received a notice in their accounts that their coverage was terminated because no payment was received from their employer', :type => :task, :dbclean => :after_each do
   let(:employer_profile1)     { FactoryGirl.build(:employer_profile) }

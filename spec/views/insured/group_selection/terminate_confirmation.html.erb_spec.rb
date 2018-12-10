@@ -1,5 +1,11 @@
 require "rails_helper"
-include Insured::FamiliesHelper
+
+# Our helper slug class so we can use the helper methods in our spec
+module SpecHelperClassesForViews
+  class InsuredFamiliesHelperSlugForGroupSelectionTermination
+    extend Insured::FamiliesHelper
+  end
+end
 
 RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
   context "DCHL ID and Premium" do
@@ -26,7 +32,7 @@ RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
     end
 
     it "should show the correct Premium" do
-      dollar_amount = number_to_currency(current_premium(hbx_enrollment), precision: 2)
+      dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugForGroupSelectionTermination.current_premium(hbx_enrollment), precision: 2)
       expect(rendered).to match /Premium/
       expect(rendered).to include dollar_amount
     end
