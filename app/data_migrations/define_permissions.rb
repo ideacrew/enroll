@@ -97,6 +97,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+  end
+
   def grant_super_admin_access
     raise "User Email Argument expected!!"if ENV['user_email'].blank?
 
