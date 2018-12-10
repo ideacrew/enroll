@@ -373,6 +373,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       context "and the terminated employee is rehired" do
+
+        before {initial_census_employee.terminate_employment!(TimeKeeper.date_of_record - 10.days)}
+
         let!(:rehire) {initial_census_employee.replicate_for_rehire}
 
         it "rehired census employee instance should have same demographic info" do
@@ -436,6 +439,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:benefit_group_assignment) {FactoryGirl.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: initial_census_employee)}
 
     context "and a roster match by dob lname and fname is performed" do
+
+      before do
+        initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
+        initial_census_employee.save
+      end
+
       context "using non-matching dob lname and fname" do
         let(:invalid_person)   { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 5.days, first_name: "john", last_name: "doe") }
         let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, person: invalid_person) }
@@ -456,6 +465,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
 
     context "and a roster match by SSN and DOB is performed" do
+
+      before do
+        initial_census_employee.benefit_group_assignments = [benefit_group_assignment]
+        initial_census_employee.save
+      end
+
       context "using non-matching ssn and dob" do
         let(:invalid_employee_role)   { FactoryGirl.build(:benefit_sponsors_employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days, employer_profile: employer_profile) }
 
