@@ -1,3 +1,11 @@
-<p>Plan Year for the employer has been published successfully.</p>
+<% if @service.errors.present? %>
+  <p><%= @service.errors.join(', ') %></p>
+<% else %>
+  <% if @service.messages['warnings'].present? %>
+    <p><%= @service.messages['warnings'].join(', ') %></p>
+  <% elsif @service.messages['notice'].present? %>
+    <p><%= @service.messages['notice'] %></p>
+  <% end %>
+<% end %>
 
 

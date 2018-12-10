@@ -277,24 +277,31 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "#force_publish" do
-      include_context "setup benefit market with market catalogs and product packages"
-      include_context "setup initial benefit application"
-      let(:user) { double("user", :has_hbx_staff_role? => true)}
-      let(:ben_app) { initial_application }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:ben_app) { initial_application }
 
     before :each do
       ben_app.update_attributes(aasm_state: "draft")
     end
 
-    it "force publish benefit application for employer" do
-      sign_in(user)
-      xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
-      expect(response).to have_http_status(:success)
+    context 'does not force published if not admin' do
+      it "does not force publish benefit application for employer" do
+        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+        expect(response).to have_http_status(302)
+      end
     end
 
-    it "does not force publish benefit application for employer" do
-      xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
-      expect(response).to have_http_status(302)
+    context 'force publish benefit application for employer' do
+      before do
+        sign_in(user)
+        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+      end
+
+      it { expect(response).to have_http_status(:success) }
+      it { expect(response).to render_template('force_publish') }
+
     end
   end
 

@@ -123,6 +123,105 @@ module BenefitSponsors
     describe '.force_submit_application' do
       include_context "setup initial benefit application"
 
+      context 'Invoke force_submit_application' do
+        let(:application_errors) do
+          { 'invalid_application' => 'Invalid application error' }
+        end
+        let(:application_warnings) do
+          { 'invalid_application' => 'Invalid application warning' }
+        end
+        subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
+
+        context 'When is_application_valid? OR is_application_eligible? AND may_submit_for_review? are is false' do
+
+          it 'should return notice, warnings and state could not be changed' do
+            allow(subject).to receive(:application_errors).and_return(application_errors)
+            allow(initial_application).to receive(:may_submit_for_review?).and_return(false)
+            subject.force_submit_application
+            initial_application.reload
+            expect(subject.messages['notice']).to eq('Employer(s) last Plan Year could not be processed')
+            expect(subject.messages['warnings']).to eq(['Invalid application error'])
+            expect(subject.errors).to eq([])
+            expect(initial_application.aasm_state).to eq :active
+          end
+        end
+
+        context 'When is_application_valid? OR is_application_eligible? is false AND may_submit_for_review? is true' do
+          context 'state is not draft' do
+            it 'should return error' do
+              allow(subject).to receive(:application_errors).and_return(application_errors)
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to eq(["Event 'submit_for_review' cannot transition from 'active'. "])
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'state is draft' do
+            before { initial_application.update_attribute(:aasm_state, 'draft') }
+            it 'should return notice, warnings and state could not be changed' do
+              allow(subject).to receive(:application_errors).and_return(application_errors)
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year was successfully submitted for review.')
+              expect(subject.messages['warnings']).to eq(['Invalid application error'])
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :pending
+            end
+          end
+        end
+
+        context 'When is_application_valid? AND is_application_eligible? are true' do
+          context 'when benefit_application may_approve_application? is false' do
+            it 'should return notice Plan Year could not be processed' do
+              allow(initial_application).to receive(:may_approve_application?).and_return(false )
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year could not be processed')
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'when benefit_application may_approve_application? is true and state is active then' do
+            it 'should return error' do
+              allow(initial_application).to receive(:may_approve_application?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to eq(["Event 'auto_approve_application' cannot transition from 'active'. "])
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'when benefit_application may_approve_application? is true and state is draft then' do
+            before { initial_application.update_attributes(aasm_state: 'draft') }
+
+            it 'should return error if today is less than open_enrollment_period' do
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              allow(subject).to receive(:today).and_return(initial_application.open_enrollment_period.begin - 1.year)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to eq(['Employer(s) last Plan Year date has not matched.'])
+              expect(initial_application.aasm_state).to eq :approved
+            end
+
+            it 'should return notice, warnings and state could not be changed' do
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) last Plan Year was successfully published.')
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :enrollment_open
+            end
+          end
+        end
+      end
+
       context "renewal application in draft state" do
 
         let(:scheduled_event)  {BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents}
