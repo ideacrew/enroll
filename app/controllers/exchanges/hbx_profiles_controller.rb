@@ -79,7 +79,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def force_publish
       @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
-      benefit_application = @benfit_sponsorships.first.benefit_applications.draft_state.last
+      benefit_application = @benfit_sponsorships.draft_benefit_application.last
       @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
       @service.force_submit_application
       respond_to do |format|
