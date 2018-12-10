@@ -56,8 +56,8 @@ class Permission
     def developer
       Permission.where(name: 'developer').first
     end
-    def hbx_system_admin
-      Permission.where(name: 'hbx_system_admin').first
+    def hbx_super_admin
+      Permission.where(name: 'hbx_super_admin').first
     end
   end
 end
