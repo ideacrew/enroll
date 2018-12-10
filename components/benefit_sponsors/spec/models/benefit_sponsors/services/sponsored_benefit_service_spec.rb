@@ -2,7 +2,7 @@ require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
+RSpec.describe BenefitSponsors::Services::SponsoredBenefitService, dbclean: :after_each do
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
@@ -49,7 +49,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
     }
   }
 
-  describe "while creating a sponsored benefit", dbclean: :after_each do
+  describe "while creating a sponsored benefit" do
 
     let(:benefits_params) {
       {
@@ -100,7 +100,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
       end
     end
 
-    context "#save", dbclean: :after_each do
+    context "#save" do
 
       before do
         subject.save(create_form)
@@ -134,7 +134,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
     let(:form) { BenefitSponsors::Forms::SponsoredBenefitForm.new(benefits_params) }
     let(:subject) { BenefitSponsors::Services::SponsoredBenefitService.new(attrs) }
 
-    context "#destroy", dbclean: :after_each do
+    context "#destroy" do
 
       before do
         subject.save(form)
@@ -174,7 +174,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService do
 
   end
 
-  describe 'Cost calculations', :dbclean => :after_each do 
+  describe 'Cost calculations' do
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
 
     include_context "setup benefit market with market catalogs and product packages"

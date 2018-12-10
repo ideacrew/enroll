@@ -41,7 +41,7 @@ module BenefitSponsors
         return if self.is_conversion?
         if aasm_state_changed?
 
-          if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
+          if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
             is_employer_open_enrollment_completed = true
           end
 
