@@ -1,6 +1,6 @@
 class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person, :enrollments
+  attr_accessor :family, :data, :person, :enrollments, :renewing_enrollments, :active_enrollments
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person
@@ -9,7 +9,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
-    self.enrollments = args[:enrollments]
+    self.enrollments = args[:renewing_enrollments] + args[:active_enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
