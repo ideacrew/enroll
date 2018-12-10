@@ -17,6 +17,7 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true)
     Permission.create(name: 'developer', list_enrollments: true, view_admin_tabs: true)
+    Permission.create(name: 'hbx_system_admin', modify_family: true, list_enrollments: true, view_admin_tabs: true)
   	permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
@@ -32,6 +33,7 @@ class DefinePermissions < MigrationTask
     u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u7 = User.create( email: 'themanda.tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
+    u8 = User.create( email: 'themanda.system_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     org = Organization.new(legal_name:'Test Org 2050',fein:'123450986')
     hbx_profile = HbxProfile.all.first
     hbx_profile_id = hbx_profile.id
@@ -42,6 +44,7 @@ class DefinePermissions < MigrationTask
     p5 = Person.create( first_name: 'tier2', last_name: "amanda#{rand(1000000)}", user: u5, dob: Date.new(1990,1,1))
     p6 = Person.create( first_name: 'developer', last_name: "developer#{rand(1000000)}", user: u6, dob: Date.new(1990,1,1))
     p7 = Person.create( first_name: 'tier3', last_name: "amanda#{rand(1000000)}", user: u7, dob: Date.new(1990,1,1))
+    p8 = Person.create( first_name: 'system_admin', last_name: "amanda#{rand(1000000)}", user: u8, dob: Date.new(1990,1,1))
     HbxStaffRole.create!( person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!(  person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
@@ -49,6 +52,7 @@ class DefinePermissions < MigrationTask
     HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p6, permission_id: Permission.hbx_csr_tier2.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person:p8, permission_id: Permission.hbx_system_admin.id, subrole: 'hbx_system_admin', hbx_profile_id: hbx_profile_id)
   end
 
   def hbx_admin_can_update_ssn
@@ -80,6 +84,7 @@ class DefinePermissions < MigrationTask
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier1.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
+    Permission.hbx_system_admin.update_attributes!(can_view_username_and_email: true)
   end
 
   def hbx_admin_can_view_application_types
