@@ -167,7 +167,7 @@ function validTerminatePy() {
     } else {
       disableSubmitButton();
     }
-    if (date.value.length > 0 && inputsPresent && inputsChecked) {
+    if (date.value.length > 0 && inputsPresent == true && inputsChecked == true) {
       enableSubmitButton()
     } else {
       disableSubmitButton();
@@ -189,7 +189,7 @@ function validateTermActions() {
 
 (function() {
   $('input.py-end-date').click(function() {
-    if (!inputsChecked) {
+    if (!inputsPresent && !inputsChecked) {
       alert('Please select termination reason');
       $(this).val('');
       $('#ui-datepicker-div').hide();
