@@ -136,12 +136,6 @@ module BenefitSponsors
       )
     }
 
-    scope :draft_benefit_application, ->{
-      where(:benefit_applications => {
-                :$elemMatch => {:aasm_state => :draft }}
-      )
-    }
-
     scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :"aasm_state".in => [:enrollment_open, :enrollment_extended] }}

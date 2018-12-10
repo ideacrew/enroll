@@ -82,19 +82,19 @@ module BenefitSponsors
           benefit_application.auto_approve_application!
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
-            @messages['notice'] = 'Employer(s) Plan Year was successfully published.'
+            @messages['notice'] = 'Employer(s) last Plan Year was successfully published.'
           else
-            raise 'Employer(s) Plan Year date has not matched.'
+            raise 'Employer(s) last Plan Year date has not matched.'
           end
         else
-          @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+          @messages['notice'] = 'Employer(s) last Plan Year could not be processed'
         end
       elsif benefit_application.may_submit_for_review?
         benefit_application.submit_for_review!
-        @messages['notice'] = 'Employer(s) Plan Year was successfully submitted for review.'
+        @messages['notice'] = 'Employer(s) last Plan Year was successfully submitted for review.'
         @messages['warnings'] = submit_application_warnings unless submit_application_warnings.empty?
       else
-        @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+        @messages['notice'] = 'Employer(s) last Plan Year could not be processed'
         @messages['warnings'] = submit_application_warnings unless submit_application_warnings.empty?
       end
     rescue => e

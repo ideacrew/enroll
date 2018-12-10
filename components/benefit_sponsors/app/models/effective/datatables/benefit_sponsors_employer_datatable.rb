@@ -91,12 +91,13 @@ module Effective
       end
 
       def get_latest_draft_benefit_application_id(benefit_sponsorship)
-        draft_app = benefit_sponsorship.draft_benefit_application.last
+        draft_apps = benefit_sponsorship.benefit_applications.draft_state
+        draft_apps.present? ? draft_apps.last : ""
       end
 
       def force_publish_link_type(benefit_sponsorship)
-        draft_application = get_latest_draft_benefit_application_id(benefit_sponsorship)
-        draft_application.blank? ? 'disabled' : 'post_ajax'
+        draft_application_id = get_latest_draft_benefit_application_id(benefit_sponsorship)
+        draft_application_id.blank? ? 'disabled' : 'post_ajax'
       end
 
       def collection
