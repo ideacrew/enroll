@@ -19,7 +19,7 @@ module Services
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+SHOP_PATH
+          is_congress ? @url = Settings.checkbook_services.Congress_base_url : @url = BASE_URL+SHOP_PATH
         end
       end
 
@@ -27,7 +27,7 @@ module Services
         return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
         begin
-          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
+          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop 
 
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
@@ -116,6 +116,19 @@ module Services
          }
       end
 
+      def construct_body_ivl
+        {
+          "remote_access_key":  ,
+          "reference_id": ,
+          "enrollment_year": 2019,
+          "family": [
+              {
+                      "dob": "1990-01-01" # Hardcoding for testing purpose
+              }
+      ],
+          "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+         }
+      end
       def employer_effective_date
         benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
         # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
