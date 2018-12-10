@@ -1,5 +1,7 @@
 require 'rails_helper'
 require 'aasm/rspec'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
@@ -413,40 +415,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     #     end
     #   end
 
-      context "status_step" do
-        let(:hbx_enrollment) {HbxEnrollment.new}
-
-        it "return 1 when coverage_selected" do
-          hbx_enrollment.aasm_state = "coverage_selected"
-          expect(hbx_enrollment.status_step).to eq 1
-        end
-
-        it "return 2 when transmitted_to_carrier" do
-          hbx_enrollment.aasm_state = "transmitted_to_carrier"
-          expect(hbx_enrollment.status_step).to eq 2
-        end
-
-        it "return 3 when enrolled_contingent" do
-          hbx_enrollment.aasm_state = "enrolled_contingent"
-          expect(hbx_enrollment.status_step).to eq 3
-        end
-
-        it "return 4 when coverage_enrolled" do
-          hbx_enrollment.aasm_state = "coverage_enrolled"
-          expect(hbx_enrollment.status_step).to eq 4
-        end
-
-        it "return 5 when coverage_canceled" do
-          hbx_enrollment.aasm_state = "coverage_canceled"
-          expect(hbx_enrollment.status_step).to eq 5
-        end
-
-        it "return 5 when coverage_terminated" do
-          hbx_enrollment.aasm_state = "coverage_terminated"
-          expect(hbx_enrollment.status_step).to eq 5
-        end
-      end
-
       context "enrollment_kind" do
         let(:hbx_enrollment) {HbxEnrollment.new}
         it "should fail validation when blank" do
@@ -553,6 +521,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(bcp)
         allow(consumer_role).to receive(:person).and_return(person)
         allow(household).to receive(:family).and_return family
+        allow(family).to receive(:family_members).and_return coverage_household.coverage_household_members.map(&:family_member)
         allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
       end
 
@@ -1323,46 +1292,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_1
       end
     end
-  end
-
-  describe HbxEnrollment, "given a set of broker accounts", dbclean: :after_each do
-    let(:submitted_at) {Time.mktime(2008, 12, 13, 12, 34, 00)}
-    subject {HbxEnrollment.new(:submitted_at => submitted_at)}
-    let(:broker_agency_account_1) {double(:start_on => start_on_1, :end_on => end_on_1)}
-    let(:broker_agency_account_2) {double(:start_on => start_on_2, :end_on => end_on_2)}
-
-    describe "with both accounts active before the purchase, and the second one unterminated" do
-      let(:start_on_1) {submitted_at - 12.days}
-      let(:start_on_2) {submitted_at - 5.days}
-      let(:end_on_1) {nil}
-      let(:end_on_2) {nil}
-
-      it "should be able to select the applicable broker" do
-        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_2
-      end
-    end
-
-    describe "with both accounts active before the purchase, and the later one terminated" do
-      let(:start_on_1) {submitted_at - 12.days}
-      let(:start_on_2) {submitted_at - 5.days}
-      let(:end_on_1) {nil}
-      let(:end_on_2) {submitted_at - 2.days}
-
-      it "should have no applicable broker" do
-        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq nil
-      end
-    end
-
-    describe "with one account active before the purchase, and the other active after" do
-      let(:start_on_1) {submitted_at - 12.days}
-      let(:start_on_2) {submitted_at + 5.days}
-      let(:end_on_1) {nil}
-      let(:end_on_2) {nil}
-
-      it "should be able to select the applicable broker" do
-        expect(subject.select_applicable_broker_account([broker_agency_account_1, broker_agency_account_2])).to eq broker_agency_account_1
-      end
-    end
 
     describe "with one account active before the purchase and terminated before the purchase, and the other active after" do
       let(:start_on_1) {submitted_at - 12.days}
@@ -1819,13 +1748,6 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       expect(family.enrollments_for_display.to_a).to eq([])
     end
 
-    it "should return coverage_termination_date by census_employee" do
-      census_employee.coverage_terminated_on = coverage_termination_date
-      employee_role.census_employee = census_employee
-      enrollment.employee_role = employee_role
-      enrollment.aasm_state = "coverage_termination_pending"
-      expect(enrollment.future_enrollment_termination_date).to eq enrollment.terminated_on
-
     it "should not be visible to the family" do
       enrollment.aasm_state = "coverage_canceled"
       enrollment.external_enrollment = false
@@ -1901,6 +1823,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         census_employee.coverage_terminated_on = coverage_termination_date
         employee_role.census_employee = census_employee
         enrollment.employee_role = employee_role
+        enrollment.terminated_on = coverage_termination_date
         enrollment.aasm_state = "coverage_termination_pending"
         expect(enrollment.future_enrollment_termination_date).to eq coverage_termination_date
       end
@@ -2300,27 +2223,26 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
 
         # Although slower, it's essential to read the record from DB, as the in-memory version may differ
-        it "enrollment is in terminated state" do
-          expect(HbxEnrollment.find(hbx_enrollment.id).coverage_terminated?).to be_truthy
+      it "enrollment is in terminated state" do
+        expect(HbxEnrollment.find(hbx_enrollment.id).coverage_terminated?).to be_truthy
+      end
+
+      context "and the enrollment is invalidated" do
+        before do
+          hbx_enrollment.invalidate_enrollment
+          hbx_enrollment.save!
         end
 
-        context "and the enrollment is invalidated" do
-          before do
-            hbx_enrollment.invalidate_enrollment
-            hbx_enrollment.save!
-          end
+        it "enrollment should transition to void state" do
+          expect(HbxEnrollment.find(hbx_enrollment.id).void?).to be_truthy
+        end
 
-          it "enrollment should transition to void state" do
-            expect(HbxEnrollment.find(hbx_enrollment.id).void?).to be_truthy
-          end
+        it "terminated_on value should be null" do
+          expect(HbxEnrollment.find(hbx_enrollment.id).terminated_on).to be_nil
+        end
 
-          it "terminated_on value should be null" do
-            expect(HbxEnrollment.find(hbx_enrollment.id).terminated_on).to be_nil
-          end
-
-          it "terminate_reason value should be null" do
-            expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
-          end
+        it "terminate_reason value should be null" do
+          expect(HbxEnrollment.find(hbx_enrollment.id).terminate_reason).to be_nil
         end
       end
     end
@@ -2423,7 +2345,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
           let(:census_employee) {double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day)}
 
           it 'should raise error' do
-            expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+            expect {hbx_enrollment.validate_for_cobra_eligiblity(employee_role, user100)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
           end
         end
     end
@@ -2880,19 +2802,21 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxEnrollment, dbclean: :after_all do
-    let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-    let!(:plan100) { FactoryGirl.create(:plan) }
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+    describe HbxEnrollment, dbclean: :after_all do
+      let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
+      let!(:plan100) { FactoryGirl.create(:plan) }
 
-    describe "is_an_existing_plan?" do
-      context "for checking if a new plan is similar to the given enr's plan " do
-        it "should return true as the compared plan has similar hios_id and same active year" do
-          expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
-        end
+      describe "is_an_existing_plan?" do
+        context "for checking if a new plan is similar to the given enr's plan " do
+          it "should return true as the compared plan has similar hios_id and same active year" do
+            expect(enrollment100.is_an_existing_plan?(enrollment100.plan)).to eq true
+          end
 
-        it "should return false as the compared plan has a different hios_id" do
-          expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+          it "should return false as the compared plan has a different hios_id" do
+            expect(enrollment100.is_an_existing_plan?(plan100)).to eq false
+          end
         end
       end
     end
