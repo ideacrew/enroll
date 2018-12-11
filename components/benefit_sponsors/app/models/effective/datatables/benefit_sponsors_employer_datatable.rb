@@ -108,7 +108,7 @@ module Effective
 
       def force_publish_link_type(benefit_sponsorship, allow)
         draft_application_id = get_latest_draft_benefit_application_id(benefit_sponsorship)
-        allow && draft_application_id.present? ? 'post_ajax' : 'disabled'
+        allow && draft_application_id.present? ? 'post_ajax' : 'hide'
       end
 
       def collection
