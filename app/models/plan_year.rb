@@ -1048,7 +1048,7 @@ class PlanYear
 
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
-      transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
+      transitions from: [:terminated,:termination_pending], to: :active, after: :reset_termination_and_end_date
     end
 
     event :renew_plan_year, :after => :record_transition do
