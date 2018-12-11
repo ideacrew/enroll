@@ -7,6 +7,8 @@ describe ForcePublishPlanYears, dbclean: :after_each do
   before :each do
     TimeKeeper.set_date_of_record_unprotected!(current_date)
   end
+
+
   
   let(:current_date)      { Date.new(2018,10,9) }
   let(:publish_date)      { Date.new(2018,12,1) }
@@ -32,6 +34,8 @@ describe ForcePublishPlanYears, dbclean: :after_each do
                                           }}
                                         }) } 
 
+          
+
   let!(:renewing_draft_plan_year)        do
     py = FactoryGirl.create(:renewing_draft_plan_year)
     bg = FactoryGirl.create(:benefit_group, plan_year: py)
@@ -50,8 +54,9 @@ describe ForcePublishPlanYears, dbclean: :after_each do
     PlanYear.find(py.id)
   end
 
-
-
+  after :each do 
+    `rm #{unassigned_file}`if File.exists?(unassigned_file)
+  end
   
   subject {ForcePublishPlanYears.new(publish_date, current_date)}
   
@@ -76,7 +81,7 @@ describe ForcePublishPlanYears, dbclean: :after_each do
 
       expect(File).to exist(unassigned_file)
       expect(census_employee_1.benefit_group_assignments).not_to be_empty
-      # `rm -rf #{unassigned_file}`
+      `rm -rf #{unassigned_file}`
     end
 
     it 'sets back the OE date for renewing draft employers with a OE date greater than current date' do
