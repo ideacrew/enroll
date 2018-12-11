@@ -411,13 +411,14 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
-  def first_name_last_name_and_suffix
-    [first_name, last_name, name_sfx].compact.join(" ")
+  def first_name_last_name_and_suffix(seperator=nil)
+    seperator = seperator.present? ? seperator : " "
+    [first_name, last_name, name_sfx].compact.join(seperator)
     case name_sfx
       when "ii" ||"iii" || "iv" || "v"
-        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(seperator)
       else
-        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(seperator)
       end
   end
 
@@ -651,11 +652,11 @@ class Person
   end
 
   def is_consumer_role_active?
-    self.active_individual_market_role == "consumer" ? true : false
+    (self.consumer_role.present? && self.active_individual_market_role == "consumer") ? true : false
   end
 
   def is_resident_role_active?
-     self.active_individual_market_role == "resident" ? true : false
+    (self.resident_role.present? && self.active_individual_market_role == "resident") ? true : false
   end
 
   class << self

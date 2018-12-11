@@ -216,33 +216,17 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
   end
-
-  describe '#review button class' do
-    let(:obj) { double }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    before :each do
-      family.active_household.hbx_enrollments << HbxEnrollment.new(:aasm_state => "enrolled_contingent")
-      allow(obj).to receive_message_chain("family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+ 
+  describe '#has_active_consumer_dependent?' do
+    let(:person1) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, :person => person) }
+    let(:dependent){ double(family_member: double) }
+    it 'returns true the person has active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person1, dependent)).to eq true
     end
-
-    it 'returns default when the status is verified' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['outstanding'])
-      expect(helper.review_button_class(family)).to eq('default')
-    end
-
-    it 'returns info when the status is in review and outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'outstanding'])
-      expect(helper.review_button_class(family)).to eq('info')
-    end
-
-    it 'returns success when the status is in review ' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review'])
-      expect(helper.review_button_class(family)).to eq('success')
-    end
-
-    it 'returns sucsess when the status is verified and in review but no outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'verified'])
-      expect(helper.review_button_class(family)).to eq('success')
+    it 'returns false the person has no active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person2, dependent)).to eq false
     end
   end
 

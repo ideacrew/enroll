@@ -6,15 +6,15 @@ class ForcePublishPlanYears
   end
   
   def call 
-    puts 'reverting plan years...' unless Rails.env.test?
-    revert_plan_years
-    puts 'assigning packages...' unless Rails.env.test?
+    puts 'Reverting plan years...' unless Rails.env.test?
+    revert_plan_years # setting renewing published plan years back to renewing draft
+    puts 'Assigning packages...' unless Rails.env.test?
     assign_packages #assign benefit packages to census employeess missing them    
-    puts'setting back oe date.s..' unless Rails.env.test?
+    puts'Setting back oe dates...' unless Rails.env.test?
     set_back_oe_date #set back oe dates for renewing draft employers with OE dates greater than current date 
-    puts 'force publishing...' unless Rails.env.test?
+    puts 'Force Publishing...' unless Rails.env.test?
     force_publish # force publish
-    puts '...generating error CSV of ERs with PYs not in Renewing Enrolling for some reason... ' unless Rails.env.test?
+    puts 'generating error CSV of ERs with PYs not in Renewing Enrolling for some reason... ' unless Rails.env.test?
     clean_up #create error csv file with ERs that did not transition correctly
   end
 
@@ -64,9 +64,11 @@ class ForcePublishPlanYears
         end
       end
     end 
+    puts "unnasigned packages file created" unless Rails.env.test?
   end
 
   def set_back_oe_date
+    puts "Setting back OE dates for the below ERs" unless Rails.env.test?
     plan_years_in_aasm_state(['renewing_draft']).each do |org|
       py = org.employer_profile.plan_years.last
       if py.open_enrollment_start_on > @current_date
@@ -78,20 +80,20 @@ class ForcePublishPlanYears
   end
 
   def force_publish
-    puts "----renewing draft count == #{plan_years_in_aasm_state(['renewing_draft']).count} prior to publish" unless Rails.env.test?
+    puts "----Renewing draft count == #{plan_years_in_aasm_state(['renewing_draft']).count} prior to publish" unless Rails.env.test?
     plan_years_in_aasm_state(['renewing_draft']).each do |org|
       py = org.employer_profile.renewing_plan_year
       org.employer_profile.renewing_plan_year.force_publish! if py.may_force_publish? && py.is_application_valid?
     end
-    puts "----renewing draft count == #{plan_years_in_aasm_state(['renewing_draft']).count} after publish" unless Rails.env.test?
-    puts "----renewing enrolling count == #{plan_years_in_aasm_state(['renewing_enrolling']).count} after publish" unless Rails.env.test?
+    puts "----Renewing draft count == #{plan_years_in_aasm_state(['renewing_draft']).count} after publish" unless Rails.env.test?
+    puts "----Renewing enrolling count == #{plan_years_in_aasm_state(['renewing_enrolling']).count} after publish" unless Rails.env.test?
   end
   
   def clean_up
     CSV.open("#{Rails.root}/employers_not_in_renewing_enrolling_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv", "w") do |csv|
     csv << ["Organization", "Plan Year State"]
     plan_years_in_aasm_state(['renewing_draft','renewing_publish_pending','renewing_enrolled','renewing_published']).each do |org|
-        aasm_state = org.employer_profile.plan_years.last.aasm_state
+        aasm_state = org.employer_profile.plan_years.where(start_on: @publish_date).first.aasm_state
         data = [org.fein, aasm_state]
         csv << data
       end
@@ -99,9 +101,7 @@ class ForcePublishPlanYears
   end
 
   def query_enrollment_count 
-
     feins = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:start_on => @publish_date, :aasm_state => 'renewing_enrolling'}}).pluck(:fein)
-
     clean_feins = feins.map do |f|
       f.gsub(/\D/,"")
     end
@@ -115,7 +115,6 @@ class ForcePublishPlanYears
     end
     puts "----Current Enrollment Count = #{enroll_pol_ids.count}----"
   end
-  
 end
 
 

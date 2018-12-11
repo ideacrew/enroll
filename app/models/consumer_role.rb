@@ -541,10 +541,11 @@ class ConsumerRole
       transitions from: :fully_verified, to: :verification_outstanding
     end
 
-    event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process] do
+    event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :dhs_pending, to: :dhs_pending
       transitions from: :sci_verified, to: :sci_verified
+      transitions from: :verification_outstanding, to: :sci_verified, :guard => :ssa_citizenship_verified?
       transitions from: :verification_outstanding, to: :verification_outstanding
       transitions from: :fully_verified, to: :sci_verified
     end
@@ -554,6 +555,7 @@ class ConsumerRole
       transitions from: :unverified, to: :verification_outstanding
       transitions from: :ssa_pending, to: :verification_outstanding
       transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :sci_verified, to: :verification_outstanding
       transitions from: :verification_outstanding, to: :verification_outstanding
       transitions from: :fully_verified, to: :verification_outstanding
       transitions from: :verification_period_ended, to: :verification_outstanding
@@ -630,6 +632,14 @@ class ConsumerRole
   def is_tribe_member?
     return false if tribal_id.nil?
     !tribal_id.empty?
+  end
+
+  def ssa_verified?
+    person.ssn && verification_types.by_name("Social Security Number").first.validation_status == "verified"
+  end
+
+  def ssa_citizenship_verified?
+    ssa_verified? && lawful_presence_authorized?
   end
 
   def tribal_no_ssn?
@@ -805,8 +815,7 @@ class ConsumerRole
 
   def invoke_residency_verification!
     if can_start_residency_verification?
-      mark_residency_pending
-      start_residency_verification_process
+      trigger_residency!
     end
   end
 
@@ -894,7 +903,7 @@ class ConsumerRole
   end
 
   def residency_pending?
-    local_residency_validation == "pending" || is_state_resident.nil?
+    (local_residency_validation == "pending" || is_state_resident.nil?) && verification_types.by_name("DC Residency").first.validation_status != "attested"
   end
 
   def residency_denied?

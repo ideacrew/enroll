@@ -85,12 +85,10 @@ class Household
     if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
       verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
-
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
         latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       end
-
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
         effective_starting_on: verified_tax_household.start_date,
@@ -132,7 +130,6 @@ class Household
         csr_percent_as_integer: latest_eligibility_determination.csr_percent,
         determined_on: latest_eligibility_determination.determination_date
       )
-
       th.save!
     end
   end

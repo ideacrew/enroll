@@ -32,6 +32,10 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  field :no_ssn, type: Boolean, default: false
+  field :enable_ssn_date, type: DateTime
+  field :disable_ssn_date, type: DateTime
+
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
@@ -168,6 +172,10 @@ class EmployerProfile
     @broker_agency_profile = active_broker_agency_account.broker_agency_profile if active_broker_agency_account.present?
   end
 
+  # def is_ssn_disabled?
+  #   no_ssn
+  # end
+
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
     @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
@@ -288,7 +296,7 @@ class EmployerProfile
   end
 
   def dt_display_plan_year
-    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
+    plan_years.where(:aasm_state.nin => ['canceled','renewing_canceled']).order_by(:"start_on".desc).first || latest_plan_year
   end
 
   def plan_year_drafts
@@ -304,7 +312,7 @@ class EmployerProfile
   end
 
   def find_plan_year_by_effective_date(target_date)
-    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(:aasm_state.in => ["expired", "termination_pending"])).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
@@ -634,8 +642,28 @@ class EmployerProfile
       })
     end
 
+    def terminate_scheduled_plan_years
+
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
+      organizations.each do |org|
+        begin
+          plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending", :end_on.lt => TimeKeeper.date_of_record)
+          plan_years.each do |py|
+            py.terminate!(py.end_on)
+            org.employer_profile.revert_application! if py.terminated? && org.employer_profile.may_revert_application?
+          end
+        rescue Exception => e
+          Rails.logger.error { "Unable to terminate plan year for #{org.legal_name} due to #{e.inspect}" }
+        end
+      end
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
+
+        # Terminates scheduled plan years
+        EmployerProfile.terminate_scheduled_plan_years
+
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           begin
