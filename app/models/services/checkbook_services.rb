@@ -118,8 +118,8 @@ module Services
 
       def construct_body_ivl
         {
-          "remote_access_key":  ,
-          "reference_id": ,
+          "remote_access_key": Settings.checkbook_services.remote_access_key ,
+          "reference_id": Settings.checkbook_services.reference_id,
           "enrollment_year": 2019,
           "family": [
               {
