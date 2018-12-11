@@ -47,7 +47,7 @@ Rails.application.routes.draw do
       post :unlock, :change_password
     end
   end
-  
+
   resources :users do
     member do
       get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
@@ -409,6 +409,7 @@ Rails.application.routes.draw do
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
 
   match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
+  # match 'general_agency_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=general_agency'), via: [:get]
   match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do

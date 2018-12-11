@@ -233,7 +233,7 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
-  
+
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
@@ -365,11 +365,11 @@ def employer_poc
 
     status_params = params.permit(:status)
     @status = status_params[:status] || 'is_applicant'
-    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
+    @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
-      format.html { render 'general_agency' }
+      # format.html { render 'general_agency' }
       format.js
     end
   end

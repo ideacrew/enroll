@@ -8,6 +8,10 @@ module BenefitSponsors
         new_profiles_registration_path(profile_type: "broker_agency")
       end
 
+      def general_agency_new_registration_url
+        new_profiles_registration_path(profile_type: "general_agency")
+      end
+
       def sponsor_new_registration_url
         new_profiles_registration_path(profile_type: "benefit_sponsor")
       end
