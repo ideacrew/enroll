@@ -118,6 +118,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'poltergeist'
   gem 'shoulda-matchers', '3.1.1'
+  gem 'simplecov', '0.14.1', :require => false
   gem 'warden'
   gem 'watir'
 end
