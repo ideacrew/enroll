@@ -111,8 +111,9 @@ function fetchCarriers() {
 
 function setSBC(element, plan) {
   var kind = fetchBenefitKind();
+  var sbc_link = element.parentElement.getElementsByClassName("sbc-download-checkbox")[0]
 
-  if (kind == "health" && element.parentElement.getElementsByClassName("sbc-download-checkbox")[0].checked == true) {
+  if (kind == "health" && sbc_link && sbc_link.checked == true) {
    $(element).attr('href',plan+"?sbc_included=true");
   } else {
    $(element).attr('href',plan);
@@ -143,7 +144,13 @@ function buildChiderenElements(form, prefix, data) {
 
 function downloadPdf(event, element) {
   event.preventDefault();
+  event.stopPropagation();
   var data = buildBenefitGroupParams();
+  if(!(data.benefit_group)) {
+    data.benefit_group = {
+      kind: element.dataset.kind
+    }
+  }
   url_redirect({url: element.href, method: "post", data: data});
 }
 
