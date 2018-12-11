@@ -229,7 +229,7 @@ RSpec.describe Employers::BrokerAgencyController do
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
     end
 
-    it "should send notice to employer, broker and agency" do
+    xit "should send notice to employer, broker and agency" do
       @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
       @org2.broker_agency_profile.save
       ActiveJob::Base.queue_adapter = :test
