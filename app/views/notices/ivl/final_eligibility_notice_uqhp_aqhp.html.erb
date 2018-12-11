@@ -8,14 +8,9 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -23,14 +18,9 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -40,15 +30,9 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -56,15 +40,9 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -74,16 +52,10 @@
   <table class="total_table" border="0">
     <tbody>
       <tr>
-        <td><h3>YOUR DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
-    </tbody>
-  </table>
-
-  <table class="total_table" border="0">
-    <tbody>
-    <tr>
-      <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-    </tr>
     </tbody>
   </table>
 <% end %>
@@ -250,7 +222,7 @@
 
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
+    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty on your DC taxes for the months you don’t have health insurance.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
