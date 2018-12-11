@@ -6,6 +6,7 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
+  include Mongoid::History::Trackable
   include AuthorizationConcern
   include PermissionsConcern
 
@@ -91,6 +92,14 @@ class User
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
+
+  track_history   :on => [:oim_id,
+                      :email],
+                :modifier_field => :modifier,
+                :version_field => :tracking_version,
+                :track_create  => true,
+                :track_update  => true,
+                :track_destroy => true
 
   before_save :strip_empty_fields
 

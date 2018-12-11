@@ -75,9 +75,12 @@ describe UsersController do
     let(:valid_email) { "email@email.com" }
 
     before do
+      allow(UserPolicy).to receive(:new).with(user, User).and_return(user_policy)
       allow(user_policy).to receive(:change_username_and_email?).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      sign_in(admin)
+      sign_in(user)
+      allow(User).to receive(:find).with(user.id).and_return(user)
+      get :edit, id: user.id, format: 'js'
     end
 
     context "email format wrong" do
