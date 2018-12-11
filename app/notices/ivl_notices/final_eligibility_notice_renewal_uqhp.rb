@@ -3,11 +3,11 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   attr_accessor :family, :data, :person
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
@@ -48,7 +48,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   def pick_enrollments
     hbx_enrollments = []
     family = recipient.primary_family
-    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
+    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
     return nil if enrollments.blank?
     health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
     dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}

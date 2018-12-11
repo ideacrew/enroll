@@ -50,6 +50,31 @@ describe FixPlanYear, dbclean: :after_each do
       end
     end
 
+    context "expired plan year to termianted plan year" do
+      before :each do
+        allow(ENV).to receive(:[]).with("fein").and_return organization.fein
+        allow(ENV).to receive(:[]).with("start_on").and_return plan_year.start_on
+        allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
+        allow(ENV).to receive(:[]).with("aasm_state").and_return 'terminated'
+        allow(ENV).to receive(:[]).with("terminated_on").and_return (TimeKeeper.date_of_record - 1.days).to_s
+        allow(ENV).to receive(:[]).with("update_enrollments").and_return "true"
+        plan_year.update_attributes!(aasm_state:'expired', terminated_on: plan_year.terminated_on, end_on: term_date)
+        hbx_enrollment.update_attributes!(aasm_state:'coverage_expired')
+      end
+
+      it "should make plan year & enrollments termianted" do
+        expect(plan_year.aasm_state).to eq 'expired'   # before migration
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
+        expect(hbx_enrollment.terminated_on).to eq nil
+        subject.migrate
+        plan_year.reload
+        hbx_enrollment.reload
+        expect(plan_year.aasm_state).to eq 'terminated'  # after migration
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
+        expect(hbx_enrollment.terminated_on).to eq plan_year.terminated_on
+      end
+    end
+
     context "termianted plan year to cancelled plan year" do
 
       before :each do

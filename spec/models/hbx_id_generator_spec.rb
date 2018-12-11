@@ -17,6 +17,10 @@ describe HbxIdGenerator do
     it "generates faa application ids" do
       expect(HbxIdGenerator.generate_application_id).not_to eq nil
     end
+
+    it "generates payment_transaction ids" do
+      expect(HbxIdGenerator.generate_payment_transaction_id).not_to eq nil
+    end
   end
 
   describe "with an amqp source" do
@@ -62,6 +66,15 @@ describe HbxIdGenerator do
 
       it "returns the expected faa_application_id" do
         expect(generator.generate_application_id).to eq sequence_number
+      end
+    end
+
+    describe "for payment_transaction_ids" do
+      let(:sequence_name) { "payment_transaction_id" }
+      let(:sequence_number) { "9876873222" }
+
+      it "returns the expected payment_transaction_id" do
+        expect(generator.generate_payment_transaction_id).to eq sequence_number
       end
     end
   end

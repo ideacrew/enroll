@@ -128,7 +128,7 @@ describe ChangeEnrollmentDetails do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
         allow(ENV).to receive(:[]).with("action").and_return "change_enrollment_status"
         allow(ENV).to receive(:[]).with("new_aasm_state").and_return "move_to_enrolled"
-        hbx_enrollment.update_attribute("aasm_state","enrolled_contingent")
+        hbx_enrollment.update_attribute("aasm_state","unverified")
         hbx_enrollment.reload
       end
 
@@ -189,6 +189,20 @@ describe ChangeEnrollmentDetails do
         expect(hbx_enrollment.aasm_state).to eq "coverage_expired"
       end
     end
+
+    context "move enr to shopping" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "move_enrollment_to_shopping"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should move enr to shopping state" do
+        expect(hbx_enrollment.aasm_state).to eq "shopping"
+      end
+    end
+
 
     context "change the plan of enrollment" do
       before do

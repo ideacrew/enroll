@@ -16,6 +16,10 @@ class HbxIdGenerator
     provider.generate_policy_id
   end
 
+  def generate_payment_transaction_id
+    provider.generate_payment_transaction_id
+  end
+
   def generate_organization_id
     provider.generate_organization_id
   end
@@ -30,6 +34,10 @@ class HbxIdGenerator
 
   def self.generate_policy_id
     self.instance.generate_policy_id
+  end
+
+  def self.generate_payment_transaction_id
+    self.instance.generate_payment_transaction_id
   end
 
   def self.generate_member_id
@@ -63,6 +71,10 @@ class HbxIdGenerator
       generate_id_from_sequence("policy_id")
     end
 
+    def self.generate_payment_transaction_id
+      generate_id_from_sequence("payment_transaction_id")
+    end
+
     def self.generate_organization_id
       generate_id_from_sequence("organization_id")
     end
@@ -78,6 +90,10 @@ class HbxIdGenerator
     end
 
     def self.generate_policy_id
+      random_uuid
+    end
+
+    def self.generate_payment_transaction_id
       random_uuid
     end
 
