@@ -27,6 +27,27 @@ BenefitSponsors::Engine.routes.draw do
       resources :broker_applicants
     end
 
+    namespace :general_agencies do
+      resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
+        collection do
+          get :family_index
+          get :messages
+          get :staff_index
+          get :agency_messages
+          get :commission_statements
+        end
+        member do
+          post :clear_assign_for_employer
+          get :assign
+          post :update_assign
+          post :family_datatable
+          get :inbox
+          get :download_commission_statement
+          get :show_commission_statement
+        end
+      end
+
+    end
     namespace :employers do
       resources :employer_profiles, only: [:show] do
         get :export_census_employees

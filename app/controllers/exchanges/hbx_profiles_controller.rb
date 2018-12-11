@@ -157,11 +157,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   def force_publish
     @element_to_replace_id = params[:employer_actions_id]
     @benefit_application   = @benefit_sponsorship.benefit_applications.draft_state.last
-    
+
     if @benefit_application.present?
       @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
       if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
-        @service.force_submit_application      
+        @service.force_submit_application
       end
     end
 
@@ -300,6 +300,14 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
+
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
+
   def user_account_index
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
@@ -422,11 +430,11 @@ def employer_poc
 
     status_params = params.permit(:status)
     @status = status_params[:status] || 'is_applicant'
-    @general_agency_profiles = GeneralAgencyProfile.filter_by(@status)
+    @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.filter_by(@status)
     @general_agency_profiles = Kaminari.paginate_array(@general_agency_profiles).page(page_no)
 
     respond_to do |format|
-      format.html { render 'general_agency' }
+      # format.html { render 'general_agency' }
       format.js
     end
   end

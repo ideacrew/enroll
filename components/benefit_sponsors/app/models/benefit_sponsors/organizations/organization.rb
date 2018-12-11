@@ -232,6 +232,10 @@ module BenefitSponsors
         self.profiles.where(_type: /.*BrokerAgencyProfile$/).first
       end
 
+      def general_agency_profile
+        self.profiles.where(_type: /.*GeneralAgencyProfile$/).first
+      end
+
       def hbx_profile
         self.profiles.where(_type: /.*HbxProfile$/).first
       end

@@ -136,7 +136,7 @@ aca:
   market_kinds: ["shop"]
   hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: false
-  general_agency_enabled: false
+  general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
   calendar_enabled: true
@@ -172,8 +172,13 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,02,05) %>
+      # start_on: <%= Date.new(2017,11,1) %>
+      # end_on: <%= Date.new(2018,02,05) %>
+      start_on: <%= Date.new(2018,11,1) %>
+      end_on: <%= Date.new(2019,01,31) %>
+    dc_resident_application: true
+    transition_family_members_link: true
+
     upcoming_open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
       end_on: <%= Date.new(2019,01,31) %>
