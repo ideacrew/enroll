@@ -136,6 +136,6 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_change_fein
-    Permission.hbx_system_admin.update_attributes!(can_change_fein: true)
+    Permission.super_admin.update_attributes!(can_change_fein: true)
   end
 end

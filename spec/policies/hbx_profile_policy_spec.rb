@@ -140,13 +140,13 @@ describe HbxProfilePolicy do
       expect(policy.can_change_fein?).to be false
     end
 
-    it 'hbx_system_admin' do
-      allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_system_admin))
-      expect(policy.modify_admin_tabs?).to be false
+    it 'super_admin' do
+      allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :super_admin))
+      expect(policy.modify_admin_tabs?).to be true
       expect(policy.view_admin_tabs?).to be true
-      expect(policy.send_broker_agency_message?).to be false
-      expect(policy.approve_broker?).to be false
-      expect(policy.approve_ga?).to be false
+      expect(policy.send_broker_agency_message?).to be true
+      expect(policy.approve_broker?).to be true
+      expect(policy.approve_ga?).to be true
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false

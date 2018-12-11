@@ -56,7 +56,7 @@ module Effective
            ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax']
           ]
           if pundit_allow(HbxProfile, :can_change_fein?)
-            dropdown.insert(5, ['Can Change FEIN', "#", 'ajax'])
+            dropdown.insert(5, ['Change FEIN', change_fein_info_exchanges_hbx_profiles_path(id: row, row_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'])
           end
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false

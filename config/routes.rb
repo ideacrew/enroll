@@ -91,6 +91,7 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :get_user_info
+        get :change_fein_info
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
