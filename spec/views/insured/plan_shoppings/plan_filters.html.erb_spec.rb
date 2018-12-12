@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
-  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
+  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month) }
   context "without consumer_role" do
     let(:person) {double(is_consumer_role_active?: false)}
     before :each do
@@ -20,10 +20,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       assign(:dc_checkbook_url, "https://staging.checkbookhealth.org/hie/dc/")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
-    end
-
-    it 'should display find your doctor link' do
-      expect(rendered).to have_selector('a', text: /estimate your costs/i)
     end
 
     it 'should display filter selections' do
@@ -191,6 +187,16 @@ RSpec.describe "insured/_plan_filters.html.erb" do
     it "should have selected aptc pct amount" do
       expect(rendered).to match /85/
       expect(rendered).to have_selector("input#elected_aptc[value='280.50']")
+    end
+
+    it 'should display find your doctor link' do
+      expect(rendered).to_not have_selector('a', text: /estimate your cost/i)
+    end
+
+     it 'should display estimate your cost link' do
+      assign(:coverage_kind, "dental")
+      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
+      expect(rendered).to have_selector('a', text: /estimate your cost/i)
     end
   end
 
