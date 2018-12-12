@@ -3,7 +3,7 @@ require File.join(Rails.root, "app", "data_migrations", "define_permissions")
 
 describe DefinePermissions, dbclean: :after_each do
   subject { DefinePermissions.new(given_task_name, double(:current_scope => nil))}
-  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer hbx_super_admin} }
+  let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
     before do
@@ -50,14 +50,14 @@ describe DefinePermissions, dbclean: :after_each do
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         @hbx_csr_tier1_person = FactoryGirl.create(:person)
         @hbx_csr_tier2_person = FactoryGirl.create(:person)
-        @hbx_super_admin_person = FactoryGirl.create(:person)
+        @super_admin_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_tier3_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3_person, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
-        hbx_super_admin_person = FactoryGirl.create(:hbx_staff_role, person: @hbx_super_admin_person, subrole: "hbx_super_admin", permission_id: Permission.hbx_super_admin.id)
+        super_admin_person = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
         subject.hbx_admin_can_view_username_and_email
         subject.hbx_admin_can_access_user_account_tab
       end
@@ -78,7 +78,7 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_username_and_email).to be true
-        expect(@hbx_super_admin_person.hbx_staff_role.permission.can_view_username_and_email).to be true
+        expect(@super_admin_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         #verifying that the rake task updated only the correct subroles
         expect(Permission.developer.can_add_sep).to be false
       end
@@ -128,11 +128,11 @@ describe DefinePermissions, dbclean: :after_each do
         @hbx_staff_person = FactoryGirl.create(:person)
         @hbx_read_only_person = FactoryGirl.create(:person)
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
-        @hbx_super_admin_person = FactoryGirl.create(:person)
+        @super_admin_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
-        hbx_super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_super_admin_person, subrole: "hbx_super_admin", permission_id: Permission.hbx_super_admin.id)
+        super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
         subject.hbx_admin_can_add_sep
       end
 
@@ -141,12 +141,12 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be false
-        expect(@hbx_super_admin_person.hbx_staff_role.permission.can_add_sep).to be false
+        expect(@super_admin_person.hbx_staff_role.permission.can_add_sep).to be true
         #verifying that the rake task updated only the correct subroles
         expect(Permission.hbx_csr_tier1.can_add_sep).to be false
         expect(Permission.hbx_csr_tier2.can_add_sep).to be false
         expect(Permission.developer.can_add_sep).to be false
-        expect(Permission.hbx_super_admin.can_add_sep).to be false
+        expect(Permission.super_admin.can_add_sep).to be true
       end
     end
 
@@ -161,13 +161,13 @@ describe DefinePermissions, dbclean: :after_each do
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         @hbx_csr_tier1_person = FactoryGirl.create(:person)
         @hbx_csr_tier2_person = FactoryGirl.create(:person)
-        @hbx_super_admin_person = FactoryGirl.create(:person)
+        @super_admin_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
-        hbx_super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_super_admin_person, subrole: "hbx_super_admin", permission_id: Permission.hbx_super_admin.id)
+        super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
         subject.hbx_admin_can_transition_family_members
       end
 
@@ -178,7 +178,7 @@ describe DefinePermissions, dbclean: :after_each do
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_transition_family_members).to be false
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_transition_family_members).to be false
         expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_transition_family_members).to be false
-        expect(@hbx_super_admin_person.hbx_staff_role.permission.can_transition_family_members).to be false
+        expect(@super_admin_person.hbx_staff_role.permission.can_transition_family_members).to be false
       end
     end
   end
@@ -242,19 +242,19 @@ describe DefinePermissions, dbclean: :after_each do
       @hbx_csr_supervisor_person = FactoryGirl.create(:person)
       @hbx_csr_tier1_person = FactoryGirl.create(:person)
       @hbx_csr_tier2_person = FactoryGirl.create(:person)
-      @hbx_super_admin_person = FactoryGirl.create(:person)
+      @super_admin_person = FactoryGirl.create(:person)
       permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
       permission_hbx_read_only = FactoryGirl.create(:permission, :hbx_read_only)
       permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
       permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
       permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
-      permission_hbx_super_admin = FactoryGirl.create(:permission, :hbx_super_admin)
+      permission_super_admin = FactoryGirl.create(:permission, :super_admin)
       hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
       hbx_read_only = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
       hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
       hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
       hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
-      hbx_super_admin = FactoryGirl.create(:hbx_staff_role, person: @hbx_super_admin_person, subrole: "hbx_super_admin", permission_id: permission_hbx_staff.id)
+      super_admin = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: permission_hbx_staff.id)
     end
     it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
       subject.hbx_admin_can_access_new_consumer_application_sub_tab
@@ -316,7 +316,7 @@ describe DefinePermissions, dbclean: :after_each do
       allow(Permission).to receive_message_chain('hbx_csr_tier1.id'){FactoryGirl.create(:permission,  :hbx_csr_tier1).id}
       allow(Permission).to receive_message_chain('hbx_csr_tier1.id'){FactoryGirl.create(:permission,  :developer).id}
       allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryGirl.create(:permission,  :hbx_tier3).id}
-      allow(Permission).to receive_message_chain('hbx_super_admin.id'){FactoryGirl.create(:permission, :hbx_super_admin).id}
+      allow(Permission).to receive_message_chain('super_admin.id'){FactoryGirl.create(:permission, :super_admin).id}
       subject.build_test_roles
     end
     it "creates permissions" do
