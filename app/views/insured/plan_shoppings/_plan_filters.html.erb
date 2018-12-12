@@ -31,7 +31,8 @@
             <p><%= l10n("modal_onscreen1") %></p>
             <p><%= l10n("modal_onscreen2") %></p>
           </div>
-          <div class="modal-footer" style="margin-right:190px">
+          <hr/>
+          <div class="nav" align="right" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%if @hbx_enrollment.effective_on.year == 2019%>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url mtz" %>
@@ -82,7 +83,7 @@
             <p><%= l10n("modal_onscreen1") %></p>
             <p><%= l10n("modal_onscreen2") %></p>
            </div>
-          <div class="modal-footer" style="margin-right:190px">
+          <div class="nav" align="right" style="margin-right:190px">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'  %>
           </div>
