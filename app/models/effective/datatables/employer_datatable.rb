@@ -59,6 +59,9 @@ module Effective
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: get_pocs(row), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
            ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax']
           ]
+          if pundit_allow(HbxProfile, :can_change_fein?)
+            dropdown.insert(5, ['Change FEIN', change_fein_info_exchanges_hbx_profiles_path(id: row, row_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'])
+          end
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
 

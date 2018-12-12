@@ -104,6 +104,7 @@ Rails.application.routes.draw do
         get :enable_or_disable_link
         get :view_terminated_hbx_enrollments
         get :get_user_info
+        get :change_fein_info
         get :identity_verification
         post :identity_verification_datatable
         get :view_terminated_hbx_enrollments

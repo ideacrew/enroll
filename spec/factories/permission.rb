@@ -100,18 +100,14 @@ FactoryGirl.define do
       name 'developer'
     end
 
-    trait :hbx_super_admin do
-      modify_family true
-      modify_employer false
-      revert_application false
-      list_enrollments true
-      send_broker_agency_message false
-      approve_broker false
-      approve_ga false
-      modify_admin_tabs false
-      view_admin_tabs  true
+    trait :super_admin do
+      can_complete_resident_application true
+      can_add_sep true
+      can_access_new_consumer_application_sub_tab true
+      can_access_identity_verification_sub_tab true
       can_access_outstanding_verification_sub_tab true
-      name 'hbx_super_admin'
+      can_change_fein true
+      name 'super_admin'
     end
   end
 end

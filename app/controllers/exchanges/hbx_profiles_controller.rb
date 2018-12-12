@@ -655,6 +655,15 @@ def employer_poc
 
   end
 
+  def change_fein_info
+    authorize HbxProfile, :can_change_fein?
+    @organization = Organization.find(params[:id])
+    @element_to_replace_id = params[:row_actions_id]
+    respond_to do |format|
+      format.js { render "change_fein_info", organization: @organization, :family_actions_id =>  params[:row_actions_id] }
+    end
+  end
+
 private
 
    def modify_admin_tabs?
