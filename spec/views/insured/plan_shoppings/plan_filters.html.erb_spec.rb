@@ -157,6 +157,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_aptc, 330)
       assign(:market_kind, 'individual')
       assign(:tax_household, true)
+      assign(:coverage_kind, "health")
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
       assign(:elected_aptc, 280.50)
@@ -189,13 +190,11 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to have_selector("input#elected_aptc[value='280.50']")
     end
 
-    it 'should display find your doctor link' do
-      expect(rendered).to_not have_selector('a', text: /estimate your cost/i)
+    it 'should display find your doctor link for health enrollments only' do
+      expect(rendered).to have_selector('a', text: /Find Your Doctor/i)
     end
 
      it 'should display estimate your cost link' do
-      assign(:coverage_kind, "dental")
-      render :template => "insured/plan_shoppings/_plan_filters.html.erb"
       expect(rendered).to have_selector('a', text: /estimate your cost/i)
     end
   end
