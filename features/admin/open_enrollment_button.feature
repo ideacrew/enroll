@@ -4,10 +4,10 @@ Feature: As an <subrole> I <case> have the ability to extend the OE
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
-    And this employer has a <aasm_state> benefit application
-    And this benefit application has a benefit package containing health benefits
 
   Scenario Outline: As an HBX Staff with <subrole> subroles I <case> be able to extend Open Enrollment for an Employer with a <aasm_state> benefit application
+    Given this employer has a <aasm_state> benefit application
+    And this benefit application has a benefit package containing health benefits
     Given that a user with a HBX staff role with <subrole> subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
     When the user clicks Action for that Employer
