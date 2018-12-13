@@ -129,6 +129,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
 
         context 'when coverage termination pending' do
           before do
+            allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
+            allow_any_instance_of(BenefitSponsors::ModelEvents::HbxEnrollment).to receive(:notify_on_save).and_return(true)
             health_enrollment.schedule_coverage_termination!
             allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
           end
