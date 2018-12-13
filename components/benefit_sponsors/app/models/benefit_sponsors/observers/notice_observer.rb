@@ -10,6 +10,24 @@ module BenefitSponsors
         @notifier = BenefitSponsors::Services::NoticeService.new
       end
 
+      def process_application_events(model_event)
+        case model_event.event_key
+        when :renewal_application_denied
+          trigger_renewal_application_denial_notice_for(model_event)
+        when :initial_application_submitted
+          trigger_initial_application_submission_notice_for(model_event)
+        else
+        end
+      end
+
+      def trigger_renewal_application_denial_notice_for(model_event)
+
+      end
+
+      def trigger_initial_application_submission_notice_for(model_event)
+
+      end
+
       def benefit_application_update(new_model_event)
         current_date = TimeKeeper.date_of_record
         raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
