@@ -1,7 +1,6 @@
 module BenefitSponsorWorld
 
   def benefit_sponsorship(employer = nil)
-    puts employer.employer_profile.add_benefit_sponsorship
     @benefit_sponsorship ||= employer.employer_profile.add_benefit_sponsorship.tap do |benefit_sponsorship|
     end
   end
