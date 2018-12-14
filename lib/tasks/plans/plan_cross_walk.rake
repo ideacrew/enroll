@@ -23,7 +23,7 @@ namespace :xml do
         if new_hios_id.blank?
           old_plans = Plan.where(hios_id: /#{old_hios_id}/, active_year: @previous_year)
           old_plans.each do |old_plan|
-            old_plan.update(cat_age_off_renewal_plan_id: nil)
+            old_plan.update(renewal_plan_id: nil)
             puts "Old #{@previous_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} retired" unless Rails.env.test?
           end
         else
