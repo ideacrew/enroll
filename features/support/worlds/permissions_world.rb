@@ -55,6 +55,10 @@ module PermissionsWorld
     Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+  end
+
   def make_all_permissions
     define_permissions
     hbx_admin_can_update_ssn
@@ -63,6 +67,7 @@ module PermissionsWorld
     hbx_admin_can_lock_unlock
     hbx_admin_can_view_username_and_email
     hbx_admin_can_reset_password
+    hbx_admin_can_force_publish
   end
 end
 
