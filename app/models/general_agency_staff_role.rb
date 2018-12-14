@@ -7,16 +7,17 @@ class GeneralAgencyStaffRole
   embedded_in :person
   field :npn, type: String
   field :general_agency_profile_id, type: BSON::ObjectId
+  field :benefit_sponsors_general_agency_profile_id, type: BSON::ObjectId
   field :aasm_state, type: String, default: "applicant"
   embeds_many :workflow_state_transitions, as: :transitional
 
   associated_with_one :general_agency_profile, :general_agency_profile_id, "GeneralAgencyProfile"
 
-  validates_presence_of :general_agency_profile_id, :npn
+  validates_presence_of :benefit_sponsors_general_agency_profile_id, :npn
   accepts_nested_attributes_for :person, :workflow_state_transitions
-  validates :npn, 
+  validates :npn,
     numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },    
+    length: { minimum: 1, maximum: 10 },
     uniqueness: true,
     allow_blank: false
 
@@ -29,11 +30,11 @@ class GeneralAgencyStaffRole
     state :general_agency_terminated
 
     event :approve, :after => [:record_transition, :send_invitation, :update_general_agency_profile] do
-      transitions from: :applicant, to: :active 
+      transitions from: :applicant, to: :active
     end
 
     event :deny, :after => [:record_transition, :update_general_agency_profile ]  do
-      transitions from: :applicant, to: :denied 
+      transitions from: :applicant, to: :denied
     end
 
     event :decertify, :after => [:record_transition , :update_general_agency_profile] do
@@ -43,7 +44,20 @@ class GeneralAgencyStaffRole
     # Attempt to achieve or return to good standing with HBX
     event :reapply, :after => :record_transition  do
       transitions from: [:applicant, :decertified, :denied], to: :applicant
-    end  
+    end
+  end
+
+  def general_agency_profile
+    return @general_agency_profile if defined? @broker_agency_profile
+    if self.benefit_sponsors_general_agency_profile_id.nil?
+      @general_agency_profile = GeneralAgencyProfile.find(general_agency_profile_id) if has_general_agency_profile?
+    else
+      @general_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_general_agency_profile_id).first.general_agency_profile if has_general_agency_profile?
+    end
+  end
+
+  def has_general_agency_profile?
+    self.benefit_sponsors_general_agency_profile_id.present? || self.general_agency_profile_id.present?
   end
 
   def send_invitation
