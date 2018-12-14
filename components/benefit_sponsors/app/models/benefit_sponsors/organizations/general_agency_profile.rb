@@ -86,6 +86,11 @@ module BenefitSponsors
         LanguageList::COMMON_LANGUAGES
       end
 
+      #old model
+      def general_agency_staff_roles
+        Person.where("general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => BSON::ObjectId.from_string(self.id)).map {|p| p.general_agency_staff_roles.detect {|s| s.benefit_sponsors_general_agency_profile_id == id}}
+      end
+
       def languages
         if languages_spoken.any?
           return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
@@ -153,10 +158,10 @@ module BenefitSponsors
           all.last
         end
 
-        def find(id)
-          organizations = BenefitSponsors::Organizations::Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-          organizations.size > 0 ? organizations.first.general_agency_profile : nil
-        end
+        # def find(id)
+        #   organizations = BenefitSponsors::Organizations::Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
+        #   organizations.size > 0 ? organizations.first.general_agency_profile : nil
+        # end
 
         def filter_by(status="is_applicant")
           if status == 'all'

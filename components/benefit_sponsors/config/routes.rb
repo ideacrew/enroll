@@ -35,6 +35,9 @@ BenefitSponsors::Engine.routes.draw do
           get :staff_index
           get :agency_messages
           get :commission_statements
+          get :staffs
+          get :edit_staff
+          post :update_staff
         end
         member do
           post :clear_assign_for_employer
