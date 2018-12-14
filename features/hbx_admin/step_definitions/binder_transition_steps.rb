@@ -1,10 +1,6 @@
 module BinderTransitionWorld
   include ApplicationHelper
 
-  def employer(*traits)
-    attributes = traits.extract_options!
-    @employer ||= FactoryGirl.create :employer, *traits, attributes
-  end
 end
 World(BinderTransitionWorld)
 
