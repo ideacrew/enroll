@@ -127,6 +127,8 @@ module BenefitSponsors
         def persist_representative!
           if is_broker_profile?
             persist_broker_staff_role!(organization.broker_agency_profile)
+          elsif is_general_agency_profile?
+            persist_general_agenecy_staff_role!(organization.general_agency_profile)
           elsif is_employer_profile?
             persist_employer_staff_role!(organization.employer_profile, claimed)
           end
@@ -146,6 +148,19 @@ module BenefitSponsors
           person.save!
           profile.update_attributes!(primary_broker_role_id: person.broker_role.id)
           trigger_broker_application_confirmation_email
+        end
+
+        def persist_general_agenecy_staff_role!(profile)
+          person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
+            :npn => self.npn,
+            :benefit_sponsors_general_agency_profile_id => profile.id, # this should be new profile id
+          })
+          profile.office_locations.each do |office_location|
+            self.person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+          end
+          person.save!
+          # profile.update_attributes!(primary_broker_role_id: person.broker_role.id)
+          # trigger_broker_application_confirmation_email
         end
 
         def persist_employer_staff_role!(profile, existing_company)
@@ -380,6 +395,8 @@ module BenefitSponsors
 
         def add_person_contact_info
           if is_broker_profile?
+            person.add_work_email(email)
+          elsif is_general_agency_profile?
             person.add_work_email(email)
           elsif is_employer_profile?
             person.contact_info(email, area_code, number, extension) if email
