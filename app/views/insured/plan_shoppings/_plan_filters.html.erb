@@ -22,17 +22,16 @@
    <div class="modal fade" id="plan_match_redirection" tabindex="-1" role="dialog" role="document">
     <div class="modal-dialog">
        <div class="modal-content">
-          <div class="modal-header" style="border-bottom:none">
+          <div class="modal-header" style="height:50px">
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-           <hr>
-          </div> 
+          </div>
           <div style="margin-left:20px;">
-            <p><%= l10n("modal_onscreen") %></p>
-            <p><%= l10n("modal_onscreen1") %></p>
-            <p><%= l10n("modal_onscreen2") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
           </div>
 
-          <div class="modal-footer">
+          <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
             <%if @hbx_enrollment.effective_on.year == 2019%>
@@ -53,7 +52,7 @@
           <div class="modal-header" style="border-bottom:none">
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
            <hr>
-          </div> 
+          </div>
            <div style="margin-left:20px;">
             <p><%= l10n("modal_onscreen") %></p>
             <p><%= l10n("modal_onscreen1") %></p>
