@@ -7,6 +7,7 @@ class User
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AuthorizationConcern
+  include Mongoid::History::Trackable
   include PermissionsConcern
 
   attr_accessor :login
