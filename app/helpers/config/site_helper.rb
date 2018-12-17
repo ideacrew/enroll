@@ -144,6 +144,7 @@ module Config::SiteHelper
     link_to site_website_name, site_main_web_address_url
   end
 
+
   def non_discrimination_notice_url
     link_to site_nondiscrimination_notice_url, site_nondiscrimination_notice_url
   end
@@ -158,6 +159,10 @@ module Config::SiteHelper
 
   def site_initial_earliest_start_prior_to_effective_on
     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+  end
+
+  def publish_due_day_of_month
+    Settings.aca.shop_market.initial_application.publish_due_day_of_month
   end
 
   def site_guidance_for_business_owners_url
