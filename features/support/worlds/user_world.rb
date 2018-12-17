@@ -37,7 +37,6 @@ module UserWorld
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
       @admin = FactoryGirl.create(:user, :person => person)
-
     end
   end
 
@@ -89,4 +88,12 @@ end
 Then(/^the user enters a new open enrollment end date$/) do
   input = find('input.hasDatepicker')
   input.set(Date.today+1.week)
+end
+
+Then(/^the user will( not)? see the Force Publish button$/) do |visible|
+  if visible.blank?
+    expect(page).to have_css('.btn.btn-xs', text: 'Force Publish')
+  else
+    expect(page).to_not have_css('.btn.btn-xs', text: 'Force Publish')
+  end
 end

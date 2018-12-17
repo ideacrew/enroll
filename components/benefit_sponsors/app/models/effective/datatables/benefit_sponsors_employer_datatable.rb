@@ -66,7 +66,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
-           ['Force Publish', force_publish_exchanges_hbx_profiles_path(ids: [row]), force_publish_link_type(row)]
+           ['Force Publish', force_publish_exchanges_hbx_profiles_path(ids: [row]), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
 
           if individual_market_is_enabled?
@@ -106,9 +106,9 @@ module Effective
         draft_apps.present? ? draft_apps.last : ""
       end
 
-      def force_publish_link_type(benefit_sponsorship)
+      def force_publish_link_type(benefit_sponsorship, allow)
         draft_application_id = get_latest_draft_benefit_application_id(benefit_sponsorship)
-        draft_application_id.blank? ? 'disabled' : 'post_ajax'
+        allow && draft_application_id.present? ? 'post_ajax' : 'hide'
       end
 
       def collection
