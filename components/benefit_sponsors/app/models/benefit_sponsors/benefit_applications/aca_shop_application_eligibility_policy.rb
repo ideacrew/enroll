@@ -18,7 +18,7 @@ module BenefitSponsors
   class BenefitApplications::AcaShopApplicationEligibilityPolicy
     include BenefitMarkets::BusinessRulesEngine
 
-    OPEN_ENROLLMENT_DAYS_MIN = 15
+    OPEN_ENROLLMENT_DAYS_MIN = 5
     MIN_BENEFIT_GROUPS = 1
     EMPLOYEE_MINIMUM_COUNT = 1
     EMPLOYEE_MAXIMUM_COUNT = 50
@@ -35,8 +35,12 @@ module BenefitSponsors
 
     rule  :benefit_application_fte_count,
             validate: -> (benefit_application){
+              if benefit_application.is_renewing?
+                true
+              else
                 benefit_application.fte_count >= EMPLOYEE_MINIMUM_COUNT && benefit_application.fte_count < EMPLOYEE_MAXIMUM_COUNT
-              },
+              end
+                },
             success:  -> (benfit_application)  { "validated successfully" },
             fail:     -> (benefit_application) { "Has #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
 
@@ -122,11 +126,22 @@ module BenefitSponsors
     business_policy  :stubbed_policy,
             rules: [:stubbed_rule_one, :stubbed_rule_two ]
 
+    business_policy :force_submit_benefit_application,
+            rules: [:open_enrollment_period_minimum,
+                    :benefit_application_contains_benefit_packages,
+                    :benefit_packages_contains_reference_plans,
+                    :all_employees_are_assigned_benefit_package,
+                    :employer_profile_eligible,
+                    :employer_primary_office_location,
+                    :all_contribution_levels_min_met,
+                    :benefit_application_fte_count]
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
 
         case event_name
+        when :force_submit_benefit_application
+          business_policies[:force_submit_benefit_application]
         when :submit_benefit_application
           business_policies[:submit_benefit_application]
         else
