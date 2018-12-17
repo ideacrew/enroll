@@ -1,5 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "move_enrollment_between_two_accounts")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
 
@@ -56,6 +58,10 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
     end
   end
   describe "it should move a shop enrollment" do
+    include_context 'setup benefit market with market catalogs and product packages'
+    include_context 'setup initial benefit application'
+
+    let(:product) {health_products[0]}
     let(:family1) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:family2) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) {
@@ -67,21 +73,22 @@ describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
                          employee_role: employee_role,
                          aasm_state: 'shopping',
                          benefit_group_assignment: benefit_group_assignment,
-                         benefit_group_id: benefit_group_assignment.benefit_group.id)
-    }
-    let(:employee_role) {FactoryGirl.create(:employee_role,person: family1.family_members[0].person, census_employee:census_employee, employer_profile: benefit_group_assignment.benefit_group.plan_year.employer_profile)}
-    let!(:employee_role2) {FactoryGirl.create(:employee_role,person: family2.family_members[0].person, census_employee:census_employee, employer_profile: benefit_group_assignment.benefit_group.plan_year.employer_profile)}
-    let(:census_employee){FactoryGirl.create(:census_employee)}
-    let(:benefit_group_assignment) {FactoryGirl.create(:benefit_group_assignment,census_employee:census_employee)}
+                         benefit_group_id: benefit_group_assignment.benefit_group.id,
+                         product_id: product.id,
+                         benefit_sponsorship_id: benefit_sponsorship.id,
+                         sponsored_benefit_package_id: current_benefit_package.id)}
+
+    let(:employee_role) {FactoryGirl.create(:employee_role,person: family1.family_members[0].person, census_employee:census_employee, employer_profile: benefit_sponsorship.profile)}
+    let!(:employee_role2) {FactoryGirl.create(:employee_role,person: family2.family_members[0].person, census_employee:census_employee, employer_profile: benefit_sponsorship.profile)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
+    let(:benefit_group_assignment) {census_employee.benefit_group_assignments.first}
     before do
       coverage_household_member = family1.households.first.coverage_households.first.coverage_household_members.first
-      census_employee.update_attributes(employer_profile_id: benefit_group_assignment.plan_year.employer_profile.id)
       h = HbxEnrollmentMember.new_from(coverage_household_member: coverage_household_member)
       h.eligibility_date = TimeKeeper.date_of_record
       h.coverage_start_on = TimeKeeper.date_of_record
       hbx_enrollment.hbx_enrollment_members << h
       hbx_enrollment.save
-      benefit_group_assignment.benefit_group.plan_year.update_attribute(:aasm_state, "published")
 
       allow(ENV).to receive(:[]).with('old_account_hbx_id').and_return family1.family_members[0].person.hbx_id
       allow(ENV).to receive(:[]).with('new_account_hbx_id').and_return family2.family_members[0].person.hbx_id

@@ -28,6 +28,8 @@ module BenefitSponsors
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
     TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
+    APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
+
     # Deprecated - Use SUBMITTED_STATES
     PUBLISHED_STATES = SUBMITTED_STATES
 
@@ -37,6 +39,8 @@ module BenefitSponsors
                                                   terminated: :terminate,
                                                   canceled:   :cancel
                                                 }
+
+
 
 
     # The date range when this application is active
@@ -113,6 +117,7 @@ module BenefitSponsors
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
     scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
+    scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -146,10 +151,20 @@ module BenefitSponsors
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
                                                                                          }
-    scope :by_year,                          ->(compare_year = TimeKeeper.date_of_record.year) { where(
+    scope :by_year,                         ->(compare_year = TimeKeeper.date_of_record.year) { where(
                                                                                                 :"effective_period.min".gte => Date.new(compare_year, 1, 1),
                                                                                                 :"effective_period.min".lte => Date.new(compare_year, 12, -1)
                                                                                               )}
+
+    scope :by_overlapping_effective_period, ->(effective_period) {
+      where(
+        "$or" => [
+          { :"effective_period.min" => {"$gte" => effective_period.min, "$lte" => effective_period.max }},
+          { :"effective_period.max" => {"$gte" => effective_period.min, "$lte" => effective_period.max }}
+        ]
+      )
+    }
+
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
     # scope :renewing,                        ->{ is_renewing } # Deprecate it in future
@@ -356,6 +371,17 @@ module BenefitSponsors
 
     def open_enrollment_length
       (open_enrollment_period.end - open_enrollment_period.begin).to_i
+    end
+
+    # This is being used by Open enrollment extension feature
+    # Admin can't choose date before regular monthly open enrollment end date i.e, 20th
+    # Admin can't choose a date beyond the effective month of the application. 
+    #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
+    def open_enrollment_date_bounds
+      {
+        min: [TimeKeeper.date_of_record, benefit_sponsorship.open_enrollment_period_for(effective_date).max].max,
+        max: effective_date.end_of_month
+      }
     end
 
     def is_submitted?
@@ -815,8 +841,8 @@ module BenefitSponsors
       end
 
       event :extend_open_enrollment do
-        transitions from: [:canceled, :enrollment_ineligible, :enrollment_extended], to: :enrollment_extended
-      end      
+        transitions from: [:canceled, :enrollment_ineligible, :enrollment_extended, :enrollment_open, :enrollment_closed], to: :enrollment_extended
+      end
     end
 
     # Notify BenefitSponsorship upon state change

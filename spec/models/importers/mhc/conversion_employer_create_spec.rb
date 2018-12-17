@@ -38,7 +38,8 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
 
   context "provided with employer date" do
     before :each do
-      # BenefitSponsors::Observers::EmployerStaffRoleObserver.any_instance.stub(:contact_changed?).and_return(true)
+      # using it because old model conversion employer creation shouldn't be invoking for new model EmployerStaffRoleObserver instance.
+      allow_any_instance_of(BenefitSponsors::Observers::EmployerStaffRoleObserver).to receive(:contact_changed?).and_return(true)
       @employer_profile = EmployerProfile.find_by_fein(fein)
     end
 

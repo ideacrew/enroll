@@ -3,6 +3,7 @@ require 'rails_helper'
 describe "import_counties" do
 
   before :all do
+    DatabaseCleaner.clean
     Rake.application.rake_require 'tasks/migrations/plans/import_counties'
     Rake::Task.define_task(:environment)
 

@@ -1,6 +1,15 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe EmployeeRole do
+describe EmployeeRole, dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application" do
+    let(:aasm_state) { :draft }
+  end
+
+  let(:person) {FactoryGirl.create(:person, :with_family)}
+
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 6, 20))
   end
@@ -9,67 +18,61 @@ describe EmployeeRole do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
-  context "an organization exists" do
-    let!(:organization) { FactoryGirl.create(:organization) }
+  context "employer with two draft plan years exist" do
+    let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+    let(:plan_year_a) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                          :with_benefit_package,
+                                          :benefit_sponsorship => benefit_sponsorship,
+                                          :aasm_state => 'draft',
+                                          :effective_period =>  start_on..(start_on + 1.year) - 1.day
+    )}
+    let(:plan_year_b) { initial_application }
 
-    context "with an employer profile" do
-      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+    context "with benefit groups" do
+      let(:benefit_group_a)    { plan_year_a.benefit_packages.first }
+      let(:benefit_group_b)    { plan_year_b.benefit_packages.first }
 
-      context "and two draft plan years exist" do
-        let!(:plan_year_a) { FactoryGirl.create(:plan_year_not_started, employer_profile: employer_profile) }
-        let!(:plan_year_b) { FactoryGirl.create(:plan_year_not_started, employer_profile: employer_profile) }
+      it "the reference plans should not be the same" do
+        expect(benefit_group_a.reference_plan.id).not_to eq benefit_group_b.reference_plan.id
+      end
 
-        context "with benefit groups" do
-          let!(:benefit_group_a) { FactoryGirl.create(:benefit_group, plan_year: plan_year_a) }
-          let!(:benefit_group_b) { FactoryGirl.create(:benefit_group, plan_year: plan_year_b) }
+      context "and we have an employee on the roster" do
+        let(:census_employee) { FactoryGirl.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
 
-          it "the reference plans should not be the same" do
-            expect(benefit_group_a.reference_plan_id).not_to eq benefit_group_b.reference_plan_id
-          end
+        context "and a new employee role is created" do
+          let(:employee_role) {FactoryGirl.create(:employee_role, person: person, census_employee_id: census_employee.id, employer_profile: abc_profile)}
 
-          context "and we have an employee on the roster" do
-            let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+          context "and the employee is assigned to both benefit groups" do
+            let(:benefit_group_assignment_a) { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group_a) }
+            let(:benefit_group_assignment_b) { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group_b) }
 
-            context "and a new employee role is created" do
-              let(:employee_role) do
-                Factories::EnrollmentFactory.add_employee_role(employer_profile: employer_profile,
-                      first_name: census_employee.first_name, last_name: census_employee.last_name,
-                      ssn: census_employee.ssn, dob: census_employee.dob, gender: census_employee.gender, hired_on: census_employee.hired_on)[0]
+            context "and the first plan year is published" do
+              before do
+                plan_year_a.approve_application!
               end
 
-              context "and the employee is assigned to both benefit groups" do
-                let!(:benefit_group_assignment_a) { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group_a) }
-                let!(:benefit_group_assignment_b) { FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group_b) }
+              it "that plan year should be published" do
+                expect(plan_year_a.aasm_state).to eq :approved
+              end
 
-                context "and the first plan year is published" do
-                  before do
-                    RatingArea.find_or_create_by(county_name: organization.primary_office_location.address.county, zip_code: organization.primary_office_location.address.zip, rating_area: "R-MA001" )
-                    plan_year_a.publish!
-                  end
+              it "the new employee role should see the correct benefit group" do
+                allow(census_employee).to receive(:under_new_hire_enrollment_period?).and_return(false)
+                expect(employee_role.benefit_group.id).to eq benefit_group_a.id
+              end
+            end
 
-                  it "that plan year should be published" do
-                    expect(plan_year_a.aasm_state).to eq "published"
-                  end
+            context "and the other plan year is published" do
+              before do
+                plan_year_b.approve_application!
+              end
 
-                  it "the new employee role should see the correct benefit group" do
-                    expect(employee_role.benefit_group.id).to eq benefit_group_a.id
-                  end
-                end
+              it "that plan year should be published" do
 
-                context "and the other plan year is published" do
-                  before do
-                    plan_year_b.publish!
-                  end
+                expect(plan_year_b.aasm_state).to eq :approved
+              end
 
-                  it "that plan year should be published" do
-
-                    expect(plan_year_b.aasm_state).to eq "published"
-                  end
-
-                  it "the new employee role should see the correct benefit group" do
-                    expect(employee_role.benefit_group.id).to eq benefit_group_b.id
-                  end
-                end
+              it "the new employee role should see the correct benefit group" do
+                expect(employee_role.benefit_group.id).to eq benefit_group_b.id
               end
             end
           end
