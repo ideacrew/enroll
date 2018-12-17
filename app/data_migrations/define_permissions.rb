@@ -118,7 +118,7 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)  
+    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents
