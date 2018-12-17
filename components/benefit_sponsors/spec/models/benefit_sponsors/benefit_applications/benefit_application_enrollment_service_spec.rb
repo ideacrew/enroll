@@ -135,11 +135,12 @@ module BenefitSponsors
         context 'When business_policy_satisfied_for? OR is_application_eligible? AND may_submit_for_review? are is false' do
 
           it 'should return notice, warnings and state could not be changed' do
-            allow(initial_application).to receive(:open_enrollment_length).and_return(10)
+            allow(initial_application).to receive(:open_enrollment_length).and_return(4)
+            allow(initial_application).to receive(:may_submit_for_review?).and_return(false)
             subject.force_submit_application
             initial_application.reload
             expect(subject.messages['notice']).to eq('Employer(s) Plan Year could not be processed')
-            expect(subject.messages['warnings']).to eq(['open enrollment period length 10 day(s) is less than 15 day(s) minimum'])
+            expect(subject.messages['warnings']).to eq(['open enrollment period length 4 day(s) is less than 5 day(s) minimum'])
             expect(subject.errors).to eq([])
             expect(initial_application.aasm_state).to eq :active
           end
@@ -161,12 +162,12 @@ module BenefitSponsors
           context 'state is draft' do
             before { initial_application.update_attribute(:aasm_state, 'draft') }
             it 'should return notice, warnings and state could not be changed' do
-              allow(initial_application).to receive(:open_enrollment_length).and_return(10)
+              allow(initial_application).to receive(:open_enrollment_length).and_return(4)
               allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
               subject.force_submit_application
               initial_application.reload
               expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully submitted for review.')
-              expect(subject.messages['warnings']).to eq(['open enrollment period length 10 day(s) is less than 15 day(s) minimum'])
+              expect(subject.messages['warnings']).to eq(['open enrollment period length 4 day(s) is less than 5 day(s) minimum'])
               expect(subject.errors).to eq([])
               expect(initial_application.aasm_state).to eq :pending
             end
