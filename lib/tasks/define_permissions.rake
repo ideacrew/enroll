@@ -91,9 +91,10 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_user_account_tab => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do
-  desc 'hbx system admin can change fein'
-  DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
+  desc 'grant super admin access for given users'
+  DefinePermissions.define_task :grant_super_admin_access => :environment
 end
 
 #RAILS_ENV=production bundle exec rake permissions:initial_hbx
