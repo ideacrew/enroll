@@ -39,7 +39,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context "when user has permissions" do
       before :each do
-        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         put :terminate, employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: TimeKeeper.date_of_record.next_month.end_of_month, term_reason: "nonpayment"
       end
@@ -56,7 +56,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
     end
 
     it "should not be a success when user doesn't have permissions" do
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: false))
       sign_in(user)
       put :terminate, employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: initial_application.start_on.next_month, term_reason: "nonpayment"
       expect(response).to have_http_status(:redirect)
@@ -70,7 +70,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context "when user has permissions" do
       before :each do
-        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: true))
+        allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :enrollment_open)
         put :cancel, employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: initial_application.start_on.next_month
@@ -88,7 +88,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
     end
 
     it "should not be a success when user doesn't have permissions" do
-      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_admin_tabs: false))
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: false))
       sign_in(user)
       put :cancel, employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: initial_application.start_on.next_month
       expect(response).to have_http_status(:redirect)

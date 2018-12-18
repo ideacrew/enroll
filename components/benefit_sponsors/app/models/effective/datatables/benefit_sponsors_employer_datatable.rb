@@ -65,9 +65,12 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
-           ['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax'],
+           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)]
           ]
+
+          if pundit_allow(HbxProfile, :can_modify_plan_year?)
+            dropdown.insert(2,['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+          end
 
           if individual_market_is_enabled?
             people_id = Person.where({"employer_staff_roles.employer_profile_id" => @employer_profile._id}).map(&:id)

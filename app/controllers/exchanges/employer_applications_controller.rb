@@ -1,7 +1,7 @@
 class Exchanges::EmployerApplicationsController < ApplicationController
   include Pundit
 
-  before_action :modify_admin_tabs?, only: [:terminate, :cancel]
+  before_action :can_modify_plan_year?, only: [:terminate, :cancel]
   before_action :check_hbx_staff_role
   before_action :find_benefit_sponsorship
 
@@ -43,8 +43,8 @@ class Exchanges::EmployerApplicationsController < ApplicationController
 
   private
 
-  def modify_admin_tabs?
-    authorize HbxProfile, :modify_admin_tabs?
+  def can_modify_plan_year?
+    authorize HbxProfile, :can_modify_plan_year?
   end
 
   def check_hbx_staff_role

@@ -21,6 +21,7 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
   field :can_extend_open_enrollment, type: Boolean, default: false
+  field :can_modify_plan_year, type: Boolean, default: false
 
   class << self
     def hbx_staff
