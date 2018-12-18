@@ -12,6 +12,7 @@ module BenefitSponsors
 
         # before_action :set_current_person, only: [:staff_index]
         # before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
+        before_action :find_general_agency_profile, only: [:employers]
         before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
 
         layout 'single_column'
@@ -29,11 +30,15 @@ module BenefitSponsors
         end
 
         def show
-          TODO authorize
+          # TODO authorize
           # authorize self, :redirect_signup?
           set_flash_by_announcement
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
           @provider = current_user.person
+        end
+
+        def employers
+          @datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyDataTable.new({id: params[:id]})
         end
 
         def staffs
