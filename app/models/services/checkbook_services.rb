@@ -19,15 +19,20 @@ module Services
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = Settings.checkbook_services.Congress_base_url : @url = BASE_URL+SHOP_PATH
+          is_congress ? @url = CONGRESS_URL : @url = BASE_URL+SHOP_PATH
         end
       end
 
       def generate_url
-        return @url if is_congress
+        #return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
         begin
-          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop 
+          construct_body = {}
+          if is_congress
+            construct_body = construct_body_congress
+          else
+            construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop 
+          end
 
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
@@ -116,14 +121,14 @@ module Services
          }
       end
 
-      def construct_body_ivl
+      def construct_body_congress
         {
           "remote_access_key": Settings.checkbook_services.remote_access_key ,
           "reference_id": Settings.checkbook_services.reference_id,
           "enrollment_year": 2019,
           "family": [
               {
-                      "dob": "1990-01-01" # Hardcoding for testing purpose
+                      "dob": "1990-01-01" # Hardcodizng for testing purpose
               }
       ],
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.

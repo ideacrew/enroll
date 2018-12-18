@@ -168,7 +168,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Rails.application.config.checkbook_services_congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment,is_congress_employee).generate_url
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
         plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
@@ -192,7 +192,6 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
     end
   end
-
 
   def set_elected_aptc
     session[:elected_aptc] = params[:elected_aptc].to_f
