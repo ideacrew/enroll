@@ -159,11 +159,11 @@ module Observers
           #TODO: Need to fix these methods on benefit application while dealing with notices.
           is_valid_employer_py_oe = true#(hbx_enrollment.sponsored_benefit_package.plan_year.open_enrollment_contains?(hbx_enrollment.submitted_at) || hbx_enrollment.benefit_group.plan_year.open_enrollment_contains?(hbx_enrollment.created_at))
 
-          if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
-            if is_valid_employer_py_oe
-              deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
-            end
-          end
+          # if new_model_event.event_key == :notify_employee_of_plan_selection_in_open_enrollment
+          #   if is_valid_employer_py_oe
+          #     deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #renewal EE notice
+          #   end
+          # end
 
           if new_model_event.event_key == :application_coverage_selected
             if is_valid_employer_py_oe

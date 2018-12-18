@@ -86,7 +86,9 @@ class CensusEmployee < CensusMember
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
 
-  add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
+  # add_observer ::BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send]
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events]
+
 
   index({aasm_state: 1})
   index({last_name: 1})

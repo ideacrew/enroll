@@ -60,7 +60,7 @@ FactoryGirl.define do
 
     trait :with_premium_tables do
       transient do
-        premium_tables_count 6
+        premium_tables_count 48
       end
 
       after(:create) do |plan, evaluator|

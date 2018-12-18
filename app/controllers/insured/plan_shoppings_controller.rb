@@ -168,7 +168,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_product_ids(@hbx_enrollment)
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
 
