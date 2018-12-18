@@ -30,7 +30,7 @@ BenefitSponsors::Engine.routes.draw do
     namespace :general_agencies do
       resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
         collection do
-          get :family_index
+          get :families
           get :messages
           get :staff_index
           get :agency_messages
