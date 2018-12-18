@@ -74,7 +74,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:ridp_docs_clean).and_return(true)
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:get_person)
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:get_document).with('sample-key').and_return(RidpDocument.new)
-        allow_any_instance_of(Insured::RidpDocumentsController).to receive(:send_data).with(nil, {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
+        allow_any_instance_of(Insured::RidpDocumentsController).to receive(:send_data).with("", {:content_type=>"application/octet-stream", :filename=>"untitled"}) {
           @controller.render nothing: true # to prevent a 'missing template' error
         }
         sign_in user

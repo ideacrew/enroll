@@ -1,5 +1,4 @@
 require 'rails_helper'
-
 module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
     let(:transaction_id)   { '1234' }
@@ -12,6 +11,7 @@ module OneLogin
     let(:test_x509_cert) { OpenSSL::X509::Certificate.new(File.read("#{Rails.root.join("spec", "test_data")}" + "/test_x509.pem")) }
 
     before :each do
+      allow(hbx_enrollment).to receive(:total_premium).and_return(202.00)
       saml_generator.instance_variable_set(:@private_key, test_priv_key)
       saml_generator.instance_variable_set(:@cert, test_x509_cert)
       hbx_enrollment.update_attributes(kind: 'individual')
