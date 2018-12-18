@@ -25,7 +25,9 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
       modify_admin_tabs: false, view_admin_tabs: true)
-
+    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: true)
     permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end

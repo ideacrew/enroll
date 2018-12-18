@@ -52,21 +52,21 @@ module BenefitSponsors
 
       def process_census_employee_events(model_instance, model_event)
        raise ArgumentError.new("expected BenefitSponsors::ModelEvents::ModelEvent") unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
+        census_employee = model_event.klass_instance
         case model_event.event_key
         when :employee_notice_for_employee_terminated_from_roster
-          trigger_notice_for_employee_terminated_from_roster_for(model_instance, model_event)
+          trigger_notice_for_employee_terminated_from_roster_for(census_employee)
+        when :employee_coverage_passively_waived, :employee_coverage_passively_renewed, :employee_coverage_passive_renewal_failed
+          trigger_census_employee_passive_enrollment_notices_for(census_employee, model_event)
         end
       end
 
-      def trigger_notice_for_employee_terminated_from_roster_for(model_instance, model_event)
-        census_employee = model_event.klass_instance
-         if BenefitSponsors::ModelEvents::CensusEmployee::OTHER_EVENTS.include?(model_event.event_key)
-          deliver(recipient: census_employee.employee_role, event_object: model_event.options[:event_object], notice_event: model_event.event_key.to_s)
-         end
+      def trigger_census_employee_passive_enrollment_notices_for(census_employee, model_event)
+        deliver(recipient: census_employee.employee_role, event_object: model_event.options[:event_object], notice_event: model_event.event_key.to_s)
+      end
 
-         if BenefitSponsors::ModelEvents::CensusEmployee::REGISTERED_EVENTS.include?(model_event.event_key)
-          deliver(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
-         end
+      def trigger_notice_for_employee_terminated_from_roster_for(census_employee)
+        deliver(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
       end
 
       def process_organization_events(model_instance, model_event)
@@ -294,19 +294,6 @@ module BenefitSponsors
         deliver(recipient: employer_profile, event_object: broker_agency_account, notice_event: "broker_fired_confirmation_to_employer")
       end
 
-      def process_organization_events(model_instance, model_event)
-        raise ArgumentError.new("expected BenefitSponsors::ModelEvents::ModelEvent") unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
-        organization = model_event.klass_instance
-        case model_event.event_key
-        when :welcome_notice_to_employer
-          trigger_welcome_notice_to_employer_for(model_instance, organization)
-        end
-      end
-
-      def trigger_welcome_notice_to_employer_for(model_instance, organization)
-        deliver(recipient: organization.employer_profile, event_object: organization.employer_profile, notice_event: "welcome_notice_to_employer")
-      end
-
       def process_employer_profile_events(model_instance, model_event)
        raise ArgumentError.new("expected BenefitSponsors::ModelEvents::ModelEvent") unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
         case model_event.event_key
@@ -388,16 +375,6 @@ module BenefitSponsors
       def vlp_document_update; end
       def paper_application_update; end
       def employer_attestation_document_update; end
-
-      def eligibility_policy
-        return @eligibility_policy if defined? @eligibility_policy
-        @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
-      end
-
-      def enrollment_policy
-        return @enrollment_policy if defined? @enrollment_policy
-        @enrollment_policy = BenefitSponsors::BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new
-      end
 
       def vlp_document_update; end
       def paper_application_update; end

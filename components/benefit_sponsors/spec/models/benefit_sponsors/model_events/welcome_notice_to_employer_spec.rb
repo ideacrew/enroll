@@ -6,11 +6,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
   let!(:model_instance)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { model_instance.employer_profile }
   let(:person){ create :person}
+  let(:observer_class) { BenefitSponsors::Observers::NoticeObserver }
 
   describe "when ER successfully creates account" do
     context "ModelEvent" do
       it "should trigger model event" do
-        model_instance.class.observer_peers.keys.each do |observer|
+        model_instance.class.observer_peers.keys.select { |ob| ob.is_a?(observer_class) }.each do |observer|
           expect(observer).to receive(:process_organization_events) do |model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :welcome_notice_to_employer, :klass_instance => model_instance, :options => {})
