@@ -129,6 +129,7 @@ group :development, :test do
   gem 'spring', '1.6.3'
   gem 'yard', '~> 0.9.5', require: false
   gem 'yard-mongoid', '~> 0.1.0', require: false
+  gem 'net-ssh', '~> 4.2.0'
 end
 
 group :test do

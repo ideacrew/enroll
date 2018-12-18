@@ -287,7 +287,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def can_shop_individual?(person)
-    false
+    true # FIX
   end
 
   def can_shop_resident?(person)

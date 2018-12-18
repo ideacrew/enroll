@@ -6,114 +6,214 @@ class Insured::GroupSelectionController < ApplicationController
   # before_action :is_under_open_enrollment, only: [:new]
 
   def new
-    set_bookmark_url
-    @adapter.disable_market_kinds(params) do |disabled_market_kind|
-      @disable_market_kind = disabled_market_kind
-    end
+    if @market_kind == 'individual' || @market_kind == 'coverall'
+      set_bookmark_url
+      set_admin_bookmark_url
+      hbx_enrollment = build_hbx_enrollment
+      @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
+      @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
+      @market_kind = select_market(@person, params)
+      @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
+      if @market_kind == 'individual' || @market_kind == 'coverall' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
+        if params[:hbx_enrollment_id].present?
+          session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
+          pre_hbx = HbxEnrollment.find(params[:hbx_enrollment_id])
+          pre_hbx.update_current(changing: true) if pre_hbx.present?
+        end
 
-    @adapter.set_mc_variables do |market_kind, coverage_kind|
-      @mc_market_kind = market_kind
-      @mc_coverage_kind = coverage_kind
-    end
-    @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |derived_employee_role|
-      @employee_role = derived_employee_role
-    end
-    @market_kind = @adapter.select_market(params)
-    @resident = @adapter.possible_resident_person
-    if @adapter.can_ivl_shop?(params)
-      if @adapter.if_changing_ivl?(params)
-        session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
-        pre_hbx = @adapter.previous_hbx_enrollment
-        pre_hbx.update_current(changing: true) if pre_hbx.present?
+        correct_effective_on = calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
+        @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
       end
 
-      @benefit = @adapter.ivl_benefit
-    end
-    @qle = @adapter.is_qle?
+      insure_hbx_enrollment_for_shop_qle_flow
+      @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
-    # Benefit group is what we will need to change
-    @benefit_group = @adapter.select_benefit_group(params)
-    @new_effective_on = @adapter.calculate_new_effective_on(params)
+      @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+      @benefit_group = select_benefit_group(@qle, @employee_role)
+      @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
 
-    @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
-      @coverage_family_members_for_cobra = cobra_members
-    end
-    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
-      @new_effective_on = new_effective_date
+      generate_coverage_family_members_for_cobra
+      # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+      @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
+    else
+      set_bookmark_url
+      @adapter.disable_market_kinds(params) do |disabled_market_kind|
+        @disable_market_kind = disabled_market_kind
+      end
+
+      @adapter.set_mc_variables do |market_kind, coverage_kind|
+        @mc_market_kind = market_kind
+        @mc_coverage_kind = coverage_kind
+      end
+      @adapter.if_employee_role_unset_but_can_be_derived(@employee_role) do |derived_employee_role|
+        @employee_role = derived_employee_role
+      end
+      @market_kind = @adapter.select_market(params)
+      @resident = @adapter.possible_resident_person
+      if @adapter.can_ivl_shop?(params)
+        if @adapter.if_changing_ivl?(params)
+          session[:pre_hbx_enrollment_id] = params[:hbx_enrollment_id]
+          pre_hbx = @adapter.previous_hbx_enrollment
+          pre_hbx.update_current(changing: true) if pre_hbx.present?
+        end
+
+        @benefit = @adapter.ivl_benefit
+      end
+      @qle = @adapter.is_qle?
+
+      # Benefit group is what we will need to change
+      @benefit_group = @adapter.select_benefit_group(params)
+      @new_effective_on = @adapter.calculate_new_effective_on(params)
+
+      @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
+        @coverage_family_members_for_cobra = cobra_members
+      end
+      # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
+      @adapter.if_qle_with_date_option_selected(params) do |new_effective_date|
+        @new_effective_on = new_effective_date
+      end
+
+      @adapter.if_change_plan_selected(params) do |new_effective_date|
+        @new_effective_on = new_effective_date
+      end
+
+      @waivable = @adapter.can_waive?(@hbx_enrollment, params)
     end
 
-    @adapter.if_change_plan_selected(params) do |new_effective_date|
-      @new_effective_on = new_effective_date
-    end
-    
-    @waivable = @adapter.can_waive?(@hbx_enrollment, params)
   end
 
   def create
-    @market_kind = @adapter.create_action_market_kind(params)
-    return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
+    if params[:market_kind] == 'individual' || params[:market_kind] == 'coverall'
+      keep_existing_plan = params[:commit] == "Keep existing plan"
+      @market_kind = params[:market_kind].present? ? params[:market_kind] : 'shop'
+      return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
 
-    if @employee_role.census_employee.present?
-      new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
-      if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
-        raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
-      end
-    end
-
-    unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
       family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
-    end
 
-    hbx_enrollment = build_hbx_enrollment(family_member_ids)
-    if @adapter.is_waiving?(params)
+      hbx_enrollment = build_hbx_enrollment(family_member_ids)
+      if (keep_existing_plan && @hbx_enrollment.present?)
+        sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
+
+        if sep.present?
+          hbx_enrollment.special_enrollment_period_id = sep.id
+        end
+
+        hbx_enrollment.plan = @hbx_enrollment.plan
+      end
+
+      hbx_enrollment.hbx_enrollment_members = hbx_enrollment.hbx_enrollment_members.select do |member|
+        family_member_ids.include? member.applicant_id
+      end
+      hbx_enrollment.generate_hbx_signature
+
+      @family.hire_broker_agency(current_user.person.broker_role.try(:id))
+      hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
+      hbx_enrollment.original_application_type = session[:original_application_type]
+      broker_role = current_user.person.broker_role
+      hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
+
+      hbx_enrollment.coverage_kind = @coverage_kind
+      hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
+
+      invalid_member_exist = hbx_enrollment.hbx_enrollment_members.map(&:valid_enrolling_member?).include?(false)
+      if invalid_member_exist
+        raise "Please select valid enrolling members"
+      end
+
+      # case for responsible party with primary and dependent in separate markets
+      # it assumes the primary and dependent are in either IVL or coverall
+      # TODO will need to account for shop market as well with coverall phase 3 when
+      # people will be able to receive a transition from shop to coverall, etc.
+
+      if ((hbx_enrollment.kind != @market_kind) && (@market_kind != "shop"))
+        hbx_enrollment.kind = @market_kind
+      end
+
+      if hbx_enrollment.save
+        hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
+        if keep_existing_plan
+          hbx_enrollment.update_coverage_kind_by_plan
+          redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
+        elsif @change_plan.present?
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
+        else
+          # FIXME: models should update relationships, not the controller
+          hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
+        end
+      else
+        raise "You must select the primary applicant to enroll in the healthcare plan"
+      end
+
+    else
+      @market_kind = @adapter.create_action_market_kind(params)
+      return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
+
+      if @employee_role.census_employee.present?
+        new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
+        if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
+          raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
+        end
+      end
+
+      unless @adapter.is_waiving?(params)
+        raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
+        family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
+          BSON::ObjectId.from_string(family_member_id)
+        end
+      end
+
+      hbx_enrollment = build_hbx_enrollment(family_member_ids)
+      if @adapter.is_waiving?(params)
+        if hbx_enrollment.save
+          @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
+          redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id, :waiver_reason => hbx_enrollment.waiver_reason)
+          return
+        else
+          raise "Waive Coverage Failed"
+        end
+      end
+
+      if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
+        sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
+
+        if sep.present?
+          hbx_enrollment.special_enrollment_period_id = sep.id
+        end
+      end
+
+      hbx_enrollment.generate_hbx_signature
+
+      @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
+      hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
+      hbx_enrollment.original_application_type = session[:original_application_type]
+      broker_role = current_user.person.broker_role
+      hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
+
+      hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
+
       if hbx_enrollment.save
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
-        redirect_to waive_insured_plan_shopping_path(:id => hbx_enrollment.id, :waiver_reason => hbx_enrollment.waiver_reason)
-        return
+        if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
+          redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
+        elsif @change_plan.present?
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        else
+          # FIXME: models should update relationships, not the controller
+          hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        end
       else
-        raise "Waive Coverage Failed"
+        raise "You must select the primary applicant to enroll in the healthcare plan"
       end
     end
 
-    if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
-      sep = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep : @hbx_enrollment.family.earliest_effective_ivl_sep
-
-      if sep.present?
-        hbx_enrollment.special_enrollment_period_id = sep.id
-      end
-    end
-
-    hbx_enrollment.generate_hbx_signature
-
-    @adapter.family.hire_broker_agency(current_user.person.broker_role.try(:id))
-    hbx_enrollment.writing_agent_id = current_user.person.try(:broker_role).try(:id)
-    hbx_enrollment.original_application_type = session[:original_application_type]
-    broker_role = current_user.person.broker_role
-    hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
-
-    hbx_enrollment.validate_for_cobra_eligiblity(@employee_role, current_user)
-
-    if hbx_enrollment.save
-      @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
-      if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
-        redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
-      elsif @change_plan.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
-      else
-        # FIXME: models should update relationships, not the controller
-        hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
-      end
-    else
-      raise "You must select the primary applicant to enroll in the healthcare plan"
-    end
-  rescue Exception => error
-    flash[:error] = error.message
-    logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
+  rescue => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
     return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
