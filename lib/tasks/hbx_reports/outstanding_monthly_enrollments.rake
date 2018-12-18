@@ -1,14 +1,6 @@
-
 require "#{Rails.root}/app/helpers/config/aca_helper"
 require File.join(Rails.root, "app", "reports", "hbx_reports", "outstanding_monthly_enrollments")
-
 include Config::AcaHelper
-
-
-end
-
-
-
 # The idea behind this report is to get a list of all of the enrollments for an employer and what is currently in Glue. 
 # Steps
 # 1) You need to pull a list of enrollments from glue (bundle exec rails r script/queries/print_all_policy_ids > all_glue_policies.txt -e production)
@@ -18,8 +10,6 @@ end
 
 namespace :reports do 
   desc "Outstanding Enrollments by Employer"
-  task :outstanding_monthly_enrollments => :environment do
     OutstandingMonthlyEnrollments.define_task :outstanding_monthly_enrollments => :environment
-
-  end
+end
   
