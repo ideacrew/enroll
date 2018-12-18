@@ -67,7 +67,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
     end
 
-    describe 'update permissions for super admin role to be able to force publish' do
+    describe 'update permissions for super admin role to be able to change FEIN' do
       let(:given_task_name) {':hbx_admin_can_change_fein'}
 
       before do
@@ -229,29 +229,7 @@ describe DefinePermissions, dbclean: :after_each do
         end
       end
 
-      context "of an hbx staff" do
-        let(:hbx_staff) do
-          FactoryGirl.create(:person).tap do |person|
-            FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
-          end
-        end
-
-        it 'returns false before the rake task is ran' do
-          expect(hbx_staff.hbx_staff_role.permission.can_change_fein).to be false
-        end
-
-        context 'after the rake task is run' do
-          before do
-            subject.hbx_admin_can_change_fein
-          end
-
-          it 'returns false' do
-            expect(hbx_staff.hbx_staff_role.permission.can_change_fein).to be false
-          end
-        end
-      end
-
-      context "of an hbx staff" do
+      context "of an hbx developer" do
         let(:developer) do
           FactoryGirl.create(:person).tap do |person|
             FactoryGirl.create(:hbx_staff_role, person: person, subrole: "developer", permission_id: Permission.developer.id)
