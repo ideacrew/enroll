@@ -22,7 +22,7 @@ class InvitationsController < ApplicationController
 
   def redirect_to_general_agency_profile(ga_profile)
     # redirect_to general_agencies_profile_path(ga_profile)
-    benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_profile)
+    redirect_to benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_profile)
   end
 
   def redirect_to_employee_match(census_employee)
