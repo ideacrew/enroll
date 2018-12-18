@@ -8,7 +8,7 @@ module BenefitSponsors
         include DataTablesAdapter
         include BenefitSponsors::Concerns::ProfileRegistration
 
-        # rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+        rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
         # before_action :set_current_person, only: [:staff_index]
         # before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
@@ -22,21 +22,21 @@ module BenefitSponsors
         #   "5"     => "employer_profile.plan_years.start_on"
         # }
 
-        def index
-          TODO authorize
-          # authorize self
-          @general_agency_profiles = BenefitSponsors::Organizations::Organization.general_agency_profiles.map(&:general_agency_profile)
-        end
+        # def index
+        #   #TODO authorize
+        #   # authorize self
+        #   @general_agency_profiles = BenefitSponsors::Organizations::Organization.general_agency_profiles.map(&:general_agency_profile)
+        # end
 
         def show
-          TODO authorize
-          # authorize self, :redirect_signup?
+          authorize self, :redirect_signup?
           set_flash_by_announcement
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
           @provider = current_user.person
         end
 
         def staffs
+          authorize self, :redirect_signup?
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:format])
           @staffs = @general_agency_profile.general_agency_staff_roles
         end
@@ -55,7 +55,7 @@ module BenefitSponsors
         # end
 
         def edit_staff
-          TODO authorize
+          authorize self, :redirect_signup?
           respond_to do |format|
             format.js
             format.html
@@ -63,7 +63,7 @@ module BenefitSponsors
         end
 
         def update_staff
-          TODO authorize
+          authorize self, :redirect_signup?
           if params['approve']
             @staff.approve!
             flash[:notice] = "Staff approved successfully."
@@ -77,6 +77,10 @@ module BenefitSponsors
           send_secure_message_to_general_agency(@staff) if @staff.active?
 
           redirect_to benefit_sponsors.profiles_general_agencies_general_agency_profile_path(@staff.general_agency_profile)
+        end
+
+        def redirect_to_show(general_agency_profile_id)
+          redirect_to benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: general_agency_profile_id)
         end
 
         # TODO need to refactor for cases around SHOP broker agencies
@@ -101,8 +105,7 @@ module BenefitSponsors
         # end
 
         def family_index
-          TODO authorize
-          # authorize self
+          authorize self
           find_general_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
           @q = params.permit(:q)[:q]
 
@@ -181,15 +184,16 @@ module BenefitSponsors
           @staff = GeneralAgencyStaffRole.find(params[:id])
         end
 
-        # def user_not_authorized(exception)
-        #   if exception.query == :redirect_signup?
-        #     redirect_to main_app.new_user_registration_path
-        #   elsif current_user.has_broker_agency_staff_role?
-        #     redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
-        #   else
-        #     redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency)
-        #   end
-        # end
+        def user_not_authorized(exception)
+          binding.pry
+          if exception.query == :redirect_signup?
+            redirect_to main_app.new_user_registration_path
+          elsif current_user.has_general_agency_staff_role?
+            redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
+          else
+            redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency)
+          end
+        end
       end
     end
   end
