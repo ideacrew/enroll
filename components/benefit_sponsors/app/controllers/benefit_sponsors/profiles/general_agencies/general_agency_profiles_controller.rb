@@ -12,7 +12,7 @@ module BenefitSponsors
 
         # before_action :set_current_person, only: [:staff_index]
         # before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
-        before_action :find_general_agency_profile, only: [:employers]
+        before_action :find_general_agency_profile, only: [:employers, :family_index]
         before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
 
         layout 'single_column'
@@ -109,14 +109,9 @@ module BenefitSponsors
         #   @draw = dt_query.draw
         # end
 
-        def family_index
+        def families
           authorize self
-          find_general_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
-          @q = params.permit(:q)[:q]
-
-          respond_to do |format|
-            format.js {}
-          end
+          @datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: params[:id]})
         end
 
         # def messages
@@ -190,7 +185,6 @@ module BenefitSponsors
         end
 
         def user_not_authorized(exception)
-          binding.pry
           if exception.query == :redirect_signup?
             redirect_to main_app.new_user_registration_path
           elsif current_user.has_general_agency_staff_role?
