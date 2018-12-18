@@ -1,13 +1,13 @@
 require "rails_helper"
 
 module BenefitSponsors
-  RSpec.describe Importers::Mhc::ConversionEmployerPlanYearUpdate, db_clean: :after_each do
+  RSpec.describe Importers::Mhc::ConversionEmployerPlanYearUpdate, dbclean: :after_each do
 
     def class_initializer(params={})
       Importers::Mhc::ConversionEmployerPlanYearUpdate.new(params)
     end
 
-    describe "Action #Update", db_clean: :after_each do
+    describe "Action #Update", dbclean: :after_each do
       let(:hios_id) {"11821MA0040003"}
       let!(:dental_product) {FactoryGirl.create(:benefit_markets_products_dental_products_dental_product, hios_id: hios_id)}
 

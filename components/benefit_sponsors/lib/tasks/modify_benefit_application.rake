@@ -1,4 +1,4 @@
-require File.join(Rails.root, "components", "benefit_sponsors", "app", "data_migrations", "modify_benefit_application")
+require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
 # This rake task is to modify benefit applications - canceling, terminating, re-instating and updating aasm state.
 # pass termination_notice="true" in order to send termination notice to both employer and employees

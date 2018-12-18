@@ -125,6 +125,11 @@ Rails.application.routes.draw do
         get :calendar_index
         get :user_account_index
         get :get_user_info
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
       end
 
       member do

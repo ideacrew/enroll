@@ -1,19 +1,17 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclean: :around_each  do
 
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
+
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-  let(:current_effective_date)  { TimeKeeper.date_of_record }
-
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_renewal_draft_application, site: site) }
-  let(:employer_profile) { organization.employer_profile }
-  let(:benefit_sponsorship) { employer_profile.active_benefit_sponsorship }
+  let(:renewal_effective_date) { start_on }
+  let(:current_effective_date) { start_on.prev_year }
+  let(:employer_profile) { abc_profile }
   let!(:model_instance) { benefit_sponsorship.renewal_benefit_application }
-
-  before do
-    model_instance.update_attributes(:effective_period =>  start_on..(start_on + 1.year) - 1.day)
-  end
 
   describe "when renewal application created" do
     context "ModelEvent" do

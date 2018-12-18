@@ -1,5 +1,5 @@
 require "rails_helper"
-include ActionView::Context
+
 RSpec.describe "insured/consumer_roles/_form.html.erb" do
   let(:person) { Person.new }
   let(:current_user) {FactoryGirl.create(:user)}
@@ -10,6 +10,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
 
   before :each do
     helper = Object.new.extend ActionView::Helpers::FormHelper
+    helper.extend ActionView::Context
     helper.extend ActionDispatch::Routing::PolymorphicRoutes
     helper.extend ActionView::Helpers::FormOptionsHelper
     person.build_consumer_role if person.consumer_role.blank?
