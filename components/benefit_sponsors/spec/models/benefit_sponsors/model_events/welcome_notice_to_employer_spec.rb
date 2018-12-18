@@ -11,7 +11,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     context "ModelEvent" do
       it "should trigger model event" do
         model_instance.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |model_instance, model_event|
+          expect(observer).to receive(:process_organization_events) do |model_instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :welcome_notice_to_employer, :klass_instance => model_instance, :options => {})
           end
@@ -21,7 +21,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     end
 
     context "NoticeTrigger" do
-      subject { BenefitSponsors::Observers::OrganizationObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:welcome_notice_to_employer, model_instance, {}) }
 
       it "should trigger notice event" do
@@ -30,7 +30,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Organizations::AcaShopCcaEmployerProfile'
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_organization_events(model_instance, model_event)
       end
     end
   end
