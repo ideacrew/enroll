@@ -85,13 +85,15 @@ describe ::Services::CheckbookServices::PlanComparision do
       let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
 
       it "should return max aptc" do
+        allow(hbx_enrollment).to receive(:coverage_year).and_return hbx_enrollment.effective_on.year
         allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
         expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc.to_i
       end
     end
-     context "when active household  not present" do 
+     context "when active household  not present" do
       it "should return max NULL" do
+        allow(hbx_enrollment).to receive(:coverage_year).and_return hbx_enrollment.effective_on.year
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
         expect(subject.aptc_value).to eq "NULL"
       end
