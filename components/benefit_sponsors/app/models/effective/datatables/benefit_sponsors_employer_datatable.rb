@@ -109,7 +109,8 @@ module Effective
       end
 
       def business_policy_accepted?(draft_application)
-        Date.today <= daydraft_application.open_enrollment_period.max && Date.today > publish_due_day_of_month && Date.today > (draft_application.effective_period.min - 2.months)
+        current_date = Date.today
+        current_date <= draft_application.open_enrollment_period.max && current_date.day > publish_due_day_of_month && current_date > (draft_application.effective_period.min - 2.months)
       end
 
       def force_publish_link_type(benefit_sponsorship, allow)

@@ -15,7 +15,7 @@ end
 And(/^the system date is (greater|less) than the publish_due_day_of_month$/) do |compare|
   current_date = Date.current
   day = compare == 'greater' ? 18 : 13
-  expect(Date).to receive(:today).thrice.and_return(current_date)
+  expect(Date).to receive(:today).and_return(current_date)
   expect(current_date).to receive(:day).and_return(day)
 end
 
