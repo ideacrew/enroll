@@ -5,7 +5,7 @@ require 'csv'
 # 1) You need to pull a list of enrollments from glue (bundle exec rails r script/queries/print_all_policy_ids > all_glue_policies.txt -e production)
 # 2) Place that file into the Enroll Root directory. 
 # 3) Run the below rake task
-# RAILS_ENV=production bundle exec rake reports:outstanding_monthly_enrollments start_date='04/01/2018'
+# RAILS_ENV=production bundle exec rake reports:outstanding_monthly_enrollments start_date='02/01/2019'
 
 namespace :reports do 
 
@@ -27,8 +27,8 @@ namespace :reports do
 
     glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
 
-    field_names = ['Employer ID', 'Employer FEIN', 'Employer Name','Open Enrollment Start', 'Open Enrollment End', 'Employer Plan Year Start Date', 'Plan Year State', 
-                   'Employer State', 'Initial/Renewal?', 'Binder Paid?', 'Enrollment Group ID', 'Carrier', 'Plan', 'Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 
+    field_names = ['Employer ID', 'Employer FEIN', 'Employer Name','Open Enrollment Start', 'Open Enrollment End', 'Employer Plan Year Start Date', 'Plan Year State', 'Covered Lives','Enrollment Reason',
+                   'Employer State', 'Initial/Renewal?', 'Binder Paid?', 'Enrollment Group ID', 'Carrier', 'Plan', 'Plan Hios ID','Enrollment Purchase Date/Time', 'Coverage Start Date', 'Enrollment State', 'Subscriber HBX ID', 
                    'Subscriber First Name','Subscriber Last Name','Policy in Glue?', 'Quiet Period?']
     CSV.open("#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv","w") do |csv|
       csv << field_names
@@ -38,6 +38,13 @@ namespace :reports do
       enrollment_ids.each do |id|
         begin
         hbx_enrollment = HbxEnrollment.by_hbx_id(id).first
+          case hbx_enrollment.enrollment_kind
+          when "special_enrollment" 
+            enrollment_reason = hbx_enrollment.special_enrollment_period.qualifying_life_event_kind.reason
+          when "open_enrollment"
+            enrollment_reason = hbx_enrollment.eligibility_event_kind
+          end
+        covered_lives = hbx_enrollment.hbx_enrollment_members.size
         benefit_sponsorship = hbx_enrollment.benefit_sponsorship
         employer_id = benefit_sponsorship.hbx_id
         fein = benefit_sponsorship.organization.fein
@@ -51,7 +58,7 @@ namespace :reports do
         initial_renewal = benefit_application.predecessor.present? ? "renewal" : "initial"
         binder_paid = %w(initial_enrollment_eligible active).include?(benefit_sponsorship_aasm.to_s)
         eg_id = id
-        product = hbx_enrollment.product.title rescue ""
+        product = hbx_enrollment.product rescue ""
         carrier = product.issuer_profile.legal_name rescue ""
         purchase_time = hbx_enrollment.created_at
         coverage_start = hbx_enrollment.effective_on
@@ -65,7 +72,7 @@ namespace :reports do
         in_glue = glue_list.include?(id)
         qp = quiet_period_range(benefit_application,effective_on)
         quiet_period_boolean = qp.include?(hbx_enrollment.created_at)
-        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state,benefit_sponsorship_aasm,initial_renewal,binder_paid,eg_id,carrier,product,purchase_time,coverage_start,
+        csv << [employer_id,fein,legal_name,oe_start,oe_end,benefit_application_start,benefit_application_state, covered_lives, enrollment_reason,benefit_sponsorship_aasm,initial_renewal,binder_paid,eg_id,carrier,product.title, product.hios_id,purchase_time,coverage_start,
                 enrollment_state,subscriber_hbx_id,first_name,last_name,in_glue, quiet_period_boolean]
         rescue Exception => e
           puts "#{id} - #{e.inspect}"
