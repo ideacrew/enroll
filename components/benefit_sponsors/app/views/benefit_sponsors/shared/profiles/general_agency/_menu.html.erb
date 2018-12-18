@@ -15,7 +15,7 @@
         <% end %>
       </li>
       <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
-        <%= link_to(family_index_profiles_general_agencies_general_agency_profiles_path(general_agency_profile_id), "aria-expanded" => "true", :remote => true, "aria-controls" => "home", "role" => "tab" ) do  %>
+        <%= link_to(benefit_sponsors.families_profiles_general_agencies_general_agency_profiles_path(id: general_agency_profile_id), "aria-expanded" => "true", :remote => true, "aria-controls" => "home", "role" => "tab" ) do  %>
           <span class="hidden-xs">Families</span>
           <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
         <% end %>

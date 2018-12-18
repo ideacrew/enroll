@@ -3,7 +3,7 @@ module BenefitSponsors
     module GeneralAgencies
       class GeneralAgencyProfilesControllerPolicy < ApplicationPolicy
 
-        def family_index?
+        def families?
           return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
         end
 
