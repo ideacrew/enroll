@@ -107,7 +107,7 @@ end
 #need to exlude this list from UQHP_FEL data set.
 if InitialEvents.include?(event)
   @excluded_list = []
-  CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
+  CSV.foreach("final_fre_aqhp_data_set.csv",:headers =>true).each do |d|
     @excluded_list << d["subscriber_id"]
   end
 end
