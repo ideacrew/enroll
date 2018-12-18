@@ -12,6 +12,7 @@ module BenefitSponsors
                 model_instance = args.klass_instance
                 # next unless (event == :notifications_send)
               end
+              next if k.is_a?(BenefitSponsors::Observers::NoticeObserver) & !args.present?
               k.send event, model_instance, args
             end
           end

@@ -15,21 +15,20 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:person1) { FactoryGirl.create(:person) }
   let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site) }
   let!(:broker_agency_profile) { broker_agency_organization1.broker_agency_profile}
-  let!(:model_instance) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
+  let!(:model_instance) { create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship) }
   let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
   
   before do
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role1.id)
-
   end
 
   describe "when ER successfully hires a broker" do
     let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:broker_hired, model_instance, {}) }
-    subject { BenefitSponsors::Observers::BrokerAgencyAccountObserver.new }
+    subject { BenefitSponsors::Observers::NoticeObserver.new }
 
     context "ModelEvent" do
       it "should trigger model event" do
-        allow(subject).to receive(:notifications_send).and_return(model_instance, model_event)
+        allow(subject).to receive(:process_broker_agency_events).and_return(model_instance, model_event)
         expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
         expect(model_event).to have_attributes(:event_key => :broker_hired, :klass_instance => model_instance, :options => {})
         model_instance.save!
@@ -57,7 +56,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
 
-        subject.notifications_send(model_instance, model_event)
+        subject.process_broker_agency_events(model_instance, model_event)
       end
     end
   end
