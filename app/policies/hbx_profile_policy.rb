@@ -30,6 +30,11 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_extend_open_enrollment
   end
 
+  def can_change_fein?
+    return false unless role = user.person.hbx_staff_role
+    role.permission.can_change_fein
+  end
+
   def show?
     @user.has_role?(:hbx_staff) or
       @user.has_role?(:csr) or

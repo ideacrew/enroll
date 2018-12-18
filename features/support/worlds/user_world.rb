@@ -90,3 +90,11 @@ Then(/^the user enters a new open enrollment end date$/) do
   input = find('input.hasDatepicker')
   input.set(Date.today+1.week)
 end
+
+Then(/^the user will( not)? see the Change FEIN button$/) do |visible|
+  if visible.blank?
+     expect(page).to have_css('.btn.btn-xs', text: 'Change FEIN')
+   else
+     expect(page).to_not have_css('.btn.btn-xs', text: 'Change FEIN')
+   end
+ end

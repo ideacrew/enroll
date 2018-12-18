@@ -25,7 +25,7 @@ module PermissionsWorld
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true, can_extend_open_enrollment: true)
+      view_admin_tabs: true, can_extend_open_enrollment: true, can_change_fein: true)
   end
 
   def hbx_admin_can_update_ssn
@@ -55,6 +55,10 @@ module PermissionsWorld
     Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_change_fein
+    Permission.super_admin.update_attributes(can_change_fein: true)
+  end
+
   def make_all_permissions
     define_permissions
     hbx_admin_can_update_ssn
@@ -63,6 +67,7 @@ module PermissionsWorld
     hbx_admin_can_lock_unlock
     hbx_admin_can_view_username_and_email
     hbx_admin_can_reset_password
+    hbx_admin_can_change_fein
   end
 end
 
