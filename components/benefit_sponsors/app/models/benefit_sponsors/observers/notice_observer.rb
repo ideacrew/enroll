@@ -96,16 +96,14 @@ module BenefitSponsors
           trigger_application_denied_for(model_instance, benefit_application)
         when :renewal_application_created
           trigger_renewal_application_created_for(model_instance, benefit_application)
-        when :renewal_application_created
-          trigger_renewal_application_created_for(model_instance, benefit_application)
         when :renewal_application_autosubmitted
           trigger_renewal_application_autosubmitted_for(model_instance, benefit_application)
         when :low_enrollment_notice_for_employer
           trigger_low_enrollment_notice_for_employer_for(model_instance)
         when :initial_employer_first_reminder_to_publish_plan_year, :initial_employer_second_reminder_to_publish_plan_year, :initial_employer_final_reminder_to_publish_plan_year
-          trigger_initial_employer_remainder_notices_for(model_instance, model_event.event_key)
+          trigger_initial_employer_reminder_notices_for(model_instance, model_event.event_key)
         when :renewal_employer_publish_plan_year_reminder_after_soft_dead_line, :renewal_plan_year_first_reminder_before_soft_dead_line, :renewal_plan_year_publish_dead_line
-          trigger_renewal_employer_remainder_notices_for(model_instance, model_event.event_key)
+          trigger_renewal_employer_reminder_notices_for(model_instance, model_event.event_key)
         when :initial_employer_no_binder_payment_received
           trigger_initial_employer_no_binder_payment_received_for(model_instance)
         when :group_advance_termination_confirmation
@@ -185,10 +183,6 @@ module BenefitSponsors
         deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_created")
       end
 
-      def trigger_renewal_application_created_for(model_instance, benefit_application)
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_created")
-      end
-
       def trigger_renewal_application_autosubmitted_for(model_instance, benefit_application)
         deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "plan_year_auto_published") if benefit_application.is_renewing?
         trigger_zero_employees_on_roster_notice(benefit_application)
@@ -206,7 +200,7 @@ module BenefitSponsors
         end
       end
 
-      def trigger_initial_employer_remainder_notices_for(model_instance, event_key)
+      def trigger_initial_employer_reminder_notices_for(model_instance, event_key)
         start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
         BenefitSponsors::Queries::NoticeQueries.initial_employers_by_effective_on_and_state(start_on: start_on, aasm_state: :draft).each do|benefit_sponsorship|
           benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).sort_by(&:created_at).last
@@ -216,7 +210,7 @@ module BenefitSponsors
         end
       end
 
-      def trigger_renewal_employer_remainder_notices_for(model_instance, event_key)
+      def trigger_renewal_employer_reminder_notices_for(model_instance, event_key)
         BenefitSponsors::Queries::NoticeQueries.organizations_for_force_publish(TimeKeeper.date_of_record).each do |benefit_sponsorship|
           benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :draft).detect { |ba| ba.is_renewing? }
           if benefit_application.present? && benefit_application.is_renewing?
@@ -342,12 +336,10 @@ module BenefitSponsors
 
       def trigger_employee_sep_request_accepted_for(model_instance, model_event)
         special_enrollment_period = model_event.klass_instance
-        if (model_event.event_key == :employee_sep_request_accepted) && special_enrollment_period.is_shop?
-          person = special_enrollment_period.family.primary_applicant.person
-          unless person.has_multiple_active_employers?
-            employee_role = person.active_employee_roles[0]
-            deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted") 
-          end
+        person = special_enrollment_period.family.primary_applicant.person
+        unless person.has_multiple_active_employers?
+          employee_role = person.active_employee_roles[0]
+          deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted")
         end
       end
 
