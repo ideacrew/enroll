@@ -39,6 +39,6 @@ When(/^the user clicks on Force Publish button$/) do
   find('.btn.btn-xs', text: 'Force Publish').click
 end
 
-Then(/^the force published action should display '(.*?)' message$/) do |message|
+Then(/^the force published action should display '(.*?)'$/) do |message|
   expect(page).to have_content(message)
 end

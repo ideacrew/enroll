@@ -144,7 +144,6 @@ module Config::SiteHelper
     link_to site_website_name, site_main_web_address_url
   end
 
-
   def non_discrimination_notice_url
     link_to site_nondiscrimination_notice_url, site_nondiscrimination_notice_url
   end
