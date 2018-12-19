@@ -34,8 +34,20 @@ module BenefitSponsors
     let(:product_package) { current_benefit_market_catalog.product_packages.first }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
-    let(:person) { FactoryGirl.create(:person) }
+
+    let!(:permission)               { FactoryGirl.create(:permission, :hbx_staff) }
+    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
+    let!(:hbx_person)               { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+
+    let!(:person1) { FactoryGirl.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person1 ) }
+    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+    let!(:employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
+    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[employer_staff_role]) }
     let!(:user) { FactoryGirl.create_default :user, person: person}
+
     let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
@@ -90,27 +102,40 @@ module BenefitSponsors
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
     end
 
-
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      benefit_sponsorship.benefit_market.site_urn = site.site_key
+      benefit_sponsorship.save
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
+      user_with_hbx_staff_role.person.hbx_staff_role.save!
+      user_with_broker_role.person.broker_role.update_attributes!(aasm_state: 'active')
+    end
 
     describe "GET new", dbclean: :after_each do
       include_context 'shared_stuff'
 
       it "should initialize the form" do
-        sign_in_and_do_new
-        expect(assigns(:benefit_application_form).class).to eq form_class
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_new(login_user)
+          expect(assigns(:benefit_application_form).class).to eq form_class
+        end
       end
 
       it "should be a success" do
-        sign_in_and_do_new
-        expect(response).to have_http_status(:success)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_new(login_user)
+          expect(response).to have_http_status(:success)
+        end
       end
 
       it "should render new template" do
-        sign_in_and_do_new
-        expect(response).to render_template("new")
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_new(login_user)
+          expect(response).to render_template("new")
+        end
       end
 
-      def sign_in_and_do_new
+      def sign_in_and_do_new(user)
         sign_in user
         get :new, :benefit_sponsorship_id => benefit_sponsorship_id
       end
@@ -120,18 +145,24 @@ module BenefitSponsors
       include_context 'shared_stuff'
 
       it "should redirect" do
-        sign_in_and_do_create
-        expect(response).to have_http_status(:redirect)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_create(login_user)
+          expect(response).to have_http_status(:redirect)
+        end
       end
 
       it "should redirect to benefit packages new" do
-        sign_in_and_do_create
-        expect(response.location.include?("benefit_packages/new")).to be_truthy
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_create(login_user)
+          expect(response.location.include?("benefit_packages/new")).to be_truthy
+        end
       end
 
       it "should initialize form" do
-        sign_in_and_do_create
-        expect(assigns(:benefit_application_form).class).to eq form_class
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_create(login_user)
+          expect(assigns(:benefit_application_form).class).to eq form_class
+        end
       end
 
       context "when create fails" do
@@ -143,17 +174,21 @@ module BenefitSponsors
         end
 
         it "should redirect to new" do
-          sign_in_and_do_create
-          expect(response).to render_template("new")
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_do_create(login_user)
+            expect(response).to render_template("new")
+          end
         end
 
         it "should return error messages" do
-          sign_in_and_do_create
-          expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_do_create(login_user)
+            expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
+          end
         end
       end
 
-      def sign_in_and_do_create
+      def sign_in_and_do_create(user)
         sign_in user
         post :create, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params
       end
@@ -167,21 +202,27 @@ module BenefitSponsors
       end
 
       it "should be a success" do
-        sign_in user
-        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
-        expect(response).to have_http_status(:success)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in login_user
+          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          expect(response).to have_http_status(:success)
+        end
       end
 
       it "should render edit template" do
-        sign_in user
-        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
-        expect(response).to render_template("edit")
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in login_user
+          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          expect(response).to render_template("edit")
+        end
       end
 
       it "should initialize form" do
-        sign_in user
-        xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
-        expect(form_class).to respond_to(:for_edit)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in login_user
+          xhr :get, :edit, :benefit_sponsorship_id => benefit_sponsorship_id, id: ben_app.id.to_s, :benefit_application => benefit_application_params
+          expect(form_class).to respond_to(:for_edit)
+        end
       end
     end
 
@@ -194,18 +235,24 @@ module BenefitSponsors
       end
 
       it "should be a success" do
-        sign_in_and_do_update
-        # expect(response).to have_http_status(:success)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_update(login_user)
+          # expect(response).to have_http_status(:success)
+        end
       end
 
       it "should initialize form" do
-        sign_in_and_do_update
-        expect(assigns(:benefit_application_form).class).to eq form_class
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_update(login_user)
+          expect(assigns(:benefit_application_form).class).to eq form_class
+        end
       end
 
       it "should redirect to benefit packages index" do
-        sign_in_and_do_update
-        expect(response.location.include?("benefit_packages")).to be_truthy
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_do_update(login_user)
+          expect(response.location.include?("benefit_packages")).to be_truthy
+        end
       end
 
       context "when update fails" do
@@ -217,17 +264,21 @@ module BenefitSponsors
         end
 
         it "should redirect to edit" do
-          sign_in_and_do_update
-          expect(response).to render_template("edit")
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_do_update(login_user)
+            expect(response).to render_template("edit")
+          end
         end
 
         it "should return error messages" do
-          sign_in_and_do_update
-          expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_do_update(login_user)
+            expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
+          end
         end
       end
 
-      def sign_in_and_do_update
+      def sign_in_and_do_update(user)
         sign_in user
         xhr :put, :update, :id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params
       end
@@ -241,15 +292,29 @@ module BenefitSponsors
       let(:aasm_state) { :draft }
       let(:benefit_application) { initial_application }
 
-      def sign_in_and_submit_application
+      def sign_in_and_submit_application(user)
         sign_in user
         post :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       context "benefit application published sucessfully" do
-        it "should redirect with success message" do
-          sign_in_and_submit_application
-          expect(flash[:notice]).to eq "Plan Year successfully published."
+        it "should redirect with success message for broker" do
+          [user_with_broker_role].each do |login_user|
+            sign_in_and_submit_application(login_user)
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+          end
+        end
+        it "should redirect with success message for amdin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in_and_submit_application(login_user)
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+          end
+        end
+        it "should redirect with success message for employer" do
+          [user].each do |login_user|
+            sign_in_and_submit_application(login_user)
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+          end
         end
       end
 
@@ -259,11 +324,31 @@ module BenefitSponsors
           allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain('non_owner_employee_present?').and_return(false)
         end
 
-        it "should redirect with success message" do
-          sign_in user
-          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
-          expect(flash[:notice]).to eq "Plan Year successfully published."
-          expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+        it "should redirect with success message for employer" do
+          [user].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+            expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+          end
+        end
+
+        it "should redirect with success message for admin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+            expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+          end
+        end
+
+        it "should redirect with success message for broker" do
+          [user_with_broker_role].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:notice]).to eq "Plan Year successfully published."
+            expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
+          end
         end
       end
 
@@ -274,9 +359,11 @@ module BenefitSponsors
         end
 
         it "should display warnings" do
-          sign_in user
-          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
-          have_http_status(:success)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            have_http_status(:success)
+          end
         end
       end
 
@@ -284,9 +371,11 @@ module BenefitSponsors
         let(:aasm_state) { :denied }
 
         it "should redirect with errors" do
-          sign_in user
-          xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
-          expect(flash[:error]).to match(/Plan Year failed to publish/)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in login_user
+            xhr :post, :submit_application, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
+            expect(flash[:error]).to match(/Plan Year failed to publish/)
+          end
         end
       end
     end
@@ -298,26 +387,32 @@ module BenefitSponsors
       let(:aasm_state) { :draft }
       let(:ben_app) { initial_application }
 
-      def sign_in_and_force_submit_application
+      def sign_in_and_force_submit_application(user)
         sign_in user
         post :force_submit_application, :benefit_application_id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
 
       it "should redirect" do
-        sign_in_and_force_submit_application
-        expect(response).to have_http_status(:redirect)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_force_submit_application(login_user)
+          expect(response).to have_http_status(:redirect)
+        end
       end
 
       # TODO: FIX ME - Add below test after adding business rules engine
       it "should expect benefit application state to be pending" do
-        sign_in_and_force_submit_application
-        ben_app.reload
-        # expect(ben_app.aasm_state).to eq :pending
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_force_submit_application(login_user)
+          ben_app.reload
+          # expect(ben_app.aasm_state).to eq :pending
+        end
       end
 
       it "should display errors" do
-        sign_in_and_force_submit_application
-        expect(flash[:error]).to match(/this application is ineligible for coverage/)
+        [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+          sign_in_and_force_submit_application(login_user)
+          expect(flash[:error]).to match(/this application is ineligible for coverage/)
+        end
       end
     end
 
@@ -327,7 +422,7 @@ module BenefitSponsors
 
       let(:benefit_application) { initial_application }
 
-      def sign_in_and_revert
+      def sign_in_and_revert(user)
         sign_in user
         post :revert, :benefit_application_id => benefit_application.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id
       end
@@ -336,28 +431,62 @@ module BenefitSponsors
         let(:aasm_state) { :draft }
 
         it "should redirect" do
-          sign_in_and_revert
-          expect(response).to have_http_status(:success)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(response).to have_http_status(:success)
+          end
         end
 
         it "should display error message" do
-          sign_in_and_revert
-          expect(flash[:error]).to match(/Plan Year could not be reverted to draft state/)
+          [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:error]).to match(/Plan Year could not be reverted to draft state/)
+          end
         end
       end
 
       context "when there is an eligible application to revert" do
         let(:aasm_state) { :approved }
 
-        it "should revert benefit application" do
-          sign_in_and_revert
-          expect(ben_app.aasm_state).to eq :draft
+        it "employer should revert benefit application" do
+          [user].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(ben_app.aasm_state).to eq :draft
+          end
+        end
+        it "broker should revert benefit application" do
+          [user_with_broker_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(ben_app.aasm_state).to eq :draft
+          end
+        end
+        it "admin should revert benefit application" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(ben_app.aasm_state).to eq :draft
+          end
         end
 
-        it "should display flash messages" do
-          sign_in_and_revert
-          expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+        it "should display flash messages for employer" do
+          [user].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+          end
+
         end
+        it "should display flash messages for broker" do
+          [user_with_broker_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+          end
+        end
+        it "should display flash messages for admin" do
+          [user_with_hbx_staff_role].each do |login_user|
+            sign_in_and_revert(login_user)
+            expect(flash[:notice]).to match(/Plan Year successfully reverted to draft state./)
+          end
+        end
+
       end
     end
   end
