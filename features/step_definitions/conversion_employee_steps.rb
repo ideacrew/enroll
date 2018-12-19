@@ -132,6 +132,12 @@ Then(/Employee should see \"employer-sponsored benefits not found\" error messag
   visit '/families/home'
 end
 
+Then(/Employee should see \"select at least one eligible applicant\" error message/) do
+  screenshot("no_eligible_applicants_exception")
+  find('.alert', text: "You must select at least one Eligible applicant to enroll in the healthcare plan")
+  visit '/families/home'
+end
+
 Then(/Employee should see \"You are attempting to purchase coverage through qle proir to your eligibility date\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
   find('.alert', text: "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date")

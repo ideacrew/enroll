@@ -21,7 +21,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       And Soren White already matched and logged into employee portal
       When Employee clicks "Shop for Plans" on my account page
       When Employee clicks continue on the group selection page
-      Then Employee should see "employer-sponsored benefits not found" error message
+      Then Employee should see "select at least one eligible applicant" error message
 
   Scenario: New Hire can't buy coverage before open enrollment of renewing plan year through New Hire badge
     Given Conversion Employer for Soren White exists with active and renewing plan year
