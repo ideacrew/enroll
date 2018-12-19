@@ -2044,6 +2044,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         coverage_date = initial_application.end_on - 1.month
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
       end
+
+      it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
+        initial_application.update_attributes(aasm_state: :imported)
+        coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
+        expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
+      end
     end
 
     context "when ER has active and renewal benefit applications" do

@@ -13,7 +13,7 @@ module BenefitSponsors
       field :probation_period_kind, type: Symbol
       field :is_default, type: Boolean, default: false
       field :is_active, type: Boolean, default: true
-      field :predecessor_id, type: BSON::ObjectId
+      field :predecessor_id, type: BSON::ObjectId  # Deprecated
 
       # Deprecated: replaced by FEHB profile and FEHB market
       # field :is_congress, type: Boolean, default: false
@@ -89,17 +89,6 @@ module BenefitSponsors
         end
       end
 
-      def package_for_date(coverage_start_date)
-        if (coverage_start_date <= end_on) && (coverage_start_date >= start_on)
-          return self
-        elsif (coverage_start_date < start_on)
-          return nil unless predecessor.present?
-          predecessor.package_for_date(coverage_start_date)
-        else
-          return nil unless successor.present?
-          successor.package_for_date(coverage_start_date)
-        end
-      end
 
       # TODO: there can be only one sponsored benefit of each kind
       def add_sponsored_benefit(new_sponsored_benefit)
