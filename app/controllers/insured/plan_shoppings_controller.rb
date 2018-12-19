@@ -78,7 +78,13 @@ class Insured::PlanShoppingsController < ApplicationController
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url
-    @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
+
+    if @market_kind == 'individual'
+      @plan = Plan.find(params.require(:plan_id))
+    else
+      @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
+    end
+
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
 
@@ -87,10 +93,12 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       get_aptc_info_from_session(@enrollment)
     end
-
-    # TODO Fix this stub
-    #@plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
-    @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    if @market_kind == 'individual'
+      @enrollment.reset_dates_on_previously_covered_members(@plan)
+      @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    else
+      @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
+    end
 
     @family = @person.primary_family
 
@@ -99,10 +107,10 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
+    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
-      format.html { render 'thankyou.html.erb' }
+      format.html {render 'thankyou.html.erb'}
     end
   end
 
