@@ -160,6 +160,10 @@ module Config::SiteHelper
     Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
   end
 
+  def publish_due_day_of_month
+    Settings.aca.shop_market.initial_application.publish_due_day_of_month
+  end
+
   def site_guidance_for_business_owners_url
     Settings.site.guidance_for_business_owners_url
   end

@@ -2,6 +2,8 @@ module Effective
   module Datatables
     class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+      include Config::SiteHelper
+
 
       SOURCE_KINDS = ([:all]+ BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
 
@@ -101,14 +103,19 @@ module Effective
         row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
       end
 
-      def get_latest_draft_benefit_application_id(benefit_sponsorship)
+      def get_latest_draft_benefit_application(benefit_sponsorship)
         draft_apps = benefit_sponsorship.benefit_applications.draft_state
         draft_apps.present? ? draft_apps.last : ""
       end
 
+      def business_policy_accepted?(draft_application)
+        current_date = Date.today
+        current_date <= draft_application.open_enrollment_period.max && current_date.day > publish_due_day_of_month && current_date > (draft_application.effective_period.min - 2.months)
+      end
+
       def force_publish_link_type(benefit_sponsorship, allow)
-        draft_application_id = get_latest_draft_benefit_application_id(benefit_sponsorship)
-        allow && draft_application_id.present? ? 'post_ajax' : 'hide'
+        draft_application = get_latest_draft_benefit_application(benefit_sponsorship)
+        draft_application.present? && business_policy_accepted?(draft_application) && allow && draft_application.present? ? 'post_ajax' : 'hide'
       end
 
       def collection
