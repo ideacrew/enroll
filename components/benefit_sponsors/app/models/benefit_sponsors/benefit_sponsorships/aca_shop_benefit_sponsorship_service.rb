@@ -114,9 +114,12 @@ module BenefitSponsors
       notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
     end
 
+    # TODO: Need to verify is_renewing? logic for off-cycle renewals
     def self.set_binder_paid(benefit_sponsorship_ids)
       benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => benefit_sponsorship_ids)
-      benefit_sponsorships.each {|benefit_sponsorship| benefit_sponsorship.credit_binder! if benefit_sponsorship.may_credit_binder?}
+      benefit_sponsorships.each do |benefit_sponsorship|
+        benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.credit_binder! if (!benefit_application.is_renewing? && benefit_application.may_credit_binder?) }
+      end
     end
 
     private

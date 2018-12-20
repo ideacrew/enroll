@@ -18,14 +18,14 @@ module BenefitSponsors
     APPLICATION_APPROVED_STATES   = [:approved].freeze
     APPLICATION_DENIED_STATES     = [:denied].freeze
     ENROLLING_STATES              = [:enrollment_open, :enrollment_extended, :enrollment_closed].freeze
-    ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible].freeze
+    ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible, :binder_paid].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
     TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired].freeze
     CANCELED_STATES               = [:canceled].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
-    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
+    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
     TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
     APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
@@ -434,6 +434,7 @@ module BenefitSponsors
       IMPORTED_STATES.include?(aasm_state)
     end
 
+    # TODO: Need to verify is_renewing? logic for off-cycle renewals
     def is_renewing?
       predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
     end
@@ -682,10 +683,11 @@ module BenefitSponsors
       end
     end
 
-    def accept_application
-      adjust_open_enrollment_date
-      transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
-    end
+    # Not being used any where in the application
+    # def accept_application
+    #   adjust_open_enrollment_date
+    #   transition_success = benefit_sponsorship.initial_application_approved! if benefit_sponsorship.may_approve_initial_application?
+    # end
 
     def recalc_pricing_determinations
       benefit_packages.each do |benefit_package|
@@ -696,6 +698,10 @@ module BenefitSponsors
       end
 
       self.save
+    end
+
+    def mark_enrollment_eligible
+      approve_enrollment_eligiblity! if may_approve_enrollment_eligiblity?
     end
 
     class << self
@@ -731,6 +737,7 @@ module BenefitSponsors
       state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
+      state :binder_paid, :after_enter => :mark_enrollment_eligible            # made binder payment - used by initial applications only
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
 
@@ -781,7 +788,7 @@ module BenefitSponsors
       end
 
       event :begin_open_enrollment do
-        transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
+        transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :binder_paid, :enrollment_ineligible],
           to:     :enrollment_open
       end
 
@@ -790,8 +797,13 @@ module BenefitSponsors
           to:     :enrollment_closed
       end
 
+      event :credit_binder do
+        transitions from: :enrollment_closed
+          to: :binder_paid
+      end
+
       event :approve_enrollment_eligiblity do
-        transitions from:   :enrollment_closed,
+        transitions from:   [:enrollment_closed, :binder_paid],
           to:     :enrollment_eligible
       end
 
@@ -801,7 +813,7 @@ module BenefitSponsors
       end
 
       event :reverse_enrollment_eligibility do
-        transitions from:   :enrollment_eligible,
+        transitions from:   [:enrollment_eligible, :binder_paid],
           to:     :enrollment_closed
       end
 
@@ -809,14 +821,14 @@ module BenefitSponsors
         transitions from:   [
           :approved, :denied,
           :enrollment_open, :enrollment_closed,
-          :enrollment_eligible, :enrollment_ineligible,
+          :enrollment_eligible, :binder_paid, :enrollment_ineligible,
           :active
         ] + APPLICATION_EXCEPTION_STATES,
           to:     :draft, :after => [:cancel_enrollments]
       end
 
       event :activate_enrollment do
-        transitions from:   :enrollment_eligible,
+        transitions from:   [:enrollment_eligible, :binder_paid],
           to:     :active
         transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled
@@ -827,7 +839,7 @@ module BenefitSponsors
       end
 
       event :expire do
-        transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :active],
+        transitions from:   [:approved, :enrollment_open, :enrollment_eligible, :binder_paid, :active],
           to:     :expired
       end
 
@@ -873,17 +885,17 @@ module BenefitSponsors
 
     # Listen for BenefitSponsorship state changes
     def benefit_sponsorship_event_subscriber(aasm)
-      if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
-        reverse_enrollment_eligibility!
-      end
+      # if (aasm.to_state == :binder_reversed) && may_reverse_enrollment_eligibility?
+      #   reverse_enrollment_eligibility!
+      # end
 
-      if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
-        approve_enrollment_eligiblity!
-      end
+      # if (aasm.to_state == :initial_enrollment_eligible) && may_approve_enrollment_eligiblity?
+      #   approve_enrollment_eligiblity!
+      # end
 
-      if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
-        deny_enrollment_eligiblity!
-      end
+      # if (aasm.to_state == :initial_enrollment_ineligible) && may_deny_enrollment_eligiblity?
+      #   deny_enrollment_eligiblity!
+      # end
 
       if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
         cancel! if enrollment_ineligible? && may_cancel?
@@ -908,7 +920,7 @@ module BenefitSponsors
               return false if self.aasm_state.blank?
               return false if self.imported?
               return false if self.effective_period.blank?
-              return true if self.enrollment_eligible? || self.active?
+              return true if self.enrollment_eligible? || self.binder_paid? || self.active?
               self.terminated? || self.expired?
             end
 
