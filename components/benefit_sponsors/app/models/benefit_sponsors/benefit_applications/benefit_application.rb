@@ -700,10 +700,6 @@ module BenefitSponsors
       self.save
     end
 
-    def mark_enrollment_eligible
-      approve_enrollment_eligiblity! if may_approve_enrollment_eligiblity?
-    end
-
     class << self
 
       def find(id)
@@ -737,7 +733,7 @@ module BenefitSponsors
       state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
       state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
-      state :binder_paid, :after_enter => :mark_enrollment_eligible            # made binder payment - used by initial applications only
+      state :binder_paid            # made binder payment - used by initial applications only
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
 
@@ -788,7 +784,7 @@ module BenefitSponsors
       end
 
       event :begin_open_enrollment do
-        transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :binder_paid, :enrollment_ineligible],
+        transitions from:   [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_ineligible],
           to:     :enrollment_open
       end
 
