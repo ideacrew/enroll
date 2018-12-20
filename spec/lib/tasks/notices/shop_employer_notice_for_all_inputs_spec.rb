@@ -1,6 +1,5 @@
 require 'rails_helper'
 Rake.application.rake_require "tasks/notices/shop_employer_notice_for_all_inputs"
-include ActiveJob::TestHelper
 Rake::Task.define_task(:environment)
 
 RSpec.describe 'Generate notices to employer by taking hbx_ids, feins, employer_ids and event name', :type => :task, dbclean: :after_each do

@@ -757,5 +757,136 @@ module BenefitSponsors
     end
 
 
+    describe "Benefit Application Open Enrollment Extension", :dbclean => :after_each do
+      let(:aasm_state) { :active }
+      let(:sponsorship_state)               { :active }
+
+      let(:this_year)                       { TimeKeeper.date_of_record.year }
+      let(:april_effective_date)            { Date.new(this_year,4,1) }
+
+      let!(:april_sponsor)                  { create(:benefit_sponsors_benefit_sponsorship,
+                                                     :with_organization_cca_profile, :with_initial_benefit_application,
+                                                     default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)),
+                                                     site: site, aasm_state: sponsorship_state, initial_application_state: aasm_state)
+                                            }
+
+      let(:april_application) { april_sponsor.benefit_applications.detect{|app| app.start_on == april_effective_date} }
+
+ 
+      context '.oe_extendable_benefit_applications' do
+
+        let(:current_date)  { Date.new(this_year, 4, 10) }
+        before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
+
+        context "when overlapping benefit application present with status as" do
+          let(:new_effective_date)            { Date.new(this_year,4,1) }
+
+          let!(:new_application)              { create(:benefit_sponsors_benefit_application,
+                                                         benefit_sponsorship: april_sponsor,
+                                                         effective_period: (new_effective_date..(new_effective_date + 1.year - 1.day)),
+                                                         aasm_state: :canceled) }
+
+          context "terminted" do
+            let(:aasm_state) { :terminated }
+
+            it "should not return application for enrollment extension" do
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end 
+          end
+
+          context "approved" do
+            let(:aasm_state) { :approved }
+            let(:sponsorship_state) { :initial_application_approved  }
+
+            it "should not return application for enrollment extension" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end
+          end
+
+          context "enrollment_extended" do
+            let(:aasm_state) { :enrollment_extended }
+            let(:sponsorship_state) { :initial_enrollment_open  }
+
+            it "should return only already extended application" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+              expect(april_sponsor.oe_extendable_benefit_applications).to eq [april_application]
+            end
+          end
+
+          context "expired" do
+            let(:aasm_state) { :expired }
+
+            it "should not return application for enrollment extension" do
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
+            end
+          end
+
+          context "draft" do
+            let(:aasm_state) { :draft }
+            let(:sponsorship_state) { :applicant }
+
+            it "should return application for enrollment extension" do 
+              expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+              expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
+            end
+          end
+        end
+
+        context "when overlapping benefit application not present" do
+
+          let(:april_effective_date)          { Date.new(this_year - 1,4,1) }
+          let(:new_effective_date)            { Date.new(this_year,5,1) }
+
+          let!(:new_application)              { create(:benefit_sponsors_benefit_application,
+                                                         benefit_sponsorship: april_sponsor,
+                                                         effective_period: (new_effective_date..(new_effective_date + 1.year - 1.day)),
+                                                         aasm_state: :canceled) }
+
+          it "should return may application for enrollment extension" do
+            expect(april_sponsor.oe_extendable_benefit_applications).to be_present
+            expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
+          end
+        end 
+      end
+
+      context '.oe_extended_applications' do
+
+        before { 
+          allow(april_sponsor).to receive(:open_enrollment_period_for).and_return(april_effective_date - 20.days..april_effective_date - 10.days)
+          TimeKeeper.set_date_of_record_unprotected!(current_date)
+        }
+
+        context "when open enrollment extended application present" do
+          let(:aasm_state) { :enrollment_extended }
+
+          context "and monthly open enrollment end date not passed" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max - 2.days }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+
+          context "and monthly open enrollment end date reached" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+
+          context "and monthly open enrollment end date passed" do
+            let(:aasm_state) { :terminated }
+            let(:current_date)  { april_sponsor.open_enrollment_period_for(april_effective_date).max + 2.days }
+
+            it "should not return application for close of open enrollment" do
+              expect(april_sponsor.oe_extended_applications).to be_empty
+            end 
+          end
+        end
+      end 
+    end
   end
 end
