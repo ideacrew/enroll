@@ -12,51 +12,54 @@ Feature: Update FEIN
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       And the user clicks Action for that Employer
-      And the user will see the Change FEIN button
-      When the user clicks the Change FEIN button
+      And the user will see Change FEIN link
+      When the user clicks Change FEIN
       Then the Change FEIN window will expand
-      And the user will see the Change FEIN window
-      And the user will see the editable New FEIN field
-      And the user will see the Cancel - X
-      And the user will see the Submit button
+      And the user will see editable New FEIN field
+      And the user will see Cancel X button
+      And the user will see submit button
 
     Scenario: HBX Staff with Super Admin does not want to edit the FEIN
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       And the user clicks Action for that Employer
-      And the user will see the Change FEIN button
-      And the user will see the Change FEIN window
-      And the user will see the Cancel - X
-      When the user clicks the Cancel - X button
+      And the user will see Change FEIN link
+      And the user clicks Change FEIN
+      And the Change FEIN window will expand
+      And the user will see Cancel X button
+      When the user clicks Cancel X button
       Then the Change FEIN window will collapse
 
     Scenario: HBX Staff with Super Admin enters FEIN without 9 digits
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       And the user clicks Action for that Employer
-      And the user will see the Change FEIN button
-      And the user will see the Change FEIN window
-      And an FEIN with less than 9 digits is entered
-      When the user clicks Submit button
-      Then an warning message will be presented - FEIN must be at least 9 digits
+      And the user will see Change FEIN link
+      And the user clicks Change FEIN
+      And the Change FEIN window will expand
+      And an FEIN with less than nine digits is entered
+      When the user clicks submit button
+      Then an warning message will be presented as FEIN must be at least nine digits
 
     Scenario: HBX Staff with Super Admin enters FEIN with 9 digits matching an existing employer
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       And the user clicks Action for that Employer
-      And the user will see the Change FEIN button
-      And the user will see the Change FEIN window
-      And an FEIN with 9 digits matches an existing Employer Profile FEIN
-      When the user clicks Submit button
-      Then an warning message will be presented - FEIN matches HBX ID ** Legal Name ***
+      And the user will see Change FEIN link
+      And the user clicks Change FEIN
+      And the Change FEIN window will expand
+      And an FEIN with nine digits matches an existing Employer Profile FEIN
+      When the user clicks submit button
+      Then an warning message will be presented as FEIN matches HBX ID Legal Name
 
     Scenario: HBX Staff with Super Admin enters a unique FEIN with 9 digits
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       And the user clicks Action for that Employer
-      And the user will see the Change FEIN button
-      And the user will see the Change FEIN window
-      And an FEIN with 9 digits matches an existing Employer Profile FEIN
-      When the user clicks Submit button
+      And the user will see Change FEIN link
+      And the user clicks Change FEIN
+      And the Change FEIN window will expand
+      And the user enters unique FEIN with nine digits
+      When the user clicks submit button
       Then a success message will display at the top of the index
       And the Change FEIN window will collapse

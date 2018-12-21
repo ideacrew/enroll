@@ -12,7 +12,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
-  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
+  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -49,6 +49,26 @@ class Exchanges::HbxProfilesController < ApplicationController
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
     ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment(TimeKeeper.date_of_record)
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
+  end
+
+  def edit_fein
+    @organization = @benefit_sponsorship.organization
+    @element_to_replace_id = params[:employer_actions_id]
+
+    respond_to do |format|
+      format.js { render "edit_fein" }
+    end
+  end
+
+  def update_fein
+    @organization = @benefit_sponsorship.organization
+    @element_to_replace_id = params[:employer_actions_id]
+    @result,  @errors_on_save = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.update_fein(params)
+
+    respond_to do |format|
+      format.js { render "edit_fein" } if @errors_on_save
+      format.js { render "update_fein" }
+    end
   end
 
   def binder_paid

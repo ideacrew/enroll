@@ -66,7 +66,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
-           ['Change FEIN',  "#", pundit_allow(HbxProfile, :can_change_fein?) ? 'ajax' : 'hide']
+           ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"]
           ]
 
           if individual_market_is_enabled?
@@ -80,7 +80,6 @@ module Effective
           if employer_attestation_is_enabled?
             dropdown.insert(2,['Attestation', main_app.edit_employers_employer_attestation_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
-
           if row.oe_extendable_benefit_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
             dropdown.insert(3,['Extend Open Enrollment', main_app.oe_extendable_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
