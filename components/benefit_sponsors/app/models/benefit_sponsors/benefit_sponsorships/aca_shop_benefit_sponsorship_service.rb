@@ -111,9 +111,8 @@ module BenefitSponsors
       benefit_sponsorships.each {|benefit_sponsorship| benefit_sponsorship.credit_binder! if benefit_sponsorship.may_credit_binder?}
     end
 
-    def self.update_fein(params)
-      organization = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:id]).organization
-      new_fein = params[:organizations_general_organization][:new_fein]
+    def update_fein(new_fein)
+      organization = benefit_sponsorship.organization
       if (organization && new_fein)
         begin
           organization.assign_attributes(fein: new_fein)
@@ -129,7 +128,7 @@ module BenefitSponsors
 
     private
 
-    def self.update_fein_errors(error_messages, new_fein)
+    def update_fein_errors(error_messages, new_fein)
       error_messages.to_a.inject([]) do |f_errors, error|
         if error[1].first.include?("is not a valid")
           f_errors << "FEIN must be at least 9 digits"

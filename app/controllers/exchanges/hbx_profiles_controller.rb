@@ -63,8 +63,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   def update_fein
     @organization = @benefit_sponsorship.organization
     @element_to_replace_id = params[:employer_actions_id]
-    @result,  @errors_on_save = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.update_fein(params)
-
+    service_obj = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: @benefit_sponsorship)
+    @result,  @errors_on_save = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
     respond_to do |format|
       format.js { render "edit_fein" } if @errors_on_save
       format.js { render "update_fein" }
