@@ -195,4 +195,8 @@ module Config::SiteHelper
   def site_title
     Settings.site.site_title
   end
+
+  def fte_max_count
+    Settings.aca.shop_market.small_market_employee_count_maximum
+  end
 end
