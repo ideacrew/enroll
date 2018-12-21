@@ -8,7 +8,7 @@ module ApplicationHelper
   end
 
   def no_rates_error(exchange)
-    "Benefits for which you may be eligible to offer are not currently approved by the #{exchange}, please return in 24 hours."
+    "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
   end
 
   def rates_available?(employer, date=nil)
