@@ -47,4 +47,53 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
     expect(rendered).to_not have_selector('h3', text: 'Enrollment Report')
   end
 
+
+  context "Should display the correct date" do
+
+    let(:open_enrollment_start_date) { TimeKeeper.date_of_record }
+    let(:start_on) { open_enrollment_end_date.next_month.beginning_of_month }
+    let(:open_enrollment_end_date) { open_enrollment_start_date+13.days }
+    let(:enrolling_plan_year) { FactoryGirl.create(:plan_year, :aasm_state => "enrolling", start_on: start_on, open_enrollment_start_on: open_enrollment_start_date, open_enrollment_end_on: open_enrollment_end_date, employer_profile: employer_profile) }
+
+  before do
+    @employer_profile = employer_profile
+    assign(:census_employees, [census_employee1, census_employee2, census_employee3])
+    assign(:plan_year, enrolling_plan_year)
+    @current_plan_year = enrolling_plan_year
+    sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
+  end
+  
+    it "should render the correct date" do
+      @tab = 'home'
+      render template: "employers/employer_profiles/show"
+      expect(rendered).to have_content((open_enrollment_end_date - TimeKeeper.date_of_record).to_i)
+    end
+  end
+  context "Should not display the wrong date" do
+
+    let(:open_enrollment_start_date) { TimeKeeper.date_of_record }
+    let(:start_on) { open_enrollment_end_date.next_month.beginning_of_month }
+    let(:open_enrollment_end_date) { open_enrollment_start_date+13.days }
+    let(:enrolling_plan_year) { FactoryGirl.create(:plan_year, :aasm_state => "enrolling", start_on: start_on, open_enrollment_start_on: open_enrollment_start_date, open_enrollment_end_on: open_enrollment_end_date, employer_profile: employer_profile) }
+
+  before do
+    @employer_profile = employer_profile
+    assign(:census_employees, [census_employee1, census_employee2, census_employee3])
+    assign(:plan_year, enrolling_plan_year)
+    @current_plan_year = enrolling_plan_year
+    sign_in user
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
+    TimeKeeper.set_date_of_record_unprotected!(open_enrollment_end_date.prev_day)
+  end
+  
+    it "should render the correct date" do
+      @tab = 'home'
+      render template: "employers/employer_profiles/show"
+      expect(rendered).not_to have_content((open_enrollment_end_date - Time.now.to_date).to_i)
+      expect(rendered).to have_content((open_enrollment_end_date - TimeKeeper.date_of_record).to_i)
+    end
+  end
 end
+
+
