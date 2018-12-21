@@ -714,4 +714,82 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "GET edit_fein" do
+
+    context "of an hbx super admin clicks Change FEIN" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
+      end
+
+      it "renders edit_fein" do
+        sign_in(user)
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        xhr :get, :edit_fein, @params
+        expect(response).to render_template('edit_fein')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST update_fein" do
+
+    context "of an hbx super admin clicks Submit in Change FEIN window" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
+      end
+
+      let(:new_valid_fein) { "23-4508390" }
+
+      it "renders update_fein" do
+        sign_in(user)
+        @params = {:organizations_general_organization => {:new_fein => new_valid_fein}, :id => benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{employer_organization.employer_profile.id.to_s}"}
+        xhr :post, :update_fein, @params
+        expect(response).to render_template('update_fein')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
 end
