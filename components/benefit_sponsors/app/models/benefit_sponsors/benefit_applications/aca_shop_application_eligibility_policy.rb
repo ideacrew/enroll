@@ -42,7 +42,7 @@ module BenefitSponsors
               end
                 },
             success:  -> (benfit_application)  { "validated successfully" },
-            fail:     -> (benefit_application) { "Should have #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
+            fail:     -> (benefit_application) { "Small business should have #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
 
     #TODO: Do not use Settings.
     rule  :employer_primary_office_location,

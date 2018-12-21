@@ -29,7 +29,6 @@ Feature: As an admin user I should have the ability to extend the OE
     When the user clicks on Force Publish button
     Then the force published action should display <display_message>
 
-
     Examples:
       | system_date_value  | display_message                                      |
       | less than          | 'Employer(s) Plan Year date has not matched.'        |
@@ -46,36 +45,18 @@ Feature: As an admin user I should have the ability to extend the OE
     And the user clicks on Force Publish button
     Then the force published action should display 'Employer(s) Plan Year was successfully published'
 
-
-  Scenario: Draft application published between submission deadline & OE End date
+  Scenario Outline: Draft application published between submission deadline & OE End date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And the action drop down is displayed for ABC Widgets
-    And ABC widgets FTE count is more than to shop:small_market_employee_count_maximum
-    And ABC widgets primary address state is MA
+    And ABC widgets FTE count is <compare_fte> to shop:small_market_employee_count_maximum
+    And ABC widgets primary address state <state_check> MA
     And the user clicks Action for that Employer
     And the user clicks on Force Publish button
     Then a warning message will appear
     And ask to confirm intention to publish.
 
-  Scenario: Draft application published between submission deadline & OE End date
-    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
-    And the user is on the Employer Index of the Admin Dashboard
-    And the action drop down is displayed for ABC Widgets
-    And ABC widgets FTE count is more than to shop:small_market_employee_count_maximum
-    And ABC widgets primary address state is not MA
-    And the user clicks Action for that Employer
-    And the user clicks on Force Publish button
-    Then a warning message will appear
-    And ask to confirm intention to publish.
-
-  Scenario: Draft application published between submission deadline & OE End date
-    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
-    And the user is on the Employer Index of the Admin Dashboard
-    And the action drop down is displayed for ABC Widgets
-    And ABC widgets FTE count is less than or equal to shop:small_market_employee_count_maximum
-    And ABC widgets primary address state is not MA
-    And the user clicks Action for that Employer
-    And the user clicks on Force Publish button
-    Then a warning message will appear
-    And ask to confirm intention to publish.
+    Examples:
+      |compare_fte         |     state_check    |
+      |more than           |        is          |
+      |more than           |        is not      |
+      |less than or equal  |        is not      |

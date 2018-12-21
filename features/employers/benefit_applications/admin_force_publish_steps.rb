@@ -64,14 +64,12 @@ And (/^(.*?) primary address state (is|is not) MA$/) do |employer, compare|
   end
 end
 
-And (/^the action drop down is displayed for (.*?)$/) do |employer|
-  expect(page).to have_css('.dropdown.pull-right', text: 'Actions')
-  # find('.dropdown-toggle', text: 'Actions')
+Then(/^a warning message will appear$/) do
+  expect(page.driver.browser.modal_message).to have_content('Can not publish due to fte count out range or primary office location out of MA, Publish anyway?')
 end
 
-Then (/^a warning message will appear$/) do
-  binding.pry
-  expect(page).to have_text('Can not publish do')
+And(/^ask to confirm intention to publish.$/) do
+  page.driver.browser.accept_confirm
 end
 
 

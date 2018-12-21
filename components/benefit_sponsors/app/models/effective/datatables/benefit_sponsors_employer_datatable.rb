@@ -117,7 +117,7 @@ module Effective
         draft_application = get_latest_draft_benefit_application(benefit_sponsorship)
         policy_accepted_and_allow = draft_application.present? && business_policy_accepted?(draft_application) && allow
         if policy_accepted_and_allow
-          ['post_ajax_with_confirmation', 'Can not publish do fte count out range or primary office location out of MA, Publish anyway?']
+          ['post_ajax_with_confirmation', 'Can not publish due to fte count out range or primary office location out of MA, Publish anyway?']
         elsif policy_accepted_and_allow
           ['post_ajax']
         else
