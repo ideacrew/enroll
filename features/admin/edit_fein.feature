@@ -5,6 +5,7 @@ Feature: Update FEIN
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
+    And there is an another employer Xfinity Enterprise
     And this employer has a enrollment_open benefit application
     And this benefit application has a benefit package containing health benefits
 

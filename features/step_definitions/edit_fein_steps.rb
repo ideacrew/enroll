@@ -39,11 +39,11 @@ Then(/^an warning message will be presented as FEIN must be at least nine digits
 end
 
 Given(/^an FEIN with nine digits matches an existing Employer Profile FEIN$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  find('#organizations_general_organization_new_fein').set(second_employer[:fein])
 end
 
 Then(/^an warning message will be presented as FEIN matches HBX ID Legal Name$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(page).to have_content("FEIN matches HBX ID #{second_employer[:hbx_id]}, #{second_employer[:legal_name]}")
 end
 
 And(/^the user enters unique FEIN with nine digits$/) do
