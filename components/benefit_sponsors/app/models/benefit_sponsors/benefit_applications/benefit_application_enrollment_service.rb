@@ -248,9 +248,9 @@ module BenefitSponsors
 
     def hbx_enrollments_by_month(date)
       s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
-      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }
-      enrollments = collection[0].last.map do |col|
-        col["hbx_enrollments"]
+      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }.reject { |pair| pair.last.nil? }
+      enrollments = collection.inject([]) do |enrollments, coll|
+        enrollments += coll.last.map { |x| x["hbx_enrollments"]}
       end
       enrollments
     end
