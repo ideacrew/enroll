@@ -23,7 +23,7 @@ module Effective
 
       def invalid_redirection(person)
         consumer_role = person.consumer_role
-        ((consumer_role.identity_validation == "pending") && (consumer_role.admin_bookmark_url.include? '/families/home?tab=home')) rescue false
+        ((consumer_role.identity_validation == "pending") && (consumer_role.admin_bookmark_url.include? '/families/home')) rescue false
       end
 
       def collection
