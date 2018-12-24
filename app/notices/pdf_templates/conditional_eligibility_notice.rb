@@ -17,6 +17,8 @@ module PdfTemplates
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
+    attribute :health_enrollments, Array[PdfTemplates::Enrollment]
+    attribute :dental_enrollments, Array[PdfTemplates::Enrollment]
     attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
@@ -31,6 +33,7 @@ module PdfTemplates
     attribute :first_name, String
     attribute :notice_subject, String
     attribute :due_date, Date
+    attribute :past_due_text, String
     attribute :application_date, Date
     attribute :last_name, String
     attribute :documents_needed, Boolean
@@ -38,16 +41,25 @@ module PdfTemplates
     attribute :coverage_year, String
     attribute :current_year, String
     attribute :is_an_aqhp_cover_letter, Boolean
-
+    attribute :same_plan_health_enrollment, Boolean
+    attribute :same_plan_dental_enrollment, Boolean
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
+    end
+
+    def general_agency?
+      false
     end
 
     def shop?
       false
     end
 
+    def broker?
+      return false
+    end
+     
     def employee_notice?
       false
     end

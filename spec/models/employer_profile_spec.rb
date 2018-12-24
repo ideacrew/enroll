@@ -362,7 +362,7 @@ describe EmployerProfile, dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'employer_invoice_available']
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'employer_invoice_available')
     end
   end
 
@@ -534,6 +534,21 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker.size).to eq 2
       expect(employers_with_broker7.size).to eq 1
+    end
+
+    it "should send notification to GA when the broker is terminated on hiring other broker by employer" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer =  organization5.create_employer_profile(entity_kind: "partnership");
+      employer.hire_broker_agency(broker_agency_profile7)
+      employer.save
+      FactoryGirl.create(:general_agency_account, employer_profile: employer, aasm_state: 'active')
+      
+      employer = Organization.find(employer.organization.id).employer_profile
+      employer.hire_broker_agency(broker_agency_profile)
+      employer.save
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs
+      expect(queued_job.any? {|h| (h[:args].include?(employer.id.to_s) && h[:args].include?('general_agency_terminated') && h[:job] == ShopNoticesNotifierJob)}).to eq true
     end
 
     it 'works with multiple broker_agency_contacts'  do
@@ -782,6 +797,25 @@ describe EmployerProfile, "roster size" do
   end
 end
 
+describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Binder Paid' for group", dbclean: :after_each do
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:organization) { employer_profile.organization }
+  let!(:census_employee){
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+    employee
+  }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
+
+  it "should trigger notice" do
+    expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
+    EmployerProfile.update_status_to_binder_paid([organization.id])
+  end
+end
+
 describe EmployerProfile, "when a binder premium is credited" do
   let(:hbx_id) { "some hbx id string value" }
   let(:employer) { EmployerProfile.new(:aasm_state => :eligible, :organization => Organization.new(:hbx_id => hbx_id)) }
@@ -982,6 +1016,20 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       employer_profile.fire_general_agency!
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
+
+    it "when with active general agency profile must send notification on broker termination" do
+      FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+      expect(employer_profile.active_general_agency_account.blank?).to eq false
+      
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.fire_general_agency!
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'general_agency_terminated')
+      expect(employer_profile.active_general_agency_account.blank?).to eq true
+    end
   end
 
   describe "notify_broker_update" do
@@ -1035,6 +1083,7 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
     let(:organization) { FactoryGirl.create(:organization, :with_draft_and_canceled_plan_years)}
     let(:invalid_employer_profile) { FactoryGirl.create(:employer_profile)}
     let!(:canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "canceled", employer_profile: invalid_employer_profile)}
+    let!(:renewing_canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "renewing_canceled", employer_profile: invalid_employer_profile)}
     let(:ineligible_employer_profile) { EmployerProfile.new }
 
     it "should return draft plan year when employer profile has canceled and draft plan years with same py start on date" do
@@ -1042,8 +1091,8 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(organization.employer_profile.dt_display_plan_year).to eq draft_plan_year
     end
 
-    it "should return canceled plan year when there is no other plan year associated with employer" do
-      expect(invalid_employer_profile.dt_display_plan_year).to eq canceled_plan_year
+    it "should return canceled or renewing canceled plan year when there is no other plan year associated with employer" do
+      expect(invalid_employer_profile.dt_display_plan_year).to eq (canceled_plan_year || renewing_canceled_plan_year)
     end
 
     it "should return nil when there is no plan year associated with employer" do
@@ -1084,6 +1133,20 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       it "should return false" do
         expect(renewing_employer.is_converting?).to be_falsey
       end
+    end
+  end
+
+  context "trigger broker_fired_notice" do
+    let(:params)  { {} }
+    let(:employer_profile) {EmployerProfile.new(**params)}
+    it "should trigger When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client." do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      employer_profile.trigger_notices("broker_fired_confirmation_to_broker")
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to include(employer_profile.id.to_s, 'broker_fired_confirmation_to_broker')
     end
   end
 
@@ -1182,6 +1245,36 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
+  let!(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled", :start_on => date) }
+  let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+   it "should return employers" do
+    organizations = EmployerProfile.initial_employers_enrolled_plan_year_state(date)
+    expect(organizations.count).to eq 1
+  end
+end
+
+describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each do
+  let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "termination_pending", end_on: TimeKeeper.date_of_record-1.day)}
+  let!(:organization) { employer_profile.organization }
+
+  before do
+    EmployerProfile.terminate_scheduled_plan_years
+  end
+
+  it "should move the plan year to terminated state" do
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "terminated"
+  end
+
+  it "should do nothing when there is no termination_pending plan year" do
+    plan_year.update_attributes!(:aasm_state => "active", :end_on => plan_year.start_on.next_year-1.days)
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "active"
+  end
+end
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }

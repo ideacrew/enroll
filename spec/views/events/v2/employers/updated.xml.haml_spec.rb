@@ -48,6 +48,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     let(:benefit_group2)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month+ 2.month - 1.year, benefit_groups: [benefit_group], aasm_state:'active',created_at:TimeKeeper.date_of_record)}
     let(:future_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, benefit_groups: [benefit_group2], aasm_state:'renewing_enrolled')}
+    let(:canceled_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, end_on: TimeKeeper.date_of_record.beginning_of_month + 2.months, benefit_groups: [benefit_group2], aasm_state:'renewing_canceled')}
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
     let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
@@ -67,7 +68,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
         allow(broker_agency_profile).to receive(:brokers).and_return([broker])
         allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker)
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: false }
+        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: false, plan_year_id:nil }
         @doc = Nokogiri::XML(rendered)
       end
 
@@ -107,6 +108,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq ""
       end
 
+      it "should have benefit group id" do
+        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_group.id.to_s
+      end
+
       it "should be schema valid" do
         expect(validate_with_schema(Nokogiri::XML(rendered))).to eq []
       end
@@ -126,7 +131,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         end
 
         it "shows the dental plan in output" do
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer,manual_gen: false}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer,manual_gen: false, plan_year_id:nil}
           expect(rendered).to include "new dental plan"
         end
       end
@@ -140,7 +145,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
         it "does not show the dental plan in output" do
 
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false, plan_year_id:nil}
           expect(rendered).not_to include "new dental plan"
         end
       end
@@ -152,7 +157,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         allow(employer).to receive(:staff_roles).and_return([staff])
       end
       it "should be included in xml" do
-        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false, plan_year_id:nil}
         expect(rendered).to have_selector('contact', count: 1)
       end
     end
@@ -162,7 +167,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       before do
         allow(employer).to receive(:staff_roles).and_return([staff])
         allow(staff).to receive(:addresses).and_return([mailing_address,home_address])
-        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false, plan_year_id:nil}
         @doc = Nokogiri::XML(rendered)
       end
 
@@ -174,17 +179,57 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     context "when manual gen of cv = true" do
 
-      before :each do
-        employer.plan_years = [plan_year,future_plan_year]
-        employer.save
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: true }
-        @doc = Nokogiri::XML(rendered)
+      context "non termination case" do
+        before :each do
+          employer.plan_years = [plan_year, future_plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true, plan_year_id:nil}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 2
+        end
       end
 
-      it "should return all eligible for export plan years" do
-        expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
+      context "terminated plan year with future termination date" do
+        before :each do
+          plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
+                                       :aasm_state => "terminated"})
+          employer.plan_years = [plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true, plan_year_id:nil}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 1
+        end
       end
     end
 
+    context "employer with canceled plan year and is eigible to export" do
+      before :each do
+        employer.plan_years = [plan_year, canceled_plan_year]
+        employer.save
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false, plan_year_id: canceled_plan_year.id.to_s}
+        @doc = Nokogiri::XML(rendered)
+      end
+
+      it "should return all eligible for export plan years includes active and canceled plan year" do
+        expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 2
+      end
+
+      it "should include active plan year" do
+        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_start", "x" => "http://openhbx.org/api/terms/1.0")[0].text).to eq plan_year.start_on.strftime("%Y%m%d")
+        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_end", "x" => "http://openhbx.org/api/terms/1.0")[0].text).to eq plan_year.end_on.strftime("%Y%m%d")
+      end
+
+      it "should include canceled plan year" do
+        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_start", "x" => "http://openhbx.org/api/terms/1.0")[1].text).to eq canceled_plan_year.start_on.strftime("%Y%m%d")
+        expect(@doc.xpath("//x:plan_years/x:plan_year/x:plan_year_end", "x" => "http://openhbx.org/api/terms/1.0")[1].text).to eq canceled_plan_year.end_on.strftime("%Y%m%d")
+      end
+
+    end
   end
 end

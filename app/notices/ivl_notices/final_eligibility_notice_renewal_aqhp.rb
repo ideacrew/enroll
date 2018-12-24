@@ -1,15 +1,17 @@
 class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person, :enrollments
+  attr_accessor :family, :data, :person, :enrollments, :renewing_enrollments, :active_enrollments
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.person = args[:person]
-    self.enrollments = args[:enrollments]
+    self.renewing_enrollments = args[:renewing_enrollments]
+    self.active_enrollments = args[:active_enrollments]
+    self.enrollments = args[:renewing_enrollments] + args[:active_enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -123,7 +125,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   end
 
   def append_enrollment_information
-    enrollments.each do |enrollment|
+    renewing_enrollments.each do |enrollment|
       plan = PdfTemplates::Plan.new({
                                         plan_name: enrollment.plan.name,
                                         is_csr: enrollment.plan.is_csr?,
@@ -171,7 +173,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalAqhp < IvlNotice
   end
 
   def document_due_date(family)
-    enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent", :kind => 'individual').first
+    enrolled_contingent_enrollment = family.enrollments.outstanding_enrollments.first
     if enrolled_contingent_enrollment.present?
       if enrolled_contingent_enrollment.special_verification_period.present?
         enrolled_contingent_enrollment.special_verification_period

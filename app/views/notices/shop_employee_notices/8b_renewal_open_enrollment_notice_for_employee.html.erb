@@ -1,7 +1,7 @@
 <!-- This notice goes to all the employees enrolled in the previous year and do not have an auto-renewal plan option available -->
 
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 

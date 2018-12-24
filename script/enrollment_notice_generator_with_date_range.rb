@@ -1,8 +1,8 @@
 @logger = Logger.new("#{Rails.root}/log/enrollment_notice_data_set.log")
 @logger.info "Script Start #{TimeKeeper.datetime_of_record}"
 
-@end_date = Date.new(2017, 12, 20)
-@start_date = Date.new(2017, 11, 1)
+@start_time = Date.new(2018,11,12).in_time_zone('Eastern Time (US & Canada)').beginning_of_day
+@end_time = Date.new(2018,11,12).in_time_zone('Eastern Time (US & Canada)').end_of_day
 
 event_name = "enrollment_notice_with_date_range"
 
@@ -16,32 +16,37 @@ field_names = %w(
 report_name = "#{Rails.root}/enrollment_notice_data_set.csv"
 
 def valid_enrollment_hbx_ids(family)
-  enrollments = family.enrollments
-  good_enrollments = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(@start_date, @end_date)
-  auto_renewing_enrollments = enrollments.where(kind: "individual").renewing.by_submitted_datetime_range(@start_date, @end_date)
-  bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days)
-  has_renewals = good_enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
-  future_enrollments = enrollments.enrolled.where(kind: "individual").any? { |enr| enr.submitted_at.present? && (enr.submitted_at.to_date > @end_date) }
+  enrollment_hbx_ids= family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive", "coverage_terminated"].include?(hbx_en.aasm_state)) &&
+      (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&
+      (hbx_en.created_at >= @start_time && hbx_en.created_at <= @end_time)
+    end.flat_map(&:hbx_id)
 
-  good_enrollments.uniq!
 
-  if !bad_enrollments_fre.present? && !has_renewals && !auto_renewing_enrollments.present? && !future_enrollments.present?
-    return good_enrollments.map(&:hbx_id)
-  else
-    return []
-  end
+  #good_enrollments = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(@start_date, @end_date)
+  # auto_renewing_enrollments = enrollments.where(kind: "individual").renewing.by_submitted_datetime_range(@start_date, @end_date)
+  # bad_enrollments_fre = enrollments.where(kind: "individual").enrolled.by_submitted_datetime_range(Date.new(2017, 1, 1), @start_date - 1.days)
+  # has_renewals = good_enrollments.any?{ |hbx_enr| hbx_enr.was_in_renewal_status? } ? true : false
+  # future_enrollments = enrollments.enrolled.where(kind: "individual").any? { |enr| enr.submitted_at.present? && (enr.submitted_at.to_date > @end_date) }
+
+  # good_enrollments.uniq
+
+  # if !bad_enrollments_fre.present? && !has_renewals && !auto_renewing_enrollments.present? && !future_enrollments.present?
+  #   return good_enrollments.map(&:hbx_id)
+  # else
+  #   return []
+  # end
 end
 
 families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "kind" => "individual",
-      "submitted_at" => {:"$gte" => @start_date, :"$lte" => @end_date},
-      "aasm_state" => { "$in" =>  HbxEnrollment::ENROLLED_STATUSES },
-      "effective_on" => Date.new(2018, 1, 1)
+      "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+      "created_at" => { "$gte" => @start_time, "$lte" => @end_time }
+      }
     }
-  }
-})
+  })
 
 total_families = families.count
 offset_count = 0

@@ -1,4 +1,3 @@
-require 'pry'
 # load Rails.root + "db/seeds.rb"
 
 When(/I use unique values/) do
@@ -61,6 +60,10 @@ def people
     "Hbx Admin" => {
       email: 'admin@dc.gov',
       password: 'aA1!aA1!aA1!'
+    },
+    "Hbx Admin Tier 3" => {
+        email: 'themanda.tier3@dc.gov',
+        password: 'P@55word'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
@@ -204,6 +207,16 @@ def non_dc_office_location
   }
 end
 
+Given(/^Hbx Admin Tier 3 exists$/) do
+  p_staff=Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                            send_broker_agency_message: true, can_view_username_and_email: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  person = people['Hbx Admin Tier 3']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id, subrole: 'hbx_tier3'
+end
+
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
@@ -238,7 +251,7 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -248,7 +261,7 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
@@ -676,16 +689,6 @@ Then(/^.+ should see the group selection page$/) do
   expect(page).to have_css('form')
 end
 
-Then(/^.+ should see the group selection page with health or dental dependents list$/) do
-  expect(page).to have_css('form')
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  find(:xpath, '//label[@for="coverage_kind_dental"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: true)
-  find(:xpath, '//label[@for="coverage_kind_health"]').click
-  expect(page).to have_selector('.group-selection-table.dn.dental', visible: false)
-  expect(page).to have_selector('.group-selection-table.health', visible: true)
-end
-
 When(/^.+ clicks? health radio on the group selection page$/) do
   find(:xpath, '//label[@for="coverage_kind_dental"]').click
 end
@@ -827,6 +830,18 @@ end
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
   wait_for_ajax
+end
+
+And(/^clicks on the person in families tab$/) do
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
+  wait_for_ajax(10,2)
+  family_member = page.find('a', :text => "#{user.person.full_name}")
+  family_member.trigger('click')
+  visit verification_insured_families_path
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|

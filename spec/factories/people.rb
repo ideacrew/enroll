@@ -91,7 +91,7 @@ FactoryGirl.define do
 
     trait :with_resident_role do
       after(:create) do |p, evaluator|
-        create_list(:resident_role, 1, person: p)
+        create_list(:resident_role, 1, person: p, dob: p.dob)
       end
     end
 
@@ -104,6 +104,18 @@ FactoryGirl.define do
     trait :with_csr_role do
       after(:create) do |p, evaluator|
         create_list(:csr_role, 1, person: p)
+      end
+    end
+
+    trait :with_active_consumer_role do
+      after(:create) do |person|
+        transition = FactoryGirl.create :individual_market_transition, person: person
+      end
+    end
+
+    trait :with_active_resident_role do
+      after(:create) do |person|
+        transition = FactoryGirl.create :individual_market_transition, :resident, person: person
       end
     end
 
