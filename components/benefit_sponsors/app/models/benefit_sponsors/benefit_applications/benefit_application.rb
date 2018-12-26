@@ -482,6 +482,10 @@ module BenefitSponsors
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
     end
 
+    def enrollments_till_next_month(date)
+      hbx_enrollments.select { |en| en.effective_on <= date } if hbx_enrollments.present?
+    end
+
     def cancel_enrollments
       hbx_enrollments.each do |enrollment|
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
