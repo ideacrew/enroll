@@ -1086,6 +1086,14 @@ class PlanYear
     event :conversion_expire, :after => :record_transition do
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
     end
+
+    event :close_open_enrollment, :after => :record_transition do 
+      transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
+      transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+    end
   end
 
   def cancel_enrollments
@@ -1298,7 +1306,7 @@ class PlanYear
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
