@@ -11,7 +11,7 @@ class GeneralAgencyStaffRole
   field :aasm_state, type: String, default: "applicant"
   embeds_many :workflow_state_transitions, as: :transitional
 
-  associated_with_one :general_agency_profile, :general_agency_profile_id, "GeneralAgencyProfile"
+  associated_with_one :general_agency_profile, :benefit_sponsors_broker_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"
 
   validates_presence_of :benefit_sponsors_general_agency_profile_id, :npn
   accepts_nested_attributes_for :person, :workflow_state_transitions
@@ -50,9 +50,9 @@ class GeneralAgencyStaffRole
   def general_agency_profile
     return @general_agency_profile if defined? @broker_agency_profile
     if self.benefit_sponsors_general_agency_profile_id.nil?
-      @general_agency_profile = GeneralAgencyProfile.find(general_agency_profile_id) if has_general_agency_profile?
+      @general_agency_profile = ::GeneralAgencyProfile.find(general_agency_profile_id) if has_general_agency_profile?
     else
-      @general_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_general_agency_profile_id).first.general_agency_profile if has_general_agency_profile?
+      @general_agency_profile = ::BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_general_agency_profile_id).first.general_agency_profile if has_general_agency_profile?
     end
   end
 
