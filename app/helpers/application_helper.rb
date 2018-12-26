@@ -7,10 +7,6 @@ module ApplicationHelper
     Plan.has_rates_for_all_carriers?(date) == false
   end
 
-  def no_rates_error
-    "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
-  end
-
   def rates_available?(employer, date=nil)
     employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
   end

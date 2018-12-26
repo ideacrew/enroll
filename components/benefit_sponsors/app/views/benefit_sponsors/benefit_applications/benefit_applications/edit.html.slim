@@ -3,7 +3,7 @@
   .alert.alert-info role="alert"
     strong
       i.fa.fa-exclamation-triangle aria-hidden="true"
-      = no_rates_error(Settings.site.exchange_name)
+      = Settings.site.late_rates_message
 
 = content_for :navigation do
     = render "ui-components/v1/navs/employers_navigation", {:active_tab=>params[:tab], organization: @benefit_application_form.service.benefit_sponsorship.profile.organization, profile: @benefit_application_form.service.benefit_sponsorship.profile}
