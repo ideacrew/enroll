@@ -145,7 +145,7 @@ module Forms
 
     def regex_for(str)
       #Regexp.compile(Regexp.escape(str.to_s))
-      clean_string = Regexp.escape(str.strip)
+      clean_string = ::Regexp.escape(str.strip)
       /^#{clean_string}$/i
     end
   end
