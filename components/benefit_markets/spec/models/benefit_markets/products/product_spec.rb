@@ -265,15 +265,15 @@ module BenefitMarkets
 
     end
 
-    describe "#has_rates_for_all_carriers" do
+    describe "#has_rates" do
       let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
 
       it "should return true if rates are available" do
-        expect(::BenefitMarkets::Products::Product.has_rates_for_all_carriers?(TimeKeeper.date_of_record)).to eq true
+        expect(::BenefitMarkets::Products::Product.has_rates?(TimeKeeper.date_of_record)).to eq true
       end
 
       it "should return false if rates are not available" do
-        expect(::BenefitMarkets::Products::Product.has_rates_for_all_carriers?(TimeKeeper.date_of_record-1.year)).to eq false
+        expect(::BenefitMarkets::Products::Product.has_rates?(TimeKeeper.date_of_record-1.year)).to eq false
       end
 
     end

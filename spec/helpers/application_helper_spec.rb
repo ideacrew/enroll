@@ -35,7 +35,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return blocking when true" do
       allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
-      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
+      allow(::BenefitMarkets::Products::Product).to receive(:has_rates?).and_return(false)
       expect(helper.product_rates_available?(benefit_sponsorship)).to eq "blocking"
     end
 

@@ -293,20 +293,16 @@ module BenefitMarkets
       new_product
     end
 
-    def self.has_rates_for_all_carriers?(start_on_date=nil)
-      no_rates_products_count = 0
+    def self.has_rates?(start_on_date=nil)
       date = start_on_date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
       return false if date.blank?
 
       products = ::BenefitMarkets::Products::Product.all.select{|a| a.active_year == date.year }
-      return false if products.empty?
+      records = products.select{|product| product.premium_table_effective_on(date)}
 
-      products.each do |product|
-        count = product.premium_tables.select{|a| a.effective_period.include?(date) }.count
-        no_rates_products_count+=1 if count == 0
-      end
-
-      no_rates_products_count == 0
+      # returns true when only some carriers does not have rates
+      # returns false when all products does not have rates
+      records.present? ? true : false
     end
 
     def health?

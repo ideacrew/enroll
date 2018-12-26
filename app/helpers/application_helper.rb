@@ -12,7 +12,7 @@ module ApplicationHelper
   end
 
   def product_rates_available?(benefit_sponsorship, date=nil)
-    benefit_sponsorship.applicant? && (::BenefitMarkets::Products::Product.has_rates_for_all_carriers?(date) == false) ? "blocking" : ""
+    benefit_sponsorship.applicant? && (::BenefitMarkets::Products::Product.has_rates?(date) == false) ? "blocking" : ""
   end
 
   def deductible_display(hbx_enrollment, plan)
