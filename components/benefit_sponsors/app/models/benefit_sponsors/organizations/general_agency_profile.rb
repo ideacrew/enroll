@@ -198,6 +198,9 @@ module BenefitSponsors
         end
       end
 
+      def applicant?
+        aasm_state == "is_applicant"
+      end
 
       private
 
