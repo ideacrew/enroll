@@ -4,6 +4,12 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
   let(:person1) { FactoryGirl.build(:invalid_person) }
   let(:consumer_role) { FactoryGirl.build(:consumer_role) }
+
+  let(:current_user) {FactoryGirl.create(:user)}
+  before :each do
+    sign_in current_user
+  end
+
   context 'family is updateable' do
     before(:each) do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
@@ -20,28 +26,32 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     end
 
     context "with consumer_role" do
-      before :each do
-        allow(person).to receive(:is_consumer_role_active?).and_return true
-        allow(person).to receive(:consumer_role).and_return consumer_role
-        render :template => "people/landing_pages/_personal.html.erb"
-      end
+      if individual_market_is_enabled?
+        context "when consumer role enabled" do 
+          before :each do
+            allow(person).to receive(:is_consumer_role_active?).and_return true
+            allow(person).to receive(:consumer_role).and_return consumer_role
+            render :template => "people/landing_pages/_personal.html.erb"
+          end
 
-      it "should have consumer_fields area" do
-        expect(rendered).to have_selector('div#consumer_fields')
-      end
+          it "should have consumer_fields area" do
+            expect(rendered).to have_selector('div#consumer_fields')
+          end
 
-      it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
-      end
+          it "should display the is_applying_coverage field option" do
+            expect(rendered).to match /Is #{person.first_name} applying for coverage?/
+          end
 
-      it "should display the affirmative message" do
-        expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
-      end
+          it "should display the affirmative message" do
+            expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
+          end
 
-      it "should have no-dc-address-reasons area" do
-        expect(rendered).to have_selector('div#address_info')
-        expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /living outside of DC temporarily and intend to return/
+          it "should have no-dc-address-reasons area" do
+            expect(rendered).to have_selector('div#address_info')
+            expect(rendered).to match /homeless DC resident/
+            expect(rendered).to match /living outside of DC temporarily and intend to return/
+          end
+        end
       end
     end
 

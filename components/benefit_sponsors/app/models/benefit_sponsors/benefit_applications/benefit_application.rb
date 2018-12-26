@@ -85,7 +85,8 @@ module BenefitSponsors
 
     validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
 
-    add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send]
+    # add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send]
+    add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_application_events]
 
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments

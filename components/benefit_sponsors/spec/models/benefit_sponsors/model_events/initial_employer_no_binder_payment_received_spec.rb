@@ -30,7 +30,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   describe "ModelEvent" do
     it "should trigger model event" do
       benefit_application.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send) do |instance, model_event|
+        expect(observer).to receive(:process_application_events) do |instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_no_binder_payment_received, :klass_instance => benefit_application, :options => {})
         end
@@ -41,7 +41,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
 
   describe "NoticeTrigger" do
     context "whne binder payment is missed" do
-      subject { BenefitSponsors::Observers::BenefitApplicationObserver.new  }
+      subject { BenefitSponsors::Observers::NoticeObserver.new  }
 
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, PlanYear, {}) }
 
@@ -59,7 +59,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
           expect(payload[:event_object_id]).to eq benefit_application.id.to_s
         end
-        subject.notifications_send(benefit_application, model_event)
+        subject.process_application_events(benefit_application, model_event)
       end
     end
   end
