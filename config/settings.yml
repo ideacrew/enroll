@@ -13,6 +13,7 @@ site:
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement."
 
   social_media:
     facebook_url: ""
