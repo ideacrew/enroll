@@ -299,7 +299,7 @@ module BenefitSponsors
           end
         end
 
-        def broker_agencies_with_matching_agency_or_broker(search_params)
+        def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
             orgs2 = self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
               :"profiles._id" => {
@@ -316,7 +316,11 @@ module BenefitSponsors
                 agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
                 return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
               end
+            elsif value.to_s == "true"
+              return []
             end
+          elsif !search_params[:q].present? && value.to_s == "true"
+            return []
           end
 
           self.search_agencies_by_criteria(search_params)
