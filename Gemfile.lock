@@ -29,6 +29,20 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: components/benefit_markets
+  specs:
+    benefit_markets (0.0.1)
+      aasm (~> 4.8.0)
+      active_model_serializers
+      config
+      mongoid (~> 5.4.0)
+      pundit (~> 1.0.1)
+      rails (~> 4.2.7.1)
+      slim (~> 3.0.9)
+      symmetric-encryption (~> 3.6.0)
+      virtus
+
+PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
@@ -37,12 +51,12 @@ PATH
       ckeditor
       combine_pdf
       curl
-      mongoid (~> 5.0.1)
+      mongoid (~> 5.4.0)
       non-stupid-digest-assets
       rails (~> 4.2.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
-      slim (= 3.0.8)
+      slim (= 3.0.9)
       virtus (~> 1.0.5)
       wicked_pdf (= 1.0.6)
       wkhtmltopdf-binary-edge (~> 0.12.3.0)
@@ -84,6 +98,11 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    active_model_serializers (0.10.7)
+      actionpack (>= 4.1, < 6)
+      activemodel (>= 4.1, < 6)
+      case_transform (>= 0.2)
+      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (4.2.7.1)
       activesupport (= 4.2.7.1)
       globalid (>= 0.3.0)
@@ -117,14 +136,14 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    bcrypt (3.1.11)
+    bcrypt (3.1.12)
     binding_of_caller (0.7.3)
       debug_inspector (>= 0.0.1)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
     bootstrap-slider-rails (6.0.17)
       railties (>= 3.2, < 5.0)
-    bson (3.2.6)
+    bson (4.3.0)
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
@@ -159,6 +178,8 @@ GEM
       carrierwave (>= 0.8, < 1.3)
       mongoid (>= 3.0, < 7.0)
       mongoid-grid_fs (>= 1.3, < 3.0)
+    case_transform (0.2)
+      activesupport
     celluloid (0.17.3)
       celluloid-essentials
       celluloid-extras
@@ -231,7 +252,7 @@ GEM
     deep_merge (1.0.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (3.4.1)
+    devise (3.5.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -313,6 +334,7 @@ GEM
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
     json (1.8.6)
+    jsonapi-renderer (0.2.0)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -347,15 +369,17 @@ GEM
       monetize (~> 1.1.0)
       money (~> 6.5.0)
       railties (>= 3.0)
-    mongo (2.1.2)
-      bson (~> 3.0)
+    mongo (2.5.1)
+      bson (>= 4.3.0, < 5.0.0)
     mongo_session_store-rails4 (6.0.0)
       actionpack (>= 3.1)
-    mongoid (5.0.1)
+    mongoid (5.4.0)
       activemodel (~> 4.0)
-      mongo (~> 2.1)
-      origin (~> 2.1)
+      mongo (>= 2.5.1, < 3.0.0)
+      origin (~> 2.3)
       tzinfo (>= 0.3.37)
+    mongoid-autoinc (5.0.2)
+      mongoid (~> 5.0)
     mongoid-compatibility (0.5.1)
       activesupport
       mongoid (>= 2.0)
@@ -565,7 +589,7 @@ GEM
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
-    slim (3.0.8)
+    slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
     slim-rails (3.1.3)
@@ -653,9 +677,10 @@ DEPENDENCIES
   addressable (= 2.3.8)
   animate-rails (~> 1.0.7)
   aws-sdk (= 2.2.4)
+  benefit_markets!
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
-  bson (= 3.2.6)
+  bson (~> 4.3.0)
   byebug (= 8.2.2)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
@@ -670,7 +695,7 @@ DEPENDENCIES
   cucumber-rails (= 1.4.3)
   curl
   database_cleaner (= 1.5.3)
-  devise (~> 3.4.1)
+  devise (= 3.5.4)
   effective_datatables!
   email_spec (= 2.0.0)
   eye (= 0.8.0)
@@ -693,9 +718,10 @@ DEPENDENCIES
   mail (= 2.6.3)
   maskedinput-rails
   money-rails (~> 1.3.0)
-  mongo (= 2.1.2)
+  mongo (= 2.5.1)
   mongo_session_store-rails4 (~> 6.0.0)
-  mongoid (= 5.0.1)
+  mongoid (~> 5.4.0)
+  mongoid-autoinc
   mongoid-enum
   mongoid-history
   mongoid-rspec (= 3.0.0)
@@ -731,8 +757,8 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
-  slim (= 3.0.8)
   simplecov (= 0.14.1)
+  slim (= 3.0.9)
   slim-rails
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
