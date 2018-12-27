@@ -551,7 +551,7 @@ module BenefitSponsors
       end
     end
 
-    describe "enrollments_till_next_month" do
+    describe "enrollments_till_given_effective_on" do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup initial benefit application"
       context "No hbx_enrollments for the benefit application" do
@@ -577,15 +577,15 @@ module BenefitSponsors
         end
 
         it "Should return the enrollments only with the effective date as next month start date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_next_month(Date.today.next_month.beginning_of_month).count).not_to eq 0
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).not_to eq 0
         end
 
         it "should not return enrollment outside given date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_next_month(Date.today.next_month.beginning_of_month).count).to eq 1
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).to eq 1
         end
 
         it "should return enrollments within the given date" do
-          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_next_month(Date.today.next_month.beginning_of_month + 2.months).count).to eq 2
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month + 2.months).count).to eq 2
         end
       end
     end

@@ -482,7 +482,7 @@ module BenefitSponsors
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
     end
 
-    def enrollments_till_next_month(date)
+    def enrollments_till_given_effective_on(date)
       hbx_enrollments.select { |en| en.effective_on <= date } if hbx_enrollments.present?
     end
 
