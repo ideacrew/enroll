@@ -6,74 +6,75 @@ module BenefitSponsors
       include Mongoid::Timestamps
       include AASM
 
-      embedded_in :benefit_sponsorship
+      embedded_in :benefit_sponsorship,
+                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
       # Begin date of relationship
       field :start_on, type: DateTime
       # End date of relationship
       field :end_on, type: DateTime
       field :updated_by, type: String
-      field :general_agency_profile_id, type: BSON::ObjectId
+      field :benefit_sponsrship_general_agency_profile_id, type: BSON::ObjectId
       field :aasm_state, type: String, default: 'active'
       field :broker_role_id, type: BSON::ObjectId
 
       scope :active, -> {where(aasm_state: 'active')}
       scope :inactive, -> {where(aasm_state: 'inactive')}
 
-      validates_presence_of :start_on, :general_agency_profile_id
+      validates_presence_of :start_on, :benefit_sponsrship_general_agency_profile_id
 
       #TODO based on new profile
-      # belongs_to general_agency_profile
-      # def general_agency_profile=(new_general_agency_profile)
-      #   raise ArgumentError.new("expected GeneralAgencyProfile") unless new_general_agency_profile.is_a?(GeneralAgencyProfile)
-      #   self.general_agency_profile_id = new_general_agency_profile._id
-      #   @general_agency_profile = new_general_agency_profile
-      # end
-      #
-      # def general_agency_profile
-      #   return @general_agency_profile if defined? @general_agency_profile
-      #   @general_agency_profile = GeneralAgencyProfile.find(self.general_agency_profile_id) unless self.general_agency_profile_id.blank?
-      # end
-      #
-      #
-      # def ga_name
-      #   Rails.cache.fetch("general-agency-name-#{self.general_agency_profile_id}", expires_in: 12.hour) do
-      #     legal_name
-      #   end
-      # end
-      #
-      #
-      # def legal_name
-      #   general_agency_profile.present? ? general_agency_profile.legal_name : ""
-      # end
-      #
-      # def broker_role
-      #   broker_role_id.present? ? BrokerRole.find(broker_role_id) : nil
-      # end
-      #
-      # def broker_role_name
-      #   broker_role.present? ? broker_role.person.full_name : ""
-      # end
-      #
-      # def for_broker_agency_account?(ba_account)
-      #   return false unless (broker_role_id == ba_account.writing_agent_id)
-      #   return false unless general_agency_profile.present?
-      #   if !ba_account.end_on.blank?
-      #     return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
-      #   end
-      #   (start_on >= ba_account.start_on)
-      # end
-      #
-      #
-      # aasm do
-      #   state :active, initial: true
-      #   state :inactive
-      #
-      #   event :terminate do
-      #     transitions from: :active, to: :inactive
-      #   end
-      # end
-      #
+      belongs_to general_agency_profile
+      def general_agency_profile=(new_general_agency_profile)
+        raise ArgumentError.new("expected GeneralAgencyProfile") unless new_general_agency_profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+        self.benefit_sponsrship_general_agency_profile_id = new_general_agency_profile._id
+        @general_agency_profile = new_general_agency_profile
+      end
+
+      def general_agency_profile
+        return @general_agency_profile if defined? @general_agency_profile
+        @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(self.benefit_sponsrship_general_agency_profile_id) unless self.benefit_sponsrship_general_agency_profile_id.blank?
+      end
+
+
+      def ga_name
+        Rails.cache.fetch("general-agency-name-#{self.benefit_sponsrship_general_agency_profile_id}", expires_in: 12.hour) do
+          legal_name
+        end
+      end
+
+
+      def legal_name
+        general_agency_profile.present? ? general_agency_profile.legal_name : ""
+      end
+
+      def broker_role
+        broker_role_id.present? ? BrokerRole.find(broker_role_id) : nil
+      end
+
+      def broker_role_name
+        broker_role.present? ? broker_role.person.full_name : ""
+      end
+
+      def for_broker_agency_account?(ba_account)
+        return false unless (broker_role_id == ba_account.writing_agent_id)
+        return false unless general_agency_profile.present?
+        if !ba_account.end_on.blank?
+          return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
+        end
+        (start_on >= ba_account.start_on)
+      end
+
+
+      aasm do
+        state :active, initial: true
+        state :inactive
+
+        event :terminate do
+          transitions from: :active, to: :inactive
+        end
+      end
+
       # class << self
       #   def find(id)
       #     org = Organization.unscoped.where(:"employer_profile.general_agency_accounts._id" => id).first
@@ -105,4 +106,3 @@ module BenefitSponsors
     end
   end
 end
-

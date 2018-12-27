@@ -13,6 +13,7 @@ BenefitSponsors::Engine.routes.draw do
           get :staff_index
           get :agency_messages
           get :commission_statements
+          get :general_agency_index
         end
         member do
           post :clear_assign_for_employer
@@ -22,6 +23,7 @@ BenefitSponsors::Engine.routes.draw do
           get :inbox
           get :download_commission_statement
           get :show_commission_statement
+          post :set_default_ga
         end
       end
       resources :broker_applicants
