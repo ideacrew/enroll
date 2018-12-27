@@ -14,13 +14,14 @@ module BenefitMarkets
     field :description, type: String, default: ""
 
     belongs_to  :site, class_name: "::BenefitSponsors::Site"
-    # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
     has_many    :benefit_market_catalogs,
                 class_name: "BenefitMarkets::BenefitMarketCatalog"
 
-    embeds_one :configuration, class_name: "BenefitMarkets::Configurations::Configuration"
-    embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
-                                        autobuild: true
+    # embeds_one :configuration, class_name: "BenefitMarkets::Configurations::Configuration"
+    # embeds_one :contact_center_setting, class_name: "BenefitMarkets::ContactCenterConfiguration",
+    #                                     autobuild: true
+
+    embeds_many :configurations, class_name: "BenefitMarkets::Configurations::Configuration"
 
     validates_presence_of :configuration #, :contact_center_setting
     validates_presence_of :site_urn, :kind, :title, :description
@@ -94,6 +95,10 @@ module BenefitMarkets
 
     def open_enrollment_grace_period_minimum_length_days
       configuration.open_enrollment_minimum_length_days
+    end
+
+    def self.by_kind(kind)
+      where(kind: kind.to_sym).first
     end
 
     private
