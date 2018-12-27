@@ -14,7 +14,6 @@ module BenefitSponsors
 
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(staff_params)
-          binding.pry
           #authorize @staff
           begin
             @status , @result = @staff.save
@@ -70,7 +69,6 @@ module BenefitSponsors
         private
 
         def staff_params
-          binding.pry
           params[:staff].present? ? params[:staff] :  params[:staff] = {}
           params[:staff].permit!
         end
