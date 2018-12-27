@@ -25,6 +25,17 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
       resources :broker_applicants
+
+      resources :broker_roles
+
+      resources :broker_agency_staff_roles do
+        collection do
+          get :search_broker_agency
+        end
+        member do
+          get :approve
+        end
+      end
     end
 
     namespace :employers do

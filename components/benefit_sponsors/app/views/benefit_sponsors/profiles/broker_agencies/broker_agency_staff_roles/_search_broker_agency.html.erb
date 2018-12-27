@@ -1,0 +1,22 @@
+<% @broker_agency_profiles.each do |agency| %>
+  <br />
+  <div class="form-border">
+    <div class="row">
+      <div class="col-md-8 col-sm-8 col-xs-12">
+        <dl class="dl-horizontal">
+          <dt>Legal Name: </dt>
+          <dd><%= agency.legal_name %></dd>
+
+          <dt>NPN: </dt>
+          <dd><%= agency.primary_broker_role.npn %></dd>
+
+          <dt>Primary Broker Name: </dt>
+          <dd><%= agency.primary_broker_role.person.full_name %></dd>
+        </dl>
+      </div>
+      <div class="col-md-4 col-sm-4 col-xs-12 text-right">
+        <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a>
+      </div>
+    </div>
+  </div>
+<% end %>
