@@ -24,6 +24,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
 
   before do
+    benefit_application.update_attributes!(aasm_state: :enrollment_closed)
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 
@@ -43,7 +44,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
     context "whne binder payment is missed" do
       subject { BenefitSponsors::Observers::BenefitApplicationObserver.new  }
 
-      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, PlanYear, {}) }
+      let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:initial_employer_no_binder_payment_received, benefit_application, {}) }
 
       it "should trigger notice event for initial employer and employees" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|

@@ -44,11 +44,12 @@ module BenefitSponsors
         })
       end
 
+      # We are not automatically moving benefit applications to enrollment ineligible
       def self.initial_employers_in_ineligible_state
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :"benefit_applications" => { 
             :$elemMatch => {
-              :"aasm_state" => :enrollment_ineligible,
+              :"aasm_state" => :enrollment_closed,
             }
           }
         })

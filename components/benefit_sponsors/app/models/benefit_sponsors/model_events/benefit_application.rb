@@ -11,6 +11,7 @@ module BenefitSponsors
         :application_denied,
         :renewal_application_created,
         :renewal_application_autosubmitted,
+        :initial_employee_plan_selection_confirmation,
 
         # :renewal_enrollment_confirmation,
         # :renewal_application_submitted,
@@ -61,6 +62,10 @@ module BenefitSponsors
 
           if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
             is_application_denied = true
+          end
+
+          if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
+            is_initial_employee_plan_selection_confirmation = true
           end
 
           if is_transition_matching?(to: [:terminated, :termination_pending], from: [:active, :expired], event: [:terminate_enrollment, :schedule_enrollment_termination])

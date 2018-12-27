@@ -110,6 +110,8 @@ module BenefitSponsors
     embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
       validate: true
 
+    embeds_many :benefit_sponsorship_accounts, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorshipAccount"
+
     embeds_one  :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
 
     embeds_one :benefit_sponsorship_account, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorshipAccount"
@@ -213,6 +215,12 @@ module BenefitSponsors
     scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
         :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_ineligible }}
+      )
+    }
+
+    scope :off_cycle_renewal_applications, -> (benefit_application) {
+      where(:benefit_applications => {
+        :$elemMatch => {:"effective_period.max" => benefit_application.start_on.to_date.prev_day, :aasm_state.in => [:termination_pending, :terminated] }}
       )
     }
 
@@ -585,7 +593,7 @@ module BenefitSponsors
       end
 
       event :cancel do
-        transitions from: :active, to: :applicant
+        transitions from: [:applicant, :active], to: :applicant
       end
     end
 

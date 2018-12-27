@@ -253,7 +253,7 @@ module BenefitSponsors
 
         context "open enrollment close date passed" do
           before :each do
-            initial_application.benefit_sponsorship.update_attributes(aasm_state: :initial_enrollment_open)
+            initial_application.benefit_sponsorship.update_attributes(aasm_state: :applicant)
             allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
           end
 
@@ -280,7 +280,7 @@ module BenefitSponsors
               subject.end_open_enrollment
               initial_application.reload
               expect(initial_application.aasm_state).to eq :enrollment_ineligible
-              expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
+              expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
             end
           end
 

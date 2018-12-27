@@ -434,9 +434,8 @@ module BenefitSponsors
       IMPORTED_STATES.include?(aasm_state)
     end
 
-    # TODO: Need to verify is_renewing? logic for off-cycle renewals
     def is_renewing?
-      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state)
+      predecessor.present? && (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.off_cycle_renewal_applications(self).present?)
     end
 
     def is_renewal_enrolling?
@@ -794,7 +793,7 @@ module BenefitSponsors
       end
 
       event :credit_binder do
-        transitions from: :enrollment_closed
+        transitions from: :enrollment_closed,
           to: :binder_paid
       end
 
@@ -894,7 +893,7 @@ module BenefitSponsors
       # end
 
       if (aasm.to_state == :applicant && aasm.current_event == :cancel!)
-        cancel! if enrollment_ineligible? && may_cancel?
+        cancel! if (enrollment_ineligible? || enrollment_closed?) && may_cancel?
       end
     end
 

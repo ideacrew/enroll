@@ -302,8 +302,8 @@ module BenefitSponsors
           context "and benefit application is valid" do
             before { benefit_application.approve_application! }
 
-            it "benefit_sponsorship should transition to state: :initial_application_approved" do
-              expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
+            it "benefit_sponsorship should remain in applicant state" do
+              expect(benefit_sponsorship.aasm_state).to eq :applicant
             end
 
             context "and open enrollment period begins" do
@@ -316,8 +316,8 @@ module BenefitSponsors
                 TimeKeeper.set_date_of_record_unprotected!(Date.today)
               }
 
-              it "should transition to state: :initial_enrollment_open" do
-                expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+              it "should remain in applicant state" do
+                expect(benefit_sponsorship.aasm_state).to eq :applicant
               end
 
               context "and open enrollment period ends" do
@@ -330,19 +330,22 @@ module BenefitSponsors
                   TimeKeeper.set_date_of_record_unprotected!(Date.today)
                 }
 
-                it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
-                  expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
+                it "benefit_sponsorship should remain in applicant state" do
+                  expect(benefit_sponsorship.aasm_state).to eq :applicant
                 end
 
-                context "and binder payment is credited" do
-                  before { benefit_sponsorship.credit_binder! }
 
-                  it "benefit_sponsorship should transition to state: :initial_enrollment_eligible" do
-                    expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_eligible
+                context "and binder is paid for initial employers" do
+                  before {
+                    benefit_application.credit_binder!
+                  }
+
+                  it "benefit_sponsorship should transition to state: :binder_paid" do
+                    expect(benefit_sponsorship.aasm_state).to eq :applicant
                   end
 
-                  it "benefit_application should transition to state: :enrollment_eligible" do
-                    expect(benefit_application.aasm_state).to eq :enrollment_eligible
+                  it "benefit_application should remain in applicant state" do
+                    expect(benefit_application.aasm_state).to eq :binder_paid
                   end
 
                   context "and effective period begins" do
@@ -363,36 +366,6 @@ module BenefitSponsors
                       expect(benefit_application.aasm_state).to eq :active
                     end
                   end
-
-                  context "and binder payment is reversed" do
-                    before { benefit_sponsorship.reverse_binder! }
-
-                    it "benefit_sponsorship should transition to state: :initial_enrollment_closed" do
-                      expect(benefit_sponsorship.aasm_state).to eq :binder_reversed
-                    end
-
-                    it "benefit_application should transition to state: enrollment_closed" do
-                      expect(benefit_application.aasm_state).to eq :enrollment_closed
-                    end
-
-                    context "and effective period begins" do
-                      before {
-                        TimeKeeper.set_date_of_record_unprotected!(benefit_application.effective_period.min)
-                        benefit_application.activate_enrollment!
-                      }
-                      after {
-                        TimeKeeper.set_date_of_record_unprotected!(Date.today)
-                      }
-
-                      it "benefit_sponsorship should transition to state: :applicant" do
-                        expect(benefit_sponsorship.aasm_state).to eq :applicant
-                      end
-
-                      it "benefit_application should transition to state: :canceled" do
-                        expect(benefit_application.aasm_state).to eq :canceled
-                      end
-                    end
-                  end
                 end
               end
             end
@@ -405,8 +378,8 @@ module BenefitSponsors
               expect(benefit_application.aasm_state).to eq :pending
             end
 
-            it "benefit_sponsorship should transition to state: :initial_application_under_review" do
-              expect(benefit_sponsorship.aasm_state).to eq :initial_application_under_review
+            it "benefit_sponsorship should remain :applicant" do
+              expect(benefit_sponsorship.aasm_state).to eq :applicant
             end
 
             context "and it's denied by HBX" do
@@ -417,7 +390,7 @@ module BenefitSponsors
               end
 
               it "benefit_sponsorship should transition to state: :initial_application_denied" do
-                expect(benefit_sponsorship.aasm_state).to eq :initial_application_denied
+                expect(benefit_sponsorship.aasm_state).to eq :denied
               end
             end
 
@@ -428,8 +401,8 @@ module BenefitSponsors
                 expect(benefit_application.aasm_state).to eq :approved
               end
 
-              it "benefit_sponsorship should transition to state: :initial_application_approved" do
-                expect(benefit_sponsorship.aasm_state).to eq :initial_application_approved
+              it "benefit_sponsorship should remain in applicant" do
+                expect(benefit_sponsorship.aasm_state).to eq :applicant
               end
             end
 
@@ -687,13 +660,12 @@ module BenefitSponsors
         let(:sponsorship_state) { :initial_enrollment_closed }
 
         before do
-          april_enrollment_elgible_sponsor.approve_initial_enrollment_eligibility!
+          april_enrollment_elgible_sponsor.benefit_applications.first.credit_binder!
         end
 
         it "should find initial sponsorships with applications in enrollment_closed state and matching effective date" do
           expect(subject.may_transition_as_initial_ineligible?(march_effective_date).size).to eq (march_sponsors.size)
           expect(subject.may_transition_as_initial_ineligible?(march_effective_date).to_a).to eq (march_sponsors)
-
           expect(subject.may_transition_as_initial_ineligible?(april_effective_date).size).to eq (april_ineligible_sponsors.size)
           expect(subject.may_transition_as_initial_ineligible?(april_effective_date).to_a).to eq (april_ineligible_sponsors)
         end
@@ -707,8 +679,8 @@ module BenefitSponsors
         let(:sponsorship_state) { :initial_enrollment_closed }
 
         before do
-          april_enrollment_elgible_sponsor.approve_initial_enrollment_eligibility!
-          april_enrollment_elgible_sponsor.benefit_applications.first.update(aasm_state: :enrollment_eligible)
+          april_enrollment_elgible_sponsor.benefit_applications.first.update(aasm_state: :enrollment_closed)
+          april_enrollment_elgible_sponsor.benefit_applications.first.credit_binder!
         end
 
         it "should find sponsorships with application in enrollment_eligible state and matching effective period begin date" do

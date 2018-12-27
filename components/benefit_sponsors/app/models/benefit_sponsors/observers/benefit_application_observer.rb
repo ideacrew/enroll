@@ -50,6 +50,18 @@ module BenefitSponsors
               deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_created")
             end
 
+            if new_model_event.event_key == :initial_employee_plan_selection_confirmation
+              employer_profile = benefit_application.employer_profile
+              if employer_profile.is_new_employer?
+                census_employees = benefit_application.benefit_sponsorship.census_employees.non_terminated
+                census_employees.each do |ce|
+                  if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer_profile.active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:binder_paid, :enrollment_closed]).first.start_on
+                    deliver(recipient: ce.employee_role, event_object: ce, notice_event: "initial_employee_plan_selection_confirmation")
+                  end
+                end
+              end
+            end
+
             if new_model_event.event_key == :renewal_application_autosubmitted
               deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "plan_year_auto_published") if benefit_application.is_renewing?
               trigger_zero_employees_on_roster_notice(benefit_application)
@@ -130,9 +142,8 @@ module BenefitSponsors
 
             if new_model_event.event_key == :initial_employer_no_binder_payment_received
               BenefitSponsors::Queries::NoticeQueries.initial_employers_in_ineligible_state.each do |benefit_sponsorship|
-                if benefit_sponsorship.initial_enrollment_ineligible?
-                  benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_ineligible).first
-
+                # if benefit_sponsorship.initial_enrollment_ineligible?
+                  benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_closed).first
                   if benefit_application.present? && !benefit_application.is_renewing?
                     deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
                     #Notice to employee that there employer misses binder payment
@@ -142,7 +153,7 @@ module BenefitSponsors
                       end
                     end
                   end
-                end
+                # end
               end
             end
           end
