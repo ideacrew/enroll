@@ -42,7 +42,7 @@ module BenefitSponsors
               end
                 },
             success:  -> (benfit_application)  { "validated successfully" },
-            fail:     -> (benefit_application) { "Has #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
+            fail:     -> (benefit_application) { "Small business should have #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
 
     #TODO: Do not use Settings.
     rule  :employer_primary_office_location,
@@ -50,7 +50,7 @@ module BenefitSponsors
               benefit_application.sponsor_profile.is_primary_office_local?
               },
             success:  -> (benfit_application)  { "validated successfully" },
-            fail:     -> (benefit_application) { "Is a small business located in #{Settings.aca.state_name}" }
+            fail:     -> (benefit_application) { "Small business NOT located in #{Settings.aca.state_name}" }
 
     rule  :benefit_application_contains_benefit_packages,
             validate: -> (benefit_application){
@@ -71,7 +71,7 @@ module BenefitSponsors
               benefit_application.benefit_sponsorship.census_employees.active.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:renewal_benefit_group_assignment).try(:benefit_package_id) || e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
             },
             success:  -> (benfit_application) { "validated successfully" },
-            fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
+            fail:     -> (benefit_application) { "All employees must have an assigned benefit package" }
 
 
     rule :employer_profile_eligible,
