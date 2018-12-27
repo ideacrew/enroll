@@ -1231,8 +1231,16 @@ def self.to_csv
   end
 
   def benefit_package_for_date(coverage_date)
-    benefit_package = active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+    benefit_assignment = benefit_group_assignment_for_date(coverage_date)
+    benefit_package = benefit_assignment.benefit_package  if benefit_assignment.present?
     (benefit_package.present? && benefit_package.is_conversion?) ? nil : benefit_package
+  end
+
+  def benefit_group_assignment_for_date(coverage_date)
+    assignments = benefit_group_assignments.select do |assignment|
+      (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
+    end
+    assignments.detect{|assignment| assignment.is_active} || assignments.first
   end
 
   def earliest_benefit_package_after(coverage_date)
