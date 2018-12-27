@@ -2044,6 +2044,12 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         coverage_date = initial_application.end_on - 1.month
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
       end
+
+      it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
+        initial_application.update_attributes(aasm_state: :imported)
+        coverage_date = census_employee.benefit_group_assignments.first.start_on - 1.month
+        expect(census_employee.benefit_group_assignment_for_date(coverage_date)).to eq nil
+      end
     end
 
     context "when ER has active and renewal benefit applications" do
@@ -2057,7 +2063,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it "should return renewal benefit_package if given effective_on date is in renewal benefit application" do
-        census_employee.active_benefit_group_assignment.update_attributes(is_active: false)
+        census_employee.active_benefit_group_assignment.update_attributes!(is_active: false)
+        census_employee.inactive_benefit_group_assignments.first.benefit_package.update_attributes!(is_active: false)
         benefit_group_assignment_two
         coverage_date = renewal_application.start_on
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq renewal_application.benefit_packages.first
@@ -2092,7 +2099,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         census_employee.benefit_group_assignments.where(:"benefit_package_id".in => benefit_application.benefit_packages.map(&:id)).each do |bga|
           # when there is both MYC & Imported Plan years, is_active for imported plan year's bga's should be false
           # to allow plan shop through myc plan years
-          bga.update_attributes(is_active: false)
+          bga.update_attributes!(is_active: false)
+          bga.benefit_package.update_attributes!(is_active: false)
         end
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq myc_application.benefit_packages.first
       end
