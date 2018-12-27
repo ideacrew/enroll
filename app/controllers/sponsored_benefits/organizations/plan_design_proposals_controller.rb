@@ -90,7 +90,6 @@ module SponsoredBenefits
     end
 
     def edit
-      @original_action = params["original_action"]
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new(organization: @plan_design_organization, proposal_id: params[:id])
       init_employee_datatable
     end
@@ -112,7 +111,6 @@ module SponsoredBenefits
     end
 
     def update
-      @original_action = params["original_action"]
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization, proposal_id: params[:id]
         }.merge(plan_design_proposal_params))
