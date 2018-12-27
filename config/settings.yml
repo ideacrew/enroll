@@ -264,8 +264,8 @@ aca:
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 26
   transmit_employers_immediately: false
-  employer_has_sic_field: true
-  validate_county: true
+  employer_has_sic_field: false
+  validate_county: false
 
   use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
