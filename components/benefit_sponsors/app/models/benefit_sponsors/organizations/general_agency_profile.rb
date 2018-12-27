@@ -135,20 +135,20 @@ module BenefitSponsors
           list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.order_by([:legal_name]).to_a
         end
         #
-        # def all_by_broker_role(broker_role, options={})
-        #   favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue []
-        #   all_ga = if options[:approved_only]
-        #              all.select{|ga| ga.aasm_state == 'is_approved'}
-        #            else
-        #              all
-        #            end
-        #
-        #   if favorite_general_agency_ids.present?
-        #     all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
-        #   else
-        #     all_ga
-        #   end
-        # end
+        def all_by_broker_role(broker_role, options={})
+          favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:benefit_sponsors_general_agency_profile_id) rescue []
+          all_ga = if options[:approved_only]
+                     all.select{|ga| ga.aasm_state == 'is_approved'}
+                   else
+                     all
+                   end
+
+          if favorite_general_agency_ids.present?
+            all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
+          else
+            all_ga
+          end
+        end
 
         def first
           all.first

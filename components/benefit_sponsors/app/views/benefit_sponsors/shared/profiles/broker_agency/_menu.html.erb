@@ -41,10 +41,10 @@
         <% if general_agency_enabled? %>
           <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
             <!--TODO: Enable Link when GA is moved to the Engine-->
-            <%#= link_to(general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
+            <%= link_to(general_agency_index_profiles_broker_agencies_broker_agency_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
               <span class="hidden-xs">General Agencies</span>
               <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
-            <%# end %>
+            <% end %>
           </li>
         <% end %>
         <% if site_broker_quoting_enabled? && individual_market_is_enabled? %>
