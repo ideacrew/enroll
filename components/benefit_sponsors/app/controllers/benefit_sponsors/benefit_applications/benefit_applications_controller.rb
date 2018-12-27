@@ -81,7 +81,7 @@ module BenefitSponsors
       end
 
       def late_rates_check
-        date = params[:start_on_date].to_date rescue nil
+        date = params[:start_on_date].present? ? Date.strptime(params[:start_on_date], "%m/%d/%Y") : nil
         render json: ::BenefitMarkets::Products::Product.has_rates?(date)
       end
 

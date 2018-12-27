@@ -11,7 +11,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return true if date is present and rates are present" do
       allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
-      expect(helper.can_employee_shop?("10/01/2018", "edit")).to eq false
+      expect(helper.can_employee_shop?("10/01/2018")).to eq true
     end
   end
 

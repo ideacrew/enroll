@@ -298,8 +298,7 @@ module BenefitMarkets
       return false if date.blank?
 
       products = ::BenefitMarkets::Products::Product.all.select{|a| a.active_year == date.year }
-      records = products.select{|product| product.premium_table_effective_on(date)}
-
+      records = products.select{|product| product.health? && product.premium_table_effective_on(date)}
       # returns true when only some carriers does not have rates
       # returns false when all products does not have rates
       records.present? ? true : false
