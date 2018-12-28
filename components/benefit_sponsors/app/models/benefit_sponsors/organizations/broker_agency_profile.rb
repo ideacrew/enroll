@@ -118,6 +118,19 @@ module BenefitSponsors
         end
       end
 
+      def staff_for_broker_including_pending
+        Person.where(:broker_agency_staff_roles => { 
+          '$elemMatch' => { 
+            benefit_sponsors_broker_agency_profile_id: self.id, 
+            '$or' => 
+              [
+                {aasm_state: :broker_agency_pending},
+                {aasm_state: :active}
+              ],
+           } 
+        })
+      end
+
       def families
         linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
         employee_families = linked_active_employees.map(&:primary_family).to_a
