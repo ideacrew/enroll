@@ -96,31 +96,27 @@ module Factories
         raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} don't have active application for renewal"
       end
     
-      # Commented out following snipped to allow
-      # System to generate a shell renewal plan year when renewal plan not available.
-      # 
-      # @active_plan_year.benefit_groups.each do |benefit_group|
-      #   reference_plan_id = benefit_group.reference_plan.renewal_plan_id
-      #   if reference_plan_id.blank?
-      #     raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.reference_plan.id} Year #{benefit_group.reference_plan.active_year} Hios #{benefit_group.reference_plan.hios_id}"
-      #   end
-      #   elected_plan_ids = benefit_group.renewal_elected_plan_ids
-      #   if elected_plan_ids.blank?
-      #     raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_plan_ids}"
-      #   end
-      # end
+      @active_plan_year.benefit_groups.each do |benefit_group|
+        reference_plan_id = benefit_group.reference_plan.renewal_plan_id
+        if reference_plan_id.blank?
+          raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.reference_plan.id} Year #{benefit_group.reference_plan.active_year} Hios #{benefit_group.reference_plan.hios_id}"
+        end
+
+        elected_plan_ids = benefit_group.renewal_elected_plan_ids
+        if elected_plan_ids.blank?
+          raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_plan_ids}"
+        end
+      end
     end
 
     def renew_benefit_groups
       @active_plan_year.benefit_groups.each do |active_group|
-        if is_renewal_health_offered?(active_group)
-          new_group = clone_benefit_group(active_group)
-          if new_group.save
-            renew_census_employees(active_group, new_group)
-          else
-            message = "Error saving benefit_group: #{new_group.id}, for employer: #{@employer_profile.id}"
-            raise PlanYearRenewalFactoryError, message
-          end
+        new_group = clone_benefit_group(active_group)
+        if new_group.save
+          renew_census_employees(active_group, new_group)
+        else
+          message = "Error saving benefit_group: #{new_group.id}, for employer: #{@employer_profile.id}"
+          raise PlanYearRenewalFactoryError, message
         end
       end
     end
@@ -134,10 +130,6 @@ module Factories
       })
 
       renewal_benefit_group
-    end
-
-    def is_renewal_health_offered?(active_group)
-      active_group.reference_plan.renewal_plan_id.present? && active_group.renewal_elected_plan_ids.any?
     end
 
     def is_renewal_dental_offered?(active_group)

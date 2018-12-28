@@ -96,7 +96,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
 
         let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: nil, coverage_kind: 'health') }
 
-        it "should create renewal plan year with no benefit groups" do
+        it "should not create renewal plan year" do
           expect(renewing_employer.renewing_plan_year.present?).to be_falsey
 
           active_benefit_group = renewing_employer.active_plan_year.benefit_groups.first
@@ -104,29 +104,9 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
           expect(active_benefit_group.dental_reference_plan.renewal_plan_id).to eq dental_renewal_plan.id
 
           generate_renewal
-          expect(renewing_employer.renewing_plan_year.present?).to be_truthy
-          expect(renewing_employer.renewing_plan_year.benefit_groups).to be_empty
-        end
-      end
-
-      context 'when renewal plan year have mapping for both health & dental not available' do
-
-        let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: nil, coverage_kind: 'health') }
-        let!(:dental_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302", renewal_plan_id: nil, coverage_kind: 'dental', dental_level: 'high')}
-
-        it "should create shell plan year" do
           expect(renewing_employer.renewing_plan_year.present?).to be_falsey
-
-          active_benefit_group = renewing_employer.active_plan_year.benefit_groups.first
-          expect(active_benefit_group.reference_plan.renewal_plan_id).to eq nil
-          expect(active_benefit_group.dental_reference_plan.renewal_plan_id).to eq nil
-
-          generate_renewal
-          expect(renewing_employer.renewing_plan_year.present?).to be_truthy
-          expect(renewing_employer.renewing_plan_year.benefit_groups).to be_empty
         end
       end
-
 
       context '.trigger_notice' do
 
