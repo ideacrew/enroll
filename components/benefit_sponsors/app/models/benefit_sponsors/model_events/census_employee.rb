@@ -37,7 +37,7 @@ module BenefitSponsors
 
       def trigger_model_event(event_name, event_options = {})
         if OTHER_EVENTS.include?(event_name)
-          ::CensusEmployee.add_observer(BenefitSponsors::Observers::CensusEmployeeObserver.new, [:notifications_send])
+          ::CensusEmployee.add_observer(BenefitSponsors::Observers::NoticeObserver.new, [:process_census_employee_events])
           notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end

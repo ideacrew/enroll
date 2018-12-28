@@ -273,10 +273,9 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   end
 
   describe "make_active", dbclean: :after_each do
-    let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
+    let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
+    let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, start_on: TimeKeeper.date_of_record)}
 
     before(:each) do
       census_employee.benefit_group_assignments.last.update(is_active:false)

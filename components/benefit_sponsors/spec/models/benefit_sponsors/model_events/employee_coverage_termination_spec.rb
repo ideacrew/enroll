@@ -49,7 +49,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
     context "ModelEvent" do
       it "should trigger model event" do
         model_instance.class.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:notifications_send) do |instance, model_event|
+          expect(observer).to receive(:process_enrollment_events) do |instance, model_event|
             expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :employee_coverage_termination, :klass_instance => model_instance, :options => {})
           end
@@ -59,7 +59,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
     end
 
     context "NoticeTrigger" do
-      subject { BenefitSponsors::Observers::HbxEnrollmentObserver.new }
+      subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_termination, model_instance, {}) }
 
       it "should trigger notice event" do
@@ -73,7 +73,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoverageTermination', dbcl
           expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_enrollment_events(model_instance, model_event)
       end
     end
   end

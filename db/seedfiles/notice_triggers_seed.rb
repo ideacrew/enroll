@@ -70,11 +70,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D002',
+      hbx_id: 'DIG002',
       title: 'Employer Approval Notice',
       description: 'Application to Offer Group Health Coverage in DC Health Link',
       resource_name: 'employer',
-      event_name: 'initial_employer_approval',
+      event_name: 'initial_application_submitted',
       notice_triggers: [
         {
           name: 'Initial Employer SHOP Approval Notice',
@@ -91,17 +91,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP2B',
+      hbx_id: 'DIG003',
       title: 'Employer Denial Notice',
       description: 'Application to Offer Group Health Coverage in DC Health Link',
       resource_name: 'employer',
-      event_name: 'initial_employer_denial',
+      event_name: 'employer_initial_eligibility_denial_notice',
       notice_triggers: [
         {
           name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
           notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
           notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-          mpi_indicator: 'MPI_SHOP2B',
+          mpi_indicator: 'SHOP_D003',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -116,13 +116,13 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Plan Offerings Finalized',
       description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
       resource_name: 'employer',
-      event_name: 'planyear_renewal_3a',
+      event_name: 'renewal_application_published',
       notice_triggers: [
         {
           name: 'PlanYear Renewal',
           notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-          mpi_indicator: 'MPI_DRG006',
+          mpi_indicator: 'SHOP_D006',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -137,13 +137,13 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Plan Offerings Finalized',
       description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
       resource_name: 'employer',
-      event_name: 'planyear_renewal_3b',
+      event_name: 'plan_year_auto_published',
       notice_triggers: [
         {
           name: 'PlanYear Renewal Auto-Published',
           notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-          mpi_indicator: 'MPI_DRG007',
+          mpi_indicator: 'SHOP_D007',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -177,17 +177,17 @@ if Settings.aca.state_abbreviation == "DC"
     },
 
     {
-      hbx_id: 'SHOP5',
+      hbx_id: 'DRG004',
       title: 'Group Renewal Available',
       description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
       resource_name: 'employer',
-      event_name: 'group_renewal_5',
+      event_name: 'renewal_application_created',
       notice_triggers: [
         {
           name: 'Group Renewal Notice',
           notice_template: 'notices/shop_employer_notices/5_employer_renewal_notice',
           notice_builder: 'ShopEmployerNotices::EmployerRenewalNotice',
-          mpi_indicator: 'MPI_SHOP5',
+          mpi_indicator: 'SHOP_D004',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -220,17 +220,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP6',
+      hbx_id: 'DAG008',
       title: 'Action Needed – Add all Eligible Employees to your Roster',
       description: 'This notice goes to all the employers with zero employees on roster when published',
       resource_name: 'employer',
-      event_name: 'zero_employees_on_roster',
+      event_name: 'zero_employees_on_roster_notice',
       notice_triggers: [
         {
           name: 'Zero Employees on Rotser',
           notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
           notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-          mpi_indicator: 'MPI_SHOP6',
+          mpi_indicator: 'SHOP_D008',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -241,17 +241,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8A',
+      hbx_id: 'DRE010',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_auto_renewal',
+      event_name: 'employee_coverage_passively_renewed',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
-          mpi_indicator: 'MPI_SHOP8A',
+          mpi_indicator: 'SHOP_D010',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -262,17 +262,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8B',
+      hbx_id: 'DRE011',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All employees that enrolled the previous year and do not have an auto-renewal plan option available.',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_no_auto_renewal',
+      event_name: 'employee_coverage_passive_renewal_failed',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal',
-          mpi_indicator: 'MPI_SHOP8B',
+          mpi_indicator: 'SHOP_D011',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -283,17 +283,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP8C',
+      hbx_id: 'DRE012',
       title: 'Your Health Plan Open Enrollment Period has Begun',
       description: 'All employees that are not currently enrolled in a plan',
       resource_name: 'employee_role',
-      event_name: 'employee_open_enrollment_unenrolled',
+      event_name: 'employee_coverage_passively_waived',
       notice_triggers: [
         {
           name: 'Renewal Open Enrollment available for Employee',
           notice_template: 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
           notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled',
-          mpi_indicator: 'MPI_SHOP8C',
+          mpi_indicator: 'SHOP_D012',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -371,7 +371,7 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Eligible to Apply for Employer-sponsored Health Insurance',
       description: 'This notices goes to all the employees who have successfully matched their employer.',
       resource_name: 'employee_role',
-      event_name: 'employee_eligibility_notice',
+      event_name: 'employee_matches_employer_rooster',
       notice_triggers: [
         {
           name: 'Employee Eligibility Notice',
@@ -413,7 +413,7 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Ineligible for SHOP Coverage Offered through DC Health Link',
       description: 'Employee must be notified when they are terminated from an ER roster that they are no longer eligible to enroll in coverage with that ER, effective DOT',
       resource_name: 'employee_role',
-      event_name: 'employee_termination_notice',
+      event_name: 'employee_notice_for_employee_terminated_from_roster',
       notice_triggers: [
         {
           name: 'Employee Termination Notice',
@@ -455,7 +455,7 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
       description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
       resource_name: 'employer',
-      event_name: 'initial_employer_first_invoice_available',
+      event_name: 'initial_employer_invoice_available',
       notice_triggers: [
         {
           name: 'Initial Employer first invoice available in the account',
@@ -493,7 +493,7 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP26',
+      hbx_id: 'DIG026',
       title: 'First Reminder to publish Application',
       description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
       resource_name: 'employer',
@@ -503,7 +503,7 @@ if Settings.aca.state_abbreviation == "DC"
           name: 'Initial Employer Application - Reminder to publish',
           notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-          mpi_indicator: 'MPI_SHOP26',
+          mpi_indicator: 'SHOP_D026',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -514,7 +514,7 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP27',
+      hbx_id: 'DIG029',
       title: 'Final Reminder to publish Application',
       description: 'All the initial employers with draft plan years will be notified to publish their plan year on 3rd of the month.',
       resource_name: 'employer',
@@ -524,7 +524,7 @@ if Settings.aca.state_abbreviation == "DC"
           name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
           notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-          mpi_indicator: 'MPI_SHOP27',
+          mpi_indicator: 'SHOP_D029',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -558,7 +558,7 @@ if Settings.aca.state_abbreviation == "DC"
    },
 
     {
-      hbx_id: 'SHOP28',
+      hbx_id: 'DIG028',
       title: 'Second Reminder to publish Application',
       description: 'All the initial employers with draft plan years will be notified to publish their plan year 1 day prior to soft deadline of 1st.',
       resource_name: 'employer',
@@ -568,7 +568,7 @@ if Settings.aca.state_abbreviation == "DC"
           name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
           notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-          mpi_indicator: 'MPI_SHOP28',
+          mpi_indicator: 'SHOP_DO28',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -579,17 +579,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP29',
+      hbx_id: 'DRG025',
       title: 'Group Renewal – Final Reminder to Publish',
       description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer publishing deadline.',
       resource_name: 'employer',
-      event_name: 'renewal_employer_final_reminder_to_publish_plan_year',
+      event_name: 'renewal_plan_year_publish_dead_line',
       notice_triggers: [
         {
           name: 'Renewal Employer reminder to publish plan year.',
           notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-          mpi_indicator: 'MPI_SHOP29',
+          mpi_indicator: 'SHOP_DO25',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -600,11 +600,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D041',
+      hbx_id: 'DAG041',
       title: 'Employee Terminating coverage',
       description: 'Employee Terminating coverage after QLE',
       resource_name: 'employer',
-      event_name: 'notify_employer_when_employee_terminate_coverage',
+      event_name: 'employer_notice_for_employee_coverage_termination',
       notice_triggers: [
         {
           name: 'Notice to employer when employee terminates coverage',
@@ -621,17 +621,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP30',
+      hbx_id: 'DRG024',
       title: 'Group Renewal – Second Reminder to Publish',
       description: 'Notification to renewing employers with draft plan years to publish their plan year 1 day prior to the renewal employer soft deadline.',
       resource_name: 'employer',
-      event_name: 'renewal_employer_second_reminder_to_publish_plan_year',
+      event_name: 'renewal_employer_publish_plan_year_reminder_after_soft_dead_line',
       notice_triggers: [
         {
           name: 'Renewal Employer reminder to publish plan year.',
           notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-          mpi_indicator: 'MPI_SHOP30',
+          mpi_indicator: 'SHOP_D024',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -642,17 +642,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP31',
+      hbx_id: 'DRG023',
       title: 'Group Renewal – First Reminder to Publish',
       description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer soft deadline.',
       resource_name: 'employer',
-      event_name: 'renewal_employer_first_reminder_to_publish_plan_year',
+      event_name: 'renewal_plan_year_first_reminder_before_soft_dead_line',
       notice_triggers: [
         {
           name: 'Renewal Employer reminder to publish plan year.',
           notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
           notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
-          mpi_indicator: 'MPI_SHOP31',
+          mpi_indicator: 'SHOP_DO23',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employer"],
@@ -663,11 +663,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D020',
+      hbx_id: 'DIG020',
       title: 'Group Ineligible to Obtain Coverage',
       description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
       resource_name: 'employer',
-      event_name: 'initial_employer_ineligibility_notice',
+      event_name: 'initial_employer_application_denied',
       notice_triggers: [
         {
           name: 'Initial Employer ineligible to obtain coverage.',
@@ -728,11 +728,11 @@ if Settings.aca.state_abbreviation == "DC"
     },
 
     {
-        hbx_id: 'SHOP_D052',
+        hbx_id: 'DAE052',
         title: 'Confirmation - Broker Fired',
         description: 'Broker gets terminated after employer selects change broker',
         resource_name: 'employer',
-        event_name: 'employer_broker_fired',
+        event_name: 'broker_fired_confirmation_to_employer',
         notice_triggers: [
             {
                 name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
@@ -753,7 +753,7 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'Special Enrollment Period Denial',
       description: 'EE SEP Requested by Employee outside of allowable time frame',
       resource_name: 'employee_role',
-      event_name: 'sep_request_denial_notice',
+      event_name: 'employee_notice_for_sep_denial',
       notice_triggers: [
         {
           name: 'Denial of SEP Requested by EE outside of allowable time frame',
@@ -791,17 +791,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP10047',
+      hbx_id: 'DIE040',
       title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
       description: 'Notification to employees regarding their Employer’s ineligibility.',
       resource_name: 'employee_role',
-      event_name: 'notify_employee_of_initial_employer_ineligibility',
+      event_name: 'group_ineligibility_notice_to_employee',
       notice_triggers: [
         {
           name: 'Notification to employees regarding their Employer’s ineligibility.',
           notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
           notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
-          mpi_indicator: 'MPI_SHOP10047',
+          mpi_indicator: 'SHOP_D040',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -812,11 +812,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D049',
+      hbx_id: 'DAG049',
       title: 'Confirmation - Broker Hired',
       description: 'Confirmation of Broker Hired Sent to Employer',
       resource_name: 'employer',
-      event_name: 'broker_hired_confirmation_notice',
+      event_name: 'broker_hired_confirmation_to_employer',
       notice_triggers: [
         {
           name: 'Boker Hired Confirmation',
@@ -854,11 +854,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D045',
+      hbx_id: 'DAG045',
       title: 'Employee has made a change to their employer-sponsored coverage selection',
       description: 'Employee mid year plan change when an eligiblity determination is reached',
       resource_name: 'employer',
-      event_name: 'ee_mid_year_plan_change_non_congressional_notice',
+      event_name: 'employee_mid_year_plan_change_notice_to_employer',
       notice_triggers: [
         {
           name: 'Employee Mid-Year Plan change Non-Congressional',
@@ -875,11 +875,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D001',
+      hbx_id: 'DIG001',
       title: 'Welcome to DC Health Link',
       description: 'ER creates an account in DC Health',
       resource_name: 'employer',
-      event_name: 'employer_account_creation_notice',
+      event_name: 'welcome_notice_to_employer',
       notice_triggers: [
         {
           name: 'Welcome Notice sent to Employer',
@@ -896,17 +896,17 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP10066',
+      hbx_id: 'DRE038',
       title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
       description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
       resource_name: 'employee_role',
-      event_name: 'notify_employee_of_renewing_employer_ineligibility',
+      event_name: 'employee_renewal_employer_ineligibility_notice',
       notice_triggers: [
         {
           name: 'Notify Employees of their employer termination due to ineligibility',
           notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
           notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
-          mpi_indicator: 'MPI_SHOP10066',
+          mpi_indicator: 'SHOP_D038',
           notice_trigger_element_group: {
             market_places: ['shop'],
             primary_recipients: ["employee"],
@@ -917,11 +917,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'D048',
+      hbx_id: 'DB0048',
       title: 'You have been hired as a broker',
       description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
       resource_name: 'broker_role',
-      event_name: 'broker_hired',
+      event_name: 'broker_hired_notice_to_broker',
       notice_triggers: [
         {
           name: 'Broker Hired',
@@ -942,7 +942,7 @@ if Settings.aca.state_abbreviation == "DC"
       title: 'You have been Hired as their Broker Agency',
       description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
       resource_name: 'broker_role',
-      event_name: 'broker_agency_hired',
+      event_name: 'broker_agency_hired_confirmation',
       notice_triggers: [
         {
           name: 'Broker Agency Hired',
@@ -959,11 +959,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D074',
+      hbx_id: 'DAE074',
       title: 'Employee Enrollment Confirmation',
       description: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
       resource_name: 'employee_role',
-      event_name: 'ee_plan_selection_confirmation_sep_new_hire',
+      event_name: 'employee_plan_selection_confirmation_sep_new_hire',
       notice_triggers: [
         {
           name: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
@@ -981,11 +981,11 @@ if Settings.aca.state_abbreviation == "DC"
     },
 
     {
-      hbx_id: 'SHOP_D034',
+      hbx_id: 'DAE034',
       title: 'Special Enrollment Period Approval',
       description: 'SEP request by Employee accepted when an eligiblity determination is reached',
       resource_name: 'employee_role',
-      event_name: 'ee_sep_request_accepted_notice',
+      event_name: 'employee_sep_request_accepted',
       notice_triggers: [
         {
           name: 'EE SEP Requested Accepted',
@@ -1066,7 +1066,7 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {                
-      hbx_id: 'SHOP_D064',
+      hbx_id: 'DIE064',
       title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
       description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
       resource_name: 'employee_role',
@@ -1108,11 +1108,11 @@ if Settings.aca.state_abbreviation == "DC"
       ]
     },
     {
-      hbx_id: 'SHOP_D042',
+      hbx_id: 'DAE042',
       title: 'Confirmation of Election To Terminate Coverage',
       description: 'Employee Terminating coverage after QLE',
       resource_name: 'employee_role',
-      event_name: 'notify_employee_confirming_coverage_termination',
+      event_name: 'employee_notice_for_employee_coverage_termination',
       notice_triggers: [
         {
           name: 'Notice to employee when employee terminates coverage',

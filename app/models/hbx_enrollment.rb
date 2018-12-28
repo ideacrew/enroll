@@ -243,7 +243,9 @@ class HbxEnrollment
                 message: "%{value} is not a valid coverage type"
             }
 
-  add_observer ::BenefitSponsors::Observers::HbxEnrollmentObserver.new, [:notifications_send]
+  # add_observer ::BenefitSponsors::Observers::HbxEnrollmentObserver.new, [:notifications_send]
+  add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_enrollment_events]
+
 
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at

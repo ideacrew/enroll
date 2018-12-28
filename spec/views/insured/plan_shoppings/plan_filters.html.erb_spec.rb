@@ -24,6 +24,12 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
 
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+      it 'should display find your doctor link' do
+        expect(rendered).to have_selector('a', text: /estimate your costs/i)
+      end
+    end
+
     it 'should display filter selections' do
       expect(rendered).to match /HSA Eligible/i
       expect(rendered).to match /Carrier/

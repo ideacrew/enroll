@@ -27,11 +27,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
 
   describe "when ER fires a broker" do
     let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:broker_fired, model_instance, {}) }
-    subject { BenefitSponsors::Observers::BrokerAgencyAccountObserver.new }
+    subject { BenefitSponsors::Observers::NoticeObserver.new }
 
     context "ModelEvent" do
       it "should trigger model event" do
-        allow(subject).to receive(:notifications_send).and_return(model_instance, model_event)
+        allow(subject).to receive(:process_broker_agency_events).and_return(model_instance, model_event)
         expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
         expect(model_event).to have_attributes(:event_key => :broker_fired, :klass_instance => model_instance, :options => {})
         model_instance.save!
@@ -57,7 +57,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
           expect(payload[:event_object_kind]).to eq 'BenefitSponsors::Accounts::BrokerAgencyAccount'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
-        subject.notifications_send(model_instance, model_event)
+        subject.process_broker_agency_events(model_instance, model_event)
       end
     end
   end

@@ -115,7 +115,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
     benefit_applications.each do |benefit_application|
       service = initialize_service(benefit_application)
       service.terminate(end_on, termination_date)
-      trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
+      # Need to re-implement this notice using new observer pattern
+      # trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
     end
   end
 
