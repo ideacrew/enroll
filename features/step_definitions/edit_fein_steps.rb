@@ -1,7 +1,8 @@
 
 When(/^the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer$/) do
-	find('.dropdown-toggle', :text => "Actions").trigger 'click'
-  click_link('Changed FEIN')
+  sleep(3)
+  find_all('.dropdown.pull-right', text: 'Actions')[0].click
+  click_link('Change FEIN')
 end
 
 And(/^an FEIN with less than nine digits is entered$/) do
@@ -17,11 +18,11 @@ Then(/^an warning message will be presented as FEIN must be at least nine digits
 end
 
 And(/^an FEIN with nine digits matches an existing Employer Profile FEIN$/) do
-  find('#organizations_general_organization_new_fein').set(second_employer[:fein])
+  find('#organizations_general_organization_new_fein').set(employer("Xfinity Enterprise")[:fein])
 end
 
 Then(/^an warning message will be presented as FEIN matches HBX ID Legal Name$/) do
-  expect(page).to have_content("FEIN matches HBX ID #{second_employer[:hbx_id]}, #{second_employer[:legal_name]}")
+  expect(page).to have_content("FEIN matches HBX ID #{employer("Xfinity Enterprise")[:hbx_id]}, #{employer("Xfinity Enterprise")[:legal_name]}")
 end
 
 And(/^the user enters unique FEIN with nine digits$/) do
