@@ -71,7 +71,7 @@ class BrokerAgencyStaffRole
   end
 
   def agency_pending?
-    false
+    aasm_state == "broker_agency_pending"
   end
 
   ## Class methods
