@@ -1,7 +1,7 @@
 
-When(/^the user clicks Change FEIN link in the Actions dropdown for that Employer$/) do
-  find('.dropdown.pull-right', text: 'Actions').click
-  click_link('Change FEIN')
+When(/^the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer$/) do
+	find('.dropdown-toggle', :text => "Actions").trigger 'click'
+  click_link('Changed FEIN')
 end
 
 And(/^an FEIN with less than nine digits is entered$/) do
