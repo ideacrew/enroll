@@ -27,7 +27,8 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeRenewalAqhp, :dbclean => :after
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :data => data,
-      enrollments: [hbx_enrollment],
+      :renewing_enrollments => [hbx_enrollment],
+      :active_enrollments => [hbx_enrollment],
       :person => person
   }}
 
