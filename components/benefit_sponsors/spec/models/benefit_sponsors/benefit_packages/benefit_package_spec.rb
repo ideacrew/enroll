@@ -332,6 +332,71 @@ module BenefitSponsors
       end
     end
 
+    describe '.renew_member_benefit' do
+      include_context "setup renewal application"
+
+      let(:renewed_enrollment) { double("hbx_enrollment")}
+      let(:ra) {renewal_application}
+      let(:ia) {predecessor_application}
+      let(:bs) { ra.predecessor.benefit_sponsorship}
+      let(:cbp){ra.predecessor.benefit_packages.first}
+      let(:rbp){ra.benefit_packages.first}
+      let(:roster_size) { 5 }
+      let(:enrollment_kinds) { ['health'] }
+      let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: bs, employer_profile: bs.profile, benefit_group: cbp) }
+      let!(:person) { FactoryGirl.create(:person) }
+      let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person)}
+      let!(:census_employee) { census_employees.first }
+      let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :shop,
+                                                household: family.active_household,
+                                                product: cbp.sponsored_benefits.first.reference_product,
+                                                coverage_kind: :health,
+                                                employee_role_id: census_employee.employee_role.id,
+                                                sponsored_benefit_package_id: cbp.id,
+                                                benefit_group_assignment_id: census_employee.benefit_group_assignments.last.id
+                                                ) }
+
+      let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+      let(:product) { renewal_product_package.products[0] }
+
+      let!(:update_product){
+        reference_product = current_benefit_package.sponsored_benefits.first.reference_product
+        reference_product.renewal_product = product
+        reference_product.save!
+      }
+
+      before do
+        census_employee.update_attributes(employee_role_id: employee_role.id)
+        census_employee.employee_role.primary_family.active_household.hbx_enrollments << hbx_enrollment
+        census_employee.employee_role.primary_family.save
+        predecessor_application.update_attributes({:aasm_state => "active"})
+        ra.update_attributes({:aasm_state => "enrollment_eligible"})
+        hbx_enrollment.benefit_group_assignment_id = census_employee.benefit_group_assignments[0].id
+        rbp.renew_member_benefit(census_employee)
+        allow(rbp).to receive(:is_renewal_benefit_available?).and_return(true)
+        allow(rbp).to receive(:trigger_renewal_model_event).and_return nil
+        allow(hbx_enrollment).to receive(:renew_benefit).with(rbp).and_return(renewed_enrollment)
+      end
+
+      it "should have renewing enrollment" do
+        hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_enrolled')
+        hbx_enrollment.save
+        expect(benefit_sponsorship).not_to eq nil
+        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
+          .by_effective_period(predecessor_application.effective_period).count).to eq 1
+        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_enrolled"
+      end
+
+      it "when active enrollment terminated for initial application" do
+        hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'coverage_terminated')
+        hbx_enrollment.save
+        expect(family.active_household.hbx_enrollments.enrolled_and_waived.by_benefit_sponsorship(benefit_sponsorship)
+          .by_effective_period(predecessor_application.effective_period).count).to eq 0
+        expect(census_employee.benefit_group_assignments[0].hbx_enrollments.first.aasm_state).to eq "coverage_terminated"
+      end
+    end
+
     describe '.is_renewal_benefit_available?' do
 
       let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
