@@ -13,3 +13,12 @@
     
   = form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f|
     = render "benefit_sponsors/profiles/employers/employer_profiles/employer_form", f: f
+
+- elsif is_general_agency_profile?(profile_type)
+  
+  = render 'shared/error_messages', :object => @agency
+  = render "benefit_sponsors/shared/profiles/general_agency/menu", {:general_agency_profile_id => @agency.profile_id, :active_tab => "home-tab"}
+
+  = form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f|
+    = render "benefit_sponsors/profiles/registrations/general_agency_form", f: f
+

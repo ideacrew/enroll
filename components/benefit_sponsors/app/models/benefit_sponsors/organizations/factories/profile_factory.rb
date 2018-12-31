@@ -383,6 +383,8 @@ module BenefitSponsors
             :agency_edit_registration_url
           elsif is_broker_profile?
             return "broker_show_registration_url@#{profile_id}"
+          elsif is_general_agency_profile?
+            return "general_agency_show_registration_url@#{profile_id}"
           end
         end
 
@@ -440,6 +442,8 @@ module BenefitSponsors
             "benefit_sponsor"
           elsif type.match(/BrokerAgencyProfile/)
             "broker_agency"
+          elsif type.match(/GeneralAgencyProfile/)
+            "general_agency"
           end
         end
 
@@ -448,6 +452,12 @@ module BenefitSponsors
           self.profile_type = profile_type
           if is_broker_profile?
             Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
+          elsif is_general_agency_profile?
+            Person.where(:"general_agency_staff_roles" => {
+              '$elemMatch' => {
+                :benefit_sponsors_general_agency_profile_id => BSON::ObjectId(profile_id),
+              }
+            })
           elsif is_employer_profile?
             Person.where(:employer_staff_roles => {
               '$elemMatch' => {

@@ -2,18 +2,17 @@
 <div class="profile-content top-pd">
   <div class="tab-row">
     <div class="tab-content" id="myTabContent">
-      <div id="broker_agency_form" class="container">
+      <div id="general_agency_form" class="container">
         <div class="row">
-          <%binding.pry%>
           <%= f.fields_for :staff_roles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>
-            <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/person_info_fields", f: f %>
+            <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/_person_info_fields", f: f %>
           <% end %>
 
           <%= f.fields_for :organization, @agency.organization, errors: {}, fieldset: false do |f| %>
             <%= f.hidden_field(:entity_kind, value: f.object.entity_kind) %>
             <div class="row">
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <h4>Broker Agency Information</h4>
+                <h4>General Agency Information</h4>
                 <div class="row no-buffer row-form-wrapper">
                   <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f, readonly: 'readonly' %>
                 </div>
@@ -25,13 +24,7 @@
                     </div>
                   </div>
                   <div class="row no-buffer row-form-wrapper">
-                    <%= render "benefit_sponsors/shared/broker_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
-                  </div><br>
-                  <div class="action-group">
-                    <% if (aca_broker_routing_information && @agency.profile_type == "broker_agency") %>
-                       <%= render "benefit_sponsors/shared/profiles/broker_agency/bank_information", f: f %>
-                       <p class="bank-name-container"></p>
-                    <% end %>
+                    <%= render "benefit_sponsors/shared/profiles/general_agency_profile_fields", f: f, read_only_dropdown: 'read_only_dropdown' %>
                   </div><br>
                   <div class="action-group">
                     <%#= render "benefit_sponsors/shared/office_locations", f: f %>
@@ -52,7 +45,7 @@
                     </div>
                     <br/>
                     <div class="row no-buffer">
-                      <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
+                      <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency">Update General Agency</button>
                     </div>
                   </div>
                 <% end %>
