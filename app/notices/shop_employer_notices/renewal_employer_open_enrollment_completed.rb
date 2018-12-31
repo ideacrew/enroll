@@ -12,7 +12,7 @@ class ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted < ShopEmployer
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_enrolled").first
+    plan_year = employer_profile.benefit_applications.where(:aasm_state => "enrollment_eligible").first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })

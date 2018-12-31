@@ -21,7 +21,7 @@ include ActionView::Helpers::NumberHelper
       })
     enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
     notice.plan = PdfTemplates::Plan.new({
-      :plan_name => enrollment.plan.name
+      :plan_name => enrollment.product.name
       })
     
     total_employee_cost =  number_to_currency(enrollment.total_employee_cost)

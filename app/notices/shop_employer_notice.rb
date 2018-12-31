@@ -1,4 +1,5 @@
 class ShopEmployerNotice < Notice
+  include ::BenefitSponsors::InvoiceHelper
 
   Required= Notice::Required + []
 
@@ -36,7 +37,7 @@ class ShopEmployerNotice < Notice
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.employer_email = recipient.staff_roles.first.work_email_or_best
     notice.primary_identifier = employer_profile.hbx_id
-    address = employer_profile.organization.primary_mailing_address.present? ? employer_profile.organization.primary_mailing_address : employer_profile.organization.primary_office_location.address
+    address = mailing_or_primary_address(employer_profile)
     append_address(address)
     append_hbe
     append_broker(employer_profile.broker_agency_profile)

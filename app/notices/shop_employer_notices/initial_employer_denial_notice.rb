@@ -12,19 +12,26 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(aasm_state: 'publish_pending').last
-    plan_year_warnings = []
-    plan_year.application_eligibility_warnings.each do |k, v|
-      case k.to_s
-      when "fte_count"
-        plan_year_warnings << "Full Time Equivalent must be 1-50"
-      when "primary_office_location"
-        plan_year_warnings << "primary business address not located in the District of Columbia"
+    plan_year = employer_profile.benefit_applications.where(aasm_state: 'pending').last
+    policy = eligibility_policy.business_policies_for(plan_year, :submit_benefit_application)
+    unless policy.is_satisfied?(plan_year)
+      plan_year_warnings = []
+      policy.fail_results.each do |k, v|
+        case k.to_s
+        when "benefit_application_fte_count"
+          plan_year_warnings << "Full Time Equivalent must be 1-50"
+        when "employer_primary_office_location"
+          plan_year_warnings << "primary business address not located in the District of Columbia"
+        end
       end
+      notice.plan_year = PdfTemplates::PlanYear.new({
+            :warnings => plan_year_warnings,
+          })
     end
-    notice.plan_year = PdfTemplates::PlanYear.new({
-          :warnings => plan_year_warnings,
-        })
   end
 
+  def eligibility_policy
+    return @eligibility_policy if defined? @eligibility_policy
+    @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
+  end
 end

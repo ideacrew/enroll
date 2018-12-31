@@ -17,7 +17,7 @@ class ShopEmployerNotices::ZeroEmployeesOnRoster < ShopEmployerNotice
           :open_enrollment_end_on => plan_year.open_enrollment_end_on,
         })
     #binder payment deadline
-    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+    scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+    notice.plan_year.binder_payment_due_date = scheduler.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
-
 end

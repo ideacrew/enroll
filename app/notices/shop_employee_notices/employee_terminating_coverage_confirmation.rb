@@ -3,7 +3,7 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmploye
   attr_accessor :census_employee, :hbx_enrollment
   
   def initialize(census_employee, args = {})
-    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment_hbx_id]).first
+    self.hbx_enrollment = args[:options][:event_object]
     super(census_employee, args)
   end
 
@@ -19,7 +19,7 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmploye
 
   def append_data
     terminated_enrollment = self.hbx_enrollment
-    plan = terminated_enrollment.plan
+    plan = terminated_enrollment.product
     notice.plan = PdfTemplates::Plan.new({
       :plan_name => plan.name
       })

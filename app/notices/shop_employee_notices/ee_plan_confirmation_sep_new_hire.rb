@@ -3,7 +3,7 @@ class ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
   attr_accessor :census_employee, :hbx_enrollment
 
   def initialize(census_employee, args = {})
-    self.hbx_enrollment = HbxEnrollment.by_hbx_id(args[:options][:hbx_enrollment]).first
+    self.hbx_enrollment = args[:options][:event_object]
     super(census_employee, args)
   end
 
@@ -21,7 +21,7 @@ class ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
     hbx_enrollment = self.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
        :effective_on => hbx_enrollment.effective_on,
-       :plan => {:plan_name => hbx_enrollment.plan.name},
+       :plan => {:plan_name => hbx_enrollment.product.name},
        :employee_cost => hbx_enrollment.total_employee_cost,
        :employer_contribution => hbx_enrollment.total_employer_contribution
        })

@@ -89,15 +89,23 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def generate_invoice
-    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
-    @organizations = @benfit_sponsorships.map(&:organization)
-    @employer_profiles = @organizations.flat_map(&:employer_profile)
-    @employer_profiles.each do |employer_profile|
-      employer_profile.trigger_model_event(:generate_initial_employer_invoice)
-    end
+      @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+      @organizations = @benfit_sponsorships.map(&:organization)
+      @employer_profiles = @organizations.flat_map(&:employer_profile)
 
-    flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
-    #redirect_to exchanges_hbx_profiles_root_path
+      if Settings.aca.state_abbreviation == "DC"
+        @organizations.each do |org|
+          @employer_invoice = ::BenefitSponsors::EmployerInvoice.new(org)
+          @employer_invoice.save_and_notify_with_clean_up
+        end
+      elsif Settings.aca.state_abbreviation == "MA"
+        @employer_profiles.each do |employer_profile|
+          employer_profile.trigger_model_event(:generate_initial_employer_invoice)
+        end
+      end
+
+      flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
+      #redirect_to exchanges_hbx_profiles_root_path
 
      respond_to do |format|
        format.js

@@ -11,6 +11,10 @@ module BenefitSponsors
         @notifier = BenefitSponsors::Services::NoticeService.new
       end
 
+      def deliver(recipient:, event_object:, notice_event:, notice_params: {})
+        notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
+      end
+
       def process_enrollment_events(model_instance, model_event)
        raise ArgumentError.new("expected BenefitSponsors::ModelEvents::ModelEvent") unless model_event.present? && model_event.is_a?(BenefitSponsors::ModelEvents::ModelEvent)
        hbx_enrollment = model_event.klass_instance
@@ -382,10 +386,6 @@ module BenefitSponsors
 
 
       private
-
-      def deliver(recipient:, event_object:, notice_event:, notice_params: {})
-        notifier.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: notice_params)
-      end
 
       def eligibility_policy
         return @eligibility_policy if defined? @eligibility_policy

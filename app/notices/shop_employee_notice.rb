@@ -13,7 +13,7 @@ class ShopEmployeeNotice < Notice
     args[:to] = census_employee.employee_role.person.work_email_or_best
     args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
-    args[:sep_qle_hash] = args[:options][:sep] if args[:options]
+    args[:sep_qle_hash] = args[:options][:event_object] if args[:options]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
@@ -108,9 +108,9 @@ class ShopEmployeeNotice < Notice
   def append_sep_qle(sep)
     if sep.present?
       notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new(
-          title: sep[:sep_qle_title],
-          qle_on: sep[:sep_qle_on],
-          end_on: sep[:sep_qle_end_on]
+          title: sep[:title],
+          qle_on: sep[:qle_on],
+          end_on: sep[:end_on]
       )
     end
   end

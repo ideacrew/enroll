@@ -32,8 +32,8 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
 
   def build_enrollment(hbx_enrollment)
     plan = PdfTemplates::Plan.new({
-      plan_name: hbx_enrollment.plan.name,
-      coverage_kind: hbx_enrollment.plan.coverage_kind
+      plan_name: hbx_enrollment.product.name,
+      coverage_kind: hbx_enrollment.product.kind
       })
     PdfTemplates::Enrollment.new({
       enrolled_count: hbx_enrollment.humanized_dependent_summary,

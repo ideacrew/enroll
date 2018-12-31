@@ -3,7 +3,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   attr_accessor :census_employee
 
   def initialize(census_employee, args = {})
-    @qle_reported_date = Date.strptime(args[:options][:qle_reported_date].to_s,"%m/%d/%Y")
+    @qle_reported_date = Date.strptime(args[:options][:qle_event_on].to_s,"%m/%d/%Y")
     @qle_title = args[:options][:qle_title]
     super(census_employee, args)
   end
@@ -24,8 +24,8 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
                                                             :title => @qle_title
                                                            })
 
-    active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
-    renewing_plan_year = census_employee.employer_profile.renewing_published_plan_year
+    active_plan_year = census_employee.employer_profile.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES ).first
+    renewing_plan_year = census_employee.employer_profile.renewing_benefit_application
 
     if renewing_plan_year.present?
       future_py_start_on,open_enrollment_end_date_py = if renewing_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
@@ -36,12 +36,12 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
     end
 
     open_enrollment_py = open_enrollment_end_date_py.present? ? open_enrollment_end_date_py : active_plan_year
-    upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : active_plan_year.end_on.next_day
+    upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : (active_plan_year.end_on + 1.day)
 
     notice.plan_year = PdfTemplates::PlanYear.new({
-      :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on,
-      :open_enrollment_start_on => open_enrollment_py.start_on,
-      :start_on => upcoming_plan_year_start_on
+      :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on.strftime("%m/%d/%Y"),
+      :open_enrollment_start_on => open_enrollment_py.start_on.strftime("%m/%d/%Y"),
+      :start_on => upcoming_plan_year_start_on.strftime("%m/%d/%Y")
       })
   end
 end

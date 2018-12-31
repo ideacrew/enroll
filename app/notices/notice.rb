@@ -21,7 +21,7 @@ class Notice
     self.to = params[:to]
     self.state = params[:options][:state] if params[:options]
     self.name = params[:name] || recipient.first_name
-    self.sep = params[:options][:sep] if params[:options]
+    self.sep = params[:options][:event_object] if params[:options]
   end
 
   def html(options = {})

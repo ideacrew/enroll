@@ -19,7 +19,7 @@ class ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal < ShopEmployeeNotice
       })
     enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
     notice.plan = PdfTemplates::Plan.new({
-      :plan_name => enrollment.plan.name
+      :plan_name => enrollment.product.name
       })
   end
 

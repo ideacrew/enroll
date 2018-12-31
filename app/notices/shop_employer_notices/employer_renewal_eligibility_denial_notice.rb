@@ -12,16 +12,24 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
   end
 
   def append_data
-     active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
-    renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_publish_pending").first
-    plan_year_warnings = []
-    if renewing_plan_year.application_eligibility_warnings.include?(:primary_office_location)
-      plan_year_warnings << "primary location is outside washington dc"
-    end
-    notice.plan_year = PdfTemplates::PlanYear.new({
-          :end_on => active_plan_year.end_on,
-          :start_on => renewing_plan_year.start_on,
-          :warnings => plan_year_warnings
+    active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
+    renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "pending").first
+    policy = eligibility_policy.business_policies_for(plan_year, :submit_benefit_application)
+    unless policy.is_satisfied?(plan_year)
+      plan_year_warnings = []
+      if policy.fail_results.include?(:employer_primary_office_location)
+        plan_year_warnings << "primary location is outside washington dc"
+      end
+      notice.plan_year = PdfTemplates::PlanYear.new({
+            :end_on => active_plan_year.end_on,
+            :start_on => renewing_plan_year.start_on,
+            :warnings => plan_year_warnings
         })
+    end
+  end
+
+  def eligibility_policy
+    return @eligibility_policy if defined? @eligibility_policy
+    @eligibility_policy = BenefitSponsors::BenefitApplications::AcaShopApplicationEligibilityPolicy.new
   end
 end
