@@ -21,11 +21,16 @@ module BenefitSponsors
       end
 
       def agency_edit_registration_url
+        binding.pry
         edit_profiles_registration_path(@agency.organization.profile.id)
       end
 
       def broker_show_registration_url(profile_id=nil)
         profiles_broker_agencies_broker_agency_profile_path(profile_id || @agency.organization.profile.id)
+      end
+
+      def general_show_registration_url(profile_id=nil)
+        profiles_general_agencies_general_agency_profile_path(profile_id || @agency.organization.profile.id)
       end
 
       def agency_home_url(profile_id)
