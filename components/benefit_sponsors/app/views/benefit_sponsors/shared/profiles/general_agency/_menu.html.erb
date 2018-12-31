@@ -26,12 +26,12 @@
           <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
         <% end %>
       </li>
-      <!-- <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>> -->
-        <%#= link_to(main_app.agency_messages_general_agencies_profiles_path(id: general_agency_profile_id), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
-          <!-- <span class="badge message-unread"><%#=begin; general_agency_profile_id.inbox.unread_messages.try(:count); rescue; return 0; end %></span> -->
-            <!-- Agency Mail -->
+<!--        <li role="presentation" id="inbox-tab" <%#= menu_tab_class(active_tab, "inbox-tab") %>>
+        <%#= link_to(agency_messages_general_agencies_profiles_path(id: general_agency_profile_id), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
+          <span class="badge message-unread"><%#=begin; general_agency_profile_id.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
+            Agency Mail
         <%# end %>
-      <!-- </li> -->
+      </li> -->
       <% if @staff_role %>
       <li role="presentation" id="staff-inbox-tab" <%= menu_tab_class(active_tab, "staff-inbox-tab") %>>
         <%= link_to(messages_general_agencies_profiles_path(id: @provider), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
