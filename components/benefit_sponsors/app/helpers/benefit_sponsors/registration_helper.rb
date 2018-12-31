@@ -8,5 +8,9 @@ module BenefitSponsors
     def is_sponsor_profile?(profile_type)
       profile_type == "benefit_sponsor"
     end
+
+    def is_general_agency_profile?(profile_type)
+      profile_type == "general_agency"
+    end
   end
 end

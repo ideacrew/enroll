@@ -2,8 +2,7 @@ module BenefitSponsors
   module Serializers
     class StaffRoleSerializer < ActiveModel::Serializer
       attributes :first_name, :last_name, :email, :dob, :status, :phone, :person_id
-
-      attribute :npn, if: :is_broker_profile?
+      attribute :npn, if: :non_sponsor_profile? # For both Broker Agency and General Agency
       attribute :status, if: :is_employer_profile?
 
       def email
@@ -28,12 +27,24 @@ module BenefitSponsors
         object.dob.to_s
       end
 
+      def non_sponsor_profile?
+        is_broker_profile? || is_general_agency_profile?
+      end
+
       def is_broker_profile?
         object.broker_role.present?
       end
 
       def npn
-        object.broker_role.npn
+        if is_broker_profile?
+          object.broker_role.npn
+        elsif is_general_agency_profile?
+          object.general_agency_staff_roles[0].npn
+        end
+      end
+
+      def is_general_agency_profile?
+        object.general_agency_staff_roles.present?
       end
 
       def staff_role

@@ -184,6 +184,7 @@ module BenefitSponsors
           return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
           return return_type
         end
+        binding.pry
         return_type = form.profile_id.present? ? [true, factory_obj.redirection_url_on_update] : [true, factory_obj.redirection_url(factory_obj.pending, true)]
         return return_type
       end
@@ -249,6 +250,11 @@ module BenefitSponsors
         profile.primary_broker_role_id == broker_role.id
       end
 
+      def has_general_agency_staff_role_for_profile?(user, profile) # When profile is general agency
+        ga_staff_roles = user.person.general_agency_staff_roles
+        ga_staff_roles.any? {|role| role.benefit_sponsors_general_agency_profile_id == profile.id }
+      end
+
       def has_employer_staff_role_for_profile?(user, profile) # When profile is benefit sponsor
         staff_roles = user.person.employer_staff_roles
         staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == profile.id }
@@ -256,7 +262,7 @@ module BenefitSponsors
 
       def is_staff_for_agency?(user, form)
         profile = load_profile
-        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile)
+        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile) || has_general_agency_staff_role_for_profile?(user, profile)
       end
 
       def load_profile

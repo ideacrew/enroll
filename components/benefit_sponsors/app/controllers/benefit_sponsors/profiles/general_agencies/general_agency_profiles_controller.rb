@@ -188,7 +188,7 @@ module BenefitSponsors
           if exception.query == :redirect_signup?
             redirect_to main_app.new_user_registration_path
           elsif current_user.has_general_agency_staff_role?
-            redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)
+            redirect_to profiles_general_agencies_general_agency_profile_path(:id => current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id)
           else
             redirect_to benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency)
           end
