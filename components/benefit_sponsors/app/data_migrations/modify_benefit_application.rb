@@ -49,15 +49,17 @@ class ModifyBenefitApplication< MongoidMigrationTask
         benefit_application.recalc_pricing_determinations
         benefit_application.renew_benefit_package_members
       end
-      benefit_sponsorship = benefit_application.benefit_sponsorship
-      unless benefit_application.is_renewing?
-        bs_from_state = benefit_sponsorship.aasm_state
-        benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
-        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: bs_from_state,
-            to_state: "initial_enrollment_open"
-        )
-      end
+      # We don't have the intermediate(initial) states on benefit_sponsorship any more
+      # BS transitions from applicant to active
+      # benefit_sponsorship = benefit_application.benefit_sponsorship
+      # unless benefit_application.is_renewing?
+      #   bs_from_state = benefit_sponsorship.aasm_state
+      #   benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_open")
+      #   benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+      #       from_state: bs_from_state,
+      #       to_state: "initial_enrollment_open"
+      #   )
+      # end
       puts "aasm state has been changed to enrolling" unless Rails.env.test?
     else
       raise "FAILED: Unable to find application or application is in invalid state"
