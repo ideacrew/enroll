@@ -969,10 +969,12 @@ describe HbxProfile, "class methods", type: :model do
     end
 
     it "terminates previous enrollments if both effective on in the future" do
-      hbx_enrollment1.effective_on = date + 10.days
+      hbx_enrollment1.effective_on = date + 19.days
       hbx_enrollment2.effective_on = date + 20.days
+      plan1.active_year = hbx_enrollment2.effective_on.year
+      plan2.active_year = hbx_enrollment2.effective_on.year
       hbx_enrollment2.select_coverage!
-      expect(hbx_enrollment1.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment1.coverage_terminated?).to be_truthy if hbx_enrollment1.effective_on.year == hbx_enrollment2.effective_on.year
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
       expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end

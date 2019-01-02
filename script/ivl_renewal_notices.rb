@@ -105,25 +105,25 @@ unless event_kind.present?
 end
 
 #need to exlude this list from UQHP_FEL data set.
-# if event == "final_eligibility_notice_uqhp"
-#   @excluded_list = []
-#   CSV.foreach("final_fel_aqhp_data_set.csv",:headers =>true).each do |d|
-#     @excluded_list << d["subscriber_id"]
-#   end
-# end
+if InitialEvents.include?(event)
+  @excluded_list = []
+  CSV.foreach("final_fre_aqhp_data_set.csv",:headers =>true).each do |d|
+    @excluded_list << d["subscriber_id"]
+  end
+end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      # (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if event == "final_eligibility_notice_uqhp"
+      (next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })) if InitialEvents.include?(event)
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       next if subscriber.nil?
       primary_person = get_primary_person(members, subscriber) if (members.present? && subscriber.present?)
       next if primary_person.nil?
-      # next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      #next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE") #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       #next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
-      # next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
+      #next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})  #need to uncomment while running "final_eligibility_notice_renewal_uqhp" notice
       renewing_enrollments, active_enrollments = valid_enrollments(primary_person)
       next if renewing_enrollments.empty?
       consumer_role = primary_person.consumer_role
@@ -131,7 +131,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         if InitialEvents.include? event
           family = primary_person.primary_family
           family.set_due_date_on_verification_types
-          family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+          family.update_attributes(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
         end
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,

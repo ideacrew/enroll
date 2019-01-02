@@ -193,9 +193,6 @@
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
 
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
-
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "If you expect your income for <coverage year> to be different than what is shown on your most recent tax return, you should also submit documents that show the income you expect to have for #{notice.coverage_year}. The documents you can submit in addition to your most recent tax return include:", top_margin: '10px'} %>
 

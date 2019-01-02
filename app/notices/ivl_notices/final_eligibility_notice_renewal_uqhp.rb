@@ -48,7 +48,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   def pick_enrollments
     hbx_enrollments = []
     family = recipient.primary_family
-    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "unverified", "renewing_coverage_selected"], :kind => "individual")
     return nil if enrollments.blank?
     health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
     dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
@@ -146,24 +146,28 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   #   end
   # end
 
+  def outstanding_verification_types(person)
+    person.consumer_role.outstanding_verification_types.map(&:type_name)
+  end
+
   def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+    outstanding_verification_types(person).include?("Social Security Number")
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+    outstanding_verification_types(person).include?('Citizenship')
   end
 
   def immigration_status_outstanding?(person)
-   person.consumer_role.outstanding_verification_types.include?('Immigration status')
+   outstanding_verification_types(person).include?('Immigration status')
   end
 
   def american_indian_status_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('American Indian Status')
+    outstanding_verification_types(person).include?('American Indian Status')
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
+    outstanding_verification_types(person).include?('DC Residency')
   end
 
   def append_unverified_individuals(people)
