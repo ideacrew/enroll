@@ -1,24 +1,25 @@
-= form_for @staff, as: :staff, url: {action: "create"},  html: {class: "needs-validation s508"} do |f|
-  = render partial: './ui-components/v1/forms/broker_registration/broker_agency_staff_information', locals: {f: f}
-  .row
-    .col-md-9.col-sm-9.col-xs-12.broker-agency-search
-      .row.search-dropdown-wrapper
-        .col-md-12.col-sm-12.col-xs-12
-          h4
-            | Select Your Broker Agency
-          .col-md-4.col-sm-6.col-xs-12.input-group.input-no-pd
-            = f.hidden_field :profile_id
-            = text_field_tag :agency_search, nil, placeholder: 'Agency/Broker Name,NPN', class: 'form-control'
-            .input-group-btn
-              = hidden_field_tag :broker_registration_page, true
-              a.btn.btn-select.search[href="#" onclick="brokerSearch();" data-loading-text="Loading..."]
-                i.fa.fa-search
-                = l10n("search").to_s.downcase
-      .result
-    br
-    .row.no-buffer.row-form-wrapper.no-border
+.broker-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
+  h1.heading-text Broker  Agency Staff
+  = form_for @staff, as: :staff, url: {action: "create"},  html: {class: "needs-ajax-validation s508", novalidate:true} do |f|
+    = render partial: './ui-components/v1/forms/broker_registration/broker_agency_staff_information', locals: {f: f}
+    .row
+      .col-md-9.col-sm-9.col-xs-12.broker-agency-search
+        .row.search-dropdown-wrapper
+          .col-md-12.col-sm-12.col-xs-12
+            h4
+              | Select Your Broker Agency
+            .col-md-4.col-sm-6.col-xs-12.input-group.input-no-pd
+              = f.hidden_field :profile_id
+              = text_field_tag :agency_search, nil, placeholder: 'Agency/Broker Name,NPN', class: 'form-control'
+              .input-group-btn
+                = hidden_field_tag :broker_registration_page, true
+                a.btn.btn-select.search[href="#" onclick="brokerSearch();" data-loading-text="Loading..."]
+                  i.fa.fa-search
+                  = l10n("search").to_s.downcase
+        .result
 
-    br
+
+      br
     .row
       .col-md-9.col-sm-9.col-xs-12
         .row.no-buffer
@@ -27,6 +28,7 @@
               = l10n("submit_application")
 
 javascript:
+  validateAjaxForm();
 
   function brokerSearch() {
     var broker_agency_search = document.getElementById('agency_search').value
@@ -48,7 +50,7 @@ javascript:
         element.forEach(function (ele) {
             ele.classList.remove("agency-selected");
         })
-    })
+    });
     document.getElementById('staff_profile_id').value = element.dataset.broker_agency_profile_id;
     element.closest(".form-border").classList.add('agency-selected')
   }
