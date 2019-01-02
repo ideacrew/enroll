@@ -40,9 +40,10 @@
         <tr><td colspan = "13" class="aptc-csr-grid-separator"></td></tr>
         <tr>
           <th colspan = "4">Household Member(s)</th>
-          <th colspan = "9">APTC Amount / Percent Ratio</th>
+          <th colspan = "5">APTC Amount / Percent Ratio</th>
+          <th colspan = "4">Transmit to Carrier?</th>
         </tr>
-        <% @household_members.each do |person_id| %>
+        <% @household_members.each_with_index do |person_id, ind| %>
           <tr>
             <td colspan = "4">
               <span class="glyphicon glyphicon-user"></span>
@@ -52,7 +53,12 @@
                 <i class="fa fa-asterisk" aria-hidden="true" data-toggle="tooltip" title="Primary Family Member"></i>
               <%end%>
             </td>
-            <td colspan = "9"> <%='%.2f' % person_id[person_id.keys[0]]%>  &nbsp;&nbsp; ( <%=(person_id[person_id.keys[0]][0]/person_id[person_id.keys[0]][1]*100).round(2)%> % ) </td>
+            <td colspan = "5"> <%='%.2f' % person_id[person_id.keys[0]]%>  &nbsp;&nbsp; ( <%=(person_id[person_id.keys[0]][0]/person_id[person_id.keys[0]][1]*100).round(2)%> % ) </td>
+            <% if ind == 0 %>
+              <td colspan = "4"><%= check_box_tag "transmit_to_carrier", @family.id %></td>
+            <% else %>
+              <td colspan = "4"></td>
+            <% end %>
           </tr>
         <%end%>
       </tbody> 

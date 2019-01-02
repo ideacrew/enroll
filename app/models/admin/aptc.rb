@@ -299,7 +299,7 @@ class Admin::Aptc < ApplicationController
     end
 
     # Create new Enrollments when Applied APTC for an Enrollment is Updated.
-    def update_aptc_applied_for_enrollments(family, params, year)
+    def update_aptc_applied_for_enrollments(family, params, year, silent_transaction=false)
       current_datetime = TimeKeeper.datetime_of_record
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
@@ -445,7 +445,7 @@ class Admin::Aptc < ApplicationController
     def years_with_tax_household(family)
       year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
       current_hbx = HbxProfile.current_hbx
-      oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.year
+      oe_start_year = 2017 || Settings.aca.individual_market.open_enrollment.start_on.year
       current_year = TimeKeeper.date_of_record.year
 
       if current_hbx && current_hbx.under_open_enrollment? && oe_start_year == current_year

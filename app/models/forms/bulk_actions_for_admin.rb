@@ -31,7 +31,7 @@ module Forms
           end
         end
       end
-      cancelled_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
+      cancelled_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions_for_terminated_enrollment(hbx_id, transmit_flag) }
     end
 
     def terminate_enrollments
@@ -53,7 +53,7 @@ module Forms
           end
         end
       end
-      terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
+      terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions_for_terminated_enrollment(hbx_id, transmit_flag) }
     end
 
     def transition_family_members
@@ -96,7 +96,7 @@ module Forms
 
     private
 
-    def handle_edi_transmissions(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
+    def handle_edi_transmissions_for_terminated_enrollment(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
       hbx = HbxEnrollment.find(hbx_id)
       ### Handle EDI transmission here ###
       notify(
@@ -105,6 +105,20 @@ module Forms
           :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
           "hbx_enrollment_id" => hbx.hbx_id,
           "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+          "is_trading_partner_publishable" => transmit_flag
+        }
+      )
+    end
+
+    def handle_edi_transmissions_for_new_enrollment(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
+      hbx = HbxEnrollment.find(hbx_id)
+      ### Handle EDI transmission here ###
+      notify(
+        "acapi.info.events.hbx_enrollment.coverage_selected",
+        {
+          :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+          "hbx_enrollment_id" => hbx.hbx_id,
+          "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#initial",
           "is_trading_partner_publishable" => transmit_flag
         }
       )
