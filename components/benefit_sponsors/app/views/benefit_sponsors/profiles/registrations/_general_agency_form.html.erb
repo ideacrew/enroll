@@ -5,7 +5,7 @@
       <div id="general_agency_form" class="container">
         <div class="row">
           <%= f.fields_for :staff_roles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>
-            <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/_person_info_fields", f: f %>
+            <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/person_info_fields", f: f %>
           <% end %>
 
           <%= f.fields_for :organization, @agency.organization, errors: {}, fieldset: false do |f| %>
