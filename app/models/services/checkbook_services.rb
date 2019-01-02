@@ -125,12 +125,8 @@ module Services
         {
           "remote_access_key": Settings.checkbook_services.remote_access_key ,
           "reference_id": Settings.checkbook_services.reference_id,
-          "enrollment_year": 2019,
-          "family": [
-              {
-                      "dob": "1990-01-01" # Hardcodizng for testing purpose
-              }
-      ],
+          "enrollment_year": Settings.checkbook_services.current_year,
+          "family": build_congress_employee_age,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
       end
@@ -187,6 +183,13 @@ module Services
           family << {"age": age, "pregnant": false, "AIAN": tribal_id}
         end
         family
+      end
+
+      def build_congress_employee_age
+        @hbx_enrollment.hbx_enrollment_members.each do |dependent|
+          family << {"dob": dependent.family_member.person.dob.strftime("%Y-%m-%d")
+          end
+          family
       end
 
       def build_family
