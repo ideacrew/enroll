@@ -50,15 +50,20 @@
     = render './ui-components/v1/forms/employer_registration/employer_profile_form', f: f
 
 javascript:
-  validateForm()
+  validateForm();
 
   $("#tabs").tabs({
       activate: function (event, ui) {
           if (ui.newPanel.selector == "#tabs-2") {
               var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
-              $.get(url, function (data) {
-                  $("#tabs-2").html(data)
-              });
+              $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#tabs-2").html(data)
+                    initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"),new Date("#{Date.today.end_of_month-18.years}"));
+                }
+              })
           }
       }
   });
