@@ -74,6 +74,10 @@ class BrokerAgencyStaffRole
     aasm_state == "broker_agency_pending"
   end
 
+  def is_open?
+    self.agency_pending? || aasm_state == "active"
+  end
+
   ## Class methods
   class << self
     

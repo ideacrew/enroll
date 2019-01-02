@@ -822,7 +822,35 @@ class Person
         return false, 'No matching employer staff role'
       end
     end
+    
+    def add_broker_agency_staff_role(first_name, last_name, dob, email, broker_agency_profile)
+      person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+      
+      return false, 'Person does not exist on the Exchange' if person.count == 0
+      return false, 'Person count too high, please contact HBX Admin' if person.count > 1
 
+      broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      broker_agency_staff_role.save
+
+      return true, person.first
+    end
+
+    def deactivate_broker_agency_staff_role(person_id, broker_agency_profile_id)
+      begin
+        person = Person.find(person_id)
+      rescue
+        return false, 'Person not found'
+      end
+
+      broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role| (role.benefit_sponsors_broker_agency_profile_id.to_s == broker_agency_profile_id.to_s) && role.is_open? }
+
+      if broker_agency_staff_role 
+        broker_agency_staff_role.broker_agency_terminate!
+        return true, 'Broker Agency Staff Role is inactive'
+      else
+        return false, 'No matching Broker Agency Staff role'
+      end
+    end
   end
 
   # HACK
