@@ -9,19 +9,24 @@ module DeviseHelper
                       count: resource.errors.count,
                       resource: resource.class.model_name.human.downcase)
 
-    html = <<-HTML
-    <div class="alert alert-error module registration-rules" role="alert">
-      <div class="text-center">
-        <strong>
-          Password Requirements
-        </strong>
-      </div>
+    top_div = '<div class="alert alert-error module registration-rules" role="alert">'.html_safe
+    
+    if resource.errors.messages.keys.include?(:password)
+      password_div = '
+        <div class="text-center">
+          <strong>
+            Password Requirements
+          </strong>
+        </div>'.html_safe
+    else
+      password_div = ''
+    end
+    error_messages_div = 
+      "
       <br/>
       <strong>#{sentence}</strong>
       <ul>#{messages}</ul>
-    </div>
-    HTML
-
-    html.html_safe
+    </div>".html_safe
+    top_div + password_div + error_messages_div
   end
 end
