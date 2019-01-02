@@ -10,10 +10,10 @@
   <div class="bottom-pd">
     <%= form_for @organization, remote: true, url: update_fein_exchanges_hbx_profiles_path(id: params["id"], employer_actions_id: "employer_actions_#{@organization.employer_profile.id.to_s}"), method: "post", class: "form" do |f|%>
       <div class="row no-buffer form-wrapper-buffer">
-        <div class="text-right">
-          <span class="close close-2" onclick="$('tr.child-row:visible').remove();">
-            <i class="fa fa-times pull-right"></i>
-          </span>
+        <div class="pull-right">
+          <a href="javascript:void(0);" onclick="$('tr.child-row:visible').remove();">
+            <span aria-hidden="true"> <i class="fa fa-times fa-lg"></i> </span>
+          </a>
         </div>
         <h3 class="title text-center">Change FEIN</h3>
         <div class="row no-buffer form-wrapper-buffer">
