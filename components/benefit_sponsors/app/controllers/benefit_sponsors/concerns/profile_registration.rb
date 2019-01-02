@@ -21,7 +21,6 @@ module BenefitSponsors
       end
 
       def agency_edit_registration_url
-        binding.pry
         edit_profiles_registration_path(@agency.organization.profile.id)
       end
 

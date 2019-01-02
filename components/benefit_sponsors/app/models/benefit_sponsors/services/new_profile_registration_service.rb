@@ -178,7 +178,6 @@ module BenefitSponsors
           return_type = form.profile_id.present? ? [false, factory_obj.redirection_url_on_update] : [false, factory_obj.redirection_url(factory_obj.pending, false)]
           return return_type
         end
-        binding.pry
         return_type = form.profile_id.present? ? [true, factory_obj.redirection_url_on_update] : [true, factory_obj.redirection_url(factory_obj.pending, true)]
         return return_type
       end
