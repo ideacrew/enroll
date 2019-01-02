@@ -1,13 +1,18 @@
 module BenefitMarkets
 	module Configurations
-	  class Configuration
+	  class Setting
 	    include Mongoid::Document
 	    include Mongoid::Timestamps
 
 	    embedded_in :benefit_market
 
-      field :key,     type: String
-      field :value,   type: String
+      field :key,         type: String
+      field :value,       type: String
+      field :default,     type: String  # Boolean, String, Integer, Array ??
+      field :site_key,    type: String
+      field :language,    type: Symbol  # :en
+      field :is_required, type: Boolean
+      field :description, type: String
 
       scope :get_all,  -> (starting_with) {
         where(key: /^#{::Regexp.escape(starting_with)}/i)
@@ -19,6 +24,7 @@ module BenefitMarkets
 
       index({ key: 1 }, { unique: true })
 
+      validates_presence_of   :value
       validates_uniqueness_of :key
 
       def write_cache
@@ -42,7 +48,7 @@ module BenefitMarkets
           scope.join("-")
         end
 
-        def [](market_kind, key)
+        def [](model_instance, key)
           benefit_market = benefit_market_for(market_kind)
           val = Rails.cache.fetch(cache_key(key, benefit_market)) do
             setting = find_setting(benefit_market, key)
