@@ -11,7 +11,8 @@ module ApplicationHelper
   end
 
   def product_rates_available?(benefit_sponsorship, date=nil)
-    benefit_sponsorship.applicant? && (::BenefitMarkets::Products::Product.has_rates?(date) == false) ? "blocking" : ""
+    date = date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
+    benefit_sponsorship.applicant? && BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
   end
 
   def deductible_display(hbx_enrollment, plan)

@@ -8,7 +8,6 @@ module BenefitMarkets
       attribute :date
 
       def factory(param)
-        return @factory if defined? @factory
         @factory = ::BenefitMarkets::Products::ProductFactory.new(param)
       end
 
@@ -18,7 +17,7 @@ module BenefitMarkets
 
       def fetch_results
         new_product_factory = factory(date)
-        self.is_late_rate = new_product_factory.has_rates?
+        self.is_late_rate = !new_product_factory.has_rates?
         self
       end
     end

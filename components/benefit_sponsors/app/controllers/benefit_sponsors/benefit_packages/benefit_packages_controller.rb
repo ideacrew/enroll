@@ -89,7 +89,7 @@ module BenefitSponsors
       def check_for_late_rates
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
         date = @benefit_package_form.service.benefit_application.start_on.to_date
-        if ::BenefitMarkets::Products::Product.has_rates?(date) == false
+        if BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
           redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
         end
       end
