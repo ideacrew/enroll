@@ -4,7 +4,6 @@
     <div class="tab-content" id="myTabContent">
       <div id="broker_agency_form" class="container">
         <div class="row">
-          <%binding.pry%>
           <%= f.fields_for :staff_roles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>
             <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/person_info_fields", f: f %>
           <% end %>
