@@ -11,12 +11,20 @@ module BenefitSponsors
 
       def find_profile(form)
         organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
-        organization.employer_profile if organization.present?
+        if form[:is_broker_profile?]
+          organization.broker_agency_profile if organization.present?
+        else
+          organization.employer_profile if organization.present?
+        end
       end
 
       def add_profile_representative!(form)
         profile = find_profile(form)
-        Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+        if form[:is_broker_profile?]
+          Person.add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+        else
+          Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+        end
       end
 
       def deactivate_profile_representative!(form)
@@ -25,7 +33,7 @@ module BenefitSponsors
         if person_ids.count == 1 && person_ids.first.to_s == form[:person_id]
           return false, 'Please add another staff role before deleting this role'
         else
-          Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
+          form[:is_broker_profile?] ? Person.deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
         end
       end
 
