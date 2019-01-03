@@ -1,22 +1,24 @@
-<% @broker_agency_profiles.each do |agency| %>
+<% if @broker_agency_profiles.present?  %>
   <br />
-  <div class="form-border">
-    <div class="row">
-      <div class="col-md-8 col-sm-8 col-xs-12">
-        <dl class="dl-horizontal">
-          <dt>Legal Name: </dt>
-          <dd><%= agency.legal_name %></dd>
-
-          <dt>NPN: </dt>
-          <dd><%= agency.primary_broker_role.npn %></dd>
-
-          <dt>Primary Broker Name: </dt>
-          <dd><%= agency.primary_broker_role.person.full_name %></dd>
-        </dl>
-      </div>
-      <div class="col-md-4 col-sm-4 col-xs-12 text-right">
-        <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a>
-      </div>
-    </div>
+  <div class='table-responsive col-12'>
+    <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
+      <thead style='height: 40px;'>
+      <th style='width: 18%; height: 40px; padding: 10px'> Legal Name</th>
+      <th style='width: 18%'> NPN</th>
+      <th style='width: 18%'> Primary Broker Name</th>
+      <th style='width: 18%'> Select Broker Agency</th>
+      </thead>
+      <% @broker_agency_profiles.each do |agency| %>
+        <tbody class="select-broker">
+        <tr style='border: 1px solid #d5d5d5; height: 50px;'>
+          <td><%= agency.legal_name %></td>
+          <td><%= agency.primary_broker_role.npn %></td>
+          <td><%= agency.primary_broker_role.person.full_name %></td>
+          <td colspan="2"> <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>">select this broker agency</a>
+          </td>
+        </tr>
+        </tbody>
+      <% end %>
+    </table>
   </div>
 <% end %>
