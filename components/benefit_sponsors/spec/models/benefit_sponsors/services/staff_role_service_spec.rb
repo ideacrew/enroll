@@ -8,6 +8,10 @@ module BenefitSponsors
     let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
+    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+    let(:broker_agency_profile) { broker_organization.broker_agency_profile }
+
 
     # let!(:employer_profile) {benefit_sponsor.employer_profile}
     let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
@@ -16,12 +20,25 @@ module BenefitSponsors
 
     describe ".find_profile" do
 
-      let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
-          profile_id: employer_profile.id)
-      }
+      context "Employer profile" do
+        let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+            profile_id: employer_profile.id)
+        }
 
-      it 'should return employer profile' do
-        expect(subject.find_profile(staff_role_form)).to eq employer_profile
+        it 'should return employer profile' do
+          expect(subject.find_profile(staff_role_form)).to eq employer_profile
+        end
+      end
+
+      context "Broker Agency profile" do
+        let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+            profile_id: broker_agency_profile.id,
+            profile_type: "broker_agency_staff")
+        }
+
+        it 'should return employer profile' do
+          expect(subject.find_profile(staff_role_form)).to eq broker_agency_profile
+        end
       end
     end
 

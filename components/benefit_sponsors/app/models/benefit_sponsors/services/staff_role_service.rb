@@ -7,7 +7,6 @@ module BenefitSponsors
       def initialize(attrs={})
         @attrs = attrs
         @profile_id = attrs[:profile_id]
-        @profile_type = attrs[:profile_type]
       end
 
       def find_profile(form)
@@ -62,8 +61,7 @@ module BenefitSponsors
         matched_people = get_matched_people(form)
 
         if matched_people.count > 1
-          errors.add(:staff_role, "too many people match the criteria provided for your identity.  Please contact HBX.")
-          return false
+          return false, "too many people match the criteria provided for your identity.  Please contact HBX."
         end
         if matched_people.count == 1
           mp = matched_people.first
@@ -72,24 +70,15 @@ module BenefitSponsors
           self.person = build_person(form)
         end
 
-        #add_person_contact_info
+        add_person_contact_info(form)
         person.save!
-
       end
 
       def get_matched_people(form)
-        if self.profile_type == "broker_agency_staff"
-          Person.where(
-              first_name: regex_for(form[:first_name]),
-              last_name: regex_for(form[:last_name]),
-              dob: self[:dob]
-          )
-        else
-          Person.where(
-              first_name: regex_for(form[:first_name]),
-              last_name: regex_for(form[:last_name])
-          )
-        end
+        Person.where(
+            first_name: regex_for(form[:first_name]),
+            last_name: regex_for(form[:last_name]),
+            dob: form[:dob])
       end
 
       def persist_broker_agency_staff_role!(profile)
@@ -107,12 +96,8 @@ module BenefitSponsors
       end
 
 
-      def add_person_contact_info
-        if is_broker_profile?
-          person.add_work_email(email)
-        elsif is_employer_profile?
-          person.contact_info(email, area_code, number, extension) if email
-        end
+      def add_person_contact_info(form)
+        person.add_work_email(form.email)
       end
 
       def build_person(form)
