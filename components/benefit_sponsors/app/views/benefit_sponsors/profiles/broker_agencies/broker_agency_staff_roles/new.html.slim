@@ -1,5 +1,5 @@
 .broker-registration-container.mt-4.pt-4.pl-3.pr-3.pb-3
-  h1.heading-text Broker  Agency Staff
+  h1.heading-text = l10n("broker_agency_staff")
   = form_for @staff, as: :staff, url: {action: "create"},  html: {class: "needs-ajax-validation s508", novalidate:true} do |f|
     = render partial: './ui-components/v1/forms/broker_registration/broker_agency_staff_information', locals: {f: f}
     .row
@@ -7,9 +7,10 @@
         .row.search-dropdown-wrapper
           .col-md-12.col-sm-12.col-xs-12
             h4
-              | Select Your Broker Agency
+              = l10n("select_your_broker_agency")
             .col-md-4.col-sm-6.col-xs-12.input-group.input-no-pd
               = f.hidden_field :profile_id
+              = hidden_field_tag :profile_type, "broker_agency_staff"
               = text_field_tag :agency_search, nil, placeholder: 'Agency/Broker Name,NPN', class: 'form-control'
               .input-group-btn
                 = hidden_field_tag :broker_registration_page, true

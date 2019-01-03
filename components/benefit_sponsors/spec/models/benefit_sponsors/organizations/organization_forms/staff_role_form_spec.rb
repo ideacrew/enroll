@@ -41,6 +41,10 @@ module BenefitSponsors
         it "should return false" do
           expect(subject.new(params).is_employer_profile?).to eq false
         end
+
+        it "should return false" do
+          expect(subject.new(params).is_broker_agency_staff_profile?).to eq false
+        end
       end
 
       context "#is_employer_profile?? " do
@@ -60,6 +64,34 @@ module BenefitSponsors
 
         it "should return false" do
           expect(subject.new(params).is_broker_profile?).to eq false
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_broker_agency_staff_profile?).to eq false
+        end
+      end
+
+      context "#is_broker_agency_staff_profile?" do
+
+        let!(:params) {
+          {
+              profile_type: 'broker_agency_staff',
+              first_name: person.first_name,
+              last_name: person.last_name,
+              dob: person.dob.to_s
+          }
+        }
+
+        it "should return true" do
+          expect(subject.new(params).is_broker_agency_staff_profile?).to eq true
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_broker_profile?).to eq false
+        end
+
+        it "should return false" do
+          expect(subject.new(params).is_employer_profile?).to eq false
         end
       end
     end
