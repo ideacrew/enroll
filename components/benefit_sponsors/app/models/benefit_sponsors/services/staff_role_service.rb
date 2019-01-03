@@ -39,7 +39,13 @@ module BenefitSponsors
 
       def approve_profile_representative!(form)
         person = Person.find(form[:person_id])
-        role = person.employer_staff_roles.detect{|role| role.is_applicant? && role.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
+
+        if (form[:is_broker_profile?])
+          role = person.broker_agency_staff_roles.detect{|role| role.agency_pending? && role.benefit_sponsors_broker_agency_profile_id.to_s == form[:profile_id]}
+        else
+          role = person.employer_staff_roles.detect{|role| role.is_applicant? && role.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
+        end
+
         if role && role.approve && role.save!
           return true, 'Role is approved'
         else

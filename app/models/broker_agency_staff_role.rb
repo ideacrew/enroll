@@ -52,6 +52,10 @@ class BrokerAgencyStaffRole
     # Invitation.invite_broker_agency_staff!(self)
   end
 
+  def approve
+    self.broker_agency_accept!
+  end
+  
   def current_state
     aasm_state.humanize.titleize
   end
