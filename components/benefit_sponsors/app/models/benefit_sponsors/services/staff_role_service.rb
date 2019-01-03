@@ -12,7 +12,7 @@ module BenefitSponsors
 
       def find_profile(form)
         organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
-        if form[:is_broker_profile?]
+        if form[:is_broker_agency_staff_profile?]
           organization.broker_agency_profile if organization.present?
         else
           organization.employer_profile if organization.present?
@@ -21,7 +21,7 @@ module BenefitSponsors
 
       def add_profile_representative!(form)
         profile = find_profile(form)
-        if form[:is_broker_profile?]
+        if form[:is_broker_agency_staff_profile?]
           Person.add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
         elsif form.profile_type == "broker_agency_staff"
           match_or_create_person(form)
@@ -33,18 +33,18 @@ module BenefitSponsors
 
       def deactivate_profile_representative!(form)
         profile = find_profile(form)
-        person_ids = form[:is_broker_profile?] ? profile.staff_for_broker.map(&:id) : Person.staff_for_employer(profile).map(&:id)
+        person_ids = form[:is_broker_agency_staff_profile?] ? profile.staff_for_broker.map(&:id) : Person.staff_for_employer(profile).map(&:id)
         if person_ids.count == 1 && person_ids.first.to_s == form[:person_id]
           return false, 'Please add another staff role before deleting this role'
         else
-          form[:is_broker_profile?] ? Person.deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
+          form[:is_broker_agency_staff_profile?] ? Person.deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
         end
       end
 
       def approve_profile_representative!(form)
         person = Person.find(form[:person_id])
 
-        if (form[:is_broker_profile?])
+        if (form[:is_broker_agency_staff_profile?])
           role = person.broker_agency_staff_roles.detect{|role| role.agency_pending? && role.benefit_sponsors_broker_agency_profile_id.to_s == form[:profile_id]}
         else
           role = person.employer_staff_roles.detect{|role| role.is_applicant? && role.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
