@@ -7,26 +7,17 @@ Feature: Update FEIN
     And there is an employer ABC Widgets
     And there is an employer Xfinity Enterprise
 
-    Scenario: HBX Staff with Super Admin enters FEIN without 9 digits
+    Scenario Outline: HBX Staff with Super Admin enters FEIN without 9 digits
       Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
       When the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer
-      And an FEIN with less than nine digits is entered
+      And the user enters <enters>
       And the user clicks submit button
-      Then an warning message will be presented as FEIN must be at least nine digits
+      Then an <messagetype> will be presented <message>
 
-    Scenario: HBX Staff with Super Admin enters FEIN with 9 digits matching an existing employer
-      Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
-      And the user is on the Employer Index of the Admin Dashboard
-      When the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer
-      And an FEIN with nine digits matches an existing Employer Profile FEIN
-      And the user clicks submit button
-      Then an warning message will be presented as FEIN matches HBX ID Legal Name
+      Examples:
+        | enters                                                | messagetype                   | message                                  |
+        | FEIN with less than nine digits                       | warning message               | as FEIN must be at least nine digits     |
+        | FEIN matches an existing Employer Profile FEIN        | warning message               | as FEIN matches HBX ID Legal Name        |
+        | unique FEIN with nine digits                          | success message               | at the top of the index                  |
 
-    Scenario: HBX Staff with Super Admin enters a unique FEIN with 9 digits
-      Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
-      And the user is on the Employer Index of the Admin Dashboard
-      When the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer
-      And the user enters unique FEIN with nine digits
-      And the user clicks submit button
-      Then a success message will display at the top of the index
