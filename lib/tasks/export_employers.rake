@@ -51,7 +51,7 @@ namespace :employers do
       broker_account ||= benefit_sponsorship.broker_agency_accounts.first
       broker_role ||= broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
 
-      staff_role = profile.staff_roles.first
+      staff_role = profile.staff_roles.detect {|person| person.user.present? }
 
       csv << [
         profile.legal_name,

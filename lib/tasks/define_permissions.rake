@@ -45,6 +45,11 @@ namespace :permissions do
  DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_extend_open_enrollment
+namespace :permissions do
+  desc 'hbx admin can extend open enrollment'
+  DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
+end
 
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do

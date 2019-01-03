@@ -101,6 +101,10 @@ class DefinePermissions < MigrationTask
     Permission.super_admin.update_attributes(can_change_fein: true)
   end
 
+  def hbx_admin_can_extend_open_enrollment
+    Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
+  end
+
   def grant_super_admin_access
     raise "User Email Argument expected!!"if ENV['user_email'].blank?
 

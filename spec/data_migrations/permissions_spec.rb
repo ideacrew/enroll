@@ -278,6 +278,35 @@ describe DefinePermissions, dbclean: :after_each do
         expect(Permission.developer.can_add_sep).to be false
       end
     end
+
+    describe 'update permissions for hbx tier3 can extend open enrollment' do
+      let(:given_task_name) {':hbx_admin_can_extend_open_enrollment'}
+      before do
+        User.all.delete
+        Person.all.delete
+      end
+      context "of an hbx tier3" do
+        let(:hbx_tier3) do
+          FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+            FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+          end
+        end
+
+        it 'returns false before the rake task is ran' do
+          expect(hbx_tier3.hbx_staff_role.permission.can_extend_open_enrollment).to be false
+        end
+
+        context 'after the rake task is run' do
+          before do
+          subject.hbx_admin_can_extend_open_enrollment
+          end
+
+          it 'returns true' do
+          expect(hbx_tier3.hbx_staff_role.permission.can_extend_open_enrollment).to be true
+          end
+        end
+      end
+    end
   end
 
   describe 'build test roles', dbclean: :after_each do

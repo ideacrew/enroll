@@ -114,6 +114,10 @@ class BenefitGroupAssignment
     @hbx_enrollment = new_hbx_enrollment
   end
 
+  def benefit_end_date
+     end_on || benefit_group.end_on
+  end
+
   def covered_families
     Family.where({
       "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
