@@ -21,7 +21,7 @@
                 <%= staff.broker_agency_staff_roles.where(:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile.id).first.agency_pending? ? "Pending" : "Active"%>
                 <%= staff.user_id ? ' Linked  ' : ' Unlinked  ' %>
                  <% if staff.broker_agency_staff_roles.where(:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile.id).first.agency_pending? %>         
-                  <%=  link_to(approve_profiles_broker_agencies_broker_agency_staff_role_path()) do %>
+                  <%=  link_to(approve_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id, person_id: staff.id)) do %>
                       approve
                   <% end %>
                 <% end %>
