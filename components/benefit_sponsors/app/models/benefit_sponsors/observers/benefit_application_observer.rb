@@ -143,7 +143,7 @@ module BenefitSponsors
             if new_model_event.event_key == :initial_employer_no_binder_payment_received
               BenefitSponsors::Queries::NoticeQueries.initial_employers_in_ineligible_state.each do |benefit_sponsorship|
                 # if benefit_sponsorship.initial_enrollment_ineligible?
-                  benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_closed).first
+                  benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_ineligible).first
                   if benefit_application.present? && !benefit_application.is_renewing?
                     deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "initial_employer_no_binder_payment_received")
                     #Notice to employee that there employer misses binder payment
