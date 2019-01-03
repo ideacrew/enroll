@@ -234,7 +234,6 @@ GEM
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    byebug (10.0.2)
     capistrano (3.3.5)
       capistrano-stats (~> 1.1.0)
       i18n
@@ -302,7 +301,6 @@ GEM
     cliver (0.3.2)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
-    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -451,7 +449,6 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
-    method_source (0.9.0)
     mime-types (2.99.3)
     mini_portile2 (2.0.0)
     minitest (5.11.3)
@@ -535,17 +532,6 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     powerpack (0.1.1)
-    pry (0.11.3)
-      coderay (~> 1.1.0)
-      method_source (~> 0.9.0)
-    pry-byebug (3.6.0)
-      byebug (~> 10.0)
-      pry (~> 0.10)
-    pry-rails (0.3.6)
-      pry (>= 0.10.4)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
     puma (3.11.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
@@ -710,7 +696,6 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (~> 3.0)
-    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -863,10 +848,6 @@ DEPENDENCIES
   parallel_tests (= 2.26.2)
   poltergeist
   prawn!
-  pry
-  pry-byebug
-  pry-rails
-  pry-remote
   puma
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)
