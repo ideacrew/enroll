@@ -618,7 +618,12 @@ class Person
      self.active_individual_market_role == "resident" ? true : false
   end
 
+  def has_pending_broker_staff_role?(broker_agency_profile_id)
+    self.broker_agency_staff_roles.where(:benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id, :aasm_state => :broker_agency_pending).size > 0
+  end
+
   class << self
+
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end
@@ -822,7 +827,7 @@ class Person
         return false, 'No matching employer staff role'
       end
     end
-    
+
     def add_broker_agency_staff_role(first_name, last_name, dob, email, broker_agency_profile)
       person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
       
