@@ -2,11 +2,12 @@ module BenefitSponsors
   module Services
     class StaffRoleService
 
-      attr_accessor :profile_id
+      attr_accessor :profile_id, :profile_type, :person
 
       def initialize(attrs={})
         @attrs = attrs
         @profile_id = attrs[:profile_id]
+        @profile_type = attrs[:profile_type]
       end
 
       def find_profile(form)
@@ -22,6 +23,9 @@ module BenefitSponsors
         profile = find_profile(form)
         if form[:is_broker_profile?]
           Person.add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
+        elsif form.profile_type == "broker_agency_staff"
+          match_or_create_person(form)
+          persist_broker_agency_staff_role!(profile)
         else
           Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
         end
@@ -52,6 +56,76 @@ module BenefitSponsors
           return false, 'Please contact HBX Admin to report this error'
         end
 
+      end
+
+      def match_or_create_person(form)
+        matched_people = get_matched_people(form)
+
+        if matched_people.count > 1
+          errors.add(:staff_role, "too many people match the criteria provided for your identity.  Please contact HBX.")
+          return false
+        end
+        if matched_people.count == 1
+          mp = matched_people.first
+          self.person = mp
+        else
+          self.person = build_person(form)
+        end
+
+        #add_person_contact_info
+        person.save!
+
+      end
+
+      def get_matched_people(form)
+        if self.profile_type == "broker_agency_staff"
+          Person.where(
+              first_name: regex_for(form[:first_name]),
+              last_name: regex_for(form[:last_name]),
+              dob: self[:dob]
+          )
+        else
+          Person.where(
+              first_name: regex_for(form[:first_name]),
+              last_name: regex_for(form[:last_name])
+          )
+        end
+      end
+
+      def persist_broker_agency_staff_role!(profile)
+        exisiting_brokers_with_same_profile =  person.broker_agency_staff_roles.select{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id }
+        if exisiting_brokers_with_same_profile.present?
+
+          return false,  "You are already associated with the Broker Agency"
+        else
+          person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
+                                                                              broker_agency_profile: profile
+                                                                          })
+          person.save!
+          return true, person
+        end
+      end
+
+
+      def add_person_contact_info
+        if is_broker_profile?
+          person.add_work_email(email)
+        elsif is_employer_profile?
+          person.contact_info(email, area_code, number, extension) if email
+        end
+      end
+
+      def build_person(form)
+        Person.new({
+                       :first_name => form[:first_name].strip,
+                       :last_name => form[:last_name].strip,
+                       :dob => form[:dob]
+                   })
+      end
+
+      def regex_for(str)
+        clean_string = ::Regexp.escape(str.strip)
+        /^#{clean_string}$/i
       end
 
     end
