@@ -23,7 +23,7 @@
             </div>
           </div>
           <div class="col-md-7 no-pd col-sm-7 col-xs-7">
-          <%= f.text_field :new_fein, placeholder: "<%= l10n('.fein') %>", class: "required fien_field input_txt pull-left", :value => params[:new_fein].present? ? params[:new_fein] : @organization.fein, required: params[:new_fein].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'}
+          <%= f.text_field :new_fein, placeholder:  "#{l10n('.fein').to_s.upcase}", class: "required fien_field input_txt pull-left", :value => params[:new_fein].present? ? params[:new_fein] : @organization.fein, required: params[:new_fein].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'}
           %>
           </div>
         </div>
@@ -31,7 +31,7 @@
       <div class="row no-buffer child-row">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12 top-buffer text-center">
           <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n(".cancel") %> </span>
-          <%= f.submit l10n('.submit'), data: { confirm: '<%= l10n(".confirm") %>' }, :class => "btn btn-primary", :size => '100px' %>
+          <%= f.submit l10n('.submit'), data: { confirm: l10n(".confirm") }, :class => "btn btn-primary", :size => '100px' %>
         </div>
       </div>
     <% end %>
