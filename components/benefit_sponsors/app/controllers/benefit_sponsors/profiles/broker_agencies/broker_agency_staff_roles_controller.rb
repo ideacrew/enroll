@@ -5,7 +5,7 @@ module BenefitSponsors
 
           def new
             @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
-            @staff.profile_type = "broker_agency"
+            @staff.profile_type = "broker_agency_staff"
             respond_to do |format|
               format.html
               format.js
@@ -62,7 +62,7 @@ module BenefitSponsors
 
           def broker_staff_params
             params[:staff].present? ? params[:staff] :  params[:staff] = {}
-            params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: "broker_agency"})
+            params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: "broker_agency_staff"})
             params[:staff].permit!
           end
 
