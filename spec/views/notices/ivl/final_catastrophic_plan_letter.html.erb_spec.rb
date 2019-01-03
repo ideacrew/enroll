@@ -21,6 +21,7 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
   }}
   let!(:notice) { catastrophic_plan_notice.notice }
   let!(:catastrophic_plan_notice) { IvlNotices::FinalCatastrophicPlanNotice.new(person.consumer_role, valid_params) }
+  let(:previous_year) { (TimeKeeper.date_of_record.year - 1) }
 
   before :each do
     catastrophic_plan_notice.append_hbe
