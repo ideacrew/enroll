@@ -15,7 +15,7 @@ module BenefitSponsors
         @new_date = new_date
         shop_daily_events
         auto_submit_renewal_applications
-        # process_applications_missing_binder_payment #disabling auto-processing of marking initial applications ineligible if binder is missed
+        process_applications_missing_binder_payment
         auto_cancel_ineligible_applications
         auto_transmit_monthly_benefit_sponsors
         close_enrollment_quiet_period
