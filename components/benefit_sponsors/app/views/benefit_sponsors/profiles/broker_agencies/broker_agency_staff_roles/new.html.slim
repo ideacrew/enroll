@@ -46,11 +46,11 @@ javascript:
   function selectBrokereAgency(element) {
     var result = document.querySelectorAll('.result');
     result.forEach(function (result) {
-        var element = result.querySelectorAll('.form-border')
+        var element = result.querySelectorAll('.select-broker')
         element.forEach(function (ele) {
             ele.classList.remove("agency-selected");
         })
     });
     document.getElementById('staff_profile_id').value = element.dataset.broker_agency_profile_id;
-    element.closest(".form-border").classList.add('agency-selected')
+    element.closest(".select-broker").classList.add('agency-selected')
   }
