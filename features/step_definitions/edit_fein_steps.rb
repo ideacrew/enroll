@@ -30,6 +30,6 @@ And(/^the user enters unique FEIN with nine digits$/) do
   find('#organizations_general_organization_new_fein').set("123456789")
 end
 
-Then(/^an success message will be presented at the top of the index$/) do
+Then(/^an success message will be presented as FEIN Update Successful$/) do
   expect(page).to have_content('FEIN Update Successful')
 end

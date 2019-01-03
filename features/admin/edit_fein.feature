@@ -13,11 +13,11 @@ Feature: Update FEIN
       When the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer
       And the user enters <enters>
       And the user clicks submit button
-      Then an <messagetype> will be presented <message>
+      Then an <messagetype> will be presented as <message>
 
       Examples:
         | enters                                                | messagetype                   | message                                  |
-        | FEIN with less than nine digits                       | warning message               | as FEIN must be at least nine digits     |
-        | FEIN matches an existing Employer Profile FEIN        | warning message               | as FEIN matches HBX ID Legal Name        |
-        | unique FEIN with nine digits                          | success message               | at the top of the index                  |
+        | FEIN with less than nine digits                       | warning message               | FEIN must be at least nine digits     |
+        | FEIN matches an existing Employer Profile FEIN        | warning message               | FEIN matches HBX ID Legal Name        |
+        | unique FEIN with nine digits                          | success message               | FEIN Update Successful                |
 
