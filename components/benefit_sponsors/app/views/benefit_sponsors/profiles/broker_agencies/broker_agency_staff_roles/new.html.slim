@@ -26,7 +26,7 @@
         .row.no-buffer
           .col-md-4.col-sm-4.col-xs-12.form-group-lg.no-pd
             br
-            button.btn.btn-primary[type="submit"]
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'broker-staff-btn']
               = l10n("submit_application")
 
 javascript:
@@ -35,6 +35,7 @@ javascript:
   function brokerSearch() {
     var broker_agency_search = document.getElementById('agency_search').value
     var broker_registration_page = document.getElementById('broker_registration_page').value
+    document.getElementById('broker-staff-btn').disabled = true;
     if (broker_agency_search != undefined) {
         $.ajax({
           url: '/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/search_broker_agency.js',
@@ -55,4 +56,5 @@ javascript:
     });
     document.getElementById('staff_profile_id').value = element.dataset.broker_agency_profile_id;
     element.closest(".select-broker").classList.add('agency-selected')
+      document.getElementById('broker-staff-btn').disabled = false;
   }
