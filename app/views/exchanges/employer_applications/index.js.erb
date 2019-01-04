@@ -39,30 +39,30 @@ $('#plan-year-btn-group ul li').each(function() {
 });
 
 function populateDropDown(status) {
-  if (status == "draft") {
+
+  var cancel_states = ["draft", "imported", "enrollment_open", "enrollment_extended", "enrollment_closed", "enrollment_eligible", "binder_paid", "enrollment_ineligible", "active"]
+  var term_states = ["active", "suspended", "expired", "termination_pending"]
+  var reinstate_states = []
+
+  if (cancel_states.indexOf(status) > -1) {
     $('li.cancel-py').removeClass('blocking');
-    $('li.terminate-py').addClass('blocking');
-    $('li.reinstate-py').addClass('blocking');
   }
-  else if (status == "terminated"){
-    $('li.cancel-py').addClass('blocking');
-    $('li.terminate-py').addClass('blocking');
-    $('li.reinstate-py').removeClass('blocking');
+  else {
+   $('li.cancel-py').addClass('blocking');
   }
-  else if (status == "canceled"){
-    $('li.cancel-py').addClass('blocking');
-    $('li.terminate-py').addClass('blocking');
-    $('li.reinstate-py').addClass('blocking');
+
+  if (term_states.indexOf(status) > -1) {
+    $('li.terminate-py').removeClass('blocking');
   }
-  else if (status == "reinstated"){
-    $('li.cancel-py').addClass('blocking');
-    $('li.terminate-py').addClass('blocking');
+  else {
+   $('li.terminate-py').addClass('blocking');
+  }
+
+  if (reinstate_states.indexOf(status) > -1) {
     $('li.reinstate-py').removeClass('blocking');
   }
   else {
-    $('li.cancel-py').removeClass('blocking');
-    $('li.terminate-py').removeClass('blocking');
-    $('li.reinstate-py').removeClass('blocking');
+   $('li.reinstate-py').addClass('blocking');
   }
 }
 
