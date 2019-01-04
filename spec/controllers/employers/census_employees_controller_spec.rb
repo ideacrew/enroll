@@ -1,16 +1,23 @@
-  require 'rails_helper'
+require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe Employers::CensusEmployeesController do
+RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
   before(:all) do
     @user = FactoryGirl.create(:user)
     p=FactoryGirl.create(:person, user: @user)
     @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
   end
+
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
   # let(:employer_profile_id) { "abecreded" }
   # let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog, :dc) }
-  let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+
+  # let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_dc_employer_profile)}
+  let(:organization)  {abc_organization}
   let(:employer_profile) { organization.employer_profile }
   let(:employer_profile_id) { employer_profile.id }
 
@@ -98,9 +105,11 @@ RSpec.describe Employers::CensusEmployeesController do
 
     it "should return success flash notice as roster added when no ER benefits present" do
       allow(census_employee).to receive(:save).and_return(true)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(false)
       post :create, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(flash[:notice]).to eq "Your employee was successfully added to your roster."
     end
+
   end
 
   describe "GET edit" do

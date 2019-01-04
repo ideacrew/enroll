@@ -28,7 +28,7 @@ module BenefitSponsors
           :"benefit_applications" => { 
             :$elemMatch => {
               :"aasm_state" => :enrollment_open,
-              :"enrollment_period.min" => current_date + 2.days
+              :"open_enrollment_period.max" => current_date + 2.days
             }
           }
         })
@@ -38,7 +38,17 @@ module BenefitSponsors
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
           :"benefit_applications" => { 
             :$elemMatch => {
-              :"aasm_state" => :enrollment_eligible,
+              :"aasm_state" => :enrollment_closed,
+            }
+          }
+        })
+      end
+
+      def self.initial_employers_in_ineligible_state
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
+          :"benefit_applications" => { 
+            :$elemMatch => {
+              :"aasm_state" => :enrollment_ineligible,
             }
           }
         })

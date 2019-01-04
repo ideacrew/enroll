@@ -58,5 +58,10 @@ module BenefitSponsors
     # Curated collections of benefits intended for specific sponsor and member groups
     has_and_belongs_to_many :benefit_markets,
       class_name: "::BenefitMarkets::BenefitMarket", :inverse_of => nil
+    
+    has_one  :owner_organization, inverse_of: :site_owner,
+              class_name: "BenefitSponsors::Organizations::ExemptOrganization"
+
+
   end
 end

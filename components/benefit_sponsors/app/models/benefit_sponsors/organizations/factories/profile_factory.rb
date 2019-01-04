@@ -21,7 +21,7 @@ module BenefitSponsors
 
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
-          organization.assign_attributes(attributes[:organization])
+          organization.assign_attributes(sanitize_organization_params_for_update(attributes[:organization]))
           organization.update_benefit_sponsorship(organization.employer_profile) if (is_employer_profile? && address_changed?(organization.employer_profile))
           factory_obj.update_representative(factory_obj, attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
@@ -268,6 +268,11 @@ module BenefitSponsors
 
         def staff_role_attributes(attrs={})
           attrs.present? ? attrs[0] : attrs
+        end
+
+        def self.sanitize_organization_params_for_update(attrs={})
+          attrs[:profiles_attributes][0].except!(:referred_by, :referred_reason)
+          attrs
         end
 
         def match_or_create_person

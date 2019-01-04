@@ -156,6 +156,9 @@ module Config::SiteHelper
     Settings.site.employer_application_deadline_link
   end
 
+  def site_initial_earliest_start_prior_to_effective_on
+    Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs
+  end
 
   def site_guidance_for_business_owners_url
     Settings.site.guidance_for_business_owners_url
@@ -173,7 +176,19 @@ module Config::SiteHelper
     Settings.site.invoice_bill_url
   end
 
+  def site_user_sign_in_url
+    Settings.site.user_sign_in_url
+  end
+
   def mail_address
     Settings.site.mail_address
+  end
+
+  def certification_url
+    Settings.site.certification_url
+  end
+
+  def site_title
+    Settings.site.site_title
   end
 end

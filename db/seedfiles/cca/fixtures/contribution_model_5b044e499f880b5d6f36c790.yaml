@@ -1,5 +1,5 @@
 --- !ruby/object:BenefitMarkets::ContributionModels::ContributionModel
-__selected_fields:
+__selected_fields: 
 attributes: !ruby/hash:BSON::Document
   _id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
@@ -11,7 +11,7 @@ attributes: !ruby/hash:BSON::Document
   contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::CcaShopReferencePlanContributionCalculator"
   title: MA List Bill Shop Contribution Model
   many_simultaneous_contribution_units: true
-  updated_at: 2018-05-22 17:07:21.437000000 Z
+  updated_at: 2018-08-01 04:11:45.860000000 Z
   created_at: 2018-05-22 17:07:21.437000000 Z
   contribution_units:
   - !ruby/hash:BSON::Document

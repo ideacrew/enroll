@@ -345,6 +345,7 @@ And(/^Employer can see the sole source plan information$/) do
 end
 
 And(/^.+ should see a button to create new plan year$/) do
+  sleep 1
   screenshot("employer_plan_year")
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
   find('a.interaction-click-control-add-plan-year').click
@@ -495,11 +496,6 @@ module EmployeeWorld
   def owner(*traits)
     attributes = traits.extract_options!
     @owner ||= FactoryGirl.create :user, *traits, attributes
-  end
-
-  def employer(*traits)
-    attributes = traits.extract_options!
-    @employer ||= FactoryGirl.create :employer, *traits, attributes
   end
 
   def employees(*traits)

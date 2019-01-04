@@ -125,6 +125,11 @@ Rails.application.routes.draw do
         get :calendar_index
         get :user_account_index
         get :get_user_info
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
       end
 
       member do
@@ -266,8 +271,14 @@ Rails.application.routes.draw do
   end
 
   namespace :employers do
+
+    # Redirect from Enroll old model to Enroll new model
+    match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    #match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
+    #match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
+    match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+
     post 'search', to: 'employers#search'
-    root 'employer_profiles#new'
 
     resources :premium_statements, :only => [:show]
 
@@ -303,6 +314,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
 
       member do
+        #match '/:id/*path' , to: redirect('/'), via: [:get, :post]
         get "download_invoice"
         get 'new_document'
         post 'download_documents'
@@ -320,6 +332,7 @@ Rails.application.routes.draw do
         get 'generate_sic_tree'
       end
       resources :plan_years do
+        get "late_rates_check"
         get 'reference_plans'
         get 'dental_reference_plans'
         get 'generate_dental_carriers_and_plans'
@@ -364,7 +377,7 @@ Rails.application.routes.draw do
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
 
-  match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
+  match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do

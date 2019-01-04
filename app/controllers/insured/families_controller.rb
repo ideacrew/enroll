@@ -19,7 +19,7 @@ class Insured::FamiliesController < FamiliesController
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
-    @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+    @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @enrollment_filter = @family.enrollments_for_display
 
     valid_display_enrollments = Array.new
@@ -151,9 +151,9 @@ class Insured::FamiliesController < FamiliesController
     end
 
     if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present?)
-      plan_year = @person.active_employee_roles.first.employer_profile.active_plan_year
+      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-      trigger_notice_observer(@person.active_employee_roles.first, plan_year, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+      trigger_notice_observer(@person.active_employee_roles.first, benefit_application, "employee_notice_for_sep_denial", qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 

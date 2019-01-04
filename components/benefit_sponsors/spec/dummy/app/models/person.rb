@@ -95,6 +95,8 @@ class Person
 
   after_create :create_inbox
 
+  scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
+
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
     if !deleted_messages.blank?
@@ -115,6 +117,22 @@ class Person
 
   def active_employee_roles
     employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
+  end
+
+  def is_active?
+    is_active
+  end
+
+  def has_multiple_active_employers?
+    active_employee_roles.count > 1
+  end
+
+  def mailing_address
+    addresses.detect { |adr| adr.kind == "mailing" } || home_address
+  end
+
+  def home_address
+    addresses.detect { |adr| adr.kind == "home" }
   end
 
   def generate_hbx_id
@@ -141,6 +159,10 @@ class Person
     end
     ssn_val = val.to_s.gsub(/\D/, '')
     SymmetricEncryption.encrypt(ssn_val)
+  end
+
+  def has_active_employer_staff_role?
+    employer_staff_roles.present? and employer_staff_roles.active.present?
   end
 
   def self.decrypt_ssn(val)
@@ -170,6 +192,10 @@ class Person
     write_attribute(:gender, new_gender.to_s.downcase)
   end
 
+  def primary_family
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
+  end
+
   def update_full_name
     full_name
   end
@@ -191,6 +217,29 @@ class Person
     email = emails.detect { |adr| adr.kind == "work" } || emails.first
     (email && email.address) || (user && user.email)
   end
+
+  def work_phone
+    phones.detect { |phone| phone.kind == "work" } || main_phone
+  end
+
+  def main_phone
+    phones.detect { |phone| phone.kind == "phone main" }
+  end
+
+  def home_phone
+    phones.detect { |phone| phone.kind == "home" }
+  end
+
+  def mobile_phone
+    phones.detect { |phone| phone.kind == "mobile" }
+  end
+
+
+  def work_phone_or_best
+    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone ? best_phone.full_phone_number : nil
+  end
+
 
   class << self
 

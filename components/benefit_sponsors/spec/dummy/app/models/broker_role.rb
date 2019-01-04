@@ -66,6 +66,18 @@ class BrokerRole
     self.benefit_sponsors_broker_agency_profile_id.present?
   end
 
+  def parent
+    self.person
+  end
+
+  def phone
+    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+  end
+
+  def email
+    parent.emails.detect { |email| email.kind == "work" }
+  end
+  
   class << self
     def find(id)
       return nil if id.blank?

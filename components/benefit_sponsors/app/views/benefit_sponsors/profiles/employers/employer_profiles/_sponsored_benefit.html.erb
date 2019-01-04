@@ -41,12 +41,12 @@
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.health_plan_kind.to_s.upcase %>
+            <%= sponsored_benefit.reference_product.product_type.to_s.upcase %>
           </p>
         </td>
         <td>
           <p>
-            <%= sponsored_benefit.reference_product.metal_level_kind.to_s.humanize %>
+            <%= sponsored_benefit.reference_product.metal_level.to_s.humanize %>
           </p>
         </td>
         <td>
@@ -57,6 +57,8 @@
               One Level
             <% elsif sponsored_benefit.product_package_kind == :single_product %>
               A Single Plan
+             <% elsif sponsored_benefit.product_package_kind == :multi_product %>
+              Custom
             <% end %>
           </p>
         </td>
@@ -73,7 +75,7 @@
     </div>
 
     <!--Health plan contribution: start-->
-    <div class="col-xs-12">
+    <div class="col-xs-12 package-offering">
       <div class="col-xs-12">
         <table>
           <% if sponsored_benefit.pricing_determinations.any? %>
@@ -92,7 +94,7 @@
             <% pdt_employee = BigDecimal.new((pdt_total - pdt_employer).to_s).round(2) %>
             <tr>
               <td>
-                <%= raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.try(:humanize)}") %>
+                <%= raw(pdt.contribution_level.is_offered ? "<i class='far fa-check-square fa-lg offered'></i>"+ " #{pdt.display_name.gsub("Dependents", "Child(ren)").try(:humanize)}" : "<i class='far fa-square fa-lg not-offered'></i>"+ " #{pdt.display_name.gsub("Dependents", "Child(ren)").try(:humanize)}") %>
               </td>
               <td id="pct">
                 <%= number_to_percentage((pdt.sponsor_contribution_factor * 100.0), precision: 0) %>

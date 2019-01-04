@@ -9,13 +9,12 @@ module BenefitSponsors
         :ineligible_application_submitted,
         :employer_open_enrollment_completed,
         :application_denied,
-        :group_advance_termination_confirmation,
+        :renewal_application_created,
+        :renewal_application_autosubmitted,
 
         # :renewal_enrollment_confirmation,
-        # :renewal_application_created,
         # :renewal_application_submitted,
         # :ineligible_renewal_application_submitted,
-        # :renewal_application_autosubmitted,
         # :open_enrollment_began, #not being used
         # :renewal_application_denied,
         # :zero_employees_on_roster,
@@ -33,12 +32,16 @@ module BenefitSponsors
           :initial_employer_final_reminder_to_publish_plan_year
       ]
 
+      OTHER_EVENTS = [
+        :group_advance_termination_confirmation
+      ]
+
       # Events triggered by state changes on individual instances
       def notify_on_save
         return if self.is_conversion?
         if aasm_state_changed?
 
-          if is_transition_matching?(to: :enrollment_closed, from: :enrollment_open, event: :end_open_enrollment)
+          if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
             is_employer_open_enrollment_completed = true
           end
 
@@ -102,6 +105,30 @@ module BenefitSponsors
             end
           end
 
+        end
+      end
+
+      def notify_on_create
+        if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
+          is_renewal_application_created = true
+        end
+
+        REGISTERED_EVENTS.each do |event|
+          begin
+            if event_fired = instance_eval("is_" + event.to_s)
+              event_options = {}
+              notify_observers(ModelEvent.new(event, self, event_options))
+            end
+          rescue Exception => e
+            Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
+          end
+        end
+      end
+
+      def trigger_model_event(event_name, event_options = {})
+        if OTHER_EVENTS.include?(event_name)
+          BenefitSponsors::BenefitApplications::BenefitApplication.add_observer(BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send])
+          notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end
 

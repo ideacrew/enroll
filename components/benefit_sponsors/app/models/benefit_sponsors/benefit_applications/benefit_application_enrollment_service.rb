@@ -6,7 +6,7 @@ module BenefitSponsors
 
 
     def initialize(benefit_application)
-      @benefit_application   = benefit_application
+      @benefit_application = benefit_application
     end
 
     def renew_application
@@ -111,19 +111,19 @@ module BenefitSponsors
       end
     end
 
-    def end_open_enrollment
-      if business_policy_satisfied_for?(:end_open_enrollment)
-        if benefit_application.may_end_open_enrollment?
-          benefit_application.end_open_enrollment!
+    def end_open_enrollment(end_date = nil)
+      if benefit_application.may_end_open_enrollment?
+        benefit_application.update(open_enrollment_period: benefit_application.open_enrollment_period.min..end_date) if end_date.present?
+        benefit_application.end_open_enrollment!
+
+        if business_policy_satisfied_for?(:end_open_enrollment)
           benefit_application.approve_enrollment_eligiblity! if benefit_application.is_renewing? && benefit_application.may_approve_enrollment_eligiblity?
           calculate_pricing_determinations(benefit_application)
           [true, benefit_application, business_policy.success_results]
+        else
+          benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
+          [false, benefit_application, business_policy.fail_results]
         end
-        [false, benefit_application, {:aasm_error => "may_end_open_enrollment? is false"}]
-      else
-        benefit_application.end_open_enrollment! if benefit_application.may_end_open_enrollment?
-        benefit_application.deny_enrollment_eligiblity! if benefit_application.may_deny_enrollment_eligiblity?
-        [false, benefit_application, business_policy.fail_results]
       end
     end
 
@@ -166,12 +166,10 @@ module BenefitSponsors
     def terminate(end_on, termination_date)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_terminate_enrollment?
-          benefit_application.terminate_enrollment!
-          if benefit_application.terminated?
             updated_dates = benefit_application.effective_period.min.to_date..end_on
             benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date)
+            benefit_application.terminate_enrollment!
           end
-        end
       else
         [false, benefit_application, business_policy.fail_results]
       end
@@ -214,8 +212,17 @@ module BenefitSponsors
     end
 
     # Exempt exception handling situation
-    def extend_open_enrollment(benefit_application, new_end_date)
+    def extend_open_enrollment(new_end_date = TimeKeeper.date_of_record)
+      if business_policy_satisfied_for?(:extend_open_enrollment)
+        if benefit_application.may_extend_open_enrollment?
+          benefit_application.update(:open_enrollment_period => benefit_application.open_enrollment_period.min..new_end_date)
+          benefit_application.extend_open_enrollment!
+        end
 
+        [true, benefit_application, business_policy.success_results]
+      else
+        [false, benefit_application, business_policy.fail_results]
+      end
     end
 
     # Exempt exception handling situation
@@ -241,9 +248,9 @@ module BenefitSponsors
 
     def hbx_enrollments_by_month(date)
       s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
-      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }
-      enrollments = collection[0].last.map do |col|
-        col["hbx_enrollments"]
+      collection = s_benefits.map { |s_benefit| [s_benefit, query(s_benefit, date)] }.reject { |pair| pair.last.nil? }
+      enrollments = collection.inject([]) do |enrollments, coll|
+        enrollments += coll.last.map { |x| x["hbx_enrollments"]}
       end
       enrollments
     end
@@ -333,7 +340,7 @@ module BenefitSponsors
     #TODO: FIX this
     def non_owner_employee_present?
       benefit_application.benefit_packages.any?{ |benefit_package|
-        benefit_package.census_employees_assigned_on(benefit_application.start_on).active.non_business_owner.present?
+        benefit_package.census_employees_assigned_on(benefit_application.start_on, !benefit_application.is_renewing?).active.non_business_owner.present?
       }
     end
   end

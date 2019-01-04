@@ -12,7 +12,7 @@ FactoryGirl.define do
 
     trait :with_owner_exempt_organization do
       after :build do |site, evaluator|
-#        site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
+       site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
 
@@ -20,6 +20,16 @@ FactoryGirl.define do
       after :build do |site, evaluator|
         site.benefit_markets << build(:benefit_markets_benefit_market, kind: evaluator.kind)
       end
+    end
+
+    trait :as_hbx_profile do
+      after :build do |site, evaluator|
+        site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
+      end
+    end
+
+    trait :cca do
+      site_key :cca
     end
   end
 end

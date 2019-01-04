@@ -4,6 +4,45 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:person) { double(id: '31111113') }
   let(:family) { double(is_eligible_to_enroll?: true, updateable?: true, list_enrollments?: true) }
 
+  let(:employee_role) do
+    instance_double(EmployeeRole)
+  end
+
+  let(:census_employee) do
+    instance_double(CensusEmployee)
+  end
+
+  let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
+
+  let(:employer_profile) do
+    instance_double(
+      BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
+      legal_name: employer_legal_name
+    )
+  end
+
+  let(:employer_legal_name) { "employer_legal_name" }
+
+  let(:product) do
+    instance_double(
+      BenefitMarkets::Products::HealthProducts::HealthProduct,
+        issuer_profile: carrier_profile,
+        title: "A Plan Name",
+        kind: plan_coverage_kind,
+        active_year: plan_active_year,
+        metal_level_kind: :gold,
+        product_type: "A plan type",
+        id: "Productid",
+        hios_id: "producthiosid",
+        health_plan_kind: :hmo,
+        sbc_document: sbc_document
+    )
+  end
+
+  let(:plan_active_year) { 2018 }
+  let(:plan_coverage_kind) { "health" }
+  let(:sbc_document) { nil }
+
   before(:each) do
     allow(view).to receive(:policy_helper).and_return(family)
     @family = family
@@ -11,103 +50,151 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "should display legal_name" do
-    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
-    let(:plan) { FactoryGirl.build(:plan) }
-    let(:hbx) { HbxEnrollment.new(created_at: TimeKeeper.date_of_record, effective_on: TimeKeeper.date_of_record) }
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "hbxenrollmentid",
+        hbx_id: "hbxenrollmenthbxid",
+        enroll_step: 1,
+        aasm_state: "coverage_selected",
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: 1.month.ago.to_date,
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        kind: "employer_sponsored",
+        is_coverage_waived?: false,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: false,
+        coverage_expired?: false,
+        total_premium: 200.00,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: "",
+        covered_members_first_names: []
+      )
+    end
+
     before :each do
-      allow(hbx).to receive(:employer_profile).and_return(employer_profile)
-      allow(hbx).to receive(:plan).and_return(plan)
-      allow(hbx).to receive(:coverage_year).and_return(2016)
+      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
     end
 
     it "when kind is employer_sponsored" do
-      allow(hbx).to receive(:kind).and_return('employer_sponsored')
-      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
-      expect(rendered).to have_content(employer_profile.legal_name)
-      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
+      allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to have_content(employer_legal_name)
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
+      expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
     end
 
     it "when kind is employer_sponsored_cobra" do
-      allow(hbx).to receive(:kind).and_return('employer_sponsored_cobra')
-      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
+      allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored_cobra')
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
     end
 
+    if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     it "when kind is individual" do
       allow(hbx).to receive(:kind).and_return('individual')
-      render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
+    end
   end
 
-  context "without consumer_role", dbclean: :before_each do
+  context "without consumer_role" do
+
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "hbxenrollmentid",
+        hbx_id: "hbxenrollmenthbxid",
+        enroll_step: 1,
+        aasm_state: enrollment_aasm_state,
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: Date.new(2015,8,10),
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        kind: "employer_sponsored",
+        is_coverage_waived?: false,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: false,
+        coverage_expired?: false,
+        total_premium: 200.00,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: future_enrollment_termination_date, 
+        covered_members_first_names: []
+      )
+    end
+
+    let(:enrollment_aasm_state) { "coverage_selected" }
+    let(:future_enrollment_termination_date) { "" }
+
+    let(:product) do
+      instance_double(
+        BenefitMarkets::Products::HealthProducts::HealthProduct,
+        issuer_profile: carrier_profile,
+        title: "A Plan Name",
+        kind: plan_coverage_kind,
+        active_year: plan_active_year,
+        metal_level_kind: :gold,
+        product_type: "A plan type",
+        id: "productid",
+        hios_id: "producthiosid",
+        health_plan_kind: :hmo,
+        sbc_document: sbc_document
+      )
+    end
+
     let(:aws_env) { ENV['AWS_ENV'] || "qa" }
-    let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
-    let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
-    let(:plan) { double("Plan",
-      :name => "A Plan Name",
-      :carrier_profile_id => "a carrier profile id",
-      :carrier_profile => mock_carrier_profile,
-      :metal_level => "Silver",
-      :coverage_kind => "health",
-      :hios_id => "19393939399",
-      :plan_type => "A plan type",
-      :created_at =>  TimeKeeper.date_of_record,
-      :active_year => TimeKeeper.date_of_record.year,
-
-      :nationwide => true,
-      :deductible => 0,
-      :total_premium => 100,
-      :total_employer_contribution => 20,
-      :total_employee_cost => 30,
-      :id => "1234234234",
-      :sbc_document => Document.new({title: 'sbc_file_name', subject: "SBC",
+    let(:sbc_document) do
+      Document.new({title: 'sbc_file_name', subject: "SBC",
                       :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}#7816ce0f-a138-42d5-89c5-25c5a3408b82"})
-    ) }
+    end
 
-
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    #let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
-                                 subscriber: nil,
-                                 covered_members_first_names: ["name"], can_complete_shopping?: false,
-                                 enroll_step: 2, coverage_terminated?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, census_employee: census_employee,
-                                 employee_role: employee_role, status_step: 2, applied_aptc_amount: 23.00, aasm_state: 'coverage_selected')}
-
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:employer_profile) do
+      instance_double(
+        BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
+        hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")
+    end
 
     before :each do
-      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
-      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
-      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
-      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
-      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
-      allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
-      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(TimeKeeper.date_of_record)
+      allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
+      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
+
     it "should open the sbc pdf" do
-      expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
+      expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end
 
     it "should display the title" do
-      expect(rendered).to match /#{plan.active_year} #{plan.coverage_kind} Coverage/
+      expect(rendered).to match /#{plan_active_year} #{plan_coverage_kind.titleize} Coverage/
       expect(rendered).to match /#{Settings.site.short_name}/
     end
 
     it "should display the link of view detail" do
-      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{plan.hios_id}']", text: "View Details")
+      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{product.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{product.hios_id}']", text: "View Details")
     end
 
     it "should display the plan start" do
@@ -115,49 +202,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
-
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
-    end
-
-    context "when outside Employers open enrollment period but new hire" do
-      before :each do
-        allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      end
-
-      it "should disable the Make Changes button" do
-        expect(rendered).to_not have_selector('.cna')
-      end
-
-    end
-
-    context "when outside Employers open enrollment period and not a new hire" do
-      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-      before :each do
-        allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-        allow(census_employee).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
-        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-        allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
-        allow(hbx_enrollment).to receive(:total_employee_cost).and_return(111)
-        allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      end
-
-      it "should disable the Make Changes button" do
-        expect(rendered).to have_selector('.cna')
-      end
-
-    end
-
-    context "when under a special enrollment but hbx_enrollment is missing a special_enrollment_period id" do
-      before :each do
-        allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return(true)
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-      end
-      it "should not disable the Make Changes button" do
-        expect(rendered).to_not have_selector('.cna')
-      end
     end
 
     it "should display the Plan Start" do
@@ -174,21 +220,27 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to match /Market/
     end
 
-    it "should display future_enrollment_termination_date when coverage_termination_pending" do
-      expect(rendered).to match /Future enrollment termination date:/
-    end
-
     it "should not show a Plan End if cobra" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
       expect(rendered).not_to match /plan ending/i
     end
+
+    context "coverage_termination_pending" do
+      let(:enrollment_aasm_state) { "coverage_termination_pending" }
+      let(:future_enrollment_termination_date) { Date.today }
+      it "displays future_enrollment_termination_date when coverage_termination_pending" do
+        expect(rendered).to match /Future enrollment termination date:/
+      end
+    end
   end
 
+
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   context "with consumer_role", dbclean: :before_each do
-    let(:plan) {FactoryGirl.build(:plan, :created_at =>  TimeKeeper.date_of_record)}
+    let(:plan) {FactoryGirl.build(:benefit_markets_products_health_products_health_product, :created_at =>  TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryGirl.create(:employee_role) }
     let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {instance_double("HbxEnrollment", plan: plan, id: "12345", total_premium: 200, kind: 'individual',
+    let(:hbx_enrollment) {instance_double(HbxEnrollment, product: plan, id: "12345", total_premium: 200, kind: 'individual',
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
@@ -229,61 +281,46 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
   end
-
-  context "about covered_members_first_names of hbx_enrollment" do
-    let(:plan) {FactoryGirl.build(:plan, :created_at => TimeKeeper.date_of_record)}
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)}
-    let(:hbx_enrollment) {double(plan: plan, id: "12345", total_premium: 200, kind: 'individual',
-                                 covered_members_first_names: [], can_complete_shopping?: false,
-                                 enroll_step: 1, subscriber: nil, coverage_terminated?: false,
-                                 may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
-                                 consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected')}
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-
-    before :each do
-      allow(hbx_enrollment).to receive(:coverage_canceled?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_expired?).and_return(false)
-      allow(hbx_enrollment).to receive(:is_coverage_waived?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_year).and_return(plan.active_year)
-      allow(hbx_enrollment).to receive(:created_at).and_return(plan.created_at)
-      allow(hbx_enrollment).to receive(:hbx_id).and_return(true)
-      allow(hbx_enrollment).to receive(:in_time_zone).and_return(true)
-      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(hbx_enrollment).to receive(:consumer_role_id).and_return(person.id)
-      allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
-      allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(nil)
-      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-    end
-
-    it "should not disable the Make Changes button" do
-      expect(rendered).to_not have_selector('.cna')
-    end
   end
 
   context "when the enrollment is coverage_terminated" do
-    let(:plan) {FactoryGirl.create(:plan)}
-    let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
-
-    let!(:enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
-                       household: family.active_household,
-                       coverage_kind: "health",
-                       effective_on: TimeKeeper.date_of_record.beginning_of_month,
-                       enrollment_kind: "open_enrollment",
-                       kind: "individual",
-                       submitted_at: TimeKeeper.date_of_record.prev_month,
-                       aasm_state: 'coverage_terminated',
-                       plan_id: plan.id
-    )}
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "some hbx enrollment id",
+        hbx_id: "some hbx enrollment hbx id",
+        enroll_step: 1,
+        aasm_state: "coverage_terminated",
+        is_shop?: true,
+        is_cobra_status?: false,
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: 1.month.ago.to_date,
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        terminated_on: DateTime.now - 1.day,
+        may_terminate_coverage?: false,
+        kind: "employer_sponsored",
+        is_coverage_waived?: false,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: true,
+        coverage_expired?: false,
+        total_premium: 200.00,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: "",
+        covered_members_first_names: []
+      )
+    end
 
     before :each do
-      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return(true)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     it "should not display status as Coverage Terminated" do
@@ -296,31 +333,46 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "when the enrollment is coverage_expired" do
-    let(:plan) {FactoryGirl.create(:plan)}
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :last_years_coverage_period) }
-    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
-    let(:end_on) { TimeKeeper.date_of_record.prev_year.end_of_year }
-    let(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "some hbx enrollment id",
+        hbx_id: "some hbx enrollment hbx id",
+        enroll_step: 1,
+        aasm_state: "coverage_expired",
+        coverage_kind: "health",
+        submitted_at: DateTime.now,
+        is_shop?: true,
+        is_cobra_status?: false,
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: 1.month.ago.to_date,
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        kind: "employer_sponsored",
+        is_coverage_waived?: false,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: false,
+        coverage_expired?: true,
+        total_premium: 200.00,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: "",
+        covered_members_first_names: []
+      )
+    end
 
-    let(:enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
-                       household: family.active_household,
-                       coverage_kind: "health",
-                       effective_on: start_on,
-                       enrollment_kind: "open_enrollment",
-                       kind: "individual",
-                       submitted_at: TimeKeeper.date_of_record.prev_month,
-                       aasm_state: 'coverage_expired',
-                       plan_id: plan.id
-    )}
+    let(:end_on) { Date.today }
 
     before :each do
-      DatabaseCleaner.clean
-      hbx_profile.save!
-      family.save!
-      enrollment.save!
-      render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
+      allow(view).to receive(:enrollment_coverage_end).with(hbx_enrollment).and_return end_on
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
     it "should not display status as Coverage Expired" do
@@ -338,21 +390,53 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   end
 
   context "when the enrollment is_coverage_waived" do
-    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
-    let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
-                        employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
-                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: nil, id: nil) }
+    let(:hbx_enrollment) do
+      instance_double(
+        HbxEnrollment,
+        id: "some hbx enrollment id",
+        hbx_id: "some hbx enrollment hbx id",
+        enroll_step: 1,
+        aasm_state: "coverage_waived",
+        coverage_kind: "health",
+        submitted_at: DateTime.now,
+        waiver_reason: "because",
+        is_shop?: true,
+        is_cobra_status?: false,
+        product: product,
+        employee_role: employee_role,
+        census_employee: census_employee,
+        effective_on: 1.month.ago.to_date,
+        updated_at: DateTime.now,
+        created_at: DateTime.now,
+        kind: "employer_sponsored",
+        is_coverage_waived?: true,
+        coverage_year: 2018,
+        employer_profile: employer_profile,
+        coverage_terminated?: false,
+        coverage_expired?: false,
+        total_premium: 200.00,
+        total_employer_contribution: 100.00,
+        total_employee_cost: 100.00,
+        benefit_group: nil,
+        consumer_role_id: nil,
+        consumer_role: nil,
+        future_enrollment_termination_date: "",
+        covered_members_first_names: []
+      )
+    end
+
+    before :each do
+      allow(view).to receive(:disable_make_changes_button?).with(hbx_enrollment).and_return true
+    end
 
     context "it should render waived_coverage_widget " do
 
       before :each do
-        allow(enrollment).to receive(:is_coverage_waived?).and_return true
-        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
-        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should render waiver template with read_only param as true" do
-        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: true, hbx_enrollment: enrollment})
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: true, hbx_enrollment: hbx_enrollment})
       end
 
       it "should display waiver text" do
@@ -363,13 +447,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "it should render waived_coverage_widget with read_only param value as helper method result" do
 
       before :each do
-        allow(enrollment).to receive(:is_coverage_waived?).and_return true
-        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return false
-        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
       it "should render waiver template with read_only param" do
-        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: view.disable_make_changes_button?(enrollment), hbx_enrollment: enrollment})
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: view.disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment})
       end
     end
   end

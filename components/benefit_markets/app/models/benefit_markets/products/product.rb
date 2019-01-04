@@ -31,6 +31,7 @@ module BenefitMarkets
     field :family_deductible, type: String
     field :issuer_assigned_id, type: String
     field :service_area_id, type: BSON::ObjectId
+    field :network_information, type: String
 
     embeds_one  :sbc_document, as: :documentable,
                 :class_name => "::Document"
@@ -39,14 +40,11 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Products::PremiumTable"
 
     # validates_presence_of :hbx_id
-    validates_presence_of :application_period, :benefit_market_kind,  :title,
-                          :premium_tables, :service_area
-
+    validates_presence_of :application_period, :benefit_market_kind, :title, :service_area
 
     validates :benefit_market_kind,
               presence: true,
               inclusion: {in: BENEFIT_MARKET_KINDS, message: "%{value} is not a valid benefit market kind"}
-
 
     index({ hbx_id: 1 }, {name: "products_hbx_id_index"})
     index({ "benefit_market_kind" => 1,
@@ -97,6 +95,10 @@ module BenefitMarkets
     scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
                                                                   :"premium_tables.effective_period.max".gte => effective_date) }
 
+    # input: application_period type: :Date
+    # ex: application_period --> [2018-02-01 00:00:00 UTC..2019-01-31 00:00:00 UTC]
+    #     BenefitProduct avilable for both 2018 and 2019
+    # output: might pull multiple records
     scope :by_application_period,       ->(application_period){ 
       where(
         "$or" => [
@@ -105,6 +107,10 @@ module BenefitMarkets
       {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
         ])
     }
+
+    #Products retrieval by type
+    scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
+    scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
 
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this
@@ -135,6 +141,11 @@ module BenefitMarkets
       else
         write_attribute(:service_area_id, val.id)
       end
+    end
+
+    def ehb
+      percent = read_attribute(:ehb)
+      (percent && percent > 0) ? percent : 1
     end
 
     def service_area
@@ -280,6 +291,14 @@ module BenefitMarkets
       new_product = self.class.new(self.attributes.except(:premium_tables))
       new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
       new_product
+    end
+
+    def health?
+      kind == :health
+    end
+
+    def dental?
+      kind == :dental
     end
   end
 end

@@ -1,6 +1,8 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
 
+  before_action :redirect_new_model, only: [:show, :welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
+
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
 
@@ -13,6 +15,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
   layout "two_column", except: [:new]
+
+  def redirect_new_model
+    redirect_to "/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor"
+  end
 
   def link_from_quote
     claim_code = params[:claim_code].upcase
@@ -35,27 +41,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 
+  #Deprecated. Use new model version instead.
   def index
-    if params[:broker_agency_id].blank?
-      @q = params.permit(:q)[:q]
-      @orgs = Organization.search(@q).exists(employer_profile: true)
-    else
-      @orgs = Organization.by_broker_agency_profile(BSON::ObjectId.from_string(params[:broker_agency_id]))
-
-    end
-
-    if @q.blank?
-      @page_alphabets = page_alphabets(@orgs, "legal_name")
-      page_no = cur_page_no(@page_alphabets.first)
-      @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
-      @employer_profiles = @organizations.map {|o| o.employer_profile}
-    else
-      @employer_profiles = @orgs.map {|o| o.employer_profile}
-    end
-
-    @profile = find_mailbox_provider
   end
 
+  #Deprecated. Use new model version instead.
   def welcome
   end
 
@@ -104,119 +94,28 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+  #Deprecated. Use new model version instead.
   def my_account
   end
 
+  #Deprecated. Use new model version instead.
   def show
-    @tab = params['tab'] || 'home'
-
-    # Conditional based columns has to display so we are passing arguments
-    data_table_params = {id: params[:id], scopes: params[:scopes]}
-    if @employer_profile.renewing_published_plan_year.present?
-      data_table_params.merge!({renewal: true, renewal_status: true})
-    end
-    @datatable = Effective::Datatables::EmployeeDatatable.new(data_table_params)
-
-    if params[:q] || params[:page] || params[:commit] || params[:status]
-      paginate_employees
-    else
-      case @tab
-      when 'benefits'
-        @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-        @current_plan_year.ensure_benefit_group_is_valid if @current_plan_year
-        sort_plan_years(@employer_profile.plan_years)
-      when 'documents'
-        @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})
-        @documents = []
-        if @employer_profile.employer_attestation.present?
-          @documents = @employer_profile.employer_attestation.employer_attestation_documents
-        else
-          @employer_profile.build_employer_attestation
-        end
-      when 'employees'
-        @current_plan_year = @employer_profile.show_plan_year
-        paginate_employees
-      when 'brokers'
-        @broker_agency_accounts = @employer_profile.broker_agency_accounts
-      when 'inbox'
-
-      else
-        @broker_agency_accounts = @employer_profile.broker_agency_accounts
-        @current_plan_year = @employer_profile.show_plan_year
-        collect_and_sort_invoices(params[:sort_order])
-        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-
-        set_flash_by_announcement if @tab == 'home'
-      end
-    end
   end
 
+  #Deprecated. Use new model version instead.
   def show_profile
-    @tab ||= params[:tab]
-    if @tab == 'benefits'
-      @current_plan_year = @employer_profile.active_plan_year
-      @plan_years = @employer_profile.plan_years.order(id: :desc)
-    elsif @tab == 'employees'
-      data_table_params = {id: @employer_profile.id, scopes: params[:scopes]}
-      if @employer_profile.renewing_plan_year.present?
-        data_table_params.merge!({renewal: true, renewal_status: true})
-      end
-      @datatable ||= Effective::Datatables::EmployeeDatatable.new(data_table_params)
-      paginate_employees
-    elsif @tab == 'families'
-      #families defined as employee_roles.each { |ee| ee.person.primary_family }
-      paginate_families
-    elsif @tab == "inbox"
-      @folder = params[:folder] || 'Inbox'
-      @sent_box = false
-      respond_to do |format|
-        format.js { render 'employers/employer_profiles/inbox' }
-      end
-    end
   end
+
+
 
   def new
-    @organization = Forms::EmployerProfile.new
-    get_sic_codes
   end
 
   def edit
-    @organization = Organization.find(params[:id])
-    get_sic_codes
-    @employer_profile = @organization.employer_profile
-    @staff = Person.staff_for_employer_including_pending(@employer_profile)
-    @add_staff = params[:add_staff]
-    @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
 
+  #Deprecated. Use new model version instead.
   def create
-    params.permit!
-    @organization = Forms::EmployerProfile.new(params[:organization])
-    organization_saved = false
-    begin
-      organization_saved, pending = @organization.save(current_user, params[:employer_id])
-    rescue Exception => e
-      flash[:error] = e.message
-      get_sic_codes
-      render action: "new"
-      return
-    end
-    if organization_saved
-      @person = current_user.person
-      create_sso_account(current_user, current_user.person, 15, "employer") do
-        if pending
-          # flash[:notice] = 'Your Employer Staff application is pending'
-          render action: 'show_pending'
-        else
-          @organization.employer_profile.trigger_shop_notices("welcome_notice_to_employer") if @organization.employer_profile.present?
-          # employer_account_creation_notice if @organization.employer_profile.present? #mirror notice
-          redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
-        end
-      end
-    else
-      get_sic_codes
-      render action: "new"
-    end
   end
 
   def show_pending
@@ -363,20 +262,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+  #Deprecated. Use new model version instead.
   def counties_for_zip_code
-      params.permit([:zip_code])
-      @counties = RatingArea.find_counties_for(zip_code: params[:zip_code])
-      @single_option = true
-
-      if @counties.count > 1
-        @single_option = false
-        @counties.unshift("SELECT COUNTY")
-      elsif @counties.empty?
-        @counties << "Zip code outside #{aca_state_abbreviation}"
-      end
-
-
-      render partial: 'employers/employer_profiles/county_field'
   end
 
   # def employer_account_creation_notice

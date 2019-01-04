@@ -43,7 +43,7 @@ attributes: !ruby/hash:BSON::Document
     raw_data: !binary |-
       Wx2L9+bro5CtEzsC
   kind: :health
-  updated_at: 2018-06-23 22:30:34.846000000 Z
+  updated_at: 2018-08-25 18:00:01.043000000 Z
   created_at: 2018-06-15 17:33:04.235000000 Z
   premium_tables:
   - !ruby/hash:BSON::Document

@@ -25,7 +25,8 @@
             a
               i.fa.fa-chevron-down.fa-lg
         div
-          h5.title.pl-1 Health
+          h5.title.pl-1
+            = sb.reference_product.kind.to_s.titleize
         table.table.benefit-group.borderless
           tr
             th.benefit-group-heading Reference Plan
@@ -34,13 +35,13 @@
           tr
             td = sb.reference_product.name.try(:upcase)
             td = sb.reference_product.issuer_profile.legal_name
-            td = sb.try(:reference_product).try(:health_plan_kind).try(:upcase)
+            td = sb.try(:reference_product).try(:product_type).try(:upcase)
           tr
             td.benefit-group-heading Metal Level
             td.benefit-group-heading Plans By
           tr
             td = sb.reference_product.metal_level.titleize
-            td = sb.product_package_kind.to_s.humanize.capitalize
+            td = selected_benefit_plan(sb.product_package_kind)
             / Health plan collapsible: start
         .collapse id="collapse#{sb.product_kind.downcase}"
           = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }

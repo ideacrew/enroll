@@ -68,7 +68,7 @@
         <% end %>
         <div class="enrollment-type info vertical-align-top">
           <strong><%= l10n("plan_type") %>:</strong>
-          <%= product.health_plan_kind.to_s.titleize %>
+          <%= product.product_type.to_s.titleize %>
         </div>
       </div>
       <% if read_only == true %>

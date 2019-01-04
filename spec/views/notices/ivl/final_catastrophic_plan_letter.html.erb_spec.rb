@@ -1,5 +1,4 @@
 require "rails_helper"
-include ActionView::Context
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do

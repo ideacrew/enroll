@@ -1447,7 +1447,7 @@ elsif Settings.aca.state_abbreviation == "DC"
     },
     {
       hbx_id: 'SHOP17',
-      title: 'Open Enrollment Completed',
+      title: 'Group Open Enrollment Successfully Completed',
       description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
       resource_name: 'employer',
       event_name: 'initial_employer_open_enrollment_completed',

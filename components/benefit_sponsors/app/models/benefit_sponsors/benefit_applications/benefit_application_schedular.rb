@@ -24,7 +24,7 @@ module BenefitSponsors
           TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         end
 
-        end_on = TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+        end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
         dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
       end
 
@@ -37,7 +37,7 @@ module BenefitSponsors
         possible_dates = Hash.new
         calculate_start_on_dates.each do |date|
           next unless is_start_on_valid?(date)
-          possible_dates[date] = open_enrollment_dates(date).merge(enrollment_schedule(date))
+          possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(date))
         end
         possible_dates
       end
@@ -146,19 +146,37 @@ module BenefitSponsors
         dates_map = {}
 
         {
-          "2018-01-01" => '2017,12,12',
-          "2018-02-01" => '2018,1,12',
-          "2018-03-01" => '2018,2,13',
-          "2018-04-01" => '2018,3,13',
-          "2018-05-01" => '2018,4,12',
-          "2018-06-01" => '2018,5,14',
-          "2018-07-01" => '2018,6,12',
           "2018-08-01" => '2018,7,24',
           "2018-09-01" => '2018,8,23',
           "2018-10-01" => '2018,9,24',
-          "2018-11-01" => '2018,10,12',
-          "2018-12-01" => '2018,11,13',
-          "2019-01-01" => '2018,12,12',
+          "2018-11-01" => '2018,10,23',
+          "2018-12-01" => '2018,11,26',
+          "2019-01-01" => '2018,12,26',
+          "2019-02-01" => '2019,1,23',
+          "2019-03-01" => '2019,2,25',
+          "2019-04-01" => '2019,3,25',
+          "2019-05-01" => '2019,4,23',
+          "2019-06-01" => '2019,5,23',
+          "2019-07-01" => '2019,6,24',
+          "2019-08-01" => '2019,7,23',
+          "2019-09-01" => '2019,8,23',
+          "2019-10-01" => '2019,9,23',
+          "2019-11-01" => '2019,10,23',
+          "2019-12-01" => '2019,11,25',
+          "2020-01-01" => '2019,12,24',
+          "2020-02-01" => '2020,1,23',
+          "2020-03-01" => '2020,2,24',
+          "2020-04-01" => '2020,3,23',
+          "2020-05-01" => '2020,4,23',
+          "2020-06-01" => '2020,5,22',
+          "2020-07-01" => '2020,6,23',
+          "2020-08-01" => '2020,7,23',
+          "2020-09-01" => '2020,8,24',
+          "2020-10-01" => '2020,9,23',
+          "2020-11-01" => '2020,10,23',
+          "2020-12-01" => '2020,11,24',
+          "2021-01-01" => '2020,12,23',
+
           }.each_pair do |k, v|
             dates_map[k] = Date.strptime(v, '%Y,%m,%d')
           end
@@ -171,7 +189,7 @@ module BenefitSponsors
         prior_month = effective_date - 1.month
         plan_year_start_on = effective_date
         plan_year_end_on = effective_date + 1.year - 1.day
-        employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months)
+        employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
         employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
         employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}").to_date
         open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
