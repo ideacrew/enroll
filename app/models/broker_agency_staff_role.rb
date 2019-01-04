@@ -52,6 +52,10 @@ class BrokerAgencyStaffRole
     # Invitation.invite_broker_agency_staff!(self)
   end
 
+  def approve
+    self.broker_agency_accept!
+  end
+  
   def current_state
     aasm_state.humanize.titleize
   end
@@ -71,7 +75,11 @@ class BrokerAgencyStaffRole
   end
 
   def agency_pending?
-    false
+    aasm_state == "broker_agency_pending"
+  end
+
+  def is_open?
+    self.agency_pending? || aasm_state == "active"
   end
 
   ## Class methods
