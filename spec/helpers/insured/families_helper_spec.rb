@@ -305,7 +305,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       let!(:person) { FactoryGirl.build_stubbed(:person)}
       let!(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person) }
       let!(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-      let!(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, aasm_state: "coverage_expired") }
+      let!(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, aasm_state: "coverage_expired", effective_on: TimeKeeper.date_of_record) }
       let!(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
       let!(:benefit_coverage_periods) { HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first}
 
