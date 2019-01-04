@@ -25,12 +25,6 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
 
-      resources :broker_agency_staff_roles do
-        member do
-          get :approve
-        end
-      end
-
       resources :broker_applicants
 
       resources :broker_roles
@@ -41,6 +35,8 @@ BenefitSponsors::Engine.routes.draw do
         end
         member do
           get :approve
+          get :new_staff_form
+          post :create_broker_staff
         end
       end
     end
