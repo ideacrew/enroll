@@ -82,7 +82,6 @@ var inputsPresent = false;
 
 function validateFormat(element, pyStartOn, pyEndOn) {
   pyEndDate = element.value;
-
   setTimeout(function() {
     if (element.value.length != 10 || element.value.indexOf("/") != 2) {
       element.value = "";
@@ -103,7 +102,7 @@ function validateFormat(element, pyStartOn, pyEndOn) {
       alert("Please select date within Start Date and End Date");
       disableSubmitButton();
     } else {
-      enableSubmitButton()
+      //enableSubmitButton()
     }
   },400);
 }
@@ -162,15 +161,16 @@ function validTerminatePy() {
   var endDates = document.querySelectorAll('.py-end-date')
   validateTermActions()
   for (date of endDates) {
+    console.log(`${date.value.length}:${inputsPresent}`)
     if (date.value.length > 0 && inputsPresent == false) {
-      enableSubmitButton()
+      //enableSubmitButton()
     } else {
-      disableSubmitButton();
+      //disableSubmitButton();
     }
     if (date.value.length > 0 && inputsPresent == true && inputsChecked == true) {
-      enableSubmitButton()
+      //enableSubmitButton()
     } else {
-      disableSubmitButton();
+      //disableSubmitButton();
     }
   }
 }
