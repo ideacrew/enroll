@@ -950,20 +950,21 @@ describe HbxProfile, "class methods", type: :model do
     end
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
-      hbx_enrollment1.effective_on = date - 10.days
+      hbx_enrollment1.effective_on = date - 1.day
+      hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
       hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
-      expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy if hbx_enrollment1.effective_on.year == hbx_enrollment2.effective_on.year
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
       expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
 
     it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
       person1.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-      hbx_enrollment3.effective_on = date - 10.days
+      hbx_enrollment3.effective_on = date
       hbx_enrollment2.effective_on = date + 1.day
       hbx_enrollment2.select_coverage!
-      expect(hbx_enrollment3.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment3.coverage_terminated?).to be_truthy if hbx_enrollment3.effective_on.year == hbx_enrollment2.effective_on.year
       expect(hbx_enrollment2.is_any_enrollment_member_outstanding?).to be_falsy
       expect(hbx_enrollment3.is_any_enrollment_member_outstanding?).to be_truthy
     end
@@ -2154,7 +2155,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
   context 'When family passively renewed' do
 
     let!(:renewing_plan_year) {
-      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
+      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: (end_on + 1.year).end_of_month, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
     }
 
     let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id, elected_plan_ids: elected_plans }
@@ -2726,7 +2727,7 @@ describe HbxEnrollment, dbclean: :after_all do
   let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
   let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household,
-                                  kind: "individual", aasm_state: "coverage_selected") }
+                                  kind: "individual", aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record) }
   let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
                                   applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
                                   eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
