@@ -3,13 +3,13 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    field :payment_type                     type: String
-    # field :amount                         type: Money
-    # field :transaction_date               type: Date
-    # field :payment_date                   type: Date
-    # field :submitted_at                   type: DateTime
-    field :benefit_application_id,          type: BSON::ObjectId
-    field :kind,                            type: String
+    field :payment_type,                     type: String
+    # field :amount,                         type: Money
+    # field :transaction_date,               type: Date
+    # field :payment_date,                   type: Date
+    # field :submitted_at,                   type: DateTime
+    field :benefit_application_id,           type: BSON::ObjectId
+    field :kind,                             type: String
 
     index({ benefit_application_id:  1 })
 
