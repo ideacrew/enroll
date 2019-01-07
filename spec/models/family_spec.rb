@@ -1502,7 +1502,7 @@ describe "#outstanding_verification scope", dbclean: :after_each do
   let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
   let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual") }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual", effective_on: TimeKeeper.date_of_record) }
   let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
   let(:active_year)               {TimeKeeper.date_of_record.year}
   before :each do
