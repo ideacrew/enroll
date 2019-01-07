@@ -636,6 +636,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
+  describe "plan_selection_callback" do
+    let(:coverage_kind){"health"} 
+    let(:market_kind){"individual"}
+    let(:hios_id){"77422DC0110002-01"}
+    let(:person) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
+    let(:user)  { FactoryGirl.create(:user, person: person) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:plan) { FactoryGirl.create(:plan) }
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: (TimeKeeper.date_of_record.beginning_of_month).to_date, plan_id: plan.id) }
+
+    context "When a callback is received" do
+      before do
+        sign_in user
+        allow(Plan).to receive(:where).and_return([plan])
+        get :plan_selection_callback, id: hbx_enrollment.id , hios_id:  hios_id,market_kind: market_kind , coverage_kind: coverage_kind
+      end
+
+      it "should assign market kind and coverage_kind" do
+        expect(assigns(:market_kind)).to be_truthy
+        expect(assigns(:coverage_kind)).to be_truthy
+      end
+    end
+  end
+
   describe ".build_same_plan_premiums", dbclean: :after_each do
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:dob) { Date.new(1985, 4, 10) }

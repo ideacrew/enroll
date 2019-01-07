@@ -53,6 +53,23 @@ describe Services::CheckbookServices::PlanComparision do
         end
       end
   end
+  
+  describe "#build_congress_employee_age" do 
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    context "when active household is present" do 
+      let(:person_congress) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role , dob: "1980-01-01") }
+      let(:person_congress_spouse) { FactoryGirl.create(:person, dob: "1984-01-01" ) }
+      let(:enrollment_memeber_congress){ double }
+      let(:enrollment_memeber_spouse){ double }
+      it "should return correct age" do
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([enrollment_memeber_congress,enrollment_memeber_spouse])
+        allow(enrollment_memeber_congress).to receive_message_chain(:family_member,:person).and_return(person_congress)
+        allow(enrollment_memeber_spouse).to receive_message_chain(:family_member,:person).and_return(person_congress_spouse)
+        expect(subject.build_congress_employee_age).to include({:dob => "1984-01-01"})
+        expect(subject.build_congress_employee_age).to include({:dob => "1980-01-01"})
+      end
+    end
+  end
 
   describe "#csr_value" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }

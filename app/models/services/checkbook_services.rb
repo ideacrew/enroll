@@ -88,9 +88,6 @@ module Services
         end
       end
 
-
-      private
-
       def construct_body_shop
         {
           "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
@@ -186,8 +183,9 @@ module Services
       end
 
       def build_congress_employee_age
+        family = []
         @hbx_enrollment.hbx_enrollment_members.each do |dependent|
-          family << {"dob": dependent.family_member.person.dob.strftime("%Y-%m-%d")
+          family << {"dob": dependent.family_member.person.dob.strftime("%Y-%m-%d")}
           end
           family
       end
