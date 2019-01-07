@@ -1,6 +1,6 @@
 module BenefitMarkets
 	module Configurations
-	  class Setting
+	  class Configuration # change to setting
 	    include Mongoid::Document
 	    include Mongoid::Timestamps
 
@@ -8,10 +8,12 @@ module BenefitMarkets
 
       field :key,         type: String
       field :value,       type: String
-      field :default,     type: String  # Boolean, String, Integer, Array ??
-      field :site_key,    type: String
-      field :language,    type: Symbol  # :en
-      field :is_required, type: Boolean
+      field :default,     type: String
+
+      # field :site_key,    type: String ?? 
+      # field :language,    type: Symbol  # :en
+
+      field :is_required, type: Boolean, default: false
       field :description, type: String
 
       scope :get_all,  -> (starting_with) {
@@ -24,11 +26,11 @@ module BenefitMarkets
 
       index({ key: 1 }, { unique: true })
 
-      validates_presence_of   :value
+      validates_presence_of   :default, :is_required
       validates_uniqueness_of :key
 
       def write_cache
-        Rails.cache.write(cache_key, value)
+        Rails.cache.write(cache_key, (value || default))
       end
 
       def expire_cache
@@ -37,6 +39,24 @@ module BenefitMarkets
 
       def cache_key
         self.class.cache_key(key, benefit_market)
+      end
+
+      def value=(val)
+        write_attribute(:value, value_for_serialization(val))
+      end
+
+      def default=(val)
+        write_attribute(:default, value_for_serialization(val))
+      end
+
+      def value_for_serialization(val)
+        return nil if val.blank?
+
+        if val.to_s.scan(/<%/).present?
+          ERB.new(val).src
+        else
+          val.inspect
+        end
       end
 
       class << self
@@ -48,32 +68,33 @@ module BenefitMarkets
           scope.join("-")
         end
 
-        def [](model_instance, key)
-          benefit_market = benefit_market_for(market_kind)
-          val = Rails.cache.fetch(cache_key(key, benefit_market)) do
+        def [](benefit_market, key)
+          Rails.cache.fetch(cache_key(key, benefit_market)) do
             setting = find_setting(benefit_market, key)
-            setting.value
+            parse_value(setting)
           end
-          val
         end
 
         # set a setting value by [] notation
-        def []=(market_kind, key, value)
-          benefit_market = benefit_market_for(market_kind)
-          key = key.to_s
-          setting = find_setting(benefit_market, key) || benefit_market.configurations.new(key: key)
-          setting.value = value
-          setting.save!
-          setting.write_cache
-          value
+        def []=(benefit_market, key, attrs)
+          find_or_initialize_setting(benefit_market, key).tap do |setting|
+            setting.attributes = attrs
+            setting.save!
+            setting.write_cache
+          end
+        end
+
+        def find_or_initialize_setting(benefit_market, key)
+          find_setting(benefit_market, key) || benefit_market.configurations.new(key: key)
         end
 
         def find_setting(benefit_market, key)
           benefit_market.configurations.by_key(key).first
         end
 
-        def benefit_market_for(market_kind)
-          BenefitMarkets::BenefitMarket.by_kind(market_kind.to_sym)
+        def parse_value(setting)
+          value = setting.value || setting.default
+          eval(value)
         end
       end
 	  end

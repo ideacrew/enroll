@@ -23,7 +23,7 @@ end
 benefit_market = BenefitMarkets::BenefitMarket.by_kind(:aca_shop)
 
 configurations.keys.each do |key|
-  BenefitMarkets::Configurations::Configuration[:aca_shop, key] = "#{configurations[key]}"
+  BenefitMarkets::Configurations::Configuration[benefit_market, key.to_s] = configurations[key]
 end
 
 puts "::: Configurations Complete :::"
