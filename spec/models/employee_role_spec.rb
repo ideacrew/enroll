@@ -56,7 +56,7 @@ describe ".coverage_effective_on" do
       employer = FactoryGirl.create :employer_profile, organization: org
       plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
       FactoryGirl.create :benefit_group, plan_year: plan_year
-      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
+      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: (end_on + 1.year).end_of_month, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
       FactoryGirl.create :benefit_group, plan_year: renewal_plan_year
       employer
     }
@@ -753,7 +753,7 @@ describe EmployeeRole do
       let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
 
       let!(:renewing_plan_year) {
-        FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
+        FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: (end_on + 1.year).end_of_month, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
       }
 
       let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }

@@ -8,7 +8,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
-  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+  let(:valid_plan_year_end_on)          { (valid_plan_year_start_on + 1.year - 1.day).end_of_month }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
   let(:valid_fte_count)                 { 5 }
@@ -2546,7 +2546,7 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
   let(:benefit_group) { FactoryGirl.build(:benefit_group)}
   let(:benefit_group1) { FactoryGirl.build(:benefit_group)}
   let!(:active_plan_year)  { FactoryGirl.create(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
-  let!(:renewal_plan_year)  { FactoryGirl.create(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let!(:renewal_plan_year)  { FactoryGirl.create(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: (TimeKeeper.date_of_record.next_month + 1.year).end_of_month, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
   let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
   let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}

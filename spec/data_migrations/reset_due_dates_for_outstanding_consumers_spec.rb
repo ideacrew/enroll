@@ -15,7 +15,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
     let!(:person)           { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:consumer_role)     { person.consumer_role }
     let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
-    let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected",
+    let!(:hbx_enrollment)   { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record,
                                                   household: family.active_household, kind: "individual") }
     let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment,
       eligibility_date: (TimeKeeper.date_of_record - 2.months), coverage_start_on: (TimeKeeper.date_of_record - 2.months),
