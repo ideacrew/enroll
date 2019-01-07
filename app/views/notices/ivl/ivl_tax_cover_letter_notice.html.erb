@@ -201,7 +201,7 @@ content: "We are required by federal law to send a copy of your Form 1095-A to y
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
- contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and DC Health Link. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."],
+ contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."],
    heading: 'If You Think This Form is Wrong', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
