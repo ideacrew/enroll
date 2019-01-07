@@ -186,6 +186,13 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
       end
     end
   end
+
+  after :all do
+    path = "#{Rails.root}/pids/"
+    if Dir.exists?(path)
+      FileUtils.rm_rf(path)
+    end
+  end
 end
 
 private
