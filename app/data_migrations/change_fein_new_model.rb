@@ -15,7 +15,7 @@ class ChangeFeinNewModel< MongoidMigrationTask
         raise "organization with fein #{right_fein} already present"
       else
         correct_exempt_org.update_attributes(fein: right_fein)
-        puts "Changed fein to #{right_fein}" unless Rails.env.test?
+        puts "Changed fein for #{correct_exempt_org.legal_name} to #{correct_exempt_org.fein} in new model" unless Rails.env.test?
       end
     end
   end
