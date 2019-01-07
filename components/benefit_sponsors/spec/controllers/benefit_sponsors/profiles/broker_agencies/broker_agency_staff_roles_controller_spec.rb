@@ -8,6 +8,8 @@ module BenefitSponsors
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:broker_agency_profile1) { organization.broker_agency_profile }
+    let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
 
     let(:bap_id) { organization.broker_agency_profile.id }
     let!(:new_person_for_staff) { FactoryGirl.create(:person) }
@@ -64,7 +66,7 @@ module BenefitSponsors
         end
 
         it "should get an notice" do
-          expect(flash[:notice]).to match /Broker Staff Role added sucessfully/
+          expect(flash[:notice]).to match /Broker Staff Role added/
         end
       end
 
@@ -92,7 +94,7 @@ module BenefitSponsors
         end
 
         it "should get an notice" do
-          expect(flash[:error]).to match /Broker Staff Role was not added because You are already associated with the Broker Agency/
+          expect(flash[:error]).to match /Broker Staff Role was not added because you are already associated with this Broker Agency/
         end
       end
 
@@ -120,9 +122,64 @@ module BenefitSponsors
         end
 
         it "should get an notice" do
-          expect(flash[:notice]).to match /Broker Staff Role added sucessfully/
+          expect(flash[:notice]).to match /Broker Staff Role added/
         end
       end
     end
+
+    describe "GET search_broker_agency" do
+
+      before do
+        broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
+        broker_agency_profile1.approve!
+        organization.reload
+        xhr :get, :search_broker_agency, params
+      end
+
+      context "return result if broker agency is present" do
+
+        let!(:params) {
+          {
+              q: broker_agency_profile1.legal_name,
+              broker_registration_page: "true"
+          }
+        }
+
+        it 'should be a success' do
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'should render the new template' do
+          expect(response).to render_template('search_broker_agency')
+        end
+
+        it 'should assign broker_agency_profiles variable' do
+          expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile1)
+        end
+      end
+
+      context "should not return result" do
+
+        let!(:params) {
+          {
+              q: "hello world",
+              broker_registration_page: "true"
+          }
+        }
+
+        it 'should be a success' do
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'should render the new template' do
+          expect(response).to render_template('search_broker_agency')
+        end
+
+        it 'should assign broker_agency_profiles variable' do
+          expect(assigns(:broker_agency_profiles)).not_to include(broker_agency_profile1)
+        end
+      end
+    end
+
   end
 end

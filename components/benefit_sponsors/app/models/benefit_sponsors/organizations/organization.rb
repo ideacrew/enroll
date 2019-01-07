@@ -317,7 +317,7 @@ module BenefitSponsors
                 return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
               end
             elsif value.to_s == "true"
-              return []
+              return self.search_agencies_by_criteria(search_params)
             end
           elsif !search_params[:q].present? && value.to_s == "true"
             return []

@@ -85,7 +85,7 @@ module BenefitSponsors
         exisiting_brokers_with_same_profile =  person.broker_agency_staff_roles.select{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id }
         if exisiting_brokers_with_same_profile.present?
 
-          return false,  "You are already associated with the Broker Agency"
+          return false,  "you are already associated with this Broker Agency"
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
                                                                               broker_agency_profile: profile

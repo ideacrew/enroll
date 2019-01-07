@@ -18,7 +18,7 @@ module BenefitSponsors
             unless @status
               flash[:error] = (' Broker Staff Role was not added because '  + @result)
             else
-              flash[:notice] = "Broker Staff Role added sucessfully"
+              flash[:notice] = "Broker Staff Role added"
             end
           rescue Exception => e
             flash[:error] = e.message
