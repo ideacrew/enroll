@@ -622,6 +622,14 @@ class Person
     self.broker_agency_staff_roles.where(:benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id, :aasm_state => :broker_agency_pending).size > 0
   end
 
+  def active_broker_staff_roles
+    self.broker_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_broker_staff_role?
+    active_broker_staff_roles.size > 0
+  end
+
   class << self
 
     def default_search_order

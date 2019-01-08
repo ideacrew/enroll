@@ -1,15 +1,15 @@
 <% insured = (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) || current_user.try(:has_employee_role?) %>
 <% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
 <% employer = employer_staff.first %>
-<% broker =  current_user.try(:has_broker_agency_staff_role?) %>
-<% roles = [insured, broker] %>
+<% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>
+<% roles = [insured, broker_staff_roles] %>
 <% portal_count = roles.select{|role|role}.count + employer_staff.count%>
 
   <% if portal_count == 1 %>
     <span>
       <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
       <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
-      <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker %>
+      <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker_staff_roles.any? %>
       <span> | </span>
     </span>
     <%elsif portal_count > 1 %>
@@ -33,8 +33,17 @@
               <% employer = BenefitSponsors::Organizations::Profile.find(id) %>
               <li><%= link_to employer.organization.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
           <% end %>
-          <% if broker %>
-            <li><%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' %></li>
+          <% broker_staff_roles.each do |broker_staff_role| %>
+            <%profile = broker_staff_role.broker_agency_profile%>
+            
+            <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
+              <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab:'home') %>
+            <% else %>
+              <% #backwards compatibility with old model %>
+              <% broker_link =  main_app.broker_agencies_profile_path(profile) %>
+            <% end %>
+
+            <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
           <% end %>
         </ul>
         <span> | </span>
