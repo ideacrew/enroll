@@ -1,15 +1,15 @@
 require "rails_helper"
 include ActionView::Context
 
-RSpec.describe "notices/ivl/ivl_tax_cover_letter_notice.html.erb" do
+RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
 
   let(:true_or_false) { true }
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'1095A Tax Cover Letter Notice',
-                            :notice_template => 'notices/ivl/ivl_tax_cover_letter_notice',
-                            :notice_builder => 'IvlNotices::IvlTaxCoverLetterPlanNotice',
+                            :notice_template => 'notices/ivl/ivl_tax_notice',
+                            :notice_builder => 'IvlNotices::IvlTaxNotice',
                             :event_name => 'ivl_tax_cover_letter_notice',
                             :options => { :is_an_aqhp_hbx_enrollment => true},
                             :mpi_indicator => 'IVL_TAX',
@@ -24,12 +24,12 @@ RSpec.describe "notices/ivl/ivl_tax_cover_letter_notice.html.erb" do
   }}
 
   let!(:notice) { catastrophic_plan_notice.notice }
-  let!(:catastrophic_plan_notice) { IvlNotices::IvlTaxCoverLetterPlanNotice.new(person.consumer_role, valid_params) }
+  let!(:catastrophic_plan_notice) { IvlNotices::IvlTaxNotice.new(person.consumer_role, valid_params) }
 
   before :each do
     catastrophic_plan_notice.append_hbe
     catastrophic_plan_notice.build
-    render file: "notices/ivl/ivl_tax_cover_letter_notice", locals: {notice: notice}
+    render file: "notices/ivl/ivl_tax_notice", locals: {notice: notice}
   end
 
   it "should display the text" do

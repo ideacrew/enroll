@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
+RSpec.describe IvlNotices::IvlTaxNotice, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'1095A Tax Cover Letter Notice',
-                            :notice_template => 'notices/ivl/ivl_tax_cover_letter_notice',
-                            :notice_builder => 'IvlNotices::IvlTaxCoverLetterPlanNotice',
+                            :notice_template => 'notices/ivl/ivl_tax_notice',
+                            :notice_builder => 'IvlNotices::IvlTaxNotice',
                             :event_name => 'ivl_tax_cover_letter_notice',
                             :options => { :is_an_aqhp_hbx_enrollment => true},
                             :mpi_indicator => 'IVL_TAX',
@@ -26,7 +26,7 @@ RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
     end
     context "valid params" do
       it "should initialze" do
-        expect{IvlNotices::IvlTaxCoverLetterPlanNotice.new(person.consumer_role, valid_params)}.not_to raise_error
+        expect{IvlNotices::IvlTaxNotice.new(person.consumer_role, valid_params)}.not_to raise_error
       end
     end
 
@@ -34,7 +34,7 @@ RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{IvlNotices::IvlTaxCoverLetterPlanNotice.new(person.consumer_role, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{IvlNotices::IvlTaxNotice.new(person.consumer_role, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
     before :each do
       allow(person).to receive("primary_family").and_return(family)
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
-      @ivl_tax_cover_letter_notice = IvlNotices::IvlTaxCoverLetterPlanNotice.new(person.consumer_role, valid_params)
+      @ivl_tax_cover_letter_notice = IvlNotices::IvlTaxNotice.new(person.consumer_role, valid_params)
       @ivl_tax_cover_letter_notice.build
     end
 
@@ -91,11 +91,11 @@ RSpec.describe IvlNotices::IvlTaxCoverLetterPlanNotice, dbclean: :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
-      @ivl_tax_cover_letter_notice = IvlNotices::IvlTaxCoverLetterPlanNotice.new(person.consumer_role, valid_params)
+      @ivl_tax_cover_letter_notice = IvlNotices::IvlTaxNotice.new(person.consumer_role, valid_params)
     end
 
     it "should render ivl_tax_cover_letter_notice" do
-      expect(@ivl_tax_cover_letter_notice.template).to eq "notices/ivl/ivl_tax_cover_letter_notice"
+      expect(@ivl_tax_cover_letter_notice.template).to eq "notices/ivl/ivl_tax_notice"
     end
 
     it "should generate pdf" do

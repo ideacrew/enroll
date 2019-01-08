@@ -1,4 +1,4 @@
-class IvlNotices::IvlTaxCoverLetterPlanNotice < IvlNotice
+class IvlNotices::IvlTaxNotice < IvlNotice
   attr_accessor :family
 
   def initialize(consumer_role, args = {})

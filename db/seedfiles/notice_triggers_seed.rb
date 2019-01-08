@@ -1648,8 +1648,8 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: '1095A Tax Cover Letter Notice',
-        notice_template: 'notices/ivl/ivl_tax_cover_letter_notice',
-        notice_builder: 'IvlNotices::IvlTaxCoverLetterPlanNotice',
+        notice_template: 'notices/ivl/ivl_tax_notice',
+        notice_builder: 'IvlNotices::IvlTaxNotice',
         mpi_indicator: 'IVL_TAX',
         notice_trigger_element_group: {
           market_places: ['individual'],
