@@ -727,8 +727,10 @@ describe "#benefit_package", dbclean: :after_each do
   context "plan shop through qle and having active & renewal plan years" do
 
     it "should return the active benefit group if sep effective date covers active plan year" do
+      sep.update_attribute(:effective_on, benefit_package.start_on + 2.days)
       allow(family).to receive(:current_sep).and_return sep
-      expect(employee_role.benefit_package(qle: true)).to eq predecessor_application.benefit_groups.first
+      allow(predecessor_application).to receive(:benefit_packages).and_return census_employee.benefit_group_assignments.first.benefit_package
+      expect(employee_role.benefit_package(qle: true)).to eq predecessor_application.benefit_groups
     end
 
     it "should return the renewal benefit group if sep effective date covers renewal plan year" do
