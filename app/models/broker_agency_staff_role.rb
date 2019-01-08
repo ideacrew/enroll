@@ -49,7 +49,7 @@ class BrokerAgencyStaffRole
   def send_invitation
     # TODO broker agency staff is not actively supported right now
     # Also this method call sends an employee invitation, which is bug 8028
-    # Invitation.invite_broker_agency_staff!(self)
+    Invitation.invite_broker_agency_staff!(self)
   end
 
   def approve
