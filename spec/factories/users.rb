@@ -108,6 +108,10 @@ FactoryBot.define do
     roles { ["broker"] }
   end
 
+  trait "general" do
+    roles ["general"]
+  end
+
   trait "broker_agency_staff" do
     roles { ["broker_agency_staff"] }
   end
