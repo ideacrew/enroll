@@ -37,6 +37,8 @@ module BenefitSponsors
           sponsor_home_registration_url(profile_id)
         elsif is_broker_profile?
           broker_show_registration_url(profile_id)
+        elsif is_general_profile?
+          general_show_registration_url(profile_id)
         end
       end
 
