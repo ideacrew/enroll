@@ -36,6 +36,13 @@ FactoryGirl.define do
       end
     end
 
+    trait :organization do
+      after(:build) do |profile, evaluator|
+          site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
+        profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site) unless profile.organization
+      end
+    end
+
     trait :with_staff do
       after :create do |benefit_sponsors_organizations_general_agency_profile, evaluator|
         FactoryGirl.create(:general_agency_staff_role,
