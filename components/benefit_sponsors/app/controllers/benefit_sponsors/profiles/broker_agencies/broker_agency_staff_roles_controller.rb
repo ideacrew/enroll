@@ -13,17 +13,15 @@ module BenefitSponsors
 
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(staff_params)
-          begin
             @status , @result = @staff.save
-            unless @status
-              flash[:error] = (' Broker Staff Role was not added because '  + @result)
-            else
-              flash[:notice] = "Broker Staff Role added"
-            end
-          rescue Exception => e
-            flash[:error] = e.message
+          unless @status
+            @messages = (' Broker Staff Role was not added because '  + @result)
+          else
+            @messages = "Broker Staff Role added sucessfully"
           end
-          redirect_to new_profiles_registration_path(profile_type: "broker_agency")
+          respond_to do |format|
+            format.js
+          end
         end
 
         def search_broker_agency

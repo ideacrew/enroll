@@ -1,0 +1,9 @@
+<% if @status %>
+  $("#tabs").replaceWith('<%= j render partial: "benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/success_message" %>')
+<% else %>
+  $("#broker_staff").html('<%= j render partial: "benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/error_message" %>')
+
+  $(document).ajaxComplete(function() {
+      $('html').scrollTop(0);
+  });
+<% end %>
