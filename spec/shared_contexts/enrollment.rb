@@ -4,11 +4,14 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
   let!(:renewal_calender_date) {HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on}
   let!(:renewal_calender_year) {renewal_calender_date.year}
 
+  let!(:current_calender_date) {HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on}
+  let!(:current_calender_year) {current_calender_date.year}
+
   let!(:family_unassisted) {FactoryGirl.create(:individual_market_family)}
   let!(:enrollment_unassisted) {FactoryGirl.create(:hbx_enrollment, :individual_unassisted, :with_enrollment_members,
                                                    household: family_unassisted.active_household,
                                                    enrollment_members: [family_unassisted.family_members.first],
-                                                   plan: active_individual_health_plan)}
+                                                   plan: active_individual_health_plan, effective_on: current_calender_date)}
 
   let!(:family_assisted) {FactoryGirl.create(:individual_market_family)}
   let!(:tax_household) {FactoryGirl.create(:tax_household, effective_starting_on: renewal_calender_date,
@@ -21,7 +24,7 @@ RSpec.shared_context "setup families enrollments", :shared_context => :metadata 
                                                  consumer_role_id: family_assisted.primary_family_member.person.consumer_role.id,
                                                  household: family_assisted.active_household,
                                                  enrollment_members: [family_assisted.family_members.first],
-                                                 plan: active_csr_87_plan)}
+                                                 plan: active_csr_87_plan, effective_on: current_calender_date)}
 
   let!(:active_individual_health_plan) {FactoryGirl.create(:active_individual_health_plan, renewal_plan: renewal_individual_health_plan)}
   let!(:active_csr_87_plan) {FactoryGirl.create(:active_csr_87_plan, renewal_plan: renewal_csr_87_plan)}
