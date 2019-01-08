@@ -4,6 +4,7 @@ class UpdateFieldsOfEmployeeRole< MongoidMigrationTask
       organization_fein = ENV["organization_fein"]
       
       employee_role_id = ENV["employee_role_id"]
+      census_employee_id = ENV["census_employee_id"]
       
       action = ENV['action']
       
@@ -11,7 +12,9 @@ class UpdateFieldsOfEmployeeRole< MongoidMigrationTask
         when "update_benefit_sponsors_employer_profile_id"
           update_benefit_sponsors_employer_profile_id(organization_fein, employee_role_id) 
         when "update_census_employee_id"
-          update_census_employee_id(organization_fein, employee_role_id) 
+          update_census_employee_id(organization_fein, employee_role_id)
+        when "update_with_given_census_employee_id"
+          update_with_given_census_employee_id(census_employee_id, employee_role_id)
         else
           puts"The Action defined is not performed in the rake task" unless Rails.env.test?
       end
@@ -47,5 +50,10 @@ class UpdateFieldsOfEmployeeRole< MongoidMigrationTask
     rescue => e
       puts "error: #{e.backtrace}" unless Rails.env.test?
     end
+  end
+
+  def update_with_given_census_employee_id(census_employee_id, employee_role_id)
+    EmployeeRole.find(employee_role_id).update_attributes!(census_employee_id: census_employee_id)
+    puts "Successfully updated employee_role with census_employee_id: #{census_employee_id}" unless Rails.env.test?
   end
 end
