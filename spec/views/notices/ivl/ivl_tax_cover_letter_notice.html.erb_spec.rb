@@ -38,6 +38,9 @@ RSpec.describe "notices/ivl/ivl_tax_cover_letter_notice.html.erb" do
     expect(rendered).to match /This letter includes your tax Form 1095-A. You’re receiving this tax form because you or someone/
     expect(rendered).to match /If you have questions or concerns, we’re here to help./
     expect(rendered).to match /The #{Settings.site.short_name} Team/
+    expect(rendered).to match /#{Settings.site.ivl_responsibility_url}/
+    expect(rendered).to match /Federal law required most Americans to have a minimum level of health coverage/
+    expect(rendered).not_to match /#{Settings.site.short_name} does not control the individual mandate/
   end
 
   context "text display for assisted" do
