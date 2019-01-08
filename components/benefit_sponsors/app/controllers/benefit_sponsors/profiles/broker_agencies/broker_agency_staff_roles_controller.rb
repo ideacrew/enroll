@@ -12,16 +12,53 @@ module BenefitSponsors
         end
 
         def create
-          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(staff_params)
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
+          begin
             @status , @result = @staff.save
-          unless @status
-            @messages = (' Broker Staff Role was not added because '  + @result)
-          else
-            @messages = "Broker Staff Role added sucessfully"
+            unless @staff.is_broker_registration_page
+              flash[:notice] = "Role added sucessfully" if @status
+              flash[:error] = "Role was not added because " + @result unless @status
+            end
+          rescue Exception => e
+            flash[:error] = "Role was not added because " + e.message
           end
+
           respond_to do |format|
+            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])}
             format.js
           end
+        end
+
+        def approve
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(broker_staff_params)
+          authorize @staff
+          begin
+            @status, @result = @staff.approve
+            if @status
+              flash[:notice] = "Role approved sucessfully"
+            else
+              flash[:error] = "Role was not approved because " + @result
+            end
+          rescue Exception => e
+            flash[:error] = "Role was not approved because " + e.message
+          end
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
+        end
+
+        def destroy
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_destroy(broker_staff_params)
+          authorize @staff
+          begin
+            @status, @result = @staff.destroy
+            if @status
+              flash[:notice] = "Role removed succesfully"
+            else
+              flash[:error] = "Role was not removed because " + @result
+            end
+          rescue Exception => e
+            flash[:error] = "Role was not removed because " + e.message
+          end
+          redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
         end
 
         def search_broker_agency
