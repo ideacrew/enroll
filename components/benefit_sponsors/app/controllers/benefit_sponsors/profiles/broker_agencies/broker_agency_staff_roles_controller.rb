@@ -41,10 +41,10 @@ module BenefitSponsors
             if @status
               flash[:notice] = "Role added sucessfully"
             else
-              flash[:error] = "Role not added due to " + @result
+              flash[:error] = "Role was not added because " + @result
             end
           rescue Exception => e
-            flash[:error] = "Role not added due to " + e.message
+            flash[:error] = "Role was not added because " + e.message
           end
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
         end
@@ -57,10 +57,10 @@ module BenefitSponsors
             if @status
               flash[:notice] = "Role approved sucessfully"
             else
-              flash[:error] = "Role not approved due to " + @result
+              flash[:error] = "Role was not approved because " + @result
             end
           rescue Exception => e
-            flash[:error] = "Role not approved due to " + e.message
+            flash[:error] = "Role was not approved because " + e.message
           end
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
         end
@@ -73,10 +73,10 @@ module BenefitSponsors
             if @status
               flash[:notice] = "Role removed succesfully"
             else
-              flash[:error] = "Role not removed due to " + @result
+              flash[:error] = "Role was not removed because " + @result
             end
           rescue Exception => e
-            flash[:error] = "Role not removed due to " + e.message
+            flash[:error] = "Role was not removed because " + e.message
           end
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
         end
