@@ -3,10 +3,9 @@ Rails.application.routes.draw do
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   mount BenefitMarkets::Engine,       at: "/benefit_markets"
-  mount TransportGateway::Engine,       at: "/transport_gateway"
-  mount TransportProfiles::Engine,      at: "/transport_profiles"
-  mount SponsoredBenefits::Engine,      at: "/sponsored_benefits"
-  mount Notifier::Engine, at: "/notifier"
+  mount TransportGateway::Engine,     at: "/transport_gateway"
+  mount TransportProfiles::Engine,    at: "/transport_profiles"
+  mount Notifier::Engine,             at: "/notifier"
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
