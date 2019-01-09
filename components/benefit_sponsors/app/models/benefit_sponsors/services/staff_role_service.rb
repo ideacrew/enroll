@@ -11,20 +11,22 @@ module BenefitSponsors
 
       def find_profile(form)
         organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
-        if form[:is_broker_agency_staff_profile?]
-          organization.broker_agency_profile if organization.present?
-        else
-          organization.employer_profile if organization.present?
+        if organization.present?
+          if form.is_broker_agency_staff_profile?
+            organization.broker_agency_profile
+          else
+            organization.employer_profile
+          end
         end
       end
 
       def add_profile_representative!(form)
         profile = find_profile(form)
-        if form[:is_broker_agency_staff_profile?]
-          Person.add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
-        elsif form.profile_type == "broker_agency_staff"
+        if form.is_broker_agency_staff_profile? && form.email.present?
           match_or_create_person(form)
           persist_broker_agency_staff_role!(profile)
+        elsif form[:is_broker_agency_staff_profile?]
+          add_broker_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
         else
           Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email] , profile)
         end
@@ -84,7 +86,6 @@ module BenefitSponsors
       def persist_broker_agency_staff_role!(profile)
         exisiting_brokers_with_same_profile =  person.broker_agency_staff_roles.select{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id }
         if exisiting_brokers_with_same_profile.present?
-
           return false,  "you are already associated with this Broker Agency"
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({

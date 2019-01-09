@@ -254,6 +254,11 @@ module BenefitSponsors
         ga_staff_roles.any? {|role| role.benefit_sponsors_general_agency_profile_id == profile.id }
       end
 
+      def has_broker_agency_staff_role_for_profile(user, profile)
+        broker_agency_staff_roles = user.person.broker_agency_staff_roles
+        broker_agency_staff_roles.any? {|role| role.benefit_sponsors_broker_agency_profile_id == profile.id }
+      end
+
       def has_employer_staff_role_for_profile?(user, profile) # When profile is benefit sponsor
         staff_roles = user.person.employer_staff_roles
         staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == profile.id }
@@ -261,7 +266,7 @@ module BenefitSponsors
 
       def is_staff_for_agency?(user, form)
         profile = load_profile
-        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile) || has_general_agency_staff_role_for_profile?(user, profile)
+        has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile) || has_broker_agency_staff_role_for_profile(user, profile) || has_general_agency_staff_role_for_profile?(user, profile)
       end
 
       def load_profile
