@@ -8,8 +8,8 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
       expect(subject.name).to eql given_task_name
     end
   end
-  describe "update employee role id on the enrollments", dbclean: :after_each do
-    let(:current_effective_date)  { TimeKeeper.date_of_record }
+  describe "update employee role id on the enrollments/census_employee", dbclean: :after_each do
+    let(:current_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
@@ -53,8 +53,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee,
       employer_profile: benefit_sponsorship.profile,
       benefit_sponsorship: benefit_sponsorship,
-      benefit_group_assignments: [benefit_group_assignment]
-    )}
+      benefit_group_assignments: [benefit_group_assignment]    )}
     let(:person) { FactoryGirl.create(:person) }
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
 
@@ -69,24 +68,48 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
                          aasm_state: 'coverage_selected'
       )
     end
-    before(:each) do
-      ENV["hbx_id"] = person.hbx_id
-      employee_role.person.save!
-    end
+    context 'update employee role id on the enrollments', dbclean: :after_each  do
+      before :each do
+        ENV["hbx_id"] = person.hbx_id
+        ENV['action'] = "update_employee_role_id_to_enrollment"
+        employee_role.person.save!
+      end
+      it "should update the ee_role_id on hbx_enrollment with the correct one" do
+        expect(person.active_employee_roles.first.id).not_to eq hbx_enrollment.employee_role_id
+        subject.migrate
+        hbx_enrollment.reload
+        expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
+      end
 
-    it "should update the ee_role_id on hbx_enrollment with the correct one" do
-      expect(person.active_employee_roles.first.id).not_to eq hbx_enrollment.employee_role_id
-      subject.migrate
-      hbx_enrollment.reload
-      expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
+      it "should not change the ee_role_id of hbx_enrollment if the EE Role id matches with the correct one" do
+        hbx_enrollment.update_attributes(:employee_role_id => employee_role.id)
+        expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
+        subject.migrate
+        hbx_enrollment.reload
+        expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
+      end
     end
+    context 'update employee role id on the census_employee', dbclean: :after_each  do
+      before :each do
+        ENV["hbx_id"] = person.hbx_id
+        ENV['action'] = "update_employee_role_id_to_ce"
+        employee_role.person.save!
+        person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: employee_role.id )
+      end
+      it "should update the ee_role_id on census_employee if the id on EE role is not similar" do
+        person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: "111111111111111111111111")
+        expect(person.active_employee_roles.first.id).not_to eq person.active_employee_roles.first.census_employee.employee_role_id
+        subject.migrate
+        person.employee_roles.first.census_employee.reload
+        expect(person.active_employee_roles.first.id).to eq person.active_employee_roles.first.census_employee.employee_role_id
+      end
 
-    it "should not change the ee_role_id of hbx_enrollment if the EE Role id matches with the correct one" do
-      hbx_enrollment.update_attributes(:employee_role_id => employee_role.id)
-      expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
-      subject.migrate
-      hbx_enrollment.reload
-      expect(person.active_employee_roles.first.id).to eq hbx_enrollment.employee_role_id
+      it "should not change the ee_role_id of census_employee if the id on EE role is similar" do
+        expect(person.active_employee_roles.first.id).to eq person.active_employee_roles.first.census_employee.employee_role_id
+        subject.migrate
+        person.employee_roles.first.census_employee.reload
+        expect(person.active_employee_roles.first.id).to eq person.active_employee_roles.first.census_employee.employee_role_id
+      end
     end
   end
 end

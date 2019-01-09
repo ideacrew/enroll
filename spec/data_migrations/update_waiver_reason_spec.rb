@@ -1,5 +1,4 @@
 require "rails_helper"
-require 'byebug'
 
 require File.join(Rails.root,"app","data_migrations","update_waiver_reason")
 

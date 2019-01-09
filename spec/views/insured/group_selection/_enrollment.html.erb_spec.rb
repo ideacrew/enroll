@@ -1,20 +1,35 @@
 require 'rails_helper'
-include Insured::FamiliesHelper
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe "insured/group_selection/_enrollment.html.erb" do
+# Our helper slug class so we can use the helper methods in our spec
+module SpecHelperClassesForViews
+  class InsuredFamiliesHelperSlugHostClass
+    extend Insured::FamiliesHelper
+  end
+end
+
+RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_each do
   context 'Employer sponsored coverage' do
-    let(:employee_role) { FactoryGirl.build(:employee_role) }
-    let(:person) { FactoryGirl.build(:person) }
-    let(:plan) { FactoryGirl.build(:plan) }
-    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment) { HbxEnrollment.new(plan: plan, benefit_group: benefit_group) }
-    let(:family) { Family.new }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:person) {FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
+    let(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile ) }
+    let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
+    let(:active_household) {family.active_household}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: active_household )}
+    let(:mock_product) { double("Product", kind: "health" ) }
 
     before :each do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:is_shop?).and_return true
-      allow(hbx_enrollment).to receive(:benefit_group).and_return benefit_group
+      allow(hbx_enrollment).to receive(:employer_profile).and_return abc_profile
+      allow(hbx_enrollment).to receive(:coverage_year).and_return current_effective_date.year
+      allow(hbx_enrollment).to receive(:total_employee_cost).and_return 0
       assign :change_plan, 'change_plan'
       assign :employee_role, employee_role
       assign :person, person
@@ -23,7 +38,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
     end
 
     it 'should have title' do
-      title = "#{hbx_enrollment.coverage_year} #{plan.coverage_kind.capitalize} Coverage"
+      title = "#{hbx_enrollment.coverage_year} #{mock_product.kind.capitalize} Coverage"
       expect(rendered).to have_content(title)
     end
 
@@ -45,7 +60,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
     end
 
     it "should show the correct Premium" do
-      dollar_amount = number_to_currency(current_premium(hbx_enrollment), precision: 2)
+      dollar_amount = number_to_currency(SpecHelperClassesForViews::InsuredFamiliesHelperSlugHostClass.current_premium(hbx_enrollment), precision: 2)
       expect(rendered).to match /Premium/
       expect(rendered).to include dollar_amount
     end
@@ -55,34 +70,36 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
     end
   end
 
-  context 'Enrollment termination' do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
-    let(:person) { FactoryGirl.build(:person) }
+  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+    context 'Enrollment termination' do
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, household: family.active_household, kind: kind)}
+      let(:person) { FactoryGirl.build(:person) }
 
-    before :each do
-      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
-      allow(hbx_enrollment).to receive(:is_shop?).and_return false
-      assign :change_plan, 'change_plan'
-      assign :person, person
-      assign :family, family
-      render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
-    end
-
-    context 'with Individual coverage' do
-      let(:kind) { 'individual' }
-
-      it "should not have terminate confirmation modal" do
-        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
+      before :each do
+        allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
+        allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
+        allow(hbx_enrollment).to receive(:is_shop?).and_return false
+        assign :change_plan, 'change_plan'
+        assign :person, person
+        assign :family, family
+        render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
       end
-    end
 
-    context 'with Coverall coverage' do
-      let(:kind) { 'coverall' }
+      context 'with Individual coverage' do
+        let(:kind) { 'individual' }
 
-      it "should not have terminate confirmation modal" do
-        expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
+        it "should not have terminate confirmation modal" do
+          expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
+        end
+      end
+
+      context 'with Coverall coverage' do
+        let(:kind) { 'coverall' }
+
+        it "should not have terminate confirmation modal" do
+          expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
+        end
       end
     end
   end

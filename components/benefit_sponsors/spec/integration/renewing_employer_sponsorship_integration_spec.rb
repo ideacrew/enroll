@@ -1,7 +1,7 @@
 require "rails_helper"
 require "fileutils"
 
-RSpec.describe "an MA ACA Employer" do
+RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
 
   def reload_db_fixtures
     warn "USING DB DUMP AS FIXTURES - REPLACE WITH CORRECTED FACTORY HARNESS"

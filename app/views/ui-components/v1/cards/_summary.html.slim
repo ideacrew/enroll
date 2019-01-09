@@ -34,7 +34,7 @@
                     | Type
                   br/
                   span.ttu.dg.fourteen
-                    = @plan.health_plan_kind ? @plan.health_plan_kind.upcase : ""
+                    = @plan.product_type ? @plan.product_type.upcase : ""
                 td
                   span.ttu.lg.twelve style=("margin-left: -10px")
                     | Metal Level
@@ -92,28 +92,27 @@
     br/
     .row
       .col-md-12.col-sm-12.col-xs-12
-  - if @coverage_kind == "health"
-    .details
-      table.table.table-bordered
-        thead
-          tr
-            th width="30%"  SERVICES YOU MAY NEED
-            th width="40%"
-              | YOUR COST AT PARTICIPATING PROVIDER
-            th width="30%"  (IN-NETWORK)
-          tr
-            th  
-            th CO-PAY
-            th COINSURANCE
-        tbody
-          = render partial: "shared/service_visit_details", locals: { qhp: qhp }
-          tr
-            td
-            td.text-center colspan="3"
-              - if @hbx_enrollment.shopping?
-                = render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan }
-              - else
-                = link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans'
+  .details
+    table.table.table-bordered
+      thead
+        tr
+          th width="30%"  SERVICES YOU MAY NEED
+          th width="40%"
+            | YOUR COST AT PARTICIPATING PROVIDER
+          th width="30%"  (IN-NETWORK)
+        tr
+          th  
+          th CO-PAY
+          th COINSURANCE
+      tbody
+        = render partial: "shared/service_visit_details", locals: { qhp: qhp }
+        tr
+          td
+          td.text-center colspan="3"
+            - if @hbx_enrollment.shopping?
+              = render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan }
+            - else
+              = link_to '<i class="fa fa-chevron-left"></i> Back to My Account'.html_safe, family_account_path, class: 'btn btn-default all-plans'
   - if @hbx_enrollment.shopping?
     = link_to '<i class="fa fa-chevron-left"></i> Back to Results'.html_safe, '#', class: 'btn btn-default all-plans'
     br/

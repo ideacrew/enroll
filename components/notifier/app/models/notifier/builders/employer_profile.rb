@@ -97,8 +97,12 @@ module Notifier
       merge_model.coverage_month = TimeKeeper.date_of_record.next_month.strftime("%m/%Y")
     end
 
+    def enrolled_benefit_application
+      active_benefit_sponsorship.benefit_applications.where(:"aasm_state".in => ["enrollment_closed", "enrollment_eligible", "enrollment_open"]).first
+    end
+
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(active_benefit_sponsorship.benefit_applications.where(:"aasm_state".in => ["enrollment_closed", "enrollment_eligible", "enrollment_open"]).first.hbx_enrollments.map(&:total_premium).sum)
+      merge_model.total_amount_due = number_to_currency(enrolled_benefit_application.enrollments_till_given_effective_on(TimeKeeper.date_of_record.next_month.beginning_of_month).map(&:total_premium).sum)
     end
 
     def date_due

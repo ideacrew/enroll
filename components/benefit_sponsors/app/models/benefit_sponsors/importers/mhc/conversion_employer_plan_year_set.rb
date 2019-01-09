@@ -11,6 +11,7 @@ module BenefitSponsors
         @plan_year_end = config["conversions"]["plan_year_end_date"]
         @mid_year_conversion = config["conversions"]["mid_year_conversion"]
         @orginal_plan_year_begin_date = config["conversions"]["orginal_plan_year_begin_date"]
+        @sponsored_benefit_kind = config["conversions"]["sponsored_benefit_kind"]
       end
 
       def recalc_plan_year_dates_from_sheet(coverage_start_date)
@@ -40,12 +41,13 @@ module BenefitSponsors
           default_plan_year_start: @default_plan_year_start,
           plan_year_end: @plan_year_end,
           mid_year_conversion: @mid_year_conversion,
-          orginal_plan_year_begin_date: @orginal_plan_year_begin_date
+          orginal_plan_year_begin_date: @orginal_plan_year_begin_date,
+          sponsored_benefit_kind:  @sponsored_benefit_kind
           })
 
         case the_action
         when "update"
-          ::Importers::Mhc::ConversionEmployerPlanYearUpdate.new(plan_year_attrs)
+          ConversionEmployerPlanYearUpdate.new(plan_year_attrs)
         else
           ConversionEmployerPlanYearCreate.new(plan_year_attrs)
         end

@@ -1,4 +1,4 @@
-<table class="table table-wrapper table-condensed group-selection-tbl">
+<table class="table-wrapper table-condensed group-selection-tbl">
   <tbody>
     <% benefit_type = (@change_plan == "change_plan" && @hbx_enrollment.present?) ? @hbx_enrollment.coverage_kind : nil %>
     <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
@@ -8,9 +8,7 @@
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
         <% if @adapter.can_shop_shop?(@person) %>
-
           <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), @effective_on_date || @new_effective_on) %>
-
         <% end %>
 
         <% if (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)) %>

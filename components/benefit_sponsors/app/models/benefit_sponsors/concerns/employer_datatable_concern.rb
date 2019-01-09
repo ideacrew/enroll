@@ -29,23 +29,23 @@ module BenefitSponsors
         scope :benefit_sponsorship_applicant, -> () { where(:"aasm_state" => :applicant) }
 
         scope :benefit_application_enrolling, -> () {
-          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_closed, :enrollment_eligible])
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible])
         }
 
         scope :benefit_application_enrolling_initial, -> () {
-          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
         scope :benefit_application_enrolling_renewing, -> () {
-          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => true})
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_enrolling_initial_oe, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open, :enrollment_extended], :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
         scope :benefit_application_enrolling_renewing_oe, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor_id" => {:$exists => true})
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open, :enrollment_extended], :"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_initial_binder_paid, -> () {

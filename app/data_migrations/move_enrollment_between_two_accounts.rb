@@ -62,7 +62,7 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
                                     product_id:hbx_enrollment.product_id,
                                     rating_area_id:hbx_enrollment.rating_area_id,
                                     issuer_profile_id: hbx_enrollment.issuer_profile_id,
-                                    created_at:hbx_enrollment.created_at
+                                    created_at:hbx_enrollment.created_at,
                                   )
 
     family_members = gp.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }

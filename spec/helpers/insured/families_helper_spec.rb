@@ -38,7 +38,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
-  describe "#render_plan_type_details" do
+  describe "#render_plan_type_details", dbclean: :after_each do
     let(:dental_plan_2015){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2015, metal_level: "dental")}
     let(:dental_plan_2016){FactoryGirl.create(:plan_template,:shop_dental, active_year: 2016, metal_level: "dental", dental_level: "high")}
     let(:health_plan_2016){FactoryGirl.create(:plan_template,:shop_health, active_year: 2016, metal_level: "silver")}
@@ -56,7 +56,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
-  describe "#show_employer_panel" do
+  describe "#show_employer_panel", dbclean: :after_each do
     let(:person) {FactoryGirl.build(:person)}
     let(:employee_role) {FactoryGirl.build(:employee_role)}
     let(:census_employee) {FactoryGirl.build(:census_employee)}
@@ -152,7 +152,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
-  describe "ShopForPlan using SEP" do
+  describe "ShopForPlan using SEP", dbclean: :after_each do
     let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
     let(:person) {FactoryGirl.create(:person, :with_employee_role, :with_family)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -223,7 +223,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
   end
 
-  describe "show_download_tax_documents_button?" do
+  describe "show_download_tax_documents_button?", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person)}
 
     before do
@@ -261,7 +261,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
     end
 
-    context "as employee and has no consumer role" do
+    context "as employee and has no consumer role", dbclean: :after_each do
       let(:person) { FactoryGirl.create(:person)}
       let(:employee_role) {FactoryGirl.build(:employee_role)}
 
@@ -276,6 +276,146 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button?).to eq false
+        end
+      end
+    end
+
+    describe "#disable_make_changes_button?" do
+      let(:hbx_enrollment) do
+        instance_double(
+          HbxEnrollment,
+          census_employee: census_employee,
+          is_shop?: is_shop,
+          sponsored_benefit_package: sponsored_benefit_package,
+          employee_role: employee_role,
+          family: family
+        )
+      end
+
+      let(:census_employee) do
+        instance_double(CensusEmployee)
+      end
+
+      let(:is_shop) { true }
+
+      let(:todays_date) { double }
+
+      let(:sponsored_benefit_package) do
+        instance_double(
+          BenefitSponsors::BenefitPackages::BenefitPackage
+        )
+      end
+
+      let(:employee_role) do
+        instance_double(
+          EmployeeRole,
+          can_enroll_as_new_hire?: can_enroll_as_new_hire
+        )
+      end
+
+      let(:family) do
+        instance_double(
+          Family,
+          current_sep: current_sep,
+          is_under_special_enrollment_period?: under_special_enrollment_period
+        )
+      end
+
+      let(:current_sep) { double(effective_on: active_during_date) }
+
+      let(:active_during_date) { double }
+
+      let(:under_special_enrollment_period) { false }
+      let(:open_enrollment_contains) { false }
+      let(:can_enroll_as_new_hire) { false }
+      let(:active_during) { false }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(todays_date)
+        allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).
+          with(todays_date).and_return(open_enrollment_contains)
+        allow(hbx_enrollment).to receive(:active_during?).
+          with(active_during_date).and_return(active_during)
+      end
+
+      context "given a non-census employee enrollment" do
+        let(:census_employee) { nil }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+      context "given an enrollment which has a census employee, but is not shop" do
+        let(:is_shop) { false }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - when inside open enrollment for the same benefit package as this enrollment
+      " do
+
+        let(:open_enrollment_contains) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - but the corresponding employee role can enroll as a new hire
+      " do
+        let(:can_enroll_as_new_hire) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - but the family is under a special enrollment period which overlaps with when this enrollment is active
+      " do
+        let(:under_special_enrollment_period) { true }
+        let(:active_during) { true }
+
+        it "does not disable the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
+        end
+      end
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - and the family is not under a special enrollment period
+      " do
+
+        it "disables the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
+        end
+      end
+      context "given:
+      - a census employee enrollment
+      - which is shop
+      - but is not inside the open enrollment period
+      - and the corresponding employee role can not enroll as a new hire
+      - and the family is under a special enrollment period, but the SEP doesn't overlap with this enrollment's active period
+      " do
+        let(:under_special_enrollment_period) { true }
+
+        it "disables the Make Changes button" do
+          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
         end
       end
     end

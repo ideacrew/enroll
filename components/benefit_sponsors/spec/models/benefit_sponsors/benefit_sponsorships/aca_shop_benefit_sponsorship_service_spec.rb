@@ -41,7 +41,7 @@ module BenefitSponsors
       aasm_state: renewal_sponsorship_state)
     }
 
-    let(:current_date)                    { Date.today }
+    let(:current_date)                    { Date.new(this_year,3,14) }
 
     before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
@@ -67,7 +67,6 @@ module BenefitSponsors
       end
     end
 
-
     describe '.auto_cancel_ineligible' do 
       let(:sponsorship_state)               { :initial_enrollment_ineligible }
       let(:initial_application_state)       { :enrollment_ineligible }
@@ -91,6 +90,61 @@ module BenefitSponsors
 
             expect(sponsor.applicant?).to be_truthy
             expect(benefit_application.canceled?).to be_truthy
+          end
+        end
+      end
+    end
+
+    describe '.end_open_enrollment' do 
+      let(:sponsorship_state)               { :initial_enrollment_open }
+      let(:business_policy) { double(success_results: [], fail_results: []) }
+
+      before do
+        allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:business_policy_satisfied_for?).and_return(true)
+        allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:calculate_pricing_determinations).and_return(true)
+        allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:business_policy).and_return(business_policy)
+      end
+
+      context  'For initial employers for whom open enrollment extended' do 
+        let(:initial_application_state)       { :enrollment_extended }
+
+        it "should close their open enrollment" do 
+          (april_sponsors).each do |sponsor|
+            benefit_application = sponsor.benefit_applications.first
+
+            expect(sponsor.initial_enrollment_open?).to be_truthy
+            expect(benefit_application.enrollment_extended?).to be_truthy
+
+            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
+            sponsorship_service.end_open_enrollment
+
+            sponsor.reload
+            benefit_application.reload
+
+            expect(sponsor.initial_enrollment_closed?).to be_truthy
+            expect(benefit_application.enrollment_closed?).to be_truthy
+          end
+        end
+      end
+
+      context  'For renewal employers for whom open enrollment extended' do 
+        let(:renewal_application_state)       { :enrollment_extended }
+
+        it "should close their open enrollment" do 
+          (april_renewal_sponsors).each do |sponsor|
+            benefit_application = sponsor.benefit_applications.first
+
+            expect(sponsor.active?).to be_truthy
+            expect(benefit_application.enrollment_extended?).to be_truthy
+
+            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
+            sponsorship_service.end_open_enrollment
+
+            sponsor.reload
+            benefit_application.reload
+
+            expect(sponsor.active?).to be_truthy
+            expect(benefit_application.enrollment_eligible?).to be_truthy
           end
         end
       end

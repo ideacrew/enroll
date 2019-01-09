@@ -15,6 +15,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
+      data_object.dental_enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.benefit_application = Notifier::MergeDataModels::BenefitApplication.new
       data_object.census_employee = Notifier::MergeDataModels::CensusEmployee.new
       data_object.special_enrollment_period = Notifier::MergeDataModels::SpecialEnrollmentPeriod.new
@@ -104,6 +105,22 @@ module Notifier
 
     def census_employee_dental_enrollment?
       merge_model.census_employee.latest_terminated_dental_enrollment_plan_name.present?
+    end
+
+    def has_multiple_enrolled_enrollments?
+      enrolled_enrollments.size > 1
+    end
+
+    def has_health_enrolled_enrollment?
+      enrolled_enrollments.by_coverage_kind("health").first.present?
+    end
+
+    def has_dental_enrolled_enrollment?
+      enrolled_enrollments.by_coverage_kind("dental").first.present?
+    end
+
+    def enrolled_enrollments
+      employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.enrolled
     end
 
     def census_employee_health_and_dental_enrollment?

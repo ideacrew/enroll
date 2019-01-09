@@ -17,7 +17,7 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
     let!(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
     let!(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
     let!(:person)                         { FactoryGirl.create(:person) }
-    let!(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: old_employer_profile.id) }
+    let!(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id) }
 
     let!(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
@@ -33,7 +33,7 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
       end
 
       it "should update employer_profile id for employee_role" do
-        expect(employee_role.benefit_sponsors_employer_profile_id.to_s).to eq old_employer_profile.id.to_s
+        expect(employee_role.employer_profile_id.to_s).to eq old_employer_profile.id.to_s
         subject.migrate
         employee_role.reload
         expect(employee_role.benefit_sponsors_employer_profile_id.to_s).to eq employer_profile.id.to_s
@@ -48,9 +48,9 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
       end
 
       it "should exit as it cannot find new_model's organization for given fein" do
-        expect(employee_role.benefit_sponsors_employer_profile_id.to_s).to eq old_employer_profile.id.to_s
+        expect(employee_role.employer_profile_id.to_s).to eq old_employer_profile.id.to_s
         subject.migrate
-        expect(employee_role.benefit_sponsors_employer_profile_id.to_s).to eq old_employer_profile.id.to_s
+        expect(employee_role.employer_profile_id.to_s).to eq old_employer_profile.id.to_s
       end
     end
   end
@@ -58,17 +58,17 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
 
 describe "update census employee id for an employee_role", dbclean: :after_each do
     let(:office_location)                 { FactoryGirl.build(:office_location, :primary) }
-    let!(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
-    let!(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
-    let!(:old_census_record)              { FactoryGirl.create(:census_employee, employer_profile: old_employer_profile) }
-    let!(:person)                         { FactoryGirl.create(:person) }
-    let!(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: old_employer_profile.id, census_employee_id: old_census_record.id) }
+    let(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
+    let(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
+    let(:old_census_record)              { CensusEmployee.create(first_name:"Eddie", last_name:"Vedder", gender:"male", dob: "1964-10-23".to_date, employer_profile_id: old_employer_profile.id, hired_on: "2015-04-01".to_date, ssn: "112212221") }
+    let(:person)                         { FactoryGirl.create(:person) }
+    let(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id, census_employee_id: old_census_record.id) }
 
-    let!(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let!(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)                   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let!(:employer_profile)               { organization.employer_profile }
+    let(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:organization)                   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_profile)               { organization.employer_profile }
     let(:census_employee)                 { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship, employee_role_id: employee_role.id) }
     let(:benefit_sponsorship)             { employer_profile.add_benefit_sponsorship }
     let(:benefit_market)                  { site.benefit_markets.first }

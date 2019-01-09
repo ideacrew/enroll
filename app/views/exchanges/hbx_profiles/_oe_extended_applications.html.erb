@@ -1,0 +1,48 @@
+<div class="container" id="extendable_applications_table">
+  <div class = "table-responsive table-override">
+  <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.close_open_enrollment") %> </h4>
+
+  <table class = "table" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th><%= l10n("hbx_profiles.application_type")%></th>
+        <th><%= l10n("hbx_profiles.effective_date")%></th>
+        <th><%= l10n("hbx_profiles.oe_end_date")%></th>
+        <th><%= l10n("hbx_profiles.application_status")%></th>
+        <th><%= l10n("hbx_profiles.submitted_at")%></th>
+        <th><%= l10n("hbx_profiles.last_updated_at")%></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @benefit_applications.each do |application| %>
+        <tr>
+          <td><%= application.predecessor.present? ? "Renewal" : "Initial" %></td>
+          <td><%= application.effective_period.min.strftime('%m/%d/%Y') %></td>
+          <td><%= application.open_enrollment_period.max.strftime('%m/%d/%Y') %></td>
+          <td><%= benefit_application_summarized_state(application) %></td>
+          <td><%= TimeKeeper.local_time(application.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+          <td><%= TimeKeeper.local_time(application.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+          <td>
+            <%= link_to l10n('hbx_profiles.close_open_enrollment'), main_app.close_extended_open_enrollment_exchanges_hbx_profiles_path(id: application.id, benefit_sponsorship_id: @benefit_sponsorship.id), :method => :post, :role => 'button', :class => "btn btn-primary btn-sm #{pundit_class HbxProfile, :can_extend_open_enrollment? }" %>
+          </td>
+        </tr>
+        <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="edit_open_enrollment_form"></div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>

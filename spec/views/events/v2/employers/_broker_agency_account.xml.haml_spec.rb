@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml" do
+RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml", dbclean: :after_each do
 
   describe "broker_agency_account xml" do
     let(:general_agency_account) {  FactoryGirl.create(:general_agency_account) }
