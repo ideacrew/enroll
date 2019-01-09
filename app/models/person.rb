@@ -619,7 +619,14 @@ class Person
   end
 
   def has_pending_broker_staff_role?(broker_agency_profile_id)
-    self.broker_agency_staff_roles.where(:benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id, :aasm_state => :broker_agency_pending).size > 0
+    self.broker_agency_staff_roles.where({ 
+          aasm_state: :broker_agency_pending,
+          '$or' => 
+            [
+              {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id},
+              {broker_agency_profile_id: broker_agency_profile_id}
+            ],
+      }).size > 0
   end
 
   def active_broker_staff_roles
@@ -841,6 +848,7 @@ class Person
       
       return false, 'Person does not exist on the Exchange' if person.count == 0
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+      return false, 'Person already has a staff role for this broker' if Person.staff_for_broker_including_pending(broker_agency_profile).include?(person.first)
 
       broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
       broker_agency_staff_role.save
@@ -855,7 +863,9 @@ class Person
         return false, 'Person not found'
       end
 
-      broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role| (role.benefit_sponsors_broker_agency_profile_id.to_s == broker_agency_profile_id.to_s) && role.is_open? }
+      broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role|
+         (role.benefit_sponsors_broker_agency_profile_id.to_s || role.broker_agency_profile_id.to_s) == broker_agency_profile_id.to_s && role.is_open? 
+      }
 
       if broker_agency_staff_role 
         broker_agency_staff_role.broker_agency_terminate!
@@ -864,6 +874,44 @@ class Person
         return false, 'No matching Broker Agency Staff role'
       end
     end
+
+    def staff_for_broker_including_pending(broker_profile)
+      #This query (and similar one below) handles both old broker profile model and new broker profile model.
+      Person.where(:broker_agency_staff_roles => { 
+          '$elemMatch' => { 
+            '$and' =>[
+              {
+                '$or' => 
+                [
+                  {benefit_sponsors_broker_agency_profile_id: broker_profile.id },
+                  {broker_agency_profile_id: broker_profile.id}
+                ],
+              },
+              {'$or' => 
+                [
+                  {aasm_state: :broker_agency_pending},
+                  {aasm_state: :active}
+                ],
+              }
+            ]
+
+           } 
+        })
+    end
+
+    def staff_for_broker(broker_profile)
+      Person.where(:broker_agency_staff_roles => { 
+        '$elemMatch' => { 
+          aasm_state: :active,
+          '$or' => 
+            [
+              {benefit_sponsors_broker_agency_profile_id: broker_profile.id, },
+              {broker_agency_profile_id: broker_profile.id}
+            ],
+         } 
+      })
+    end
+
   end
 
   # HACK

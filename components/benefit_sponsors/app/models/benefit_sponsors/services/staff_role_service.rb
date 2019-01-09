@@ -32,7 +32,7 @@ module BenefitSponsors
 
       def deactivate_profile_representative!(form)
         profile = find_profile(form)
-        person_ids = form[:is_broker_agency_staff_profile?] ? profile.staff_for_broker.map(&:id) : Person.staff_for_employer(profile).map(&:id)
+        person_ids = form[:is_broker_agency_staff_profile?] ? Person.staff_for_broker(profile).map(&:id) : Person.staff_for_employer(profile).map(&:id)
         if person_ids.count == 1 && person_ids.first.to_s == form[:person_id]
           return false, 'Please add another staff role before deleting this role'
         else
