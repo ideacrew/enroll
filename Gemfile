@@ -175,7 +175,6 @@ end
 # gem 'factory_girl_rails', '4.6.0'
 # gem 'jbuilder', '~> 2.0'
 # gem 'mongoid', '~> 5.4.0'
-# gem 'mongoid-enum'
 # gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'
 # gem 'nokogiri', '1.6.7.2'
 # gem 'pundit', '~> 1.0.1'
@@ -197,10 +196,10 @@ end
 # gem 'jquery-turbolinks'
 # gem 'jquery-ui-rails'
 # gem 'less-rails-bootstrap', '~> 3.3.1.0'
+# gem 'mongoid-enum'
 # gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 # gem 'redis-rails',  '~> 5.0.2'
 # gem 'sass-rails', '~> 5.0'
 # gem 'sprockets', '~> 2.12.3'
 # gem 'therubyracer', '~> 0.12.3', platforms: :ruby
-
 #######################################################
