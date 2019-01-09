@@ -12,6 +12,8 @@ site:
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
   exchange_hbx_id: "DC0"
+  forms: "https://dchealthlink.com/forms#en"
+  website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
