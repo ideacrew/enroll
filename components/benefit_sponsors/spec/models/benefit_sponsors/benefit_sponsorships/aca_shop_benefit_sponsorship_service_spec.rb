@@ -41,7 +41,7 @@ module BenefitSponsors
       aasm_state: renewal_sponsorship_state)
     }
 
-    let(:current_date)                    { Date.today }
+    let(:current_date)                    { Date.new(this_year,3,14) }
 
     before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
