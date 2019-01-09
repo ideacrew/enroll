@@ -348,7 +348,7 @@ module BenefitSponsors
           if canceled_coverages.present?
             sponsored_benefits.each do |sponsored_benefit|
               hbx_enrollment = canceled_coverages.detect{|coverage| coverage.coverage_kind == sponsored_benefit.product_kind.to_s}
-              enrollment_transition = hbx_enrollment.workflow_state_transitions[0]
+              enrollment_transition = hbx_enrollment.workflow_state_transitions[0] if hbx_enrollment.present?
 
               if enrollment_transition.present? && enrollment_transition.to_state == hbx_enrollment.aasm_state
                 hbx_enrollment.update(aasm_state: enrollment_transition.from_state)
