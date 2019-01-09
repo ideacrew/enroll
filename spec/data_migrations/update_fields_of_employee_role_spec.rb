@@ -119,16 +119,20 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
     let(:census_employee) { FactoryGirl.create(:census_employee)}
     let(:person) { FactoryGirl.create(:person, :with_employee_role)}
     let(:employee_role) { person.employee_roles.first }
-    before :each do
-      allow(ENV).to receive(:[]).with("census_employee_id").and_return(census_employee.id.to_s)
-      allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
-      allow(ENV).to receive(:[]).with("action").and_return("update_with_given_census_employee_id")
-    end
 
-    it "should update census_employee_id by using employee_role" do
-      subject.migrate
-      employee_role.reload
-      expect(employee_role.census_employee_id.to_s).to eq census_employee.id.to_s
+    context "should update census_employee_id by using employee_role" do
+      before :each do
+        allow(ENV).to receive(:[]).with("census_employee_id").and_return(census_employee.id.to_s)
+        allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
+        allow(ENV).to receive(:[]).with("action").and_return("update_with_given_census_employee_id")
+      end
+
+      it "should update census_employee_id by using employee_role" do
+        expect(employee_role.census_employee_id.to_s).not_to eq census_employee.id.to_s
+        subject.migrate
+        employee_role.reload
+        expect(employee_role.census_employee_id.to_s).to eq census_employee.id.to_s
+      end
     end
   end
 end

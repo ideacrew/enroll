@@ -53,7 +53,17 @@ class UpdateFieldsOfEmployeeRole< MongoidMigrationTask
   end
 
   def update_with_given_census_employee_id(census_employee_id, employee_role_id)
-    EmployeeRole.find(employee_role_id).update_attributes!(census_employee_id: census_employee_id)
-    puts "Successfully updated employee_role with census_employee_id: #{census_employee_id}" unless Rails.env.test?
+    begin
+      census_employee = CensusEmployee.where(id: census_employee_id)
+      employee_role = EmployeeRole.find(employee_role_id)
+        if employee_role.present? && census_employee.present?
+          employee_role.update_attributes!(census_employee_id: census_employee_id)
+          puts "Successfully updated employee_role with census_employee_id: #{ce.id}" unless Rails.env.test?
+        else
+          puts "Please check the EE Role id and Census Employee id"
+        end
+    rescue => e
+      puts "error: #{e.backtrace}" unless Rails.env.test?
+    end
   end
 end
