@@ -7,7 +7,7 @@ module Services
       attr_accessor :hbx_enrollment, :is_congress, :elected_aptc
 
       BASE_URL = Rails.application.config.checkbook_services_base_url
-      CONGRESS_URL = Rails.application.config.checkbook_services_congress_url
+      CONGRESS_URL = Settings.checkbook_services.checkbook_services_congress_url
       IVL_PATH = Rails.application.config.checkbook_services_ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
@@ -127,6 +127,7 @@ module Services
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
       end
+
       def employer_effective_date
         benefit_group_assignment  = @hbx_enrollment.effective_on < @census_employee.active_benefit_group_assignment.plan_year.end_on ? @census_employee.active_benefit_group_assignment : @census_employee.renewal_benefit_group_assignment
         # benefit_group_assignment = @census_employee.renewal_benefit_group_assignment  || @census_employee.active_benefit_group_assignment
