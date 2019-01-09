@@ -16,7 +16,7 @@ module BenefitSponsors
           unless @status
             @messages = (' Broker Staff Role was not added because '  + @result)
           else
-            @messages = "Broker Staff Role added sucessfully"
+            @messages = "Broker Staff Role added"
           end
           respond_to do |format|
             format.js

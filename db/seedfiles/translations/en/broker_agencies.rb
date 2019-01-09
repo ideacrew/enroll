@@ -21,6 +21,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.hbx_acct" => "HBX Acct",
 	"en.ee_ct" => "EE Ct",
 	"en.enroll_status" => "Enroll Status",
+	"en.no_agencies_found" => "No Broker Agencies Found",
 	"en.broker_agencies.profiles.assigned_agency"=> "Assigned Agency",
 	"en.assign_history" => "Assign History",
 	"en.start_on" => "start on",
