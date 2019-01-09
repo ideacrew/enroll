@@ -12,7 +12,6 @@ gem 'rails', '~> 5.2.2'
 # gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'effective_datatables', '~> 4.3'
 # gem 'jquery-datatables-rails', '3.4.0'
-# gem 'jquery-datatables-rails'
 
 # Verify this gem git reference is necessary.  Otherwise point it to release level
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
@@ -22,9 +21,6 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 
 ## Fix this dependency -- bring into project
 # gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
-
-## Remove this component and code in directory tree ##
-# gem "sponsored_benefits", path: "components/sponsored_benefits"
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
 # gem 'database_cleaner',       '~> 1.7'
