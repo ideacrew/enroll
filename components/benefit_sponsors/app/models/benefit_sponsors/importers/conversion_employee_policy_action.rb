@@ -8,12 +8,28 @@ module BenefitSponsors
         return nil unless census_employee
 
         found_employer = find_employer
-        benefit_application = find_employer.active_benefit_application
+        benefit_application = fetch_application_based_sponsored_kind
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
           @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
         end
+      end
+
+      def current_benefit_application(employer)
+        if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+          employer.benefit_applications.where(:aasm_state => :imported).first
+        else
+          employer.benefit_applications.where(:aasm_state => :active).first
+        end
+      end
+
+      # for normal :conversion, :mid_plan_year_conversion we use :imported plan year
+      # but while creating :dental sponsored_benefit we will add it on :active benefit_application
+      def fetch_application_based_sponsored_kind
+        employer = find_employer
+        benefit_application = sponsored_benefit_kind == :dental ? employer.active_benefit_application : current_benefit_application(employer)
+        benefit_application
       end
 
       def find_employee
@@ -39,17 +55,35 @@ module BenefitSponsors
         return @plan unless @plan.nil?
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
-        corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+
+        if sponsored_benefit_kind == :dental
+          corrected_hios_id = clean_hios.split("-")[0]
+        else
+          corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+        end
+
         sponsor_benefit = find_sponsor_benefit
         return nil if sponsor_benefit.blank?
-        sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id).first
+
+        if sponsor_benefit.source_kind == :conversion
+          actual_start_on = (sponsor_benefit.benefit_package.end_on + 1.day).prev_year
+          # hios = (sponsored_benefit_kind == :dental ? hios_id : corrected_hios_id)
+          ::BenefitMarkets::Products::Product.where(hios_id: corrected_hios_id).detect do |product|
+            product.application_period.cover?(actual_start_on)
+          end
+        else
+          sponsor_benefit.product_package.products.where(hios_id: corrected_hios_id).first
+        end
       end
 
       def find_sponsor_benefit
-        employer = find_employer
-        if benefit_application = employer.active_benefit_application
+        benefit_application = fetch_application_based_sponsored_kind
+
+        if benefit_application
           benefit_package = benefit_application.benefit_packages.first
-          benefit_package.sponsored_benefits.first
+          benefit_package.sponsored_benefits.unscoped.detect {|sponsored_benefit|
+            sponsored_benefit.product_kind == sponsored_benefit_kind
+          }
         end
       end
 
@@ -63,15 +97,16 @@ module BenefitSponsors
       # TODO: update references for plan years with benefit applications
       def save
         return false unless valid?
-        employer = find_employer
         employee = find_employee
         employee_role = employee.employee_role
-        benefit_application = employer.active_benefit_application
+        benefit_application = fetch_application_based_sponsored_kind
         benefit_package = benefit_application.benefit_packages.first
 
         if find_benefit_group_assignment.blank?
           if benefit_application
-            has_active_state = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES.include?(benefit_application.aasm_state)
+            published_states = BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES
+            imported_states = BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES
+            has_active_state = (published_states + imported_states).include?(benefit_application.aasm_state)
             employee.benefit_group_assignments << BenefitGroupAssignment.new({
                                                                                  benefit_package_id: benefit_package.id,
                                                                                  start_on: benefit_application.start_on,
@@ -99,16 +134,21 @@ module BenefitSponsors
         return [] if family.blank?
 
         employer = find_employer
+
         sponsor_ship = employer.active_benefit_sponsorship
-        benefit_application = employer.active_benefit_application
+
+        benefit_application = fetch_application_based_sponsored_kind
         # plan_years = employer.plan_years.select {|py| py.coverage_period_contains?(start_date)}
         # active_plan_year = plan_years.detect {|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
         return [] if benefit_application.blank?
 
-        family.active_household.hbx_enrollments.where({
+        hbx_enrollments = family.active_household.hbx_enrollments.where({
                                                           :benefit_sponsorship_id => sponsor_ship.id,
                                                           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
                                                       })
+        sponsored_benefit_kind = (sponsored_benefit_kind == :health) ? "health" : "dental"
+
+        hbx_enrollments.by_coverage_kind(sponsored_benefit_kind)
       end
     end
   end

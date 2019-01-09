@@ -31,7 +31,8 @@ module BenefitMarkets
       # Transform an external relationship into the mapped relationship
       # specified by this pricing model.
       def map_relationship_for(relationship, age, disability)
-        member_relationships.detect { |mr| mr.match?(relationship, age, disability) }.relationship_name
+        found_relationship = member_relationships.detect { |mr| mr.match?(relationship, age, disability) }
+        found_relationship.nil? ? nil : found_relationship.relationship_name
       end
 
       def create_copy_for_embedding

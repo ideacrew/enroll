@@ -10,6 +10,8 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :around_each do
   let(:organization) { employer_profile.organization }
   let(:start_on) { "01012017" }
   let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
+  let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
+  let!(:document) { FactoryGirl.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
 
   describe "create_initial_plan_year", dbclean: :after_each do
     it "creates a new plan year" do

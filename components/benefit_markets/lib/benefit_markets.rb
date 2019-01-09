@@ -28,7 +28,6 @@ module BenefitMarkets
       :"Only Paper and Electronic communications" => :paper_and_electronic
     }
 
-
     class << self
       attr_writer :configuration
     end

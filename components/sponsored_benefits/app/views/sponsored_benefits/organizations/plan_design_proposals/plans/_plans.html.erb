@@ -1,5 +1,6 @@
 <% @plans.each do |plan| %>
 <div class="col-xs-4">
+  <label for="reference_plan_<%= plan.id %>">
   <div class="col-xs-12 reference-plan"
     data-plan-type="<%= plan.plan_type %>"
     data-plan-hsa="<%= plan.plan_hsa %>"
@@ -8,18 +9,17 @@
     data-family-deductible="<%= plan.family_deductible %>"
   >
     <div class="col-xs-2">
-
-      <%= radio_button "#{@location_id}", :reference_plan_id, plan.id %>
-      <%= label_tag "#{@location_id}_reference_plan_id" do %>
-      <i class="far fa-circle" onclick="setRadioButtons(this)" data-tempId="<%= plan.id %>"></i>
-      <% end %>
+      <%= radio_button_tag :reference_plan, "#{plan.id}", false, onclick:"setMyPlans(this)", data:{planId:plan.id} %>
     </div>
 
     <div class="col-xs-10">
+
       <div class="panel row reference-plan-info">
+
         <div class="panel-heading">
-          <h3><b><%= plan.name %></b></h3>
+           <h3 class="pdp-titles-class"><b><%= plan.name %></b></h3>
         </div>
+
         <div class="panel-body">
           <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
           <span class="plan-label">Carrier: </span><span><%= carriers_cache[plan.carrier_profile_id] %></span><br>
@@ -28,13 +28,17 @@
             <%= render partial: "shared/network_data", locals: {plan: plan} %>
           </span>
           <br />
-          <span><%= check_box_tag "#{@location_id}", plan.id, false, id:'plan-comparison' %> </span><span>Include in comparison</span>
+          <% if !(kind == "dental") %>
+            <span><%= check_box_tag "#{@location_id}", plan.id, false, id:'plan-comparison' %> </span><span>Include in comparison</span>
+          <% end %>
           <br/>
         </div>
+
       </div>
 
     </div>
   </div>
+  </label>
 </div>
 <% end %>
 

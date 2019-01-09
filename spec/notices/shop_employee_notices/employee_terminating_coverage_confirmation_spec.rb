@@ -1,20 +1,27 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :dbclean => :after_each do
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
-  let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
-  let!(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
-  let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
-  let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
-  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-  let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  let(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending')}
-  let(:renewal_plan) { FactoryGirl.create(:plan)}
-  let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
+
+  let(:person) {FactoryGirl.create(:person, :with_family)}
+  let(:family){ person.primary_family }
+  let(:household){ family.active_household }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package ) }
+  let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile) }
+  let!(:sponsored_benefit) { renewal_application.benefit_packages.first.sponsored_benefits.first }
+  let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
+  let(:hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                            household: household,
+                                            hbx_enrollment_members: [hbx_enrollment_member],
+                                            external_enrollment: false,
+                                            sponsored_benefit_id: sponsored_benefit.id,
+                                            rating_area_id: rating_area.id )
+  }
+
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employee must be notified when they successfully match to their employer',
                             :notice_template => 'notices/shop_employee_notices/employee_terminating_coverage_confirmation',
@@ -31,11 +38,9 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
       :options => { :hbx_enrollment_hbx_id => hbx_enrollment.hbx_id.to_s }
   }}
 
-  let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected', coverage_kind: "dental")}
-
   describe "New" do
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
     end
     context "valid params" do
@@ -63,7 +68,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
     it "should build notice with all necessory info" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
-      expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employee_notice.notice.employer_name).to eq abc_profile.organization.legal_name.titleize
     end
   end
 
@@ -71,10 +76,10 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
-      allow(enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
-      allow(enrollment).to receive(:coverage_kind).and_return("dental")
+      allow(hbx_enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
+      allow(hbx_enrollment).to receive(:coverage_kind).and_return("health")
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
-      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
     end
 
     it "should append data" do
@@ -87,10 +92,10 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
-      allow(enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
-      allow(enrollment).to receive(:coverage_kind).and_return("dental")
+      allow(hbx_enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
+      allow(hbx_enrollment).to receive(:coverage_kind).and_return("dental")
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment  
-      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
     end
 
     it "should render terminating_coverage_notice" do

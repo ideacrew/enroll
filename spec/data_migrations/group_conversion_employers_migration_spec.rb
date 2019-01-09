@@ -15,17 +15,22 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
   describe "changing plan year's state", dbclean: :after_each do
 
     let(:organization) { FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: "Corp 1", fein: "520818450" }
-    let (:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
+    let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryGirl.create(:person)}
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,10,1))}
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     before do
-      allow(Time).to receive(:now).and_return(Time.parse("2016-10-15 00:00:00"))
+      # rake is doing a job of date specific check on employer plan year
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(2016,10,15))
       organization.employer_profile.update_attributes(profile_source: "conversion", aasm_state: "eligible")
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
       hbx_enrollment.update_attribute(:benefit_group_id, organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first.id)
-      allow(Time).to receive(:now).and_return(Time.parse("2016-10-1 00:00:00"))
       organization.employer_profile.plan_years.where(:aasm_state => "expired").first.update(is_conversion: true)
     end
 
@@ -39,7 +44,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
 
       it "should migrate the 2015 plan year" do
         expired_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "expired").first
-        expired_plan_year.update(is_conversion: true)
+        expired_plan_year.update_attributes(is_conversion: true)
         subject.migrate
         expired_plan_year.reload
         expect(expired_plan_year.aasm_state).to eq "conversion_expired"

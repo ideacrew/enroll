@@ -9,6 +9,7 @@ module SponsoredBenefits
       attr_reader :profile
       attr_reader :plan_design_organization
       attr_reader :proposal
+      attr_reader :kind
 
       validates_presence_of :title, :effective_date, :sic_code, :county, :zip_code
 
@@ -19,8 +20,16 @@ module SponsoredBenefits
         ensure_sic_zip_county
       end
 
-      def build_benefit_group
-        ensure_benefit_group
+      def for_new
+        service.ensure_benefits
+      end
+
+      def for_create(attrs)
+        service.save_benefits(attrs)
+      end
+
+      def for_destroy
+        service.destroy_benefits
       end
 
       def assign_wrapper_attributes(attrs = {})
@@ -51,6 +60,10 @@ module SponsoredBenefits
           @profile = @proposal.profile
           prepopulate_attributes
         end
+      end
+
+      def kind=(val)
+        @kind = val
       end
 
       def prepopulate_attributes
@@ -94,27 +107,6 @@ module SponsoredBenefits
         application.benefit_groups << benefit_group
         ## this is not saving even though it claims to be valid
         @proposal.save!
-      end
-
-      def ensure_benefit_group
-        sponsorship = @proposal.profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.first
-        benefit_group = application.benefit_groups.first || construct_new_benefit_group
-        if benefit_group.relationship_benefits.empty?
-          benefit_group.build_relationship_benefits
-        end
-        if benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
-      end
-
-      def construct_new_benefit_group
-        sponsorship = @proposal.profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.first
-        benefit_group = application.benefit_groups.build
-        benefit_group.build_relationship_benefits
-        benefit_group.build_composite_tier_contributions
-        benefit_group
       end
 
       def save
@@ -174,6 +166,23 @@ module SponsoredBenefits
             ]
           ]
         }
+      end
+
+      def is_dental?
+        kind == "dental"
+      end
+
+      def service
+        return @service if defined? @service
+        @service = SponsoredBenefits::Services::PlanDesignProposalService.new(
+          kind: kind,
+          proposal: proposal
+        )
+      end
+
+      def is_dental_plans_avialable?
+        self.effective_date = @effective_date unless @effective_date.is_a?(Date)
+        service.is_dental_plans_avialable?(self)
       end
     end
   end

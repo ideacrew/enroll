@@ -15,7 +15,7 @@ module BenefitSponsors
                       
       ACCESS_RIGHTS = %w(public pii_restricted)
 
-      after_save :notify_on_save
+      after_create :notify_on_create
 
       add_observer ::BenefitSponsors::Observers::DocumentObserver.new, [:notifications_send]
 

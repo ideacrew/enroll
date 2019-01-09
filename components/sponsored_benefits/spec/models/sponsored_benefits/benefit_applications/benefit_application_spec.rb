@@ -73,17 +73,20 @@ module SponsoredBenefits
           phone: phone
         )
       }
-      let(:benefit_group)             { FactoryGirl.create :benefit_group }
+      let(:benefit_group)             { FactoryGirl.create :benefit_group, title:'new' }
 
       let(:benefit_market)      { site.benefit_markets.first }
       let(:current_effective_date)  { TimeKeeper.date_of_record }
       let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                              benefit_market: benefit_market,
-                                              title: "SHOP Benefits for #{current_effective_date.year}",
-                                              application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                      }
-      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+                                             benefit_market: benefit_market,
+                                             title: "SHOP Benefits for #{current_effective_date.year}",
+                                             application_period: (effective_period_start_on.beginning_of_year..effective_period_start_on.end_of_year))
+
+      }
+      let!(:product)      { benefit_market_catalog.product_packages.where(package_kind:'single_product').first.products.first}
+      let!(:plan) {benefit_group.reference_plan}
+      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area, active_year: effective_period_start_on.year }
+      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area, active_year: effective_period_start_on.year }
       let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:benefit_sponsor_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:sponsor_benefit_sponsorship) { benefit_sponsor_organization.employer_profile.add_benefit_sponsorship }
@@ -93,6 +96,8 @@ module SponsoredBenefits
       let(:profile) {SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile.new}
 
       before(:each) do
+        plan.hios_id = product.hios_id
+        plan.save
         sponsor_benefit_sponsorship.rating_area = rating_area
         sponsor_benefit_sponsorship.service_areas = [service_area]
         sponsor_benefit_sponsorship.save

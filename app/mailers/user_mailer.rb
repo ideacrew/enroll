@@ -42,7 +42,7 @@ class UserMailer < ApplicationMailer
           format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
         end
       else
-        mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+        mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
           format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
         end
       end
@@ -53,20 +53,20 @@ class UserMailer < ApplicationMailer
   def send_future_employee_open_enrollment_invitation(email, census_employee, invitation)
     benefit_applications = census_employee.benefit_sponsorship.benefit_applications.published.select{|ba| ba.effective_period.cover?(census_employee.earliest_effective_date)}
     if email.present? && benefit_applications.any?{|ba| ba.is_submitted?}
-      mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+      mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
         format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
       end
     end
   end
 
   def renewal_invitation_email(email, census_employee, invitation)
-    mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+    mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
       format.html { render "renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
     end
   end
 
   def initial_employee_invitation_email(email, census_employee, invitation)
-    mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
+    mail({to: email, subject: "Enroll Now: Your Plan Open Enrollment Period has Begun"}) do |format|
       format.html { render "initial_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
     end
   end
@@ -81,7 +81,7 @@ class UserMailer < ApplicationMailer
 
   def broker_invitation_email(email, person_name, invitation)
     if email.present?
-      mail({to: email, subject: "Congratulations! Your Broker Application for the #{site_short_name} for Business has been Approved!"}) do |format|
+      mail({to: email, subject: "Important information for accessing your new broker account through the #{site_short_name}"}) do |format|
         format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
       end
     end
@@ -97,7 +97,7 @@ class UserMailer < ApplicationMailer
 
   def send_employee_ineligibility_notice(email, first_name)
     if email.present?
-      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Health Insurance", from: '#{mail_address}'}) do |format|
+      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Insurance", from: '#{mail_address}'}) do |format|
         format.html {render "employee_ineligibility_notice", locals: {first_name: first_name}}
       end
     end
@@ -163,7 +163,7 @@ class UserMailer < ApplicationMailer
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?
-      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: " Welcome! You've Submitted a Broker Application on the #{site_short_name} for Business"}) do |format|
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application through the #{site_short_name} for Business"}) do |format|
         format.html { render "broker_application_confirmation", :locals => { :person => person }}
       end
     end

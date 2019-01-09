@@ -20,42 +20,48 @@ module BenefitSponsors
 
         scope :attestations_by_kind, ->(attestation_kind) {
           orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state" => attestation_kind)
-          self.where(:"organization".in => orgs.collect{|org| org.id.to_s})}
+          self.where(:"organization".in => orgs.collect{|org| org.id})}
 
         scope :employer_attestations, -> {
           orgs =  BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles.employer_attestation.aasm_state".in => EmployerAttestation::ATTESTATION_KINDS)
           self.where(:"organization".in => orgs.collect{|org| org.id.to_s}) }
 
-         scope :benefit_sponsorship_applicant, -> () {
-           where(:"aasm_state" => :applicant)
-         }
+        scope :benefit_sponsorship_applicant, -> () { where(:"aasm_state" => :applicant) }
 
         scope :benefit_application_enrolling, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES)
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible])
         }
 
         scope :benefit_application_enrolling_initial, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
         scope :benefit_application_enrolling_renewing, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, :"benefit_applications.predecessor_id" => {:$exists => true})
+          where(:"benefit_applications.aasm_state".in => [:draft, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_enrolling_initial_oe, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open, :enrollment_extended], :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
         scope :benefit_application_enrolling_renewing_oe, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_open], :"benefit_applications.predecessor_id" => {:$exists => true})
+          where(:"benefit_applications.aasm_state".in => [:enrollment_open, :enrollment_extended], :"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_initial_binder_paid, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => false})
+          where(:"aasm_state" => :initial_enrollment_eligible, :"benefit_applications.predecessor_id" => {:$exists => false})
         }
 
-        scope :benefit_application_renewing_binder_paid, -> () {
-          where(:"benefit_applications.aasm_state".in => [:enrollment_eligible], :"benefit_applications.predecessor_id" => {:$exists => true})
+        scope :benefit_application_initial_binder_pending, -> () {
+          where(:"aasm_state" => :binder_reversed, :"benefit_applications.predecessor_id" => {:$exists => false})
+        }
+
+        scope :benefit_application_pending, -> () {
+          where(:"benefit_applications.aasm_state".in => [:pending], :"benefit_applications.predecessor_id" => {:$exists => false})
+        }
+
+        scope :benefit_application_renewal_pending, -> () {
+          where(:"benefit_applications.aasm_state".in => [:pending],:"benefit_applications.predecessor_id" => {:$exists => true})
         }
 
         scope :benefit_application_imported, -> () {
@@ -63,7 +69,7 @@ module BenefitSponsors
         }
 
         scope :benefit_application_enrolled, -> () {
-          where(:"benefit_applications.aasm_state".in => BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_APPROVED_STATES)
+          where(:"benefit_applications.aasm_state".in => [:enrollment_closed, :enrollment_eligible, :active])
         }
 
         scope :benefit_application_published, -> () {

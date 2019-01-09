@@ -57,5 +57,28 @@ module BenefitSponsors
         expect(response).to have_http_status(:success)
       end
     end
+
+
+    describe "GET coverage_reports" do
+      let!(:employees) {
+        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+      }
+
+      before do
+        benefit_sponsorship.save!
+        allow(controller).to receive(:authorize).and_return(true)
+        sign_in user
+        get :coverage_reports, employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime("%m/%d/%Y")
+        allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+      end
+
+      it "should render coverage_reports template" do
+        expect(response).to render_template("coverage_reports")
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 end

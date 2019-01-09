@@ -17,7 +17,7 @@ module BenefitSponsors
     APPLICATION_DRAFT_STATES      = [:draft, :imported] + APPLICATION_EXCEPTION_STATES.freeze
     APPLICATION_APPROVED_STATES   = [:approved].freeze
     APPLICATION_DENIED_STATES     = [:denied].freeze
-    ENROLLING_STATES              = [:enrollment_open, :enrollment_closed].freeze
+    ENROLLING_STATES              = [:enrollment_open, :enrollment_extended, :enrollment_closed].freeze
     ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
@@ -25,8 +25,10 @@ module BenefitSponsors
     CANCELED_STATES               = [:canceled].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
-    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
+    APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
+    TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
+    APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
 
     # Deprecated - Use SUBMITTED_STATES
     PUBLISHED_STATES = SUBMITTED_STATES
@@ -37,6 +39,8 @@ module BenefitSponsors
                                                   terminated: :terminate,
                                                   canceled:   :cancel
                                                 }
+
+
 
 
     # The date range when this application is active
@@ -100,7 +104,7 @@ module BenefitSponsors
     scope :submitted,           ->{ any_in(aasm_state: APPROVED_STATES) }
     scope :exception,           ->{ any_in(aasm_state: APPLICATION_EXCEPTION_STATES) }
     scope :enrolling,           ->{ any_in(aasm_state: ENROLLING_STATES) }
-    scope :enrolling_state,     ->{ where(aasm_state: :enrollment_open) }
+    scope :enrolling_state,     ->{ any_in(aasm_state: [:enrollment_open, :enrollment_extended]) }
 
     scope :enrollment_eligible,             ->{ any_in(aasm_state: ENROLLMENT_ELIGIBLE_STATES) }
     scope :enrollment_ineligible,           ->{ any_in(aasm_state: ENROLLMENT_INELIGIBLE_STATES) }
@@ -112,6 +116,8 @@ module BenefitSponsors
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
+    scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
+    scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
@@ -145,10 +151,20 @@ module BenefitSponsors
     scope :benefit_terminate_on,            ->(compare_date = TimeKeeper.date_of_record) { where(
                                                                                          :"terminated_on" => compare_date)
                                                                                          }
-    scope :by_year,                          ->(compare_year = TimeKeeper.date_of_record.year) { where(
+    scope :by_year,                         ->(compare_year = TimeKeeper.date_of_record.year) { where(
                                                                                                 :"effective_period.min".gte => Date.new(compare_year, 1, 1),
                                                                                                 :"effective_period.min".lte => Date.new(compare_year, 12, -1)
                                                                                               )}
+
+    scope :by_overlapping_effective_period, ->(effective_period) {
+      where(
+        "$or" => [
+          { :"effective_period.min" => {"$gte" => effective_period.min, "$lte" => effective_period.max }},
+          { :"effective_period.max" => {"$gte" => effective_period.min, "$lte" => effective_period.max }}
+        ]
+      )
+    }
+
     # TODO
     scope :published,                       ->{ any_in(aasm_state: PUBLISHED_STATES) }
     # scope :renewing,                        ->{ is_renewing } # Deprecate it in future
@@ -157,6 +173,15 @@ module BenefitSponsors
     # scope :renewing,                        ->{ any_in(aasm_state: RENEWING) }
     # scope :renewing_published_state,        ->{ any_in(aasm_state: RENEWING_APPROVED_STATE) }
     # scope :published_or_renewing_published, ->{ any_of([published.selector, renewing_published_state.selector]) }
+
+    scope :renewing_published_state,        ->{
+      where(
+        "$and" => [
+          {:aasm_state.in => PUBLISHED_STATES },
+          {"$exists" => {:predecessor_id => true} }
+        ]
+      )
+    }
 
     scope :published_benefit_applications_within_date_range, ->(begin_on, end_on) {
       where(
@@ -348,8 +373,23 @@ module BenefitSponsors
       (open_enrollment_period.end - open_enrollment_period.begin).to_i
     end
 
+    # This is being used by Open enrollment extension feature
+    # Admin can't choose date before regular monthly open enrollment end date i.e, 20th
+    # Admin can't choose a date beyond the effective month of the application. 
+    #   ex: For 1/1 application we limit calender from 12/20 to 1/31.
+    def open_enrollment_date_bounds
+      {
+        min: [TimeKeeper.date_of_record, benefit_sponsorship.open_enrollment_period_for(effective_date).max].max,
+        max: effective_date.end_of_month
+      }
+    end
+
     def is_submitted?
       PUBLISHED_STATES.include?(aasm_state)
+    end
+
+    def can_be_migrated?
+      imported?
     end
 
     # TODO: Refer to benefit_sponsorship instead of employer profile.
@@ -440,6 +480,10 @@ module BenefitSponsors
     def hbx_enrollments
       @hbx_enrollments = [] if benefit_packages.size == 0
       @hbx_enrollments ||= HbxEnrollment.all_enrollments_under_benefit_application(self)
+    end
+
+    def enrollments_till_given_effective_on(date)
+      hbx_enrollments.select { |en| en.effective_on <= date } if hbx_enrollments.present?
     end
 
     def cancel_enrollments
@@ -571,6 +615,12 @@ module BenefitSponsors
       benefit_packages.each { |benefit_package| benefit_package.renew_member_benefits } if is_renewing?
     end
 
+    def reinstate_canceled_benefit_package_members
+      if aasm.from_state == :canceled
+        benefit_packages.each { |benefit_package| benefit_package.reinstate_canceled_member_benefits }
+      end
+    end
+
     def transition_benefit_package_members
       transition_kind = BENEFIT_PACKAGE_MEMBERS_TRANSITION_MAP[aasm_state]
       return if transition_kind.blank?
@@ -671,6 +721,7 @@ module BenefitSponsors
 
       # TODO: send_employee_invites - needs to be moved to observer pattern.
       state :enrollment_open, after_enter: [:recalc_pricing_determinations, :renew_benefit_package_members, :send_employee_invites] # Approved application has entered open enrollment period
+      state :enrollment_extended, :after_enter => :reinstate_canceled_benefit_package_members
       state :enrollment_closed
       state :enrollment_eligible    # Enrollment meets criteria necessary for sponsored members to effectuate selected benefits
       state :enrollment_ineligible  # open enrollment did not meet eligibility criteria
@@ -727,7 +778,7 @@ module BenefitSponsors
       end
 
       event :end_open_enrollment do
-        transitions from:   :enrollment_open,
+        transitions from:   [:enrollment_open, :enrollment_extended],
           to:     :enrollment_closed
       end
 
@@ -774,7 +825,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
-        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES + [:enrollment_ineligible],
+        transitions from:   APPLICATION_DRAFT_STATES + ENROLLING_STATES + [:enrollment_ineligible, :active],
           to:     :canceled
       end
 
@@ -791,6 +842,10 @@ module BenefitSponsors
       # Coverage reinstated
       event :reinstate_enrollment do
         transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
+      end
+
+      event :extend_open_enrollment do
+        transitions from: [:canceled, :enrollment_ineligible, :enrollment_extended, :enrollment_open, :enrollment_closed], to: :enrollment_extended
       end
     end
 

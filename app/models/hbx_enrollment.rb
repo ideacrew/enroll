@@ -206,7 +206,6 @@ class HbxEnrollment
                                                           :"effective_on".lte => effective_period.max
                                                         )}
 
-
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship,
@@ -763,6 +762,50 @@ class HbxEnrollment
   def plan
     return @plan if defined? @plan
     @plan = Plan.find(self.plan_id) unless plan_id.blank?
+  end
+
+  def benefit_sponsorship
+    return @benefit_sponsorship if defined? @benefit_sponsorship
+    @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(benefit_sponsorship_id)
+  end
+
+  def benefit_sponsorship=(benefit_sponsorship)
+    raise ArgumentError.new("expected BenefitSponsors::BenefitSponsorships::BenefitSponsorship") unless benefit_sponsorship.is_a? ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship
+    self.benefit_sponsorship_id = benefit_sponsorship._id
+    @benefit_sponsorship = benefit_sponsorship
+  end
+
+  def sponsored_benefit_package
+    return @sponsored_benefit_package if defined? @sponsored_benefit_package
+    @sponsored_benefit_package = ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
+  end
+
+  def sponsored_benefit_package=(benefit_package)
+    raise ArgumentError.new("expected BenefitSponsors::BenefitPackages::BenefitPackage") unless benefit_package.is_a? ::BenefitSponsors::BenefitPackages::BenefitPackage
+    self.sponsored_benefit_package_id = benefit_package._id
+    @sponsored_benefit_package = benefit_package
+  end
+
+  def sponsored_benefit
+    return @sponsored_benefit if defined? @sponsored_benefit
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+  end
+
+  def sponsored_benefit=(sponsored_benefit)
+    raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
+    self.sponsored_benefit_id = sponsored_benefit._id
+    @sponsored_benefit = sponsored_benefit    
+  end
+
+  def rating_area
+    return @rating_area if defined? @rating_area
+    @rating_area = ::BenefitMarkets::Locations::RatingArea.find(self.rating_area_id)
+  end
+
+  def rating_area=(rating_area)
+    raise ArgumentError.new("expected BenefitMarkets::Locations::RatingArea") unless rating_area.is_a? ::BenefitMarkets::Locations::RatingArea
+    self.rating_area_id = rating_area._id
+    @rating_area = rating_area
   end
 
   def product=(new_product)
@@ -1422,7 +1465,6 @@ class HbxEnrollment
     event :force_select_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
-
   end
 
   def termination_attributes_cleared?
@@ -1583,12 +1625,6 @@ class HbxEnrollment
     sponsored_benefit.single_plan_type?
   end
 
-  def rating_area
-    return nil unless is_shop?
-    return nil if benefit_group_id.blank?
-    benefit_group.rating_area
-  end
-
   # def ee_plan_selection_confirmation_sep_new_hire
   #   if is_shop? && (enrollment_kind == "special_enrollment" || census_employee.new_hire_enrollment_period.present?)
   #     if census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || special_enrollment_period.present?
@@ -1624,20 +1660,6 @@ class HbxEnrollment
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
  end
-
-  def sponsored_benefit_package
-    @sponsored_benefit_package ||= ::BenefitSponsors::BenefitPackages::BenefitPackage.find(sponsored_benefit_package_id)
-  end
-
-  def sponsored_benefit
-    @sponsored_benefit ||= sponsored_benefit_package.sponsored_benefits.detect do |sb|
-     sb.id == sponsored_benefit_id
-    end
-  end
-
-  def rating_area
-    @rating_area ||= ::BenefitMarkets::Locations::RatingArea.find(self.rating_area_id)
-  end
 
   EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled) do
     def is_disabled?

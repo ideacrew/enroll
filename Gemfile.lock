@@ -80,9 +80,12 @@ PATH
       active_model_serializers
       config
       devise (~> 3.5.4)
+      interactor (= 3.1.0)
+      interactor-rails (= 2.0.2)
       language_list (~> 1.1.0)
       money-rails (~> 1.3.0)
       mongoid (~> 5.4.0)
+      mongoid-autoinc
       pundit (~> 1.0.1)
       rails (~> 4.2.7.1)
       roo (~> 2.1.0)
@@ -96,9 +99,11 @@ PATH
     notifier (0.0.1)
       aasm (~> 4.8.0)
       acapi
-      ckeditor
+      ckeditor (= 4.2.4)
       combine_pdf
+      config
       curl
+      money-rails (~> 1.3.0)
       mongoid (~> 5.4.0)
       non-stupid-digest-assets
       rails (~> 4.2.3)
@@ -229,7 +234,6 @@ GEM
     builder (3.2.3)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    byebug (8.2.2)
     capistrano (3.3.5)
       capistrano-stats (~> 1.1.0)
       i18n
@@ -297,7 +301,6 @@ GEM
     cliver (0.3.2)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
-    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -372,8 +375,6 @@ GEM
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
     ffi (1.9.23)
-    font-awesome-rails (4.5.0.1)
-      railties (>= 3.2, < 5.1)
     forgery (0.7.0)
     gherkin (3.2.0)
     globalid (0.4.1)
@@ -448,7 +449,6 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     maskedinput-rails (1.4.1.0)
-    method_source (0.9.0)
     mime-types (2.99.3)
     mini_portile2 (2.0.0)
     minitest (5.11.3)
@@ -517,7 +517,7 @@ GEM
       childprocess (~> 0.6, >= 0.6.3)
       iniparse (~> 1.4)
     parallel (1.12.1)
-    parallel_tests (2.21.3)
+    parallel_tests (2.26.2)
       parallel
     parser (2.5.0.5)
       ast (~> 2.4.0)
@@ -532,20 +532,6 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     powerpack (0.1.1)
-    pry (0.11.3)
-      coderay (~> 1.1.0)
-      method_source (~> 0.9.0)
-    pry-byebug (3.3.0)
-      byebug (~> 8.0)
-      pry (~> 0.10)
-    pry-rails (0.3.6)
-      pry (>= 0.10.4)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
-    pry-stack_explorer (0.4.9.2)
-      binding_of_caller (>= 0.7)
-      pry (>= 0.9.11)
     puma (3.11.2)
     pundit (1.0.1)
       activesupport (>= 3.0.0)
@@ -710,7 +696,6 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (~> 3.0)
-    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -806,7 +791,6 @@ DEPENDENCIES
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-slider-rails (= 6.0.17)
   bson (~> 4.3.0)
-  byebug (= 8.2.2)
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
   capybara (= 2.6.2)
@@ -828,7 +812,6 @@ DEPENDENCIES
   eye (= 0.8.0)
   factory_girl_rails (= 4.6.0)
   fakeredis
-  font-awesome-rails (= 4.5.0.1)
   forgery
   haml
   httparty
@@ -862,14 +845,9 @@ DEPENDENCIES
   notifier!
   openhbx_cv2!
   overcommit
-  parallel_tests
+  parallel_tests (= 2.26.2)
   poltergeist
   prawn!
-  pry
-  pry-byebug
-  pry-rails
-  pry-remote
-  pry-stack_explorer
   puma
   pundit (~> 1.0.1)
   railroady (~> 1.5.2)

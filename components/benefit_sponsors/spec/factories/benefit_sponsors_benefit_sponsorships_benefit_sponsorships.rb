@@ -6,6 +6,7 @@ FactoryGirl.define do
     transient do
       initial_application_state :active
       renewal_application_state :enrollment_open
+      draft_application_state :draft
       default_effective_period nil
       default_open_enrollment_period nil
       service_area_list []
@@ -50,7 +51,7 @@ FactoryGirl.define do
         if evaluator.site
           site = evaluator.site
         else
-          site  = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+          site  = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
         end
         organization  = create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
         benefit_sponsorship.benefit_market = site.benefit_markets.first
@@ -126,6 +127,20 @@ FactoryGirl.define do
           :with_predecessor_imported_application,
           :benefit_sponsorship => benefit_sponsorship,
           :aasm_state => evaluator.renewal_application_state,
+          :predecessor_application_state => evaluator.initial_application_state,
+          :default_effective_period => evaluator.default_effective_period,
+          :default_open_enrollment_period => evaluator.default_open_enrollment_period
+        )
+      end
+    end
+
+    trait :with_renewal_draft_benefit_application do
+      after :build do |benefit_sponsorship, evaluator|
+        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+          :with_benefit_package,
+          :with_predecessor_application,
+          :benefit_sponsorship => benefit_sponsorship,
+          :aasm_state => evaluator.draft_application_state,
           :predecessor_application_state => evaluator.initial_application_state,
           :default_effective_period => evaluator.default_effective_period,
           :default_open_enrollment_period => evaluator.default_open_enrollment_period
