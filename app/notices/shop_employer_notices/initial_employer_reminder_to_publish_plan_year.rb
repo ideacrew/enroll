@@ -11,10 +11,12 @@ class ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear < ShopEmploy
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state => "draft").first
+    plan_year = employer_profile.benefit_applications.where(:aasm_state => "draft").first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })
-    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+
+    scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+    notice.plan_year.binder_payment_due_date = scheduler.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
 end

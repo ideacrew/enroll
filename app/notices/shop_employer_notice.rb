@@ -100,7 +100,7 @@ class ShopEmployerNotice < Notice
 
   def append_broker(broker)
     return if broker.blank?
-    location = broker.organization.primary_office_location
+    location = broker.primary_office_location
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
@@ -130,5 +130,5 @@ class ShopEmployerNotice < Notice
       UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
     end
   end
-
 end
+

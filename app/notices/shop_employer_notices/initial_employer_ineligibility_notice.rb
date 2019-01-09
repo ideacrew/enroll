@@ -13,7 +13,7 @@ class ShopEmployerNotices::InitialEmployerIneligibilityNotice < ShopEmployerNoti
 
   def append_data
     plan_year = employer_profile.benefit_applications.where(:aasm_state => "enrollment_ineligible").first
-    policy = enrollment_policy.business_policies_for(benefit_application, :end_open_enrollment)
+    policy = enrollment_policy.business_policies_for(plan_year, :end_open_enrollment)
     unless policy.is_satisfied?(plan_year)
       plan_year_warnings = []
       policy.fail_results.each do |k, v|

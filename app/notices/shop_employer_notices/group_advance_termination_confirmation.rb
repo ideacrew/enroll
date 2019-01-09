@@ -12,7 +12,7 @@ class ShopEmployerNotices::GroupAdvanceTerminationConfirmation < ShopEmployerNot
    end
  
    def append_data
-     plan_year = employer_profile.plan_years.where(:aasm_state => "terminated").sort_by(&:start_on).last
+     plan_year = employer_profile.benefit_applications.where(:aasm_state => "terminated").sort_by(&:start_on).last
      notice.plan_year = PdfTemplates::PlanYear.new({ end_on: plan_year.end_on })
    end
  

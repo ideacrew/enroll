@@ -1,20 +1,21 @@
 class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
 
   Required= Notice::Required + []
+  include ::BenefitSponsors::InvoiceHelper
 
   attr_accessor :broker_agency_profile
   attr_accessor :employer_profile
 
-  def initialize(employer_profile, args = {})
-    self.employer_profile = employer_profile
-    self.broker_agency_profile = employer_profile.broker_agency_profile
+  def initialize(broker_agency_profile, args = {})
+    self.employer_profile = args[:options][:event_object]
+    self.broker_agency_profile = broker_agency_profile
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
     args[:to] = broker_agency_profile.primary_broker_role.email_address
     args[:name] = broker_agency_profile.primary_broker_role.person.full_name
     args[:recipient_document_store] = broker_agency_profile
-    self.header = "notices/shared/shop_header.html.erb"
+    self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(employer_profile, args)
   end
 
@@ -42,7 +43,7 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
 
     })
     notice.broker_agency = broker_agency_profile.legal_name.titleize
-    address = broker_agency_profile.organization.primary_mailing_address.present? ? broker_agency_profile.organization.primary_mailing_address : broker_agency_profile.organization.primary_office_location.address
+    address = mailing_or_primary_address(broker_agency_profile)
     append_address(address)
     append_hbe
   end

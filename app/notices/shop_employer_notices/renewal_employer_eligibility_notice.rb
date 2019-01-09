@@ -15,7 +15,8 @@ class ShopEmployerNotices::RenewalEmployerEligibilityNotice < ShopEmployerNotice
   end
 
   def build_plan_year
-    active_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE).first
+    aasm_states = (BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES)
+    active_plan_year = employer_profile.benefit_applications.where(:aasm_state.in => aasm_states).first
     notice.plan_year = PdfTemplates::PlanYear.new({
         :open_enrollment_start_on => active_plan_year.open_enrollment_start_on,
         :open_enrollment_end_on => active_plan_year.open_enrollment_end_on

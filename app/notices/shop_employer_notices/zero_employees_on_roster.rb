@@ -12,7 +12,7 @@ class ShopEmployerNotices::ZeroEmployeesOnRoster < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.show_plan_year
+    plan_year = employer_profile.published_benefit_application
     notice.plan_year = PdfTemplates::PlanYear.new({
           :open_enrollment_end_on => plan_year.open_enrollment_end_on,
         })

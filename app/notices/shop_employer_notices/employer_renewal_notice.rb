@@ -33,7 +33,8 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
   end
 
   def append_data
-    renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
+    aasm_states = ["draft", "approved", "enrollment_open", "enrollment_eligible", "pending"]
+    renewing_plan_year = employer_profile.benefit_applications.where(:predecessor_id => { :$exists => true }, :aasm_state.in => aasm_states).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on,
           :start_on => renewing_plan_year.start_on,
@@ -44,5 +45,4 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
   def conversion_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'conversion_employer_attachment.pdf')]
   end
-
 end

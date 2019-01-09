@@ -13,14 +13,14 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "published"]).first
+    plan_year = employer_profile.benefit_applications.where(:aasm_state.in => ["enrollment_open", "approved"]).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
           :open_enrollment_start_on => plan_year.open_enrollment_start_on,
           :open_enrollment_end_on => plan_year.open_enrollment_end_on
         })
     #binder payment deadline
-    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+    scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+    notice.plan_year.binder_payment_due_date = scheduler.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
-
 end

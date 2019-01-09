@@ -112,6 +112,8 @@ module BenefitSponsors
           trigger_initial_employer_no_binder_payment_received_for(model_instance)
         when :group_advance_termination_confirmation
           trigger_group_advance_termination_confirmation_for(model_instance, benefit_application)
+        when :employee_open_enrollment_reminder
+          trigger_employee_open_enrollment_reminder_for(model_instance, benefit_application)
         else
         end
       end
@@ -184,7 +186,11 @@ module BenefitSponsors
       end
 
       def trigger_renewal_application_created_for(model_instance, benefit_application)
-        deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_created")
+        if benefit_application.employer_profile.is_converting?
+          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "conversion_group_renewal")
+        else
+          deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "renewal_application_created")
+        end
       end
 
       def trigger_renewal_application_autosubmitted_for(model_instance, benefit_application)
@@ -193,7 +199,7 @@ module BenefitSponsors
       end
 
       def trigger_low_enrollment_notice_for_employer_for(model_instance)
-        BenefitSponsors::Queries::NoticeQueries.organizations_for_low_enrollment_notice(TimeKeeper.date_of_record).each do |benefit_sponsorship|
+        BenefitSponsors::Queries::NoticeQueries.organizations_ending_oe_in_two_days(TimeKeeper.date_of_record).each do |benefit_sponsorship|
          begin
            benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state => :enrollment_open).sort_by(&:created_at).last
             next if benefit_application.effective_period.min.yday == 1
@@ -248,6 +254,25 @@ module BenefitSponsors
         benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
           begin
             deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination") if ce.employee_role
+          end
+        end
+      end
+
+      def trigger_employee_open_enrollment_reminder_for(model_instance, benefit_application)
+        date = TimeKeeper.date_of_record
+        BenefitSponsors::Queries::NoticeQueries.organizations_ending_oe_in_two_days(date).each do |benefit_sponsorship|
+          begin
+          # next if benefit_application.benefit_groups.any?{|bg| bg.is_congress?}
+            benefit_application = benefit_sponsorship.benefit_applications.enrollment_open.sort_by(&:created_at).last
+            benefit_sponsorship.census_employees.non_terminated.each do |ce|
+              begin
+                #exclude new hires
+                next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
+                deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "employee_open_enrollment_reminder") if ce.employee_role
+              rescue Exception => e
+                (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
+              end
+            end
           end
         end
       end

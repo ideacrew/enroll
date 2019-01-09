@@ -14,8 +14,8 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
   def append_data
     active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
     renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "pending").first
-    policy = eligibility_policy.business_policies_for(plan_year, :submit_benefit_application)
-    unless policy.is_satisfied?(plan_year)
+    policy = eligibility_policy.business_policies_for(renewing_plan_year, :submit_benefit_application)
+    unless policy.is_satisfied?(renewing_plan_year)
       plan_year_warnings = []
       if policy.fail_results.include?(:employer_primary_office_location)
         plan_year_warnings << "primary location is outside washington dc"

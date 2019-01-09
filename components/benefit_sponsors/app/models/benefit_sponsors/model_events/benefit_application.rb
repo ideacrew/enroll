@@ -29,7 +29,8 @@ module BenefitSponsors
           :low_enrollment_notice_for_employer,
           :initial_employer_first_reminder_to_publish_plan_year,
           :initial_employer_second_reminder_to_publish_plan_year,
-          :initial_employer_final_reminder_to_publish_plan_year
+          :initial_employer_final_reminder_to_publish_plan_year,
+          :employee_open_enrollment_reminder
       ]
 
       OTHER_EVENTS = [
@@ -185,6 +186,8 @@ module BenefitSponsors
           elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
             is_initial_employer_final_reminder_to_publish_plan_year = true
           end
+
+          is_employee_open_enrollment_reminder = true
 
           DATA_CHANGE_EVENTS.each do |event|
             begin

@@ -12,8 +12,8 @@ class ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted < ShopEmployer
   end
 
   def append_data
-    aasm_state = (BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES)
-    plan_year = employer_profile.benefit_applications.where(:aasm_state.in => aasm_state).first
+    aasm_states = (BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES - BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES)
+    plan_year = employer_profile.benefit_applications.where(:aasm_state.in => aasm_states).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })

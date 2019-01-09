@@ -10,12 +10,16 @@ class ShopEmployerNotices::EmployerInvoiceAvailable < ShopEmployerNotice
     send_generic_notice_alert
     # send_generic_notice_alert_to_broker_and_ga  # turning off emails to brokers/GA
   end
+
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + ["terminated"]).first
+    aasm_states = BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES + ["terminated"]
+    plan_year = employer_profile.benefit_applications.where(:aasm_state.in => aasm_states).first
     notice.plan_year = PdfTemplates::PlanYear.new({
                                                       :start_on => plan_year.start_on,
                                                   })
-    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+    #binder payment deadline
+    scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+    notice.plan_year.binder_payment_due_date = scheduler.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
 
   def create_secure_inbox_message(notice)
@@ -25,5 +29,4 @@ class ShopEmployerNotices::EmployerInvoiceAvailable < ShopEmployerNotice
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
-
 end

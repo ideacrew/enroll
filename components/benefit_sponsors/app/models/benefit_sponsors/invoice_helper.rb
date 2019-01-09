@@ -221,8 +221,8 @@ module BenefitSponsors
       end
     end
 
-    def mailing_or_primary_address(employer_profile)
-      office_locations = employer_profile.office_locations
+    def mailing_or_primary_address(instance)
+      office_locations = instance.office_locations
       mailing_office_locations, primary_office_locations = office_locations.partition { |ol| ol.address.mailing? }
       mailing_office_locations.present? ? mailing_office_locations.first.address : primary_office_locations.first.address
     end
