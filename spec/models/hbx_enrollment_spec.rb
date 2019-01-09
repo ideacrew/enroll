@@ -2328,22 +2328,6 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
     end
   end
 
-  context 'terminating a terminating_pending enrollment should not update terminated on date' do
-
-    let(:terminated_on)   { TimeKeeper.date_of_record+5.days }
-
-    before do
-      enrollment.update_attributes!(aasm_state: "coverage_termination_pending", terminated_on: terminated_on)
-      current_plan_year.terminate_plan_year(TimeKeeper.date_of_record+20.days, TimeKeeper.date_of_record, "voluntary", false)
-      enrollment.reload
-    end
-
-    it "should not update terminated on date on enrollment" do
-      expect(enrollment.aasm_state).to eq "coverage_termination_pending"
-      expect(enrollment.terminated_on).to eq terminated_on
-    end
-  end
-
   context "market_name" do
     it "for shop" do
       enrollment.kind = 'employer_sponsored'
