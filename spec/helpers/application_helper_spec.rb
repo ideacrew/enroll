@@ -31,17 +31,28 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#product_rates_available?" do
+    let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
     let(:benefit_sponsorship){ double("benefit_sponsorship") }
 
-    it "should return blocking when true" do
-      allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
-      allow(::BenefitMarkets::Products::Product).to receive(:has_rates?).and_return(false)
-      expect(helper.product_rates_available?(benefit_sponsorship)).to eq "blocking"
+    context "when active_benefit_application is present" do
+      it "should return false" do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(true)
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
     end
 
-    it "should return empty string when false" do
-      allow(benefit_sponsorship).to receive(:applicant?).and_return(false)
-      expect(helper.product_rates_available?(benefit_sponsorship)).to eq ""
+    context "when active_benefit_application is not present" do
+      before(:each) do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(false)
+        allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
+      end
+      it "should return false if not in late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
+
+      it "should return true if during late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship, TimeKeeper.date_of_record + 1.year)).to eq true
+      end
     end
   end
 
