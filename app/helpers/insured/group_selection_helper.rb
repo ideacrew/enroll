@@ -62,7 +62,7 @@ module Insured
         qle = QualifyingLifeEventKind.find(params[:qle_id])
         return qle.market_kind
       end
-      if person.has_active_employee_role?
+      if (person.has_active_employee_role? && person.has_employer_benefits?)
         'shop'
       elsif person.is_consumer_role_active?
         'individual'
