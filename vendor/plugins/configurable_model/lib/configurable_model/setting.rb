@@ -1,49 +1,52 @@
 module ConfigurableModel
-  class Setting
-    include Mongoid::Document
-    include Mongoid::Timestamps
+  module Setting
+    extend ActiveSupport::Concern
 
-    embedded_in :configurable, polymorphic: true
+    included do
 
-    field :label,       type: String  # fill using key like i18n in the form if not provided
-    field :description, type: String
+      include Mongoid::Document
+      include Mongoid::Timestamps
 
-    field :key,         type: String  # benefit_markets.shop_market.initial_application
-    field :value,       type: String
-    field :default,     type: String
+      field :label,       type: String  # fill using key like i18n in the form if not provided
+      field :description, type: String
 
-    field :type,        type: String # list, date, number, boolean, string, range, datetime, day of month, days, year, months
-    field :is_required, type: Boolean, default: false
+      field :key,         type: String  # benefit_markets.shop_market.initial_application
+      field :value,       type: String
+      field :default,     type: String, default: ''
 
-    # list/enumerated...capture if user can choose multiple
-    scope :get_all,  -> (starting_with) {
-      where(key: /^#{::Regexp.escape(starting_with)}/i)
-    }
+      field :type,        type: String # list, date, number, boolean, string, range, datetime, day of month, days, year, months
+      field :is_required, type: Boolean, default: true
 
-    scope :by_key, -> (key) { 
-      where(key: key)
-    }
+      # list/enumerated...capture if user can choose multiple
+      scope :get_all,  -> (starting_with) {
+        where(key: /^#{::Regexp.escape(starting_with)}/i)
+      }
 
-    index({ key: 1 }, { unique: true })
+      scope :by_key, -> (key) { 
+        where(key: key)
+      }
 
-    validates_presence_of   :default, :is_required
-    validates_uniqueness_of :key
+      index({ key: 1 }, { unique: true })
 
-    def value=(val)
-      write_attribute(:value, serialize_value(val))
-    end
+      validates_presence_of   :default, :is_required
+      validates_uniqueness_of :key
 
-    def default=(val)
-      write_attribute(:default, serialize_value(val))
-    end
+      def value=(val)
+        write_attribute(:value, serialize_value(val))
+      end
 
-    def serialize_value(val)
-      return nil if val.blank?
+      def default=(val)
+        write_attribute(:default, serialize_value(val))
+      end
 
-      if val.to_s.scan(/<%/).present?
-        ERB.new(val).src
-      else
-        val.inspect
+      def serialize_value(val)
+        return nil if val.blank?
+
+        if val.to_s.scan(/<%/).present?
+          ERB.new(val).src
+        else
+          val.inspect
+        end
       end
     end
   end

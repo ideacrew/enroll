@@ -2,6 +2,7 @@ module BenefitSponsors
   class Site
     include Mongoid::Document
     include Mongoid::Timestamps
+    include ConfigurableModel
 
     SITE_KEY_MAX_LENGTH = 6
 

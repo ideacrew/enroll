@@ -5,6 +5,7 @@ module BenefitMarkets
   class BenefitMarket
     include Mongoid::Document
     include Mongoid::Timestamps
+    include ConfigurableModel
 
     attr_reader :contact_center_profile
 
@@ -99,6 +100,18 @@ module BenefitMarkets
 
     def self.by_kind(kind)
       where(kind: kind.to_sym).first
+    end
+
+    def test_class
+      relation = ConfigurableModel::Relation.new(self.class.name)
+
+      Class.new(ConfigurableModel::Setting) do
+        # store_in collection: relation.setting_relation_name
+      end.tap do |klass|
+        Object.const_set(relation.setting_klass, klass)
+      end
+
+      embeds_many relation.setting_relation_name.to_sym, class_name: relation.setting_klass
     end
 
     private

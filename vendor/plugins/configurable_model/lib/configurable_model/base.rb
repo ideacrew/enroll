@@ -31,5 +31,9 @@ module ConfigurableModel
     def setting_cache
       Caches::SettingCache.new(self)
     end
+
+    def settings
+      eval("#{self.class.to_s.demodulize.underscore}_settings")
+    end
   end
 end

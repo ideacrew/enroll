@@ -42,14 +42,14 @@ module BenefitMarkets
       end
 
       def value=(val)
-        write_attribute(:value, value_for_serialization(val))
+        write_attribute(:value, serialize_value(val))
       end
 
       def default=(val)
-        write_attribute(:default, value_for_serialization(val))
+        write_attribute(:default, serialize_value(val))
       end
 
-      def value_for_serialization(val)
+      def serialize_value(val)
         return nil if val.blank?
 
         if val.to_s.scan(/<%/).present?
@@ -93,8 +93,12 @@ module BenefitMarkets
         end
 
         def parse_value(setting)
-          value = setting.value || setting.default
-          eval(value)
+          value_parser = proc {|value|
+            $SAFE = 2
+            eval(value)
+          }
+ 
+          value_parser.call(setting.value || setting.default)
         end
       end
 	  end
