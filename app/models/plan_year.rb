@@ -1128,7 +1128,7 @@ class PlanYear
 
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
-      transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
+      transitions from: [:terminated,:termination_pending], to: :active, after: :reset_termination_and_end_date
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1165,6 +1165,14 @@ class PlanYear
 
     event :conversion_expire, :after => :record_transition do
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
+    end
+
+    event :close_open_enrollment, :after => :record_transition do 
+      transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
+      transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
     end
   end
 
@@ -1424,6 +1432,46 @@ class PlanYear
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer renewal force publish notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
+    end
+  end
+
+  def zero_employees_on_roster
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if self.employer_profile.census_employees.active.count < 1
+      begin
+        self.employer_profile.trigger_notices("zero_employees_on_roster")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
+
+  def notify_employee_of_initial_employer_ineligibility
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver employee initial eligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
+
+  def initial_employer_approval_notice
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
+    begin
+      self.employer_profile.trigger_notices("initial_employer_approval")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial eligibiliy approval notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+    end
+  end
+
+  def initial_employer_ineligibility_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    begin
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end
   end
 
