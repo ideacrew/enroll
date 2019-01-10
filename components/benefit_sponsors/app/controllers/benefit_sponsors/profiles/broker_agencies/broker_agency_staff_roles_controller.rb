@@ -22,7 +22,6 @@ module BenefitSponsors
           rescue Exception => e
             flash[:error] = "Role was not added because " + e.message
           end
-
           respond_to do |format|
             format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])}
             format.js
