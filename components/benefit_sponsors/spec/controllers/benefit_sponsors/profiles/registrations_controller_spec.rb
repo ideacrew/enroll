@@ -15,6 +15,7 @@ module BenefitSponsors
     let(:update_user) { edit_user }
     let(:benefit_sponsor_user) { user }
     let(:broker_agency_user) { nil }
+    let(:general_agency_user) { nil }
 
     let(:phone_attributes) {
       {
@@ -64,12 +65,19 @@ module BenefitSponsors
       }
     }
 
+    let(:general_agency_profile_attributes) {
+      {
+        :market_kind => :shop,
+        :office_locations_attributes => office_locations_attributes,
+      }
+    }
+
     let(:benefit_sponsor_organization) {
       {
         :entity_kind => :tax_exempt_organization,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
-        :fein => "237864678",
+        :fein => "111111111",
         :profile_attributes => employer_profile_attributes
       }
     }
@@ -79,8 +87,18 @@ module BenefitSponsors
         :entity_kind => :s_corporation,
         :legal_name => "uweyrtuo",
         :dba=> "uweyruoy",
-        :fein => "237864678",
+        :fein => "222222222",
         :profile_attributes => broker_profile_attributes
+      }
+    }
+
+    let(:general_agency_organization) {
+      {
+        :entity_kind => :s_corporation,
+        :legal_name => "uweyrtuo",
+        :dba=> "uweyruoy",
+        :fein => "333333333",
+        :profile_attributes => general_agency_profile_attributes
       }
     }
 
@@ -147,17 +165,17 @@ module BenefitSponsors
 
       it_behaves_like "initialize profile for new", "benefit_sponsor"
       it_behaves_like "initialize profile for new", "broker_agency"
+      it_behaves_like "initialize profile for new", "general_agency"
       # it_behaves_like "initialize profile for new", "issuer"
-      # it_behaves_like "initialize profile for new", "general_agency"
       # it_behaves_like "initialize profile for new", "contact_center"
       # it_behaves_like "initialize profile for new", "fedhb"
 
       it_behaves_like "initialize registration form", :new, {profile_type: "benefit_sponsor"}, "benefit_sponsor"
       it_behaves_like "initialize registration form", :new, {profile_type: "broker_agency"}, "broker_agency"
-      # it_behaves_like "initialize profile for new", :new, { profile_type: "issuer" }
-      # it_behaves_like "initialize profile for new", :new, { profile_type: "general_agency" }
-      # it_behaves_like "initialize profile for new", :new, { profile_type:  "contact_center" }
-      # it_behaves_like "initialize profile for new", :new, { profile_type: "fedhb" }
+      it_behaves_like "initialize registration form", :new, { profile_type: "general_agency" }, "general_agency"
+      # it_behaves_like "initialize registration form", :new, { profile_type: "issuer" }
+      # it_behaves_like "initialize registration form, :new, { profile_type:  "contact_center" }
+      # it_behaves_like "initialize registration form", :new, { profile_type: "fedhb" }
 
       describe "for new on broker_agency_portal", dbclean: :after_each do
         context "for new on broker_agency_portal click without user" do
@@ -218,6 +236,14 @@ module BenefitSponsors
           }
         }
 
+        let(:general_agency_params) {
+          {
+            :profile_type => "general_agency",
+            :staff_roles_attributes => staff_roles_attributes,
+            :organization => general_agency_organization
+          }
+        }
+
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
@@ -235,24 +261,25 @@ module BenefitSponsors
             expect(response.location.include?("tab=home")).to eq true if profile_type == "benefit_sponsor"
           end
 
-          it "should redirect to new for broker agency" do
+          it "should redirect to new for broker agency or general agency" do
             expect(response.location.include?("new?profile_type=broker_agency")).to eq true if profile_type == "broker_agency"
+            expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
           end
         end
 
         it_behaves_like "store profile for create", "benefit_sponsor"
         it_behaves_like "store profile for create", "broker_agency"
+        it_behaves_like "store profile for create", "general_agency"
         # it_behaves_like "store profile for create", "issuer"
-        # it_behaves_like "store profile for create", "general_agency"
         # it_behaves_like "store profile for create", "contact_center"
         # it_behaves_like "store profile for create", "fedhb"
 
         it_behaves_like "initialize registration form", :create, {}, "benefit_sponsor"
         it_behaves_like "initialize registration form", :create, {}, "broker_agency"
-        # it_behaves_like "initialize profile for new", :create, { profile_type: "issuer" }
-        # it_behaves_like "initialize profile for new", :create, { profile_type: "general_agency" }
-        # it_behaves_like "initialize profile for new", :create, { profile_type: "contact_center" }
-        # it_behaves_like "initialize profile for new", :create, { profile_type: "fedhb" }
+        it_behaves_like "initialize registration form", :create, {}, "general_agency"
+        # it_behaves_like "initialize registration form", :create, { profile_type: "issuer" }
+        # it_behaves_like "initialize registration form", :create, { profile_type: "contact_center" }
+        # it_behaves_like "initialize registration form", :create, { profile_type: "fedhb" }
 
         shared_examples_for "fail store profile for create if params invalid" do |profile_type|
 
@@ -275,16 +302,16 @@ module BenefitSponsors
           it "should have profile_type in params" do
             expect(controller.params[:agency][:profile_type] == "benefit_sponsor").to eq true if profile_type == "benefit_sponsor"
             expect(controller.params[:agency][:profile_type] == "broker_agency").to eq true if profile_type == "broker_agency"
+            expect(controller.params[:agency][:profile_type] == "general_agency").to eq true if profile_type == "general_agency"
           end
         end
 
         it_behaves_like "fail store profile for create if params invalid", "benefit_sponsor"
         it_behaves_like "fail store profile for create if params invalid", "broker_agency"
+        it_behaves_like "fail store profile for create if params invalid", "general_agency"
         # it_behaves_like "fail store profile for create if params invalid", "issuer"
-        # it_behaves_like "fail store profile for create if params invalid", "general_agency"
         # it_behaves_like "fail store profile for create if params invalid", "contact_center"
         # it_behaves_like "fail store profile for create if params invalid", "fedhb"
-
       end
     end
 
@@ -298,6 +325,9 @@ module BenefitSponsors
       let!(:employer_staff_roles) { person.employer_staff_roles << staff_role }
       let!(:broker_role) {FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency.profiles.first.id,person:person)}
       let!(:update_profile) { broker_agency.profiles.first.update_attributes(primary_broker_role_id: broker_role.id)}
+
+      let(:general_agency) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+      let!(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency.profiles.first.id, person: person)}
 
       shared_examples_for "initialize profile for edit" do |profile_type|
 
@@ -330,17 +360,17 @@ module BenefitSponsors
 
       it_behaves_like "initialize profile for edit", "benefit_sponsor"
       it_behaves_like "initialize profile for edit", "broker_agency"
-      # it_behaves_like "initialize profile for new", "issuer"
-      # it_behaves_like "initialize profile for new", "general_agency"
-      # it_behaves_like "initialize profile for new", "contact_center"
-      # it_behaves_like "initialize profile for new", "fedhb"
+      it_behaves_like "initialize profile for edit", "general_agency"
+      # it_behaves_like "initialize profile for edit", "issuer"
+      # it_behaves_like "initialize profile for edit", "contact_center"
+      # it_behaves_like "initialize profile for edit", "fedhb"
 
       it_behaves_like "initialize registration form", :edit, { id: "id"}, "benefit_sponsor"
       it_behaves_like "initialize registration form", :edit, { id: "id" }, "broker_agency"
-      # it_behaves_like "initialize profile for new", :edit, { profile_type: "issuer" }
-      # it_behaves_like "initialize profile for new", :edit, { profile_type: "general_agency" }
-      # it_behaves_like "initialize profile for new", :edit, { profile_type: "contact_center" }
-      # it_behaves_like "initialize profile for new", :edit, { profile_type: "fedhb" }
+      it_behaves_like "initialize registration form", :edit, { id: "id" }, "general_agency"
+      # it_behaves_like "initialize registration form", :edit, { profile_type: "issuer" }
+      # it_behaves_like "initialize registration form", :edit, { profile_type: "contact_center" }
+      # it_behaves_like "initialize registration form", :edit, { profile_type: "fedhb" }
     end
 
     describe "PUT update", dbclean: :after_each do
@@ -351,6 +381,7 @@ module BenefitSponsors
 
         let(:benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
         let(:broker_agency)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+        let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
 
         let(:benefit_sponsor_params) {
           {
@@ -368,12 +399,24 @@ module BenefitSponsors
           }
         }
 
+        let(:general_agency_params) {
+          {
+            :id => general_agency.profiles.first.id,
+            :staff_roles_attributes => staff_roles_attributes,
+            :organization => general_agency_organization
+          }
+        }
+
         def sanitize_attributes(profile_type)
           employer_profile_attributes.merge!({
             id: self.send(profile_type).profiles.first.id.to_s
           })
 
           broker_profile_attributes.merge!({
+            id: self.send(profile_type).profiles.first.id.to_s
+          })
+
+          general_agency_profile_attributes.merge!({
             id: self.send(profile_type).profiles.first.id.to_s
           })
 
@@ -402,15 +445,16 @@ module BenefitSponsors
             expect(response.location.include?("/edit")).to eq true if profile_type == "benefit_sponsor"
           end
 
-          it "should redirect to show for broker_agency" do
+          it "should redirect to show for broker_agency or general agency" do
             expect(response.location.include?("/broker_agency_profiles/")).to eq true if profile_type == "broker_agency"
+            expect(response.location.include?("/general_agency_profiles/")).to eq true if profile_type == "general_agency"
           end
         end
 
         it_behaves_like "store profile for update", "benefit_sponsor"
         it_behaves_like "store profile for update", "broker_agency"
+        it_behaves_like "store profile for update", "general_agency"
         # it_behaves_like "store profile for update", "issuer"
-        # it_behaves_like "store profile for update", "general_agency"
         # it_behaves_like "store profile for update", "contact_center"
         # it_behaves_like "store profile for update", "fedhb"
 
@@ -436,8 +480,8 @@ module BenefitSponsors
 
         it_behaves_like "fail store profile for update if params invalid", "benefit_sponsor"
         it_behaves_like "fail store profile for update if params invalid", "broker_agency"
+        it_behaves_like "fail store profile for update if params invalid", "general_agency"
         # it_behaves_like "fail store profile for update if params invalid", "issuer"
-        # it_behaves_like "fail store profile for update if params invalid", "general_agency"
         # it_behaves_like "fail store profile for update if params invalid", "contact_center"
         # it_behaves_like "fail store profile for update if params invalid", "fedhb"
       end
