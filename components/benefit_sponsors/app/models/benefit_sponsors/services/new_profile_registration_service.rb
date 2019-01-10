@@ -22,7 +22,7 @@ module BenefitSponsors
       end
 
       def find
-        organization = factory_class.build(profile_id: profile_id)
+        organization = factory_class.build(profile_id: profile_id, profile_type: profile_type)
         staff_roles = factory_class.find_representatives(profile_id, profile_type)
         attributes_to_form_params(organization, staff_roles)
       end

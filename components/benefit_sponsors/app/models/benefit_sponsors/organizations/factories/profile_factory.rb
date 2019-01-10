@@ -138,8 +138,9 @@ module BenefitSponsors
         end
 
         def persist_representative!
-          handler.organization = organization
+          handler.profile = profile
           handler.factory = self
+          handler.person = person
           handler.persist_representative!
         end
 
