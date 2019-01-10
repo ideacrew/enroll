@@ -34,7 +34,7 @@ module BenefitSponsors
         end
 
         def update_representative(factory_obj, attributes)
-          if is_broker_profile? || is_general_agency_profile?
+          if is_broker_profile?
             person = Person.find(attributes[:person_id])
             person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
           end
@@ -364,7 +364,7 @@ module BenefitSponsors
           elsif is_broker_profile?
             return "broker_show_registration_url@#{profile_id}"
           elsif is_general_agency_profile?
-            return "general_show_registration_url@#{profile_id}"
+            return "general_agency_show_registration_url@#{profile_id}"
           end
         end
 
@@ -451,7 +451,7 @@ module BenefitSponsors
         end
 
         def get_matched_people
-          if is_employer_profile? || is_broker_profile? || is_general_agency_profile?
+          if is_employer_profile? || is_broker_profile?
             Person.where(
               first_name: regex_for(first_name),
               last_name: regex_for(last_name),
