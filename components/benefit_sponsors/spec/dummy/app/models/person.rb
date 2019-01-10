@@ -165,6 +165,14 @@ class Person
     employer_staff_roles.present? and employer_staff_roles.active.present?
   end
 
+  def active_broker_staff_roles
+    self.broker_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_broker_staff_role?
+    active_broker_staff_roles.size > 0
+  end
+
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
   end

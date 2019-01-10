@@ -41,7 +41,7 @@ module PermissionsConcern
     end
 
     def has_broker_agency_staff_role?
-      has_role?(:broker_agency_staff)
+      person && person.has_active_broker_staff_role?
     end
 
     def has_general_agency_staff_role?
