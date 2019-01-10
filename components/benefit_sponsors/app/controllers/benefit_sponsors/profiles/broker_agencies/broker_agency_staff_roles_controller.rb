@@ -36,6 +36,7 @@ module BenefitSponsors
 
         def create_broker_staff
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
+          authorize @staff
           begin
             @status , @result = @staff.save
             if @status
