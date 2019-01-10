@@ -12,7 +12,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
   let(:product_kinds)  { [:health, :dental] }
   let(:roster_size) { 2 }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
-  let(:effective_period) { start_on..start_on.next_year.prev_day }
+  let(:effective_period) {start_on..start_on.next_year.prev_day}
 
   let(:ce) { benefit_sponsorship.census_employees.non_business_owner.first }
 
@@ -39,7 +39,10 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
       shared_examples_for "under open enrollment period" do |coverage_kind|
         let(:coverage_kind) { coverage_kind }
         let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+        let(:current_effective_date) { start_on }
         let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+        let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+        let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
         let(:aasm_state) { :enrollment_open }
         let(:waiver_subject) { enrollment_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: effective_on, waiver_reason: "this is waiver reason") }
         let(:enrolled_subject) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: effective_on) }
@@ -47,7 +50,6 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
         subject(:enrollment) {
           state == "waiver" ? waiver_subject : enrolled_subject
         }
-
 
         it "should build a new #{coverage_kind} enrollment" do
           expect(enrollment.valid?).to be_truthy
@@ -69,6 +71,10 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
       context "under new hire enrollment period" do
 
         shared_examples_for "with past hired on date" do |coverage_kind|
+          let(:current_effective_date) { start_on }
+          let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+          let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+          let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
           let(:coverage_kind) { coverage_kind }
           let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
           let(:aasm_state) { :active }
@@ -143,6 +149,10 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
       shared_examples_for "under special enrollment period" do |coverage_kind|
         let(:coverage_kind) { coverage_kind }
         let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+        let(:current_effective_date) { start_on }
+        let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+        let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+        let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
         let(:aasm_state) { :active }
         let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
         let(:qle_on) { TimeKeeper.date_of_record - 2.days }
