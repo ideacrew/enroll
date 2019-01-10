@@ -10,6 +10,16 @@
       <% end %>
     </li>
   <% end %>
+  <% if dental_offers_custom_creation? %>
+    <li role="presentation" class="col-xs-4 carrier-custom-tab" data-offering-kind="custom" data-offering-id="<%= offering_id %>">
+      <%= f.radio_button :plan_option_kind, "custom", selected: f.object.plan_option_kind, data: {tempId: 1} %>
+      <%= f.label :plan_option_kind_custom, class: "elected_plan" do %>
+        <div class="pdp_carrier_title">
+          CUSTOM
+        </div>
+      <% end %>
+    </li>
+  <% end %>
   <% if dental_offers_single_carrier? %>
     <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= offering_id %>">
       <%= f.radio_button :plan_option_kind, "single_carrier" %>
@@ -56,6 +66,17 @@
       <p class="twenty plan_heading_text"><%= fetch_health_product_option_choice_description_for_sole_source %></p>
       <br/>
       <div id="soleSourceCarrierList" class="carrier-list-container">
+        <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i>
+          <h5>Searching for Carriers in your area...</h5></div>
+      </div>
+    </div>
+  <% end %>
+  <% if dental_offers_custom_creation? %>
+    <div class="col-xs-12 carrier-custom-plan-tab tab-container" style="display: none;">
+      <br><br>
+      <p class="twenty plan_heading_text"><%= fetch_health_product_option_choice_description_for_sole_source %></p>
+      <br/>
+      <div id="CustomCarrierList" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i>
           <h5>Searching for Carriers in your area...</h5></div>
       </div>
