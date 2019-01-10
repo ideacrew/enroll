@@ -30,7 +30,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#product_rates_available?" do
+  describe "#product_rates_available?", :dbclean => :after_each  do
     let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
     let(:benefit_sponsorship){ double("benefit_sponsorship") }
 
