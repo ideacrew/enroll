@@ -42,7 +42,7 @@ module BenefitSponsors
 
       shared_examples_for "should permit for a user with general agency role" do |policy_type|
         it "should permit" do
-          binding.pry
+          allow(user).to receive(:has_general_agency_staff_role?) {true}
           expect(policy.send(policy_type)).to be true
         end
       end

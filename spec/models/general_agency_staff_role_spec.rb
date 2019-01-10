@@ -135,4 +135,23 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
       expect(staff_role.parent).to eq staff_role.person
     end
   end
+
+  describe ".general_agency_profile" do
+    context "with_staff_role" do
+      let(:staff_role) { FactoryGirl.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id) }
+      it "has general_agency_profile" do
+        expect(staff_role.general_agency_profile).to eq general_agency_profile
+      end
+    end
+  end
+    
+  describe ".has_general_agency_profile?" do
+    context "with_staff_role" do
+      let(:staff_role) { FactoryGirl.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id) }
+
+      it "returns true for has_general_agency_profile?" do
+        expect(staff_role.has_general_agency_profile?).to eq true
+      end
+    end
+  end
 end
