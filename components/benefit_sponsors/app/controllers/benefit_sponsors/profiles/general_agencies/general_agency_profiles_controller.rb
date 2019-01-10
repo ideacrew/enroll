@@ -110,32 +110,26 @@ module BenefitSponsors
           @datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: params[:id]})
         end
 
-        # def messages
-        #   @sent_box = true
-        #   # don't use current_user
-        #   # messages are different for current_user is admin and broker account login
-        #   @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
-        #   @broker_provider = @broker_agency_profile.primary_broker_role.person
-        #
-        #   respond_to do |format|
-        #     format.js {}
-        #   end
-        # end
-        #
-        # def agency_messages
-        # end
-        #
-        # def inbox
-        #   @sent_box = true
-        #   id = params["id"]||params['profile_id']
-        #   @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
-        #   @folder = (params[:folder] || 'Inbox').capitalize
-        #   if current_user.person._id.to_s == id
-        #     @provider = current_user.person
-        #   else
-        #     @provider = @broker_agency_provider
-        #   end
-        # end
+        def messages
+          @sent_box = true
+          @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
+          @provider = @general_agency_profile
+        end
+
+        def agency_messages
+        end
+
+        def inbox
+          @sent_box = true
+          id = params["id"]||params['profile_id']
+          @general_agency_provider = BenefitSponsors::Organizations::GeneralAgencyProfile.find(id)
+          @folder = (params[:folder] || 'Inbox').capitalize
+          if current_user.person._id.to_s == id
+            @provider = current_user.person
+          else
+            @provider = @general_agency_provider
+          end
+        end
 
         private
 
