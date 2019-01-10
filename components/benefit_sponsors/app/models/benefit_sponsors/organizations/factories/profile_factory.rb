@@ -138,9 +138,10 @@ module BenefitSponsors
         end
 
         def persist_representative!
-          handler.profile = profile
+          handler.organization = organization
           handler.factory = self
           handler.person = person
+          handler.current_user = current_user
           handler.persist_representative!
         end
 
@@ -271,9 +272,10 @@ module BenefitSponsors
           self.profile = BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
-        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :is_saved) do
+        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
+            profile = organization.employer_profile
             person.user = current_user
             employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
             if employer_ids.include? profile.id
@@ -339,7 +341,7 @@ module BenefitSponsors
           end
 
           def redirection_url
-            return "sponsor_show_pending_registration_url" if factory.is_pending
+            return "sponsor_show_pending_registration_url" if factory.pending
             organization = factory.organization
             resource_id = factory.profile_id || (organization.employer_profile.id if organization.present?)
             return "sponsor_home_registration_url@#{resource_id}" if is_saved
@@ -351,9 +353,10 @@ module BenefitSponsors
           end
         end
 
-        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :is_saved) do
+        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
+            profile = organization.general_agency_profile
             person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({
               :npn => factory.npn,
               :benefit_sponsors_general_agency_profile_id => profile.id,
@@ -401,9 +404,10 @@ module BenefitSponsors
           end
         end
 
-        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :is_saved) do
+        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
 
           def persist_representative!
+            profile = organization.broker_agency_profile
             person.broker_role = ::BrokerRole.new({
               :provider_kind => 'broker',
               :npn => factory.npn,
