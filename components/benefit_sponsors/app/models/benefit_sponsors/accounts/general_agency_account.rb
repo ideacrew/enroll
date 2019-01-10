@@ -24,7 +24,7 @@ module BenefitSponsors
       validates_presence_of :start_on, :benefit_sponsrship_general_agency_profile_id
 
       #TODO based on new profile
-      belongs_to general_agency_profile
+      belongs_to :general_agency_profile
       def general_agency_profile=(new_general_agency_profile)
         raise ArgumentError.new("expected GeneralAgencyProfile") unless new_general_agency_profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
         self.benefit_sponsrship_general_agency_profile_id = new_general_agency_profile._id
