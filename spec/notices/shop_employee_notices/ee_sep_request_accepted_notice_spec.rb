@@ -30,7 +30,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice, dbclean: :after_
                             :mpi_indicator => 'MPI_SHOP36',
                             :title => "Special Enrollment Period Approval"})
                           }
-  let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
+  let(:qle_on) { TimeKeeper.date_of_record }
   let(:end_on) {qle_on+30.days}
   let(:title) { "had a baby"}
 
@@ -38,7 +38,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice, dbclean: :after_
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
-      :options => {:qle_on => qle_on.to_s, :end_on => end_on.to_s, :title => title},
+      :options => {:event_object => {:qle_on => qle_on, :end_on => end_on, :title => title}},
       :template => application_event.notice_template
   }}
 
@@ -77,7 +77,7 @@ RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice, dbclean: :after_
   end
 
   describe "append data" do
-    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+    let(:special_enrollment_period) { FactoryGirl.build(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id, title: "had a baby") }
     let(:sep1) {family.special_enrollment_periods.new}
     let(:sep2) {family.special_enrollment_periods.new}
     let(:order) {[sep1,sep2]}

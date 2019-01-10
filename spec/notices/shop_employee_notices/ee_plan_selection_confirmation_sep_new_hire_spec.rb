@@ -38,7 +38,7 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire, dbclean: :afte
     :mpi_indicator => application_event.mpi_indicator,
     :event_name => application_event.event_name,
     :template => application_event.notice_template,
-    :options => { :hbx_enrollment => hbx_enrollment.hbx_id.to_s }
+    :options => { :event_object => hbx_enrollment }
   }}
   let(:rate_schedule_date) {TimeKeeper.date_of_record}
   let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
