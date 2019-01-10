@@ -51,6 +51,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
+  def admin_create_plan_year
+    authorize HbxProfile, :create_plan_year_for_employer?
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
   def binder_paid
     if params[:ids]
       begin

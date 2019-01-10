@@ -1,0 +1,32 @@
+<div class="container" id="admin_plan_year_table">
+  <div class = "table-responsive table-override">
+  <h4 class="text-center heading-text"> Not Needed </h4>
+
+  <table class="table" style="table-layout: fixed;">
+    <thead>
+      <tr>
+       <th>Tablr Taffggf</th>
+       <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Some Table Data</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>

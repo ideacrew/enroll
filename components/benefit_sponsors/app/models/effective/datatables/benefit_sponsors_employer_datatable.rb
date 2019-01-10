@@ -65,7 +65,7 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
-           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
+           ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)]
           ]
 
           if individual_market_is_enabled?
@@ -80,13 +80,17 @@ module Effective
             dropdown.insert(2,['Attestation', main_app.edit_employers_employer_attestation_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
 
+          if current_user.person.hbx_staff_role.subrole == "super_admin"
+            dropdown.insert(3,['Create Plan Year', main_app.admin_create_plan_year_exchanges_hbx_profiles_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+          end
+
           if row.oe_extendable_benefit_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
-            dropdown.insert(3,['Extend Open Enrollment', main_app.oe_extendable_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
+            dropdown.insert(4,['Extend Open Enrollment', main_app.oe_extendable_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
 
           if row.oe_extended_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
-            dropdown.insert(4, ['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(
-              id: @employer_profile.latest_benefit_sponsorship.id, 
+            dropdown.insert(5, ['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(
+              id: @employer_profile.latest_benefit_sponsorship.id,
               employer_actions_id: "employer_actions_#{@employer_profile.id}"
             ), 'ajax'])
           end
