@@ -11,4 +11,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.last_updated_at" => "Last Updated At",
 	"en.hbx_profiles.edit_open_enrollment" => "Edit Open Enrollment",
 	"en.hbx_profiles.close_open_enrollment" => "Close Open Enrollment",
+	"en.hbx_profiles.publish_application" => "Publish Application",
+	"en.hbx_profiles.force_publish_success" => "Force Publish Successful"
 }
