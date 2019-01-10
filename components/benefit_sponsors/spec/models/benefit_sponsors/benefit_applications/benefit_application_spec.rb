@@ -784,5 +784,26 @@ module BenefitSponsors
         end
       end
     end
+
+    describe "after_create actions" do
+      let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:benefit_sponsorship)     { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+      let(:benefit_application)     { described_class.new(valid_params) }
+
+      before do
+        benefit_application.benefit_sponsorship = benefit_sponsorship
+        benefit_application.save!
+      end
+
+      context "for expiration_date" do
+        it "should default to min date of effective_period" do
+          expect(benefit_application.expiration_date).to eq (benefit_application.effective_period.min)
+        end
+
+        it "should not default to max date of effective_period" do
+          expect(benefit_application.expiration_date).not_to eq (benefit_application.effective_period.max)
+        end
+      end
+    end
   end
 end
