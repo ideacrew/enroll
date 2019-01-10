@@ -45,6 +45,7 @@ module BenefitSponsors
     describe "A new model instance" do
      it { is_expected.to be_mongoid_document }
      it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
+     it { is_expected.to have_field(:expiration_date).of_type(Date)}
      it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
      it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
      it { is_expected.to have_field(:pte_count).of_type(Integer).with_default_value_of(0)}
@@ -783,7 +784,5 @@ module BenefitSponsors
         end
       end
     end
-
-
   end
 end

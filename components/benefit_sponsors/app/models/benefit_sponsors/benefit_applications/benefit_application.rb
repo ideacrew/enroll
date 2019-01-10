@@ -40,8 +40,7 @@ module BenefitSponsors
                                                   canceled:   :cancel
                                                 }
 
-
-
+    field :expiration_date,           type: Date
 
     # The date range when this application is active
     field :effective_period,        type: Range
@@ -94,7 +93,7 @@ module BenefitSponsors
     before_validation :pull_benefit_sponsorship_attributes
     after_create      :renew_benefit_package_assignments
     after_save        :notify_on_save
-    after_create      :notify_on_create
+    after_create      :notify_on_create, :set_expiration_date
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
@@ -1017,6 +1016,10 @@ module BenefitSponsors
     end
 
     private
+
+    def set_expiration_date
+      write_attribute(:expiration_date, effective_period.min) if expiration_date.blank?
+    end
 
     def refresh_recorded_rating_area
       self.recorded_rating_area = benefit_sponsorship.rating_area_on(self.start_on)
