@@ -431,22 +431,36 @@ module BenefitSponsors
     end
 
     describe '.cancel' do
+
+      include_context "setup initial benefit application"
+
+      subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
+
       context "when a benefit application is canceled" do
-        include_context "setup initial benefit application"
-
-        subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
-
         before do
           subject.cancel
           initial_application.reload
         end
 
-        it "should move benefit application to termiantion pending" do
+        it "should move benefit application to canceled" do
           expect(initial_application.aasm_state).to eq :canceled
         end
 
         it "should update end date on benefit application" do
           # expect(initial_application.end_on).to eq initial_application.start_on
+        end
+      end
+
+      context 'when an approved/published benefit application is canceled' do
+
+        before do
+          initial_application.update_attributes(aasm_state: :approved)
+          subject.cancel
+          initial_application.reload
+        end
+
+        it "should move benefit_application to canceled state" do
+          expect(initial_application.aasm_state).to eq :canceled
         end
       end
     end

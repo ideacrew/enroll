@@ -497,7 +497,7 @@ module BenefitSponsors
 
     # Workflow for self service
     aasm do
-      state :applicant, initial: true, :after_enter => :publish_benefit_sponsor_event
+      state :applicant, initial: true#, :after_enter => :publish_benefit_sponsor_event
       # state :initial_application_under_review # Sponsor's first application is submitted invalid and under HBX review
       # state :initial_application_denied       # Sponsor's first application is rejected
       # state :initial_application_approved     # Sponsor's first application is submitted and approved
