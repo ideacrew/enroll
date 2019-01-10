@@ -8,10 +8,9 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :after_each do
   let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { benefit_sponsor.employer_profile }
   let(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-  let(:broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
-  let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: broker_agency_profile.id)}
+  let(:this_broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
   let(:signed_in?){ true }
-
+  let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
   before do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
@@ -26,14 +25,17 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :after_each do
     expect(rendered).to match(/I'm an Admin/)
   end
   it 'identifies Brokers' do
+    assign(:broker_agency_profile, this_broker_agency_profile)
+    allow(controller).to receive(:controller_path).and_return("broker_agency_profiles")
+    person_user.broker_agency_staff_roles = [broker_agency_staff_role]
     current_user.roles=['broker_agency_staff']
-    person_user.broker_role = broker_role
     current_user.save
     render :template => 'layouts/_header.html.erb'
     expect(rendered).to match(/I'm a Broker/)
   end
   it 'identifies Employers' do
     allow(person_user).to receive(:employer_staff_roles).and_return([active_employer_staff_role])
+    allow(controller).to receive(:controller_path).and_return("employer_profiles")
     current_user.roles=['employer_staff']
     current_user.save
     render :template => 'layouts/_header.html.erb'

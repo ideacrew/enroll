@@ -20,12 +20,15 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       let!(:employee_role) { FactoryGirl.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
+        allow(current_user.person).to receive(:employer_staff_roles).and_return [employer_staff_role]
+        allow(controller).to receive(:controller_path).and_return("employer_profiles")
         expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
       end
 
       it "should have I'm an Employee link when user has active employee_staff_role" do
         allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/cca-icon-individual.png\" alt=\"Cca icon individual\" /> &nbsp; I'm an Employee</a>"
+        allow(controller).to receive(:controller_path).and_return("insured")
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/cca-icon-individual.png\" alt=\"Cca icon individual\" /> &nbsp; I'm an Employee</a>"
       end
 
       it "should have Welcome prompt when user has no active role" do
