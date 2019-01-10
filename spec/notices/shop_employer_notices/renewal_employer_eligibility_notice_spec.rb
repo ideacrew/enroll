@@ -1,15 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
-  let!(:employer_profile){ create :employer_profile}
-  let(:calender_year) { TimeKeeper.date_of_record.year }
-  let(:calender_month) { (TimeKeeper.date_of_record + 2.months).month}
-  let(:start_on) { Date.new(calender_year, calender_month, 1)}
-  let(:end_on) { start_on.next_year.prev_day }
-  let(:open_enrollment_start_on) { start_on.prev_month }
-  let(:open_enrollment_end_on) { open_enrollment_start_on + 10.days}
-  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: "renewing_enrolling", start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
-  let(:person){ create :person}
+RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice, dbclean: :after_each do
+  let!(:person){ FactoryGirl.create(:person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',
                             :notice_template => 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
@@ -24,9 +16,23 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
       :event_name => application_event.event_name,
       :template => application_event.notice_template
   }}
+  let(:model_event) { "application_denied" }
+  let(:notice_event) { "renewal_employer_ineligibility_notice" }
+  let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+  let(:end_on) { start_on.next_year.prev_day }
+  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:employer_profile)    { organization.employer_profile }
+  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+  let!(:model_instance) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                             :with_benefit_package,
+                                             :benefit_sponsorship => benefit_sponsorship,
+                                             :aasm_state => 'enrollment_closed'
+  )}
 
   describe "New" do
     before do
+      allow(model_instance).to receive(:is_renewing?).and_return(true)
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
@@ -53,7 +59,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
     it "should build notice with all necessory info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
       expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
     end
   end
@@ -65,11 +71,11 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
       @employer_notice.build_plan_year
     end
 
-    it "should append open enrollment start on info" do  
-      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq active_plan_year.open_enrollment_start_on
+    it "should append open enrollment start on info" do
+      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq model_instance.open_enrollment_start_on
     end
     it "should append open enrollment end on info" do 
-      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq active_plan_year.open_enrollment_end_on
+      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq model_instance.open_enrollment_end_on
     end
   end 
 

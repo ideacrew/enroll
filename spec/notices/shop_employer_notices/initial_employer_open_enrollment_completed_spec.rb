@@ -1,11 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
-  let(:employer_profile){ create :employer_profile}
+RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted, dbclean: :around_each  do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
-  let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employee Open Enrollment Successfully Completed',
                             :notice_template => 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
@@ -14,12 +11,25 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
                             :mpi_indicator => 'MPI_SHOP17',
                             :title => "Open Enrollment Completed"})
                           }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
+  let(:model_event) { "employer_open_enrollment_completed" }
+  let(:notice_event) { "initial_employer_open_enrollment_completed" }
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:employer_profile)    { organization.employer_profile }
+  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+  let!(:model_instance) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                             :with_benefit_package,
+                                             :benefit_sponsorship => benefit_sponsorship,
+                                             :aasm_state => 'enrollment_open',
+                                             :effective_period =>  start_on..(start_on + 1.year) - 1.day
+  )}
+  let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
 
   describe "New" do
     before do
@@ -49,7 +59,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
     it "should build notice with all necessary info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
       expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
     end
   end
@@ -61,9 +71,9 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
     end
     it "should append necessary" do
       plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+      due_date = benefit_application_schedular.calculate_open_enrollment_date(model_instance.start_on)[:binder_payment_due_date]
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
+      expect(@employer_notice.notice.plan_year.start_on).to eq model_instance.start_on
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
     end
   end

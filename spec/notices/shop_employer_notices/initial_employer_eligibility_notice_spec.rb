@@ -1,11 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
-  let(:employer_profile){ create :employer_profile}
+RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice, dbclean: :around_each  do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
-  let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employer SHOP Approval Notice',
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
@@ -20,6 +17,17 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
       :event_name => application_event.event_name,
       :template => application_event.notice_template
   }}
+  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:employer_profile)    { organization.employer_profile }
+  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+  let!(:model_instance) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+                                             :with_benefit_package,
+                                             :benefit_sponsorship => benefit_sponsorship,
+                                             :aasm_state => 'enrollment_open',
+                                             :effective_period =>  start_on..(start_on + 1.year) - 1.day
+  )}
+  let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
 
   before do
     allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
@@ -55,7 +63,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
     end
 
     it "should build notice with legal_name" do
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
     end
 
     it "should build notice with hbx_id" do
@@ -71,19 +79,19 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
     end
 
     it "should append PlanYear start_on date" do
-      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
+      expect(@employer_notice.notice.plan_year.start_on).to eq model_instance.start_on
     end
 
     it "should append PlanYear open_enrollment_start_on date" do
-      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq plan_year.open_enrollment_start_on
+      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq model_instance.open_enrollment_start_on
     end
 
     it "should append PlanYear open_enrollment_end_on date" do
-      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
+      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq model_instance.open_enrollment_end_on
     end
 
     it "should append PlanYear due_date" do
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+      due_date = benefit_application_schedular.calculate_open_enrollment_date(model_instance.start_on)[:binder_payment_due_date]
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
     end
   end
