@@ -102,7 +102,8 @@ module Services
           "contribution": employer_contributions,
           "reference_plan": reference_plan.hios_id,
           "filterOption": filter_option,
-          "filterValue": filter_value
+          "filterValue": filter_value,
+          "enrollmentId": @hbx_enrollment.id.to_s,
         }
       end
 
