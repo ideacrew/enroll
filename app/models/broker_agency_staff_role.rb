@@ -79,9 +79,13 @@ class BrokerAgencyStaffRole
   end
 
   def is_open?
-    self.agency_pending? || aasm_state == "active"
+    self.agency_pending? || self.is_active?
   end
 
+  def is_active?
+    aasm_state == "active"
+  end
+  
   ## Class methods
   class << self
     
