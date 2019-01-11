@@ -1,13 +1,13 @@
 function stopEditingDeduction() {
   $('.driver-question, .instruction-row, .deduction-kind').removeClass('disabled');
-  $('input.deduction-checkbox').prop('disabled', false);
+  $('input#deduction_kind').prop('disabled', false);
   $('a.deduction-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
 function startEditingDeduction(deduction_kind) {
   $('.driver-question, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
-  $('input.deduction-checkbox').prop('disabled', true);
+  $('input#deduction_kind').prop('disabled', true);
   $('a.deduction-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
 };
@@ -77,11 +77,14 @@ $(document).ready(function() {
         startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
         $(clonedForm).find('select').selectric();
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+        e.stopImmediatePropagation();
       } else {
         e.preventDefault();
         // prompt to delete all these dedcutions
         $("#destroyAllDeductions").modal();
-
+        var deduction_kind_name = $(this).val().replace(/_/g, ' ');
+        deduction_kind_name = deduction_kind_name.charAt(0).toUpperCase() + deduction_kind_name.slice(1);
+        $('#deduction_kind_modal').text(deduction_kind_name);
         $("#destroyAllDeductions .modal-cancel-button").click(function(e) {
           $("#destroyAllDeductions").modal('hide');
         });
@@ -116,6 +119,7 @@ $(document).ready(function() {
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
       $(clonedForm).find('select').selectric();
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
+      e.stopImmediatePropagation();
     });
 
     /* edit existing deductions */

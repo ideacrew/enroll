@@ -307,10 +307,6 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits with
 
   # Benefit Group
   fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
-
-  find('.interaction-choice-control-plan-year-start-on').click
-  find('li.interaction-choice-control-plan-year-start-on-1').click
-
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
@@ -445,6 +441,19 @@ Given /^an employer exists$/ do
   owner :with_family, :employer, organization: employer
 end
 
+Given /^the employer has draft plan year$/ do
+  create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: 'draft', with_dental: false)
+end
+
+Given /^the employer has broker agency profile$/ do
+  employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.save!
+end
+
+When /^they visit the Employer Home page$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
+end
+
 When /^they visit the Employee Roster$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
 end
@@ -484,6 +493,10 @@ Then /^employer clicks on terminated filter$/ do
   wait_for_ajax
   page.execute_script("$('.filter-options').show();")
   find("#terminated_yes").trigger('click')
+end
+
+Then /^employer should not see the Get Help from Broker$/ do
+  expect(page).not_to have_xpath("//h3", :text => "Get Help From a Broker")
 end
 
 Then /^employer sees termination date column$/ do

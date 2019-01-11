@@ -24,24 +24,6 @@
     <% end %>
     <% end %>
   </div>
-  <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true)%>">
-    <% @benefit_groups.each_with_index do |benefit_group, index| %>
-    <% if index == 0 %>
-    <h3><%= benefit_group.title%></h3>
-    <section>
-      <div class="step_section_<%= index%>">
-        <%= render partial: 'quote_calculate', locals: {benefit_group: benefit_group }%>
-      </div>
-    </section>
-    <% else %>
-    <h3><%= benefit_group.title %></h3>
-    <section>
-      <div id='second_div' class="step_section_<%= index%>">
-      </div>
-    </section>
-    <% end %>
-    <% end %>
-  </div>
   <%= link_to "Save and Go Back to Quotes", my_quotes_broker_agencies_broker_role_quotes_path(@broker), class: 'btn btn-primary', style: "margin-top: -60px; margin-left: 8px;", data: { no_turbolink: true } %>
 </div>
 

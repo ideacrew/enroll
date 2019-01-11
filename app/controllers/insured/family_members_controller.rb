@@ -7,6 +7,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def index
     set_bookmark_url
+    set_admin_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
@@ -40,6 +41,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.market_kind = qle.market_kind == "shop" ? "shop" : "ivl"
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
       @market_kind = qle.market_kind
@@ -149,14 +151,13 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    @dependent = Forms::FamilyMember.find(params.require(:id))
-    #Application when in draft state
+
     @application = @dependent.family_member.family.application_in_progress
     if @application.present?
       load_support_texts
     end
 
-    if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
+    if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }
@@ -166,9 +167,11 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-    consumer_role.check_for_critical_changes(params[:dependent], @family) if consumer_role
+    @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       @family.reload
+      consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+      consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|
         format.html { render 'show' }
@@ -187,6 +190,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def resident_index
     set_bookmark_url
+    set_admin_bookmark_url
     @resident_role = @person.resident_role
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''

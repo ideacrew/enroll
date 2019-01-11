@@ -109,10 +109,12 @@ namespace :seed do
         application = family.applications.new
         application.populate_applicants_for(family)
         application.save!
+        print "."
       rescue
         raise ud.inspect
       end
     end
+    puts "loaded successfully"
   end
 end
 

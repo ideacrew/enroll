@@ -103,11 +103,6 @@ if missing_plan_dumps
   system "bundle exec rake sbc:map"
   puts "::: Mapping Plans to SBC pdfs seed complete :::"
 
-  puts "*"*80
-  puts "::: Updating network info for 2017 plans :::"
-  system "bundle exec rake import:network_information"
-  puts "::: Updating network info for 2017 plans complete:::"
-
   # puts "*"*80
   system "bundle exec rake migrations:cat_age_off_renewal_plan"
   puts "*"*80
@@ -159,12 +154,24 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 puts "::: complete :::"
 
+fixtures_pattern = File.join(Rails.root, "db", "fixtures_dump", "application_*.yaml")
+fixtures_dump = Dir.glob(fixtures_pattern)
+
+if fixtures_dump.present?
+  puts "*"*80
+  puts "Loading faa families and applications"
+  system "bundle exec rake seed:faa_core_families"
+  system "bundle exec rake fixture_dump:load_applications"
+  puts "::: complete :::"
+end
+
 puts "*"*80
 puts "Loading benefit packages."
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2017_seed')
 system "bundle exec rake import:benefit_package_2018"
+system "bundle exec rake migrations:import_2019_ivl_benefit_package"
 puts "::: benefit packages seed complete :::"
 
 puts "*"*80

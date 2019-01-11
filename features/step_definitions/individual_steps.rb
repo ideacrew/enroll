@@ -3,6 +3,7 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   click_link 'Consumer/Family Portal'
   FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
 
   Caches::PlanDetails.load_record_cache!
   screenshot("individual_start")
@@ -33,6 +34,22 @@ Then(/Individual creates HBX account$/) do
   fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
   screenshot("create_account")
   click_button "Create account"
+end
+
+And(/^I can see the select effective date$/) do
+  expect(page).to have_content "SELECT EFFECTIVE DATE"
+end
+
+When 'I click on continue button on select effective date' do
+  click_button "Continue"
+end
+
+Then(/^I can see the error message (.*?)$/) do |message|
+  expect(page).to have_content(message)
+end
+
+And 'I select a effective date from list' do
+  select 'Date of event', from: 'effective_on_kind'
 end
 
 And(/user should see your information page$/) do
@@ -73,7 +90,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
 
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
   fill_in "person_addresses_attributes_0_city", :with=> "Washington"
@@ -102,8 +119,9 @@ end
 
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
-    find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
-    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+    find(:xpath, '//label[@for="person_us_citizen_false"]').click
+    wait_for_ajax
+    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
     find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
@@ -145,6 +163,11 @@ Then(/^\w+ agrees? to the privacy agreeement/) do
   click_link "Continue"
 end
 
+Then(/^Individual checks to not apply for assistance$/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.btn', text: 'CONTINUE').click
+end
+
 When /^Individual clicks on Individual and Family link should be on verification page/ do
   wait_for_ajax
   find('.interaction-click-control-individual-and-family').trigger('click')
@@ -158,48 +181,73 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
+end
+
+Then(/\w+ should be on the Help Paying for Coverage page/) do
+  expect(page).to have_content("Help Paying for Coverage")
+end
+
+Then(/\w+ does not apply for assistance and clicks continue/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.interaction-click-control-continue').click
 end
 
 Then(/\w+ should see the dependents form/) do
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 
 And(/Individual clicks on add member button/) do
-  find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
+  click_link "Add New Person"
   expect(page).to have_content('Lives with primary subscriber')
 
   fill_in "dependent[first_name]", :with => @u.first_name
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
+  find("#dependent_relationship").find(:xpath, 'option[2]').select_option
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
   screenshot("add_member")
-  all(:css, ".mz").last.click
+  find('.mz').click
+end
+
+And(/Individual adds member with incomplete immigration info/) do
+  click_link "Add New Person"
+  expect(page).to have_content('Lives with primary subscriber')
+  fill_in "dependent[first_name]", :with => @u.first_name
+  fill_in "dependent[last_name]", :with => @u.last_name
+  fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
+  fill_in "dependent[ssn]", :with => @u.ssn
+  find("#dependent_relationship").find(:xpath, 'option[2]').select_option
+  find(:xpath, '//label[@for="radio_female"]').click
+  find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
+  find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+  find(:xpath, '//label[@for="indian_tribe_member_no"]').click
+  find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 end
 
 And(/Individual again clicks on add member button/) do
-  find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
+  click_link "Add New Person"
   expect(page).to have_content('Lives with primary subscriber')
 
   fill_in "dependent[first_name]", :with => @u.first_name
   fill_in "dependent[last_name]", :with => @u.last_name
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   fill_in "dependent[ssn]", :with => @u.ssn
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
+  find("#dependent_relationship").find(:xpath, 'option[2]').select_option
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 
   #testing
   screenshot("added member")
@@ -210,6 +258,11 @@ end
 And(/I click on continue button on household info form/) do
   screenshot("line 161")
   click_link "Continue"
+end
+
+And(/I click Special Enrollment Period Link on Coverage Household page/) do
+  find('.interaction-click-control-special-enrollment-period').click
+  expect(page).to have_content 'None of the situations listed above apply'
 end
 
 Then(/Individual creates a new HBX account$/) do
@@ -225,6 +278,15 @@ When(/I click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
   find('#no_qle_checkbox').click
   expect(page).to have_content 'To enroll before open enrollment'
+end
+
+When(/I click on none of the situations listed above apply checkbox during open enrollment$/) do
+  expect(page).to have_content 'None of the situations listed above apply'
+  find('#no_qle_checkbox').click
+end
+
+Then(/^I should see pop up with message It is currently open enrollment$/) do
+  expect(page).to have_content 'It is currently open enrollment. You can enroll even if you do not qualify for a special enrollment period'
 end
 
 And(/I click on back to my account button$/) do
@@ -303,7 +365,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -318,14 +380,14 @@ Then(/^Individual fills in the form$/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  find(:xpath, '//label[@for="radio_physically_disabled_no"]').click
 end
 
 Then(/^Individual ads address for dependent$/) do
   find(:xpath, '//label[@for="dependent_same_with_primary"]').click
   fill_in 'dependent[addresses][0][address_1]', :with => '36 Campus Lane'
   fill_in 'dependent[addresses][0][city]', :with => 'Washington'
-  find('#address_info .selectric p.label').trigger 'click'
-  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
+  find('#dependent_addresses_0_state').find(:xpath, 'option[10]').select_option
   fill_in 'dependent[addresses][0][zip]', :with => "20002"
   all(:css, ".mz").last.click
   find('#btn-continue').click

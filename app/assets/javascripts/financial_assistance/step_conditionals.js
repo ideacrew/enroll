@@ -1,13 +1,6 @@
 $(document).ready(function() {
-  $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-other-questions', function(e) {
-    //Leave without saving
-    $('.btn.btn-primary').click(function() {
-        window.location.href = e.target.href;
-      });
-  });
-
-  $(document).on('click', 'a[href]:not(.disabled).interaction-click-control-tax-info', function(e) {
-    //Leave without saving
+  $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
+    //Leave without saving for all side nav items - this gathers all items 
     $('.btn.btn-primary').click(function() {
         window.location.href = e.target.href;
       });

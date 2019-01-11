@@ -22,7 +22,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
 
     context "with consumer_role" do
       before :each do
-        allow(person).to receive(:has_active_consumer_role?).and_return true
+        allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:consumer_role).and_return consumer_role
         render :template => "people/landing_pages/_personal.html.erb"
       end
@@ -42,13 +42,13 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /living outside of DC temporarily and intend to return/
+        expect(rendered).to match /Currently living outside of DC temporarily and plan to return./
       end
     end
 
     context "without consumer_role" do
       before :each do
-        allow(person).to receive(:has_active_consumer_role?).and_return false
+        allow(person).to receive(:is_consumer_role_active?).and_return false
         render :template => "people/landing_pages/_personal.html.erb"
       end
 
@@ -117,7 +117,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     before :each do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       allow(person).to receive(:consumer_role).and_return consumer_role
-      allow(person).to receive(:has_active_consumer_role?).and_return true
+      allow(person).to receive(:is_consumer_role_active?).and_return true
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign(:person, person)
       assign(:support_texts, {support_text_key: "support-text-description"})

@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -27,6 +28,7 @@ RSpec.describe Insured::FamilyMembersController do
         @controller.instance_variable_set(:@family, test_family)
         allow(test_family).to receive(:build_relationship_matrix).and_return([])
         allow(test_family).to receive(:find_missing_relationships).and_return([])
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
         get :index, :employee_role_id => employee_role_id
@@ -55,6 +57,7 @@ RSpec.describe Insured::FamilyMembersController do
         @controller.instance_variable_set(:@family, test_family)
         allow(test_family).to receive(:build_relationship_matrix).and_return([])
         allow(test_family).to receive(:find_missing_relationships).and_return([])
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
         get :index, :employee_role_id => employee_role_id
@@ -83,6 +86,7 @@ RSpec.describe Insured::FamilyMembersController do
       before :each do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
       end
@@ -113,12 +117,17 @@ RSpec.describe Insured::FamilyMembersController do
           get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
           expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
         end
+
+        it "qle market kind is should be shop" do
+          expect(qle.market_kind).to eq "shop"
+        end
       end
     end
 
     it "with qle_id" do
       allow(person).to receive(:primary_family).and_return(test_family)
       allow(person).to receive(:broker_role).and_return(nil)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user
@@ -255,6 +264,106 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
   end
+
+  describe "For member addition/deletion (post create or delete destroy)" do
+
+    let!(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:application) {FactoryGirl.create(:application, family: family)}
+    let!(:household) {family.households.first}
+    let!(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+    let!(:family_member) {family.primary_applicant}
+    let!(:applicant) {FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member.id)}
+    let(:params) {{
+        "consumer_role_id"=>"",
+        "employee_role_id"=>"",
+        "dependent"=>
+            {"first_name"=>"mem",
+             "middle_name"=>"",
+             "last_name"=>"one",
+             "is_applying_coverage"=>"true",
+             "dob"=>"1990-06-01",
+             "ssn"=>"213-21-3312",
+             "no_ssn"=>"0",
+             "gender"=>"female",
+             "relationship"=>"domestic_partner",
+             "us_citizen"=>"true",
+             "naturalized_citizen"=>"false",
+             "indian_tribe_member"=>"false",
+             "tribal_id"=>"",
+             "is_incarcerated"=>"false",
+             "is_physically_disabled"=>"false",
+             "ethnicity"=>["", "", "", "", "", "", ""],
+             "is_consumer_role"=>"true",
+             "same_with_primary"=>"true",
+             "addresses"=>
+                 {"0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
+                  "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}},
+             "is_homeless"=>"0",
+             "is_temporarily_out_of_state"=>"0",
+             "family_id"=> family.id},
+        "jq_datepicker_ignore_dependent"=>{"dob"=>"06/01/1990"},
+        "immigration_doc_type"=>"",
+        "naturalization_doc_type"=>"",
+        "form_for_consumer_role"=>"false",
+        "button"=>"",
+        "controller"=>"insured/family_members"}}
+
+    before :each do
+      sign_in(user)
+      allow(STDOUT).to receive(:puts)
+    end
+
+    context "for member addition" do
+      it "should copy application if previous application is not in draft state" do
+        expect(family.applications.count).to eq 1
+        post :create, params
+        expect(family.applications.count).to eq 2
+      end
+
+      it "should not copy application if previous application is in draft state" do
+        family.applications.first.update_attributes(aasm_state: "draft")
+        expect(family.applications.count).to eq 1
+        post :create, params
+        expect(family.applications.count).to eq 1
+      end
+
+      it "should not copy application if there are no applications" do
+        family.applications.first.destroy!
+        family.reload
+        expect(family.applications.count).to eq 0
+        post :create, params
+        expect(family.applications.count).to eq 0
+      end
+    end
+
+    context "for member deletion" do
+      let!(:person2) { FactoryGirl.create(:person) }
+      let!(:family_member2){FactoryGirl.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person2)}
+
+
+      it "should copy application if previous application is not in draft state" do
+        expect(family.applications.count).to eq 1
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 2
+      end
+
+      it "should not copy application if previous application is in draft state" do
+        family.applications.first.update_attributes(aasm_state: "draft")
+        expect(family.applications.count).to eq 1
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 1
+      end
+
+      it "should not copy application if there are no applications" do
+        family.applications.first.destroy!
+        family.reload
+        expect(family.applications.count).to eq 0
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 0
+      end
+    end
+  end
+
 
   describe "DELETE destroy" do
     let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }

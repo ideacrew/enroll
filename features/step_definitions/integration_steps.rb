@@ -1,10 +1,15 @@
-require 'pry'
 # load Rails.root + "db/seeds.rb"
 
 When(/I use unique values/) do
   require 'test/unique_value_stash.rb'
   include UniqueValueStash
   @u = UniqueValueStash::UniqueValues.new unless defined?(@u)
+end
+
+#Shows page with relevant CSS and javascripts loaded
+def show_page
+  save_page Rails.root.join( 'public', 'capybara.html' )
+  %x(launchy http://localhost:3000/capybara.html)
 end
 
 def people
@@ -61,6 +66,10 @@ def people
     "Hbx Admin" => {
       email: 'admin@dc.gov',
       password: 'aA1!aA1!aA1!'
+    },
+    "Hbx Admin Tier 3" => {
+        email: 'themanda.tier3@dc.gov',
+        password: 'P@55word'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
@@ -204,6 +213,16 @@ def non_dc_office_location
   }
 end
 
+Given(/^Hbx Admin Tier 3 exists$/) do
+  p_staff=Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                            send_broker_agency_message: true, can_view_username_and_email: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  person = people['Hbx Admin Tier 3']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id, subrole: 'hbx_tier3'
+end
+
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
@@ -238,7 +257,7 @@ Given(/^a Hbx admin with read and write permissions exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -248,7 +267,7 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
   person = people['Hbx Admin']
@@ -621,7 +640,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
 end
 
 Then(/^.+ should see the dependents page$/) do
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
 
@@ -644,27 +663,28 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
   expect(page).to have_selector('li.dependent_list', :count => n.to_i)
 end
 
-When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+When(/^.+ clicks? Add New Person$/) do
+  click_link "Add New Person"
 end
 
 Then(/^.+ should see the new dependent form$/) do
 
-  expect(page).to have_content('Confirm Member')
+  expect(page).to have_content('CONFIRM MEMBER')
 end
 
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
   fill_in 'dependent[first_name]', with: 'Cynthia'
   fill_in 'dependent[last_name]', with: 'White'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/2011'
-  find(:xpath, "//p[@class='label'][contains(., 'This Person Is')]").click
+  find(:xpath, "//h2[@class='darkblue'][contains(., 'Household Info')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'choose')]").click
   find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
   find(:xpath, "//label[@for='radio_female']").click
 end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  expect(page).to have_link('Add New Person')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
@@ -817,6 +837,18 @@ end
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
   wait_for_ajax
+end
+
+And(/^clicks on the person in families tab$/) do
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  page.find('.families.dropdown-toggle.interaction-click-control-families').click
+  find(:xpath, "//a[@href='/exchanges/hbx_profiles/family_index_dt']").click
+  wait_for_ajax(10,2)
+  family_member = page.find('a', :text => "#{user.person.full_name}")
+  family_member.trigger('click')
+  visit verification_insured_families_path
+  find(:xpath, "//ul/li/a[contains(@class, 'interaction-click-control-documents')]").click
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|

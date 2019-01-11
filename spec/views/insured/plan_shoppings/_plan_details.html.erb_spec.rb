@@ -13,8 +13,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
   let(:application) { FactoryGirl.create(:application, family: family) }
 
   let(:plan) do
@@ -43,7 +43,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
   end
 
   let(:plan_hsa_status) { Hash.new }
-  let(:hbx_enrollment_members) { [double("HbxEnrollmentMember"), double("HbxEnrollmentMember")]}
+  let(:hbx_enrollment_member1) { double("HbxEnrollmentMember", applicant_id: family.family_members[0].id) }
+  let(:hbx_enrollment_member2) { double("HbxEnrollmentMember", applicant_id: family.family_members[1].id) }
+  let(:hbx_enrollment_members) { [hbx_enrollment_member1, hbx_enrollment_member2]}
   let(:hbx_enrollment) do
     instance_double(
       "HbxEnrollment", id: "hbx enrollment id",
@@ -62,6 +64,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     application.update_attributes!(family: family)
     tax_household = FactoryGirl.create(:tax_household, household: household )
     eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
+    assign(:tax_household, tax_household)
   end
 
   context "deductible" do
