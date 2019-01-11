@@ -20,13 +20,13 @@ site:
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
   byline: "DC's Online Health Insurance Marketplace"
-  long_name: "Massachusetts Health Connector"
+  long_name: "DC Health Link"
   copyright_period_start: "2013"
   header_message: "The Right Place for the Right Plan"
-  logo_file_name: "dchealthlink.jgp"
+  logo_file_name: "dc_logo.png"
   make_their_premium_payments_online: "https://ww2.e-billexpress.com/ebpp/MAConnector/"
   tab_icon: 'favicon.ico'
-  mailer_logo_file_name: "health_connector.png"
+  mailer_logo_file_name: "dc_logo.png"
   employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
   broker_quoting_enabled: false

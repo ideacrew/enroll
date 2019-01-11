@@ -19,6 +19,8 @@ class EnrollmentEligibilityReason
         SpecialEnrollmentPeriodReasonProvider.new(provider)
       when BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
         EmployerProfileReasonProvider.new(provider)
+      when BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+        EmployerProfileReasonProvider.new(provider)
       when BenefitSponsorship
         BenefitSponsorshipReasonProvider.new(provider)
       else
