@@ -9,15 +9,13 @@
         - if individual_market_is_enabled?
           li.dropdown role="presentation"
             a Families
-          li role="presentation"
-            a Employers
         - else
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
             = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families" }
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-            = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers" }
+        li role="presentation"
+          a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+          = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers" }
         - if aca_user_accounts_enabled
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
