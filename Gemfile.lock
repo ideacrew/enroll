@@ -949,7 +949,7 @@ GEM
     ffi (1.9.25)
     forgery (0.7.0)
     gherkin (5.1.0)
-    globalid (0.4.1)
+    globalid (0.4.2)
       activesupport (>= 4.2.0)
     haml (5.0.4)
       temple (>= 0.8.0)
@@ -1404,4 +1404,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.5
+   1.16.6
