@@ -38,7 +38,7 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
     notice.plan_year = PdfTemplates::PlanYear.new({
           :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on,
           :start_on => renewing_plan_year.start_on,
-          :carrier_name => renewing_plan_year.benefit_groups.first.reference_plan.carrier_profile.legal_name
+          :carrier_name => renewing_plan_year.benefit_packages.first.reference_plan.carrier_profile.legal_name
         })
   end
 

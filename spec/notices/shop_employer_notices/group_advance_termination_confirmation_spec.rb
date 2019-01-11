@@ -1,10 +1,15 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
-  let(:employer_profile){ create :employer_profile}
+RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation, dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application" do
+    let(:aasm_state) {:terminated}
+  end
+
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
-  let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'terminated', :fte_count => 55) }
+  let(:person){ FactoryGirl.create :person}
   let(:application_event) do
     double("ApplicationEventKind",
       {
@@ -26,41 +31,41 @@ RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
 
   describe "New" do
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(abc_profile, valid_parmas)}.not_to raise_error
       end
     end
   end
 
   describe "Build" do
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(employer_profile, valid_parmas)
+      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(abc_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq abc_profile.organization.legal_name.titleize
     end
   end
 
   describe "append_data" do
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(employer_profile, valid_parmas)
+      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(abc_profile, valid_parmas)
     end
     it "should append necessary information" do
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.end_on).to eq plan_year.end_on
+      expect(@employer_notice.notice.plan_year.end_on).to eq initial_application.end_on
     end
   end
 
   describe "generate_pdf_notice" do
     before do
-      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(employer_profile, valid_parmas)
+      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(abc_profile, valid_parmas)
     end
 
     it "should render group advance termination confirmation partial" do
