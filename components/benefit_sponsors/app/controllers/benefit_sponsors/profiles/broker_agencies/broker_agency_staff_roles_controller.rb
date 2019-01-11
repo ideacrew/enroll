@@ -61,21 +61,16 @@ module BenefitSponsors
         end
 
         def search_broker_agency
-          @filter_criteria = params.permit(:q)
-          results = BenefitSponsors::Organizations::Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria, params[:broker_registration_page])
-          if results.first.is_a?(Person)
-            @filtered_broker_roles  = results.map(&:broker_role)
-            @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
-          else
-            @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
-          end
+          @broker_agencies = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
+          @broker_agency_profiles =  @broker_agencies.broker_agency_search
         end
 
         private
 
         def broker_staff_params
           params[:staff].present? ? params[:staff] :  params[:staff] = {}
-          params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: "broker_agency_staff"})
+          params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type:  params[:profile_type] || "broker_agency_staff",
+                                  filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page]})
           params[:staff].permit!
         end
       end

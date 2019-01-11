@@ -7,9 +7,12 @@ module BenefitSponsors
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor) { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile) { benefit_sponsor.employer_profile }
-    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
-    let(:user) { FactoryBot.create(:user, :person => person)}
+    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_agency_profile) { broker_organization.broker_agency_profile }
+    let!(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+    let(:user) { FactoryGirl.create(:user, :person => person)}
 
     subject { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
@@ -250,6 +253,44 @@ module BenefitSponsors
         context '#destroy' do
           it "should return error" do
             expect(approve_form.destroy).to eq [false, "Person not found"]
+          end
+        end
+      end
+    end
+
+    describe '#for_broker_agency_search' do
+
+      let!(:person) { FactoryGirl.create(:person) }
+      let!(:params) {
+        {
+            filter_criteria: {"q" => broker_agency_profile.legal_name},
+            is_broker_registration_page: "true"
+        }
+      }
+
+      context "with valid form attributes " do
+
+        let!(:broker_search_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search params }
+
+
+        it "should assign the params for broker_search_form" do
+          expect(broker_search_form.filter_criteria.class).to eq Hash
+          expect(broker_search_form.is_broker_registration_page).to eq "true"
+        end
+
+        context '#broker_agency_search!' do
+
+          it 'should instantiates a new Staff Role Service' do
+            expect(broker_search_form.send(:service)).to be_an_instance_of(Services::StaffRoleService)
+          end
+
+          it "should search for broker agencies and return result if broker profile is approved" do
+            broker_agency_profile.update_attributes!(aasm_state: "is_approved")
+            expect(broker_search_form.broker_agency_search).to eq [broker_agency_profile]
+          end
+
+          it "should return empty result if broker profile is not approved" do
+            expect(broker_search_form.broker_agency_search).to eq []
           end
         end
       end
