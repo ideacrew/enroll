@@ -63,6 +63,10 @@ module BenefitSponsors
         Settings.aca.employer_has_sic_field
       end
 
+      def display_referred_by_for_employer?
+        Settings.aca.display_referred_by
+      end
+
       def employer_attestation_is_enabled?
         Settings.aca.employer_attestation
       end

@@ -6,6 +6,7 @@ module BenefitSponsors
     include BenefitSponsors::Concerns::RecordTransition
     include ::BenefitSponsors::Concerns::Observable
     include ::BenefitSponsors::ModelEvents::BenefitApplication
+    include ::Config::AcaModelConcern
 
     include AASM
 
@@ -83,7 +84,9 @@ module BenefitSponsors
     embeds_many :benefit_packages,
       class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage"
 
-    validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area, :recorded_sic_code
+    validates_presence_of :effective_period, :open_enrollment_period, :recorded_service_areas, :recorded_rating_area
+
+    validates_presence_of :recorded_sic_code if sic_field_exists_for_employer?
 
     # add_observer ::BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send]
     add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_application_events]
