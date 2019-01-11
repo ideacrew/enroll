@@ -110,67 +110,30 @@ module BenefitSponsors
         office && office.phone.to_s
       end
 
-      def linked_employees
-        employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
-        if employer_profiles
-          emp_ids = employer_profiles.map(&:id)
-          Person.where(:'employee_roles.benefit_sponsors_employer_profile_id'.in => emp_ids)
-        end
-      end
+      # should not be here!
+      # def linked_employees
+      #   employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
+      #   if employer_profiles
+      #     emp_ids = employer_profiles.map(&:id)
+      #     Person.where(:'employee_roles.benefit_sponsors_employer_profile_id'.in => emp_ids)
+      #   end
+      # end
 
-      def families
-        linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
-        employee_families = linked_active_employees.map(&:primary_family).to_a
-        consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
-        families = (consumer_families + employee_families).uniq
-        families.sort_by{|f| f.primary_applicant.person.last_name}
-      end
+      # def families
+      #   linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+      #   employee_families = linked_active_employees.map(&:primary_family).to_a
+      #   consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
+      #   families = (consumer_families + employee_families).uniq
+      #   families.sort_by{|f| f.primary_applicant.person.last_name}
+      # end
 
       class << self
-        def list_embedded(parent_list)
-          parent_list.reduce([]) { |list, parent_instance| list << parent_instance.general_agency_profile }
-        end
+        def find(id)
+          organization = BenefitSponsors::Organizations::Organization.where(
+            "profiles._id" => BSON::ObjectId.from_string(id)
+          ).first
 
-        def all
-          list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.order_by([:legal_name]).to_a
-        end
-        #
-        def all_by_broker_role(broker_role, options={})
-          favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:benefit_sponsors_general_agency_profile_id) rescue []
-          all_ga = if options[:approved_only]
-                     all.select{|ga| ga.aasm_state == 'is_approved'}
-                   else
-                     all
-                   end
-
-          if favorite_general_agency_ids.present?
-            all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
-          else
-            all_ga
-          end
-        end
-
-        def first
-          all.first
-        end
-
-        def last
-          all.last
-        end
-
-        # def find(id)
-        #   organizations = BenefitSponsors::Organizations::Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-        #   organizations.size > 0 ? organizations.first.general_agency_profile : nil
-        # end
-
-        def filter_by(status="is_applicant")
-          if status == 'all'
-            all
-          else
-            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:'profiles.aasm_state' => status).order_by([:legal_name]).to_a
-          end
-        rescue
-          []
+          organization.profiles.where(id: BSON::ObjectId.from_string(id)).first if organization.present?
         end
       end
 
