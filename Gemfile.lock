@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/dchbx/acapi.git
+  revision: 9cdaae0fd03b74a84b3b7d9a859b9d7f0d6f9196
+  branch: rails_5_update
+  specs:
+    acapi (1.1.0)
+      activesupport (~> 5.2.2)
+      bunny (~> 1.7.0)
+      sneakers
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -61,6 +71,7 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     afm (0.2.2)
+    amq-protocol (1.9.2)
     animate-rails (1.0.10)
       rails
     arel (9.0.0)
@@ -768,6 +779,8 @@ GEM
       sass (>= 3.5.2)
     bson (4.3.0)
     builder (3.2.3)
+    bunny (1.7.1)
+      amq-protocol (~> 1.9.2)
     capistrano (3.3.5)
       capistrano-stats (~> 1.1.0)
       i18n
@@ -1205,9 +1218,12 @@ GEM
     selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2, >= 1.2.2)
+    serverengine (1.5.11)
+      sigdump (~> 0.2.2)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
     sigar (0.7.3)
+    sigdump (0.2.4)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -1225,6 +1241,11 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    sneakers (1.1.2)
+      bunny (>= 1.7.0, <= 2.0.0)
+      serverengine (~> 1.5.5)
+      thor
+      thread (~> 0.1.7)
     spring (1.7.2)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -1247,6 +1268,7 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.5.0)
     thor (0.20.3)
+    thread (0.1.7)
     thread_safe (0.3.6)
     tilt (2.0.9)
     timers (4.2.0)
@@ -1304,6 +1326,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 4.8)
+  acapi!
   action_mailer_cache_delivery (~> 0.3)
   addressable (~> 2.3)
   animate-rails (~> 1.0.10)
