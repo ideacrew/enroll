@@ -15,20 +15,25 @@ module BenefitSponsors
         #   return user.has_hbx_staff_role? || user.has_csr_role?
         # end
 
+        def employers?
+          show?
+        end
+
         def show?
+          return false if user.blank?
           return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
         end
 
-        def edit_staff
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+        def edit_staff?
+          show?
         end
 
-        def update_staff
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+        def update_staff?
+          show?
         end
 
-        def staffs
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+        def staffs?
+          show?
         end
 
         def redirect_signup?
@@ -36,7 +41,7 @@ module BenefitSponsors
         end
 
         def staff_index?
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+          show?
         end
       end
     end

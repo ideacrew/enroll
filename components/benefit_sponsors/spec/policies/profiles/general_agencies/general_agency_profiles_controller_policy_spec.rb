@@ -15,9 +15,9 @@ module BenefitSponsors
       end
 
       it_behaves_like "should not permit for invalid user", :show?
-      it_behaves_like "should not permit for invalid user", :edit_staff
-      it_behaves_like "should not permit for invalid user", :update_staff
-      it_behaves_like "should not permit for invalid user", :staffs
+      it_behaves_like "should not permit for invalid user", :edit_staff?
+      it_behaves_like "should not permit for invalid user", :update_staff?
+      it_behaves_like "should not permit for invalid user", :staffs?
       it_behaves_like "should not permit for invalid user", :staff_index?
     end
 
@@ -31,9 +31,9 @@ module BenefitSponsors
       end
 
       it_behaves_like "should permit for a user with hbx staff role", :show?
-      it_behaves_like "should permit for a user with hbx staff role", :edit_staff
-      it_behaves_like "should permit for a user with hbx staff role", :update_staff
-      it_behaves_like "should permit for a user with hbx staff role", :staffs
+      it_behaves_like "should permit for a user with hbx staff role", :edit_staff?
+      it_behaves_like "should permit for a user with hbx staff role", :update_staff?
+      it_behaves_like "should permit for a user with hbx staff role", :staffs?
       it_behaves_like "should permit for a user with hbx staff role", :staff_index?
     end
 

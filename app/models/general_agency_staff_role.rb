@@ -11,7 +11,7 @@ class GeneralAgencyStaffRole
   field :aasm_state, type: String, default: "applicant"
   embeds_many :workflow_state_transitions, as: :transitional
 
-  associated_with_one :general_agency_profile, :benefit_sponsors_broker_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"
+  associated_with_one :general_agency_profile, :benefit_sponsors_general_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"
 
   validates_presence_of :benefit_sponsors_general_agency_profile_id, :npn
   accepts_nested_attributes_for :person, :workflow_state_transitions
