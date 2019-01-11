@@ -1,5 +1,5 @@
 class InvitationsController < ApplicationController
-  before_filter :require_login_and_allow_new_account
+  before_action :require_login_and_allow_new_account
   
   def claim
     @invitation = Invitation.find(params[:id])

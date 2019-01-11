@@ -7,7 +7,7 @@ class SessionTimeoutController < ApplicationController
     request.env["devise.skip_trackable"] = true
   end
 
-  skip_before_filter :authenticate_user!, only: [:has_user_timed_out]
+  skip_before_action :authenticate_user!, only: [:has_user_timed_out]
 
   def check_time_until_logout
     @time_left = Devise.timeout_in - (Time.now - user_session["last_request_at"]).to_i.round

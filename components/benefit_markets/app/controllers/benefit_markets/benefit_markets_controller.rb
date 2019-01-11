@@ -1,7 +1,7 @@
 module BenefitMarkets
   class BenefitMarketsController < ApplicationController
     layout 'benefit_markets/application.html.slim'
-    before_filter :set_site_id
+    before_action :set_site_id
 
     def index
       @benefit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)

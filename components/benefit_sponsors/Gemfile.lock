@@ -17,7 +17,7 @@ PATH
       active_model_serializers
       config
       mongoid (~> 7.0)
-      pundit (~> 1.0.1)
+      pundit (~> 2.0)
       rails (~> 5.2.2)
       slim (~> 3.0.9)
       symmetric-encryption (~> 3.6.0)
@@ -33,7 +33,7 @@ PATH
       combine_pdf
       config
       curl
-      money-rails (~> 1.3.0)
+      money-rails (~> 1.13)
       mongoid (~> 7.0)
       non-stupid-digest-assets
       rails (~> 5.2.2)
@@ -41,7 +41,7 @@ PATH
       roo (~> 2.1.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
-      wicked_pdf (= 1.0.6)
+      wicked_pdf (= 1.0)
       wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 PATH
@@ -52,13 +52,13 @@ PATH
       active_model_serializers
       config
       devise (~> 4.2)
-      interactor (= 3.1.0)
+      interactor (= 3.0)
       interactor-rails (= 2.2)
-      language_list (~> 1.1.0)
-      money-rails (~> 1.3.0)
+      language_list (~> 1)
+      money-rails (~> 1.13)
       mongoid (~> 7.0)
       mongoid-autoinc
-      pundit (~> 1.0.1)
+      pundit (~> 2.0)
       rails (~> 5.2.2)
       roo (~> 2.1.0)
       slim (~> 3.0.8)
@@ -233,9 +233,10 @@ GEM
       ruby_parser (~> 3.5)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    i18n (0.7.0)
+    i18n (1.5.1)
+      concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
-    interactor (3.1.0)
+    interactor (3.0.0)
     interactor-rails (2.2.0)
       interactor (~> 3.0)
       rails (>= 4.2, < 5.3)
@@ -252,7 +253,7 @@ GEM
       activerecord
       kaminari-core (= 1.1.1)
     kaminari-core (1.1.1)
-    language_list (1.1.0)
+    language_list (1.2.1)
     loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -268,14 +269,14 @@ GEM
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
-    monetize (1.1.0)
-      money (~> 6.5.0)
-    money (6.5.1)
-      i18n (>= 0.6.4, <= 0.7.0)
-    money-rails (1.3.0)
+    monetize (1.9.0)
+      money (~> 6.12)
+    money (6.13.2)
+      i18n (>= 0.6.4, <= 2)
+    money-rails (1.13.1)
       activesupport (>= 3.0)
-      monetize (~> 1.1.0)
-      money (~> 6.5.0)
+      monetize (~> 1.9.0)
+      money (~> 6.13.0)
       railties (>= 3.0)
     mongo (2.6.2)
       bson (>= 4.3.0, < 5.0.0)
@@ -306,7 +307,7 @@ GEM
       sprockets (>= 2.0)
     orm_adapter (0.5.0)
     public_suffix (3.0.3)
-    pundit (1.0.1)
+    pundit (2.0.0)
       activesupport (>= 3.0.0)
     rack (2.0.6)
     rack-test (1.1.0)
@@ -429,7 +430,7 @@ GEM
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
-    wicked_pdf (1.0.6)
+    wicked_pdf (1.0.0)
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
@@ -454,4 +455,4 @@ DEPENDENCIES
   test-prof (= 0.5.0)
 
 BUNDLED WITH
-   1.16.6
+   2.0.1

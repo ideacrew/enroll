@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency "virtus", "~> 1.0.5"
   s.add_dependency "redcarpet", "~> 3.4.0"
   s.add_dependency "wkhtmltopdf-binary-edge", "~> 0.12.3.0"
-  s.add_dependency "wicked_pdf", "1.0.6"
+  s.add_dependency "wicked_pdf", "1.1.0"
   s.add_dependency "combine_pdf"
   s.add_dependency "curl"
   s.add_dependency "ckeditor", '4.2.4'
@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'aasm', '~> 4.8.0'
   s.add_dependency 'acapi'
   s.add_dependency 'config'
-  s.add_dependency 'money-rails', '~> 1.3.0'
+  s.add_dependency 'money-rails', '~> 1.13'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'
