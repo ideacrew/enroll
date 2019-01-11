@@ -19,6 +19,9 @@ module BenefitSponsors
 
       attribute :profile_type, String
 
+      attribute :filter_criteria, Hash
+      attribute :is_broker_registration_page, String
+
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
@@ -77,6 +80,10 @@ module BenefitSponsors
         new(attrs)
       end
 
+      def self.for_broker_agency_search(attrs)
+        new(attrs)
+      end
+
       def save
         persist!
       end
@@ -93,6 +100,10 @@ module BenefitSponsors
 
       def approve
         approve!
+      end
+
+      def broker_agency_search
+        service.broker_agency_search!(self)
       end
 
       def approve!

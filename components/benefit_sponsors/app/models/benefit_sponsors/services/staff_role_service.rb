@@ -11,12 +11,13 @@ module BenefitSponsors
 
       def find_profile(form)
         organization = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(form[:profile_id])).first
-        if form.is_broker_agency_staff_profile?
-          organization.broker_agency_profile if organization.present?
-        else
-          organization.employer_profile if organization.present?
+        if organization.present?
+          if form.is_broker_agency_staff_profile?
+            organization.broker_agency_profile
+          else
+            organization.employer_profile
+          end
         end
-
       end
 
       def add_profile_representative!(form)
@@ -92,6 +93,16 @@ module BenefitSponsors
                                                                           })
           person.save!
           return true, person
+        end
+      end
+
+      def broker_agency_search!(form)
+        results = BenefitSponsors::Organizations::Organization.broker_agencies_with_matching_agency_or_broker(form[:filter_criteria].symbolize_keys!, form[:is_broker_registration_page])
+        if results.first.is_a?(Person)
+          @filtered_broker_roles  = results.map(&:broker_role)
+          @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+        else
+          @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
         end
       end
 
