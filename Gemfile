@@ -30,7 +30,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 #######################################################
 # Local components/engines
 #######################################################
-# gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'development'
+gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'rails_5_update'
 # gem "benefit_markets",    path: "components/benefit_markets"
 # gem "benefit_sponsors",   path: "components/benefit_sponsors"
 # gem 'openhbx_cv2',        git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
