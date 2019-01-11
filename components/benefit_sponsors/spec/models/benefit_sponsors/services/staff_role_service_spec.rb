@@ -234,5 +234,30 @@ module BenefitSponsors
         end
       end
     end
+
+    describe ".broker_agency_search!", dbclean: :after_each do
+      context 'when broker agency profile is in approved state' do
+
+        let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+            filter_criteria: {"q" => broker_agency_profile.legal_name},
+            is_broker_registration_page: "true")
+        }
+        it "should return result if broker profile is approved" do
+          broker_agency_profile.update_attributes!(aasm_state: "is_approved")
+          expect(subject.broker_agency_search!(staff_role_form)).to eq [broker_agency_profile]
+        end
+      end
+
+      context 'when broker agency profile is not in approved state' do
+        let(:staff_role_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(
+            filter_criteria: {"q" => broker_agency_profile.legal_name},
+            is_broker_registration_page: "true")
+        }
+        it "should return empty result if broker profile is not approved" do
+          expect(subject.broker_agency_search!(staff_role_form)).to eq []
+        end
+      end
+
+    end
   end
 end

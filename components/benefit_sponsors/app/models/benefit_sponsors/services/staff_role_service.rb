@@ -96,6 +96,16 @@ module BenefitSponsors
         end
       end
 
+      def broker_agency_search!(form)
+        results = BenefitSponsors::Organizations::Organization.broker_agencies_with_matching_agency_or_broker(form[:filter_criteria].symbolize_keys!, form[:is_broker_registration_page])
+        if results.first.is_a?(Person)
+          @filtered_broker_roles  = results.map(&:broker_role)
+          @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+        else
+          @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+        end
+      end
+
 
       def add_person_contact_info(form)
         person.add_work_email(form.email)
