@@ -192,6 +192,29 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     end
   end
 
+  describe "#select_market" do
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile, census_employee_id: census_employee.id)}
+      before do
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_employer_benefits?).and_return(true)
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      end
+      it "should return shop when person has both individual and employee roles" do
+        expect(subject.select_market(person, params)).to eq "shop"
+      end
+      it "should return individual when the person has only active consumer role" do
+        allow(person).to receive(:has_employer_benefits?).and_return(false)
+        expect(subject.select_market(person, params)).to eq "individual"
+      end
+      it "should return coverall if can_shop_resident? return true" do
+        allow(person).to receive(:is_consumer_role_active?).and_return(false)
+        allow(person).to receive(:has_employer_benefits?).and_return(false)
+        allow(person).to receive(:is_resident_role_active?).and_return(true)
+        expect(subject.select_market(person, params)).to eq "coverall"
+      end
+  end
+
   describe "#selected_enrollment" do
 
     context "selelcting the enrollment" do
