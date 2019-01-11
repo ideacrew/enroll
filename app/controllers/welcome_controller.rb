@@ -1,5 +1,5 @@
 class WelcomeController < ApplicationController
-  skip_before_filter :require_login
+  skip_before_action :require_login
 
   def show_hints
     current_user.hints = !current_user.hints

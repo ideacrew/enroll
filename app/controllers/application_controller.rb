@@ -19,9 +19,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   ## Devise filters
-  before_filter :require_login, unless: :authentication_not_required?
-  before_filter :authenticate_user_from_token!
-  before_filter :authenticate_me!
+  before_action :require_login, unless: :authentication_not_required?
+  before_action :authenticate_user_from_token!
+  before_action :authenticate_me!
 
   # for i18L
   before_action :set_locale

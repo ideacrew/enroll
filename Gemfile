@@ -31,12 +31,12 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'rails_5_update'
-# gem "benefit_markets",    path: "components/benefit_markets"
-# gem "benefit_sponsors",   path: "components/benefit_sponsors"
-# gem 'openhbx_cv2',        git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
-# gem "notifier",           path: "components/notifier"
-# gem "transport_gateway",  path: "components/transport_gateway"
-# gem "transport_profiles", path: "components/transport_profiles"
+gem "benefit_markets",    path: "components/benefit_markets"
+gem "benefit_sponsors",   path: "components/benefit_sponsors"
+gem 'openhbx_cv2',        git: 'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
+gem "notifier",           path: "components/notifier"
+gem "transport_gateway",  path: "components/transport_gateway"
+gem "transport_profiles", path: "components/transport_profiles"
 #######################################################
 
 ## MongoDB gem dependencies
@@ -65,11 +65,11 @@ gem 'coffee-rails',             '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 1.0'
 gem 'curl',                     '~> 0.0.9'
-gem 'devise',                   '~> 4.0'
+gem 'devise',                   '~> 4.5'
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
-gem 'interactor',               '~> 3.1'
+gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
@@ -93,7 +93,7 @@ gem 'symmetric-encryption',     '~> 3.6'
 gem 'turbolinks',               '~> 5'
 gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'
-gem 'wicked_pdf',               '~> 1.0'
+gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 3.4'
 
