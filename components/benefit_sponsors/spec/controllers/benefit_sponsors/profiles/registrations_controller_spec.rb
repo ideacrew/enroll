@@ -66,7 +66,7 @@ module BenefitSponsors
     }
 
     let(:general_agency_profile_attributes) {
-      { 
+      {
         :market_kind => :shop,
         :office_locations_attributes => office_locations_attributes,
       }
@@ -379,14 +379,9 @@ module BenefitSponsors
 
         let(:person) { FactoryBot.create :person}
 
-<<<<<<< HEAD
         let(:benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
         let(:broker_agency)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-=======
-        let(:benefit_sponsor) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-        let(:broker_agency)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-        let(:general_agency) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
->>>>>>> f6d274aa26... adding specs to general agency registration for new/create/edit/update actions
+        let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
 
         let(:benefit_sponsor_params) {
           {
