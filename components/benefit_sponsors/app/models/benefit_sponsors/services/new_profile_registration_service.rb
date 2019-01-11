@@ -220,7 +220,7 @@ module BenefitSponsors
 
       def is_broker_agency_registered?(user, form)
         if user.present? && user.person.present?
-          broker_agency_staff_role = user.person.broker_agency_staff_roles.first
+          broker_agency_staff_role = user.person.broker_agency_staff_roles.where(aasm_state: "active").first
           broker_role = user.person.broker_role
           if broker_agency_staff_role || broker_role
             form.profile_id = broker_agency_staff_role.present? ? broker_agency_staff_role.benefit_sponsors_broker_agency_profile_id : broker_role.benefit_sponsors_broker_agency_profile_id.to_s
