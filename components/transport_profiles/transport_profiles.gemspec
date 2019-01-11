@@ -16,13 +16,12 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency 'rails', '>= 4.2.0', '< 5.0'
-  s.add_dependency 'mongoid', '5.4.0'
+  s.add_dependency 'rails', '5.2.2'
+  s.add_dependency 'mongoid', "~> 7.0"
   s.add_dependency 'transport_gateway'
-  s.add_dependency 'nokogiri', '1.6.7.2'
   s.add_dependency 'acapi'
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
-  s.add_dependency 'rubyzip', '1.2.1'
+  s.add_dependency 'rubyzip', '>= 1.2.1'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'

@@ -29,11 +29,11 @@ Gem::Specification.new do |s|
   s.add_dependency 'money-rails', '~> 1.3.0'
   s.add_dependency 'virtus', '~> 1.0.5'
   s.add_dependency 'active_model_serializers'
-  s.add_dependency 'devise', '~> 3.5.4'
+  s.add_dependency 'devise', '~> 4.2'
   s.add_dependency 'language_list', '~> 1.1.0'
   s.add_dependency 'mongoid-autoinc'
   s.add_dependency 'interactor', '3.1.0'
-  s.add_dependency 'interactor-rails', '2.0.2'
+  s.add_dependency 'interactor-rails', '2.2'
 
   s.test_files = Dir["spec/**/*"]
 

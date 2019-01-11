@@ -1,3 +1,3 @@
-require "active_model_serializers"
+# require "active_model_serializers"
 
-ActiveModelSerializers.config.default_includes = "**"
+# ActiveModelSerializers.config.default_includes = "**"

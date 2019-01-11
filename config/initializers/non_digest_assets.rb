@@ -1,1 +1,1 @@
-NonStupidDigestAssets.whitelist += [/notifier\/ckeditor\/.*/]
+# NonStupidDigestAssets.whitelist += [/notifier\/ckeditor\/.*/]
