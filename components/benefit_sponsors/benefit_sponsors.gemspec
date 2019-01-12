@@ -17,34 +17,36 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 5.2.2"
-  s.add_dependency "slim", "~> 3.0.8"
-  s.add_dependency "mongoid", "~> 7.0"
-  # s.add_dependency 'mongoid-multitenancy', '~> 1.2'
-  s.add_dependency "aasm", "~> 4.8.0"
-  s.add_dependency 'config'
-  s.add_dependency 'symmetric-encryption', '~> 3.6.0'
-  s.add_dependency 'pundit', '~> 2.0'
-  s.add_dependency 'roo', '~> 2.1.0'
-  s.add_dependency 'money-rails', '~> 1.13'
-  s.add_dependency 'virtus', '~> 1.0.5'
-  s.add_dependency 'active_model_serializers'
-  s.add_dependency 'devise', '~> 4.5'
-  s.add_dependency 'language_list', '~> 1'
-  s.add_dependency 'mongoid-autoinc'
-  s.add_dependency 'interactor', '3.0'
-  s.add_dependency 'interactor-rails', '2.2'
+  s.add_dependency "rails",                     "~> 5.2.2"
+
+  s.add_dependency "mongoid",                   "~> 7.0"
+  s.add_dependency 'mongoid-autoinc',           '~> 6.0'
+
+  s.add_dependency "aasm",                      "~> 4.8.0"
+  s.add_dependency 'active_model_serializers',  '~> 0.10'
+  s.add_dependency 'config',                    '~> 1.7'
+  s.add_dependency 'devise',                    '~> 4.5'
+  s.add_dependency 'interactor',                '~> 3.0'
+  s.add_dependency 'interactor-rails',          '~> 2.2'
+  s.add_dependency 'language_list',             '~> 1'
+  s.add_dependency 'money-rails',               '~> 1.13'
+  s.add_dependency 'pundit',                    '~> 2.0'
+  s.add_dependency 'roo',                       '~> 2.1'
+  s.add_dependency 'virtus',                    '~> 1.0'
+  s.add_dependency "slim",                      "~> 3.0"
+  s.add_dependency 'symmetric-encryption',      '~> 3.6'
 
   s.test_files = Dir["spec/**/*"]
 
-  s.add_development_dependency "rspec-rails"
-  s.add_development_dependency "mongoid-rspec"
-  s.add_development_dependency 'shoulda-matchers'
+  # s.add_development_dependency 'bundler-audit',             '~> 0.6'
+  s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'capybara', '2.6.2'
-  s.add_development_dependency 'factory_girl_rails', '4.6.0'
-  s.add_development_dependency 'test-prof', '0.5.0'
-  s.add_development_dependency 'forgery'
-  s.add_development_dependency 'mongoid_rails_migrations'
-  s.add_development_dependency 'rails-perftest'
+  s.add_development_dependency 'factory_bot_rails',         '~> 4'
+  s.add_development_dependency 'forgery',                   '~> 0.7.0'
+  s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
+  s.add_development_dependency "mongoid-rspec",             '~> 4'
+  s.add_development_dependency 'rails-perftest',            '~> 0.0.7'
+  s.add_development_dependency "rspec-rails",               '~> 3.8'
+  s.add_development_dependency 'shoulda-matchers',          '~> 3'
+  s.add_development_dependency 'test-prof',                 '~> 0.5.0'
 end
