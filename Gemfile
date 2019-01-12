@@ -117,6 +117,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'bundler-audit'           '~> 0.6'
   gem 'capistrano',             '3.3.5'
   gem 'capistrano-rails',       '1.1.6'
 
