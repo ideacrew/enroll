@@ -42,7 +42,6 @@ gem "transport_profiles", path: "components/transport_profiles"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'money-rails',              '~> 1.13'
 gem 'mongoid',                  '~> 7.0'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
@@ -77,6 +76,7 @@ gem 'kaminari',                 '~> 0.17'
 gem 'language_list',            '~> 1'
 gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
+gem 'money-rails',              '~> 1.13'
 gem 'nokogiri',                 '~> 1.10'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'pundit',                   '~> 2.0'
@@ -117,7 +117,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'bundler-audit'           '~> 0.6'
+  # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '3.3.5'
   gem 'capistrano-rails',       '1.1.6'
 
@@ -135,13 +135,13 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'capybara',                     '~> 2.6.2'
+  gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber',                     '~> 3'
   gem 'cucumber-rails',               '~> 1.6',   :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
-  gem 'poltergeist',                  '~> 1.17.0'
+  gem 'poltergeist',                  '~> 1.18.0'
   gem 'rspec-instafail',              '~> 1'
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
