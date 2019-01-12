@@ -1,9 +1,9 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_sponsored_benefits_dental_sponsored_benefit, class: 'BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit', parent: :benefit_sponsors_sponsored_benefits_sponsored_benefit do
     sponsor_contribution { build(:benefit_sponsors_sponsored_benefits_sponsor_contribution) }
 
     transient do
-      product_package nil
+      product_package { nil }
     end
 
     after(:build) do |sponsored_benefit, evaluator|

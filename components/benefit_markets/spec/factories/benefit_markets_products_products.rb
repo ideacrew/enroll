@@ -1,9 +1,9 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_markets_products_product, class: 'BenefitMarkets::Products::Product' do
 
-    benefit_market_kind  :aca_shop
-    application_period    Date.new(TimeKeeper.date_of_record.year, 1, 1)..
-                          Date.new(TimeKeeper.date_of_record.year, 12, 31)
+    benefit_market_kind  { :aca_shop }
+    application_period    { Date.new(TimeKeeper.date_of_record.year, 1, 1)..
+                          Date.new(TimeKeeper.date_of_record.year, 12, 31) }
 
     hbx_id do
       deductable = Forgery('basic').text(
@@ -24,7 +24,7 @@ FactoryGirl.define do
       "SafeCo Health $#{deductable} Deductable Premier"
     end
 
-    description          "Highest rated and highest value"
+    description          { "Highest rated and highest value" }
     association :service_area, factory: :benefit_markets_locations_service_area
 
     after(:build) do |product, evaluator|

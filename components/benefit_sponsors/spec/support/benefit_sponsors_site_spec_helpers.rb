@@ -2,7 +2,7 @@ module BenefitSponsors
   class SiteSpecHelpers
     def self.create_cca_site_with_hbx_profile_and_benefit_market(market_kind = :aca_shop)
       site = create_cca_site_with_hbx_profile
-      site.benefit_markets << FactoryGirl.create(:benefit_markets_benefit_market, kind: market_kind)
+      site.benefit_markets << FactoryBot.create(:benefit_markets_benefit_market, kind: market_kind)
       site
     end
 

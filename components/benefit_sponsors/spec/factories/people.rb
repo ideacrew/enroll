@@ -1,4 +1,4 @@
-# FactoryGirl.define do
+# FactoryBot.define do
 #   factory :person do
 #     first_name 'John'
 #     sequence(:last_name) {|n| "Smith#{n}" }
@@ -15,7 +15,7 @@
 #     end
 #
 #     trait :with_mailing_address do
-#       addresses { [FactoryGirl.build(:address, :mailing_kind)]}
+#       addresses { [FactoryBot.build(:address, :mailing_kind)]}
 #     end
 #
 #     trait :with_ssn do
@@ -23,11 +23,11 @@
 #     end
 #
 #     trait :with_work_email do
-#       emails { [FactoryGirl.build(:email, kind: "work") ] }
+#       emails { [FactoryBot.build(:email, kind: "work") ] }
 #     end
 #
 #     trait :with_work_phone do
-#       phones { [FactoryGirl.build(:phone, kind: "work") ] }
+#       phones { [FactoryBot.build(:phone, kind: "work") ] }
 #     end
 #
 #     trait :without_first_name do

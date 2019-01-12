@@ -1,18 +1,18 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_markets_benefit_market_catalog, class: 'BenefitMarkets::BenefitMarketCatalog' do
 
-    title                     "Benefit Buddy's SHOP Employer Benefit Market"
-    description               "Some awesome description text here"
-    application_interval_kind :monthly
-    application_period        Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31)
-    probation_period_kinds    [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days]
+    title                     { "Benefit Buddy's SHOP Employer Benefit Market" }
+    description               { "Some awesome description text here" }
+    application_interval_kind { :monthly }
+    application_period        { Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
+    probation_period_kinds    { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
     sponsor_market_policy     { build(:benefit_markets_market_policies_sponsor_market_policy) }
     member_market_policy      { build(:benefit_markets_market_policies_member_market_policy) }
 
     transient do
       health_product_package_kinds { [:single_product, :single_issuer, :metal_level] }
       dental_product_package_kinds { [:single_product] }
-      number_of_products 5
+      number_of_products { 5 }
       product_kinds { [:health, :dental] }
     end
 

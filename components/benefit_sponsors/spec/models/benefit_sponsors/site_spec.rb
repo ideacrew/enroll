@@ -16,9 +16,9 @@ module BenefitSponsors
     let(:phone  )             { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)     { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let(:office_locations)    { [office_location] }
-    let(:profile)             { FactoryGirl.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
+    let(:profile)             { FactoryBot.build(:benefit_sponsors_organizations_hbx_profile, office_locations: office_locations) }
 
-    let(:benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
+    let(:benefit_market)      { FactoryBot.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
     let(:site)      { owner_organization.site }
 
 
@@ -47,7 +47,7 @@ module BenefitSponsors
     end
 
     describe 'Site Model has a', dbclean: :after_each do
-      let!(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca)}
+      let!(:site) { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca)}
       it 'has a valid factory' do
         expect(site.valid?).to be_truthy
       end
@@ -82,7 +82,7 @@ module BenefitSponsors
       end
 
       context "with two benefit markets of the same kind" do
-        let(:same_benefit_market)      { FactoryGirl.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
+        let(:same_benefit_market)      { FactoryBot.build(:benefit_markets_benefit_market, kind: benefit_market_kind) }
 
         let(:site) { Site.new(params) }
 
@@ -131,7 +131,7 @@ module BenefitSponsors
     end
 
     context "site keys must be valid" do
-      let(:site) { FactoryGirl.build(:benefit_sponsors_site) }
+      let(:site) { FactoryBot.build(:benefit_sponsors_site) }
 
       context "with keys longer than max length" do
         let(:max_key_length)  { 6 }
@@ -180,10 +180,10 @@ module BenefitSponsors
 
       let!(:site)               { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:owner_organization)  { site.owner_organization }
-      let(:hbx_profile)         { FactoryGirl.create(:benefit_sponsors_organizations_hbx_profile, organization: owner_organization) }
+      let(:hbx_profile)         { FactoryBot.create(:benefit_sponsors_organizations_hbx_profile, organization: owner_organization) }
 
-      let!(:loony_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, legal_name: loony_legal_name, site: site) }
-      let!(:acme_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, legal_name: itune_legal_name, site: site) }
+      let!(:loony_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, legal_name: loony_legal_name, site: site) }
+      let!(:acme_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, legal_name: itune_legal_name, site: site) }
 
       # this will include the owner_organization in the count
       it "should have correct number of site_organizations" do
@@ -210,8 +210,8 @@ module BenefitSponsors
           let(:shop_kind)             { :aca_shop }
           let(:individual_kind)       { :aca_individual }
 
-          let(:shop_benefit_market_1) { FactoryGirl.build(:benefit_markets_benefit_market, kind: shop_kind) }
-          let(:ivl_benefit_market_1)  { FactoryGirl.build(:benefit_markets_benefit_market, kind: individual_kind) }
+          let(:shop_benefit_market_1) { FactoryBot.build(:benefit_markets_benefit_market, kind: shop_kind) }
+          let(:ivl_benefit_market_1)  { FactoryBot.build(:benefit_markets_benefit_market, kind: individual_kind) }
 
           before do
             site.benefit_markets = [shop_benefit_market_1,ivl_benefit_market_1]

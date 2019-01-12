@@ -10,10 +10,10 @@ module BenefitMarkets
     let(:effective_period)        { effective_date..(effective_date + 1.year - 1.day) }
     let(:open_enrollment_period)  { (effective_date - 1.month)..(effective_date - 1.month + 9.days) }
     let(:probation_period_kinds)  { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
-    let(:service_areas)           { FactoryGirl.build(:benefit_markets_locations_service_area).to_a }
+    let(:service_areas)           { FactoryBot.build(:benefit_markets_locations_service_area).to_a }
     let(:sponsor_market_policy)   { BenefitMarkets::MarketPolicies::SponsorMarketPolicy.new }
     let(:member_market_policy)    { BenefitMarkets::MarketPolicies::MemberMarketPolicy.new }
-    let(:product_packages)        { [FactoryGirl.build(:benefit_markets_products_product_package)] }
+    let(:product_packages)        { [FactoryBot.build(:benefit_markets_products_product_package)] }
 
     let(:params) do
       {
@@ -155,7 +155,7 @@ module BenefitMarkets
 
       context "and the product_packages are different", dbclean: :after_each do
         let(:compare_catalog)     { described_class.new(**params) }
-        let(:new_product_package) { FactoryGirl.build(:benefit_markets_products_product_package) }
+        let(:new_product_package) { FactoryBot.build(:benefit_markets_products_product_package) }
 
         before { compare_catalog.product_packages << new_product_package }
 

@@ -6,15 +6,15 @@ module BenefitMarkets
     let(:this_year)               { TimeKeeper.date_of_record.year }
     # let(:benefit_market_kind)     { :aca_shop }
 
-    let(:benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog) }
+    let(:benefit_market_catalog)  { FactoryBot.build(:benefit_markets_benefit_market_catalog) }
     let(:benefit_kind)            { :aca_shop }
     let(:product_kind)            { :health }
     let(:package_kind)            { :single_issuer }
     let(:title)                   { "SafeCo Issuer Health" }
     let(:description)             { "All products offered by a single issuer" }
-    let(:products)                { FactoryGirl.build_list(:benefit_markets_products_product, 5) }
-    let(:contribution_model)      { FactoryGirl.build(:benefit_markets_contribution_models_contribution_model) }
-    let(:pricing_model)           { FactoryGirl.build(:benefit_markets_pricing_models_pricing_model) }
+    let(:products)                { FactoryBot.build_list(:benefit_markets_products_product, 5) }
+    let(:contribution_model)      { FactoryBot.build(:benefit_markets_contribution_models_contribution_model) }
+    let(:pricing_model)           { FactoryBot.build(:benefit_markets_pricing_models_pricing_model) }
 
 
     let(:params) do
@@ -127,7 +127,7 @@ module BenefitMarkets
 
       context "and the product_packages are different" do
         let(:compare_product_package)     { described_class.new(**params) }
-        let(:new_product)                 { FactoryGirl.build(:benefit_markets_products_product) }
+        let(:new_product)                 { FactoryBot.build(:benefit_markets_products_product) }
 
         before { compare_product_package.products << new_product }
 

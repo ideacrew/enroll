@@ -159,7 +159,7 @@ module BenefitMarkets
 
       context "and the premium_tables are different" do
         let(:compare_product)   { described_class.new(**params) }
-        let(:new_premium_table) { FactoryGirl.build(:benefit_markets_products_premium_table) }
+        let(:new_premium_table) { FactoryBot.build(:benefit_markets_products_premium_table) }
 
         before { compare_product.premium_tables << new_premium_table }
 

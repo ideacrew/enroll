@@ -97,7 +97,7 @@ module BenefitMarkets
 
       context "and the premium_tuples are different" do
         let(:compare_premium_table)   { described_class.new(**params) }
-        let(:new_premium_tuple)       { FactoryGirl.build(:benefit_markets_products_premium_tuple) }
+        let(:new_premium_tuple)       { FactoryBot.build(:benefit_markets_products_premium_tuple) }
 
         before { compare_premium_table.premium_tuples << new_premium_tuple }
 

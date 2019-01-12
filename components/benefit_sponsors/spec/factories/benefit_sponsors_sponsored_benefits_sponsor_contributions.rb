@@ -1,8 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_sponsored_benefits_sponsor_contribution, class: 'BenefitSponsors::SponsoredBenefits::SponsorContribution' do
     
     transient do 
-      product_package nil
+      product_package { nil }
     end
 
     after(:build) do |sponsor_contribution, evaluator|

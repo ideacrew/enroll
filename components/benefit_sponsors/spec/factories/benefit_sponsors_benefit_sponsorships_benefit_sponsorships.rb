@@ -1,21 +1,21 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_benefit_sponsorship, class: 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship' do
 
-    source_kind   :self_serve
+    source_kind   { :self_serve }
 
     transient do
-      initial_application_state :active
-      renewal_application_state :enrollment_open
-      draft_application_state :draft
-      default_effective_period nil
-      default_open_enrollment_period nil
-      service_area_list []
-      supplied_rating_area nil
-      site nil
+      initial_application_state { :active }
+      renewal_application_state { :enrollment_open }
+      draft_application_state { :draft }
+      default_effective_period { nil }
+      default_open_enrollment_period { nil }
+      service_area_list { [] }
+      supplied_rating_area { nil }
+      site { nil }
     end
 
     trait :with_benefit_market do
-      benefit_market { FactoryGirl.build :benefit_markets_benefit_market}
+      benefit_market { FactoryBot.build :benefit_markets_benefit_market}
     end
 
     trait :with_rating_area do
@@ -77,7 +77,7 @@ FactoryGirl.define do
 
     trait :with_initial_benefit_application do
       after :build do |benefit_sponsorship, evaluator|
-        FactoryGirl.build(:benefit_sponsors_benefit_application,
+        FactoryBot.build(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           benefit_sponsorship: benefit_sponsorship,
           aasm_state: evaluator.initial_application_state,
@@ -89,7 +89,7 @@ FactoryGirl.define do
 
     trait :with_renewal_benefit_application do
       after :build do |benefit_sponsorship, evaluator|
-        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+        benefit_application = FactoryBot.build(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           :with_predecessor_application,
           :benefit_sponsorship => benefit_sponsorship,
@@ -107,7 +107,7 @@ FactoryGirl.define do
 
     trait :with_expired_and_active_benefit_application do
       after :build do |benefit_sponsorship, evaluator|
-        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+        benefit_application = FactoryBot.build(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           :with_active,
           :with_predecessor_expired_application,
@@ -122,7 +122,7 @@ FactoryGirl.define do
 
     trait :with_imported_and_renewal_benefit_application do
       after :build do |benefit_sponsorship, evaluator|
-        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+        benefit_application = FactoryBot.build(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           :with_predecessor_imported_application,
           :benefit_sponsorship => benefit_sponsorship,
@@ -136,7 +136,7 @@ FactoryGirl.define do
 
     trait :with_renewal_draft_benefit_application do
       after :build do |benefit_sponsorship, evaluator|
-        benefit_application = FactoryGirl.build(:benefit_sponsors_benefit_application,
+        benefit_application = FactoryBot.build(:benefit_sponsors_benefit_application,
           :with_benefit_package,
           :with_predecessor_application,
           :benefit_sponsorship => benefit_sponsorship,
@@ -150,15 +150,15 @@ FactoryGirl.define do
 
     trait :with_broker_agency_account do
       transient do
-        broker_agency_profile nil
+        broker_agency_profile { nil }
       end
 
       after :build do |benefit_sponsorship, evaluator|
         if evaluator.broker_agency_profile
-          broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: evaluator.broker_agency_profile, benefit_sponsorship: benefit_sponsorship
+          broker_agency_account = FactoryBot.build :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: evaluator.broker_agency_profile, benefit_sponsorship: benefit_sponsorship
           benefit_sponsorship.broker_agency_accounts = [broker_agency_account]
         else
-          broker_agency_account = FactoryGirl.build :benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship
+          broker_agency_account = FactoryBot.build :benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship
           benefit_sponsorship.broker_agency_accounts = [broker_agency_account]
         end
       end

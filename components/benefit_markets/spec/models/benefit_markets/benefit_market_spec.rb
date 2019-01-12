@@ -97,10 +97,10 @@ module BenefitMarkets
       let(:last_year_range)                 { (this_year_range.begin - 1.year)..(this_year_range.end - 1.year)}
       let(:next_year_range)                 { (this_year_range.begin + 1.year)..(this_year_range.end + 1.year)}
 
-      let(:last_year_benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, application_period: this_year_range) }
-      let(:this_year_benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, application_period: last_year_range) }
-      let(:next_year_benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, application_period: next_year_range) }
-      let(:same_year_benefit_market_catalog)  { FactoryGirl.build(:benefit_markets_benefit_market_catalog, application_period: this_year_range) }
+      let(:last_year_benefit_market_catalog)  { FactoryBot.build(:benefit_markets_benefit_market_catalog, application_period: this_year_range) }
+      let(:this_year_benefit_market_catalog)  { FactoryBot.build(:benefit_markets_benefit_market_catalog, application_period: last_year_range) }
+      let(:next_year_benefit_market_catalog)  { FactoryBot.build(:benefit_markets_benefit_market_catalog, application_period: next_year_range) }
+      let(:same_year_benefit_market_catalog)  { FactoryBot.build(:benefit_markets_benefit_market_catalog, application_period: this_year_range) }
 
       it "should add a benefit_market_catalog" do
         benefit_market.add_benefit_market_catalog(this_year_benefit_market_catalog)

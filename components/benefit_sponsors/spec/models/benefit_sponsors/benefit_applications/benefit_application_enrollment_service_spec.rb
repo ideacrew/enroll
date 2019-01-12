@@ -834,17 +834,17 @@ module BenefitSponsors
       let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
       let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
       let(:benefit_package) { initial_application.benefit_packages.first }
-      let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
-      let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
-      let(:census_employee) { FactoryGirl.create(:census_employee,
+      let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+      let(:census_employee) { FactoryBot.create(:census_employee,
         employer_profile: benefit_sponsorship.profile,
         benefit_sponsorship: benefit_sponsorship,
         benefit_group_assignments: [benefit_group_assignment]
       )}
-      let(:person){ FactoryGirl.create(:person, :with_family)}
+      let(:person){ FactoryBot.create(:person, :with_family)}
       let(:family) {person.primary_family}
 
-      let!(:hbx_enrollment) {  FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+      let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         aasm_state: "coverage_selected",
                         effective_on: initial_application.start_on,
@@ -856,7 +856,7 @@ module BenefitSponsors
                         employee_role_id: employee_role.id)
       }
 
-      let!(:dental_hbx_enrollment) {  FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+      let!(:dental_hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         aasm_state: "coverage_selected",
                         effective_on: initial_application.start_on,

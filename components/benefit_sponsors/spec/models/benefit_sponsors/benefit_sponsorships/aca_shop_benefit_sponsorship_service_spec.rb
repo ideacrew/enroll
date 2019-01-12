@@ -11,11 +11,11 @@ module BenefitSponsors
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:benefit_market)  { site.benefit_markets.first }
 
-    let(:employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_organization)   { FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
-    let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
-    let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
+    let!(:rating_area)                    { FactoryBot.create(:benefit_markets_locations_rating_area)  }
+    let!(:service_area)                    { FactoryBot.create(:benefit_markets_locations_service_area)  }
     let(:this_year)                       { TimeKeeper.date_of_record.year }
 
     let(:april_effective_date)            { Date.new(this_year,4,1) }

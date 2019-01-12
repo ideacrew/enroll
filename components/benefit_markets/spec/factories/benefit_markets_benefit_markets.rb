@@ -1,10 +1,10 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_markets_benefit_market, class: 'BenefitMarkets::BenefitMarket' do
-    site_urn 'acme'
+    site_urn { 'acme' }
     site  { build(:benefit_sponsors_site) }
-    kind :aca_shop
-    title "DC Health Link SHOP Market"
-    description "Health Insurance Marketplace for District Employers and Employees"
+    kind { :aca_shop }
+    title { "DC Health Link SHOP Market" }
+    description { "Health Insurance Marketplace for District Employers and Employees" }
 
     after :build do |benefit_market|
       if benefit_market.kind == :aca_shop
