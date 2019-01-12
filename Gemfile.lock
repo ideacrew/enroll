@@ -1,23 +1,4 @@
 GIT
-  remote: https://github.com/dchbx/acapi.git
-  revision: 9cdaae0fd03b74a84b3b7d9a859b9d7f0d6f9196
-  branch: rails_5_update
-  specs:
-    acapi (1.1.0)
-      activesupport (~> 5.2.2)
-      bunny (~> 1.7.0)
-      sneakers
-
-GIT
-  remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: 630e2b4e201ea331c0104694c8e1434d7e1c4bc8
-  branch: master
-  specs:
-    openhbx_cv2 (0.0.1)
-      activesupport (>= 3.2)
-      nokogiri-happymapper (~> 0.5)
-
-GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -28,86 +9,12 @@ GIT
       ruby-rc4
       ttfunk (~> 1.0.3)
 
-PATH
-  remote: components/benefit_markets
-  specs:
-    benefit_markets (0.0.1)
-      aasm (~> 4.8.0)
-      active_model_serializers
-      config
-      mongoid (~> 7.0)
-      pundit (~> 2.0)
-      rails (~> 5.2.2)
-      slim (~> 3.0.9)
-      symmetric-encryption (~> 3.6.0)
-      virtus
-
-PATH
-  remote: components/benefit_sponsors
-  specs:
-    benefit_sponsors (0.0.1)
-      aasm (~> 4.8.0)
-      active_model_serializers
-      config
-      devise (~> 4.5)
-      interactor (= 3.0)
-      interactor-rails (= 2.2)
-      language_list (~> 1)
-      money-rails (~> 1.13)
-      mongoid (~> 7.0)
-      mongoid-autoinc
-      pundit (~> 2.0)
-      rails (~> 5.2.2)
-      roo (~> 2.1.0)
-      slim (~> 3.0.8)
-      symmetric-encryption (~> 3.6.0)
-      virtus (~> 1.0.5)
-
-PATH
-  remote: components/notifier
-  specs:
-    notifier (0.0.1)
-      aasm (~> 4.8.0)
-      acapi
-      ckeditor (= 4.2.4)
-      combine_pdf
-      config
-      curl
-      money-rails (~> 1.13)
-      mongoid (~> 7.0)
-      non-stupid-digest-assets
-      rails (~> 5.2.2)
-      redcarpet (~> 3.4.0)
-      roo (~> 2.1.0)
-      slim (= 3.0.9)
-      virtus (~> 1.0.5)
-      wicked_pdf (= 1.1.0)
-      wkhtmltopdf-binary-edge (~> 0.12.3.0)
-
-PATH
-  remote: components/transport_gateway
-  specs:
-    transport_gateway (0.0.1)
-      aws-sdk (>= 2.2.4)
-      net-sftp (~> 2.1, >= 2.1.2)
-      rails (>= 5.2.2)
-
-PATH
-  remote: components/transport_profiles
-  specs:
-    transport_profiles (0.0.1)
-      acapi
-      mongoid (~> 7.0)
-      rails (= 5.2.2)
-      rubyzip (>= 1.2.1)
-      symmetric-encryption (~> 3.6.0)
-      transport_gateway
-
 GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.3)
-    aasm (4.8.0)
+    aasm (4.12.3)
+      concurrent-ruby (~> 1.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
     actioncable (5.2.2)
@@ -133,11 +40,6 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_model_serializers (0.10.8)
-      actionpack (>= 4.1, < 6)
-      activemodel (>= 4.1, < 6)
-      case_transform (>= 0.2)
-      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (5.2.2)
       activesupport (= 5.2.2)
       globalid (>= 0.3.6)
@@ -159,7 +61,6 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     afm (0.2.2)
-    amq-protocol (1.9.2)
     animate-rails (1.0.10)
       rails
     arel (9.0.0)
@@ -168,7 +69,7 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.0.1)
-    aws-partitions (1.131.0)
+    aws-partitions (1.129.0)
     aws-sdk (3.0.1)
       aws-sdk-resources (~> 3)
     aws-sdk-acm (1.14.0)
@@ -267,7 +168,7 @@ GEM
     aws-sdk-codecommit (1.11.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-codedeploy (1.13.0)
+    aws-sdk-codedeploy (1.12.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-codepipeline (1.11.0)
@@ -297,7 +198,7 @@ GEM
     aws-sdk-connect (1.10.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-core (3.45.0)
+    aws-sdk-core (3.44.2)
       aws-eventstream (~> 1.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
@@ -332,16 +233,13 @@ GEM
     aws-sdk-dlm (1.7.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-docdb (1.0.0)
-      aws-sdk-core (~> 3, >= 3.39.0)
-      aws-sigv4 (~> 1.0)
     aws-sdk-dynamodb (1.19.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-dynamodbstreams (1.6.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-ec2 (1.66.0)
+    aws-sdk-ec2 (1.65.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-ecr (1.10.0)
@@ -374,7 +272,7 @@ GEM
     aws-sdk-elastictranscoder (1.7.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-emr (1.9.0)
+    aws-sdk-emr (1.8.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-firehose (1.11.0)
@@ -416,7 +314,7 @@ GEM
     aws-sdk-inspector (1.12.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-iot (1.22.0)
+    aws-sdk-iot (1.21.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-iot1clickdevicesservice (1.6.0)
@@ -563,10 +461,10 @@ GEM
     aws-sdk-rds (1.42.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-rdsdataservice (1.1.0)
+    aws-sdk-rdsdataservice (1.0.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-redshift (1.18.0)
+    aws-sdk-redshift (1.17.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-rekognition (1.16.0)
@@ -578,7 +476,7 @@ GEM
     aws-sdk-resourcegroupstaggingapi (1.6.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-resources (3.37.0)
+    aws-sdk-resources (3.36.0)
       aws-sdk-acm (~> 1)
       aws-sdk-acmpca (~> 1)
       aws-sdk-alexaforbusiness (~> 1)
@@ -631,7 +529,6 @@ GEM
       aws-sdk-directconnect (~> 1)
       aws-sdk-directoryservice (~> 1)
       aws-sdk-dlm (~> 1)
-      aws-sdk-docdb (~> 1)
       aws-sdk-dynamodb (~> 1)
       aws-sdk-dynamodbstreams (~> 1)
       aws-sdk-ec2 (~> 1)
@@ -760,14 +657,14 @@ GEM
     aws-sdk-route53resolver (1.1.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-s3 (1.30.1)
+    aws-sdk-s3 (1.30.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.0)
     aws-sdk-s3control (1.1.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
-    aws-sdk-sagemaker (1.28.0)
+    aws-sdk-sagemaker (1.27.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-sagemakerruntime (1.7.0)
@@ -871,8 +768,9 @@ GEM
       sass (>= 3.5.2)
     bson (4.3.0)
     builder (3.2.3)
-    bunny (1.7.1)
-      amq-protocol (~> 1.9.2)
+    bundler-audit (0.6.0)
+      bundler (~> 1.2)
+      thor (~> 0.18)
     capistrano (3.3.5)
       capistrano-stats (~> 1.1.0)
       i18n
@@ -902,8 +800,6 @@ GEM
       carrierwave (>= 0.8, < 1.4)
       mongoid (>= 3.0, < 8.0)
       mongoid-grid_fs (>= 1.3, < 3.0)
-    case_transform (0.2)
-      activesupport
     celluloid (0.17.4)
       celluloid-essentials
       celluloid-extras
@@ -1018,20 +914,20 @@ GEM
       dry-logic (~> 0.4, >= 0.4.0)
       dry-types (~> 0.13.1)
     easy_diff (1.0.0)
-    effective_bootstrap (0.3.8)
+    effective_bootstrap (0.3.7)
       bootstrap (>= 4.0.0)
       coffee-rails
       inline_svg
       jquery-rails
       rails (>= 4.0.0)
       sass
-    effective_datatables (4.3.19)
+    effective_datatables (4.3.18)
       coffee-rails
       effective_bootstrap
       effective_resources
       rails (>= 3.2.0)
       sass
-    effective_resources (1.1.4)
+    effective_resources (1.1.2)
       rails (>= 4.0.0)
     email_spec (2.2.0)
       htmlentities (~> 4.3.3)
@@ -1056,7 +952,7 @@ GEM
     ffi (1.9.25)
     forgery (0.7.0)
     gherkin (5.1.0)
-    globalid (0.4.2)
+    globalid (0.4.1)
       activesupport (>= 4.2.0)
     haml (5.0.4)
       temple (>= 0.8.0)
@@ -1074,7 +970,7 @@ GEM
     inline_svg (1.3.1)
       activesupport (>= 3.0)
       nokogiri (>= 1.6)
-    interactor (3.0.0)
+    interactor (3.1.1)
     interactor-rails (2.2.0)
       interactor (~> 3.0)
       rails (>= 4.2, < 5.3)
@@ -1088,7 +984,6 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.1.0)
-    jsonapi-renderer (0.2.0)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -1120,7 +1015,7 @@ GEM
       money (~> 6.12)
     money (6.13.2)
       i18n (>= 0.6.4, <= 2)
-    money-rails (1.13.1)
+    money-rails (1.13.0)
       activesupport (>= 3.0)
       monetize (~> 1.9.0)
       money (~> 6.13.0)
@@ -1170,8 +1065,6 @@ GEM
     mustermann (1.0.3)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-sftp (2.1.2)
-      net-ssh (>= 2.6.5)
     net-ssh (5.1.0)
     newrelic_rpm (5.6.0.349)
     nio4r (2.3.1)
@@ -1179,8 +1072,6 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogiri-happymapper (0.8.0)
       nokogiri (~> 1.5)
-    non-stupid-digest-assets (1.0.9)
-      sprockets (>= 2.0)
     orm_adapter (0.5.0)
     overcommit (0.46.0)
       childprocess (~> 0.6, >= 0.6.3)
@@ -1260,7 +1151,7 @@ GEM
       redis-namespace (~> 1.6)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    roo (2.1.1)
+    roo (2.7.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
     rspec (3.8.0)
@@ -1317,12 +1208,9 @@ GEM
     selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2, >= 1.2.2)
-    serverengine (1.5.11)
-      sigdump (~> 0.2.2)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
     sigar (0.7.3)
-    sigdump (0.2.4)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -1340,11 +1228,6 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
-    sneakers (1.1.2)
-      bunny (>= 1.7.0, <= 2.0.0)
-      serverengine (~> 1.5.5)
-      thor
-      thread (~> 0.1.7)
     spring (1.7.2)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -1360,14 +1243,13 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machine (1.2.0)
-    symmetric-encryption (3.6.0)
-      coercible (>= 1.0.0)
+    symmetric-encryption (3.9.1)
+      coercible (~> 1.0)
     temple (0.8.0)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.5.0)
     thor (0.20.3)
-    thread (0.1.7)
     thread_safe (0.3.6)
     tilt (2.0.9)
     timers (4.2.0)
@@ -1425,17 +1307,15 @@ PLATFORMS
 
 DEPENDENCIES
   aasm (~> 4.8)
-  acapi!
   action_mailer_cache_delivery (~> 0.3)
   addressable (~> 2.3)
   animate-rails (~> 1.0.10)
   aws-sdk (~> 3.0)
   bcrypt (~> 3.1)
-  benefit_markets!
-  benefit_sponsors!
   bootsnap (>= 1.1)
   bootstrap (~> 4.1)
   bson (~> 4.3)
+  bundler-audit
   capistrano (= 3.3.5)
   capistrano-rails (= 1.1.6)
   capybara (~> 2.6.2)
@@ -1449,7 +1329,7 @@ DEPENDENCIES
   cucumber (~> 3)
   cucumber-rails (~> 1.6)
   curl (~> 0.0.9)
-  devise (~> 4.5)
+  devise (~> 4.0)
   effective_datatables (~> 4.3)
   email_spec (~> 2)
   eye (= 0.8)
@@ -1459,7 +1339,7 @@ DEPENDENCIES
   haml (~> 5.0)
   httparty (~> 0.16)
   i18n (~> 1.5)
-  interactor (~> 3.0)
+  interactor (~> 3.1)
   interactor-rails (~> 2.2)
   jbuilder (~> 2.7)
   jquery-rails (~> 4.3)
@@ -1481,8 +1361,6 @@ DEPENDENCIES
   newrelic_rpm (~> 5.0)
   nokogiri (~> 1.10)
   nokogiri-happymapper (~> 0.8.0)
-  notifier!
-  openhbx_cv2!
   overcommit (~> 0.44)
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.17.0)
@@ -1512,8 +1390,6 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.0)
   symmetric-encryption (~> 3.6)
   test-prof (~> 0.5.0)
-  transport_gateway!
-  transport_profiles!
   turbolinks (~> 5)
   uglifier (>= 4)
   unicorn (~> 4.8)
@@ -1523,7 +1399,7 @@ DEPENDENCIES
   web-console (>= 3)
   webmock (~> 3.0.1)
   webpacker (~> 3.4)
-  wicked_pdf (~> 1.1.0)
+  wicked_pdf (~> 1.0)
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
   yard (~> 0.9.12)
   yard-mongoid (~> 0.1)
@@ -1532,4 +1408,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   1.16.5
