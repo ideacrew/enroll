@@ -30,7 +30,7 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_extend_open_enrollment
   end
 
-  def create_plan_year_for_employer?
+  def new_benefit_application_for_employer?
     return true unless role = user.person.hbx_staff_role
     role.subrole == "super_admin"
   end

@@ -714,4 +714,43 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "benefit application creation" do
+    let!(:user) { FactoryGirl.create(:user) }
+    let!(:person) { FactoryGirl.create(:person, user: user) }
+    let!(:permission) { FactoryGirl.create(:permission, name: "super_admin") }
+    let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person, subrole: "super_admin", permission_id: permission.id) }
+
+    before :each do
+      sign_in(user)
+    end
+
+    context '.new_benefit_application' do
+      before :each do
+        xhr :get, :new_benefit_application
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render new_benefit_application' do
+        expect(response).to render_template("exchanges/hbx_profiles/new_benefit_application")
+      end
+    end
+
+    context '.create_benefit_application' do
+      before :each do
+        xhr :post, :create_benefit_application
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render new_benefit_application' do
+        expect(response).to render_template("exchanges/hbx_profiles/create_benefit_application")
+      end
+    end
+  end
 end

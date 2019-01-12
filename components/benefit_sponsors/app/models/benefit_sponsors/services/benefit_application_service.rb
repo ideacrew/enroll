@@ -15,7 +15,12 @@ module BenefitSponsors
       def load_form_metadata(form)
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         find_benefit_sponsorship(form)
-        form.start_on_options = schedular.start_on_options_with_schedule
+
+        if form.admin_datatable_action
+          form.start_on_options = schedular.start_on_options_for_datatable_action
+        else
+          form.start_on_options = schedular.start_on_options_with_schedule
+        end
       end
 
       def load_form_params_from_resource(form)

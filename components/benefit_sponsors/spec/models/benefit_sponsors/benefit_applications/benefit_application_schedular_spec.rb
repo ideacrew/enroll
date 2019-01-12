@@ -50,5 +50,23 @@ module BenefitSponsors
         it { expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(Date.parse('2018-11-01'))).to eq(Date.parse('2018-10-23')) }
       end
     end
+
+    describe 'start_on_options_for_datatable_action' do
+      let(:dates_hash) { ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.start_on_options_for_datatable_action }
+
+      it 'should return a instance of Hash' do
+        expect(dates_hash).to be_a Hash
+      end
+
+      it 'should have sub keys' do
+        [:open_enrollment_start_on, :open_enrollment_end_on].each do |dt_key|
+          expect(dates_hash.values.first.has_key?(dt_key)).to be_truthy
+        end
+      end
+
+      it "should return today's date for start_on" do
+        expect(dates_hash.values.first[:open_enrollment_start_on]).to eq TimeKeeper.date_of_record
+      end
+    end
   end
 end

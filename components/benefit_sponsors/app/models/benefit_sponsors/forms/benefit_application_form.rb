@@ -19,6 +19,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :benefit_sponsorship_id, String
       attribute :start_on_options, Hash
+      attribute :admin_datatable_action, Boolean
 
       validates :start_on, presence: true
       validates :end_on, presence: true
@@ -35,8 +36,8 @@ module BenefitSponsors
         @service = BenefitSponsors::Services::BenefitApplicationService.new
       end
 
-      def self.for_new(benefit_sponsorship_id)
-        form = self.new(:benefit_sponsorship_id => benefit_sponsorship_id)
+      def self.for_new(params)
+        form = self.new(params)
         form.service.load_default_form_params(form)
         form.service.load_form_metadata(form)
         form

@@ -1,0 +1,121 @@
+= form_tag create_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: @benefit_application_form.benefit_sponsorship_id),class:'admin-plan-year-form', :method => :post, :remote => true do
+  = hidden_field_tag :employer_actions_id, params["employer_actions_id"]
+  br
+  .row
+    .pull-right[style="margin-right:20px"]
+      i.fas.fa-times.fa-2x.admin-fa-times[onclick="closeRow(this)"]
+  .row
+    .col-md-4
+      label[for="effectiveStartDate" style="font-weight:bold"]
+        | Effective Start Date
+      br
+      .input-group
+        = select_tag :start_on, options_for_select(@benefit_application_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange: "selectedDate(this)", id:'baStartDate'}
+    .col-md-4
+      label[for="effectiveEndDate" style="font-weight:bold"]
+        | Effective End Date
+      br
+      .input-group
+        = text_field_tag :end_on, nil, class:'form-control', readonly: true
+        span.input-group-addon
+          i.fas.fa-calendar-alt
+    .col-md-4
+      label[for="fullTimeEmployees" style="font-weight:bold"]
+        | Full Time Employees
+      br
+      = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()"
+    / .col-md-4
+    /   label[for="binderDueDate" style="font-weight:bold"]
+    /     | Binder Payment Due Date
+    /   br
+    /   .input-group
+    /     = text_field_tag :binder_due_date, nil, class:'form-control', onchange: "enableDisableSubmit()"
+    /     span.input-group-addon
+    /       i.fas.fa-calendar-alt
+  br
+  .row
+    .col-md-4
+      label[for="openEnrollmentStartDate" style="font-weight:bold"]
+        | Open Enrollment Start Date
+      br
+      .input-group
+        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", :"data-date-min" => @benefit_application_form.start_on ? (Date.strptime(@benefit_application_form.start_on, "%m/%d/%Y") - 2.months) : ""
+        span.input-group-addon
+          i.fas.fa-calendar-alt
+    .col-md-4
+      label[for="openEnrollmentEndDate" style="font-weight:bold"]
+        | Open Enrollment End Date
+      br
+      .input-group
+        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", onchange: "enableDisableSubmit()"
+        span.input-group-addon
+          i.fas.fa-calendar-alt
+  / br
+  / .row
+  /   .col-md-4
+  /     label[for="fullTimeEmployees" style="font-weight:bold"]
+  /       | Full Time Employees
+  /     br
+  /     = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()"
+  br
+  .row
+    .col-md-12
+      button#adminCreatePyButton.pull-right.btn.btn-primary[type="submit"]
+        | Submit
+
+javascript:
+  $( function() {
+    $('#adminCreatePyButton').addClass('disabled');
+    $("#open_enrollment_start_on").datepicker();
+    $("#open_enrollment_end_on").datepicker();
+    $("#binder_due_date").datepicker();
+  } );
+
+  function closeRow(element) {
+    element.closest('tr').remove();
+  }
+
+  var employeeCounts = {
+    fte: Number
+  }
+
+  function enableDisableSubmit() {
+    var start_on = document.getElementById('baStartDate');
+    var end_on = document.getElementById('end_on');
+    var oe_start_on = document.getElementById('open_enrollment_start_on');
+    var oe_end_on = document.getElementById('open_enrollment_end_on');
+    var fte_count = document.getElementById('fteCount');
+
+    if (fte_count) {
+      employeeCounts.fte = fte_count.value
+    }
+
+    if ((employeeCounts.fte >= 1) && start_on.value && end_on.value && oe_start_on.value && oe_end_on.value) {
+      document.getElementById('adminCreatePyButton').classList.remove('disabled')
+    } else {
+      document.getElementById('adminCreatePyButton').classList.add('disabled')
+    }
+  }
+
+  function resetInputOptions() {
+    document.querySelector('input#end_on').value = '';
+    document.querySelector("input#open_enrollment_start_on").value = '';
+    document.querySelector("input#open_enrollment_end_on").value = '';
+  }
+
+  function assignBenefitApplicationDates(targetDate) {
+    var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
+    debugger
+    document.querySelector('input#end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
+    document.querySelector("input#open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
+    document.querySelector("input#open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+  }
+
+  function selectedDate(element) {
+    if (element && element.value) {
+      assignBenefitApplicationDates(element.value)
+    } else {
+      resetInputOptions()
+    }
+    enableDisableSubmit()
+  }

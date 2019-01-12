@@ -42,6 +42,26 @@ module BenefitSponsors
         possible_dates
       end
 
+      def start_on_options_for_datatable_action
+        possible_dates = Hash.new
+        [TimeKeeper.date_of_record.beginning_of_month].each do |date|
+          possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates_for_dt(date))
+        end
+        possible_dates
+      end
+
+      def calculate_oe_end_date
+        #TODO calculate dates as per 15 day month rules.
+        (TimeKeeper.date_of_record + 2.months)
+      end
+
+      def open_enrollment_dates_for_dt(date)
+        {
+          open_enrollment_start_on: TimeKeeper.date_of_record,
+          open_enrollment_end_on: calculate_oe_end_date
+        }
+      end
+
       def open_enrollment_dates(start_on)
         calculate_open_enrollment_date(start_on)
       end

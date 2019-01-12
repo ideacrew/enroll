@@ -51,8 +51,16 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
-  def admin_create_plan_year
-    authorize HbxProfile, :create_plan_year_for_employer?
+  def new_benefit_application
+    authorize HbxProfile, :new_benefit_application_for_employer?
+    @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_benefit_application_params)
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def create_benefit_application
+    @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_benefit_application_params)
+    authorize @benefit_application_form, :updateable?
+    @error_on_save = benefit_application_error_messages(@benefit_application_form) unless @benefit_application_form.save
     @element_to_replace_id = params[:employer_actions_id]
   end
 
@@ -606,6 +614,20 @@ def employer_poc
   end
 
 private
+
+  def benefit_application_error_messages(instance)
+    instance.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
+  end
+
+  def new_benefit_application_params
+    params.merge!({:admin_datatable_action => true}).permit(:benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def create_benefit_application_params
+    params.merge!({:pte_count =>"0", :msp_count =>"0"})
+    params.permit( :start_on, :end_on, :fte_count, :pte_count, :msp_count,
+      :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id)
+  end
 
    def modify_admin_tabs?
      authorize HbxProfile, :modify_admin_tabs?

@@ -7,7 +7,7 @@ module BenefitSponsors
 
     describe "model attributes" do
       it {
-        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on].each do |key|
+        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :admin_datatable_action].each do |key|
           expect(subject.attributes.has_key?(key)).to be_truthy
         end
       }
@@ -58,7 +58,7 @@ module BenefitSponsors
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
 
       it "should assign benefit sponsorship" do
-        form = BenefitSponsors::Forms::BenefitApplicationForm.for_new("rspec-id")
+        form = BenefitSponsors::Forms::BenefitApplicationForm.for_new({:benefit_sponsorship_id => "rspec-id"})
         expect(form.service).to be_instance_of(BenefitSponsors::Services::BenefitApplicationService)
         expect(form.start_on_options).not_to be nil
         expect(form.benefit_sponsorship_id).to eq "rspec-id"

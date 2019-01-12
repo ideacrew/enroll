@@ -66,6 +66,7 @@ describe HbxProfilePolicy do
     end
   end
 end
+
 describe HbxProfilePolicy do
   let(:person){FactoryGirl.create(:person, user: user)}
   let(:user){FactoryGirl.create(:user)}
@@ -119,6 +120,22 @@ describe HbxProfilePolicy do
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
     end
+  end
+end
 
+describe HbxProfilePolicy do
+  context '.new_benefit_application_for_employer?' do
+    let!(:user10) { FactoryGirl.create(:user) }
+    let!(:person) { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
+    subject { HbxProfilePolicy.new(user10, nil) }
+
+    it 'should return false' do
+      expect(subject.new_benefit_application_for_employer?).to be_falsey
+    end
+
+    it 'should return true' do
+      person.hbx_staff_role.update_attributes!(subrole: 'super_admin')
+      expect(subject.new_benefit_application_for_employer?).to be_truthy
+    end
   end
 end
