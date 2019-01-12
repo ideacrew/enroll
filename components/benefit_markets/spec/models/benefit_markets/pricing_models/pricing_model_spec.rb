@@ -47,7 +47,7 @@ module BenefitMarkets
     end
 
     describe ".map_relationship_for" do
-      let(:pricing_model) { FactoryGirl.build :benefit_markets_pricing_models_pricing_model }
+      let(:pricing_model) { FactoryBot.build :benefit_markets_pricing_models_pricing_model }
 
       it "should return nil" do
         expect(pricing_model.map_relationship_for("child_over_26", 27, false)).to be_nil

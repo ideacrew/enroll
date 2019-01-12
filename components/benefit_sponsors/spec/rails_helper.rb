@@ -12,17 +12,17 @@ require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
 require "forgery"
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 require 'pundit/rspec'
 
 
-FactoryGirl.definition_file_paths = [
+FactoryBot.definition_file_paths = [
   File.expand_path(File.join(File.dirname(__FILE__),'../../benefit_markets/spec/factories')),
   File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
 ]
-FactoryGirl.find_definitions
+FactoryBot.find_definitions
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -81,7 +81,7 @@ RSpec.configure do |config|
   config.include Mongoid::Matchers, type: :model
   config.include Devise::TestHelpers, :type => :controller
   config.include Devise::TestHelpers, :type => :view
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.include Capybara::DSL
 
   config.after(:example, :dbclean => :after_each) do

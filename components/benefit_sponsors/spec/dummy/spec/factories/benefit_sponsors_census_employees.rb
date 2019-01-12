@@ -1,15 +1,15 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_census_employee, class: 'CensusEmployee' do
 
-    first_name "Eddie"
+    first_name { "Eddie" }
     sequence(:last_name) {|n| "Vedder#{n}" }
-    dob "1964-10-23".to_date
-    gender "male"
-    expected_selection "enroll"
-    employee_relationship "self"
-    hired_on "2015-04-01".to_date
+    dob { "1964-10-23".to_date }
+    gender { "male" }
+    expected_selection { "enroll" }
+    employee_relationship { "self" }
+    hired_on { "2015-04-01".to_date }
     sequence(:ssn) { |n| 222222220 + n }
-    is_business_owner  false
+    is_business_owner  { false }
 
     association :address, strategy: :build
     association :email, strategy: :build
@@ -17,13 +17,13 @@ FactoryGirl.define do
     association :benefit_sponsorship, factory: [:benefit_sponsors_benefit_sponsorship, :with_market_profile], strategy: :build
 
     # before(:create) do |instance|
-    #   FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+    #   FactoryBot.create(:application_event_kind,:out_of_pocket_notice)
     # end
 
     transient do
       benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
       renewal_benefit_group { build(:benefit_sponsors_benefit_packages_benefit_package) }
-      create_with_spouse false
+      create_with_spouse { false }
     end
 
     after(:create) do |census_employee, evaluator|
@@ -34,7 +34,7 @@ FactoryGirl.define do
     end
 
     trait :owner do
-      is_business_owner  true
+      is_business_owner  { true }
     end
 
     trait :termination_details do
@@ -44,7 +44,7 @@ FactoryGirl.define do
     end
 
     trait :with_enrolled_census_employee do
-      aasm_state :eligible
+      aasm_state { :eligible }
     end
 
     factory :benefit_sponsors_census_employee_with_active_assignment do

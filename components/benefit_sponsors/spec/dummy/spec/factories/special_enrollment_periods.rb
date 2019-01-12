@@ -1,8 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :special_enrollment_period do
     family
     qle_on  { 10.days.ago.to_date }
-    qualifying_life_event_kind_id { FactoryGirl.create(:qualifying_life_event_kind)._id }
+    qualifying_life_event_kind_id { FactoryBot.create(:qualifying_life_event_kind)._id }
     start_on { qle_on }
     end_on  { qle_on + 30.days }
     effective_on  { qle_on.end_of_month + 1 }

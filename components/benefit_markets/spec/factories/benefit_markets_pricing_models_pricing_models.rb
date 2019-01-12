@@ -1,8 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_markets_pricing_models_pricing_model, class: 'BenefitMarkets::PricingModels::PricingModel' do
 
-    price_calculator_kind "::BenefitSponsors::PricingCalculators::ShopSimpleListBillPricingCalculator"
-    name  "FEHB Employer Price Model"
+    price_calculator_kind { "::BenefitSponsors::PricingCalculators::ShopSimpleListBillPricingCalculator" }
+    name  { "FEHB Employer Price Model" }
 
     after(:build) do |pricing_model|
 

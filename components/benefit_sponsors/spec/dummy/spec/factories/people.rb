@@ -1,14 +1,14 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :person do
     # name_pfx 'Mr'
-    first_name 'John'
+    first_name { 'John' }
     # middle_name 'X'
     sequence(:last_name) {|n| "Smith#{n}" }
     # name_sfx 'Jr'
-    dob "1972-04-04".to_date
-    is_incarcerated false
-    is_active true
-    gender "male"
+    dob { "1972-04-04".to_date }
+    is_incarcerated { false }
+    is_active { true }
+    gender { "male" }
 
     trait :with_broker_role do
       after(:create) do |p, evaluator|
@@ -18,16 +18,16 @@ FactoryGirl.define do
 
     trait :with_family do
       after :create do |person|
-        family = FactoryGirl.create :family, :with_primary_family_member, person: person
+        family = FactoryBot.create :family, :with_primary_family_member, person: person
       end
     end
 
     trait :with_work_phone do
-      phones { [FactoryGirl.build(:phone, kind: "work") ] }
+      phones { [FactoryBot.build(:phone, kind: "work") ] }
     end
 
     trait :with_work_email do
-      emails { [FactoryGirl.build(:email, kind: "work") ] }
+      emails { [FactoryBot.build(:email, kind: "work") ] }
     end
 
     trait :with_employee_role do

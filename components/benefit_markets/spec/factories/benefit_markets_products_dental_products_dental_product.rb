@@ -1,16 +1,16 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_markets_products_dental_products_dental_product, class: 'BenefitMarkets::Products::DentalProducts::DentalProduct' do
     
-    benefit_market_kind  :aca_shop
-    application_period   Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31)
+    benefit_market_kind  { :aca_shop }
+    application_period   { Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
     sequence(:hbx_id)    { |n| n + 98765 }
 
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }
-    description          "Highest rated and highest value"
-    premium_ages         20..65
+    description          { "Highest rated and highest value" }
+    premium_ages         { 20..65 }
     # health_plan_kind     :pos
-    ehb                  0.9943
-    metal_level_kind     :dental
+    ehb                  { 0.9943 }
+    metal_level_kind     { :dental }
 
     product_package_kinds { [:single_product] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
@@ -21,7 +21,7 @@ FactoryGirl.define do
 
     trait :with_renewal_product do
       transient do
-        renewal_service_area nil
+        renewal_service_area { nil }
       end
 
       before(:create) do |product, evaluator|

@@ -384,7 +384,7 @@ module BenefitSponsors
       end
 
       context "when renewal product not offered by employer" do
-        let(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
+        let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
         let(:hbx_enrollment) { double(product: current_benefit_package.sponsored_benefits.first.reference_product, coverage_kind: :health, is_coverage_waived?: false) }
         let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
             product_package_kind: :single_issuer

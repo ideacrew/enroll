@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_members_dependent_member, class: 'BenefitSponsors::Members::DependentMember' do
-    last_name     "Jetson"
+    last_name     { "Jetson" }
 
     ssn do
       Forgery('basic').text(
@@ -13,23 +13,23 @@ FactoryGirl.define do
     end
 
     trait :as_female_domestic_partner do
-      kinship_to_primary_member :domestic_partner
-      first_name    ["Olivia", "Ava", "Sophia", "Isabella", "Mia", "Charlotte", "Abigail", "Emily", "Harper"].sample
-      gender        :female
+      kinship_to_primary_member { :domestic_partner }
+      first_name    { ["Olivia", "Ava", "Sophia", "Isabella", "Mia", "Charlotte", "Abigail", "Emily", "Harper"].sample }
+      gender        { :female }
       dob           { Date.today - 38.years }
     end
 
     trait :as_spouse do
-      kinship_to_primary_member :spouse
-      first_name    ["Olivia", "Ava", "Sophia", "Isabella", "Mia", "Charlotte", "Abigail", "Emily", "Harper"].sample
-      gender        :female
+      kinship_to_primary_member { :spouse }
+      first_name    { ["Olivia", "Ava", "Sophia", "Isabella", "Mia", "Charlotte", "Abigail", "Emily", "Harper"].sample }
+      gender        { :female }
       dob           { Date.today - 35.years }
     end
 
     trait :as_child do
-      kinship_to_primary_member :child
-      first_name    ["Liam", "William", "Mason", "James", "Benjamin", "Jacob", "Michael", "Elijah", "Ethan"].sample
-      gender        :male
+      kinship_to_primary_member { :child }
+      first_name    { ["Liam", "William", "Mason", "James", "Benjamin", "Jacob", "Michael", "Elijah", "Ethan"].sample }
+      gender        { :male }
       dob           { Date.today - 7.years }
     end
 

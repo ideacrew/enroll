@@ -6,7 +6,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   let(:effective_period)          { current_effective_date..(current_effective_date.next_year.prev_day) }
   let(:open_enrollment_start_on)  { current_effective_date.prev_month }
   let(:open_enrollment_period)    { open_enrollment_start_on..(open_enrollment_start_on+5.days) }
-  let!(:abc_organization)         { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:abc_organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)               { abc_organization.employer_profile }
   
   let!(:benefit_sponsorship)    { 
@@ -71,7 +71,7 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let(:effective_period)        { renewal_effective_date..renewal_effective_date.next_year.prev_day }
   let(:open_enrollment_period)  { effective_period.min.prev_month..(effective_period.min - 10.days) }
 
-  let(:abc_organization)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:abc_organization)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:abc_profile)            { abc_organization.employer_profile }
   let!(:benefit_sponsorship)    { abc_profile.add_benefit_sponsorship }
 

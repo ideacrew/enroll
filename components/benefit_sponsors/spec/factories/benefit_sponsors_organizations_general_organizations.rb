@@ -1,8 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_organizations_general_organization, class: 'BenefitSponsors::Organizations::GeneralOrganization' do
-    legal_name  "ACME Widgets, Inc."
-    dba         "ACME Co."
-    entity_kind :c_corporation
+    legal_name  { "ACME Widgets, Inc." }
+    dba         { "ACME Co." }
+    entity_kind { :c_corporation }
 
     fein do
       Forgery('basic').text(:allow_lower   => false,

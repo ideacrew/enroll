@@ -19,7 +19,7 @@ module BenefitSponsors
 
    context "Validates passes_open_enrollment_period_policy business policy" do
 
-     let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+     let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
         :with_benefit_package,
         :fte_count => 1,
         :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN),
@@ -39,7 +39,7 @@ module BenefitSponsors
 
 
   context "Fails passes_open_enrollment_period_policy business policy" do
-    let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+    let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
        :fte_count => 3,
        :open_enrollment_period => Range.new(Date.today+5, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN),
      )

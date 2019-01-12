@@ -1,11 +1,11 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_organizations_profile, class: 'BenefitSponsors::Organizations::Profile' do
 
-    contact_method :paper_and_electronic
+    contact_method { :paper_and_electronic }
 
     transient do
-      office_locations_count 1
-      office_location_kind :primary
+      office_locations_count { 1 }
+      office_location_kind { :primary }
     end
 
     after(:build) do |office_locations_count, evaluator|

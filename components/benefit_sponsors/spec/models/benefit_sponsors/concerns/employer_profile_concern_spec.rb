@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :after_each do
     describe "#billing_benefit_application" do
-      let(:organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization,
+      let(:organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization,
         :with_site,
         :with_aca_shop_cca_employer_profile_initial_application
       )}

@@ -11,14 +11,14 @@ require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'forgery'
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 
-FactoryGirl.definition_file_paths = [
+FactoryBot.definition_file_paths = [
 # File.expand_path(File.join(File.dirname(__FILE__),'factories')),
 # You get this for free:
   File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
 ]
-FactoryGirl.find_definitions
+FactoryBot.find_definitions
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -73,7 +73,7 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean
