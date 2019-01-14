@@ -14,11 +14,11 @@ describe RemoveOneCeFromEr, dbclean: :after_each do
 
   describe "remove one cenesus employee from employer roaster" do
     subject {RemoveOneCeFromEr.new("remove_one_ce_from_er", double(:current_scope => nil)) }
-      let(:person) { FactoryGirl.create(:person, :with_employee_role) }
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-      let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
-      let(:census_employee){ FactoryGirl.create(:census_employee, dob: TimeKeeper.date_of_record - 30.years)}
-      let(:employee_role) {FactoryGirl.create(:employee_role)}
+      let(:person) { FactoryBot.create(:person, :with_employee_role) }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let(:household) { FactoryBot.create(:household, family: person.primary_family) }
+      let(:census_employee){ FactoryBot.create(:census_employee, dob: TimeKeeper.date_of_record - 30.years)}
+      let(:employee_role) {FactoryBot.create(:employee_role)}
       before :each do
         allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
         allow(employee_role).to receive(:census_employee_id).and_return census_employee.id

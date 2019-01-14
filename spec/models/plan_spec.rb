@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Plan, dbclean: :after_each do
   def carrier_profile;
-    FactoryGirl.create(:carrier_profile);
+    FactoryBot.create(:carrier_profile);
   end
 
   def name;
@@ -409,8 +409,8 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   describe ".ehb" do
-    let(:plan1) {FactoryGirl.create(:plan, ehb: 0.9)}
-    let(:plan2) {FactoryGirl.create(:plan, ehb: 1)}
+    let(:plan1) {FactoryBot.create(:plan, ehb: 0.9)}
+    let(:plan2) {FactoryBot.create(:plan, ehb: 1)}
 
     it "should get ehb from db when ehb more than 0" do
       expect(plan1.ehb).to eq 0.9
@@ -452,9 +452,9 @@ RSpec.describe Plan, dbclean: :after_each do
 
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
-    let(:organization) { FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
-    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
-    let(:carrier_profile_1) { FactoryGirl.create(:carrier_profile) }
+    let(:organization) { FactoryBot.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
+    let(:carrier_profile_0) { FactoryBot.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
+    let(:carrier_profile_1) { FactoryBot.create(:carrier_profile) }
     let(:carrier_service_area) { create(:carrier_service_area, issuer_hios_id: '11111', serves_entire_state: true, service_area_id: 'EX123') }
     let(:shop_count) { platinum_count + gold_count + shop_silver_count }
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
@@ -466,12 +466,12 @@ RSpec.describe Plan, dbclean: :after_each do
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1, service_area_id: 'EX123')
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX111')
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX222')
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX123')
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX321')
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX321')
+        FactoryBot.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1, service_area_id: 'EX123')
+        FactoryBot.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX111')
+        FactoryBot.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX222')
+        FactoryBot.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX123')
+        FactoryBot.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX321')
+        FactoryBot.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX321')
       end
 
       context "with no referenced scope" do
@@ -596,7 +596,7 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "valid_shop_health_plans" do
-      let(:carrier_profile) {FactoryGirl.create(:carrier_profile)}
+      let(:carrier_profile) {FactoryBot.create(:carrier_profile)}
       before :each do
         Rails.cache.clear
       end
@@ -611,10 +611,10 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "individual_plans" do
-      let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
-      let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
-      let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
+      let(:plan1) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let(:plan2) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
+      let(:plan3) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
+      let(:plan4) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
       let(:tax_household) { double(latest_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
 
       before :each do
@@ -640,12 +640,12 @@ RSpec.describe Plan, dbclean: :after_each do
 
   describe "Instance method" do
     it "catastrophic plan can not use aptc" do
-      plan = FactoryGirl.create(:plan, metal_level: 'catastrophic')
+      plan = FactoryBot.create(:plan, metal_level: 'catastrophic')
       expect(plan.can_use_aptc?).to eq false
     end
 
     it "normal metal_level plan can use aptc" do
-      plan = FactoryGirl.build(:plan)
+      plan = FactoryBot.build(:plan)
       (Plan::METAL_LEVEL_KINDS - ['catastrophic']).each do |metal_level|
         plan.metal_level = metal_level
         expect(plan.can_use_aptc?).to eq true

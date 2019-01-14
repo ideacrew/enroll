@@ -5,12 +5,12 @@ module BenefitSponsors
 
     describe '.unread_messages_count', dbclean: :after_each do
       let(:site) do
-        FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
+        FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
       end
       let(:organization) do
-        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
+        FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
       end
-      let(:inbox) { FactoryGirl.create(:benefit_sponsors_inbox, :with_message, recipient: organization.employer_profile)}
+      let(:inbox) { FactoryBot.create(:benefit_sponsors_inbox, :with_message, recipient: organization.employer_profile)}
 
       let(:inbox_serializer) { Serializers::InboxSerializer.new(inbox) }
 

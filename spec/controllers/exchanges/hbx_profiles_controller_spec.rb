@@ -48,8 +48,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:user) { double("user")}
     let(:person) { double("person")}
     let(:hbx_profile) { double("HbxProfile") }
-    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryGirl.create(:permission))}
-    let(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state: "enrolling") }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryBot.create(:permission))}
+    let(:employer_profile){ FactoryBot.create(:employer_profile, aasm_state: "enrolling") }
 
     before(:each) do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -163,10 +163,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "#update" do
-    let(:user) { FactoryGirl.create(:user, :hbx_staff) }
+    let(:user) { FactoryBot.create(:user, :hbx_staff) }
     let(:person) { double }
     let(:new_hbx_profile){ HbxProfile.new }
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:hbx_profile_params) { {hbx_profile: new_hbx_profile.attributes, id: hbx_profile.id }}
     let(:hbx_staff_role) {double}
 
@@ -196,7 +196,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "#destroy" do
     let(:user){ double("User") }
     let(:person){ double("Person") }
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:hbx_staff_role) {double}
 
     it "destroys hbx_profile" do
@@ -338,7 +338,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:user) { double("user", :has_hbx_staff_role? => true)}
     let(:employer_profile) { double("EmployerProfile", id: double("id"))}
     let(:organization){ Organization.new }
-    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+    let(:hbx_enrollment) { FactoryBot.build_stubbed :hbx_enrollment }
 
     before :each do
       sign_in(user)
@@ -548,9 +548,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "POST" do
-    let(:user) { FactoryGirl.create(:user)}
-    let(:person) { FactoryGirl.create(:person, user: user) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let(:user) { FactoryBot.create(:user)}
+    let(:person) { FactoryBot.create(:person, user: user) }
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
     let(:time_keeper_form) { instance_double(Forms::TimeKeeper) }
 
     before :each do
@@ -601,12 +601,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "GET edit_dob_ssn" do
 
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
-    let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
-    let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile)}
+    let(:permission_yes) { FactoryBot.create(:permission, :can_update_ssn => true)}
+    let(:permission_no) { FactoryBot.create(:permission, :can_update_ssn => false)}
 
     it "should return authorization error for Non-Admin users" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
@@ -629,13 +629,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "POST update_dob_ssn" do
 
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:person1) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:person1) { FactoryBot.create(:person) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
-    let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
-    let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile)}
+    let(:permission_yes) { FactoryBot.create(:permission, :can_update_ssn => true)}
+    let(:permission_no) { FactoryBot.create(:permission, :can_update_ssn => false)}
     let(:invalid_ssn) { "234-45-839" }
     let(:valid_ssn) { "234-45-8390" }
     let(:valid_dob) { "03/17/1987" }
@@ -676,7 +676,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "GET general_agency_index" do
-    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+    let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in user

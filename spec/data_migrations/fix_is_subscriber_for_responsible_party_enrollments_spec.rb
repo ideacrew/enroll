@@ -14,24 +14,24 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
   end
 
   describe "given an responsible party enrollment with no active subscribers" do
-    let(:dependent_1) { FactoryGirl.create(:person, hbx_id: 1, dob: TimeKeeper.date_of_record - 1.week, ssn: '555555551') }
-    let(:dependent_2) { FactoryGirl.create(:person, hbx_id: 2, dob: TimeKeeper.date_of_record - 1.year, ssn: '555555552') }
+    let(:dependent_1) { FactoryBot.create(:person, hbx_id: 1, dob: TimeKeeper.date_of_record - 1.week, ssn: '555555551') }
+    let(:dependent_2) { FactoryBot.create(:person, hbx_id: 2, dob: TimeKeeper.date_of_record - 1.year, ssn: '555555552') }
     let(:family_relationships) { [
       PersonRelationship.new(relative: dependent_1, kind: "child"),
       PersonRelationship.new(relative: dependent_2, kind: "child")]
     }
-    let(:subscriber) { FactoryGirl.create(
+    let(:subscriber) { FactoryBot.create(
       :person,
       person_relationships: family_relationships,
       dob: TimeKeeper.date_of_record - 30.years,
       ssn: '555555550')
     }
     let(:family_members) { [subscriber, dependent_1, dependent_2] }
-    let(:family) { FactoryGirl.create(:family, :with_family_members, person: subscriber, people: family_members) }
+    let(:family) { FactoryBot.create(:family, :with_family_members, person: subscriber, people: family_members) }
     let(:family_member_1) { family.family_members.where(person_id: dependent_1).first }
     let(:family_member_2) { family.family_members.where(person_id: dependent_2).first }
     let(:hbx_enrollment_member_1) {
-      FactoryGirl.create(:hbx_enrollment_member,
+      FactoryBot.create(:hbx_enrollment_member,
         is_subscriber: false,
         applicant_id: family_member_1.id,
         hbx_enrollment: hbx_enrollment,
@@ -39,7 +39,7 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
         coverage_start_on: TimeKeeper.date_of_record.beginning_of_month)
     }
     let(:oldest_hbx_enrollment_member) {
-      FactoryGirl.create(:hbx_enrollment_member,
+      FactoryBot.create(:hbx_enrollment_member,
         is_subscriber: false,
         applicant_id: family_member_2.id,
         hbx_enrollment: hbx_enrollment,
@@ -47,7 +47,7 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
         coverage_start_on: TimeKeeper.date_of_record.beginning_of_month)
     }
     let(:hbx_enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
+      FactoryBot.create(:hbx_enrollment,
         :individual_unassisted,
         household: family.active_household)
     }

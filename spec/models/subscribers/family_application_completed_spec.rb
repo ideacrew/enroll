@@ -43,7 +43,7 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       context "with no person matched to user and no primary family associated with the person" do
-        let(:person) { FactoryGirl.create(:person) }
+        let(:person) { FactoryBot.create(:person) }
 
         before do
           allow(Person).to receive(:where).and_return([person])
@@ -64,7 +64,7 @@ describe Subscribers::FamilyApplicationCompleted do
         let(:message) { { "body" => xml } }
         let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml")) }
         let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml"))).first }
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
 
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
         let(:ua_params) do
@@ -109,7 +109,7 @@ describe Subscribers::FamilyApplicationCompleted do
         let(:message) { { "body" => xml } }
         let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_sample.xml")) }
         let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_sample.xml"))).first }
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
 
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
         let(:ua_params) do
@@ -155,7 +155,7 @@ describe Subscribers::FamilyApplicationCompleted do
     let(:message) { { "body" => xml } }
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_broker_sample.xml")) }
     let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_with_broker_sample.xml"))).first }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     context "simulating consumer role controller create action with first and last name cases that do not match the payload" do
       let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
@@ -199,9 +199,9 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       context "with valid broker's npn" do
-        let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile).broker_agency_profile}
+        let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile).broker_agency_profile}
         let!(:update) {broker_agency_profile.update_attributes(primary_broker_role_id:broker.id)}
-        let(:broker) {FactoryGirl.create(:broker_role,benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id)}
+        let(:broker) {FactoryBot.create(:broker_role,benefit_sponsors_broker_agency_profile_id:broker_agency_profile.id)}
         let(:broker_id) { broker_agency_profile.primary_broker_role.id }
 
         it "should not log any errors and set the broker for the family" do
@@ -249,7 +249,7 @@ describe Subscribers::FamilyApplicationCompleted do
     let(:message) { { "body" => xml } }
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml")) }
     let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_no_ssn_sample.xml"))).first }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     context "simulating consumer role controller create action with first and last name cases that do not match the payload" do
       let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
@@ -321,7 +321,7 @@ describe Subscribers::FamilyApplicationCompleted do
     let(:message) { { "body" => xml } }
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml")) }
     let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_family_single_dup_payload_sample.xml"))).first }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     context "simulating consumer role controller create action" do
       let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }
@@ -414,7 +414,7 @@ describe Subscribers::FamilyApplicationCompleted do
   describe "given a valid payload with more multiple members and multiple coverage households" do
     let(:message) { { "body" => xml } }
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml")) }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     context "simulating consumer role controller create action" do
       let!(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_sample.xml"))).first }

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe VlpDocument, :type => :model do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
-  let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+  let(:person2) {FactoryBot.create(:person, :with_consumer_role)}
 
 
   describe "creates person with vlp_docs" do

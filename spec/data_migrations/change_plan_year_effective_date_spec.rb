@@ -14,14 +14,14 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
 
   describe "changing plan year's effective date & reference plan and force publishing the plan year", dbclean: :after_each do
 
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-    let(:plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: "draft", employer_profile: employer_profile, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:plan) { FactoryGirl.create(:plan, :with_premium_tables) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible", benefit_group_assignments: [benefit_group_assignment]) }
+    let(:employer_profile)  { FactoryBot.create(:employer_profile) }
+    let(:plan_year) { FactoryBot.create(:future_plan_year, aasm_state: "draft", employer_profile: employer_profile, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
+    let(:plan) { FactoryBot.create(:plan, :with_premium_tables) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible", benefit_group_assignments: [benefit_group_assignment]) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)

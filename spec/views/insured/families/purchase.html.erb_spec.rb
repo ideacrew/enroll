@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe "insured/families/purchase.html.erb" do
 
-  let(:employee_role){FactoryGirl.create(:employee_role)}
-  let(:plan){FactoryGirl.create(:plan)}
-  let(:benefit_group){ FactoryGirl.build(:benefit_group) }
+  let(:employee_role){FactoryBot.create(:employee_role)}
+  let(:plan){FactoryBot.create(:plan)}
+  let(:benefit_group){ FactoryBot.build(:benefit_group) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
-  let(:person) { FactoryGirl.create(:person)}
+  let(:person) { FactoryBot.create(:person)}
   let(:group_enrollment) { double("BenefitSponsors::Enrollments::GroupEnrollment", product_cost_total: 200.00, sponsor_contribution_total: 100 , employee_cost_total: 100 )}
   let(:member_group) { double("BenefitSponsors::Enrollments::GroupEnrollment", group_enrollment: group_enrollment)}
   context "purchase" do

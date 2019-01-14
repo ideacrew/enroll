@@ -6,7 +6,7 @@ describe CuramUser, "verification if user exists in Curam" do
   let(:dob_1982) { Date.new(1982, 1, 1) }
 
   before :each do
-    user1 = FactoryGirl.create(:curam_user, ssn: "123456789")
+    user1 = FactoryBot.create(:curam_user, ssn: "123456789")
   end
 
   context "match email" do
@@ -48,7 +48,7 @@ describe CuramUser, "verification if user exists in Curam" do
   end
 
   it "returns false if DOB mathing and SSN matching but belongs to diff users" do
-    user2 = FactoryGirl.create(:curam_user, dob: Date.new(1981, 1, 1))
+    user2 = FactoryBot.create(:curam_user, dob: Date.new(1981, 1, 1))
     expect(CuramUser.match_ssn_dob(123456789, "01/01/1981").any?).to be false
   end
 

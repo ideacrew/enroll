@@ -22,9 +22,9 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     end
 
     context 'when there is an error then', dbclean: :after_each do
-      let(:site) { FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let(:broker_organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site) }
-      let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+      let(:site) { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:broker_organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site) }
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
 
       it "has the correct number of unread messages" do
         expect(profile_unread_messages_count(broker_agency_profile)).to eq(0)

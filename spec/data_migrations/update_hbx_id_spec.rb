@@ -12,8 +12,8 @@ describe UpdateHbxId do
   end
 
   describe "changing hbx id within person records" do
-    let(:person1) { FactoryGirl.create(:person)}
-    let(:person2) { FactoryGirl.create(:person)}
+    let(:person1) { FactoryBot.create(:person)}
+    let(:person2) { FactoryBot.create(:person)}
     let(:correct_hbxid) {person1.hbx_id}
     let(:incorrect_hbxid) {person2.hbx_id}
 

@@ -23,7 +23,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 # gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
-# gem 'database_cleaner',       '~> 1.7'
+gem 'database_cleaner',       '~> 1.7'
 
 #######################################################
 
@@ -105,7 +105,9 @@ end
 group :development do
   gem "certified",              '~> 1'
   gem 'overcommit',             '~> 0.47'
-  gem 'rubocop',                '~> 0.34', require: false
+  gem 'rubocop',                require: false
+  gem 'rubocop-rspec'
+
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
@@ -120,9 +122,9 @@ group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
-
+  gem 'pry'
   gem 'email_spec',             '~> 2'
-  gem 'factory_bot_rails',      '~> 4'
+  gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'puma',                   '~> 3.11'

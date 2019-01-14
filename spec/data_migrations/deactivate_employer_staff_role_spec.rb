@@ -13,11 +13,11 @@ describe DeactivateEmployerStaffRole do
   end
 
   describe "deactivate employer staff role" do
-    let(:employer_profile) { FactoryGirl.build(:employer_profile)}
+    let(:employer_profile) { FactoryBot.build(:employer_profile)}
 
-    let(:employer_staff_role) {FactoryGirl.build(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer_profile.id)}
-    let(:person) { FactoryGirl.create(:person,employer_staff_roles:[employer_staff_role])}
-    let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
+    let(:employer_staff_role) {FactoryBot.build(:employer_staff_role, aasm_state:'is_active', employer_profile_id: employer_profile.id)}
+    let(:person) { FactoryBot.create(:person,employer_staff_roles:[employer_staff_role])}
+    let(:organization) { FactoryBot.create(:organization, employer_profile:employer_profile)}
     let(:staff_role) { Person.by_hbx_id(person.hbx_id).first.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == employer_profile.id.to_s} }
 
     before(:each) do

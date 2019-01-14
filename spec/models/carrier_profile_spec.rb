@@ -9,7 +9,7 @@ RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
   it { should delegate_method(:updated_by).to :organization }
 
 
-  let(:organization) {FactoryGirl.create(:organization)}
+  let(:organization) {FactoryBot.create(:organization)}
   let(:abbrev) {"uhc"}
 
   describe "class methods" do
@@ -69,7 +69,7 @@ RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
   end
 
   describe ".associated_carrier_profile" do
-    let(:organization) {FactoryGirl.create(:organization)}
+    let(:organization) {FactoryBot.create(:organization)}
     let(:abbrev) {"uhc"}
 
     let(:valid_params) do
@@ -80,7 +80,7 @@ RSpec.describe CarrierProfile, :type => :model, dbclean: :after_each do
     end
 
     context "with associated_carrier_profile" do
-      let(:associated_carrier_profile) {FactoryGirl.create(:carrier_profile)}
+      let(:associated_carrier_profile) {FactoryBot.create(:carrier_profile)}
       let(:carrier_profile) {CarrierProfile.new(**valid_params)}
 
       before {associated_carrier_profile}

@@ -55,7 +55,7 @@ module BenefitSponsors
     end
 
     describe "#for_new" do
-      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
+      let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application)}
 
       it "should assign benefit sponsorship" do
         form = BenefitSponsors::Forms::BenefitApplicationForm.for_new({:benefit_sponsorship_id => "rspec-id"})
@@ -84,8 +84,8 @@ module BenefitSponsors
     end
 
     describe ".submit_application" do
-      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to submit application and" do
@@ -104,8 +104,8 @@ module BenefitSponsors
     end
 
     describe ".force_submit_application_with_eligibility_errors" do
-      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to force submit application and" do
@@ -118,8 +118,8 @@ module BenefitSponsors
     end
 
     describe ".revert" do
-      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to revert back and" do
@@ -138,9 +138,9 @@ module BenefitSponsors
     end
 
     describe ".persist" do
-      let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
-      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
+      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application)}
       let!(:service_object) { double("BenefitApplicationService")}
       context "save request received" do
         it "should save successfully if update request received false" do

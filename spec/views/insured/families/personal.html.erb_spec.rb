@@ -25,10 +25,10 @@ RSpec.describe "insured/families/personal.html.erb" do
   end
 
   context "for employee role", dbclean: :after_each do
-   let(:person) {FactoryGirl.create(:person, :with_family)}
-   let(:employee_role) {FactoryGirl.create(:employee_role, census_employee_id: census_employee.id)}
-   let(:census_employee) {FactoryGirl.create(:census_employee)}
-   let(:current_user) { FactoryGirl.create(:user, person: person) }
+   let(:person) {FactoryBot.create(:person, :with_family)}
+   let(:employee_role) {FactoryBot.create(:employee_role, census_employee_id: census_employee.id)}
+   let(:census_employee) {FactoryBot.create(:census_employee)}
+   let(:current_user) { FactoryBot.create(:user, person: person) }
 
    it "should renders home address fields" do
     expect(response).to render_template("shared/_home_address_fields")
@@ -48,7 +48,7 @@ RSpec.describe "insured/families/personal.html.erb" do
  if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     context "for consumer role" do
-      let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+      let(:person) {FactoryBot.create(:person, :with_consumer_role)}
 
       it "should renders home address fields and consumer fields" do
         expect(response).to render_template("shared/_consumer_fields")

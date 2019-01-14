@@ -18,16 +18,16 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
   end
 
   describe "update employer_profile_id for an employee_role", dbclean: :after_each do
-    let(:office_location)                 { FactoryGirl.build(:office_location, :primary) }
-    let!(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
-    let!(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
-    let!(:person)                         { FactoryGirl.create(:person) }
-    let!(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id) }
+    let(:office_location)                 { FactoryBot.build(:office_location, :primary) }
+    let!(:old_organization)               { FactoryBot.create(:organization, office_locations: [office_location]) }
+    let!(:old_employer_profile)           { FactoryBot.create(:employer_profile, organization: old_organization) }
+    let!(:person)                         { FactoryBot.create(:person) }
+    let!(:employee_role)                  { FactoryBot.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id) }
 
-    let!(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:rating_area)                    { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)                   { FactoryBot.create_default :benefit_markets_locations_service_area }
     let!(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)                   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)                   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)               { organization.employer_profile }
 
     context "for successfull update" do
@@ -62,24 +62,24 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
 
 
   describe "update census employee id for an employee_role", dbclean: :after_each do
-    let(:office_location)                 { FactoryGirl.build(:office_location, :primary) }
-    let(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
-    let(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
+    let(:office_location)                 { FactoryBot.build(:office_location, :primary) }
+    let(:old_organization)               { FactoryBot.create(:organization, office_locations: [office_location]) }
+    let(:old_employer_profile)           { FactoryBot.create(:employer_profile, organization: old_organization) }
     let(:old_census_record)              { CensusEmployee.create(first_name:"Eddie", last_name:"Vedder", gender:"male", dob: "1964-10-23".to_date, employer_profile_id: old_employer_profile.id, hired_on: "2015-04-01".to_date, ssn: "112212221") }
-    let(:person)                         { FactoryGirl.create(:person) }
-    let(:employee_role)                  { FactoryGirl.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id, census_employee_id: old_census_record.id) }
+    let(:person)                         { FactoryBot.create(:person) }
+    let(:employee_role)                  { FactoryBot.create(:employee_role, person: person, employer_profile_id: old_employer_profile.id, census_employee_id: old_census_record.id) }
 
-    let(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let(:rating_area)                    { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let(:service_area)                   { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:organization)                   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)                   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)               { organization.employer_profile }
-    let(:census_employee)                 { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship, employee_role_id: employee_role.id) }
+    let(:census_employee)                 { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship, employee_role_id: employee_role.id) }
     let(:benefit_sponsorship)             { employer_profile.add_benefit_sponsorship }
     let(:benefit_market)                  { site.benefit_markets.first }
 
     let(:benefit_sponsorship) do
-      FactoryGirl.create(
+      FactoryBot.create(
         :benefit_sponsors_benefit_sponsorship,
         organization: organization,
         profile_id: organization.profiles.first.id,
@@ -116,8 +116,8 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
   end
 
   describe "#update_with_given_census_employee_id" do
-    let(:census_employee) { FactoryGirl.create(:census_employee)}
-    let(:person) { FactoryGirl.create(:person, :with_employee_role)}
+    let(:census_employee) { FactoryBot.create(:census_employee)}
+    let(:person) { FactoryBot.create(:person, :with_employee_role)}
     let(:employee_role) { person.employee_roles.first }
 
     context "should update census_employee_id by using employee_role" do

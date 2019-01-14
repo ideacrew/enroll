@@ -15,10 +15,10 @@ describe ReinstatePlanYear, dbclean: :after_each do
 
   describe "reinstate_plan_year", dbclean: :after_each do
 
-    let!(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let!(:employer_profile)  { FactoryBot.create(:employer_profile) }
     let!(:organization)  { employer_profile.organization }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:census_employee) { FactoryBot.create(:census_employee,employer_profile: employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)
@@ -30,11 +30,11 @@ describe ReinstatePlanYear, dbclean: :after_each do
 
     context "when reinstating active plan year plan year" do
 
-      let(:benefit_group) { FactoryGirl.build(:benefit_group)}
-      let(:plan_year) { FactoryGirl.build(:plan_year, aasm_state:'terminated', end_on: TimeKeeper.date_of_record + 30.days, terminated_on: TimeKeeper.date_of_record - 30.days,benefit_groups:[benefit_group]) }
+      let(:benefit_group) { FactoryBot.build(:benefit_group)}
+      let(:plan_year) { FactoryBot.build(:plan_year, aasm_state:'terminated', end_on: TimeKeeper.date_of_record + 30.days, terminated_on: TimeKeeper.date_of_record - 30.days,benefit_groups:[benefit_group]) }
       let!(:emp_plan_years) {employer_profile.plan_years << plan_year}
-      let!(:enrollment_terminated) { FactoryGirl.create(:hbx_enrollment, :terminated, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
-      let!(:ce_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment,hbx_enrollment_id:enrollment_terminated.id, benefit_group_id:benefit_group.id, end_on:plan_year.end_on) }
+      let!(:enrollment_terminated) { FactoryBot.create(:hbx_enrollment, :terminated, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
+      let!(:ce_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment,hbx_enrollment_id:enrollment_terminated.id, benefit_group_id:benefit_group.id, end_on:plan_year.end_on) }
       let!(:ce_assignments) { census_employee.benefit_group_assignments << ce_benefit_group_assignment}
 
       it "plan year state should be active" do
@@ -81,18 +81,18 @@ describe ReinstatePlanYear, dbclean: :after_each do
       let(:start_on) {TimeKeeper.date_of_record.beginning_of_month - 1.year}
       let(:end_on) {TimeKeeper.date_of_record.end_of_month - 3.month}
 
-      let!(:benefit_group) { FactoryGirl.build(:benefit_group)}
-      let!(:plan_year) { FactoryGirl.build(:plan_year, aasm_state:'terminated', open_enrollment_start_on:open_enrollment_start_on,open_enrollment_end_on:open_enrollment_end_on,start_on:start_on, end_on:end_on,terminated_on:end_on,benefit_groups:[benefit_group]) }
+      let!(:benefit_group) { FactoryBot.build(:benefit_group)}
+      let!(:plan_year) { FactoryBot.build(:plan_year, aasm_state:'terminated', open_enrollment_start_on:open_enrollment_start_on,open_enrollment_end_on:open_enrollment_end_on,start_on:start_on, end_on:end_on,terminated_on:end_on,benefit_groups:[benefit_group]) }
 
 
-      let!(:renew_benefit_group) { FactoryGirl.build(:benefit_group)}
-      let!(:renewing_plan_year) { FactoryGirl.build(:plan_year, aasm_state:'renewing_canceled',benefit_groups:[renew_benefit_group]) }
+      let!(:renew_benefit_group) { FactoryBot.build(:benefit_group)}
+      let!(:renewing_plan_year) { FactoryBot.build(:plan_year, aasm_state:'renewing_canceled',benefit_groups:[renew_benefit_group]) }
 
-      let!(:terminated_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, effective_on:plan_year.start_on, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
-      let!(:canceled_enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on:renewing_plan_year.start_on, benefit_group_id:renew_benefit_group.id, household: family.active_household, aasm_state:'coverage_canceled')}
+      let!(:terminated_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, effective_on:plan_year.start_on, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
+      let!(:canceled_enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:renewing_plan_year.start_on, benefit_group_id:renew_benefit_group.id, household: family.active_household, aasm_state:'coverage_canceled')}
 
-      let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, aasm_state:'coverage_selected',hbx_enrollment_id:terminated_enrollment.id,benefit_group_id:benefit_group.id,start_on:start_on,end_on:end_on) }
-      let!(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, hbx_enrollment_id:canceled_enrollment.id, benefit_group_id:renew_benefit_group.id, is_active:false) }
+      let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, aasm_state:'coverage_selected',hbx_enrollment_id:terminated_enrollment.id,benefit_group_id:benefit_group.id,start_on:start_on,end_on:end_on) }
+      let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id:canceled_enrollment.id, benefit_group_id:renew_benefit_group.id, is_active:false) }
 
 
       let!(:emp_plan_years) {  employer_profile.plan_years << [renewing_plan_year,plan_year] }

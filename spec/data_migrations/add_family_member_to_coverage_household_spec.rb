@@ -14,9 +14,9 @@ describe AddFamilyMemberToCoverageHousehold, dbclean: :after_each do
 
   describe "add family member to coverage household", dbclean: :after_each do
 
-    let!(:person) { FactoryGirl.create(:person, :with_family) }
-    let!(:dependent) { FactoryGirl.create(:person) }
-    let!(:family_member) { FactoryGirl.create(:family_member, family: person.primary_family ,person: dependent)}
+    let!(:person) { FactoryBot.create(:person, :with_family) }
+    let!(:dependent) { FactoryBot.create(:person) }
+    let!(:family_member) { FactoryBot.create(:family_member, family: person.primary_family ,person: dependent)}
     let!(:coverage_household_member) { coverage_household.coverage_household_members.new(:family_member_id => family_member.id) }
     let(:primary_family){person.primary_family}
     let(:coverage_household){person.primary_family.active_household.immediate_family_coverage_household}

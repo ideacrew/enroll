@@ -3,7 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
   module Observers
     RSpec.describe OrganizationObserver, type: :model, dbclean: :after_each do
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile) }
+      let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_aca_shop_cca_employer_profile) }
       let(:subject) { BenefitSponsors::Organizations::Organization}
       let(:observer_instance) { OrganizationObserver.new }
 

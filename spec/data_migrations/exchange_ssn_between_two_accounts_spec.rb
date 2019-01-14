@@ -10,8 +10,8 @@ describe ChangeFein do
     end
   end
   describe "change ssn if both people exits and both have ssn" do
-    let(:person1){ FactoryGirl.create(:person,ssn:"123123123")}
-    let(:person2){FactoryGirl.create(:person,ssn:"456456456")}
+    let(:person1){ FactoryBot.create(:person,ssn:"123123123")}
+    let(:person2){FactoryBot.create(:person,ssn:"456456456")}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id_1").and_return(person1.hbx_id)
@@ -32,8 +32,8 @@ describe ChangeFein do
     end
   end
   describe "not change ssn if either people not exist" do
-    let(:person1){ FactoryGirl.create(:person,ssn:"123123123")}
-    let(:person2){FactoryGirl.create(:person,ssn:"456456456")}
+    let(:person1){ FactoryBot.create(:person,ssn:"123123123")}
+    let(:person2){FactoryBot.create(:person,ssn:"456456456")}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id_1").and_return("")
@@ -53,8 +53,8 @@ describe ChangeFein do
     end
   end
   describe "not change ssn if either people has no ssn" do
-    let(:person1){ FactoryGirl.create(:person,ssn:"123123123")}
-    let(:person2){FactoryGirl.create(:person)}
+    let(:person1){ FactoryBot.create(:person,ssn:"123123123")}
+    let(:person2){FactoryBot.create(:person)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id_1").and_return(person1.hbx_id)

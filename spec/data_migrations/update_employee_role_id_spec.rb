@@ -19,14 +19,14 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     let(:benefit_market)      { site.benefit_markets.first }
     let!(:product_package) { benefit_market_catalog.product_packages.first }
 
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
-      FactoryGirl.create(
+      FactoryBot.create(
         :benefit_sponsors_benefit_sponsorship,
         :with_rating_area,
         :with_service_areas,
@@ -41,24 +41,24 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     let(:start_on)  { current_effective_date.prev_month }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
     let!(:benefit_application) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
       application.benefit_sponsor_catalog.save!
       application
     }
 
-    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
-    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package)}
+    let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+    let(:benefit_group_assignment) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package)}
 
-    let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
-    let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee,
+    let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+    let(:census_employee) { FactoryBot.create(:benefit_sponsors_census_employee,
       employer_profile: benefit_sponsorship.profile,
       benefit_sponsorship: benefit_sponsorship,
       benefit_group_assignments: [benefit_group_assignment]    )}
-    let(:person) { FactoryGirl.create(:person) }
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:person) { FactoryBot.create(:person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
     let!(:hbx_enrollment) do
-      FactoryGirl.create(:hbx_enrollment,
+      FactoryBot.create(:hbx_enrollment,
                          household: family.active_household,
                          kind: "employer_sponsored",
                          effective_on: start_on,

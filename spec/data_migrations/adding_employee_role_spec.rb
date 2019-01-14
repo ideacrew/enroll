@@ -3,24 +3,24 @@ require File.join(Rails.root, "app", "data_migrations", "adding_employee_role")
 
 describe AddingEmployeeRole, dbclean: :after_each do
   let!(:site) { create(:benefit_sponsors_site,:with_benefit_market, :with_benefit_market_catalog_and_product_packages, :as_hbx_profile, :cca) }
-  let!(:org) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:org) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile) { org.employer_profile }
-  let!(:rating_area) { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-  let!(:service_area) { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let!(:rating_area) { FactoryBot.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area) { FactoryBot.create_default :benefit_markets_locations_service_area }
   let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:benefit_market) { site.benefit_markets.first }
   let(:benefit_market_catalog) { benefit_market.benefit_market_catalogs.first }
   let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
-  let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
-  let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
-  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_package.id, household: family.active_household)}
-  let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
-  let(:benefit_group_assignment2) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
-  let(:benefit_group_assignment3) {FactoryGirl.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
-  let(:census_employee) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
-  let(:census_employee2) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
-  let(:census_employee3) { FactoryGirl.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
+  let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, sponsored_benefit_package_id: benefit_package.id, household: family.active_household)}
+  let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
+  let(:benefit_group_assignment2) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
+  let(:benefit_group_assignment3) {FactoryBot.build(:benefit_group_assignment, benefit_package: benefit_package, hbx_enrollment: hbx_enrollment, start_on: benefit_application.start_on) }
+  let(:census_employee) { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
+  let(:census_employee2) { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
+  let(:census_employee3) { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
 
   let(:given_task_name) { "adding_employee_role" }
   subject { AddingEmployeeRole.new(given_task_name, double(:current_scope => nil)) }
@@ -32,7 +32,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
   end
 
   describe "creating new employee role", dbclean: :after_each do
-    let(:person) { FactoryGirl.create(:person, ssn: "009998887") }
+    let(:person) { FactoryBot.create(:person, ssn: "009998887") }
 
     context 'When params are missing/invalid' do
       context 'when census_employee_id not provided then' do
@@ -128,7 +128,7 @@ describe AddingEmployeeRole, dbclean: :after_each do
     end
 
     context 'when benefit application state is not published then' do
-      let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+      let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
       before(:each) do
         allow(ENV).to receive(:[]).with('action').and_return('Link')
         allow(ENV).to receive(:[]).with('census_employee_ids').and_return "#{census_employee.id}"

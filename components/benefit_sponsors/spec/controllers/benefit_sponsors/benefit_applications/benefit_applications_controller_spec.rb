@@ -32,26 +32,26 @@ module BenefitSponsors
 
     let(:current_effective_date)  { effective_period_start_on }
     let(:product_package) { current_benefit_market_catalog.product_packages.first }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
     let(:form_class)  { BenefitSponsors::Forms::BenefitApplicationForm }
 
-    let!(:permission)               { FactoryGirl.create(:permission, :hbx_staff) }
-    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
-    let!(:hbx_person)               { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
+    let!(:permission)               { FactoryBot.create(:permission, :hbx_staff) }
+    let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
     let(:organization_with_hbx_profile)  { site.owner_organization }
 
-    let!(:person1) { FactoryGirl.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person1 ) }
-    let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:person1) { FactoryBot.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person1 ) }
+    let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
-    let!(:employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
-    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[employer_staff_role]) }
-    let!(:user) { FactoryGirl.create_default :user, person: person}
+    let!(:employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles:[employer_staff_role]) }
+    let!(:user) { FactoryBot.create_default :user, person: person}
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
-      FactoryGirl.create(
+      FactoryBot.create(
         :benefit_sponsors_benefit_sponsorship,
         :with_rating_area,
         :with_service_areas,

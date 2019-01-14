@@ -10,7 +10,7 @@ describe ChangeSuffixPerson do
     end
   end
   describe "changing person's name suffix " do
-    let(:person) { FactoryGirl.create(:person, name_sfx: nil)}
+    let(:person) { FactoryBot.create(:person, name_sfx: nil)}
     let(:hbx_id) { person.hbx_id}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_ids").and_return(hbx_id)

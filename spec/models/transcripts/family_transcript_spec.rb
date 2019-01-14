@@ -4,12 +4,12 @@ RSpec.describe Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse)  { FactoryGirl.create(:person)}
-    let!(:child1)  { FactoryGirl.create(:person)}
-    let!(:child2)  { FactoryGirl.create(:person)}
+    let!(:spouse)  { FactoryBot.create(:person)}
+    let!(:child1)  { FactoryBot.create(:person)}
+    let!(:child2)  { FactoryBot.create(:person)}
 
     let!(:person) do
-      p = FactoryGirl.build(:person)
+      p = FactoryBot.build(:person)
       p.person_relationships.build(relative: spouse, kind: "spouse")
       p.person_relationships.build(relative: child1, kind: "child")
       p.person_relationships.build(relative: child2, kind: "child")

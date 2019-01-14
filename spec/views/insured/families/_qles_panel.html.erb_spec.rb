@@ -6,9 +6,9 @@ RSpec.describe "insured/families/_qles_panel.html.erb" do
 
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
 
-    10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
+    10.times.each {FactoryBot.create(:qualifying_life_event_kind)}
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
-    assign(:person, FactoryGirl.create(:person))
+    assign(:person, FactoryBot.create(:person))
     render "insured/families/qles_panel"
   end
 
@@ -45,9 +45,9 @@ RSpec.describe "insured/families/_qles_panel.html.erb" do
 
      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: false))
 
-    10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
+    10.times.each {FactoryBot.create(:qualifying_life_event_kind)}
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
-    assign(:person, FactoryGirl.create(:person))
+    assign(:person, FactoryBot.create(:person))
     render "insured/families/qles_panel"
   end
 

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
-  let(:staff) { FactoryGirl.create(:general_agency_staff_role) }
+  let(:staff) { FactoryBot.create(:general_agency_staff_role) }
   before :each do
     assign :staffs, [staff]
     Settings.aca.general_agency_enabled = true

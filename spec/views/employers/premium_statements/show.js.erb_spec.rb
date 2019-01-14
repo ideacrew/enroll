@@ -59,7 +59,7 @@ describe "employers/premium_statements/show.js.erb" do
   let(:new_employee_role){ instance_double("EmployeeRole", census_employee: new_census_employee) }
   let(:employee_roles) {[new_employee_role, new_employee_role]}
   let(:hbx_enrollments){ [new_hbx_enrollment]}
-  let(:employer_profile){FactoryGirl.create(:employer_profile)}
+  let(:employer_profile){FactoryBot.create(:employer_profile)}
 
   # let(:current_plan_year){ instance_double("PlanYear")}
 

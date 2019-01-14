@@ -10,14 +10,14 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
   end
 
   describe "creating new enrollment member record for an enrollment", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:enrollment) do
-      hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "individual")
-      hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
+      hbx = FactoryBot.create(:hbx_enrollment, household: family.active_household, kind: "individual")
+      hbx.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record - 30.days)
       hbx.save
       hbx
     end
-    let(:family_member) { FactoryGirl.create(:family_member, family: family)}
+    let(:family_member) { FactoryBot.create(:family_member, family: family)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(enrollment.hbx_id.to_s)
       allow(ENV).to receive(:[]).with("family_member_id").and_return(family_member.id)
@@ -30,7 +30,7 @@ describe AddHbxEnrollmentMember, dbclean: :after_each do
     end
 
     it "should not create a new enrollment member record if it already exists under enrollment" do
-      enrollment.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record - 30.days)
+      enrollment.hbx_enrollment_members << FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record - 30.days)
       enrollment.save
       hem_size = enrollment.hbx_enrollment_members.count
       subject.migrate

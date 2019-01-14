@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Inbox, :type => :model do
   let (:inbox) {Inbox.new}
-  let (:message) {FactoryGirl.build(:message)}
-  let (:message_list) {FactoryGirl.build_list(:message, 15)}
+  let (:message) {FactoryBot.build(:message)}
+  let (:message_list) {FactoryBot.build_list(:message, 15)}
 
   describe "#post_message" do
 
@@ -17,8 +17,8 @@ RSpec.describe Inbox, :type => :model do
   end
 
   describe "#read_messages" do
-    let(:read_messages) {FactoryGirl.build_list(:message, 3, message_read: true, folder: "inbox")}
-    let(:unread_messages) {FactoryGirl.build_list(:message, 4, message_read: false, folder: "inbox")}
+    let(:read_messages) {FactoryBot.build_list(:message, 3, message_read: true, folder: "inbox")}
+    let(:unread_messages) {FactoryBot.build_list(:message, 4, message_read: false, folder: "inbox")}
     let(:messages) {[read_messages + unread_messages]}
 
     before do
@@ -39,13 +39,13 @@ RSpec.describe Inbox, :type => :model do
   end
 
   describe "#delete_message" do
-    let(:orphan_message) {FactoryGirl.build(:message)}
+    let(:orphan_message) {FactoryBot.build(:message)}
     let(:message_count) {15}
 
     let(:inbox_with_many_messages) do
       inbox = Inbox.new
       message_count.times do
-        message = FactoryGirl.build(:message)
+        message = FactoryBot.build(:message)
         inbox.post_message(message)
       end
       inbox

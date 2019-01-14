@@ -4,11 +4,11 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
   let(:hbx_profile) { double(id: double("hbx_profile_id"))}
   let(:user) { double("user") }
   let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { benefit_sponsor.employer_profile }
-  let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-  let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
-  let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+  let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+  let!(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
 
   describe "Get new" do
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"), inbox: double(messages: double(build: double("inbox"))))}
@@ -32,7 +32,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
     let(:inbox){Inbox.new}
     let(:inbox_provider){double(id: double("id"),legal_name: double("inbox_provider"))}
     let(:valid_params){{"message"=>{"subject"=>"test", "body"=>"test", "sender_id"=>"558b63ef4741542b64290000", "from"=>"HBXAdmin", "to"=>"Acme Inc."}}}
-    let!(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+    let!(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
     before do
       allow(user).to receive(:person).and_return(person)
       sign_in(user)
@@ -70,7 +70,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
     let(:broker_agency_profile) { double("BrokerAgencyProfile", legal_name: "my broker name") }
     let(:inbox){ double("Inbox") }
     let(:messages){ double("Message", build: double("test")) }
-    let(:organization){ FactoryGirl.create(:organization) }
+    let(:organization){ FactoryBot.create(:organization) }
     let(:hbx_profile){ double("HbxProfile") }
     it "renders" do
       sign_in

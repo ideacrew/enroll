@@ -23,10 +23,10 @@ describe FixInvalidRelationshipBenefitInPlanYear, dbclean: :after_each do
             RelationshipBenefit.new(offered: true, relationship: :child_26_and_over, premium_pct: 50)
         ]
       end
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group,relationship_benefits:relationship_benefits)}
-      let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [active_benefit_group]) }
-      let(:employer_profile) { FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
-      let(:organization)      { FactoryGirl.create(:organization, employer_profile: employer_profile)}
+      let!(:active_benefit_group) { FactoryBot.create(:benefit_group,relationship_benefits:relationship_benefits)}
+      let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [active_benefit_group]) }
+      let(:employer_profile) { FactoryBot.build(:employer_profile, plan_years: [plan_year]) }
+      let(:organization)      { FactoryBot.create(:organization, employer_profile: employer_profile)}
 
       it "should return offered false for child_over_26_relationship" do
         child_over_26_relationship=organization.employer_profile.plan_years.first.benefit_groups.map(&:relationship_benefits).flatten.select{|r| r.relationship == "child_26_and_over"}.first

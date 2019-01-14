@@ -30,7 +30,7 @@ end
 
 Then(/^there are (\d+) preloaded user accounts without email$/) do |num|
   (0...num.to_i).each do |int|
-    FactoryGirl.create(:user, :without_email, :with_family)
+    FactoryBot.create(:user, :without_email, :with_family)
   end
 end
 

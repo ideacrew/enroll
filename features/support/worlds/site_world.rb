@@ -1,6 +1,6 @@
 module SiteWorld
   def site
-    @site ||= FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+    @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
   end
 
   def reset_product_cache

@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
-  let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
-  let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+  let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
+  let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
   let(:person) { test_family.primary_family_member.person }
-  let(:published_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: :published)}
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
+  let(:published_plan_year)  { FactoryBot.build(:plan_year, aasm_state: :published)}
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
+  let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
-  let(:census_employee) { FactoryGirl.create(:census_employee) }
+  let(:census_employee) { FactoryBot.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -69,7 +69,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
        subject { Observers::NoticeObserver.new }
 
-      let(:sep) { FactoryGirl.create :special_enrollment_period, family: test_family }
+      let(:sep) { FactoryBot.create :special_enrollment_period, family: test_family }
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
 
       before :each do
@@ -162,7 +162,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:save_result) { false }
-    # let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+    # let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
 
     before :each do
       sign_in(user)

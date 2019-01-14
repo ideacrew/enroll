@@ -13,7 +13,7 @@ module BenefitSponsorWorld
   end
 
   def issuer_profile
-    @issuer_profile ||= FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site)
+    @issuer_profile ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site)
   end
 
 end

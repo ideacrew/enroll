@@ -4,9 +4,9 @@ require File.join(Rails.root, 'app', 'data_migrations', 'fix_citizen_status')
 
 describe FixCitizenStatus, dbclean: :after_each do
   subject { FixCitizenStatus.new('fix_citizen_status', double(:current_scope => nil)) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person3) { FactoryBot.create(:person, :with_consumer_role) }
 
   shared_examples_for 'fix_citizen_status' do |old_state, new_state, result|
     before do

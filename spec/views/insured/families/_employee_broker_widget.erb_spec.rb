@@ -3,12 +3,12 @@ require 'rails_helper'
 RSpec.describe "_employee_brokers_widget.html.erb" do
 
   context 'insured home broker widget as employee' do
-    let!(:employee_role) { FactoryGirl.create(:employee_role) }
+    let!(:employee_role) { FactoryBot.create(:employee_role) }
     let(:person) { employee_role.person }
     let!(:employer_profile) do
       ep = employee_role.employer_profile
       ep.broker_agency_accounts = [
-        FactoryGirl.build(:broker_agency_account, employer_profile: ep)
+        FactoryBot.build(:broker_agency_account, employer_profile: ep)
       ]
       ep.save
       ep
@@ -31,13 +31,13 @@ RSpec.describe "_employee_brokers_widget.html.erb" do
   end
 
   context 'insured home broker widget as employee without selected broker' do
-    let!(:employee_role) { FactoryGirl.create(:employee_role) }
-    let!(:broker_agency_profile) { FactoryGirl.build_stubbed(:broker_agency_profile) }
+    let!(:employee_role) { FactoryBot.create(:employee_role) }
+    let!(:broker_agency_profile) { FactoryBot.build_stubbed(:broker_agency_profile) }
     let(:person) { employee_role.person }
     let!(:employer_profile) do
       ep = employee_role.employer_profile
       ep.broker_agency_accounts = [
-        FactoryGirl.build(:broker_agency_account, employer_profile: ep)
+        FactoryBot.build(:broker_agency_account, employer_profile: ep)
       ]
       ep.save
       ep

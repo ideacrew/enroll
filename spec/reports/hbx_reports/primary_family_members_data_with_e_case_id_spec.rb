@@ -6,17 +6,17 @@ describe PrimaryFamilyMembersDataWithECaseId do
 
   let(:given_task_name) { "with_e_case_id" }
   subject { PrimaryFamilyMembersDataWithECaseId.new(given_task_name, double(:current_scope => nil)) }
-  let(:person1) {FactoryGirl.create(:person,
+  let(:person1) {FactoryBot.create(:person,
                                     :with_consumer_role,
                                     first_name: "f_name1",
                                     last_name:"l_name1")}
   
-    let(:person2) {FactoryGirl.create(:person,
+    let(:person2) {FactoryBot.create(:person,
                                     :with_employee_role,
                                     first_name: "f_name2",
                                     last_name:"l_name2")}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person1)}
-    let(:dependent) { FactoryGirl.create(:family_member, :person => person2, :family => family )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
+    let(:dependent) { FactoryBot.create(:family_member, :person => person2, :family => family )}
 
   describe "correct data input" do
      it "has the given task name" do

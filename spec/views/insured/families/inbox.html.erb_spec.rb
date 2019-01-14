@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 describe "insured/families/inbox.html.erb", dbclean: :after_each do
-  let(:person) {FactoryGirl.create(:person, :with_family)}
-  let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:employee_role) {FactoryGirl.create(:employee_role, census_employee_id: census_employee.id)}
-  let(:census_employee) {FactoryGirl.create(:census_employee)}
+  let(:person) {FactoryBot.create(:person, :with_family)}
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:employee_role) {FactoryBot.create(:employee_role, census_employee_id: census_employee.id)}
+  let(:census_employee) {FactoryBot.create(:census_employee)}
 
   before :each do
     sign_in(user)

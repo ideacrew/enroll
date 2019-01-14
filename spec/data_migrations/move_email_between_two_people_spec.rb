@@ -12,8 +12,8 @@ describe MoveEmailBetweenTwoPeople do
   end
 
   describe "move email between two people" do
-    let!(:person1) { FactoryGirl.create(:person )}
-    let!(:person2) { FactoryGirl.create(:person)}
+    let!(:person1) { FactoryBot.create(:person )}
+    let!(:person2) { FactoryBot.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("from_hbx_id").and_return(person1.hbx_id)
       allow(ENV).to receive(:[]).with("to_hbx_id").and_return(person2.hbx_id)

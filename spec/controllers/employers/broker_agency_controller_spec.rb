@@ -3,23 +3,23 @@ require 'rails_helper'
 RSpec.describe Employers::BrokerAgencyController do
 
   before(:all) do
-    @employer_profile = FactoryGirl.create(:employer_profile)
+    @employer_profile = FactoryBot.create(:employer_profile)
 
-    @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')
-    @org1 = FactoryGirl.create(:broker_agency, legal_name: "agencyone")
+    @broker_role =  FactoryBot.create(:broker_role, aasm_state: 'active')
+    @org1 = FactoryBot.create(:broker_agency, legal_name: "agencyone")
     @org1.broker_agency_profile.update_attributes(primary_broker_role: @broker_role)
     @broker_role.update_attributes(broker_agency_profile_id: @org1.broker_agency_profile.id)
     @org1.broker_agency_profile.approve!
 
-    @broker_role2 = FactoryGirl.create(:broker_role, aasm_state: 'active')
-    @org2 = FactoryGirl.create(:broker_agency, legal_name: "agencytwo")
+    @broker_role2 = FactoryBot.create(:broker_role, aasm_state: 'active')
+    @org2 = FactoryBot.create(:broker_agency, legal_name: "agencytwo")
     @org2.broker_agency_profile.update_attributes(primary_broker_role: @broker_role2)
     @broker_role2.update_attributes(broker_agency_profile_id: @org2.broker_agency_profile.id)
     @org2.broker_agency_profile.approve!
 
-    @user = FactoryGirl.create(:user)
-    p=FactoryGirl.create(:person, user: @user)
-    @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
+    @user = FactoryBot.create(:user)
+    p=FactoryBot.create(:person, user: @user)
+    @hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: p)
   end
 
   after :all do
@@ -206,13 +206,13 @@ RSpec.describe Employers::BrokerAgencyController do
   end
 
   describe ".create for invalid plan year" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
     before (:each) do
           allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
           allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
           sign_in(@user)
           @employer_profile.plan_years=[]
-          invalid_plan=FactoryGirl.build(:plan_year, open_enrollment_end_on: Date.today)
+          invalid_plan=FactoryBot.build(:plan_year, open_enrollment_end_on: Date.today)
           @employer_profile.plan_years << invalid_plan
           @employer_profile.save!(validate:false)
     end

@@ -4,16 +4,16 @@ module BenefitSponsors
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let!(:user_with_hbx_staff_role) { FactoryGirl.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryGirl.create(:person, user: user_with_hbx_staff_role )}
-    let!(:person01) { FactoryGirl.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person01 ) }
+    let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person01) { FactoryBot.create(:person, :with_broker_role) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person01 ) }
 
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
-    let!(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
     let(:bap_id) { organization.broker_agency_profile.id }
 
@@ -56,7 +56,7 @@ module BenefitSponsors
       end
 
       context "index for user with broker_agency_staff_role(on failed pundit)" do
-        let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
+        let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
 
         before :each do
           user_with_broker_role.roles << "broker_agency_staff"
@@ -124,7 +124,7 @@ module BenefitSponsors
       end
 
       context "with an invalid user and with broker_agency_profile_id(on falied pundit)" do
-        let!(:user_without_person) { FactoryGirl.create(:user, :with_hbx_staff_role) }
+        let!(:user_without_person) { FactoryBot.create(:user, :with_hbx_staff_role) }
 
         before :each do
           sign_in(user_without_person)
@@ -158,7 +158,7 @@ module BenefitSponsors
       end
 
       context "without a valid user" do
-        let!(:user) { FactoryGirl.create(:user, roles: [], person: FactoryGirl.create(:person)) }
+        let!(:user) { FactoryBot.create(:user, roles: [], person: FactoryBot.create(:person)) }
 
         before :each do
           sign_in(user)

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
-  let(:qlk) {FactoryGirl.create(:qualifying_life_event_kind)}
+  let(:qlk) {FactoryBot.create(:qualifying_life_event_kind)}
   before :each do
     assign :qle, qlk
     assign :qle_date, TimeKeeper.date_of_record

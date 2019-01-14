@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_each do
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
 
   before :each do
     sign_in(user)
@@ -12,8 +12,8 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_eac
   end
 
   context "with hbx admin role" do
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ["hbx_staff_role"]) }
-    let(:person) { FactoryGirl.create(:person, :with_hbx_staff_role)}
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff_role"]) }
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role)}
 
     it "should not have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
@@ -32,8 +32,8 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb", :dbclean => :after_eac
   end
 
   context "with broker role" do
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ["broker"]) }
-    let(:person) { FactoryGirl.create(:person, :with_broker_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["broker"]) }
+    let(:person) { FactoryBot.create(:person, :with_broker_role) }
 
     context "with individual market enabled " do
       before do

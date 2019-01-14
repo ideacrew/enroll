@@ -3,9 +3,9 @@ require "rails_helper"
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
 describe "A new consumer role with an individual market enrollment", :dbclean => :around_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:family) { FactoryGirl.create(:individual_market_family, primary_person: person) }
-  let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:family) { FactoryBot.create(:individual_market_family, primary_person: person) }
+  let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:enrollment) do
     benefit_sponsorship = hbx_profile.benefit_sponsorship
     benefit_package = benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first

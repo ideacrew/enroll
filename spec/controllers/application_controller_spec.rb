@@ -36,7 +36,7 @@ RSpec.describe ApplicationController do
   end
 
   context "when signed in with new user" do
-    let(:user) { FactoryGirl.create("user") }
+    let(:user) { FactoryBot.create("user") }
 
     it "should return the root url in dev environment" do
       expect( controller.send(:after_sign_out_path_for, user) ).to eq logout_saml_index_path
@@ -67,7 +67,7 @@ RSpec.describe ApplicationController do
   end
 
   context "authenticate_user_from_token!" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     it "should get signed in flash notice" do
       allow(controller).to receive(:authentication_not_required?).and_return true
@@ -77,8 +77,8 @@ RSpec.describe ApplicationController do
   end
 
   context "session[person_id] is nil" do
-      let(:person) {FactoryGirl.create(:person);}
-      let(:user) { FactoryGirl.create(:user, :person=>person); }
+      let(:person) {FactoryBot.create(:person);}
+      let(:user) { FactoryBot.create(:user, :person=>person); }
 
       before do
         sign_in(user)
@@ -107,8 +107,8 @@ RSpec.describe ApplicationController do
       end
   end
   context "session[person_id] is nil" do
-      let(:person) {FactoryGirl.create(:person);}
-      let(:user) { FactoryGirl.create(:user, :person=>person); }
+      let(:person) {FactoryBot.create(:person);}
+      let(:user) { FactoryBot.create(:user, :person=>person); }
 
       before do
         sign_in(user)
@@ -126,8 +126,8 @@ RSpec.describe ApplicationController do
   end
 
   context "require_login" do
-    let(:person) {FactoryGirl.create(:person);}
-    let(:user) { FactoryGirl.create(:user, :person=>person); }
+    let(:person) {FactoryBot.create(:person);}
+    let(:user) { FactoryBot.create(:user, :person=>person); }
 
     before do
       sign_in(user)
@@ -149,8 +149,8 @@ RSpec.describe ApplicationController do
   end
 
   context "page_alphabets" do
-    let(:person) { FactoryGirl.create(:person); }
-    let(:user) { FactoryGirl.create(:user, :person => person); }
+    let(:person) { FactoryBot.create(:person); }
+    let(:user) { FactoryBot.create(:user, :person => person); }
     let(:alphabet_array) { Person.distinct('last_name').collect { |word| word.first.upcase }.uniq.sort }
 
     before do

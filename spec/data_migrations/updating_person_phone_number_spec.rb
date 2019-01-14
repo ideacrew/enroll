@@ -13,8 +13,8 @@ describe UpdatingPersonPhoneNumber, dbclean: :after_each do
   end
 
   describe "changing broker phone kind" do  
-     let(:phone) {FactoryGirl.build(:phone, kind:'work')}
-     let(:person) { FactoryGirl.create(:person,phones:[phone]) }
+     let(:phone) {FactoryBot.build(:phone, kind:'work')}
+     let(:person) { FactoryBot.create(:person,phones:[phone]) }
 
 
     before(:each) do

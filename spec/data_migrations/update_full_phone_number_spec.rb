@@ -16,7 +16,7 @@ describe UpdateFullPhoneNumber, dbclean: :after_each do
     subject { UpdateFullPhoneNumber.new("fix me task", double(:current_scope => nil)) }
 
     context "get person phones " do
-      let(:person) { FactoryGirl.create(:person) }
+      let(:person) { FactoryBot.create(:person) }
       let(:params) { {kind: "home", person: person} }
       let(:phone) { Phone.create(**params) }
       before :each do
@@ -37,8 +37,8 @@ describe UpdateFullPhoneNumber, dbclean: :after_each do
     subject { UpdateFullPhoneNumber.new("fix me task", double(:current_scope => nil)) }
 
     context "get office phones" do
-      let(:organization) { FactoryGirl.create(:organization) }
-      let(:phone) { FactoryGirl.build(:phone) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:phone) { FactoryBot.build(:phone) }
       let(:valid_params) { {
           organization: organization,
           phone: phone

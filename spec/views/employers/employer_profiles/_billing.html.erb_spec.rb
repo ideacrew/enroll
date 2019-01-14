@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/_billing.html.erb" do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
   before :each do
     assign(:employer_profile, employer_profile)

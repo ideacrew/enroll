@@ -2,8 +2,8 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_mailing_address)}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_mailing_address)}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Catastrophic Plan Notice',
                             :notice_template => 'notices/ivl/final_catastrophic_plan_letter',

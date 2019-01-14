@@ -295,7 +295,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
   end
 
   context "employer profile without current plan year", :pending => "This Route is no longer used since similar view is there in engine" do
-    let(:employer_profile){ FactoryGirl.create(:employer_profile) }
+    let(:employer_profile){ FactoryBot.create(:employer_profile) }
 
     before :each do
       allow(view).to receive(:pundit_class).and_return(double("EmployerProfilePolicy", updateable?: true))

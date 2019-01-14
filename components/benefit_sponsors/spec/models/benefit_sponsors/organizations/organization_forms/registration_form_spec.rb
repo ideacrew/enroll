@@ -7,7 +7,7 @@ module BenefitSponsors
     let!(:benefit_market)  { benefit_market = site.benefit_markets.first
                               benefit_market.save }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
-    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
 
     subject { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
 
@@ -46,7 +46,7 @@ module BenefitSponsors
     end
 
     shared_examples_for "should validate create_form and save profile" do |profile_type|
-      let!(:security_question)  { FactoryGirl.create_default :security_question }
+      let!(:security_question)  { FactoryBot.create_default :security_question }
 
       let(:params) do
         {"profile_type"=>"#{profile_type}",
@@ -80,7 +80,7 @@ module BenefitSponsors
                              "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"222", "number"=>"2221111", "extension"=>""}}},
                   "contact_method"=>"paper_and_electronic"}},
          "profile_id"=>nil,
-         "current_user_id"=> profile_type == "benefit_sponsor" ? FactoryGirl.create(:user).id: nil}
+         "current_user_id"=> profile_type == "benefit_sponsor" ? FactoryBot.create(:user).id: nil}
       end
 
       before :each do
@@ -131,16 +131,16 @@ module BenefitSponsors
     end
 
     describe '##for_edit' do
-      let!(:security_question)  { FactoryGirl.create_default :security_question }
+      let!(:security_question)  { FactoryBot.create_default :security_question }
 
-      let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+      let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
       let!(:employer_profile) {general_org.employer_profile}
       let!(:primary_office_location_address){employer_profile.primary_office_location.address }
-      let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-      let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+      let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+      let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
-      let(:user) { FactoryGirl.create(:user, :person => person)}
+      let!(:person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
+      let(:user) { FactoryBot.create(:user, :person => person)}
 
       before :each do
         primary_office_location_address.update_attributes!(kind: 'primary')
@@ -181,14 +181,14 @@ module BenefitSponsors
     end
 
     describe '##for_update' do
-      let!(:security_question)  { FactoryGirl.create_default :security_question }
-      let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+      let!(:security_question)  { FactoryBot.create_default :security_question }
+      let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
       let!(:employer_profile) {general_org.employer_profile}
-      let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-      let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+      let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+      let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
       let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-      let!(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
-      let(:user) { FactoryGirl.create(:user, :person => person)}
+      let!(:person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
+      let(:user) { FactoryBot.create(:user, :person => person)}
 
       context "profile_type = benefit_sponsor" do
 

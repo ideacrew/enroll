@@ -5,17 +5,17 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
-    let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)              { organization.employer_profile }
     let(:active_benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
-    let!(:broker_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
-    let!(:person1) { FactoryGirl.create(:person) }
-    let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
+    let!(:broker_organization)    { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+    let!(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:person1) { FactoryBot.create(:person) }
+    let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
     let(:broker_management_form_create) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
                                           employer_profile_id: employer_profile.id,
                                           broker_agency_profile_id: broker_agency_profile1.id,

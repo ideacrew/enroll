@@ -3,8 +3,8 @@ require File.join(Rails.root, 'app', 'data_migrations', 'fix_document_status_on_
 
 describe FixDocumentStatus, dbclean: :after_each do
   subject { FixDocumentStatus.new('fix_document_status_on_family', double(:current_scope => nil)) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:family_person) {family.primary_applicant.person}
 
   before(:each) do

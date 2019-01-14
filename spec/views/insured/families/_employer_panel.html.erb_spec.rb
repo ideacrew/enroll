@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_employer_panel.html.erb" do
-  let(:person) {FactoryGirl.build(:person)}
-  let(:employee_role) {FactoryGirl.build(:employee_role)}
-  let(:employer_profile) {FactoryGirl.build(:employer_profile)}
+  let(:person) {FactoryBot.build(:person)}
+  let(:employee_role) {FactoryBot.build(:employee_role)}
+  let(:employer_profile) {FactoryBot.build(:employer_profile)}
 
   before :each do
     assign(:person, person)
@@ -14,7 +14,7 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
   end
 
   context 'Person has a single employer/employee_role' do  
-    let(:person) { FactoryGirl.create :person, :with_employee_role }
+    let(:person) { FactoryBot.create :person, :with_employee_role }
 
     before :each do
       render "insured/families/employer_panel", employee_role: person.employee_roles.first
@@ -40,7 +40,7 @@ RSpec.describe "insured/families/_employer_panel.html.erb" do
   end
 
   context 'Person has two employers/employee_roles' do  
-    let(:person) { FactoryGirl.create :person, :with_employee_role, :with_employee_role }
+    let(:person) { FactoryBot.create :person, :with_employee_role, :with_employee_role }
 
     before :each do
       render "insured/families/employer_panel", employee_role: person.employee_roles.first

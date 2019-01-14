@@ -2,8 +2,8 @@ require "rails_helper"
 
 describe IvlNotificationMailer do
   # describe "new_user" do
-  #   let(:consumer_role) {FactoryGirl.create(:consumer_role)}
-  #   let(:family) {FactoryGirl.build(:family, :with_primay_family_member)}
+  #   let(:consumer_role) {FactoryBot.create(:consumer_role)}
+  #   let(:family) {FactoryBot.build(:family, :with_primay_family_member)}
   #   let(:hbx_enrollment) {double(plan: double(name: 'plan name'), total_premium: 100, phone_number: '123456789', hbx_enrollment_members: [], effective_on: TimeKeeper.date_of_record)}
   #   let(:hbx_enrollments) {double(active: [hbx_enrollment])}
   #   let(:household) {double(hbx_enrollments: hbx_enrollments)}

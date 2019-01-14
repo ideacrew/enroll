@@ -37,8 +37,8 @@ end
 
 describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
 
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency, fein: "223230323") }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile, fein: "333230323") }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency, fein: "223230323") }
+  let(:employer_profile) { FactoryBot.create(:employer_profile, fein: "333230323") }
   let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }
   let(:attributes) { {
     first_name: 'joe',
@@ -98,7 +98,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       }}
 
     before(:each) do
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+      2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
       subject.save
     end
 
@@ -149,7 +149,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       }}
 
     before(:each) do
-      FactoryGirl.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
       subject.save
     end
 
@@ -228,7 +228,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
 
   context 'when more than 1 person matched' do
     before :each do
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+      2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
     end
 
     it "should raise an exception" do
@@ -240,7 +240,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     let(:other_attributes) { {first_name: "larry"}}
 
      before :each do
-      FactoryGirl.create(:person, first_name: "larry", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, first_name: "larry", last_name: "smith", dob: "10/10/1974")
       subject.match_or_create_person
     end
 
@@ -284,8 +284,8 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
       dob: "1985-11-11"
       } }
 
-    let(:person) { FactoryGirl.create(:person)}
-    let(:organization) { FactoryGirl.create(:organization)}
+    let(:person) { FactoryBot.create(:person)}
+    let(:organization) { FactoryBot.create(:organization)}
 
     before do
       person.update_attributes(other_attributes)
@@ -302,8 +302,8 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
 end
 
 describe Forms::BrokerAgencyProfile, ".find" do
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+  let(:organization) {FactoryBot.create(:organization)}
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
 
   before :each do
     @form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)
@@ -332,8 +332,8 @@ describe Forms::BrokerAgencyProfile, ".find" do
 end
 
 describe Forms::BrokerAgencyProfile, '.update_attributes' do
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+  let(:organization) {FactoryBot.create(:organization)}
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
   let(:broker_role) { broker_agency_profile.primary_broker_role }
   let(:person) { broker_role.person }
   let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }

@@ -15,8 +15,8 @@ describe ChangeAppliedAptcAmount, dbclean: :after_each do
 
   describe "updating applied aptc amount for a given hbx_id" do
 
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)

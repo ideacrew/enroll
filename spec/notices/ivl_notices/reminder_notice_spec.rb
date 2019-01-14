@@ -2,12 +2,12 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, :min_verification_due_date => TimeKeeper.date_of_record+95.days) }
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
-  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household, kind: "individual", aasm_state: "enrolled_contingent")}
-  let(:plan){ FactoryGirl.create(:plan) }
+  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], household: family.active_household, kind: "individual", aasm_state: "enrolled_contingent")}
+  let(:plan){ FactoryBot.create(:plan) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'First Outstanding Verification Notification',
                             :notice_template => 'notices/ivl/documents_verification_reminder',
@@ -65,8 +65,8 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
   describe "#document_due_date", dbclean: :after_each do
     context "when special verifications exists" do
-      let(:special_verification) { FactoryGirl.create(:special_verification, type: "admin")}
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
+      let(:special_verification) { FactoryBot.create(:special_verification, type: "admin")}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
       it "should return the due date on the related latest special verification" do
         expect(family.document_due_date(family.primary_family_member, special_verification.verification_type)).to eq special_verification.due_date.to_date
@@ -75,12 +75,12 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
     context "when special verifications not exist" do
 
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
       context "when the family member had an 'enrolled_contingent' policy" do
 
-        let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
+        let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
 
         before do
           fm = family.primary_family_member

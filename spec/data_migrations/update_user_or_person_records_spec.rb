@@ -4,7 +4,7 @@ require File.join(Rails.root, "app", "data_migrations", "update_user_or_person_r
 describe UpdateUserOrPersonRecords, dbclean: :after_each do
 
   let(:given_task_name) { "update_user_or_person_records" }
-  let(:user) { FactoryGirl.create(:user, :with_family)}
+  let(:user) { FactoryBot.create(:user, :with_family)}
   subject { UpdateUserOrPersonRecords.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
@@ -14,8 +14,8 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
   end
 
   describe "update username & email on user and also destroying headless user", dbclean: :after_each do
-    let!(:person) { FactoryGirl.create(:person, hbx_id: "1234", user: user) }
-    let!(:user) { FactoryGirl.create(:user) }
+    let!(:person) { FactoryBot.create(:person, hbx_id: "1234", user: user) }
+    let!(:user) { FactoryBot.create(:user) }
 
     before :each do
       ['action', 'user_email', 'person_email', 'user_name', 'headless_user', 'find_user_by', 'hbx_id', 'new_user_email', 'new_user_name', 'dob' ].each do |var|
@@ -164,7 +164,7 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
         end
 
         context "person with employee_role" do
-          let(:person) { FactoryGirl.create(:person, :with_employee_role)}
+          let(:person) { FactoryBot.create(:person, :with_employee_role)}
 
           it "should not update the dob if the census record already linked" do
             updated_dob = wrong_birthday

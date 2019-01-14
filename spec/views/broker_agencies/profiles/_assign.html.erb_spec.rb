@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each do
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
   let(:general_agency_enabled) { true }
   before do
     assign :employers, Kaminari.paginate_array(EmployerProfile.all).page(0)
@@ -13,7 +13,7 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
     context "General Agencies can be toggled by settings" do
       if ExchangeTestingConfigurationHelper.general_agency_enabled?
       context "when enabled" do
-        let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+        let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
         before do
           assign :general_agency_profiles, [general_agency_profile]
           Enroll::Application.reload_routes!

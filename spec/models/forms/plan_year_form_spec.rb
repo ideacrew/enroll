@@ -26,23 +26,23 @@ describe ::Forms::PlanYearForm, "when newly created" do
   end
 
   context "plans" do
-    let(:carrier_profile) {FactoryGirl.build(:carrier_profile)}
+    let(:carrier_profile) {FactoryBot.build(:carrier_profile)}
     let(:next_year_plan_year_form) { ::Forms::PlanYearForm.new(PlanYear.new(start_on: TimeKeeper.date_of_record + 1.year)) }
 
     before :each do
       Plan.delete_all
       Rails.cache.clear
-      plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      plan = FactoryBot.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @plan = ["#{::Organization.valid_carrier_names[plan.carrier_profile_id.to_s]} - #{plan.name}", plan.id]
-      excluded_metal_level_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
+      excluded_metal_level_plan = FactoryBot.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "catastrophic")
       @excluded_metal_level_plan = ["#{::Organization.valid_carrier_names[excluded_metal_level_plan.carrier_profile_id.to_s]} - #{excluded_metal_level_plan.name}", excluded_metal_level_plan.id.to_s]
-      excluded_market_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
+      excluded_market_plan = FactoryBot.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "individual", coverage_kind: "health", carrier_profile: carrier_profile, metal_level: "silver")
       @excluded_market_plan = ["#{::Organization.valid_carrier_names[:excluded_market_plan]} - #{excluded_market_plan.name}", excluded_market_plan.id.to_s]
-      excluded_coverage_kind_plan = FactoryGirl.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver", dental_level: "high")
+      excluded_coverage_kind_plan = FactoryBot.create(:plan, active_year: TimeKeeper.date_of_record.year, market: "shop", coverage_kind: "dental", carrier_profile: carrier_profile, metal_level: "silver", dental_level: "high")
       @excluded_coverage_kind_plan = ["#{::Organization.valid_carrier_names[:excluded_coverage_kind_plan]} - #{excluded_coverage_kind_plan.name}", excluded_coverage_kind_plan.id.to_s]
-      FactoryGirl.create(:plan, active_year: (TimeKeeper.date_of_record.year - 1), carrier_profile: carrier_profile)
-      FactoryGirl.create(:plan, market: "individual", carrier_profile: carrier_profile)
-      FactoryGirl.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile, dental_level: "low")
+      FactoryBot.create(:plan, active_year: (TimeKeeper.date_of_record.year - 1), carrier_profile: carrier_profile)
+      FactoryBot.create(:plan, market: "individual", carrier_profile: carrier_profile)
+      FactoryBot.create(:plan, coverage_kind: "dental", carrier_profile: carrier_profile, dental_level: "low")
     end
 
     describe "asked to provide plans for a carrier" do
@@ -92,7 +92,7 @@ describe ::Forms::PlanYearForm, "when newly created" do
 end
 
 describe ::Forms::PlanYearForm, "when update" do
-  let(:plan_year) { FactoryGirl.build(:plan_year) }
+  let(:plan_year) { FactoryBot.build(:plan_year) }
   let(:plan_year_atts) {plan_year.attributes}
 
   it "change plan_year attributes" do

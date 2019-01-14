@@ -40,9 +40,9 @@ module Effective
         }, :filter => false, :sortable => false
       end
 
-      scopes do
-         scope :legal_name, "Hello"
-      end
+      # scopes do
+      #    scope :legal_name, "Hello"
+      # end
 
       def collection
         unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string

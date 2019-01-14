@@ -312,12 +312,12 @@ Then(/^.+ continues to the consumer home page$/) do
 end
 
 Given(/^zip code for county exists as rate reference$/) do
-  FactoryGirl.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
+  FactoryBot.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
     zip_code_in_multiple_counties: true)
 end
 
 Given(/^a valid ach record exists$/) do
-  FactoryGirl.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
+  FactoryBot.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
 end
 
 #

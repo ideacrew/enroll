@@ -13,13 +13,13 @@ describe AddAndRemoveEnrollmentMember, dbclean: :after_each do
   end
 
   describe "changing plan year's state" do
-    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+    let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
     let(:primary) { family.primary_family_member }
     let(:dependents) { family.dependents }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
     let(:date) { DateTime.now - 10.days }
-    let(:subscriber) { FactoryGirl.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment, eligibility_date: date, coverage_start_on: date, applicant_id: primary.id) }
-    let(:hbx_en_member1) { FactoryGirl.create(:hbx_enrollment_member,
+    let(:subscriber) { FactoryBot.create(:hbx_enrollment_member, :hbx_enrollment => hbx_enrollment, eligibility_date: date, coverage_start_on: date, applicant_id: primary.id) }
+    let(:hbx_en_member1) { FactoryBot.create(:hbx_enrollment_member,
                                               :id => "111",
                                               :hbx_enrollment => hbx_enrollment,
                                               eligibility_date: date,

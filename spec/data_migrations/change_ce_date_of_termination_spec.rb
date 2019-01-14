@@ -17,7 +17,7 @@ describe ChangeCeDateOfTermination do
 
     let(:employer_profile) { census_employee.employer_profile }
     let(:employer_profile_id) { employer_profile.id }
-    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: (TimeKeeper.date_of_record - 2.years).to_s) }
+    let(:census_employee) { FactoryBot.create(:census_employee, hired_on: (TimeKeeper.date_of_record - 2.years).to_s) }
     let(:date) { (TimeKeeper.date_of_record - 2.days).to_s }
 
     before :each do
@@ -39,7 +39,7 @@ describe ChangeCeDateOfTermination do
     let(:employer_profile) { census_employee.employer_profile }
     let(:employer_profile_id) { employer_profile.id }
     let(:date) {  (TimeKeeper::date_of_record - 1.days).to_s }
-    let(:census_employee) { FactoryGirl.create(:census_employee, hired_on: (TimeKeeper.date_of_record - 2.days)) }
+    let(:census_employee) { FactoryBot.create(:census_employee, hired_on: (TimeKeeper.date_of_record - 2.days)) }
 
     before :each do
       allow(ENV).to receive(:[]).with('ssn').and_return census_employee.ssn

@@ -14,11 +14,11 @@ describe CancelDentalOfferingsFromPlanYear, dbclean: :after_each do
   end
 
   describe "changing plan year's state", dbclean: :after_each do
-    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
     let(:census_employee) {
-      ce = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years
-      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
+      ce = FactoryBot.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years
+      person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
         enrollment = HbxEnrollment.create_from(

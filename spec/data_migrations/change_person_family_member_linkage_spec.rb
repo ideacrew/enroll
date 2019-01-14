@@ -3,8 +3,8 @@ require File.join(Rails.root, "app", "data_migrations", "change_person_family_me
 
 describe ChangePersonFamilyMemberLinkage, dbclean: :after_each do 
   let(:given_task_name) { "change_person_family_member_linkage" }
-  let(:family_1) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:family_2) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family_1) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:family_2) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:family_member) { family_2.primary_applicant }
   let(:person) { family_1.primary_applicant.person }
   subject { ChangePersonFamilyMemberLinkage.new(given_task_name, double(:current_scope => nil)) }

@@ -17,7 +17,7 @@ describe Subscribers::SsaVerification do
     let(:xml_hash3) { {:response_code => "ss", :response_text => "Failed", :ssn_verification_failed => nil,
                       :death_confirmation => nil, :ssn_verified => "true", :citizenship_verified => "false",
                       :incarcerated => "false"} }
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:consumer_role) { person.consumer_role }
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }

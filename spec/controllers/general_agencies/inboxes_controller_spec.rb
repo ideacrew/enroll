@@ -2,10 +2,10 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::InboxesController, dbclean: :after_each do
-  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+  let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
     Settings.aca.general_agency_enabled = true

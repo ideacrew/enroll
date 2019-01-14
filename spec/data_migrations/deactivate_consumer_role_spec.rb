@@ -14,7 +14,7 @@ describe DeactivateConsumerRole, dbclean: :after_each do
   end
 
   describe "deactivate consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "12345678")}
+  	let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "12345678")}
 
    before(:each) do
     allow(ENV).to receive(:[]).with("hbx_id").and_return("12345678")

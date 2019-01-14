@@ -10,7 +10,7 @@ end
 
 describe TerminateCensusEmployee, dbclean: :after_each do
   subject { TerminateCensusEmployee.new("termiante_census_employee", double(:current_scope => nil)) }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:employer_profile_id) { employer_profile.id }
 
   context "given a task name" do
@@ -20,7 +20,7 @@ describe TerminateCensusEmployee, dbclean: :after_each do
   end
 
   context "census employee's employment_terminated_on with past date" do
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
 
     it "with employee_termination_pending aasm_state" do
       common_method(census_employee, "employee_termination_pending")
@@ -34,7 +34,7 @@ describe TerminateCensusEmployee, dbclean: :after_each do
   end
 
   context "census employee's employment_terminated_on with future date" do
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: "2014-11-11") }
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, hired_on: "2014-11-11") }
 
     it "census employee termination should be in pending state" do
       census_employee.terminate_employment!(TimeKeeper.date_of_record + 5.days)

@@ -128,7 +128,7 @@ let(:ssa_response_ssn_true_citizenship_true) { EventResponse.new({:received_at =
 let(:ssa_response_ssn_true_citizenship_false) { EventResponse.new({:received_at => threshold_date + 1.hour, :body => body_ssn_true_citizenship_false}) }
 let(:ssa_response_ssn_true_NO_citizenship) { EventResponse.new({:received_at => threshold_date + 1.hour, :body => body_ssn_true_NO_citizenship}) }
 let(:ssa_response_ssn_false) { EventResponse.new({:received_at => threshold_date + 1.hour, :body => body_ssn_false}) }
-let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
 
 describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => :after_each do

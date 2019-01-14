@@ -3,10 +3,10 @@ require "rails_helper"
 module BenefitSponsors
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesControllerPolicy, dbclean: :after_each do
     let(:policy) { BenefitSponsors::Profiles::BrokerAgencies::BrokerAgencyProfilesControllerPolicy.new(user, nil) }
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person) }
 
     context 'for a user with no role' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
 
       shared_examples_for "should not permit for invalid user" do |policy_type|
         it "should not permit" do
@@ -22,7 +22,7 @@ module BenefitSponsors
     end
 
     context 'for a user with hbx staff role' do
-      let(:user) { FactoryGirl.create(:user, :with_hbx_staff_role, person: person) }
+      let(:user) { FactoryBot.create(:user, :with_hbx_staff_role, person: person) }
 
       shared_examples_for "should permit for a user with hbx staff role" do |policy_type|
         it "should permit" do
@@ -38,7 +38,7 @@ module BenefitSponsors
     end
 
     context 'for a user with broker role' do
-      let(:user) { FactoryGirl.create(:user, :broker, person: person) }
+      let(:user) { FactoryBot.create(:user, :broker, person: person) }
 
       shared_examples_for "should permit for a user with broker role" do |policy_type|
         it "should permit" do
@@ -63,7 +63,7 @@ module BenefitSponsors
     end
 
     context 'for a user with csr role' do
-      let(:user) { FactoryGirl.create(:user, :csr, person: person) }
+      let(:user) { FactoryBot.create(:user, :csr, person: person) }
 
       shared_examples_for "should not permit for a user with csr role" do |policy_type|
         it "should not permit" do

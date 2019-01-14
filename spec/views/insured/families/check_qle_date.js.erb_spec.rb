@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "insured/families/check_qle_date.js.erb" do
-  let(:qle) {FactoryGirl.create(:qualifying_life_event_kind)}
+  let(:qle) {FactoryBot.create(:qualifying_life_event_kind)}
 
   context "with qualified_date" do
     context "without effective_on_options" do

@@ -12,7 +12,7 @@ describe UpdateConversionFlag, :dbclean => :after_each do
   end
 
   describe "updating conversion flag of employer" do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:employer_profile) { FactoryBot.create(:employer_profile)}
 
     it "should update profile source to self_serve and should approve employer attestation" do
       ENV["fein"] = employer_profile.fein
@@ -34,9 +34,9 @@ describe UpdateConversionFlag, :dbclean => :after_each do
   end
 
   describe "employer with denied employer attestation" do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
-    let(:document) { FactoryGirl.create(:employer_attestation_document, aasm_state: 'rejected', employer_attestation: employer_attestation) }
+    let!(:employer_profile) { FactoryBot.create(:employer_profile)}
+    let!(:employer_attestation) { FactoryBot.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
+    let(:document) { FactoryBot.create(:employer_attestation_document, aasm_state: 'rejected', employer_attestation: employer_attestation) }
     let(:attestation) { document.employer_attestation }
 
     it "should approve employer attestation" do
@@ -51,9 +51,9 @@ describe UpdateConversionFlag, :dbclean => :after_each do
   end
 
   describe "employer with rejected employer attestation document" do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
-    let(:document) { FactoryGirl.create(:employer_attestation_document) }
+    let!(:employer_profile) { FactoryBot.create(:employer_profile)}
+    let!(:employer_attestation) { FactoryBot.create(:employer_attestation,aasm_state:'denied',employer_profile:employer_profile) }
+    let(:document) { FactoryBot.create(:employer_attestation_document) }
     let(:attestation) { document.employer_attestation }
 
     it "should accept the employer attested document" do

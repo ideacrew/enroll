@@ -188,11 +188,11 @@ module BenefitSponsors
     end
 
     context "for active_broker" do
-      let(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:employer_profile100)    { benefit_sponsor.employer_profile }
       let(:benefit_sponsorship100)    { employer_profile100.add_benefit_sponsorship }
-      let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, assigned_site: site) }
-      let!(:broker_agency_account) { FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship100, broker_agency_profile: broker_agency_profile) }
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, assigned_site: site) }
+      let!(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: benefit_sponsorship100, broker_agency_profile: broker_agency_profile) }
 
       it "should return person record" do
         expect(employer_profile100.active_broker).to eq broker_agency_account.writing_agent.person

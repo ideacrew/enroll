@@ -4,9 +4,9 @@ module HbxAdminWorld
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
       modify_admin_tabs: true, view_admin_tabs: true)
     attributes = traits.extract_options!
-    @hbx_admin ||= FactoryGirl.create :user, *traits, attributes
-    hbx_profile = FactoryGirl.create :hbx_profile
-    FactoryGirl.create :hbx_staff_role, person: @hbx_admin.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+    @hbx_admin ||= FactoryBot.create :user, *traits, attributes
+    hbx_profile = FactoryBot.create :hbx_profile
+    FactoryBot.create :hbx_staff_role, person: @hbx_admin.person, hbx_profile: hbx_profile, permission_id: p_staff.id
     @hbx_admin
   end
 end

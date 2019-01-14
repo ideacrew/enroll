@@ -15,34 +15,34 @@ describe ResolveCensusEmployeeValidationFailures do
   describe "employer profile with employees present", dbclean: :after_each do
 
     let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
-    let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
+    let!(:plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
 
     context 'Renewing employer exists with published plan year', dbclean: :after_each do
 
       let!(:employer) {
-        FactoryGirl.create(:employer_with_planyear, start_on: effective_on, reference_plan_id: plan.id, plan_year_state: 'active')
+        FactoryBot.create(:employer_with_planyear, start_on: effective_on, reference_plan_id: plan.id, plan_year_state: 'active')
       }
 
       let(:benefit_group) { employer.active_plan_year.benefit_groups.first }
 
       let(:employees) {
-        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: employer, 
+        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: employer, 
           benefit_group: benefit_group)
       }
 
       context 'when employee exists with active coverage' do
         let(:employee) {
-          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer)
+          employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer)
           ce.update_attributes({employee_role: employee_role})
           employee_role
         }
        
-        let!(:family) { FactoryGirl.create(:family, :with_family_members, person: person, people: [person]) }
-        let(:person) { FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
+        let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: [person]) }
+        let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
         let(:ce) { employees[0] }
  
         let!(:enrollment) {
-          FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+          FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
             enrollment_members: family.family_members,
             household: family.active_household,
             coverage_kind: 'health',

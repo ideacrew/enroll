@@ -7,8 +7,8 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
   file = "#{Rails.root}/spec/test_data/notices/ivl_backlog_notice.csv"
   csv = CSV.open(file,"r",:headers =>true)
   data = csv.to_a
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :hbx_id => "39587345")}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, min_verification_due_date: TimeKeeper.date_of_record, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "39587345")}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, min_verification_due_date: TimeKeeper.date_of_record, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Backlog Notice',
       :notice_template => 'notices/ivl/ivl_backlog_verification_notice_uqhp',
@@ -17,7 +17,7 @@ RSpec.describe IvlNotices::IvlBacklogVerificationNoticeUqhp, :dbclean => :after_
       :mpi_indicator => 'IVL_BV',
       :title => "You Must Submit Documents by the Deadline to Keep Your Insurance"})
   }
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:valid_parmas) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,

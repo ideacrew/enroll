@@ -4,7 +4,7 @@ module BenefitMarketWorld
   end
 
   def rating_area
-    @rating_area ||= FactoryGirl.create(:benefit_markets_locations_rating_area)
+    @rating_area ||= FactoryBot.create(:benefit_markets_locations_rating_area)
   end
 
   def current_effective_date
@@ -16,15 +16,15 @@ module BenefitMarketWorld
   end
 
   def prior_rating_area
-    @prior_rating_area ||= FactoryGirl.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year - 1)
+    @prior_rating_area ||= FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year - 1)
   end
 
   def current_rating_area
-    @current_rating_area ||= FactoryGirl.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year)
+    @current_rating_area ||= FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year)
   end
 
   def renewal_rating_area
-    @renewal_rating_area ||= FactoryGirl.create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year)
+    @renewal_rating_area ||= FactoryBot.create(:benefit_markets_locations_rating_area, active_year: renewal_effective_date.year)
   end
 
   def product_kinds
@@ -32,11 +32,11 @@ module BenefitMarketWorld
   end
 
   def service_area
-    @service_area ||= FactoryGirl.create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip.id], active_year: current_effective_date.year)
+    @service_area ||= FactoryBot.create(:benefit_markets_locations_service_area, county_zip_ids: [county_zip.id], active_year: current_effective_date.year)
   end
 
   def county_zip
-    @county_zip ||= FactoryGirl.create(:benefit_markets_locations_county_zip,
+    @county_zip ||= FactoryBot.create(:benefit_markets_locations_county_zip,
       county_name: 'Middlesex',
       zip: '01754',
       state: 'MA'
@@ -44,15 +44,15 @@ module BenefitMarketWorld
   end
 
   def issuer_profile(carrier=:default)
-    @issuer_profile[carrier] ||= FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
+    @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
   def renewal_service_area
-    @renewal_service_area ||= FactoryGirl.create(:benefit_markets_locations_service_area, county_zip_ids: service_area.county_zip_ids, active_year: service_area.active_year + 1)
+    @renewal_service_area ||= FactoryBot.create(:benefit_markets_locations_service_area, county_zip_ids: service_area.county_zip_ids, active_year: service_area.active_year + 1)
   end
 
   def health_products
-    @health_products ||= FactoryGirl.create_list(:benefit_markets_products_health_products_health_product,
+    @health_products ||= FactoryBot.create_list(:benefit_markets_products_health_products_health_product,
       5,
       :with_renewal_product,
       application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
@@ -66,7 +66,7 @@ module BenefitMarketWorld
   end
 
   def dental_products
-    @dental_products ||= FactoryGirl.create_list(:benefit_markets_products_dental_products_dental_product,
+    @dental_products ||= FactoryBot.create_list(:benefit_markets_products_dental_products_dental_product,
       5,
       :with_renewal_product,
       application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
@@ -93,7 +93,7 @@ module BenefitMarketWorld
   end
 
   def current_benefit_market_catalog
-    @current_benefit_market_catalog ||= FactoryGirl.create(:benefit_markets_benefit_market_catalog,
+    @current_benefit_market_catalog ||= FactoryBot.create(:benefit_markets_benefit_market_catalog,
       benefit_market: benefit_market,
       product_kinds: product_kinds,
       title: "SHOP Benefits for #{current_effective_date.year}",
@@ -109,7 +109,7 @@ module BenefitMarketWorld
   end
 
   def renewal_benefit_market_catalog
-    @renewal_benefit_market_catalog ||= FactoryGirl.create(:benefit_markets_benefit_market_catalog,
+    @renewal_benefit_market_catalog ||= FactoryBot.create(:benefit_markets_benefit_market_catalog,
       benefit_market: benefit_market,
       product_kinds: product_kinds,
       title: "SHOP Benefits for #{renewal_effective_date.year}",

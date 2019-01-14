@@ -12,9 +12,9 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
   end
   describe "remove family member from coverage household", dbclean: :after_each do
 
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member) {FactoryGirl.create(:family_member, family: family)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member) {FactoryBot.create(:family_member, family: family)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
@@ -33,10 +33,10 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
 
 
   describe "removing duplicate family member" do
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member1) {FactoryGirl.create(:family_member, family: family)}
-    let(:family_member2) {FactoryGirl.create(:family_member, family: family)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member1) {FactoryBot.create(:family_member, family: family)}
+    let(:family_member2) {FactoryBot.create(:family_member, family: family)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
@@ -57,10 +57,10 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
 
 
   describe "removing all duplicate family member" do
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member1) {FactoryGirl.create(:family_member, family: family)}
-    let(:family_member2) {FactoryGirl.create(:family_member, family: family)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member1) {FactoryBot.create(:family_member, family: family)}
+    let(:family_member2) {FactoryBot.create(:family_member, family: family)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id

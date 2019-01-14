@@ -4,9 +4,9 @@ module UserWorld
     if @employee
       @employee
     else
-      employer_staff_role = FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
-      person = FactoryGirl.create(:person, employer_staff_roles:[employer_staff_role])
-      @employee = FactoryGirl.create(:user, :person => person)
+      employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
+      person = FactoryBot.create(:person, employer_staff_roles:[employer_staff_role])
+      @employee = FactoryBot.create(:user, :person => person)
     end
   end
 
@@ -14,9 +14,9 @@ module UserWorld
     if @broker
       @broker
     else
-      person = FactoryGirl.create(:person)
-      broker_role = FactoryGirl.build(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)
-      @broker = FactoryGirl.create(:user, :person => person)
+      person = FactoryBot.create(:person)
+      broker_role = FactoryBot.build(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)
+      @broker = FactoryBot.create(:user, :person => person)
     end
   end
 
@@ -25,8 +25,8 @@ module UserWorld
       @admin
     else
       subrole = subrole.parameterize.underscore
-      hbx_profile_id = FactoryGirl.create(:hbx_profile).id
-      person = FactoryGirl.create(:person)
+      hbx_profile_id = FactoryBot.create(:hbx_profile).id
+      person = FactoryBot.create(:person)
       if subrole.blank?
         raise "No subrole was provided"
       end
@@ -36,7 +36,8 @@ module UserWorld
         raise "No permission was found for subrole #{subrole}"
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
-      @admin = FactoryGirl.create(:user, :person => person)
+      @admin = FactoryBot.create(:user, :person => person)
+
     end
   end
 

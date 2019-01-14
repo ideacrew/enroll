@@ -2,10 +2,10 @@ require "rails_helper"
 
 describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
   subject { AccessPolicies::EmployeeRole.new(user) }
-  let(:user) { FactoryGirl.create(:user, person: person)}
-  let(:person) {FactoryGirl.create(:person, :with_employee_role) }
+  let(:user) { FactoryBot.create(:user, person: person)}
+  let(:person) {FactoryBot.create(:person, :with_employee_role) }
   let(:controller) { Insured::EmployeeRolesController.new }
-  let(:another_employer) { FactoryGirl.create(:employer_profile) }
+  let(:another_employer) { FactoryBot.create(:employer_profile) }
 
   context "user's person with id" do
     it "should be ok with the action" do
@@ -24,8 +24,8 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
   context "with admin user" do
     subject { AccessPolicies::EmployeeRole.new(admin_user) }
-    let(:admin_user) { FactoryGirl.create(:user, person: admin_person) }
-    let(:admin_person) {FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:admin_user) { FactoryBot.create(:user, person: admin_person) }
+    let(:admin_person) {FactoryBot.create(:person, :with_hbx_staff_role) }
     it "should be ok with the action" do
       expect(subject.authorize_employee_role(person.employee_roles.first, controller)).to be_truthy
     end
@@ -33,8 +33,8 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
   context "with has_csr_subrole user" do
     subject { AccessPolicies::EmployeeRole.new(csr_user) }
-    let(:csr_user) { FactoryGirl.create(:user, person: csr_role_person) }
-    let(:csr_role_person) {FactoryGirl.create(:person, :with_csr_role) }
+    let(:csr_user) { FactoryBot.create(:user, person: csr_role_person) }
+    let(:csr_role_person) {FactoryBot.create(:person, :with_csr_role) }
     it "should be ok with the action" do
       expect(subject.authorize_employee_role(person.employee_roles.first, controller)).to be_truthy
     end
@@ -42,10 +42,10 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
   context "with broker role user" do
     subject { AccessPolicies::EmployeeRole.new(broker_user) }
-    let(:broker_user) { FactoryGirl.create(:user, person: broker_person, roles: ["broker"]) }
-    let(:broker_person) { FactoryGirl.create(:person) }
-    let(:broker_role) { FactoryGirl.create(:broker_role, person: broker_person)}
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, primary_broker_role: broker_role) }
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person, roles: ["broker"]) }
+    let(:broker_person) { FactoryBot.create(:person) }
+    let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person)}
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, primary_broker_role: broker_role) }
 
     before do
       broker_role.save
@@ -69,10 +69,10 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
 
   context "with broker agency staff role user" do
     subject { AccessPolicies::EmployeeRole.new(broker_user) }
-    let(:broker_user) { FactoryGirl.create(:user, person: broker_person, roles: ["broker"]) }
-    let(:broker_person) { FactoryGirl.create(:person) }
-    let(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, person: broker_person, broker_agency_profile_id: broker_agency_profile.id)}
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person, roles: ["broker"]) }
+    let(:broker_person) { FactoryBot.create(:person) }
+    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, person: broker_person, broker_agency_profile_id: broker_agency_profile.id)}
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
 
     before do
       broker_agency_staff_role.save
@@ -97,10 +97,10 @@ describe AccessPolicies::EmployeeRole, :dbclean => :after_each do
   context "with general agency staff role user" do
     include ActiveSupport::Concern
     subject { AccessPolicies::EmployeeRole.new(general_user) }
-    let(:general_user) { FactoryGirl.create(:user, person: general_person, roles: ["general_agency_staff"]) }
-    let(:general_person) { FactoryGirl.create(:person) }
-    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role, person: general_person, general_agency_profile_id: general_agency_profile.id)}
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let(:general_user) { FactoryBot.create(:user, person: general_person, roles: ["general_agency_staff"]) }
+    let(:general_person) { FactoryBot.create(:person) }
+    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, person: general_person, general_agency_profile_id: general_agency_profile.id)}
+    let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
 
     before do
       general_agency_staff_role.save

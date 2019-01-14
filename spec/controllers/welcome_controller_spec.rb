@@ -37,7 +37,7 @@ RSpec.describe WelcomeController, :type => :controller do
   end
 
   describe "POST show_hints" do
-    let(:user) { FactoryGirl.build(:user) }
+    let(:user) { FactoryBot.build(:user) }
     it "should return to a http status success" do
       sign_in user
       xhr :post, "show_hints", :format => "js"

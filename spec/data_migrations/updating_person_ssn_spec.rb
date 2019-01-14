@@ -10,7 +10,7 @@ describe ChangeFein do
     end
   end
   describe "change person ssn" do
-    let(:person1){ FactoryGirl.create(:person,ssn:"787878787")}
+    let(:person1){ FactoryBot.create(:person,ssn:"787878787")}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id_1").and_return(person1.hbx_id)

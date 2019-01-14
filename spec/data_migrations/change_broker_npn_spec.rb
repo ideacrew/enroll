@@ -11,7 +11,7 @@ describe ChangeBrokerNpn, dbclean: :after_each do
   end
   describe "change the broker role" do
 
-    let(:broker_role) {FactoryGirl.create(:broker_role,npn:"123123")}
+    let(:broker_role) {FactoryBot.create(:broker_role,npn:"123123")}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(broker_role.person.hbx_id)
       allow(ENV).to receive(:[]).with("new_npn").and_return("321321")

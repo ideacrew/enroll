@@ -17,20 +17,20 @@ describe Importers::ConversionEmployeeAction, :dbclean => :after_each do
 
   context "where the sponsor employer is found" do
 
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion') }
+    let(:employer_profile) { FactoryBot.create(:employer_profile, profile_source: 'conversion') }
 
-    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile) { FactoryBot.create(:carrier_profile) }
 
     let(:renewal_health_plan)   {
-      FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2016, carrier_profile_id: carrier_profile.id)
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2016, carrier_profile_id: carrier_profile.id)
     }
 
     let(:current_health_plan)   {
-      FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2015, renewal_plan_id: renewal_health_plan.id, carrier_profile_id: carrier_profile.id)
+      FactoryBot.create(:plan, :with_premium_tables, coverage_kind: "health", active_year: 2015, renewal_plan_id: renewal_health_plan.id, carrier_profile_id: carrier_profile.id)
     }
 
     let(:plan_year)            {
-      py = FactoryGirl.create(:plan_year,
+      py = FactoryBot.create(:plan_year,
                               start_on: Date.new(2015, 7, 1),
                               end_on: Date.new(2016, 6, 30),
                               open_enrollment_start_on: Date.new(2015, 6, 1),
@@ -39,7 +39,7 @@ describe Importers::ConversionEmployeeAction, :dbclean => :after_each do
                              )
 
       py.benefit_groups = [
-        FactoryGirl.build(:benefit_group,
+        FactoryBot.build(:benefit_group,
                           title: "blue collar",
                           plan_year: py,
                           reference_plan_id: current_health_plan.id,
@@ -65,7 +65,7 @@ describe Importers::ConversionEmployeeAction, :dbclean => :after_each do
       end
 
       let(:census_employee) {
-        FactoryGirl.build(:census_employee, :employer_profile => employer_profile)
+        FactoryBot.build(:census_employee, :employer_profile => employer_profile)
       }
 
       let(:subject) { ::Importers::ConversionEmployeeAction.new(conversion_employee_props) }
@@ -89,7 +89,7 @@ describe Importers::ConversionEmployeeAction, :dbclean => :after_each do
       end
 
       let(:census_employee) {
-        FactoryGirl.create(:census_employee, :employer_profile => employer_profile)
+        FactoryBot.create(:census_employee, :employer_profile => employer_profile)
       }
 
       let(:mock_update) { double(:save => true, :warnings => [], :errors => [])}

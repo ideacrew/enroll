@@ -7,8 +7,8 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
   file = "#{Rails.root}/spec/test_data/notices/ivl_renewal_notice_test_data.csv"
   csv = CSV.open(file,"r",:headers =>true)
   data = csv.to_a
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :hbx_id => "39587345")}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "39587345")}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'September Projected Renewal Notice',
                             :notice_template => 'notices/ivl/projected_eligibility_notice',
@@ -17,7 +17,7 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
                             :mpi_indicator => 'IVL_PRE_1',
                             :title => "Projected Eligibility Notice"})
                           }
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:open_enrollment_start_on)    { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_start_on}
   let!(:open_enrollment_end_on)      { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_end_on }
   let(:valid_parmas) {{

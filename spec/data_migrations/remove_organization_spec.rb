@@ -13,7 +13,7 @@ describe RemoveOrganization, dbclean: :after_each do
   end
 
   describe "deleting organization" do
-    let(:organization) { FactoryGirl.create(:organization)}
+    let(:organization) { FactoryBot.create(:organization)}
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end

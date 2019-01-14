@@ -10,7 +10,7 @@ describe ChangeDateOfHire, dbclean: :after_each do
   end
   describe "Change doh for employee role" do
     subject {ChangeDateOfHire.new("change_date_of_hire", double(:current_scope => nil)) }
-    let(:person_with_employee_role) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person_with_employee_role) { FactoryBot.create(:person, :with_employee_role) }
     let(:employer_profile_id){ person_with_employee_role.employee_roles.first.employer_profile_id }
     let(:date){ TimeKeeper.date_of_record - 5.days}
     before :each do
@@ -27,8 +27,8 @@ describe ChangeDateOfHire, dbclean: :after_each do
 
   describe "Change doh for employee role for multiple employees" do
     subject {ChangeDateOfHire.new("change_date_of_hire", double(:current_scope => nil)) }
-    let(:person_with_employee_role1) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:person_with_employee_role2) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person_with_employee_role1) { FactoryBot.create(:person, :with_employee_role) }
+    let(:person_with_employee_role2) { FactoryBot.create(:person, :with_employee_role) }
     let(:employer_profile_id){ person_with_employee_role1.employee_roles.first.employer_profile_id }
     let(:date){ TimeKeeper.date_of_record - 5.days}
     before :each do
@@ -48,8 +48,8 @@ describe ChangeDateOfHire, dbclean: :after_each do
 
   describe "Doesnot Change doh for employee role with different employee profile id" do
     subject {ChangeDateOfHire.new("change_date_of_hire", double(:current_scope => nil)) }
-    let(:person_with_employee_role1) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:person_with_employee_role2) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person_with_employee_role1) { FactoryBot.create(:person, :with_employee_role) }
+    let(:person_with_employee_role2) { FactoryBot.create(:person, :with_employee_role) }
     let(:employer_profile_id){ person_with_employee_role1.employee_roles.first.employer_profile_id }
     let(:date){ TimeKeeper.date_of_record - 5.days}
     before :each do

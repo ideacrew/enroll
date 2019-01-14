@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe "shared/_shop_for_plans_progress.html.erb" do
-  let(:plan) { FactoryGirl.build(:plan) }
+  let(:plan) { FactoryBot.build(:plan) }
   let(:enrollment) { double(id: 'hbx_id') }
-  let(:person) { FactoryGirl.create(:person)}
+  let(:person) { FactoryBot.create(:person)}
 
   context "step 1" do
     before :each do
@@ -72,7 +72,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
   end
 
     context "waive button with employee role" do
-      let(:employee_role) {FactoryGirl.build(:employee_role)}
+      let(:employee_role) {FactoryBot.build(:employee_role)}
       before :each do
         allow(enrollment).to receive(:employee_role).and_return employee_role
         assign :enrollment, enrollment
@@ -90,7 +90,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
 
       context "waive button without employee role" do
-        let(:employee_role) {FactoryGirl.build(:employee_role)}
+        let(:employee_role) {FactoryBot.build(:employee_role)}
         let(:benefit_group) {double("Benefit group")}
         before :each do
           allow(enrollment).to receive(:employee_role).and_return nil

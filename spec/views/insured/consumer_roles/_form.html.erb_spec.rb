@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "insured/consumer_roles/_form.html.erb" do
   let(:person) { Person.new }
-  let(:current_user) {FactoryGirl.create(:user)}
+  let(:current_user) {FactoryBot.create(:user)}
 
   #before do
     #Translation.create(key: "en.required_field", value: "\"required field\"")

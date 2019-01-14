@@ -39,9 +39,9 @@ describe UpdateFamilyMembersIndex do
 
   describe "update family_members index", dbclean: :after_each do
 
-    let(:wife) { FactoryGirl.create(:person, first_name: "wifey")}
-    let(:husband) { FactoryGirl.create(:person, first_name: "hubby")}
-    let(:family) { FactoryGirl.build(:family) }
+    let(:wife) { FactoryBot.create(:person, first_name: "wifey")}
+    let(:husband) { FactoryBot.create(:person, first_name: "hubby")}
+    let(:family) { FactoryBot.build(:family) }
     let!(:husbands_family) do
       husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: "self")
       husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: "spouse")

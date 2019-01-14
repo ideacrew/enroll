@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe PaperApplication, :type => :model do
-  let(:person) {FactoryGirl.create(:person, :with_resident_role)}
-  let(:person2) {FactoryGirl.create(:person, :with_resident_role)}
+  let(:person) {FactoryBot.create(:person, :with_resident_role)}
+  let(:person2) {FactoryBot.create(:person, :with_resident_role)}
 
 
   describe "creates person with coverall paper application" do

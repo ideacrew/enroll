@@ -12,8 +12,8 @@ describe TriggerBrokerInvitationUrl, dbclean: :after_each do
   end
 
   describe "changing person ssn" do
-    let(:person) {FactoryGirl.build(:person)}
-    let!(:registered_broker_role) {FactoryGirl.create(:broker_role, npn: "2323334")}
+    let(:person) {FactoryBot.build(:person)}
+    let!(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334")}
 
     before do
       $stdout = StringIO.new

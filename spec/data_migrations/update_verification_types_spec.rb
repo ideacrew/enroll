@@ -3,7 +3,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "update_verification_types")
 
 describe "UpdateVerificationTypes data migration", dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   subject { UpdateVerificationTypes.new("fix me task", double(:current_scope => nil)) }
   shared_examples_for "update residency type for verified people" do |consumer_state, old_validation, attr_to_check, result|
     before do

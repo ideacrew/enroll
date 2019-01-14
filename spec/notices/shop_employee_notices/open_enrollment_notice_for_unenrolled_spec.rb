@@ -6,11 +6,11 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled, :dbclean 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
 
-  let(:person) {FactoryGirl.create(:person)}
-  let(:family){ FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+  let(:person) {FactoryBot.create(:person)}
+  let(:family){ FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:household){ family.active_household }
-  let!(:census_employee) { FactoryGirl.create(:census_employee_with_active_and_renewal_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package ) }
-  let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile) }
+  let!(:census_employee) { FactoryBot.create(:census_employee_with_active_and_renewal_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package ) }
+  let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Open Enrollment available for Employee',
                             :notice_template => 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',

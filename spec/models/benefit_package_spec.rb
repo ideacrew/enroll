@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe BenefitPackage, :type => :model do
   context "effective_year" do
-    let(:hbx_profile) { FactoryGirl.build(:hbx_profile) }
+    let(:hbx_profile) { FactoryBot.build(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first}
 
     it "should equal to start_on of benefit_coverage_period" do

@@ -2,16 +2,16 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Exchanges::ResidentsController, :type => :controller do
-  let(:user){ FactoryGirl.create(:user, :resident) }
-  let(:person){ FactoryGirl.create(:person) }
+  let(:user){ FactoryBot.create(:user, :resident) }
+  let(:person){ FactoryBot.create(:person) }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
-  let(:resident_role){ FactoryGirl.build(:resident_role) }
+  let(:resident_role){ FactoryBot.build(:resident_role) }
   let(:bookmark_url) {'localhost:3000'}
-  let(:permission) { FactoryGirl.create(:permission, :hbx_staff) }
-  let(:read_only_permission) { FactoryGirl.create(:permission, :hbx_read_only) }
-  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)}
-  let(:hbx_read_only_role) { FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: read_only_permission.id)}
+  let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+  let(:read_only_permission) { FactoryBot.create(:permission, :hbx_read_only) }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)}
+  let(:hbx_read_only_role) { FactoryBot.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: read_only_permission.id)}
 
   describe "Get search" do
     let(:mock_resident_candidate) { instance_double("Forms::ResidentCandidate", dob: "12/26/1975") }

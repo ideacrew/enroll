@@ -14,8 +14,8 @@ describe AddCoverageHouseholdMember, dbclean: :after_each do
 
   describe "adding coverage household member", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
     before do
       allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id

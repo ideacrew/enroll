@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "shared/_email_fields.html.erb" do
-  let(:email) { FactoryGirl.build(:email, kind: 'home') }
+  let(:email) { FactoryBot.build(:email, kind: 'home') }
 
   before :each do
     helper = Object.new.extend ActionView::Helpers::FormHelper

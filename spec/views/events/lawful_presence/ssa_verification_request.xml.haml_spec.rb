@@ -12,7 +12,7 @@ RSpec.describe "events/lawful_presence/ssa_verification_request.xml.haml"
       download_vocabularies
     end
 
-    let(:individual) { FactoryGirl.build_stubbed :generative_individual }
+    let(:individual) { FactoryBot.build_stubbed :generative_individual }
 
     before :each do
       render :template => "events//lawful_presence/ssa_verification_request.xml", :locals => { :individual => individual }

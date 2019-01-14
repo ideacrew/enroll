@@ -6,7 +6,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
   skip "DEPRECATED rake was never updated to new model, check if we can remove it" do
 
   let(:given_task_name) { "change_renewing_plan_year_aasm_state" }
-  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryBot.create(:rating_area)  }
   subject { ChangeRenewingPlanYearAasmState.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
@@ -16,30 +16,30 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
   end
 
   describe "updating aasm_state of the renewing plan year", dbclean: :after_each do
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
-    let!(:renewal_plan) {FactoryGirl.create(:plan, active_year:TimeKeeper.date_of_record.year)}
-    let(:active_benefit_group_ref_plan) {FactoryGirl.create(:plan, active_year:TimeKeeper.date_of_record.year - 1,renewal_plan_id:renewal_plan.id)}
+    let!(:renewal_plan) {FactoryBot.create(:plan, active_year:TimeKeeper.date_of_record.year)}
+    let(:active_benefit_group_ref_plan) {FactoryBot.create(:plan, active_year:TimeKeeper.date_of_record.year - 1,renewal_plan_id:renewal_plan.id)}
 
-    let(:benefit_group) { FactoryGirl.build(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id]) }
-    let!(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, reference_plan_id:renewal_plan.id, elected_plan_ids:[renewal_plan.id],plan_year:plan_year) }
+    let(:benefit_group) { FactoryBot.build(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id]) }
+    let!(:renewal_benefit_group) { FactoryBot.build(:benefit_group, reference_plan_id:renewal_plan.id, elected_plan_ids:[renewal_plan.id],plan_year:plan_year) }
 
-    let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.last_month.end_of_month, aasm_state: "expired",benefit_groups:[benefit_group]) }
-    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending") }
-    let(:plan_year2){ FactoryGirl.build(:plan_year, aasm_state: "renewing_canceled") }
+    let(:active_plan_year){ FactoryBot.build(:plan_year,start_on: TimeKeeper.date_of_record.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.last_month.end_of_month, aasm_state: "expired",benefit_groups:[benefit_group]) }
+    let(:plan_year){ FactoryBot.build(:plan_year, aasm_state: "renewing_publish_pending") }
+    let(:plan_year2){ FactoryBot.build(:plan_year, aasm_state: "renewing_canceled") }
 
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year, plan_year2]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:employer_profile){ FactoryBot.build(:employer_profile, plan_years: [active_plan_year,plan_year, plan_year2]) }
+    let(:organization)  {FactoryBot.create(:organization,employer_profile:employer_profile)}
 
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on:active_plan_year.start_on, benefit_group: benefit_group)}
-    let(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on:plan_year.start_on, benefit_group: renewal_benefit_group)}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,benefit_group_assignments:[benefit_group_assignment,renewal_benefit_group_assignment],employee_role_id:employee_role.id) }
+    let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on:active_plan_year.start_on, benefit_group: benefit_group)}
+    let(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on:plan_year.start_on, benefit_group: renewal_benefit_group)}
+    let(:employee_role) { FactoryBot.create(:employee_role)}
+    let(:census_employee) { FactoryBot.create(:census_employee,employer_profile: employer_profile,benefit_group_assignments:[benefit_group_assignment,renewal_benefit_group_assignment],employee_role_id:employee_role.id) }
 
-    let(:person) {FactoryGirl.create(:person,ssn:census_employee.ssn)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
+    let(:person) {FactoryBot.create(:person,ssn:census_employee.ssn)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member,person:person)}
 
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on:active_plan_year.start_on,aasm_state:'coverage_selected',plan_id:active_benefit_group_ref_plan.id,benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id)}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:active_plan_year.start_on,aasm_state:'coverage_selected',plan_id:active_benefit_group_ref_plan.id,benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id)}
     let(:active_household) {family.active_household}
 
     before(:each) do

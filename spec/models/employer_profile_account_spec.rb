@@ -2,9 +2,9 @@ require 'rails_helper'
 
 describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
-  let(:employer_profile)        { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile)        { FactoryBot.create(:employer_profile) }
   let!(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 
   def persisted_employer_profile
     EmployerProfile.find(employer_profile.id)
@@ -18,7 +18,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   let(:binder_payment_due_on)   { open_enrollment_end_on + 2.days }
   let(:next_premium_due_on)     { binder_payment_due_on }
   let(:next_premium_amount)     { 3155.86 }
-  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryBot.create(:rating_area)  }
 
   let(:valid_params) do
     {
@@ -98,8 +98,8 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
     context "and open enrollment has closed and is employer is eligible for coverage" do
 
-      let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
-      let(:plan_year)                 { FactoryGirl.create(:plan_year,
+      let(:benefit_group)             { FactoryBot.create(:benefit_group) }
+      let(:plan_year)                 { FactoryBot.create(:plan_year,
                                           employer_profile: employer_profile,
                                           start_on: start_on,
                                           end_on: end_on,
@@ -122,7 +122,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
                                             start_on: plan_year.start_on
                                           )}
 
-      let(:census_employee)             { FactoryGirl.create(:census_employee,
+      let(:census_employee)             { FactoryBot.create(:census_employee,
                                             employer_profile: employer_profile,
                                             benefit_group_assignments: [benefit_group_assignment]
                                           ) }

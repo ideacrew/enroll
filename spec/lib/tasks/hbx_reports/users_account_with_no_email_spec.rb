@@ -4,8 +4,8 @@ require 'csv'
 
 describe 'user account with no email address', :dbclean => :after_each do
   describe 'report:user_account:with_no_email_address' do
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person, email:'', roles: ['consumer'], created_at: TimeKeeper.date_of_record) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:user) { FactoryBot.create(:user, person: person, email:'', roles: ['consumer'], created_at: TimeKeeper.date_of_record) }
     before do
       load File.expand_path("#{Rails.root}/lib/tasks/hbx_reports/users_account_with_no_email.rake", __FILE__)
       Rake::Task.define_task(:environment)

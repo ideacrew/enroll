@@ -9,7 +9,7 @@ describe ChangeEmailOfUser, dbclean: :after_each do
     end
   end
   describe "change the email of a user" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("user_oimid").and_return(user.oim_id)
       allow(ENV).to receive(:[]).with("new_email").and_return("newemail@gmail.com")
@@ -23,7 +23,7 @@ describe ChangeEmailOfUser, dbclean: :after_each do
     end
   end
   describe "not change the email if the user not found" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("user_oimid").and_return("")
       allow(ENV).to receive(:[]).with("new_email").and_return("newemail@gmail.com")

@@ -17,14 +17,14 @@ describe FixSpecialEnrollmentPeriod, dbclean: :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
-    let(:person) {FactoryGirl.create(:person, :with_family, :with_ssn)}
+    let(:person) {FactoryBot.create(:person, :with_family, :with_ssn)}
     let(:family) { person.primary_family }
-    let(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
-    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee_id: census_employee.id, employer_profile: abc_profile) }
+    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
+    let(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee_id: census_employee.id, employer_profile: abc_profile) }
     let(:add_emp_role) {person.employee_roles = [employee_role]
       person.save
     }
-    let(:special_enrollment_period) {FactoryGirl.build(:special_enrollment_period, family: family, optional_effective_on:[Date.strptime(initial_application.start_on.to_s, "%m/%d/%Y").to_s])}
+    let(:special_enrollment_period) {FactoryBot.build(:special_enrollment_period, family: family, optional_effective_on:[Date.strptime(initial_application.start_on.to_s, "%m/%d/%Y").to_s])}
     let(:add_special_enrollemt_period) {family.special_enrollment_periods = [special_enrollment_period]
                                           family.save
     }

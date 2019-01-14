@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 describe "exchanges/hbx_profiles/_edit_enrollment.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, :person => person) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, :person => person) }
 
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:enrollment) { FactoryBot.create(:hbx_enrollment,
                                       household: family.active_household,
                                       kind: "employer_sponsored",
                                       submitted_at: TimeKeeper.datetime_of_record - 3.days,

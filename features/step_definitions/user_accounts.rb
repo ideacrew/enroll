@@ -24,27 +24,27 @@ Then(/^Hbx Admin should see columns related to user account$/) do
 end
 
 And(/^a user exists with employer staff role$/) do
-  FactoryGirl.create :user, :employer_staff, oim_id: "test_employer", email: 'employer1@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
+  FactoryBot.create :user, :employer_staff, oim_id: "test_employer", email: 'employer1@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
 end
 
 And(/^a user exists with employee role$/) do
-  FactoryGirl.create :user, :employee, oim_id: 'test_employee', email: 'employe31@dc.gov', password: '1q23az@WSX', password_confirmation: '1q23az@WSX'
+  FactoryBot.create :user, :employee, oim_id: 'test_employee', email: 'employe31@dc.gov', password: '1q23az@WSX', password_confirmation: '1q23az@WSX'
 end
 
 And(/^a user exists with broker role$/) do
-  FactoryGirl.create :user, :broker_with_person, oim_id: 'test_broker', email: 'broker2331@dc.gov', password: '112q24az@WSX', password_confirmation: '112q24az@WSX'
+  FactoryBot.create :user, :broker_with_person, oim_id: 'test_broker', email: 'broker2331@dc.gov', password: '112q24az@WSX', password_confirmation: '112q24az@WSX'
 end
 
 And(/^a locked user exists with employer staff role$/) do
-  FactoryGirl.create :user, :employer_staff, oim_id: "test1_employer1", email: 'employer11@dc.gov', password: '11qaz@WSX', password_confirmation: '11qaz@WSX', locked_at: Date.today
+  FactoryBot.create :user, :employer_staff, oim_id: "test1_employer1", email: 'employer11@dc.gov', password: '11qaz@WSX', password_confirmation: '11qaz@WSX', locked_at: Date.today
 end
 
 And(/^a locked user exists with employee role$/) do
-  FactoryGirl.create :user, :employee, oim_id: 'test1_employee1', email: 'employe311@dc.gov', password: '11q24az@WSX', password_confirmation: '11q24az@WSX', locked_at: Date.today
+  FactoryBot.create :user, :employee, oim_id: 'test1_employee1', email: 'employe311@dc.gov', password: '11q24az@WSX', password_confirmation: '11q24az@WSX', locked_at: Date.today
 end
 
 And(/^a locked user exists with broker role$/) do
-  FactoryGirl.create :user, :broker_with_person, oim_id: 'test1_broker1', email: 'broker23311@dc.gov', password: '1412q24az@WSX', password_confirmation: '1412q24az@WSX', locked_at: Date.today
+  FactoryBot.create :user, :broker_with_person, oim_id: 'test1_broker1', email: 'broker23311@dc.gov', password: '1412q24az@WSX', password_confirmation: '1412q24az@WSX', locked_at: Date.today
 end
 
 When(/^I click Employee button$/)do

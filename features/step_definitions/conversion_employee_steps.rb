@@ -1,19 +1,19 @@
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
 
-  secondary_organization = FactoryGirl.create :organization, legal_name: person[:mlegal_name],
+  secondary_organization = FactoryBot.create :organization, legal_name: person[:mlegal_name],
                                                    dba: person[:mdba],
                                                    fein: person[:mfein]
-  secondary_employer_profile = FactoryGirl.create :employer_profile, organization: secondary_organization,
+  secondary_employer_profile = FactoryBot.create :employer_profile, organization: secondary_organization,
                                                            profile_source:'conversion',
                                                            registered_on: TimeKeeper.date_of_record
-  secondary_employee = FactoryGirl.create :census_employee, employer_profile: secondary_employer_profile,
+  secondary_employee = FactoryBot.create :census_employee, employer_profile: secondary_employer_profile,
                                                             first_name: person[:first_name],
                                                             last_name: person[:last_name],
                                                             ssn: person[:ssn],
                                                             dob: person[:dob_date]
 
- employee_role = FactoryGirl.create(:employee_role, employer_profile: secondary_employer_profile)
+ employee_role = FactoryBot.create(:employee_role, employer_profile: secondary_employer_profile)
  secondary_employee.update_attributes!(employee_role_id: employee_role.id)
 
   open_enrollment_start_on = TimeKeeper.date_of_record
@@ -22,7 +22,7 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   end_on = start_on + 1.year - 1.day
 
 
-  active_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+  active_plan_year = FactoryBot.create :plan_year, employer_profile: secondary_employer_profile,
                                                        start_on: start_on - 1.year,
                                                        end_on: end_on - 1.year,
                                                        open_enrollment_start_on: open_enrollment_start_on - 1.year,
@@ -31,10 +31,10 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                        aasm_state: :published,
                                                        is_conversion: true
 
-  secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
+  secondary_benefit_group = FactoryBot.create :benefit_group, plan_year: active_plan_year
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on
 
-  renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: secondary_employer_profile,
+  renewing_plan_year = FactoryBot.create :plan_year, employer_profile: secondary_employer_profile,
                                              start_on: start_on,
                                              end_on: end_on,
                                              open_enrollment_start_on: open_enrollment_start_on,
@@ -42,10 +42,10 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                              fte_count: 2,
                                              aasm_state: :renewing_enrolling
 
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, title: 'this is the BGGG'
+  benefit_group = FactoryBot.create :benefit_group, plan_year: renewing_plan_year, title: 'this is the BGGG'
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop")
 
   benefit_group_carrier = benefit_group.reference_plan.carrier_profile
   renewing_carrier = benefit_group.reference_plan.carrier_profile
@@ -85,7 +85,7 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
   ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                                :last_name => /#{person[:last_name]}/i).first
-  person_record = FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name],
+  person_record = FactoryBot.create(:person_with_employee_role, first_name: person[:first_name],
                                                                  last_name: person[:last_name],
                                                                  ssn: person[:ssn],
                                                                  dob: person[:dob_date],
@@ -94,8 +94,8 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
                                                                  hired_on: ce.hired_on)
 
   ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
-  FactoryGirl.create :family, :with_primary_family_member, person: person_record
-  user = FactoryGirl.create(:user, person: person_record,
+  FactoryBot.create :family, :with_primary_family_member, person: person_record
+  user = FactoryBot.create(:user, person: person_record,
                                    email: person[:email],
                                    password: person[:password],
                                    password_confirmation: person[:password])
@@ -114,15 +114,15 @@ And(/(.*) matches all employee roles to employers and is logged in/) do |named_p
     if used_person.nil?
       ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                                    :last_name => /#{person[:last_name]}/i).first
-      person_record = FactoryGirl.create(:person_with_employee_role, first_name: person[:first_name],
+      person_record = FactoryBot.create(:person_with_employee_role, first_name: person[:first_name],
                                                                      last_name: person[:last_name],
                                                                      ssn: person[:ssn],
                                                                      dob: person[:dob_date],
                                                                      census_employee_id: ce.id,
                                                                      employer_profile_id: employer_profile.id,
                                                                      hired_on: ce.hired_on)
-      FactoryGirl.create :family, :with_primary_family_member, person: person_record
-      user = FactoryGirl.create(:user, person: person_record,
+      FactoryBot.create :family, :with_primary_family_member, person: person_record
+      user = FactoryBot.create(:user, person: person_record,
                                        email: person[:email],
                                        password: person[:password],
                                        password_confirmation: person[:password])

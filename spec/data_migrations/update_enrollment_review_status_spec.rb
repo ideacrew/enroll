@@ -3,9 +3,9 @@ require File.join(Rails.root, "app", "data_migrations", "update_enrollment_revie
 
 describe UpdateReviewStatus, dbclean: :after_each do
   subject { UpdateReviewStatus.new("update_enrollment_review_status", double(:current_scope => nil)) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment_with_nil_review) {
-    FactoryGirl.create(:hbx_enrollment,
+    FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
@@ -16,7 +16,7 @@ describe UpdateReviewStatus, dbclean: :after_each do
                        review_status: nil )
   }
   let(:enrollment_with_existing_review) {
-    FactoryGirl.create(:hbx_enrollment,
+    FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

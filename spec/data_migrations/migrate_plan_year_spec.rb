@@ -14,9 +14,9 @@ describe MigratePlanYear, dbclean: :after_each do
 
   describe "changing plan year's state" do
 
-    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], aasm_state: "active", is_conversion: true) }
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile, plan_years: [plan_year], profile_source: "conversion") }
+    let(:benefit_group)     { FactoryBot.build(:benefit_group)}
+    let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [benefit_group], aasm_state: "active", is_conversion: true) }
+    let(:employer_profile)  { FactoryBot.create(:employer_profile, plan_years: [plan_year], profile_source: "conversion") }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("feins").and_return(employer_profile.parent.fein)

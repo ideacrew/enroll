@@ -165,7 +165,7 @@ describe UsersController do
     end
 
   describe '.edit' do
-    let(:user) { FactoryGirl.build(:user, :with_consumer_role) }
+    let(:user) { FactoryBot.build(:user, :with_consumer_role) }
     before do
       sign_in(admin)
       allow(User).to receive(:find).with(user.id).and_return(user)

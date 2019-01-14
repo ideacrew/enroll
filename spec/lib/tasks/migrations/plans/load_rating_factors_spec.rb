@@ -6,8 +6,8 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     DatabaseCleaner.clean
     site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
     ['82569', '88806', '34484', '73331'].each do |hios_id|
-      FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
-      FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: [hios_id], assigned_site: site)
+      FactoryBot.create(:carrier_profile, issuer_hios_ids: [hios_id])
+      FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: [hios_id], assigned_site: site)
     end
     CompositeRatingTierFactorSet.delete_all
     invoke_factors_task

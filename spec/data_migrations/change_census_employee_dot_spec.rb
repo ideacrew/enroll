@@ -10,9 +10,9 @@ describe ChangeCensusEmployeeDot, dbclean: :after_each do
     end
   describe "census employee not in terminated state" do
     subject {ChangeCensusEmployeeDot.new("change_census_employee_dot", double(:current_scope => nil)) }
-      let(:employer_profile){ FactoryGirl.create(:employer_profile) }
+      let(:employer_profile){ FactoryBot.create(:employer_profile) }
       let(:employer_profile_id){ employer_profile.id }
-      let(:census_employee){ FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
+      let(:census_employee){ FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
       let(:census_employee_params) {
                                      {
                                      "hired_on" => "05/02/2015",
@@ -40,9 +40,9 @@ describe ChangeCensusEmployeeDot, dbclean: :after_each do
 
    describe "census employee's in terminated state" do
     subject {ChangeCensusEmployeeDot.new("change_census_employee_dot", double(:current_scope => nil)) }
-      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let(:employer_profile) { FactoryBot.create(:employer_profile) }
       let(:employer_profile_id) { employer_profile.id }
-      let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
+      let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id,employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
       let(:census_employee_params) {
                                      {
                                      "hired_on" => "05/02/2015",

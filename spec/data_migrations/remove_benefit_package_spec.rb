@@ -14,14 +14,14 @@ describe RemoveBenefitPackage, dbclean: :after_each do
 
   describe "remove benefit package", dbclean: :after_each do
 
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group_assignment.id, benefit_group_id: benefit_group.id)}
-    let(:census_employee) { FactoryGirl.create(:census_employee)}
-    let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "this is our title") }
-    let(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
-    let(:plan_year)         { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
-    let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group_assignment.id, benefit_group_id: benefit_group.id)}
+    let(:census_employee) { FactoryBot.create(:census_employee)}
+    let!(:benefit_group_assignment)  { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, title: "this is our title") }
+    let(:benefit_group_two) { FactoryBot.create(:benefit_group, plan_year: plan_year) }
+    let(:plan_year)         { FactoryBot.create(:plan_year, employer_profile: employer_profile) }
+    let(:employer_profile)  { FactoryBot.create(:employer_profile) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.parent.fein)

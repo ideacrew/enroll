@@ -15,14 +15,14 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
 
   describe "updating aasm_state of the initial plan year", dbclean: :after_each do
     let(:start_on)      { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let!(:canceled_plan_year){ FactoryGirl.build(:plan_year,start_on: start_on, aasm_state: "canceled", open_enrollment_start_on: TimeKeeper.date_of_record, benefit_groups:[benefit_group]) }
-    let!(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state:'applicant',plan_years: [canceled_plan_year], organization: organization) }
-    let!(:organization)  { FactoryGirl.create(:organization) }
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
-    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
-    let!(:document) { FactoryGirl.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
+    let!(:canceled_plan_year){ FactoryBot.build(:plan_year,start_on: start_on, aasm_state: "canceled", open_enrollment_start_on: TimeKeeper.date_of_record, benefit_groups:[benefit_group]) }
+    let!(:employer_profile){ FactoryBot.create(:employer_profile, aasm_state:'applicant',plan_years: [canceled_plan_year], organization: organization) }
+    let!(:organization)  { FactoryBot.create(:organization) }
+    let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee) { FactoryBot.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
+    let!(:employer_attestation) { FactoryBot.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
+    let!(:document) { FactoryBot.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
@@ -56,14 +56,14 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
 
   describe "updating aasm_state for plan year", dbclean: :after_each do
     let(:start_on)      { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let!(:plan_year){ FactoryGirl.build(:plan_year,start_on: start_on,benefit_groups:[benefit_group]) }
-    let!(:employer_profile){ FactoryGirl.build(:employer_profile, aasm_state:'binder_paid',plan_years: [plan_year]) }
-    let!(:organization)  {FactoryGirl.create(:organization, employer_profile:employer_profile)}
-    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
-    let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
-    let!(:document) { FactoryGirl.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
+    let!(:plan_year){ FactoryBot.build(:plan_year,start_on: start_on,benefit_groups:[benefit_group]) }
+    let!(:employer_profile){ FactoryBot.build(:employer_profile, aasm_state:'binder_paid',plan_years: [plan_year]) }
+    let!(:organization)  {FactoryBot.create(:organization, employer_profile:employer_profile)}
+    let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee) { FactoryBot.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment]) }
+    let!(:employer_attestation) { FactoryBot.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
+    let!(:document) { FactoryBot.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)

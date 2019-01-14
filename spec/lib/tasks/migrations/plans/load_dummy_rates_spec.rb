@@ -13,11 +13,11 @@ describe "load_dummy_rates" do
     @application_period = Time.utc(@start_date.year, @start_date.month, @start_date.day)..Time.utc(@end_date.year, @end_date.month, @end_date.day)
 
     issuer_profiles = BenefitSponsors::Organizations::Organization.issuer_profiles.all
-    @hp1 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[0].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
-    @hp2 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[1].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
-    @hp3 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[2].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: Range.new(@application_period.min.months_ago(3), @application_period.max.months_ago(3))))
-    @hp4 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: Range.new(@application_period.min.months_ago(3), @application_period.max.months_ago(3))))
-    @hp5 = FactoryGirl.create(:benefit_markets_products_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
+    @hp1 = FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[0].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
+    @hp2 = FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[1].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
+    @hp3 = FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[2].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: Range.new(@application_period.min.months_ago(3), @application_period.max.months_ago(3))))
+    @hp4 = FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: Range.new(@application_period.min.months_ago(3), @application_period.max.months_ago(3))))
+    @hp5 = FactoryBot.create(:benefit_markets_products_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id, premium_tables: build_list(:benefit_markets_products_premium_table, 3, effective_period: @application_period))
 
     Rake.application.rake_require 'tasks/migrations/plans/load_dummy_rates'
     Rake::Task.define_task(:environment)

@@ -13,10 +13,10 @@ describe UpdateOpenEnrollmentDatesForBcp, dbclean: :after_each do
   end
 
   describe "update open enrollment dates for benefit coverage period" do
-    let!(:organization) { FactoryGirl.create(:organization) }
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period, :organization => organization) }
+    let!(:organization) { FactoryBot.create(:organization) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period, :organization => organization) }
     let!(:benefit_sponsorship) { hbx_profile.benefit_sponsorship }
-    let!(:benefit_coverage_period) { FactoryGirl.create(:benefit_coverage_period, :open_enrollment_coverage_period, benefit_sponsorship: benefit_sponsorship) }
+    let!(:benefit_coverage_period) { FactoryBot.create(:benefit_coverage_period, :open_enrollment_coverage_period, benefit_sponsorship: benefit_sponsorship) }
     let(:open_enrollment_start_on) { Date.new(TimeKeeper.date_of_record.year,11,1) }
     let(:open_enrollment_end_on) { Date.new(TimeKeeper.date_of_record.year,12,31) }
 

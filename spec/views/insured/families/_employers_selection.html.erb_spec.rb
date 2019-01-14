@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_employers_selection.html.erb", dbclean: :after_each do
-  let(:person) {FactoryGirl.build(:person)}
-  let(:employee_role1) {FactoryGirl.build(:employee_role, person: person, employer_profile: ef1)}
-  let(:employee_role2) {FactoryGirl.build(:employee_role, person: person, employer_profile: ef2)}
-  let(:ef1) { FactoryGirl.build(:employer_profile) }
-  let(:ef2) { FactoryGirl.build(:employer_profile) }
-  let(:ce1) { FactoryGirl.build(:census_employee, employer_profile: ef1) }
-  let(:ce2) { FactoryGirl.build(:census_employee, employer_profile: ef2) }
+  let(:person) {FactoryBot.build(:person)}
+  let(:employee_role1) {FactoryBot.build(:employee_role, person: person, employer_profile: ef1)}
+  let(:employee_role2) {FactoryBot.build(:employee_role, person: person, employer_profile: ef2)}
+  let(:ef1) { FactoryBot.build(:employer_profile) }
+  let(:ef2) { FactoryBot.build(:employer_profile) }
+  let(:ce1) { FactoryBot.build(:census_employee, employer_profile: ef1) }
+  let(:ce2) { FactoryBot.build(:census_employee, employer_profile: ef2) }
 
   before :each do
     allow(employee_role1).to receive(:census_employee).and_return ce1

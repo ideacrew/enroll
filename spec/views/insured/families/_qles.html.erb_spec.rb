@@ -1,17 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_qles.html.erb" do
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:resident_role) { FactoryGirl.create(:resident_role) }
+  let(:person) { FactoryBot.create(:person, :with_family ) }
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:resident_role) { FactoryBot.create(:resident_role) }
 
   before :each do
     assign(:person, person)
     person.resident_role = resident_role
     person.save
     QualifyingLifeEventKind.delete_all
-    10.times.each {FactoryGirl.create(:qualifying_life_event_kind)}
-    FactoryGirl.create(:qualifying_life_event_kind, tool_tip: "")
+    10.times.each {FactoryBot.create(:qualifying_life_event_kind)}
+    FactoryBot.create(:qualifying_life_event_kind, tool_tip: "")
     assign(:qualifying_life_events, QualifyingLifeEventKind.all)
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     render "insured/families/qles"

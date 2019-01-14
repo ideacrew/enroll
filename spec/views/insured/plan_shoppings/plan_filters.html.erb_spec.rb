@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "insured/_plan_filters.html.erb" do
   let(:benefit_group){ double("BenefitGroup") }
-  let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
+  let(:hbx_enrollment) { FactoryBot.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
     let(:person) {double(has_active_consumer_role?: false)}
     let(:offers_nationwide_plans) { true }

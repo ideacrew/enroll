@@ -12,9 +12,9 @@ describe ReactivateTaxHouseholdWithAssistanceYear, dbclean: :after_each do
     end
   end
   describe "Set the effective end on to nil" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person) }
     let(:household) {Household.new}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, households: [household])}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, households: [household])}
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_73', max_aptc: 1017, csr_percent: 0.73, determined_on: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record, effective_ending_on: TimeKeeper.date_of_record+1.year, eligibility_determinations: [eligibility_determination])}
     before(:each) do
@@ -37,9 +37,9 @@ describe ReactivateTaxHouseholdWithAssistanceYear, dbclean: :after_each do
 
 
   describe "Should not set the effective end on to nil" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person) }
     let(:household) {Household.new}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, households: [household])}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, households: [household])}
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_73', max_aptc: 100, csr_percent: 0.73, determined_on: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record, effective_ending_on: TimeKeeper.date_of_record+1.year, eligibility_determinations: [eligibility_determination])}
     before(:each) do
@@ -61,9 +61,9 @@ describe ReactivateTaxHouseholdWithAssistanceYear, dbclean: :after_each do
   end
 
   describe "Should not set the effective end on to nil" do
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryBot.create(:person) }
     let(:household) {Household.new}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person, households: [household])}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, households: [household])}
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', max_aptc: 100, csr_percent: 0.87, determined_on: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record, effective_ending_on: TimeKeeper.date_of_record+1.year, eligibility_determinations: [eligibility_determination])}
     before(:each) do

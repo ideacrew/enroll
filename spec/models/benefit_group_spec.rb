@@ -2,19 +2,19 @@ require 'rails_helper'
 
 describe BenefitGroup, dbclean: :after_each do
   context "an employer profile with census_employees exists" do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:employer_profile) { FactoryBot.create(:employer_profile)}
     let!(:census_employees) do
       [1,2].collect do
-        FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+        FactoryBot.create(:census_employee, employer_profile: employer_profile)
       end.sort_by(&:id)
     end
     context "and a plan year exists" do
-      let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
+      let(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
 
       context "starting on 2/1/2015" do
         let(:start_plan_year) {Date.new(2015, 2, 1)}
         context "and a benefit_group_exists" do
-          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
           it "knows effective on for dates of hire" do
             year = 2015
             day = 15
@@ -39,7 +39,7 @@ describe BenefitGroup, dbclean: :after_each do
       context "starting on 1/1/xxxx" do
         let(:start_plan_year) {Date.new(2015, 1, 1)}
         context "and a benefit_group_exists" do
-          let(:benefit_group) { FactoryGirl.create(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let(:benefit_group) { FactoryBot.create(:benefit_group, :invalid_employee_relationship_benefit, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
 
           it "is true" do
             expect(benefit_group.save).to be_truthy
@@ -50,7 +50,7 @@ describe BenefitGroup, dbclean: :after_each do
       context "starting on 4/1/2015" do
         let(:start_plan_year) {Date.new(2015, 4, 1)}
         context "and a benefit_group_exists" do
-          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
           it "knows effective on for dates of hire" do
             year = 2015
             day = 15
@@ -71,13 +71,13 @@ describe BenefitGroup, dbclean: :after_each do
 end
 
 describe BenefitGroup, "instance methods", dbclean: :after_each do
-  let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
-  let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
-  let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
-  let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
+  let!(:benefit_group)            { FactoryBot.build(:benefit_group) }
+  let!(:plan_year)                { FactoryBot.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(2015,1,1)) }
+  let!(:employer_profile)         { FactoryBot.create(:employer_profile, plan_years: [plan_year]) }
+  let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group) }
   let!(:census_employees) do
     [1,2].collect do
-      FactoryGirl.create(:census_employee, :old_case, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] )
+      FactoryBot.create(:census_employee, :old_case, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] )
     end.sort_by(&:id)
   end
 
@@ -169,10 +169,10 @@ end
 describe BenefitGroup, type: :model, dbclean: :after_each do
 
   context 'disabling the benefit group' do
-    let(:plan_year) { FactoryGirl.create(:plan_year)}
-    let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
-    let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
-    let!(:census_employee) { FactoryGirl.create(:census_employee, :old_case, employer_profile: benefit_group_one.plan_year.employer_profile)}
+    let(:plan_year) { FactoryBot.create(:plan_year)}
+    let!(:benefit_group_one) { FactoryBot.create(:benefit_group, plan_year: plan_year, title: "1st one") }
+    let!(:benefit_group_two) { FactoryBot.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
+    let!(:census_employee) { FactoryBot.create(:census_employee, :old_case, employer_profile: benefit_group_one.plan_year.employer_profile)}
 
     it "should have a default benefit group assignment with 1st benefit group" do
       expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
@@ -214,15 +214,15 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 end
 
 describe BenefitGroup, type: :model, dbclean: :after_each do
-  let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
-  let!(:plan_year)                { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group], start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
-  let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group) }
-  let!(:employer_profile)         { FactoryGirl.create(:employer_profile, plan_years: [plan_year]) }
+  let!(:benefit_group)            { FactoryBot.build(:benefit_group) }
+  let!(:plan_year)                { FactoryBot.build(:plan_year, benefit_groups: [benefit_group], start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month) }
+  let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group) }
+  let!(:employer_profile)         { FactoryBot.create(:employer_profile, plan_years: [plan_year]) }
 
-  let!(:census_employee_1){FactoryGirl.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
-  let!(:census_employee_2){FactoryGirl.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
-  let!(:census_employee_3){FactoryGirl.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
-  let!(:census_employee_4){FactoryGirl.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_1){FactoryBot.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_2){FactoryBot.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_3){FactoryBot.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
+  let!(:census_employee_4){FactoryBot.create(:census_employee, :old_case, employer_profile_id: employer_profile.id, benefit_group_assignments: [benefit_group_assignment])}
   let(:census_employees) {[census_employee_1, census_employee_2, census_employee_3, census_employee_4]}
 
   context "#participation_rate" do
@@ -267,7 +267,7 @@ end
 
 describe BenefitGroup, type: :model, dbclean: :after_each do
 
-  let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+  let!(:employer_profile)               { FactoryBot.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
@@ -285,7 +285,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
   let(:title)                   { "Employee Perks" }
   let(:plan_year)               { PlanYear.new(plan_year_valid_params) }
-  let(:reference_plan)          { FactoryGirl.build(:plan) }
+  let(:reference_plan)          { FactoryBot.build(:plan) }
   let(:plan_option_kind)        { "single_plan" }
   let(:effective_on_kind)       { "first_of_month" }
   let(:effective_on_offset)     { 30 }
@@ -527,7 +527,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
   context "and a reference plan is selected" do
     let(:params)                { valid_params }
     let(:benefit_group)         { BenefitGroup.new(**params) }
-    let(:reference_plan_choice) { FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables) }
+    let(:reference_plan_choice) { FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables) }
 
     context "and the 'single plan' option is chosen" do
       before do
@@ -549,7 +549,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
       end
 
       context "and the elected plan is not the reference plan" do
-        let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
+        let(:elected_plan_choice)     { FactoryBot.build(:plan) }
 
         before do
           benefit_group.plan_option_kind = :single_plan
@@ -565,8 +565,8 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
     end
 
     context "and the 'metal level' option is offered" do
-      let(:reference_plan_choice)   { FactoryGirl.build(:plan) }
-      let(:elected_plan_choice)     { FactoryGirl.build(:plan) }
+      let(:reference_plan_choice)   { FactoryBot.build(:plan) }
+      let(:elected_plan_choice)     { FactoryBot.build(:plan) }
 
       context "and elected plans are not all of the same metal level as reference plan" do
         before do
@@ -584,14 +584,14 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
     context "and the 'carrier plans' option is offered", dbclean: :after_each do
       let(:organization)            { employer_profile.organization }
-      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile_1) }
-      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
+      let(:carrier_profile)         { FactoryBot.create(:carrier_profile, organization: organization) }
+      let(:carrier_profile_1)       { FactoryBot.create(:carrier_profile) }
+      let(:reference_plan_choice)   { FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
+      let(:elected_plan_choice)     { FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile_1) }
+      let(:bronze_plan_choice)      { FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
       let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
+          FactoryBot.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice, bronze_plan_choice])
         plans
@@ -641,8 +641,8 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
   end
 
   context "and relationship benefit values are specified" do
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+    let(:plan_year) { FactoryBot.create(:plan_year) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year) }
 
     context "and employer contribution for employee" do
       let(:minimum_contribution) { Settings.aca.shop_market.employer_contribution_percent_minimum }
@@ -704,28 +704,28 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
     context "contribution amount calculations" do
 
-      let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
+      let!(:employer_profile) { FactoryBot.create(:employer_profile)}
       let(:start_plan_year) { TimeKeeper.date_of_record.end_of_month + 1.day }
 
       let!(:census_employees) do
         [1,2].collect do
-          FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+          FactoryBot.create(:census_employee, employer_profile: employer_profile)
         end.sort_by(&:id)
       end
 
       context "and a plan year exists" do
 
-        let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
+        let(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: start_plan_year)}
 
         context "when benefit_group not persisted in the database" do
-          let!(:benefit_group) { FactoryGirl.build(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let!(:benefit_group) { FactoryBot.build(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
           it "should calculate contributions for all employees of the employer" do
             expect(benefit_group.targeted_census_employees.size).to eq 2
           end
         end
 
         context "when benefit_group saved" do
-          let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+          let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
           it "should calculate contributions for employees assigned to benefit group" do
             expect(benefit_group.targeted_census_employees.size).to eq 0
           end
@@ -735,13 +735,13 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
   end
 
   describe BenefitGroup, dbclean: :after_each do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
-    let(:default_benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: default_carrier_plan)}
-    let(:carrier_profile_one) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111']) }
-    let(:composite_carrier_two) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['22222']) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
+    let(:default_benefit_group) { FactoryBot.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: default_carrier_plan)}
+    let(:carrier_profile_one) { FactoryBot.create(:carrier_profile, issuer_hios_ids: ['11111']) }
+    let(:composite_carrier_two) { FactoryBot.create(:carrier_profile, issuer_hios_ids: ['22222']) }
     let(:number_of_employees) { 1 }
-    let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile_one)}
-    let!(:default_carrier_plan) { FactoryGirl.create(:plan, carrier_profile: composite_carrier_two)}
+    let!(:plan) { FactoryBot.create(:plan, carrier_profile: carrier_profile_one)}
+    let!(:default_carrier_plan) { FactoryBot.create(:plan, carrier_profile: composite_carrier_two)}
 
     let(:carrier_one_size_3) { build(:rating_factor_entry, factor_key: 3, factor_value: 1.101) }
     let(:carrier_one_size_6) { build(:rating_factor_entry, factor_key: 6, factor_value: 1.07) }
@@ -811,10 +811,10 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
     context "effective_on_for" do
 
       let(:start_plan_year) { Date.new(2016, 1, 1) }
-      let(:plan_year) { FactoryGirl.create(:plan_year, start_on: start_plan_year)}
+      let(:plan_year) { FactoryBot.create(:plan_year, start_on: start_plan_year)}
 
       context "when employer picked 'Date of Hire'" do
-        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "date_of_hire")}
+        let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "date_of_hire")}
 
         context "when doh is a past date" do
           let(:doh) { Date.new(2015, 8, 1)}
@@ -842,7 +842,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
       end
 
       context "when employer picked 'First of the month following or coinciding with date of hire'" do
-        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 0)}
+        let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 0)}
 
         context "when doh is a past date first of month" do
           let(:doh) { Date.new(2015, 11, 1)}
@@ -878,7 +878,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
       end
 
       context "when employer picked 'First of the month following 30 days'" do
-        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
+        let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 30)}
 
         context "when doh is a very old date" do
           let(:doh) { Date.new(2015, 8, 1)}
@@ -910,7 +910,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
       end
 
       context "when employer picked 'First of the month following 60 days'" do
-        let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 60)}
+        let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year, effective_on_kind: "first_of_month", effective_on_offset: 60)}
 
         context "when doh is a very old date" do
           let(:doh) { Date.new(2015, 8, 10)}
@@ -944,10 +944,10 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
     context "renewing conversion employer" do
       let(:is_conversion) { false }
-      let!(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion', registered_on: Date.new(2016, 4, 1)) }
-      let!(:off_exchange_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,7,1), end_on: Date.new(2016,6,30), open_enrollment_start_on: Date.new(2015, 5, 3), open_enrollment_end_on: Date.new(2015, 6, 10), aasm_state: 'active', is_conversion: is_conversion) }
-      let!(:offexchange_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: off_exchange_planyear, effective_on_kind: "first_of_month", effective_on_offset: 0)}
-      let!(:renewing_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2016,7,1), end_on: Date.new(2017,6,30), open_enrollment_start_on: Date.new(2016, 5, 3), open_enrollment_end_on: Date.new(2016, 6, 13), aasm_state: 'renewing_published') }
+      let!(:employer_profile) { FactoryBot.create(:employer_profile, profile_source: 'conversion', registered_on: Date.new(2016, 4, 1)) }
+      let!(:off_exchange_planyear) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,7,1), end_on: Date.new(2016,6,30), open_enrollment_start_on: Date.new(2015, 5, 3), open_enrollment_end_on: Date.new(2015, 6, 10), aasm_state: 'active', is_conversion: is_conversion) }
+      let!(:offexchange_benefit_group) { FactoryBot.create(:benefit_group, plan_year: off_exchange_planyear, effective_on_kind: "first_of_month", effective_on_offset: 0)}
+      let!(:renewing_planyear) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2016,7,1), end_on: Date.new(2017,6,30), open_enrollment_start_on: Date.new(2016, 5, 3), open_enrollment_end_on: Date.new(2016, 6, 13), aasm_state: 'renewing_published') }
       let(:hired_on) { Date.new(2016, 5, 10) }
 
       context 'when plan is off-exchange plan year' do

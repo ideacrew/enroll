@@ -14,9 +14,9 @@ describe UpdateEmployerStatus, dbclean: :after_each do
   end
 
   describe "updating aasm_state of the employer profile to enrolled", dbclean: :after_each do
-    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "application_ineligible") }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, aasm_state:'registered', plan_years: [plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:plan_year){ FactoryBot.build(:plan_year, aasm_state: "application_ineligible") }
+    let(:employer_profile){ FactoryBot.build(:employer_profile, aasm_state:'registered', plan_years: [plan_year]) }
+    let(:organization)  {FactoryBot.create(:organization,employer_profile:employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)

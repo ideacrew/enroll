@@ -8,18 +8,18 @@ module BenefitSponsors
     subject { broker_management_form_class.new }
 
     let!(:site)                       { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)               { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)               { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)            { organization.employer_profile }
     let!(:benefit_sponsorship)        { employer_profile.add_benefit_sponsorship }
     let!(:active_benefit_sponsorship) { benefit_sponsorship.save! }
 
-    let!(:broker_agency_organization1) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'Legal Name', site: site) }
+    let!(:broker_agency_organization1) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'Legal Name', site: site) }
     let!(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
 
 
     let(:model_attributes) { [:employer_profile_id, :broker_agency_profile_id, :broker_role_id, :termination_date, :direct_terminate] }
-    let!(:person1) { FactoryGirl.create(:person) }
-    let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
+    let!(:person1) { FactoryBot.create(:person) }
+    let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
 
 
     let(:create_params) {

@@ -5,7 +5,7 @@ module BenefitSponsors
 
   subject { BenefitSponsors::Forms::SponsoredBenefitForm.new }
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
   let(:benefit_application)    { benefit_sponsorship.benefit_applications.first }
   let(:benefit_package)    { benefit_application.benefit_packages.first }
@@ -19,7 +19,7 @@ module BenefitSponsors
   end
 
   describe "#for_new" do
-    let(:benefit_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_form)}
+    let(:benefit_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_form)}
 
     it "should assign benefit sponsorship" do
       form = BenefitSponsors::Forms::SponsoredBenefitForm.for_new_benefit({benefit_sponsorship_id: benefit_sponsorship.id, benefit_package_id: benefit_package.id, kind: "dental", benefit_application_id: benefit_application.id})

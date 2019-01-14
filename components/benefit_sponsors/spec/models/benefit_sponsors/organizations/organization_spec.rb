@@ -87,7 +87,7 @@ module BenefitSponsors
       end
 
       context "and an employer sponsors benefits" do
-        let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: hbx_site) }
+        let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: hbx_site) }
         let(:employer_profile)        { employer_organization.employer_profile }
 
         before { employer_organization.sponsor_benefits_for(employer_profile) }

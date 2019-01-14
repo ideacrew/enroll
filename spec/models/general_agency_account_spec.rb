@@ -2,8 +2,8 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyAccount, type: :model do
-  let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
-  let(:general_agency_profile) { FactoryGirl.build(:general_agency_profile) }
+  let(:employer_profile)      { FactoryBot.create(:employer_profile)}
+  let(:general_agency_profile) { FactoryBot.build(:general_agency_profile) }
   let(:start_on)              { TimeKeeper.date_of_record }
 
   let(:valid_params) do
@@ -63,7 +63,7 @@ RSpec.describe GeneralAgencyAccount, type: :model do
   end
 
   describe 'Instance method' do
-    let(:general_agency_account) { FactoryGirl.build(:general_agency_account) }
+    let(:general_agency_account) { FactoryBot.build(:general_agency_account) }
 
     it "legal_name" do
       expect(general_agency_account.legal_name).to eq general_agency_account.general_agency_profile.try(:legal_name)
@@ -76,10 +76,10 @@ RSpec.describe GeneralAgencyAccount, type: :model do
   end
 
   describe 'Class method' do
-    let(:broker_role1) { FactoryGirl.create(:broker_role) }
-    let(:broker_role2) { FactoryGirl.create(:broker_role) }
-    let(:gaa1) { FactoryGirl.create(:general_agency_account, broker_role_id: broker_role1.id) }
-    let(:gaa2) { FactoryGirl.create(:general_agency_account, broker_role_id: broker_role2.id) }
+    let(:broker_role1) { FactoryBot.create(:broker_role) }
+    let(:broker_role2) { FactoryBot.create(:broker_role) }
+    let(:gaa1) { FactoryBot.create(:general_agency_account, broker_role_id: broker_role1.id) }
+    let(:gaa2) { FactoryBot.create(:general_agency_account, broker_role_id: broker_role2.id) }
 
     before :each do
       gaa1

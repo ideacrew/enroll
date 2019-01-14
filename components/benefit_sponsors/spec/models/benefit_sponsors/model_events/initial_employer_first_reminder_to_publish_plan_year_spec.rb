@@ -6,10 +6,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFirstRemainderToPub
   let(:notice_event) { "initial_employer_first_reminder_to_publish_plan_year" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:model_instance) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+  let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
     :with_benefit_package,
     :benefit_sponsorship => benefit_sponsorship,
     :aasm_state => 'draft',

@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe EmployerInvoice, dbclean: :after_each do
-  let!(:conversion_employer_organization) { FactoryGirl.create(:organization, :conversion_employer_with_expired_and_active_plan_years) }
-  let!(:initial_employer_organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years) }
+  let!(:conversion_employer_organization) { FactoryBot.create(:organization, :conversion_employer_with_expired_and_active_plan_years) }
+  let!(:initial_employer_organization) { FactoryBot.create(:organization, :with_expired_and_active_plan_years) }
   let!(:params_regular) { {recipient: initial_employer_organization.employer_profile, event_object: initial_employer_organization.employer_profile.active_plan_year, notice_event: "initial_employer_invoice_available"} }
   let!(:params_conversion) { {recipient: conversion_employer_organization.employer_profile, event_object: conversion_employer_organization.employer_profile.active_plan_year, notice_event: "initial_employer_invoice_available"} }
 

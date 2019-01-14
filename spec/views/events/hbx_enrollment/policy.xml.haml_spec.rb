@@ -1,17 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "events/hbx_enrollment/policy.haml.erb", dbclean: :after_each do
-  let(:benefit_sponsorship) {  FactoryGirl.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application }
+  let(:benefit_sponsorship) {  FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application }
   let!(:benefit_application) { benefit_sponsorship.benefit_applications.first }
-  let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
-  let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product,issuer_profile: issuer_profile) }
-  let(:census_employee) { FactoryGirl.build(:census_employee, :benefit_group_assignments => [FactoryGirl.build(:benefit_group_assignment)]) }
-  let(:employee_role) { FactoryGirl.build(:employee_role, census_employee: census_employee) }
+  let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+  let!(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product,issuer_profile: issuer_profile) }
+  let(:census_employee) { FactoryBot.build(:census_employee, :benefit_group_assignments => [FactoryBot.build(:benefit_group_assignment)]) }
+  let(:employee_role) { FactoryBot.build(:employee_role, census_employee: census_employee) }
   let(:benefit_group_assignment) { employee_role.census_employee.benefit_group_assignments.first }
-  let(:person) { FactoryGirl.create(:person)}
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  let(:hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.primary_family_member.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,rating_area_id: benefit_application.recorded_rating_area_id,
+  let(:person) { FactoryBot.create(:person)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_family_member.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record)}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,rating_area_id: benefit_application.recorded_rating_area_id,
                                              sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id ,
                                              sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
                                              benefit_sponsorship_id:benefit_application.benefit_sponsorship.id,

@@ -14,7 +14,7 @@ describe RemoveIncorrectPersonRelationship, dbclean: :after_each do
 
   describe "destroying person relationships" do
 
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
 
     before(:each) do
       person.person_relationships << PersonRelationship.new(kind: "child", relative_id: person.id)

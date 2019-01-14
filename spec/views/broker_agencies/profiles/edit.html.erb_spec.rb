@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "broker_agencies/profiles/edit.html.erb", :dbclean => :after_each do
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
 
   before :each do
     org_form = Forms::BrokerAgencyProfile.find(broker_agency_profile.id)

@@ -19,8 +19,8 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer, dbclean: :after_each 
     let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
 
     let!(:census_employees){
-      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-      employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+      FactoryBot.create :census_employee, :owner, employer_profile: employer_profile
+      employee = FactoryBot.create :census_employee, employer_profile: employer_profile
     }
 
     let(:census_employee) { employer_profile.census_employees.non_business_owner.first }

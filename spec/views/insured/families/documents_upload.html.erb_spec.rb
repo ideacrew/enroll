@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/documents_upload.html.erb" do
-  let(:consumer_role) { FactoryGirl.build(:consumer_role) }
-  let(:person) { FactoryGirl.build(:person, consumer_role: consumer_role) }
+  let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:person) { FactoryBot.build(:person, consumer_role: consumer_role) }
 
   before :each do
     stub_template "insured/families/_navigation.html.erb" => ''

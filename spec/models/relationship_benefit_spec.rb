@@ -96,8 +96,8 @@ describe RelationshipBenefit do
   end
 
   context "validation" do
-    let(:benefit_group) {FactoryGirl.build(:benefit_group)}
-    let(:relationship_benefit) { FactoryGirl.create(:relationship_benefit, benefit_group: benefit_group) }
+    let(:benefit_group) {FactoryBot.build(:benefit_group)}
+    let(:relationship_benefit) { FactoryBot.create(:relationship_benefit, benefit_group: benefit_group) }
 
     it "should success" do
       relationship_benefit.premium_pct = 70

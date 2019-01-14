@@ -7,9 +7,9 @@ module BenefitSponsors
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor) { create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile) { benefit_sponsor.employer_profile }
-    let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     subject { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
@@ -72,7 +72,7 @@ module BenefitSponsors
 
     describe '#for_create' do
 
-      let!(:person) { FactoryGirl.create(:person) }
+      let!(:person) { FactoryBot.create(:person) }
       let!(:params) {
         {
             profile_id: employer_profile.id.to_s,
@@ -133,8 +133,8 @@ module BenefitSponsors
 
     describe '#for_approve' do
 
-      let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
-      let!(:person) { FactoryGirl.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+      let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
+      let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
       let!(:params) {
         {
             profile_id: employer_profile.id.to_s,
@@ -179,8 +179,8 @@ module BenefitSponsors
 
     describe '#for_destroy' do
 
-      let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-      let!(:person2) { FactoryGirl.create(:person, first_name:'y',employer_staff_roles:[active_employer_staff_role]) }
+      let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+      let!(:person2) { FactoryBot.create(:person, first_name:'y',employer_staff_roles:[active_employer_staff_role]) }
       let!(:params) {
         {
             profile_id: employer_profile.id.to_s,

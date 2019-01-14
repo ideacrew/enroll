@@ -13,7 +13,7 @@ describe MigrateInvoicesToEmployerProfile do
   end
 
   describe "migrate invoices from organization to employer_profile", dbclean: :after_each do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let(:employer_profile) { FactoryBot.create(:employer_profile)}
     let(:organization)     { employer_profile.organization }
 
     before do

@@ -4,7 +4,7 @@ require File.join(Rails.root, "app", "data_migrations", "remove_dependent")
 describe RemoveDependent, dbclean: :after_each do
 
   let(:given_task_name) { "remove_dependent" }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
   subject { RemoveDependent.new(given_task_name, double(:current_scope => nil)) }
 
   before do

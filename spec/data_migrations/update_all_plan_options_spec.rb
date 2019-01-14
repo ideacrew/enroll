@@ -12,7 +12,7 @@ describe UpdateAllPlanOptions, dbclean: :after_each do
   end
 
   describe "updating the plan attributes" do
-    let(:plan) { FactoryGirl.create(:plan, is_horizontal: false, is_vertical: false, is_sole_source: true) }
+    let(:plan) { FactoryBot.create(:plan, is_horizontal: false, is_vertical: false, is_sole_source: true) }
 
     it "should update all plans" do
       plan.save!

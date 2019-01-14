@@ -11,7 +11,7 @@ describe ChangePersonNameSuffix, dbclean: :after_each do
     end
   end
   describe "changing person's name suffix" do
-    let(:person) { FactoryGirl.create(:person, name_sfx: "Jr")}
+    let(:person) { FactoryBot.create(:person, name_sfx: "Jr")}
     let(:csv_row) { CSV::Row.new(["HBX ID","Potential Correct Suffix"],[person.hbx_id,"Jr."]) }
 
     it "should change the person's name suffix" do

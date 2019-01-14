@@ -4,12 +4,12 @@ require File.join(Rails.root, "app", "data_migrations", "correct_not_lawfully_ci
 
 describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
   subject { CorrectNotLawfullyCitizenStatus.new('correct_not_lawfully_citizen_status', double(:current_scope => nil)) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person3) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
+    FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: 'health',
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

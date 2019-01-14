@@ -2,8 +2,8 @@ require "rails_helper"
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe "general_agencies/profiles/edit.html.erb" do
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:general_agency_profile) {FactoryGirl.create(:general_agency_profile, :with_staff, organization: organization)}
+  let(:organization) {FactoryBot.create(:organization)}
+  let(:general_agency_profile) {FactoryBot.create(:general_agency_profile, :with_staff, organization: organization)}
 
   before :each do
     org_form = Forms::GeneralAgencyProfile.find(general_agency_profile.id)

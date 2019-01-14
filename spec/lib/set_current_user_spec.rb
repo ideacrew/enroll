@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 describe SetCurrentUser do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   before do
     extend SetCurrentUser
   end
 
   context "with module on top level model" do
-    let(:org) { FactoryGirl.build(:organization) }
+    let(:org) { FactoryBot.build(:organization) }
 
     before(:each) do
       SAVEUSER[:current_user_id] = user.id
@@ -30,7 +30,7 @@ describe SetCurrentUser do
     end
 
     context "a different user makes an update to top level object" do
-      let(:user1) { FactoryGirl.create(:user) }
+      let(:user1) { FactoryBot.create(:user) }
 
       it "updates user" do
         SAVEUSER[:current_user_id] = user1.id
@@ -40,7 +40,7 @@ describe SetCurrentUser do
     end
 
     context "a different user makes an update to an embedded object" do
-      let(:user2) { FactoryGirl.create(:user) }
+      let(:user2) { FactoryBot.create(:user) }
 
       it "does not update the user" do
         SAVEUSER[:current_user_id] = user2.id

@@ -6,9 +6,9 @@ RSpec.describe Admin::Aptc, :type => :model do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
   # Household
-  let(:family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:household) {FactoryGirl.create(:household, family: family)}
-  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
+  let(:family)       { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:household) {FactoryBot.create(:household, family: family)}
+  let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
   let(:sample_max_aptc_1) {511.78}
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
@@ -17,11 +17,11 @@ RSpec.describe Admin::Aptc, :type => :model do
   let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
 
   # Enrollments
-  let!(:hbx_with_aptc_1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), kind: "individual", applied_aptc_amount: 100)}
-  let!(:hbx_with_aptc_2) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), kind: "individual", applied_aptc_amount: 210)}
+  let!(:hbx_with_aptc_1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), kind: "individual", applied_aptc_amount: 100)}
+  let!(:hbx_with_aptc_2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), kind: "individual", applied_aptc_amount: 210)}
   let!(:hbx_enrollments) {[hbx_with_aptc_1, hbx_with_aptc_2]}
-  let(:hbx_enrollment_member_1){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 70)}
-  let(:hbx_enrollment_member_2){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 30)}
+  let(:hbx_enrollment_member_1){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 70)}
+  let(:hbx_enrollment_member_2){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month, applied_aptc_amount: 30)}
   let(:year) {TimeKeeper.date_of_record.year}
 
   context "household_level aptc_csr data" do
@@ -123,9 +123,9 @@ RSpec.describe Admin::Aptc, :type => :model do
   context "years_with_tax_household", dbclean: :after_each do
     let(:past_date) { Date.new(oe_start_year, 10, 10) }
     let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
-    let!(:family10) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:tax_household10) { FactoryGirl.create(:tax_household, household: family10.households.first, effective_starting_on: past_date) }
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.households.first, effective_starting_on: past_date) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
     let!(:current_hbx_under_open_enrollment) {double("current hbx", under_open_enrollment?: true)}
     let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
 

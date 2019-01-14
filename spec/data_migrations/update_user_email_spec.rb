@@ -21,7 +21,7 @@ describe UpdateUserEmail, dbclean: :after_each do
     subject { UpdateUserEmail.new("fix me task", double(:current_scope => nil)) }
 
     context "user oim_id found" do
-      let(:user) { FactoryGirl.create(:user, oim_id:'username1', email:'') }
+      let(:user) { FactoryBot.create(:user, oim_id:'username1', email:'') }
       before :each do
         allow(File).to receive(:exists?).and_return(true)
         allow(Roo::Spreadsheet).to receive(:open).and_return(@result)
@@ -35,7 +35,7 @@ describe UpdateUserEmail, dbclean: :after_each do
     end
 
     context "user oim_id not found " do
-      let(:user1) { FactoryGirl.create(:user, oim_id:'username10',email:'test@gmail.com') }
+      let(:user1) { FactoryBot.create(:user, oim_id:'username10',email:'test@gmail.com') }
       before :each do
         allow(File).to receive(:exists?).and_return(true)
         allow(Roo::Spreadsheet).to receive(:open).and_return(@result)

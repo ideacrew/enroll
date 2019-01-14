@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "insured/consumer_roles/immigration_document_options.js.erb" do
-  let(:person) {FactoryGirl.build(:person)}
-  let(:consumer_role) {FactoryGirl.build(:consumer_role)}
+  let(:person) {FactoryBot.build(:person)}
+  let(:consumer_role) {FactoryBot.build(:consumer_role)}
 
   context "with target" do
     before :each do

@@ -48,7 +48,7 @@ describe Forms::PersonSignup, ".match_or_create_person" do
 
   context 'when more than 1 person matched' do 
     before :each do
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+      2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
     end
 
     it "should raise an exception" do
@@ -60,7 +60,7 @@ describe Forms::PersonSignup, ".match_or_create_person" do
     let(:other_attributes) { {first_name: "james"}}
 
      before :each do
-      FactoryGirl.create(:person, first_name: "james", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, first_name: "james", last_name: "smith", dob: "10/10/1974")
       subject.match_or_create_person
     end
 

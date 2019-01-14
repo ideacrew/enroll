@@ -13,10 +13,10 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
   end
 
   describe "revering EE termination when EE in employment terminated status", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { FactoryGirl.build(:census_employee, :termination_details) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
+    let(:employee_role) { FactoryBot.create(:employee_role)}
+    let(:census_employee) { FactoryBot.build(:census_employee, :termination_details) }
 
     before do
       allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(enrollment.hbx_id)
@@ -57,10 +57,10 @@ describe RevertTerminationForEmployee, dbclean: :after_each do
     end
   end
   describe "revering EE termination when EE in employee_termination_pending ", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
-    let(:employee_role) { FactoryGirl.create(:employee_role)}
-    let(:census_employee) { FactoryGirl.build(:census_employee, :termination_details) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, terminate_reason: "by_error")}
+    let(:employee_role) { FactoryBot.create(:employee_role)}
+    let(:census_employee) { FactoryBot.build(:census_employee, :termination_details) }
 
     before do
       allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(enrollment.hbx_id)

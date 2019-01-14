@@ -13,8 +13,8 @@ describe TriggerShopNotices, dbclean: :after_each do
   end
 
   describe '#trigger_employer_notice' do
-    let(:employer_profile1){ FactoryGirl.create(:employer_profile) }
-    let(:employer_profile2){ FactoryGirl.create(:employer_profile) }
+    let(:employer_profile1){ FactoryBot.create(:employer_profile) }
+    let(:employer_profile2){ FactoryBot.create(:employer_profile) }
 
     before :each do
       allow(ENV).to receive(:[]).with("recipient_ids").and_return("#{employer_profile1.fein}, #{employer_profile2.fein}")

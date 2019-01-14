@@ -15,7 +15,7 @@ describe UpdateBrokerAgencyProfileLegalName, dbclean: :after_each do
   describe "update the legal name of the broker agency profile" do
 
 
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
     let(:organization) { broker_agency_profile.organization }
 
     before(:each) do

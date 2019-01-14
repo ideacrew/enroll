@@ -14,7 +14,7 @@ describe UpdateCarrierAppointments do
 
   describe "migrating old pending broker records" do
     before do
-    @broker_role = FactoryGirl.create(:broker_role, carrier_appointments: { "altus" => nil,
+    @broker_role = FactoryBot.create(:broker_role, carrier_appointments: { "altus" => nil,
                                                                             "blue_cross_blue_shield_ma" => nil,
                                                                             "boston_medical_center_health_plan" => nil,
                                                                             "delta" => nil,
@@ -54,7 +54,7 @@ describe UpdateCarrierAppointments do
     end
 
     it "should return value for value " do
-     @broker_role = FactoryGirl.create(:broker_role, carrier_appointments: @value)
+     @broker_role = FactoryBot.create(:broker_role, carrier_appointments: @value)
       allow(BrokerRole).to receive(:all).and_return([@broker_role])
       subject.migrate
       expect(@broker_role.carrier_appointments).to eq  @value

@@ -4,8 +4,8 @@ require File.join(Rails.root, "app", "data_migrations", "import_missing_person_c
 describe ImportMissingPersonContactInfo, dbclean: :after_each do
   subject { ImportMissingPersonContactInfo.new("import_missing_person_Contact_info", double(current_scope: nil)) }
 
-  let(:census_employee) { FactoryGirl.create(:census_employee) }
-  let(:employer_profile){ FactoryGirl.create(:employer_profile) }
+  let(:census_employee) { FactoryBot.create(:census_employee) }
+  let(:employer_profile){ FactoryBot.create(:employer_profile) }
 
   let(:employee_role_params){
     {

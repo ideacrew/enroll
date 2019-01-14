@@ -12,9 +12,9 @@ describe RemoveInvalidCoverageHouseholdMember, dbclean: :after_each do
   end
 
   describe "remove invalid coverage household member" do
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member) {FactoryGirl.create(:family_member, family: family, is_active: true)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member) {FactoryBot.create(:family_member, family: family, is_active: true)}
     let(:coverage_household) { family.latest_household.coverage_households.first }
     before do
       coverage_household_member_id = coverage_household.coverage_household_members.first.id

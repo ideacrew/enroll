@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/_employer_form.html.erb" do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:person) {FactoryGirl.build(:person)}
-  let(:organization) {FactoryGirl.build(:organization)}
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
+  let(:person) {FactoryBot.build(:person)}
+  let(:organization) {FactoryBot.build(:organization)}
 
   before :each do
     allow(organization).to receive(:employer_profile).and_return employer_profile

@@ -12,7 +12,7 @@ describe RemoveSsn do
   end
 
   describe "changing person ssn" do
-    let(:person) { FactoryGirl.create(:person, ssn:"123123123")}
+    let(:person) { FactoryBot.create(:person, ssn:"123123123")}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     end

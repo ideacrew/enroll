@@ -4,10 +4,10 @@ require File.join(Rails.root, "app", "data_migrations", "change_incorrect_termin
 describe ChangeIncorrectTerminationDateInEnrollment do
 
   subject { ChangeIncorrectTerminationDateInEnrollment.new("change incorrect termination date in enrollment", double(:current_scope => nil)) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
   let(:enrollment_1) {
-    FactoryGirl.create(
+    FactoryBot.create(
        :hbx_enrollment,
        household: family.active_household,
        coverage_kind: "health",
@@ -22,7 +22,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
   }
 
   let(:enrollment_2) {
-    FactoryGirl.create(
+    FactoryBot.create(
       :hbx_enrollment,
       household: family.active_household,
       coverage_kind: "health",

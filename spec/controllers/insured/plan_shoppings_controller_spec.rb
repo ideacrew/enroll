@@ -6,17 +6,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:person) {FactoryGirl.create(:person)}
-  let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:family){ FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
+  let(:person) {FactoryBot.create(:person)}
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
   let(:household){ family.active_household }
-  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
   let(:reference_plan) {double("Product")}
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
-  let(:hbx_enrollment){ FactoryGirl.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+  let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
                                            household: household,
                                            hbx_enrollment_members: [hbx_enrollment_member],
                                            coverage_kind: "health",
@@ -26,9 +26,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   }
   let(:benefit_group) { current_benefit_package }
   let(:usermailer) {double("UserMailer")}
-  let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
   let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
-  let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
+  let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
   let!(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
   let(:rate_schedule_date) {TimeKeeper.date_of_record}
   let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
@@ -192,8 +192,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "returns http success as BROKER" do
       person = create(:person)
-      f=FactoryGirl.create(:family,:family_members=>[{:is_primary_applicant=>true, :is_active=>true, :person_id => person.id}])
-      current_broker_user = FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
+      f=FactoryBot.create(:family,:family_members=>[{:is_primary_applicant=>true, :is_active=>true, :person_id => person.id}])
+      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'],
                                                :person => person )
       current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
       allow(session).to receive(:[]).and_return(person.id.to_s)
@@ -308,9 +308,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "GET show" do
-    let(:product_1)   { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
-    let(:product_2)   { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
-    let(:product_3)   { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+    let(:product_1)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let(:product_2)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
+    let(:product_3)   { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
     let(:products) {[hbx_enrollment.sponsored_benefit.reference_product]}
     let(:coverage_kind){"health"}
     let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
@@ -392,7 +392,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context "when user has_active_consumer_role" do
         let(:tax_household) {double("TaxHousehold")}
-        let(:family) { FactoryGirl.build(:individual_market_family) }
+        let(:family) { FactoryBot.build(:individual_market_family) }
         let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
         let(:user) {double("user",person: person)}
 

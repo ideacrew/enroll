@@ -10,8 +10,8 @@ describe RemoveTerminationDateFromEnrollment do
     end
   end
   describe "remove termination date from enrollment" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, terminated_on:DateTime.now())}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, terminated_on:DateTime.now())}
     before(:each) do
       allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(hbx_enrollment.hbx_id)
     end

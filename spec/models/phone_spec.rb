@@ -72,7 +72,7 @@ describe Phone, type: :model do
     end
   end
 
-  let(:person) {FactoryGirl.create(:person)}
+  let(:person) {FactoryBot.create(:person)}
   let(:params) {{kind: "home", full_phone_number: "(222)-111-3333", person: person}}
 
   it "strips valid area code and number from full phone number" do
@@ -86,7 +86,7 @@ describe Phone, type: :model do
   end
 
   context "phone components" do
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) {FactoryBot.create(:person)}
     let(:params) {{kind: "home", full_phone_number: "(222)-111-3333", person: person}}
     let(:phone) {Phone.create(**params)}
 

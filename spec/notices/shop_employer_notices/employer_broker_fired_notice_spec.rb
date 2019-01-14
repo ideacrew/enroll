@@ -3,14 +3,14 @@ require 'rails_helper'
 RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :after_each do
   before(:all) do
 
-    @site =  FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
-    @organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: @site) 
+    @site =  FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+    @organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: @site) 
     @employer_profile = @organization.employer_profile
     @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
-    @broker_agency_organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: @site)
+    @broker_agency_organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: @site)
     @broker_agency_profile = @broker_agency_organization.broker_agency_profile
-    @broker_agency_account = FactoryGirl.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: @broker_agency_profile, benefit_sponsorship: @benefit_sponsorship)
-    @broker_role = FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id)
+    @broker_agency_account = FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: @broker_agency_profile, benefit_sponsorship: @benefit_sponsorship)
+    @broker_role = FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id)
     @broker_agency_organization.broker_agency_profile.update_attributes(primary_broker_role: @broker_role)
     @broker_role.update_attributes(broker_agency_profile_id: @broker_agency_organization.broker_agency_profile.id)
     @broker_agency_organization.broker_agency_profile.approve!

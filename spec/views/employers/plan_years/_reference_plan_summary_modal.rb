@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "employers/plan_years/_reference_plan_summary_modal.html.erb" do
-  let(:employer_profile){FactoryGirl.create(:employer_profile)}
-  let(:plan) { FactoryGirl.create(:plan) }
+  let(:employer_profile){FactoryBot.create(:employer_profile)}
+  let(:plan) { FactoryBot.create(:plan) }
   before(:each) do
     assign(:employer_profile, employer_profile)
     assign(:plan, plan)

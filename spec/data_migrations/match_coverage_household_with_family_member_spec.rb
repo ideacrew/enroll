@@ -14,8 +14,8 @@ describe MatchCoverageHouseholdWithFamilyMember, dbclean: :after_each do
 
   describe "matching coverage household with family members", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:coverage_household) { family.latest_household.coverage_households.first }
 
     context 'When family member has empty coverage household members' do

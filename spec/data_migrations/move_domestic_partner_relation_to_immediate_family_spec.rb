@@ -11,7 +11,7 @@ describe MoveDomesticPartnerRelationToImmediateFamily, dbclean: :after_each do
 
   describe "move domestic partner relation to immediate family", dbclean: :after_each do
     let(:family) {
-      family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent)
+      family = FactoryBot.build(:family, :with_primary_family_member_and_dependent)
       primary_person = family.family_members.where(is_primary_applicant: true).first.person
       other_person = family.family_members.where(is_primary_applicant: false).first.person
       other_child_person = family.family_members.where(is_primary_applicant: false).last.person

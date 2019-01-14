@@ -10,14 +10,14 @@ end
 RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
   context "DCHL ID and Premium" do
 
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first })}
-    let(:benefit_sponsorship) { FactoryGirl.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment, :with_enrollment_members, :individual_assisted, { household: family.households.first })}
+    let(:benefit_sponsorship) { FactoryBot.create :benefit_sponsors_benefit_sponsorship, :with_benefit_market, :with_organization_cca_profile, :with_initial_benefit_application}
     let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
     let(:employer_profile) { benefit_sponsorship.organization.employer_profile }
     let(:employee_names) { ["fname1 sname1", "fname2 sname2"] }
 
-    let(:current_user) {FactoryGirl.create(:user)}
+    let(:current_user) {FactoryBot.create(:user)}
 
     before(:each) do
       allow(hbx_enrollment).to receive(:covered_members_first_names).and_return(employee_names)

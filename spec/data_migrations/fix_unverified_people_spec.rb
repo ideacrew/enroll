@@ -138,7 +138,7 @@ describe FixUnverifiedPeople, :dbclean => :after_each do
   let(:ssa_response_ssn_true_citizenship_true) { EventResponse.new({:received_at => Time.now, :body => body_ssn_true_citizenship_true}) }
   let(:ssa_response_ssn_true_citizenship_false) { EventResponse.new({:received_at => Time.now, :body => body_ssn_true_citizenship_false}) }
   let(:ssn_verification_failed) { EventResponse.new({:received_at => Time.now, :body => body_ssn_verification_failed}) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
 
   describe "consumer has unverified status" do

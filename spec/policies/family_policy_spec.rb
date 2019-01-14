@@ -27,18 +27,18 @@ describe FamilyPolicy, "given a user who is the primary member" do
 end
 
 describe FamilyPolicy, "given a family with an active broker agency account", :dbclean => :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_family)}
+  let(:person) { FactoryBot.create(:person, :with_family)}
   let(:family) { (person.primary_family) }
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
-  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
+  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
+  let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
 
   subject { FamilyPolicy.new(user, family) }
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile.id }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
       expect(subject.show?).to be_truthy
@@ -48,7 +48,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
   describe "when the user is an active member of a different broker agency from the account" do
     let(:broker_agency_profile_id_account) { double }
     let(:broker_person) { broker_role.person }
-    let(:user) { FactoryGirl.create(:user, :person => broker_person)}
+    let(:user) { FactoryBot.create(:user, :person => broker_person)}
 
     it "can't show" do
       expect(subject.show?).to be_falsey
@@ -58,20 +58,20 @@ end
 
 describe FamilyPolicy, "given a family where the primary has an active employer broker account", dbclean: :after_each do
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { organization.employer_profile }
-  let(:employee_role) {FactoryGirl.create(:employee_role, employer_profile: employer_profile)}
-  let(:person) { FactoryGirl.create(:person, :with_family)}
+  let(:employee_role) {FactoryBot.create(:employee_role, employer_profile: employer_profile)}
+  let(:person) { FactoryBot.create(:person, :with_family)}
   let(:family) { (person.primary_family) }
-  let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-  let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
-  let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
+  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id ) }
+  let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
 
   subject { FamilyPolicy.new(user, family) }
 
   describe "when the user is an active member of the same broker agency as the account" do
     let(:broker_agency_profile_id_account) { broker_agency_profile.id }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
       expect(subject.show?).to be_truthy
@@ -81,7 +81,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   describe "when the user is an active member of a different broker agency from the account" do
     let(:broker_agency_profile_id_account) { double }
     let(:employee_person) { employee_role.person }
-    let(:user) { FactoryGirl.create(:user, :person => employee_person)}
+    let(:user) { FactoryBot.create(:user, :person => employee_person)}
 
     it "can't show" do
       expect(subject.show?).to be_falsey

@@ -11,7 +11,7 @@ RSpec.describe ApplicationEventKind, :type => :model do
       }
     }
 
-  let(:notice_trigger)  { FactoryGirl.create(:notice_trigger) }
+  let(:notice_trigger)  { FactoryBot.create(:notice_trigger) }
 
   context "resource_kind parameter" do
     it "should" do

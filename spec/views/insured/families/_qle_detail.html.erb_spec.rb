@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_qle_detail.html.erb" do
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:resident_role) { FactoryGirl.create(:resident_role) }
+  let(:person) { FactoryBot.create(:person, :with_family ) }
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:resident_role) { FactoryBot.create(:resident_role) }
 
   before :each do
     assign(:person, person)

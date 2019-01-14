@@ -3,12 +3,12 @@
 module BrokerWorld
   def broker(*traits)
     attributes = traits.extract_options!
-    @broker ||= FactoryGirl.create :user, *traits, attributes
+    @broker ||= FactoryBot.create :user, *traits, attributes
   end
 
   def broker_agency(*traits)
     attributes = traits.extract_options!
-    @broker_agency ||= FactoryGirl.create :broker, *traits, attributes
+    @broker_agency ||= FactoryBot.create :broker, *traits, attributes
   end
 
 end
@@ -19,8 +19,8 @@ Given (/^that a broker exists$/) do
   broker_agency
   broker :with_family, :broker_with_person, organization: broker_agency
   broker_agency_profile = broker_agency.broker_agency_profile
-  broker_agency_account = FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
-  employer_profile = FactoryGirl.create(:employer_profile)
+  broker_agency_account = FactoryBot.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_agency_profile.primary_broker_role.id)
+  employer_profile = FactoryBot.create(:employer_profile)
   employer_profile.broker_agency_accounts << broker_agency_account
   employer_profile.save!
 end
@@ -136,10 +136,10 @@ Given(/^the Plans exist$/) do
   open_enrollment_end_on = open_enrollment_start_on + 12.days
   start_on = open_enrollment_start_on + 2.months
   end_on = start_on + 1.year - 1.day
-  plan1 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
-  plan2 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
-  plan3 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan4 = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan1 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
+  plan2 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
+  plan3 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  plan4 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
   Caches::PlanDetails.load_record_cache!
 end
 

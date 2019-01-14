@@ -21,10 +21,10 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   end
 
   context "new_hbx_enrollment_from" do
-    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:consumer_role) {FactoryBot.create(:consumer_role)}
     let(:person) { double(primary_family: family)}
     let(:family) { double }
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
     let(:coverage_household) {CoverageHousehold.new}
     let(:household) {Household.new}
@@ -48,11 +48,11 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   end
 
   context "latest_active_tax_household_with_year" do
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:household) {FactoryGirl.create(:household, family: family)}
-    let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
-    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
-    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryBot.create(:household, family: family)}
+    let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_ending_on: nil)}
+    let(:tax_household2) {FactoryBot.create(:tax_household, household: household)}
+    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
 
     it "return correct tax_household" do
       household.tax_households << tax_household
@@ -73,12 +73,12 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   end
 
   context "current_year_hbx_enrollments" do
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:household) {FactoryGirl.create(:household, family: family)}
-    let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-    let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: false)}
-    let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
-    let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let(:household) {FactoryBot.create(:household, family: family)}
+    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+    let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, is_active: false)}
+    let!(:hbx3) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
+    let!(:hbx4) {FactoryBot.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
 
     it "should return right hbx_enrollments" do
       household.reload
@@ -89,13 +89,13 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
 
   context "enrolled_including_waived_hbx_enrollments" do
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:household) {FactoryGirl.create(:household, family: family)}
-    let(:plan1){ FactoryGirl.create(:plan_template, :shop_health) }
-    let(:plan2){ FactoryGirl.create(:plan_template, :shop_dental) }
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let(:household) {FactoryBot.create(:household, family: family)}
+    let(:plan1){ FactoryBot.create(:plan_template, :shop_health) }
+    let(:plan2){ FactoryBot.create(:plan_template, :shop_dental) }
 
     context "for shop health enrollment" do
-      let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return only health hbx enrollment" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
@@ -105,7 +105,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
 
     context "for shop dental enrollment" do
-      let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return only health hbx enrollment" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 1
@@ -115,11 +115,11 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
 
     context "for both shop health and dental enrollment" do
-      let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx3) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx2) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx4) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
-      let!(:hbx5) {FactoryGirl.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx1) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx3) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan1, is_active: true, aasm_state: 'coverage_selected', changing: false, coverage_kind: 'dental', effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx2) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx4) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'inactive', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
+      let!(:hbx5) {FactoryBot.create(:hbx_enrollment, household: household, plan: plan2, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days), applied_aptc_amount: 10)}
 
       it "should return the latest hbx enrollments for each shop and dental" do
         expect(household.enrolled_including_waived_hbx_enrollments.size).to eq 2
@@ -135,16 +135,16 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   end
 
   context "eligibility determinations for a household" do
-    #let!(:tax_household1) {FactoryGirl.create(:tax_household }
+    #let!(:tax_household1) {FactoryBot.create(:tax_household }
     let(:year) { TimeKeeper.date_of_record.year }
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:household) {FactoryGirl.create(:household, family: family)}
-    let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
-    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
-    let(:tax_household3) {FactoryGirl.create(:tax_household, household: household)}
-    let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
-    let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2)}
-    let(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryBot.create(:household, family: family)}
+    let(:tax_household1) {FactoryBot.create(:tax_household, household: household)}
+    let(:tax_household2) {FactoryBot.create(:tax_household, household: household)}
+    let(:tax_household3) {FactoryBot.create(:tax_household, household: household)}
+    let(:eligibility_determination1) {FactoryBot.create(:eligibility_determination, tax_household: tax_household1)}
+    let(:eligibility_determination2) {FactoryBot.create(:eligibility_determination, tax_household: tax_household2)}
+    let(:eligibility_determination3) {FactoryBot.create(:eligibility_determination, tax_household: tax_household3)}
 
     it "should return all the eligibility determinations across all tax households when there is one eligibility determination per tax household" do
       tax_household1.eligibility_determinations = [eligibility_determination1]
@@ -184,15 +184,15 @@ end
 
 
 describe Household, "for dependent with domestic partner relationship", type: :model, dbclean: :after_each do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:person) do
-    p = FactoryGirl.build(:person)
+    p = FactoryBot.build(:person)
     p.person_relationships.build(relative: person_two, kind: "domestic_partner")
     p.save
     p
   end
-  let(:person_two)  { FactoryGirl.create(:person)}
-  let(:family_member) { FactoryGirl.create(:family_member, family: family, person: person_two)}
+  let(:person_two)  { FactoryBot.create(:person)}
+  let(:family_member) { FactoryBot.create(:family_member, family: family, person: person_two)}
   before(:each) do
     family.relate_new_member(person_two, "domestic_partner")
     family.save!
@@ -204,19 +204,19 @@ describe Household, "for dependent with domestic partner relationship", type: :m
 end
 
 describe "multiple taxhouseholds for a family", type: :model, dbclean: :after_each do
-  let!(:person) { FactoryGirl.create(:person, :with_family) }
+  let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:household) { person.primary_family.households.first }
-  let!(:tax_household1) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household2) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 11, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household3) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 6, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household4) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 7, 1), created_at: "2018-01-15 21:53:54 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household5) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 4, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household6) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 8, 1), created_at: "2018-01-15 21:53:50 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household7) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household8) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household9) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:54 UTC", submitted_at: "2018-01-16 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household10) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:55 UTC", submitted_at: "2018-01-15 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
-  let!(:tax_household11) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 5), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household1) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household2) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 11, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household3) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 6, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household4) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 7, 1), created_at: "2018-01-15 21:53:54 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household5) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 4, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household6) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 8, 1), created_at: "2018-01-15 21:53:50 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household7) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household8) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household9) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:54 UTC", submitted_at: "2018-01-16 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household10) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:55 UTC", submitted_at: "2018-01-15 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household11) { FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 5), is_eligibility_determined: true, effective_ending_on: nil) }
 
 
   it "should have only one active tax household for year 2018" do
@@ -253,10 +253,10 @@ describe "multiple taxhouseholds for a family", type: :model, dbclean: :after_ea
 end
 
 describe "financial assistance eligibiltiy for a family", type: :model, dbclean: :after_each do
-  let!(:person) { FactoryGirl.create(:person, :with_family) }
+  let!(:person) { FactoryBot.create(:person, :with_family) }
   let!(:active_household) { person.primary_family.active_household }
   let!(:date) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:slcsp) { HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id }
 
   it "should create one active tax household for the specified year" do

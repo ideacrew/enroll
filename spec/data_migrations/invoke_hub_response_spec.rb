@@ -15,8 +15,8 @@ describe InvokeHubResponse, dbclean: :after_each do
 
   describe "invoke hub response", dbclean: :after_each do
 
-    let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-    let!(:invalid_person) {FactoryGirl.create(:person) }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:invalid_person) {FactoryBot.create(:person) }
 
     before do
       allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
@@ -32,7 +32,7 @@ describe InvokeHubResponse, dbclean: :after_each do
 
   describe "should not invoke hub response", dbclean: :after_each do
 
-    let!(:invalid_person) {FactoryGirl.create(:person) }
+    let!(:invalid_person) {FactoryBot.create(:person) }
 
     before do
       $stdout = StringIO.new

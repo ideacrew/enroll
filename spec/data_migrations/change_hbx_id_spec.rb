@@ -12,7 +12,7 @@ describe ChangeHbxId do
   end
 
   describe "changing person hbx id" do
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("new_hbx_id").and_return("34588973")

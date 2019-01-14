@@ -13,9 +13,9 @@ describe TerminateEnrWithDate do
   end
 
   describe "terminate enrollment with terminated on date" do
-    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: Date.strptime("02/01/2017" , "%m/%d/%Y"), household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, effective_on: Date.strptime("02/01/2017" , "%m/%d/%Y"), household: family.active_household)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("enr_hbx_id").and_return(hbx_enrollment.hbx_id)

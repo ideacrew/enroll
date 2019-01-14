@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml", dbclean: :after_each do
 
   describe "broker_agency_account xml" do
-    let(:general_agency_account) {  FactoryGirl.create(:general_agency_account) }
-    let(:broker_agency_account) { FactoryGirl.create(:broker_agency_account, {employer_profile:general_agency_account.employer_profile}) }
+    let(:general_agency_account) {  FactoryBot.create(:general_agency_account) }
+    let(:broker_agency_account) { FactoryBot.create(:broker_agency_account, {employer_profile:general_agency_account.employer_profile}) }
 
     context "ga_assignment" do
       context "no ga_assignment" do

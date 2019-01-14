@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 describe Family, "with 2 policies", :dbclean => :around_each do
-  let(:family) { FactoryGirl.build(:family) }
-  let(:primary) { FactoryGirl.create(:consumer_role) }
-  let(:plan) { FactoryGirl.create(:plan) }
-  let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let(:family) { FactoryBot.build(:family) }
+  let(:primary) { FactoryBot.create(:consumer_role) }
+  let(:plan) { FactoryBot.create(:plan) }
+  let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
 
   before :each do

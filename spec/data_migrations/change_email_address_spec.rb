@@ -10,7 +10,7 @@ describe ChangeEmailAddress, dbclean: :after_each do
     end
   end
   describe "change the email of a person" do
-    let(:person) { FactoryGirl.create(:person, :with_work_email, hbx_id: "123123123") }
+    let(:person) { FactoryBot.create(:person, :with_work_email, hbx_id: "123123123") }
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("old_email").and_return(person.emails.first.address)
@@ -25,7 +25,7 @@ describe ChangeEmailAddress, dbclean: :after_each do
     end
   end
   describe "not change the email if hbx_id not found" do
-    let(:person) { FactoryGirl.create(:person, :with_work_email) }
+    let(:person) { FactoryBot.create(:person, :with_work_email) }
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(" ")
       allow(ENV).to receive(:[]).with("old_email").and_return(person.emails.first.address)

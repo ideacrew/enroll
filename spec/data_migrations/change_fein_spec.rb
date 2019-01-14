@@ -12,7 +12,7 @@ describe ChangeFein, dbclean: :after_each do
   end
 
   describe "changing organization's fein" do
-    let(:organization) { FactoryGirl.create(:organization)}
+    let(:organization) { FactoryBot.create(:organization)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("old_fein").and_return(organization.fein)

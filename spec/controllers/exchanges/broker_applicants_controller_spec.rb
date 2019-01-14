@@ -28,7 +28,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
   describe ".edit" do
     let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
-    let(:broker_role) {FactoryGirl.create(:broker_role)}
+    let(:broker_role) {FactoryBot.create(:broker_role)}
 
     before :each do
       sign_in(user)
@@ -44,10 +44,10 @@ RSpec.describe Exchanges::BrokerApplicantsController do
 
   describe ".update" do
     let(:user) { instance_double("User", :has_hbx_staff_role? => true) }
-    let(:broker_role) {FactoryGirl.create(:broker_role)}
+    let(:broker_role) {FactoryBot.create(:broker_role)}
 
     before :all do
-      @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
+      @broker_agency_profile = FactoryBot.create(:broker_agency).broker_agency_profile
     end
 
     before :each do
@@ -72,7 +72,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     context 'when application approved and applicant is not primary broker' do
 
       before :each do
-        FactoryGirl.create(:hbx_profile)
+        FactoryBot.create(:hbx_profile)
         put :update, id: broker_role.person.id, approve: true, person: { broker_role_attributes: { training: true , carrier_appointments: {}} } , format: :js
         broker_role.reload
       end
@@ -88,7 +88,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
     end
 
     context 'when applicant is a primary broker' do
-      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, primary_broker_role_id: broker_role.id) }
+      let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, primary_broker_role_id: broker_role.id) }
 
       context 'when application is approved' do
         before :each do

@@ -8,7 +8,7 @@ describe PopulateConversionFlag, dbclean: :after_each do
 
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:profile_source) { 'self_serve' }
-  let!(:employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear, profile_source: profile_source, start_on: start_on, registered_on: 3.months.ago)}
+  let!(:employer_profile) { FactoryBot.create(:employer_with_renewing_planyear, profile_source: profile_source, start_on: start_on, registered_on: 3.months.ago)}
 
   context "non conversion employer" do
     it "should set conversion flag to false" do

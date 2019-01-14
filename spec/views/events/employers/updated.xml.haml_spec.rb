@@ -44,8 +44,8 @@ RSpec.describe "events/employers/updated.haml.erb" do
 
     context "with dental plans" do
 
-      let(:benefit_group) {bg = FactoryGirl.create(:benefit_group, plan_year: plan_year);
-                          bg.elected_dental_plans = [FactoryGirl.create(:plan, name: "new dental plan", coverage_kind: 'dental',
+      let(:benefit_group) {bg = FactoryBot.create(:benefit_group, plan_year: plan_year);
+                          bg.elected_dental_plans = [FactoryBot.create(:plan, name: "new dental plan", coverage_kind: 'dental',
                                                  dental_level: 'high')];
                           bg}
 
@@ -70,7 +70,7 @@ RSpec.describe "events/employers/updated.haml.erb" do
     end
 
     context "person of contact" do
-      let(:staff) {FactoryGirl.create(:person)}
+      let(:staff) {FactoryBot.create(:person)}
 
       before do
         allow(employer).to receive(:staff_roles).and_return([staff])
@@ -93,8 +93,8 @@ RSpec.describe "events/employers/updated.haml.erb" do
         download_vocabularies
       end
 
-      let(:employer) { FactoryGirl.build_stubbed :generative_employer_profile }
-      let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
+      let(:employer) { FactoryBot.build_stubbed :generative_employer_profile }
+      let(:staff) { FactoryBot.create(:person, :with_work_email, :with_work_phone)}
 
       before :each do
         allow(employer).to receive(:staff_roles).and_return([staff])

@@ -6,7 +6,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
   end
 
   context "when an HBX is instantiated as a benefit sponsor" do
-    let(:hbx_profile)             { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile)             { FactoryBot.create(:hbx_profile) }
     let(:service_markets)         { %w(individual) }
 
     let(:valid_params){
@@ -35,7 +35,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
     context "with all required arguments" do
       let(:params)                  { valid_params }
       let(:benefit_sponsorship)     { BenefitSponsorship.new(**params) }
-      let(:geographic_rating_area)  { FactoryGirl.build(:geographic_rating_area) }
+      let(:geographic_rating_area)  { FactoryBot.build(:geographic_rating_area) }
 
       it "should be valid" do
         expect(benefit_sponsorship.valid?).to be_truthy
@@ -53,7 +53,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
         end
 
         context "and a benefit coverage period is defined with open enrollment start/end dates" do
-          let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
+          let(:benefit_coverage_period) { FactoryBot.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 10.days) }
 
           context "when system date is during open enrollment period" do
             before do
@@ -66,7 +66,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
           end
 
           context "when system date is outside open enrollment period" do
-            let(:benefit_coverage_period) { FactoryGirl.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record + 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 40.days) }
+            let(:benefit_coverage_period) { FactoryBot.build(:benefit_coverage_period, open_enrollment_start_on: TimeKeeper.date_of_record + 10.days, open_enrollment_end_on: TimeKeeper.date_of_record + 40.days) }
 
             before do
               benefit_sponsorship.benefit_coverage_periods = benefit_coverage_period.to_a
@@ -80,7 +80,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
 
         context "and benefit coverage periods are defined for the current and following years" do
           let(:benefit_coverage_period_this_year) {
-              FactoryGirl.build(:benefit_coverage_period,
+              FactoryBot.build(:benefit_coverage_period,
                 start_on: TimeKeeper.date_of_record.beginning_of_year,
                 end_on:   TimeKeeper.date_of_record.end_of_year,
                 open_enrollment_start_on: (TimeKeeper.date_of_record.beginning_of_year - 2.months),
@@ -88,7 +88,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
               )
             }
           let(:benefit_coverage_period_next_year) {
-              FactoryGirl.build(:benefit_coverage_period,
+              FactoryBot.build(:benefit_coverage_period,
                 start_on: (TimeKeeper.date_of_record + 1.year).beginning_of_year,
                 end_on: (TimeKeeper.date_of_record + 1.year).end_of_year,
                 open_enrollment_start_on: ((TimeKeeper.date_of_record + 1.year).beginning_of_year - 2.months),

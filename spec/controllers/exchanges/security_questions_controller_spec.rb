@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
 
-  let(:user) { FactoryGirl.create(:user, with_security_questions: false) }
-  let(:person) { FactoryGirl.create(:person, user: user) }
-  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+  let(:user) { FactoryBot.create(:user, with_security_questions: false) }
+  let(:person) { FactoryBot.create(:person, user: user) }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
   let(:question) { instance_double("SecurityQuestion", title: 'Your Question', id: '1') }
 
   before :each do

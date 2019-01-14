@@ -6,21 +6,21 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
 
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
+  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
                               :with_benefit_package,
                               :benefit_sponsorship => benefit_sponsorship,
                               :aasm_state => 'active',
                               :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
   let!(:benefit_package)  {benefit_application.benefit_packages.first}
-  let!(:person)       { FactoryGirl.create(:person, :with_family) }
+  let!(:person)       { FactoryBot.create(:person, :with_family) }
   let!(:family)       { person.primary_family }
-  let!(:model_instance)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id ) }
-  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: model_instance.id)}
-  let!(:hbx_enrollment) {  FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+  let!(:model_instance)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id ) }
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: model_instance.id)}
+  let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         aasm_state: "coverage_termination_pending",
                         effective_on: benefit_application.start_on,

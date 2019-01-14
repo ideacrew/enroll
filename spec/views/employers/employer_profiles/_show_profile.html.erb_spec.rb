@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/_show_profile", dbclean: :after_each do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:user) { FactoryGirl.create(:user) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
+  let(:census_employee1) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employee2) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employee3) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:user) { FactoryBot.create(:user) }
   before :each do
     @employer_profile = employer_profile
     stub_template "shared/alph_paginate" => ''

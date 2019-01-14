@@ -13,9 +13,9 @@ describe ChangeGender, dbclean: :after_each do
   end
 
   describe "changing gender for an Employee", dbclean: :after_each do
-    let(:person) { FactoryGirl.create(:person, gender: "male") }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, gender: "male") }
+    let(:person) { FactoryBot.create(:person, gender: "male") }
+    let(:employer_profile) { FactoryBot.create(:employer_profile)}
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: employer_profile, gender: "male") }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)

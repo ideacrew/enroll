@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe "employers/plan_years/reference_plan_summary.js.erb" do
-  let(:employer_profile){ FactoryGirl.build_stubbed(:employer_profile) }
-  let(:plan) { FactoryGirl.build_stubbed(:plan) }
+  let(:employer_profile){ FactoryBot.build_stubbed(:employer_profile) }
+  let(:plan) { FactoryBot.build_stubbed(:plan) }
   before(:each) do
     assign(:employer_profile, employer_profile)
     assign(:plan, plan)

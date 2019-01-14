@@ -2,8 +2,8 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.build(:person, :with_consumer_role) }
   let(:consumer_role) { {consumer_role: ''} }
   let(:consumer_wrapper) { double }
 
@@ -62,7 +62,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
     describe "file upload" do
       let(:file) { [:temp_file] }
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
       let(:params) { {person: {consumer_role: person.consumer_role}, file: file} }

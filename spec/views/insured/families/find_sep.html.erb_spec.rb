@@ -1,17 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
-  let(:current_user) {FactoryGirl.create(:user)}
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
-  let(:resident_role) { FactoryGirl.create(:resident_role) }
+  let(:current_user) {FactoryBot.create(:user)}
+  let(:person) { FactoryBot.create(:person, :with_family ) }
+  let(:resident_role) { FactoryBot.create(:resident_role) }
 
   before do
-    qle1 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual')
-    qle2 = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
+    qle1 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual')
+    qle2 = FactoryBot.create(:qualifying_life_event_kind, market_kind: 'individual', title: 'I had a baby')
     sign_in current_user
     assign :qualifying_life_events, [qle1, qle2]
     assign :next_ivl_open_enrollment_date, TimeKeeper.date_of_record
-    #assign(:person, FactoryGirl.create(:person))
+    #assign(:person, FactoryBot.create(:person))
     assign(:person, person)
     person.resident_role = resident_role
     person.save

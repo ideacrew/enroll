@@ -23,8 +23,8 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
   context "rating a large family" do
 
     context "for health coverage" do 
-      let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'shop') }
-      let!(:reference_plan)  {  FactoryGirl.create(:plan, :with_premium_tables, market: 'shop') }
+      let!(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'shop') }
+      let!(:reference_plan)  {  FactoryBot.create(:plan, :with_premium_tables, market: 'shop') }
 
       let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 
@@ -84,8 +84,8 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
 
     context "for dental coverage" do 
 
-      let!(:plan) { FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
-      let!(:reference_plan)  {  FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
+      let!(:plan) { FactoryBot.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
+      let!(:reference_plan)  {  FactoryBot.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
 
       let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 

@@ -25,47 +25,47 @@ describe "CcaBrokerAgencyAccountsMigration" do
 
     before :all do
 
-      organization1 = FactoryGirl.create(:broker)
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: organization1.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123456")
-      broker_role1 = FactoryGirl.create(:broker_role, broker_agency_profile_id: organization1.broker_agency_profile.id)
+      organization1 = FactoryBot.create(:broker)
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile: organization1.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123456")
+      broker_role1 = FactoryBot.create(:broker_role, broker_agency_profile_id: organization1.broker_agency_profile.id)
 
-      organization2 = FactoryGirl.create(:broker)
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: organization2.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123457")
-      broker_role2 = FactoryGirl.create(:broker_role, broker_agency_profile_id: organization2.broker_agency_profile.id)
+      organization2 = FactoryBot.create(:broker)
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile: organization2.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123457")
+      broker_role2 = FactoryBot.create(:broker_role, broker_agency_profile_id: organization2.broker_agency_profile.id)
 
-      organization3 = FactoryGirl.create(:broker)
-      FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: organization3.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123458")
-      broker_role3 =FactoryGirl.create(:broker_role, broker_agency_profile_id: organization3.broker_agency_profile.id)
+      organization3 = FactoryBot.create(:broker)
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile: organization3.broker_agency_profile, benefit_sponsors_broker_agency_profile_id: "123458")
+      broker_role3 =FactoryBot.create(:broker_role, broker_agency_profile_id: organization3.broker_agency_profile.id)
 
-      employer_profile = FactoryGirl.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
+      employer_profile = FactoryBot.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
       employer_profile.organization.created_at = TimeKeeper.date_of_record - 2.year
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+      FactoryBot.create(:employer_staff_role, employer_profile_id: employer_profile.id)
 
-      employer_profile2 = FactoryGirl.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
+      employer_profile2 = FactoryBot.create(:employer_profile, created_at: TimeKeeper.date_of_record - 2.year, registered_on: TimeKeeper.date_of_record - 2.year)
       employer_profile2.organization.created_at = TimeKeeper.date_of_record - 2.year
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile2.id)
+      FactoryBot.create(:employer_staff_role, employer_profile_id: employer_profile2.id)
 
 
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record, end_on: nil, writing_agent: broker_role1, is_active: false)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record + 1.day, end_on: TimeKeeper.date_of_record + 1.day, writing_agent: broker_role1, is_active: true)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 1.day, end_on: TimeKeeper.date_of_record - 1.day, writing_agent: broker_role1, is_active: false)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 1.year + 1.day, end_on: TimeKeeper.date_of_record - 6.months, writing_agent: broker_role2, is_active: false)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile, broker_agency_profile: organization1.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 2.year + 1.day, end_on: TimeKeeper.date_of_record - 1.year - 6.months, writing_agent: broker_role3, is_active: false)
 
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record + 1.day, end_on: nil, writing_agent: broker_role1, is_active: true)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 1.year + 1.day, end_on: TimeKeeper.date_of_record - 6.months, writing_agent: broker_role2, is_active: false)
-      FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
+      FactoryBot.create(:broker_agency_account, employer_profile: employer_profile2, broker_agency_profile: organization2.broker_agency_profile,
                          start_on: TimeKeeper.date_of_record - 2.year + 1.day, end_on: TimeKeeper.date_of_record - 1.year - 6.months, writing_agent: broker_role3, is_active: false)
 
       site = BenefitSponsors::Site.all.first
-      benefit_market = FactoryGirl.create(:benefit_markets_benefit_market)
+      benefit_market = FactoryBot.create(:benefit_markets_benefit_market)
       site.benefit_markets << benefit_market
       site.save!
 
