@@ -116,7 +116,7 @@ module BenefitSponsors
       let(:start_on) { Date.new(2019, 02, 01) }
       let(:previous_date) { Date.new(2019, 01, 02) }
       let(:later_date) { Date.new(2019, 01, 28) }
-      let(:default_monthly_end_on) { Settings.aca.shop_market.open_enrollment.monthly_end_on }
+      let(:default_monthly_end_on_date) { Date.new(2019, 01, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
@@ -126,7 +126,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 1 date' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (later_date..Date.new(2019, 01, default_monthly_end_on))
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (later_date..default_monthly_end_on_date)
           end
         end
 
@@ -144,13 +144,13 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 1 date' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (previous_date..Date.new(2019, 01, default_monthly_end_on))
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (previous_date..default_monthly_end_on_date)
           end
         end
 
         context 'not an admin data table action' do
           it 'should return 2 dates' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (previous_date..Date.new(2019, 01, default_monthly_end_on))
+            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (previous_date..default_monthly_end_on_date)
           end
         end
       end
