@@ -97,3 +97,7 @@ Then(/^the user will( not)? see the Force Publish button$/) do |visible|
     expect(page).to_not have_css('.btn.btn-xs', text: 'Force Publish')
   end
 end
+
+And(/^system date is between submission deadline & OE End date$/) do
+  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
+end
