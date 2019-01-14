@@ -52,8 +52,8 @@ module BenefitSponsors
       end
     end
 
-    describe 'start_on_options_for_datatable_action' do
-      let(:dates_hash) { subject.start_on_options_for_datatable_action }
+    describe 'start_on_options_with_schedule' do
+      let(:dates_hash) { subject.start_on_options_with_schedule(true) }
 
       it 'should return a instance of Hash' do
         expect(dates_hash).to be_a Hash
@@ -107,6 +107,50 @@ module BenefitSponsors
         context 'not an admin data table action' do
           it 'should return 2 dates' do
             expect(subject.calculate_start_on_dates(true)).to eq both_dates
+          end
+        end
+      end
+    end
+
+    describe 'open_enrollment_period_by_effective_date' do
+      let(:start_on) { Date.new(2019, 02, 01) }
+      let(:previous_date) { Date.new(2019, 01, 02) }
+      let(:later_date) { Date.new(2019, 01, 28) }
+      let(:default_monthly_end_on) { Settings.aca.shop_market.open_enrollment.monthly_end_on }
+      let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
+
+      context 'after open_enrollment_minimum_begin_day_of_month' do
+        before :each do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(later_date)
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 1 date' do
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (later_date..Date.new(2019, 01, default_monthly_end_on))
+          end
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 2 dates' do
+            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (later_date..(later_date+oe_min_days))
+          end
+        end
+      end
+
+      context 'before open_enrollment_minimum_begin_day_of_month' do
+        before :each do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(previous_date)
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 1 date' do
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (previous_date..Date.new(2019, 01, default_monthly_end_on))
+          end
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 2 dates' do
+            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (previous_date..Date.new(2019, 01, default_monthly_end_on))
           end
         end
       end
