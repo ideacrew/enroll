@@ -17,8 +17,8 @@ module BenefitSponsors
         end
       end
 
-      def calculate_start_on_dates
-        start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)
+      def calculate_start_on_dates(admin_datatable_action = false)
+        start_on = if (!admin_datatable_action && (TimeKeeper.date_of_record > open_enrollment_minimum_begin_day_of_month(true)))
           TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         else
           TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
@@ -33,9 +33,9 @@ module BenefitSponsors
       end
 
       # Responsible for calculating all the possible dataes
-      def start_on_options_with_schedule
+      def start_on_options_with_schedule(admin_datatable_action = nil)
         possible_dates = Hash.new
-        calculate_start_on_dates.each do |date|
+        calculate_start_on_dates(admin_datatable_action).each do |date|
           next unless is_start_on_valid?(date)
           possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(date))
         end

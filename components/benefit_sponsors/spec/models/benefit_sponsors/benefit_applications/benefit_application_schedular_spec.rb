@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplicationSchedular, type: :model, :dbclean => :after_each do
+    subject {::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new}
 
     describe "#map_binder_payment_due_date_by_start_on" do
       let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
@@ -52,7 +53,7 @@ module BenefitSponsors
     end
 
     describe 'start_on_options_for_datatable_action' do
-      let(:dates_hash) { ::BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.start_on_options_for_datatable_action }
+      let(:dates_hash) { subject.start_on_options_for_datatable_action }
 
       it 'should return a instance of Hash' do
         expect(dates_hash).to be_a Hash
@@ -66,6 +67,47 @@ module BenefitSponsors
 
       it "should return today's date for start_on" do
         expect(dates_hash.values.first[:open_enrollment_start_on]).to eq TimeKeeper.date_of_record
+      end
+    end
+
+    describe 'calculate_start_on_dates' do
+      let(:previous_date) { Date.new(2019, 01, 02) }
+      let(:later_date) { Date.new(2019, 01, 28) }
+
+      context 'after open_enrollment_minimum_begin_day_of_month' do
+        before :each do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(later_date)
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 1 date' do
+            expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 03, 01)]
+          end
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 2 dates' do
+            expect(subject.calculate_start_on_dates(true)).to eq [Date.new(2019, 02, 01), Date.new(2019, 03, 01)]
+          end
+        end
+      end
+
+      context 'before open_enrollment_minimum_begin_day_of_month' do
+        before :each do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(previous_date)
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 1 date' do
+            expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 03, 01)]
+          end
+        end
+
+        context 'not an admin data table action' do
+          it 'should return 2 dates' do
+            expect(subject.calculate_start_on_dates(true)).to eq [Date.new(2019, 02, 01), Date.new(2019, 03, 01)]
+          end
+        end
       end
     end
   end
