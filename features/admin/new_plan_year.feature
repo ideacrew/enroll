@@ -11,7 +11,20 @@ Feature: As a Super Admin I will be the only user
     And the user clicks Action for that Employer
 
   Scenario: HBX Staff with Super Admin subroles should see Create Plan Year button
-    Given that the user has clicked the Create Plan Year button for this Employer
-    When the user selects an input in the Effective Start date drop down
-    Then the Effective End Date will populate with a date equal to one year minus 1 day from the Effective Start Date
-    And the Effective End Date will not be editable.
+    Then the user will see the Create Plan Year button
+
+  Scenario: HBX Staff with Super Admin subroles should see the Create Plan Year Form
+    When the user clicks the Create Plan Year button for this Employer
+    Then the user will see the Create Plan Year option row
+
+  Scenario: Create Plan Year button will be disabled until all required fields have been filled.
+    When the user clicks the Create Plan Year button for this Employer
+    Then the Create Plan Year form submit button will be disabled
+    When the user completely fills out the Create Plan Year Form
+    Then the Create Plan Year form submit button will not be disabled
+
+  Scenario: Cancel the Create Plan Year new benefit application
+    When the user clicks the Create Plan Year button for this Employer
+    Then the user will see the Create Plan Year option row
+    #When the user clicks the X icon on the Create Plan Year form
+    #Then the Create Plan Year option row will no longer be visible

@@ -3,7 +3,7 @@
   br
   .row
     .pull-right[style="margin-right:20px"]
-      i.fas.fa-times.fa-2x.admin-fa-times[onclick="closeRow(this)"]
+      i.fas.fa-times.fa-2x.admin-fa-times#closeBAForm[onclick="closeRow(this)"]
   .row
     .col-md-4
       label[for="effectiveStartDate" style="font-weight:bold"]
@@ -98,7 +98,6 @@ javascript:
 
   function assignBenefitApplicationDates(targetDate) {
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
-    debugger
     document.querySelector('input#end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
     document.querySelector("input#open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
     document.querySelector("input#open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
