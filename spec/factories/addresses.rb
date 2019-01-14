@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :address do
     kind 'home'
     sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }

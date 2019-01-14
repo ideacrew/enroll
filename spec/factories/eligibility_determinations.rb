@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :eligibility_determination do
     tax_household
     determined_on TimeKeeper.datetime_of_record

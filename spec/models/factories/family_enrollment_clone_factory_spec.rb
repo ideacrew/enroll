@@ -15,21 +15,21 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   let!(:employer_profile) {benefit_sponsorship.profile}
   let!(:update_renewal_app) {renewal_application.update_attributes(aasm_state: :enrollment_eligible)}
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }
-  let(:employee_role) { FactoryGirl.create :employee_role, employer_profile: employer_profile }
-  let!(:active_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package)}
-  let!(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_package: benefit_package)}
-  let!(:ce) { FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile, employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
+  let(:employee_role) { FactoryBot.create :employee_role, employer_profile: employer_profile }
+  let!(:active_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package)}
+  let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_package: benefit_package)}
+  let!(:ce) { FactoryBot.create :census_employee, :owner, employer_profile: employer_profile, employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
   let!(:ce_update){ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: coverage_terminated_on.next_day, coverage_terminated_on: coverage_terminated_on)}
 
 
   let!(:family) {
-    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
     ce.update_attributes({employee_role: employee_role})
     family_rec = Family.find_or_build_from_employee_role(employee_role)
-    hbx_enrollment_mem=FactoryGirl.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
+    hbx_enrollment_mem=FactoryBot.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
 
-     FactoryGirl.create(:hbx_enrollment,
+     FactoryBot.create(:hbx_enrollment,
       household: person.primary_family.active_household,
       coverage_kind: "health",
       effective_on: ce.active_benefit_group_assignment.benefit_package.start_on,

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :qualifying_life_event_kind do
 
     title "Married"

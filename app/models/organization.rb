@@ -3,7 +3,7 @@ class Organization
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
-  include Mongoid::Versioning
+  # include Mongoid::Versioning
   include Acapi::Notifiers
   include Config::AcaModelConcern
   extend Acapi::Notifiers

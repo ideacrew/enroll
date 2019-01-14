@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :products_qhp, :class => 'Products::Qhp' do
     issuer_id "1234"
     state_postal_code "DC"

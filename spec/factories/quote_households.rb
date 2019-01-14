@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :quote_household do
     sequence(:family_id){|n|"#{n}"}
     quote_benefit_group_id {@qbg_id_testing}

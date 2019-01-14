@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :sic_code do
     division_code "A"
       division_label "Agriculture, Forestry, And Fishing"

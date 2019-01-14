@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :workflow_state_transition do
     end_state     "approved"
     transition_on TimeKeeper.date_of_record

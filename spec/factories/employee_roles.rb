@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :employee_role do
     # association :person, ssn: '123456789', dob: "1/1/1965", gender: "female", first_name: "Sarah", last_name: "Smile"
     association :person

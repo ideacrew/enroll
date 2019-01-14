@@ -11,16 +11,16 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
 
   context 'New Employer' do
     let(:organization) {
-      org = FactoryGirl.create :organization, legal_name: "Corp 1"
-      employer_profile = FactoryGirl.create :employer_profile, organization: org
-      plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      org = FactoryBot.create :organization, legal_name: "Corp 1"
+      employer_profile = FactoryBot.create :employer_profile, organization: org
+      plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
       :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
-      benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
-      owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
-      2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+      benefit_group = FactoryBot.create :benefit_group, :with_valid_dental, plan_year: plan_year
+      owner = FactoryBot.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+      2.times{|i| FactoryBot.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
-        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+        person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
 
@@ -88,19 +88,19 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
 
   context "Renewing employer" do
     let(:organization) {
-      org = FactoryGirl.create :organization, legal_name: "Corp 1"
-      employer_profile = FactoryGirl.create :employer_profile, organization: org
-      active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+      org = FactoryBot.create :organization, legal_name: "Corp 1"
+      employer_profile = FactoryBot.create :employer_profile, organization: org
+      active_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
       :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      renewing_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
       :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
-      benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
-      renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-      owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
-      2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+      benefit_group = FactoryBot.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
+      renewing_benefit_group = FactoryBot.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
+      owner = FactoryBot.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+      2.times{|i| FactoryBot.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
-        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+        person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
 
@@ -200,19 +200,19 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     context 'When employer active plan year ended' do
 
       let(:organization) {
-        org = FactoryGirl.create :organization, legal_name: "Corp 1"
-        employer_profile = FactoryGirl.create :employer_profile, organization: org
-        active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+        org = FactoryBot.create :organization, legal_name: "Corp 1"
+        employer_profile = FactoryBot.create :employer_profile, organization: org
+        active_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
         :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
-        renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+        renewing_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
         :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10), fte_count: 5
-        benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
-        renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-        owner = FactoryGirl.create :census_employee, :old_case, :owner, employer_profile: employer_profile
-        2.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+        benefit_group = FactoryBot.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
+        renewing_benefit_group = FactoryBot.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
+        owner = FactoryBot.create :census_employee, :old_case, :owner, employer_profile: employer_profile
+        2.times{|i| FactoryBot.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
         employer_profile.census_employees.each do |ce|
-          person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+          person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+          employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
           ce.update_attributes({:employee_role =>  employee_role })
           family = Family.find_or_build_from_employee_role(employee_role)
           

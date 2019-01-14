@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :carrier_service_area do
     issuer_hios_id '12345'
     service_area_id 1

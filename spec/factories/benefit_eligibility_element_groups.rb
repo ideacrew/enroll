@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_eligibility_element_group do
     association :benefit_package
     market_places           ["individual"]

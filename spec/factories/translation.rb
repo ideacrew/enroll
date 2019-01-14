@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :translation do
     key "en.path.to.view"
     value "display value"

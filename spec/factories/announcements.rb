@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :announcement do
     content 'announcement msg'
     start_date (TimeKeeper.date_of_record - 10.days)

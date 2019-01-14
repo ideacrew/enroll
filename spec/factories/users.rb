@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     sequence(:email) {|n| "example#{n}@example.com"}
     sequence(:oim_id) {|n| "example#{n}"}
@@ -38,7 +38,7 @@ FactoryGirl.define do
 
     after :create do |user, evaluator|
       if user.person.present?
-      user.person.hbx_staff_role = FactoryGirl.build :hbx_staff_role
+      user.person.hbx_staff_role = FactoryBot.build :hbx_staff_role
       user.save
       end
     end
@@ -77,8 +77,8 @@ FactoryGirl.define do
 
     after :create do |user, evaluator|
       if user.person.present?
-        user.person.broker_agency_staff_roles.push FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile_id: evaluator.organization.broker_agency_profile.id)
-        evaluator.organization.broker_agency_profile.primary_broker_role = FactoryGirl.create :broker_role, person: user.person, broker_agency_profile: evaluator.organization.broker_agency_profile
+        user.person.broker_agency_staff_roles.push FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: evaluator.organization.broker_agency_profile.id)
+        evaluator.organization.broker_agency_profile.primary_broker_role = FactoryBot.create :broker_role, person: user.person, broker_agency_profile: evaluator.organization.broker_agency_profile
         evaluator.organization.save
         user.save
       end
@@ -91,11 +91,11 @@ FactoryGirl.define do
     end
 
     after :create do |user, evaluator|
-      #person = FactoryGirl.create :person, :with_family, :user => user
-      evaluator.organization.employer_profile = FactoryGirl.create(:employer_profile,
-        employee_roles: [ FactoryGirl.create(:employee_role, :person => user.person) ],
+      #person = FactoryBot.create :person, :with_family, :user => user
+      evaluator.organization.employer_profile = FactoryBot.create(:employer_profile,
+        employee_roles: [ FactoryBot.create(:employee_role, :person => user.person) ],
         organization: evaluator.organization)
-      user.person.employer_staff_roles.push FactoryGirl.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
+      user.person.employer_staff_roles.push FactoryBot.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
       user.save
     end
   end
@@ -118,25 +118,25 @@ FactoryGirl.define do
 
   trait :with_consumer_role do
     after :create do |user|
-      FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+      FactoryBot.create :person, :with_consumer_role, :with_family, :user => user
     end
   end
 
   trait :with_resident_role do
     after :create do |user|
-      FactoryGirl.create :person, :with_resident_role, :with_family, :user => user
+      FactoryBot.create :person, :with_resident_role, :with_family, :user => user
     end
   end
 
   trait :with_csr_sub_role do
     after :create do |user|
-      FactoryGirl.create :person, :with_csr_role, :with_family, :user => user
+      FactoryBot.create :person, :with_csr_role, :with_family, :user => user
     end
   end
 
   trait :with_family do
     after :create do |user|
-      FactoryGirl.create :person, :with_family, :user => user
+      FactoryBot.create :person, :with_family, :user => user
     end
   end
 

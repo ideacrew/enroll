@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :quote_member do
     first_name "John"
     middle_name "M"
@@ -8,7 +8,7 @@ FactoryGirl.define do
   end
 end
 
-FactoryGirl.define do
+FactoryBot.define do
   factory(:quote_spouse, {class: QuoteMember}) do
     first_name "Suzie"
     middle_name "Q"

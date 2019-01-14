@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :directory_premium, :class => 'Directory::Premium' do
     hbx_id "MyString"
     hbx_plan_id "MyString"

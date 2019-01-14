@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_census_employee, class: 'CensusEmployee' do
 
     first_name "Eddie"
@@ -17,7 +17,7 @@ FactoryGirl.define do
     association :benefit_sponsorship, factory: [:benefit_sponsors_benefit_sponsorship, :with_market_profile], strategy: :build
 
     before(:create) do |instance|
-      FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+      FactoryBot.create(:application_event_kind,:out_of_pocket_notice)
     end
 
     transient do
@@ -61,11 +61,11 @@ FactoryGirl.define do
       end
 
       before :create do |organization, evaluator|
-        organization.office_locations.push FactoryGirl.build :office_location, :primary
+        organization.office_locations.push FactoryBot.build :office_location, :primary
       end
 
       after :create do |organization, evaluator|
-        FactoryGirl.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
+        FactoryBot.create :general_agency_profile, *Array.wrap(evaluator.general_agency_traits) + [:with_staff], evaluator.general_agency_attributes.merge(organization: organization)
       end
     end
 

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :inbox do
     trait :with_message do
       after(:create) do |i|

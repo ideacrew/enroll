@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :quote do
     start_on "2017-07-02"
     claim_code nil

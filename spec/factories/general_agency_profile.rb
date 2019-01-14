@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :general_agency_profile do
     entity_kind "s_corporation"
     market_kind "shop"
@@ -7,7 +7,7 @@ FactoryGirl.define do
 
     trait :with_staff do
       after :create do |general_agency_profile, evaluator|
-        FactoryGirl.create :general_agency_staff_role, general_agency_profile: general_agency_profile
+        FactoryBot.create :general_agency_staff_role, general_agency_profile: general_agency_profile
       end
     end
     trait :shop_agency do

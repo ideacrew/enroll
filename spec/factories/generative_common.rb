@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory(:generative_email, {class: Email}) do
     kind { 
       Email::KINDS[Random.rand(2)]

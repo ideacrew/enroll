@@ -47,7 +47,7 @@ gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
-gem 'mongoid-versioning',       '~> 0.1'
+# gem 'mongoid-versioning',       '~> 1.2.0'
 gem 'mongoid_userstamp',        '~> 0.4'
 gem 'mongoid_rails_migrations', '~> 1.2'
 
@@ -118,8 +118,8 @@ end
 
 group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
-  gem 'capistrano',             '3.3.5'
-  gem 'capistrano-rails',       '1.1.6'
+  gem 'capistrano',             '~> 3.1'
+  gem 'capistrano-rails',       '1.4'
 
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4'
