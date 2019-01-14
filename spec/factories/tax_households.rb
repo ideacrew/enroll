@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :tax_household do
     household
     sequence(:hbx_assigned_id) { |n| 42 + n }

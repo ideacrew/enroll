@@ -1,64 +1,64 @@
-FactoryGirl.define do
-  factory(:generative_individual, {class: Person}) do
-    first_name { Forgery(:name).first_name }
-    last_name { Forgery(:name).first_name }
-    gender { Forgery(:personal).gender }
-    dob { Date.today }
-    addresses {
-      address_count = Random.rand(4)
-      if address_count == 0
-        []
-      else
-        (1..address_count).to_a.map do |idx|
-          FactoryGirl.build_stubbed :generative_address
-        end
-      end
-    }
-    phones {
-      address_count = Random.rand(4)
-      if address_count == 0
-        []
-      else
-        (1..address_count).to_a.map do |idx|
-          FactoryGirl.build_stubbed :generative_phone
-        end
-      end
-    }
-    emails {
-      address_count = Random.rand(4)
-      if address_count == 0
-        []
-      else
-        (1..address_count).to_a.map do |idx|
-          FactoryGirl.build_stubbed :generative_email
-        end
-      end
-    }
-    broker_role {
-      FactoryGirl.build_stubbed :generative_person_broker_role, :person_obj => self
-    }
-    employee_roles {
-      address_count = Random.rand(4)
-      if address_count == 0
-        []
-      else
-        (1..address_count).to_a.map do |idx|
-          FactoryGirl.build_stubbed :generative_person_employee_role, :person_obj => self
-        end
-      end
-    }
-    person_relationships {
-      address_count = Random.rand(4)
-      if address_count == 0
-        []
-      else
-        (1..address_count).to_a.map do |idx|
-          FactoryGirl.build_stubbed :generative_person_relationship
-        end
-      end
-    }
-    consumer_role
-  end
+FactoryBot.define do
+  # factory(:generative_individual, {class: Person}) do
+  #   first_name { Forgery(:name).first_name }
+  #   last_name { Forgery(:name).first_name }
+  #   gender { Forgery(:personal).gender }
+  #   dob { Date.today }
+  #   addresses {
+  #     address_count = Random.rand(4)
+  #     if address_count == 0
+  #       []
+  #     else
+  #       (1..address_count).to_a.map do |idx|
+  #         FactoryBot.build_stubbed :generative_address
+  #       end
+  #     end
+  #   }
+  #   phones {
+  #     address_count = Random.rand(4)
+  #     if address_count == 0
+  #       []
+  #     else
+  #       (1..address_count).to_a.map do |idx|
+  #         FactoryBot.build_stubbed :generative_phone
+  #       end
+  #     end
+  #   }
+  #   emails {
+  #     address_count = Random.rand(4)
+  #     if address_count == 0
+  #       []
+  #     else
+  #       (1..address_count).to_a.map do |idx|
+  #         FactoryBot.build_stubbed :generative_email
+  #       end
+  #     end
+  #   }
+  #   broker_role {
+  #     FactoryBot.build_stubbed :generative_person_broker_role, :person_obj => self
+  #   }
+  #   employee_roles {
+  #     address_count = Random.rand(4)
+  #     if address_count == 0
+  #       []
+  #     else
+  #       (1..address_count).to_a.map do |idx|
+  #         FactoryBot.build_stubbed :generative_person_employee_role, :person_obj => self
+  #       end
+  #     end
+  #   }
+  #   person_relationships {
+  #     address_count = Random.rand(4)
+  #     if address_count == 0
+  #       []
+  #     else
+  #       (1..address_count).to_a.map do |idx|
+  #         FactoryBot.build_stubbed :generative_person_relationship
+  #       end
+  #     end
+  #   }
+  #   consumer_role
+  # end
 
   factory(:generative_person_relationship, {class: PersonRelationship}) do
     kind {
@@ -67,7 +67,7 @@ FactoryGirl.define do
       pick_list[Random.rand(max)]
     }
     relative {
-      FactoryGirl.build_stubbed :generative_person
+      FactoryBot.build_stubbed :generative_person
     }
   end
 
@@ -85,7 +85,7 @@ FactoryGirl.define do
     person { person_obj }
     npn "123432423"
     broker_agency_profile {
-      FactoryGirl.build_stubbed :generative_broker_agency_profile
+      FactoryBot.build_stubbed :generative_broker_agency_profile
     }
   end
 

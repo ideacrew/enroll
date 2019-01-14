@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :plan do
     sequence(:hbx_id)    { |n| n + 12345 }
     sequence(:name)      { |n| "BlueChoice Silver#{n} 2,000" }
@@ -10,7 +10,7 @@ FactoryGirl.define do
     plan_type           "pos"
     market              "shop"
     ehb                 0.9943
-    carrier_profile     { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
+    carrier_profile     { FactoryBot.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
     deductible          "$500"
@@ -70,7 +70,7 @@ FactoryGirl.define do
         unless Settings.aca.rating_areas.empty?
           plan.service_area_id = CarrierServiceArea.for_issuer(plan.carrier_profile.issuer_hios_ids).first.service_area_id
           plan.save!
-          rating_area = RatingArea.first.try(:rating_area) || FactoryGirl.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
+          rating_area = RatingArea.first.try(:rating_area) || FactoryBot.create(:rating_area, rating_area: Settings.aca.rating_areas.first).rating_area
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: rating_area)
         else
           create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
@@ -203,7 +203,7 @@ FactoryGirl.define do
   end
 end
 
-FactoryGirl.define do
+FactoryBot.define do
   factory(:plan_template, {class: Plan}) do
     name "Some plan name"
     carrier_profile_id { BSON::ObjectId.new }

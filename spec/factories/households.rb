@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :household do
     family
     irs_group_id ""

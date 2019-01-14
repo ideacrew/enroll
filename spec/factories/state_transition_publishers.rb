@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :state_transition_publisher do
     
   end

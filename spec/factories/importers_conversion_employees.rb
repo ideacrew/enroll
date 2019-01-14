@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :importers_conversion_employee, class: 'Importers::ConversionEmployee' do
     
   end

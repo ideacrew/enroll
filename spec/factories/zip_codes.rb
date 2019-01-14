@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :zip_code do
     
   end

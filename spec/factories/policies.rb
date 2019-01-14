@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :policy do
     hbx_id '1234567'
     premium_total_in_cents '66666.66'

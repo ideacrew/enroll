@@ -6,11 +6,11 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
  
-    let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
-    let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
+    let!(:renewal_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
+    let!(:plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
 
-    let!(:dental_renewal_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year, hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
-    let!(:dental_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302",  renewal_plan_id: dental_renewal_plan.id, coverage_kind: 'dental', dental_level: 'high') }
+    let!(:dental_renewal_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year, hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
+    let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302",  renewal_plan_id: dental_renewal_plan.id, coverage_kind: 'dental', dental_level: 'high') }
 
     let(:generate_passive_renewal) {
       Factories::ShopEnrollmentRenewalFactory.new({
@@ -27,7 +27,7 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
     context 'Renewing employer exists with published plan year' do
 
       let(:renewing_employer) {
-        FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on, 
+        FactoryBot.create(:employer_with_renewing_planyear, start_on: effective_on, 
           renewal_plan_year_state: 'renewing_enrolling',
           reference_plan_id: plan.id,
           renewal_reference_plan_id: renewal_plan.id,
@@ -41,27 +41,27 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
       let(:renewal_benefit_group) { renewing_employer.renewing_plan_year.benefit_groups.first }
 
       let(:renewing_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
+        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
           benefit_group: benefit_group, renewal_benefit_group: renewal_benefit_group)
       }
 
       context 'when employee exists with active coverage' do
         let(:employee) {
-          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: renewing_employer)
+          employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: renewing_employer)
           ce.update_attributes({employee_role: employee_role})
           employee_role
         }
        
-        let!(:family) { FactoryGirl.create(:family, :with_family_members, person: person, people: family_members) }
-        let(:person) { FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name, person_relationships: family_relationships) }
+        let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: family_members) }
+        let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name, person_relationships: family_relationships) }
         let(:ce) { renewing_employees[0] }
         let(:family_members) { [person, spouse, child]}
-        let(:spouse) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 50.years) }
-        let(:child)  { FactoryGirl.create(:person, dob: child_age) }
+        let(:spouse) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 50.years) }
+        let(:child)  { FactoryBot.create(:person, dob: child_age) }
         let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
 
         let!(:enrollment) {
-          FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+          FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
             enrollment_members: family.family_members,
             household: family.active_household,
             coverage_kind: 'health',

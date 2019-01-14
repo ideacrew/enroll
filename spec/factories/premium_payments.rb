@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :premium_payment do
     paid_on  TimeKeeper.date_of_record.beginning_of_month - 1.day
     amount  7215.12

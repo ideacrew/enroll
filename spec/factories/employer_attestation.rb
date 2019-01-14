@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :employer_attestation do
     employer_profile
     aasm_state "unsubmitted"
@@ -6,7 +6,7 @@ FactoryGirl.define do
     trait :with_attestation_document do
       after :create do |employer_attestation, evaluator|
         if employer_attestation.submitted?
-          employer_attestation_documents { [FactoryGirl.create(:employer_attestation_document, employer_attestation: employer_attestation)] }
+          employer_attestation_documents { [FactoryBot.create(:employer_attestation_document, employer_attestation: employer_attestation)] }
         end
       end
     end

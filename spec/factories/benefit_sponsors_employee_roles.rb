@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :benefit_sponsors_employee_role, class: "EmployeeRole" do
     association :person
     association :employer_profile, factory: :benefit_sponsors_organizations_aca_shop_cca_employer_profile, strategy: :build

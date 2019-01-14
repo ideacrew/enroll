@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :rating_area do
     zip_code '10010'
     county_name 'Hampstead'

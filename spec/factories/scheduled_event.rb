@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :scheduled_event do
     type 'holiday'
     event_name 'Christmas'

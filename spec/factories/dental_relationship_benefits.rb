@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :dental_relationship_benefit do
     relationship     :employee
     premium_pct             40

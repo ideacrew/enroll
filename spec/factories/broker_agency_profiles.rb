@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :broker_agency_profile do
     market_kind "shop"
     entity_kind "s_corporation"
@@ -13,7 +13,7 @@ FactoryGirl.define do
                             :allow_special => false, :exactly => 8)
     end
     # before(:create) do |broker_agency|
-    #   FactoryGirl.create(:organization, broker_agency_profile: broker_agency)
+    #   FactoryBot.create(:organization, broker_agency_profile: broker_agency)
     # end
     trait :shop_agency do
       market_kind "shop"

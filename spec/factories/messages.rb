@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :message do
     subject "phoenix project"
     body    "welcome to the hbx"

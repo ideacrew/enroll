@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :enrollment_period do
     
   end

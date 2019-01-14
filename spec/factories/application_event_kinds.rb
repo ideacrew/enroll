@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :application_event_kind do
     
   trait :out_of_pocket_notice do 

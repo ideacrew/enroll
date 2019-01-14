@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :plan_year do
     employer_profile
 
@@ -22,11 +22,11 @@ FactoryGirl.define do
     fte_count { 5 }
 
     trait :with_benefit_group_congress do
-      benefit_groups { [FactoryGirl.build(:benefit_group_congress)] }
+      benefit_groups { [FactoryBot.build(:benefit_group_congress)] }
     end
 
     trait :with_benefit_group do
-      benefit_groups { [FactoryGirl.build(:benefit_group, effective_on_kind: "first_of_month")] }
+      benefit_groups { [FactoryBot.build(:benefit_group, effective_on_kind: "first_of_month")] }
     end
 
   end
@@ -66,7 +66,7 @@ FactoryGirl.define do
     transient do
       renewing false
       with_dental false
-      reference_plan {FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables)._id}
+      reference_plan {FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables)._id}
       dental_reference_plan nil
     end
 

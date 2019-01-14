@@ -19,13 +19,13 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
     benefit_group = predecessor_application.benefit_packages[0]
     renewing_benefit_group = benefit_package
 
-    census_employee = FactoryGirl.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile:benefit_sponsorship.profile, benefit_group: renewing_benefit_group, dob: TimeKeeper.date_of_record - 30.years, hired_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month)
+    census_employee = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile:benefit_sponsorship.profile, benefit_group: renewing_benefit_group, dob: TimeKeeper.date_of_record - 30.years, hired_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month)
 
     employer_profile.census_employees.each do |ce|
       ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
       ce.add_renew_benefit_group_assignment([renewing_benefit_group])
-      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+      person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
       ce.update_attributes({employee_role: employee_role})
       family = Family.find_or_build_from_employee_role(employee_role)
     end

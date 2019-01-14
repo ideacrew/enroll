@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :hbx_enrollment do
     household
     kind "employer_sponsored"
@@ -26,7 +26,7 @@ FactoryGirl.define do
     plan { create(:plan, :with_rating_factors, :with_premium_tables, active_year: active_year) }
 
     trait :with_enrollment_members do
-      hbx_enrollment_members { enrollment_members.map{|member| FactoryGirl.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
+      hbx_enrollment_members { enrollment_members.map{|member| FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
     end
 
     trait :with_dental_coverage_kind do
@@ -79,7 +79,7 @@ FactoryGirl.define do
     end
 
     trait :with_product do
-      product {  FactoryGirl.create(:benefit_markets_products_product) }
+      product {  FactoryBot.create(:benefit_markets_products_product) }
     end
 
     trait :coverage_selected do
@@ -119,14 +119,14 @@ FactoryGirl.define do
     factory :individual_qhp_enrollment_may1,  traits: [:individual_unassisted, :newer_effective_date, :with_enrollment_members]
   end
 
-  FactoryGirl.define do
+  FactoryBot.define do
     factory(:individual_market_health_enrollment, class: HbxEnrollment) do
       transient do
-        primary_person { FactoryGirl.create(:person, :with_consumer_role) }
+        primary_person { FactoryBot.create(:person, :with_consumer_role) }
       end
 
       family_members { [
-                         FactoryGirl.create(:family_member, family: self, is_primary_applicant: true, is_active: true, person: primary_person)
+                         FactoryBot.create(:family_member, family: self, is_primary_applicant: true, is_active: true, person: primary_person)
       ] }
 
       hbx_enrollment_members { [

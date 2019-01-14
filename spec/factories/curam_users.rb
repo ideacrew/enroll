@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :curam_user do
     first_name "Ivan"
     last_name "Lisyk"

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :employer_staff_role do
     person
     is_owner true

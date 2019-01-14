@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :vlp_document do
     alien_number "123456789"
     receipt_number "abc4567890123"

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :census_dependent do
     first_name "Mary"
     last_name "Doe"

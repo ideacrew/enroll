@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :invitation do
     aasm_state 'active'
     invitation_email { Forgery(:internet).email_address }
@@ -14,7 +14,7 @@ FactoryGirl.define do
         "general_agency_staff_role" => "general_agency_staff_role" }[source_kind]
     end
 
-    source_id { FactoryGirl.create(source_kind.to_sym).id.to_s }
+    source_id { FactoryBot.create(source_kind.to_sym).id.to_s }
   end
 
   trait :census_employee do
