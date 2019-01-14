@@ -73,6 +73,7 @@ module BenefitSponsors
     describe 'calculate_start_on_dates' do
       let(:previous_date) { Date.new(2019, 01, 02) }
       let(:later_date) { Date.new(2019, 01, 28) }
+      let(:both_dates) { [Date.new(2019, 02, 01), Date.new(2019, 03, 01)] }
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
         before :each do
@@ -87,7 +88,7 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq [Date.new(2019, 02, 01), Date.new(2019, 03, 01)]
+            expect(subject.calculate_start_on_dates(true)).to eq both_dates
           end
         end
       end
@@ -99,13 +100,13 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 1 date' do
-            expect(subject.calculate_start_on_dates).to eq [Date.new(2019, 03, 01)]
+            expect(subject.calculate_start_on_dates).to eq both_dates
           end
         end
 
         context 'not an admin data table action' do
           it 'should return 2 dates' do
-            expect(subject.calculate_start_on_dates(true)).to eq [Date.new(2019, 02, 01), Date.new(2019, 03, 01)]
+            expect(subject.calculate_start_on_dates(true)).to eq both_dates
           end
         end
       end
