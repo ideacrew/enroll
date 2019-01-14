@@ -5,7 +5,7 @@ describe EmployerStaffRole, dbclean: :after_each do
 
   it_behaves_like 'observable'
 
-  let(:person) { FactoryGirl.create(:person) }
+  let(:person) { FactoryBot.create(:person) }
   let(:employer_profile) { double(id: "valid_id") }
 
   describe ".new" do

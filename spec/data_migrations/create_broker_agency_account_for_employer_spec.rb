@@ -13,11 +13,11 @@ describe CreateBrokerAgencyAccountForEmployer, dbclean: :after_each do
 
   describe "should create broker_agency_accounts for employer" do
 
-    let!(:employer_profile) { FactoryGirl.build(:employer_profile)}
-    let!(:organization) { FactoryGirl.create(:organization,employer_profile:employer_profile)}
-    let!(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile)}
-    let!(:br_agency_organization) { FactoryGirl.create(:organization,broker_agency_profile:broker_agency_profile)}
-    let!(:broker_role) { FactoryGirl.create(:broker_role,languages_spoken: ["rrrrr"],broker_agency_profile_id:broker_agency_profile.id, aasm_state:'active')}
+    let!(:employer_profile) { FactoryBot.build(:employer_profile)}
+    let!(:organization) { FactoryBot.create(:organization,employer_profile:employer_profile)}
+    let!(:broker_agency_profile) { FactoryBot.build(:broker_agency_profile)}
+    let!(:br_agency_organization) { FactoryBot.create(:organization,broker_agency_profile:broker_agency_profile)}
+    let!(:broker_role) { FactoryBot.create(:broker_role,languages_spoken: ["rrrrr"],broker_agency_profile_id:broker_agency_profile.id, aasm_state:'active')}
 
     before(:each) do
       allow(br_agency_organization.broker_agency_profile).to receive(:active_broker_roles).and_return([broker_role])

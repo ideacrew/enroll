@@ -1,19 +1,19 @@
 require 'rails_helper'
 RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_broker.html.erb", :type => :view, dbclean: :after_each do
 
-  let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
-  let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+  let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
+  let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let(:employer_profile) { organization.employer_profile }
-  let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-  let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+  let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+  let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
 
-  let!(:benefit_sponsorship) {FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_broker_agency_account, profile: employer_profile, broker_agency_profile: broker_agency_profile, benefit_market: site.benefit_markets.first)}
+  let!(:benefit_sponsorship) {FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_broker_agency_account, profile: employer_profile, broker_agency_profile: broker_agency_profile, benefit_market: site.benefit_markets.first)}
   let!(:broker_agency_account) {benefit_sponsorship.broker_agency_accounts.first}
 
 
-  let!(:person) { FactoryGirl.create(:person) }
+  let!(:person) { FactoryBot.create(:person) }
   let!(:date) { TimeKeeper.date_of_record - 1.day }
-  let!(:user) {   FactoryGirl.create(:user, person: person) }
+  let!(:user) {   FactoryBot.create(:user, person: person) }
 
   before :each do
     view.extend BenefitSponsors::Engine.routes.url_helpers
@@ -69,8 +69,8 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
   end
 
   context "can_change_broker?" do
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:user) { FactoryBot.create(:user, person: person) }
     context "without broker" do
       before :each do
         view.extend BenefitSponsors::Engine.routes.url_helpers

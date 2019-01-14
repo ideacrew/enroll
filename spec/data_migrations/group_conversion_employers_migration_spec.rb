@@ -14,12 +14,12 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
 
   describe "changing plan year's state", dbclean: :after_each do
 
-    let(:organization) { FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: "Corp 1", fein: "520818450" }
-    let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
-    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
-    let(:person) { FactoryGirl.create(:person)}
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,10,1))}
+    let(:organization) { FactoryBot.create :organization, :with_expired_and_active_plan_years, legal_name: "Corp 1", fein: "520818450" }
+    let(:census_employee) { FactoryBot.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
+    let(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
+    let(:person) { FactoryBot.create(:person)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, effective_on: Date.new(2016,10,1))}
 
     after do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)

@@ -14,9 +14,9 @@ describe UpdateAptcDentalEnr, dbclean: :after_each do
   end
 
   describe "updating the applied aptc amount for a Dental Plan" do
-    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "dental", applied_aptc_amount: 100.00, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :coverage_kind => "dental", applied_aptc_amount: 100.00, household: family.active_household)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id.to_s)
@@ -33,9 +33,9 @@ describe UpdateAptcDentalEnr, dbclean: :after_each do
   end
 
   describe "should not update for a Health Plan" do
-    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "health", applied_aptc_amount: 100.00, household: family.active_household)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :coverage_kind => "health", applied_aptc_amount: 100.00, household: family.active_household)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id.to_s)

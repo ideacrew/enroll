@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-describe "employers/census_employees/_address_fields.html.erb", dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:address) { FactoryGirl.create(:address, person: person) }
-  let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn)}
+describe "employers/census_employees/_address_fields.html.erb" do
+  let(:person) { FactoryBot.create(:person) }
+  let(:address) { FactoryBot.create(:address, person: person) }
+  let(:census_employee) { FactoryBot.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn)}
 
   before :each do
     helper = Object.new.extend ActionView::Helpers::FormHelper

@@ -1,9 +1,9 @@
 Given("shop health plans exist for both last and this year") do
   year = (Date.today - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).year
-  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000, is_sole_source: false
-  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_sole_source: false
-  sole_source_plan = FactoryGirl.create :plan, :with_rating_factors, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_vertical: false, is_horizontal: false, is_sole_source: true
-  sole_source_plan_two = FactoryGirl.create :plan, :with_rating_factors, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_vertical: false, is_horizontal: false, is_sole_source: true
+  plan = FactoryBot.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000, is_sole_source: false
+  plan2 = FactoryBot.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_sole_source: false
+  sole_source_plan = FactoryBot.create :plan, :with_rating_factors, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_vertical: false, is_horizontal: false, is_sole_source: true
+  sole_source_plan_two = FactoryBot.create :plan, :with_rating_factors, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id, is_vertical: false, is_horizontal: false, is_sole_source: true
 
 end
 

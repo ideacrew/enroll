@@ -14,17 +14,17 @@ describe UpdateBrokerAgencyProfileId, dbclean: :after_each do
 
   describe "update benefit agency profile" do
 
-    let(:person) { FactoryGirl.create(:person, user: user) }
-    let(:user) { FactoryGirl.create(:user) }
-    let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active') }
-    let(:broker_agency) { FactoryGirl.create(:broker_agency, legal_name: "agencytwo") }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:person) { FactoryBot.create(:person, user: user) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
+    let(:broker_agency) { FactoryBot.create(:broker_agency, legal_name: "agencytwo") }
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
 
     before(:each) do
       broker_agency.broker_agency_profile.update_attributes(primary_broker_role: broker_role)
       broker_role.update_attributes(broker_agency_profile: broker_agency.broker_agency_profile)
       broker_agency.broker_agency_profile.approve!
-      @broker_agency_staff_role = FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id,person: person)
+      @broker_agency_staff_role = FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id,person: person)
       allow(ENV).to receive(:[]).with("hbx_id").and_return person.hbx_id
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:broker_role).and_return(broker_role)

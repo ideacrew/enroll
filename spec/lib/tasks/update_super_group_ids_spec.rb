@@ -5,11 +5,11 @@ Rake::Task.define_task(:environment)
 RSpec.describe 'Migrating carrier specific super group Id', :type => :task do
 
   before :all do
-    @plan = FactoryGirl.create(:plan, hios_id: "88806MA0040003-01", active_year: 2017, carrier_special_plan_identifier: nil)
-    @plan_non_super_group = FactoryGirl.create(:plan, hios_id: "82569MA0200001-01")
+    @plan = FactoryBot.create(:plan, hios_id: "88806MA0040003-01", active_year: 2017, carrier_special_plan_identifier: nil)
+    @plan_non_super_group = FactoryBot.create(:plan, hios_id: "82569MA0200001-01")
 
-    @product = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "88806MA0040003-01", application_period: Date.new(2017, 1, 1)..Date.new(2017, 12, 31))
-    @product_non_super_group = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "82569MA0200001-01", application_period: Date.new(2017, 1, 1)..Date.new(2017, 12, 31))
+    @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "88806MA0040003-01", application_period: Date.new(2017, 1, 1)..Date.new(2017, 12, 31))
+    @product_non_super_group = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "82569MA0200001-01", application_period: Date.new(2017, 1, 1)..Date.new(2017, 12, 31))
 
     Rake::Task["supergroup:update_plan_id"].invoke
   end

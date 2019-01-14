@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_index_table.html.erb" do
-  let(:employer_profile_a) { FactoryGirl.create(:employer_profile) }
-  let(:employer_profile_b) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile_a) { FactoryBot.create(:employer_profile) }
+  let(:employer_profile_b) { FactoryBot.create(:employer_profile) }
 
   before :each do
     assign(:employer_profiles, [employer_profile_a, employer_profile_b])

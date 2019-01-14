@@ -14,11 +14,11 @@ describe BuildShopEnrollment, dbclean: :after_each do
   end
 
   describe "creating a new shop enrollment", dbclean: :after_each do
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:person) { FactoryGirl.create(:person, :with_employee_role)}
-    let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: person.employee_roles[0].employer_profile, aasm_state: "active")}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: plan_year.employer_profile)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:person) { FactoryBot.create(:person, :with_employee_role)}
+    let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
+    let(:plan_year) { FactoryBot.create(:plan_year, employer_profile: person.employee_roles[0].employer_profile, aasm_state: "active")}
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: plan_year.employer_profile)}
     before do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("effective_on").and_return(TimeKeeper.date_of_record)

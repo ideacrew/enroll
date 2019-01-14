@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Exchanges::AnnouncementsController do
-  let(:announcement) { FactoryGirl.create(:announcement) }
-  let(:user_no_person) { FactoryGirl.create(:user) }
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, user: user) }
-  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+  let(:announcement) { FactoryBot.create(:announcement) }
+  let(:user_no_person) { FactoryBot.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.create(:person, user: user) }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
 
   describe "GET index" do
     it "should redirect when login without hbx_staff" do

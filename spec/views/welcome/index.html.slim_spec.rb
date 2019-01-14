@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  do
-  let(:user) { FactoryGirl.create(:user, oim_id: "test@enroll.com") }
+  let(:user) { FactoryBot.create(:user, oim_id: "test@enroll.com") }
 
   unless Settings.site.key == :cca
     describe "a signed in user" do

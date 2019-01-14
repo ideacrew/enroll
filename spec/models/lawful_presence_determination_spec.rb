@@ -3,7 +3,7 @@ require 'rails_helper'
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe LawfulPresenceDetermination do
   let(:consumer_role) {
-    FactoryGirl.create(:consumer_role_object)
+    FactoryBot.create(:consumer_role_object)
   }
   let(:person_id) { consumer_role.person.id }
   let(:payload) { "lsjdfioennnklsjdfe" }
@@ -90,7 +90,7 @@ end
 
 describe LawfulPresenceDetermination do
   context "state machine" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     subject { person.consumer_role.lawful_presence_determination }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
     all_states = [:verification_pending, :verification_outstanding, :verification_successful]

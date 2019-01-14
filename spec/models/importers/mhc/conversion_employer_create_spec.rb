@@ -32,7 +32,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
   let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
 
   let!(:fein) { record_attrs[:fein] }
-  let!(:carrier_profile) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
+  let!(:carrier_profile) { FactoryBot.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
   
   subject { Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
 

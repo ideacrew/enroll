@@ -4,7 +4,7 @@ RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'terminated', :fte_count => 55) }
+  let!(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'terminated', :fte_count => 55) }
   let(:application_event) do
     double("ApplicationEventKind",
       {

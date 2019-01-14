@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::AgentsController do
   render_views
-  let(:person_user) { FactoryGirl.create(:person, user: current_user)}
-  let(:current_user){FactoryGirl.create(:user)}
+  let(:person_user) { FactoryBot.create(:person, user: current_user)}
+  let(:current_user){FactoryBot.create(:user)}
   describe 'Agent Controller behavior' do
     let(:signed_in?){ true }
      before :each do
@@ -12,7 +12,7 @@ RSpec.describe Exchanges::AgentsController do
      end
 
     it 'renders home for CAC' do
-      person_user.csr_role = FactoryGirl.build(:csr_role, cac: true)
+      person_user.csr_role = FactoryBot.build(:csr_role, cac: true)
       sign_in current_user
       get :home
       expect(response).to have_http_status(:success)
@@ -21,7 +21,7 @@ RSpec.describe Exchanges::AgentsController do
     end
 
     it 'renders home for CSR' do
-      person_user.csr_role = FactoryGirl.build(:csr_role, cac: false)
+      person_user.csr_role = FactoryBot.build(:csr_role, cac: false)
       sign_in current_user
       get :home
       expect(response).to have_http_status(:success)
@@ -36,7 +36,7 @@ RSpec.describe Exchanges::AgentsController do
   end
 
   describe "resume enrollment method behavior", dbclean: :after_each do
-    let!(:consumer_role) { FactoryGirl.create(:consumer_role, bookmark_url: nil, person: person_user) }
+    let!(:consumer_role) { FactoryBot.create(:consumer_role, bookmark_url: nil, person: person_user) }
 
     before(:each) do
       allow(current_user).to receive(:roles).and_return ['consumer']

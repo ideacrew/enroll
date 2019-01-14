@@ -14,8 +14,8 @@ describe FixOrganization, dbclean: :after_each do
   end
 
   describe "update the fein of an Employer" do
-    let(:employer_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:employer_organization_2)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_organization_2)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     before(:each) do
       ENV["action"] = "update_fein"
@@ -68,8 +68,8 @@ describe FixOrganization, dbclean: :after_each do
 
 
   describe "swap the fein of an Employer" do
-    let(:employer_organization)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "111111111") }
-    let(:employer_organization_2)  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "987654321") }
+    let(:employer_organization)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "111111111") }
+    let(:employer_organization_2)  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site, fein: "987654321") }
     let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     before(:each) do
       ENV["action"] = "swap_fein"
@@ -103,10 +103,10 @@ describe FixOrganization, dbclean: :after_each do
 
   describe "update employer attestation for profiles with attestation unsubmitted and document submitted" do
 
-    let(:employer_organization)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
     let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:employer_attestation)   { FactoryGirl.build(:employer_attestation, aasm_state:'unsubmitted') }
+    let!(:employer_attestation)   { FactoryBot.build(:employer_attestation, aasm_state:'unsubmitted') }
     let!(:benefit_sponsorship)   { employer_profile.add_benefit_sponsorship }
     before(:each) do
       ENV["action"] = "approve_attestation"
@@ -195,13 +195,13 @@ describe FixOrganization, dbclean: :after_each do
     let(:organization) { benefit_sponsorship.organization }
     let(:employer_profile) { organization.employer_profile }
     let(:active_benefit_sponsorship) { benefit_sponsorship }
-    let(:old_broker_organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: organization.site)}
-    let!(:old_broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: old_broker_organization, market_kind: 'shop') }
-    let!(:old_broker_role) { FactoryGirl.create(:broker_role, benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id) }
-    let!(:broker_agency_account) { FactoryGirl.create(:benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: active_benefit_sponsorship, is_active: true, broker_agency_profile: old_broker_agency_profile) }
-    let(:broker_organization) { FactoryGirl.build(:benefit_sponsors_organizations_exempt_organization, site: organization.site)}
-    let!(:broker_agency_profile1) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
-    let!(:broker_role) { FactoryGirl.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id) }
+    let(:old_broker_organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: organization.site)}
+    let!(:old_broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: old_broker_organization, market_kind: 'shop') }
+    let!(:old_broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id) }
+    let!(:broker_agency_account) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, benefit_sponsorship: active_benefit_sponsorship, is_active: true, broker_agency_profile: old_broker_agency_profile) }
+    let(:broker_organization) { FactoryBot.build(:benefit_sponsors_organizations_exempt_organization, site: organization.site)}
+    let!(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id) }
 
     context "updating broker agency account details to correct information is provided" do
       before(:each) do

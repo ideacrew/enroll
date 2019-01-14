@@ -15,9 +15,9 @@ describe FixPlanYearsToObeyMinimumOpenEnrollmentPeriod, dbclean: :after_each do
   describe "fix bad plan year" do
 
     context "change open_enrollment_start_on date" do
-      let(:organization)      { FactoryGirl.create(:organization)}
-      let(:plan_year)         { FactoryGirl.build(:plan_year, open_enrollment_start_on: Date.new(2016, 2, 8), open_enrollment_end_on: Date.new(2016, 2, 10), start_on: Date.new(2016, 3, 1)) }
-      let(:employer_profile)  { FactoryGirl.build(:employer_profile, organization: organization, plan_years: [plan_year]) }
+      let(:organization)      { FactoryBot.create(:organization)}
+      let(:plan_year)         { FactoryBot.build(:plan_year, open_enrollment_start_on: Date.new(2016, 2, 8), open_enrollment_end_on: Date.new(2016, 2, 10), start_on: Date.new(2016, 3, 1)) }
+      let(:employer_profile)  { FactoryBot.build(:employer_profile, organization: organization, plan_years: [plan_year]) }
 
       before(:each) do
         employer_profile.save(validate: false) # Forcing the validation because we want an employer profile with an invalid plan year for the test case.

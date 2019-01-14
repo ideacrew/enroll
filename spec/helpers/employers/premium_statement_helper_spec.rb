@@ -3,12 +3,12 @@ require "rails_helper"
 RSpec.describe Employers::PremiumStatementHelper, :type => :helper do
 
   describe "#billing_period_options", dbclean: :after_each do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let(:employer_profile) { FactoryBot.create(:employer_profile)}
     before do
       assign(:employer_profile, employer_profile)
     end
     context "when ER has intial plan year which is 4 months old & without renewal plan year" do
-      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+      let!(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile)}
       before do
         start_on = (TimeKeeper.date_of_record).beginning_of_month - 4.months
         plan_year.update_attributes(
@@ -28,7 +28,7 @@ RSpec.describe Employers::PremiumStatementHelper, :type => :helper do
       end
 
       context "when ER has plan which has start_on date older than 6 months from now" do
-        let!(:old_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+        let!(:old_plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile)}
         before do
           start_on = (TimeKeeper.date_of_record).beginning_of_month - 7.months
           old_plan_year.update_attributes(
@@ -46,14 +46,14 @@ RSpec.describe Employers::PremiumStatementHelper, :type => :helper do
     end
 
     context "when ER has plan year which stars 2 months ahead in future" do
-      let!(:plan_year) { FactoryGirl.create(:future_plan_year, employer_profile: employer_profile)}
+      let!(:plan_year) { FactoryBot.create(:future_plan_year, employer_profile: employer_profile)}
       it "should have plan year start on month in the dropdown" do
         expect(helper.billing_period_options.first[1]).to eq employer_profile.plan_years.first.start_on
       end
     end
 
     context "when ER has both active & renewal plan years" do
-      let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years, employer_profile: employer_profile)}
+      let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years, employer_profile: employer_profile)}
       before do
         assign(:employer_profile, organization.employer_profile)
       end

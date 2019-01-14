@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe "exchanges/announcements/index.html.erb" do
-  let(:person) { FactoryGirl.create(:person)}
-  let(:user) { FactoryGirl.create(:user, :person => person)}
+  let(:person) { FactoryBot.create(:person)}
+  let(:user) { FactoryBot.create(:user, :person => person)}
   before :each do
     stub_template "exchanges/hbx_profiles/shared/_primary_nav.html.erb"  => 'nav_bar'
     sign_in user

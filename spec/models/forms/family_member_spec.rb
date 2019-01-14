@@ -121,8 +121,8 @@ describe Forms::FamilyMember do
     let(:addr1) {Address.new(zip: '1234', state: 'DC')}
     let(:addr2) {Address.new(zip: '4321', state: 'DC')}
     let(:addr3) {Address.new(zip: '1234', state: 'DC', 'address_3' => "abc")}
-    let(:person) {FactoryGirl.create(:person)}
-    let(:primary) {FactoryGirl.create(:person)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:primary) {FactoryBot.create(:person)}
     let(:family) {double(primary_family_member: double(person: primary))}
     let(:family_member) {double(person: person, family: family)}
     let(:employee_dependent) { Forms::FamilyMember.new }
@@ -214,7 +214,7 @@ end
 
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
   let(:family_id) { double }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
@@ -461,7 +461,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the relationship of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
-      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
+      allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
@@ -469,14 +469,14 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the attributes of the person" do
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
-      allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
+      allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
   end
 
   context "it should create the coverage household member record if found a inactive family member record" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:new_family_member) { FactoryGirl.create(:family_member, family: family, :is_active => false)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:new_family_member) { FactoryBot.create(:family_member, family: family, :is_active => false)}
     before do
       allow(family).to receive(:find_matching_inactive_member).and_return new_family_member
       new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }.each { |chm| chm.destroy! }
@@ -498,8 +498,8 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 end
 
 describe Forms::FamilyMember, "relationship validation" do
-  let(:family) { FactoryGirl.build(:family) }
-  let(:family_member) { FactoryGirl.build(:family_member, family: family) }
+  let(:family) { FactoryBot.build(:family) }
+  let(:family_member) { FactoryBot.build(:family_member, family: family) }
   let(:family_members) { family.family_members}
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }

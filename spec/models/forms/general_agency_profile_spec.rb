@@ -18,7 +18,7 @@ describe Forms::GeneralAgencyProfile, "given nothing" do
 end
 
 describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
-  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
 
   let(:attributes) { {
     first_name: 'joe',
@@ -75,7 +75,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       }}
 
     before(:each) do
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+      2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
       subject.save
     end
 
@@ -85,7 +85,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
   end
 
   context 'when general agency already exists with same FEIN' do
-    let(:general_agency) { FactoryGirl.create(:general_agency_with_organization) }
+    let(:general_agency) { FactoryBot.create(:general_agency_with_organization) }
     let(:other_attributes) {
       {
         fein: general_agency.fein
@@ -127,7 +127,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       }}
 
     before(:each) do
-      FactoryGirl.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, first_name: "joseph", last_name: "smith", dob: "10/10/1974")
       subject.save
     end
 
@@ -171,7 +171,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
   end
 
   context "validate_duplicate_npn" do
-    let(:staff) { FactoryGirl.create(:general_agency_staff_role) }
+    let(:staff) { FactoryBot.create(:general_agency_staff_role) }
     let(:other_attributes) { {
       first_name: 'kevin',
       email: "useraccount2@gmail.com",
@@ -220,7 +220,7 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
 
   context 'when more than 1 person matched' do
     before :each do
-      2.times { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+      2.times { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
     end
 
     it "should raise an exception" do
@@ -236,7 +236,7 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
     end
 
      before :each do
-      FactoryGirl.create(:person, first_name: "larry", last_name: "smith", dob: "10/10/1974")
+      FactoryBot.create(:person, first_name: "larry", last_name: "smith", dob: "10/10/1974")
       subject.match_or_create_person
     end
 
@@ -274,7 +274,7 @@ describe Forms::GeneralAgencyProfile, ".match_or_create_person", :dbclean => :af
 end
 
 describe Forms::GeneralAgencyProfile, ".find", dbclean: :after_each do
-  let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :with_staff) }
+  let(:general_agency_profile) { FactoryBot.create(:general_agency_profile, :with_staff) }
   let(:organization) { general_agency_profile.organization }
 
   before :each do

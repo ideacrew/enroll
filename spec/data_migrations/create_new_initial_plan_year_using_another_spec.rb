@@ -5,13 +5,13 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :around_each do
   let(:given_task_name) { "create_new_initial_plan_year_using_another" }
   subject { CreateNewInitialPlanYearUsingAnother.new(given_task_name, double(:current_scope => nil)) }
   let(:benefit_group) { existing_plan_year.benefit_groups.first }
-  let(:existing_plan_year) { FactoryGirl.create(:custom_plan_year, employer_profile: employer_profile) }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:existing_plan_year) { FactoryBot.create(:custom_plan_year, employer_profile: employer_profile) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:organization) { employer_profile.organization }
   let(:start_on) { "01012017" }
-  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
-  let!(:employer_attestation) { FactoryGirl.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
-  let!(:document) { FactoryGirl.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
+  let!(:rating_area) { RatingArea.first || FactoryBot.create(:rating_area)  }
+  let!(:employer_attestation) { FactoryBot.create(:employer_attestation,aasm_state:'approved',employer_profile:employer_profile) }
+  let!(:document) { FactoryBot.create(:employer_attestation_document, aasm_state: 'accepted', employer_attestation: employer_attestation) }
 
   describe "create_initial_plan_year", dbclean: :after_each do
     it "creates a new plan year" do

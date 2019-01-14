@@ -2,9 +2,9 @@ require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_families.html.erb" do
 
-  let!(:family_1) { FactoryGirl.create(:family, :with_primary_family_member, person: person_1, is_active: true, renewal_consent_through_year: 2015)}
-  let(:person_1) { FactoryGirl.create(:person, first_name: "fun", last_name: "team")}
-  let(:person_2) { FactoryGirl.create(:person)}
+  let!(:family_1) { FactoryBot.create(:family, :with_primary_family_member, person: person_1, is_active: true, renewal_consent_through_year: 2015)}
+  let(:person_1) { FactoryBot.create(:person, first_name: "fun", last_name: "team")}
+  let(:person_2) { FactoryBot.create(:person)}
 
   let(:employer_profile){
     double("EmployerProfile",

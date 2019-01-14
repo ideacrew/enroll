@@ -5,7 +5,7 @@ class FakesController < ApplicationController
 end
 
 describe FakesController do
-  let(:consumer_role) { FactoryGirl.create(:person, :with_consumer_role).consumer_role }
+  let(:consumer_role) { FactoryBot.create(:person, :with_consumer_role).consumer_role }
   let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016" }}}, naturalized_citizen: false, eligible_immigration_status: false } }
   let(:person_params) { ActionController::Parameters.new({person: params }) }
   let(:dependent_params) { ActionController::Parameters.new({dependent: params }) }
@@ -33,15 +33,15 @@ describe FakesController do
   end
 
   context "#get_vlp_doc_subject_by_consumer_role" do
-    let(:vlp_doc_naturalized) { FactoryGirl.build(:vlp_document, :subject => "Certificate of Citizenship" ) }
-    let(:vlp_doc_immigrant) { FactoryGirl.build(:vlp_document, :subject => "I-327 (Reentry Permit)" ) }
+    let(:vlp_doc_naturalized) { FactoryBot.build(:vlp_document, :subject => "Certificate of Citizenship" ) }
+    let(:vlp_doc_immigrant) { FactoryBot.build(:vlp_document, :subject => "I-327 (Reentry Permit)" ) }
     shared_examples_for "returns vlp document subject" do |doc_subject, citizen_status|
       before do
         consumer_role.vlp_documents = [vlp_doc_naturalized, vlp_doc_immigrant]
       end
       describe "#{citizen_status}" do
         before do
-          consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :subject => doc_subject)
+          consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :subject => doc_subject)
           consumer_role.citizen_status = citizen_status
         end
         it "returns nil if no consumer role" do

@@ -5,11 +5,11 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
   context "Plan year display" do
 
-    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
-    let(:plan_year) { FactoryGirl.build_stubbed(:plan_year) }
-    let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
-    let(:plan) { FactoryGirl.build_stubbed(:plan) }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:employer_profile) { FactoryBot.build_stubbed(:employer_profile) }
+    let(:plan_year) { FactoryBot.build_stubbed(:plan_year) }
+    let(:benefit_group) { FactoryBot.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
+    let(:plan) { FactoryBot.build_stubbed(:plan) }
+    let(:user) { FactoryBot.create(:user) }
 
     before :each do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))
@@ -52,13 +52,13 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
   end
 
   context "Plan year" do
-    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
-    let(:plan_year) { FactoryGirl.build_stubbed(:plan_year, :aasm_state => 'renewing_draft') }
-    let(:published_plan_year) { FactoryGirl.build_stubbed(:plan_year, :aasm_state => 'active') }
-    let(:terminated_plan_year) { FactoryGirl.build_stubbed(:plan_year, :aasm_state => 'terminated', :terminated_on =>  TimeKeeper.date_of_record) }
-    let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
-    let(:plan) { FactoryGirl.build_stubbed(:plan) }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:employer_profile) { FactoryBot.build_stubbed(:employer_profile) }
+    let(:plan_year) { FactoryBot.build_stubbed(:plan_year, :aasm_state => 'renewing_draft') }
+    let(:published_plan_year) { FactoryBot.build_stubbed(:plan_year, :aasm_state => 'active') }
+    let(:terminated_plan_year) { FactoryBot.build_stubbed(:plan_year, :aasm_state => 'terminated', :terminated_on =>  TimeKeeper.date_of_record) }
+    let(:benefit_group) { FactoryBot.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
+    let(:plan) { FactoryBot.build_stubbed(:plan) }
+    let(:user) { FactoryBot.create(:user) }
 
     before :each do
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))

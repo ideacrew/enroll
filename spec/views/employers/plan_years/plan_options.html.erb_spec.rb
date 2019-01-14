@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "employers/plan_years/_plan_options.html.erb" do
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:carrier_profile) {FactoryGirl.create(:carrier_profile, organization: organization)}
-  let(:plan) {FactoryGirl.create(:plan, carrier_profile: carrier_profile)}
+  let(:organization) {FactoryBot.create(:organization)}
+  let(:carrier_profile) {FactoryBot.create(:carrier_profile, organization: organization)}
+  let(:plan) {FactoryBot.create(:plan, carrier_profile: carrier_profile)}
 
   before :each do
     carriers = {}

@@ -5,12 +5,20 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     proposal: proposal
   )}
 
+<<<<<<< HEAD
   let(:organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization, :with_profile)}
+=======
+  let(:organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile)}
+>>>>>>> running specs and failing at creation of user and person
   let(:proposal) { organization.plan_design_proposals.first }
   let(:benefit_kind) { "health" }
   let(:profile) { proposal.profile }
   let(:sponsorship) { profile.benefit_sponsorships.first }
+<<<<<<< HEAD
   let(:application) { FactoryGirl.create(:plan_design_benefit_application, benefit_sponsorship: sponsorship)}
+=======
+  let(:application) { FactoryBot.create(:plan_design_benefit_application, benefit_sponsorship: sponsorship)}
+>>>>>>> running specs and failing at creation of user and person
 
   before do
     DatabaseCleaner.clean
@@ -55,7 +63,11 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
   describe "#ensure_dental_benefits" do
 
     let(:benefit_kind) { "dental" }
+<<<<<<< HEAD
     let(:application) { FactoryGirl.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: sponsorship) }
+=======
+    let(:application) { FactoryBot.create(:plan_design_benefit_application, :with_benefit_group, benefit_sponsorship: sponsorship) }
+>>>>>>> running specs and failing at creation of user and person
 
     before do
       application
@@ -88,6 +100,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     }
     let(:health_plan_option_kind) { "single_issuer" }
 
+<<<<<<< HEAD
     let(:benefit_group) { application.benefit_groups.first }
 
     context "#save_health_benefits" do
@@ -104,6 +117,22 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
 
       it "should have relationship_benefits being set" do
         employee_benefits = benefit_group.relationship_benefits.where(:relationship => "employee").first
+=======
+    context "#save_health_benefits" do
+
+      before do
+        application
+        subject.save_health_benefits(health_attributes)
+        @benefit_group = application.benefit_groups.first
+      end
+
+      it "should have plan_option_kind being set" do
+        expect(@benefit_group.plan_option_kind).to eq health_plan_option_kind
+      end
+
+      it "should have relationship_benefits being set" do
+        employee_benefits = @benefit_group.relationship_benefits.where(:relationship => "employee").first
+>>>>>>> running specs and failing at creation of user and person
         expect(employee_benefits.premium_pct).to eq 65.0
       end
     end
@@ -123,6 +152,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
         allow(organization).to receive_message_chain(:broker_agency_profile, :legal_name).and_return "LegalName"
         subject.save_health_benefits(health_attributes)
         subject.save_dental_benefits(dental_attributes)
+<<<<<<< HEAD
       end
 
       it "should have dental_plan_option_kind being set" do
@@ -131,6 +161,17 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
 
       it "should have dental_relationship_benefits being set" do
         employee_dental_benefits = benefit_group.dental_relationship_benefits.where(:relationship => "employee").first
+=======
+        @benefit_group = application.benefit_groups.first
+      end
+
+      it "should have dental_plan_option_kind being set" do
+        expect(@benefit_group.dental_plan_option_kind).to eq dental_plan_option_kind
+      end
+
+      it "should have dental_relationship_benefits being set" do
+        employee_dental_benefits = @benefit_group.dental_relationship_benefits.where(:relationship => "employee").first
+>>>>>>> running specs and failing at creation of user and person
         expect(employee_dental_benefits.premium_pct).to eq 65.0
       end
     end

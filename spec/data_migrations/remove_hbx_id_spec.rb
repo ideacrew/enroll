@@ -12,7 +12,7 @@ describe RemoveHbxId do
   end
 
   describe "changing person ssn" do
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     end

@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "insured/consumer_roles/edit.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:consumer_role) { FactoryGirl.create(:consumer_role) }
-  let(:current_user) {FactoryGirl.create(:user)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:current_user) {FactoryBot.create(:user)}
   let(:individual_market_is_enabled) { true }
   before :each do
     assign(:person, person)

@@ -2,10 +2,10 @@ require "rails_helper"
 
 describe Importers::ConversionEmployerUpdate, :dbclean => :after_each do
 
-  let(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion') }
-  let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
-  let(:broker_agency_profile){ FactoryGirl.create(:broker_agency_profile) }
-  let(:broker_role) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile, profile_source: 'conversion') }
+  let(:carrier_profile) { FactoryBot.create(:carrier_profile) }
+  let(:broker_agency_profile){ FactoryBot.create(:broker_agency_profile) }
+  let(:broker_role) { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
 
   let(:record_attrs) {
     {

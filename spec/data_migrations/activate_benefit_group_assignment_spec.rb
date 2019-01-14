@@ -14,14 +14,14 @@ describe ActivateBenefitGroupAssignment do
 
   describe "activate benefit group assignment" do
 
-    # let!(:benefit_group1)     { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    # let!(:benefit_group2)     { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    # let!(:plan_year)         { FactoryGirl.create(:plan_year, aasm_state: "draft", employer_profile: employer_profile) }
-    # let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee,ssn:"123456789")}
+    # let!(:benefit_group1)     { FactoryBot.create(:benefit_group, plan_year: plan_year)}
+    # let!(:benefit_group2)     { FactoryBot.create(:benefit_group, plan_year: plan_year)}
+    # let!(:plan_year)         { FactoryBot.create(:plan_year, aasm_state: "draft", employer_profile: employer_profile) }
+    # let(:employer_profile)  { FactoryBot.create(:employer_profile) }
+    let!(:census_employee) { FactoryBot.create(:census_employee,ssn:"123456789")}
 
-    let!(:benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
-    let!(:benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
+    let!(:benefit_group_assignment1)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
+    let!(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_ssn").and_return(census_employee.ssn)
       allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment1.id)

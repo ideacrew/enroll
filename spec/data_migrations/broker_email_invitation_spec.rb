@@ -11,7 +11,7 @@ describe BrokerEmailInvitation, dbclean: :after_each do
   end
 
   describe "Send invitation to the broker" do
-    let(:registered_broker_role) {FactoryGirl.create(:broker_role, npn: "2323334", aasm_state:"active")}
+    let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"active")}
     before do
       allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
     end
@@ -23,8 +23,8 @@ describe BrokerEmailInvitation, dbclean: :after_each do
   end
 
   describe "Already invited broker should not be sent an invitation" do    
-    let(:registered_broker_role) {FactoryGirl.create(:broker_role, npn: "2323334", aasm_state:"active")}
-    let(:invitation) { FactoryGirl.create(:invitation, :broker_role, :source_id => registered_broker_role.id, :invitation_email => registered_broker_role.email_address)}
+    let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"active")}
+    let(:invitation) { FactoryBot.create(:invitation, :broker_role, :source_id => registered_broker_role.id, :invitation_email => registered_broker_role.email_address)}
     before do
       allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
     end
@@ -37,7 +37,7 @@ describe BrokerEmailInvitation, dbclean: :after_each do
   end
 
   describe "Do not send an invitation to the broker who is not in active state" do
-    let(:registered_broker_role) {FactoryGirl.create(:broker_role, npn: "2323334", aasm_state:"broker_agency_pending")}
+    let(:registered_broker_role) {FactoryBot.create(:broker_role, npn: "2323334", aasm_state:"broker_agency_pending")}
     before do
       allow(ENV).to receive(:[]).with("npn").and_return(registered_broker_role.npn)
     end

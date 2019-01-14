@@ -10,12 +10,12 @@ describe RemovePlanOfferings, dbclean: :after_each do
     end
   end
   describe "remove the plans of specific carrier for an er " do
-    let(:organization){ FactoryGirl.create(:organization) }
-    let(:active_benefit_group_ref_plan) {FactoryGirl.create(:plan, active_year:TimeKeeper.date_of_record.year - 1)}
-    let(:active_benefit_group_ref_plan2) {FactoryGirl.create(:plan, active_year:TimeKeeper.date_of_record.year - 1)}
-    let(:benefit_group) { FactoryGirl.build(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id, active_benefit_group_ref_plan2.id]) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
-    let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile, benefit_groups:[benefit_group])}
+    let(:organization){ FactoryBot.create(:organization) }
+    let(:active_benefit_group_ref_plan) {FactoryBot.create(:plan, active_year:TimeKeeper.date_of_record.year - 1)}
+    let(:active_benefit_group_ref_plan2) {FactoryBot.create(:plan, active_year:TimeKeeper.date_of_record.year - 1)}
+    let(:benefit_group) { FactoryBot.build(:benefit_group, reference_plan_id:active_benefit_group_ref_plan.id, elected_plan_ids:[active_benefit_group_ref_plan.id, active_benefit_group_ref_plan2.id]) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile, organization: organization) }
+    let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile, benefit_groups:[benefit_group])}
     before(:each) do
       ENV['fein'] = employer_profile.fein
       ENV['aasm_state'] = plan_year.aasm_state

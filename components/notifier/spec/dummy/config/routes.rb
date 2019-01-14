@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+# Rails.application.routes.draw do
 
-  mount Notifier::Engine => "/notifier"
-end
+#   mount Notifier::Engine => "/notifier"
+# end

@@ -16,8 +16,8 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
   let(:ce) { benefit_sponsorship.census_employees.non_business_owner.first }
 
   let!(:family) {
-    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: abc_profile)
+    person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: abc_profile)
     ce.update_attributes({employee_role: employee_role})
     Family.find_or_build_from_employee_role(employee_role)
   }
@@ -42,7 +42,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
     context "when employee making changes to existing enrollment" do 
 
       let!(:hbx_enrollment) {
-        FactoryGirl.create(:hbx_enrollment,
+        FactoryBot.create(:hbx_enrollment,
           household: family.active_household,
           coverage_kind: "dental",
           effective_on: enrollment_effective_date,
@@ -72,7 +72,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
 
     context "when employee purchasing coverage through qle" do 
 
-      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:qualifying_life_event_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
       let(:qle_on) { TimeKeeper.date_of_record - 2.days }
 
       let!(:special_enrollment_period) {
@@ -105,7 +105,7 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
     end
 
     context "When employee purchasing coverage through future application using qle" do
-      let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:qualifying_life_event_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
       let(:qle_on) { TimeKeeper.date_of_record - 2.days }
       let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 

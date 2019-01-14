@@ -1,7 +1,7 @@
 require 'rails_helper'
 RSpec.describe "_enrollment_report_widget.html.erb" do
-  let(:employer_profile){FactoryGirl.create(:employer_profile)}
-  let(:plan_year){FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+  let(:employer_profile){FactoryBot.create(:employer_profile)}
+  let(:plan_year){FactoryBot.create(:plan_year, employer_profile: employer_profile)}
 
   context "with active plan year billing date" do
     before :each do
@@ -19,7 +19,7 @@ RSpec.describe "_enrollment_report_widget.html.erb" do
     end
     
   context "without active plan year" do
-    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+    let(:employer_profile) { FactoryBot.build_stubbed(:employer_profile) }
     before :each do
       assign(:employer_profile, employer_profile)
       allow(employer_profile).to receive(:billing_plan_year).and_return([])

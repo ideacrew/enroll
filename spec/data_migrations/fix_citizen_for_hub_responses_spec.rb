@@ -8,9 +8,9 @@ STATES_TO_FIX = ["not_lawfully_present_in_us", "non_native_not_lawfully_present_
 
 describe UpdateCitizenStatus, dbclean: :after_each do
   subject { UpdateCitizenStatus.new("fix_citizen_for_hub_responses", double(:current_scope => nil)) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person1) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
 
   shared_examples_for "fixing citizen status for consumer" do |old_state, new_state, result, vlp_authority|
     before do

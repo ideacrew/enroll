@@ -10,10 +10,10 @@ describe UpdateEmployeePlanSelection, dbclean: :after_each do
     end
   end
   describe "changing employer contributions" do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:family){FactoryGirl.create(:family,:with_primary_family_member)}
-    let!(:hbx_enrollment){FactoryGirl.create(:hbx_enrollment, benefit_group:benefit_group,household:family.active_household)}
-    let(:plan){FactoryGirl.create(:plan,hios_id:"12345")}
+    let(:benefit_group) { FactoryBot.create(:benefit_group)}
+    let(:family){FactoryBot.create(:family,:with_primary_family_member)}
+    let!(:hbx_enrollment){FactoryBot.create(:hbx_enrollment, benefit_group:benefit_group,household:family.active_household)}
+    let(:plan){FactoryBot.create(:plan,hios_id:"12345")}
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(benefit_group.employer_profile.parent.fein)
       allow(ENV).to receive(:[]).with("hios_id").and_return(plan.hios_id)

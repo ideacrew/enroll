@@ -10,8 +10,8 @@ describe RemoveCeFromRoster, dbclean: :after_each do
     end
   end
   describe "remove census_employee" do
-    let(:employer_profile)     { FactoryGirl.create(:employer_profile) }
-    let(:census_employee)     { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id) }
+    let(:employer_profile)     { FactoryBot.create(:employer_profile) }
+    let(:census_employee)     { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id) }
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)
     end

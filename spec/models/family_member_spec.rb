@@ -110,8 +110,8 @@ describe FamilyMember, dbclean: :after_each do
   end
 
   context "broker" do
-    let(:broker_role)   {FactoryGirl.create(:broker_role)}
-    let(:broker_role2)  {FactoryGirl.create(:broker_role)}
+    let(:broker_role)   {FactoryBot.create(:broker_role)}
+    let(:broker_role2)  {FactoryBot.create(:broker_role)}
 
     it "with broker_role" do
       family_member = ag.family_members.create(**family_member_params)
@@ -185,10 +185,10 @@ describe FamilyMember, "which is inactive" do
 end
 
 describe FamilyMember, "given a relationship to update" do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:relationship) { "spouse" }
-  let(:person) { FactoryGirl.build(:person) }
-  subject { FactoryGirl.build(:family_member, person: person, family: family) }
+  let(:person) { FactoryBot.build(:person) }
+  subject { FactoryBot.build(:family_member, person: person, family: family) }
 
   it "should do nothing if the relationship is the same" do
     subject.update_relationship(subject.primary_relationship)

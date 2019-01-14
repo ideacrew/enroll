@@ -13,15 +13,15 @@ describe EeWithoutEmployeeRole, dbclean: :after_each do
   end
 
   describe "assign employee role", dbclean: :after_each do
-    let(:person) { FactoryGirl.create(:person)}
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:active_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: 'active', benefit_groups: [benefit_group])}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, plan_years: [active_plan_year])}
-    let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
-    let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile:employer_profile)}
-    let(:census_employee2) { FactoryGirl.create(:census_employee, aasm_state:'eligible', employer_profile:employer_profile)}
-    let(:employee_role1) { FactoryGirl.create(:employee_role, person:person, census_employee:census_employee1, employer_profile_id:employer_profile.id)}
-    let(:employee_role2) { FactoryGirl.create(:employee_role, person:person, census_employee:census_employee2, employer_profile_id:employer_profile.id)}
+    let(:person) { FactoryBot.create(:person)}
+    let(:benefit_group) { FactoryBot.create(:benefit_group)}
+    let(:active_plan_year)  { FactoryBot.build(:plan_year, aasm_state: 'active', benefit_groups: [benefit_group])}
+    let(:employer_profile) { FactoryBot.create(:employer_profile, plan_years: [active_plan_year])}
+    let(:organization) { FactoryBot.create(:organization, employer_profile:employer_profile)}
+    let(:census_employee1) { FactoryBot.create(:census_employee, employer_profile:employer_profile)}
+    let(:census_employee2) { FactoryBot.create(:census_employee, aasm_state:'eligible', employer_profile:employer_profile)}
+    let(:employee_role1) { FactoryBot.create(:employee_role, person:person, census_employee:census_employee1, employer_profile_id:employer_profile.id)}
+    let(:employee_role2) { FactoryBot.create(:employee_role, person:person, census_employee:census_employee2, employer_profile_id:employer_profile.id)}
 
     before do
       allow(person).to receive(:employee_roles).and_return([employee_role1, employee_role2])

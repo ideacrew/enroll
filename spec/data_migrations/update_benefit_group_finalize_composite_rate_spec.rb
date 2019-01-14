@@ -14,12 +14,12 @@ describe UpdateBenefitGroupFinalizeCompositeRate, dbclean: :after_each do
   end
 
   describe "updating aasm_state of the renewing plan year", dbclean: :after_each do
-    let(:benefit_group2) { FactoryGirl.build(:benefit_group, plan_option_kind: "sole_source") }
-    let(:benefit_group) { FactoryGirl.build(:benefit_group, plan_option_kind: "sole_source") }
-    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active",benefit_groups:[benefit_group]) }
-    let(:canceled_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "canceled",benefit_groups:[benefit_group2]) }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [plan_year,canceled_plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:benefit_group2) { FactoryBot.build(:benefit_group, plan_option_kind: "sole_source") }
+    let(:benefit_group) { FactoryBot.build(:benefit_group, plan_option_kind: "sole_source") }
+    let(:plan_year){ FactoryBot.build(:plan_year, aasm_state: "active",benefit_groups:[benefit_group]) }
+    let(:canceled_plan_year){ FactoryBot.build(:plan_year, aasm_state: "canceled",benefit_groups:[benefit_group2]) }
+    let(:employer_profile){ FactoryBot.build(:employer_profile, plan_years: [plan_year,canceled_plan_year]) }
+    let(:organization)  {FactoryBot.create(:organization,employer_profile:employer_profile)}
     let!(:composite_tier_contribution) {plan_year.benefit_groups.first.composite_tier_contributions.first}
 
     before(:each) do

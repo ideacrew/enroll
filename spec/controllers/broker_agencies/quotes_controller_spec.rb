@@ -5,9 +5,9 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
   let(:user){create(:user, person: person)}
   let(:quote){create :quote , :with_household_and_members}
   let(:quote_benefit_group){build_stubbed :quote_benefit_group}
-  let(:quote_attributes){FactoryGirl.attributes_for(:quote)}
-  let(:quote_household_attributes){FactoryGirl.attributes_for(:quote_household)}
-  let(:quote_member_attributes){FactoryGirl.attributes_for(:quote_member)}
+  let(:quote_attributes){FactoryBot.attributes_for(:quote)}
+  let(:quote_household_attributes){FactoryBot.attributes_for(:quote_household)}
+  let(:quote_member_attributes){FactoryBot.attributes_for(:quote_member)}
 
   before do
     sign_in user
@@ -58,7 +58,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   describe "Update" do
     before do
-      @quote = FactoryGirl.create(:quote,:with_household_and_members)
+      @quote = FactoryBot.create(:quote,:with_household_and_members)
     end
 
     context "update quote name" do
@@ -112,7 +112,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   describe "Delete" do
     before do
-      @quote = FactoryGirl.create(:quote,:with_household_and_members)
+      @quote = FactoryBot.create(:quote,:with_household_and_members)
     end
     context "#delete_quote" do
       it "should delete quote" do
@@ -199,7 +199,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
 
   describe "Creating New Quote " do
     before do
-      @quote = FactoryGirl.create(:quote,:with_household_and_members)
+      @quote = FactoryBot.create(:quote,:with_household_and_members)
       quote_household_attributes.merge!("id" => @quote.quote_households.first.id, "quote_members_attributes" => { "0" => {"first_name" =>"Kevin",
         "middle_name"=>"M" , "dob" => "07/04/1990", "id" => @quote.quote_households.first.quote_members.first.id } })
       quote_attributes[:quote_benefit_groups_attributes] = {"0"=>{"title"=>"Default Benefit Package"}}

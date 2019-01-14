@@ -10,7 +10,7 @@ describe UpdatePersonName, dbclean: :after_each do
     end
   end
   describe "changing person's name" do
-    let(:person) { FactoryGirl.create(:person, first_name: 'James', last_name: 'federer')}
+    let(:person) { FactoryBot.create(:person, first_name: 'James', last_name: 'federer')}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("first_name").and_return("Chirec")

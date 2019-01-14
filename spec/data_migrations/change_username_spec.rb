@@ -10,7 +10,7 @@ describe ChangeUsername, dbclean: :after_each do
     end
   end
   describe "change the username of a user" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("old_user_oimid").and_return(user.oim_id)
       allow(ENV).to receive(:[]).with("new_user_oimid").and_return("NewUsername")
@@ -25,7 +25,7 @@ describe ChangeUsername, dbclean: :after_each do
   end
   
   describe "not change the username if the user not found" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("old_user_oimid").and_return("")
       allow(ENV).to receive(:[]).with("new_user_oimid").and_return("NewUsername")
@@ -40,8 +40,8 @@ describe ChangeUsername, dbclean: :after_each do
   end
 
   describe "if new user already present in Enroll System" do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:new_user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:new_user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("old_user_oimid").and_return(user.oim_id)
       allow(ENV).to receive(:[]).with("new_user_oimid").and_return(new_user.oim_id)

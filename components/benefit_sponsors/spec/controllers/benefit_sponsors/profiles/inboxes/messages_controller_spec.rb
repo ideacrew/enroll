@@ -4,22 +4,22 @@ module BenefitSponsors
   RSpec.describe Inboxes::MessagesController, type: :controller, dbclean: :after_each do
 
     routes {BenefitSponsors::Engine.routes}
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)}
+    let!(:site) {FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)}
 
-    let(:organization) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
-    let(:inbox) {FactoryGirl.create(:benefit_sponsors_inbox, :with_message, recipient: organization.employer_profile)}
-    let(:person) {FactoryGirl.create(:person)}
-    let(:user) {FactoryGirl.create(:user, :person => person)}
+    let(:organization) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+    let(:inbox) {FactoryBot.create(:benefit_sponsors_inbox, :with_message, recipient: organization.employer_profile)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:user) {FactoryBot.create(:user, :person => person)}
 
-    let(:broker_organization) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
-    let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
-    let(:broker_user) { FactoryGirl.create(:user, person: broker_person ) }
+    let(:broker_organization) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+    let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person ) }
 
-    let(:admin_person) {FactoryGirl.create(:person)}
-    let(:admin_user) {FactoryGirl.create(:user, :person => admin_person)}
-    let(:hbx_staff_role) {FactoryGirl.create(:hbx_staff_role, person: admin_user.person)}
+    let(:admin_person) {FactoryBot.create(:person)}
+    let(:admin_user) {FactoryBot.create(:user, :person => admin_person)}
+    let(:hbx_staff_role) {FactoryBot.create(:hbx_staff_role, person: admin_user.person)}
 
 
     describe "GET show / DELETE destroy" do

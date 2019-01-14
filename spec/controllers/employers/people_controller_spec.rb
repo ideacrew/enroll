@@ -110,7 +110,7 @@ RSpec.describe Employers::PeopleController do
 
     context "given valid parameters render 'match' template" do
       let(:validation_result) { true }
-      let(:found_person) { FactoryGirl.create(:person) }
+      let(:found_person) { FactoryBot.create(:person) }
 
       it "renders the 'match' template" do
         expect(response).to have_http_status(:success)
@@ -137,7 +137,7 @@ RSpec.describe Employers::PeopleController do
       deep_merge(phones_attributes: {0 => {"id" => phone_attributes}}).
       deep_merge(emails_attributes: {0 => {"id" => email_attributes}})
       } }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     before(:each) do
       sign_in(user)

@@ -10,10 +10,10 @@ RSpec.describe "events/brokers/created.xml.haml" , dbclean: :after_each do
       download_vocabularies
     end
 
-    let!(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
+    let!(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
     let!(:broker_agency_profile) {broker_agency_organization.broker_agency_profile }
-    let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
-    let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone, broker_role: broker)}
+    let(:broker) {FactoryBot.build(:broker_role,aasm_state:'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+    let(:person_broker) {FactoryBot.build(:person,:with_work_email, :with_work_phone, broker_role: broker)}
 
     before :each do
       broker_agency_profile.update_attributes(ach_routing_number:'123456789',ach_account_number:"9999999999999999")

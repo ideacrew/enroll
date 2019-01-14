@@ -6,8 +6,8 @@ describe Notify do
   end
 
   context "notify_change_envent function" do
-    let(:person){FactoryGirl.build(:person)}
-    let(:per){FactoryGirl.create(:person)}
+    let(:person){FactoryBot.build(:person)}
+    let(:per){FactoryBot.create(:person)}
     before(:all) do
       @instance = Object.new
       @instance.extend(Notify) 
@@ -28,8 +28,8 @@ describe Notify do
   end
 
   context "paypload function" do
-    let(:person){FactoryGirl.create(:person)}
-    let(:per){FactoryGirl.build(:person)}
+    let(:person){FactoryBot.create(:person)}
+    let(:per){FactoryBot.build(:person)}
 
     context "for field" do
       it "will call notify with change person's first_name" do
@@ -57,8 +57,8 @@ describe Notify do
     end
 
     context "for embeds_one relationship" do
-      let(:broker_role) {FactoryGirl.build(:broker_role)}
-      let(:br) {FactoryGirl.create(:broker_role)}
+      let(:broker_role) {FactoryBot.build(:broker_role)}
+      let(:br) {FactoryBot.create(:broker_role)}
 
       it "will call notify with create person broker_role" do
         expect([payload(broker_role.person, field: "broker_role")]).to eq [{"status"=>"created", "broker_role"=>broker_role}]

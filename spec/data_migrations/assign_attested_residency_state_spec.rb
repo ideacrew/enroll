@@ -3,10 +3,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 require File.join(Rails.root, "app", "data_migrations", "assign_attested_residency_state")
 
 describe AssignAttestedResidency, :dbclean => :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:active_household) { family.active_household }
-  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
+  let(:enrollment) { FactoryBot.create(:hbx_enrollment,
                        household: active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.beginning_of_month,

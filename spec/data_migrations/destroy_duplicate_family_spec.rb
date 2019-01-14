@@ -12,11 +12,11 @@ describe DestroyDuplicateFamily, dbclean: :after_each do
   end
 
   describe "should destroy invalid family" do
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member,person:person)}
 
     let(:active_household) {family.active_household}
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on:TimeKeeper.date_of_record,aasm_state:'coverage_selected')}
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:TimeKeeper.date_of_record,aasm_state:'coverage_selected')}
 
 
     before(:each) do

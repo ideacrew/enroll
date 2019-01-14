@@ -14,8 +14,8 @@ describe UpdatePersonRelationshipKind, dbclean: :after_each do
   # end
 
   describe "changing plan year's state" do
-    let(:person) { FactoryGirl.create(:person)}
-    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:person) { FactoryBot.create(:person)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     before(:each) do
       person.person_relationships << PersonRelationship.new(relative: person, kind: "child")
       person.save

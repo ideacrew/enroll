@@ -1,16 +1,16 @@
 
 Given (/a matched Employee exists with multiple employee roles/) do
-  org1 = FactoryGirl.create :organization, :with_active_plan_year
-  org2 = FactoryGirl.create :organization, :with_active_plan_year_and_without_dental
+  org1 = FactoryBot.create :organization, :with_active_plan_year
+  org2 = FactoryBot.create :organization, :with_active_plan_year_and_without_dental
   benefit_group1 = org1.employer_profile.plan_years[0].benefit_groups[0]
   benefit_group2 = org2.employer_profile.plan_years[0].benefit_groups[0]
-  bga1 = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group1
-  bga2 = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group2
-  FactoryGirl.create(:user)
-  @person = FactoryGirl.create(:person, :with_family, first_name: "Employee", last_name: "E", user: user)
-  employee_role1 = FactoryGirl.create :employee_role, person: @person, employer_profile: org1.employer_profile
-  employee_role2 = FactoryGirl.create :employee_role, person: @person, employer_profile: org2.employer_profile
-  ce1 =  FactoryGirl.build(:census_employee,
+  bga1 = FactoryBot.build :benefit_group_assignment, benefit_group: benefit_group1
+  bga2 = FactoryBot.build :benefit_group_assignment, benefit_group: benefit_group2
+  FactoryBot.create(:user)
+  @person = FactoryBot.create(:person, :with_family, first_name: "Employee", last_name: "E", user: user)
+  employee_role1 = FactoryBot.create :employee_role, person: @person, employer_profile: org1.employer_profile
+  employee_role2 = FactoryBot.create :employee_role, person: @person, employer_profile: org2.employer_profile
+  ce1 =  FactoryBot.build(:census_employee,
           first_name: @person.first_name, 
           last_name: @person.last_name, 
           dob: @person.dob, 
@@ -18,7 +18,7 @@ Given (/a matched Employee exists with multiple employee roles/) do
           employee_role_id: employee_role1.id,
           employer_profile: org1.employer_profile
         )
-  ce2 =  FactoryGirl.build(:census_employee,
+  ce2 =  FactoryBot.build(:census_employee,
           first_name: @person.first_name, 
           last_name: @person.last_name, 
           dob: @person.dob, 
@@ -40,13 +40,13 @@ Given (/a matched Employee exists with multiple employee roles/) do
 end
 
 Given (/a matched Employee exists with consumer role/) do
-  org = FactoryGirl.create :organization, :with_active_plan_year
+  org = FactoryBot.create :organization, :with_active_plan_year
   benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
-  bga = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group
-  FactoryGirl.create(:user)
-  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
-  employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
-  ce =  FactoryGirl.build(:census_employee,
+  bga = FactoryBot.build :benefit_group_assignment, benefit_group: benefit_group
+  FactoryBot.create(:user)
+  @person = FactoryBot.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
+  employee_role = FactoryBot.create :employee_role, person: @person, employer_profile: org.employer_profile
+  ce =  FactoryBot.build(:census_employee,
           first_name: @person.first_name, 
           last_name: @person.last_name, 
           dob: @person.dob, 
@@ -61,7 +61,7 @@ Given (/a matched Employee exists with consumer role/) do
 
   employee_role.update_attributes!(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
   ce.employee_role.reload
-  FactoryGirl.create(:hbx_profile)
+  FactoryBot.create(:hbx_profile)
 end
 
 
@@ -69,13 +69,13 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
   @family = Family.all.first
   if role == "employee"
-    dependent = FactoryGirl.create :person, dob: dob
+    dependent = FactoryBot.create :person, dob: dob
   elsif role == "Resident"
-    dependent = FactoryGirl.create :person, :with_resident_role, dob: dob
+    dependent = FactoryBot.create :person, :with_resident_role, dob: dob
   else
-    dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
+    dependent = FactoryBot.create :person, :with_consumer_role, dob: dob
   end
-  fm = FactoryGirl.create :family_member, family: @family, person: dependent
+  fm = FactoryBot.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
   ch = @family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
@@ -84,8 +84,8 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
 end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
-  sep = FactoryGirl.create :special_enrollment_period, family: @family
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  sep = FactoryBot.create :special_enrollment_period, family: @family
+  enrollment = FactoryBot.create(:hbx_enrollment, 
                                   household: @family.active_household,
                                   kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
@@ -102,13 +102,13 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
 end
 
 And(/employee also has a (.*) enrollment with primary covered under (.*) employer/) do |coverage_kind, var|
-  sep = FactoryGirl.create :special_enrollment_period, family: @person.primary_family
+  sep = FactoryBot.create :special_enrollment_period, family: @person.primary_family
   benefit_group = if var == "first"
                     @person.active_employee_roles[0].employer_profile.plan_years[0].benefit_groups[0]
                   else
                     @person.active_employee_roles[1].employer_profile.plan_years[0].benefit_groups[0]
                   end
-  enrollment = FactoryGirl.create(:hbx_enrollment, 
+  enrollment = FactoryBot.create(:hbx_enrollment, 
                                   household: @person.primary_family.active_household,
                                   kind: "employer_sponsored",
                                   effective_on: TimeKeeper.date_of_record,
@@ -126,22 +126,21 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
 end
 
 Given (/a matched Employee exists with active and renwal plan years/) do
-  FactoryGirl.create(:user)
-  person = FactoryGirl.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
-  org = FactoryGirl.create :organization, :with_active_and_renewal_plan_years
+  FactoryBot.create(:user)
+  person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
+  org = FactoryBot.create :organization, :with_active_and_renewal_plan_years
   @active_benefit_group = org.employer_profile.active_plan_year.benefit_groups[0]
-  active_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @active_benefit_group
-  benefit_package = FactoryGirl.build :benefit_package
+  active_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @active_benefit_group
 
   @renewal_benefit_group = org.employer_profile.show_plan_year.benefit_groups[0]
-  renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group, benefit_package_id: benefit_package.id
+  renewal_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
 
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.build(:census_employee,
-          first_name: person.first_name,
-          last_name: person.last_name,
-          dob: person.dob,
-          ssn: person.ssn,
+  ce =  FactoryBot.build(:census_employee,
+          first_name: person.first_name, 
+          last_name: person.last_name, 
+          dob: person.dob, 
+          ssn: person.ssn, 
           employee_role_id: @employee_role.id,
           employer_profile: org.employer_profile
         )
@@ -171,8 +170,8 @@ And(/Employer not offers dental benefits for spouse in renewal plan year/) do
   until benefits.blank?
     benefits.each { |rb| rb.delete }
   end
-  rbs = [FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :employee, premium_pct: 49, employer_max_amt: 1000.00),
-         FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :spouse, premium_pct: 40, employer_max_amt:  200.00, offered: false)]
+  rbs = [FactoryBot.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :employee, premium_pct: 49, employer_max_amt: 1000.00),
+         FactoryBot.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :spouse, premium_pct: 40, employer_max_amt:  200.00, offered: false)]
   @renewal_benefit_group.save
 end
 
@@ -255,7 +254,7 @@ And(/user did not apply coverage for child as ivl/) do
 end
 
 And(/employee has a valid "(.*)" qle/) do |qle|
-  qle = FactoryGirl.create :qualifying_life_event_kind, title: qle
+  qle = FactoryBot.create :qualifying_life_event_kind, title: qle
 end
 
 And(/employee cannot uncheck primary person/) do
@@ -345,8 +344,8 @@ end
 
 When(/Resident visits home page with qle/) do
   # we have only shop & ivl as market kinds for qle
-  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
-  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   visit "/families/home"
 end
 

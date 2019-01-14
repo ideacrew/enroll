@@ -8,16 +8,16 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
     context "has_employer_staff_role?" do
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let!(:benefit_sponsor)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:employer_profile)    { benefit_sponsor.employer_profile }
-      let!(:employer_staff_role){ FactoryGirl.create(:employer_staff_role, aasm_state:'is_closed', :benefit_sponsor_employer_profile_id=>employer_profile.id)}
-      let!(:benefit_sponsor2)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:employer_staff_role){ FactoryBot.create(:employer_staff_role, aasm_state:'is_closed', :benefit_sponsor_employer_profile_id=>employer_profile.id)}
+      let!(:benefit_sponsor2)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:employer_profile2)    { benefit_sponsor2.employer_profile }
-      let!(:employer_staff_role2){ FactoryGirl.create(:employer_staff_role, aasm_state:'is_active', :benefit_sponsor_employer_profile_id=>employer_profile2.id)}
-      let!(:this_person) { FactoryGirl.build(:person, :employer_staff_roles => [employer_staff_role, employer_staff_role2]) }
-      let!(:current_user) { FactoryGirl.build(:user, :person=>this_person)}
+      let!(:employer_staff_role2){ FactoryBot.create(:employer_staff_role, aasm_state:'is_active', :benefit_sponsor_employer_profile_id=>employer_profile2.id)}
+      let!(:this_person) { FactoryBot.build(:person, :employer_staff_roles => [employer_staff_role, employer_staff_role2]) }
+      let!(:current_user) { FactoryBot.build(:user, :person=>this_person)}
       let!(:emp_id) {current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id}
-      let!(:employee_role) { FactoryGirl.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
+      let!(:employee_role) { FactoryBot.build(:employee_role, person: current_user.person, employer_profile: employer_profile)}
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
         expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" alt=\"Icon business owner\" /> &nbsp; I'm an Employer</a>"
@@ -35,7 +35,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
     end
 
     context "has_consumer_role?" do
-      let(:current_user) { FactoryGirl.build(:user, :identity_verified_date => Time.now)}
+      let(:current_user) { FactoryBot.build(:user, :identity_verified_date => Time.now)}
       before(:each) do
         allow(current_user).to receive(:has_consumer_role?).and_return(true)
         allow(controller).to receive(:controller_path).and_return("insured")

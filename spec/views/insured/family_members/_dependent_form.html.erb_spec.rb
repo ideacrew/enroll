@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe "insured/family_members/_dependent_form.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:consumer_role) { FactoryGirl.create(:consumer_role)}
-  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:consumer_role) { FactoryBot.create(:consumer_role)}
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }

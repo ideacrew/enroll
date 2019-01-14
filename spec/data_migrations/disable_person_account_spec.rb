@@ -13,7 +13,7 @@ describe DisablePersonAccount do
   end
 
   describe "disable person account", dbclean: :after_each do
-    let(:person) { FactoryGirl.create(:person, is_active: true, is_disabled: nil) }
+    let(:person) { FactoryBot.create(:person, is_active: true, is_disabled: nil) }
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
     end

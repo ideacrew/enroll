@@ -12,9 +12,9 @@ describe RemoveCoverageHouseholdMember, dbclean: :after_each do
   end
   describe "remove family member from coverage household", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member){ FactoryGirl.create(:family_member,family: family, is_active: true)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member){ FactoryBot.create(:family_member,family: family, is_active: true)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
@@ -37,9 +37,9 @@ describe RemoveCoverageHouseholdMember, dbclean: :after_each do
 
   describe "remove coverage household member", dbclean: :after_each do
 
-    let(:person) {FactoryGirl.create(:person)}
-    let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member) {FactoryGirl.create(:family_member, family: family, is_active: true)}
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member) {FactoryBot.create(:family_member, family: family, is_active: true)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
@@ -63,9 +63,9 @@ describe RemoveCoverageHouseholdMember, dbclean: :after_each do
 
   describe "remove invalid family member from coverage household", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member){ FactoryGirl.create(:family_member,family: family, is_active: true)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member){ FactoryBot.create(:family_member,family: family, is_active: true)}
     let(:action){ "remove_invalid_fm"}
 
     before do

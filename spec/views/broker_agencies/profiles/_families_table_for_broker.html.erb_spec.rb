@@ -4,7 +4,7 @@ RSpec.describe "broker_agencies/profiles/_families_table_for_broker.html.erb" do
 
 context "shows families", dbclean: :after_each do
 
-    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:family1) { FactoryBot.create(:family, :with_primary_family_member)}
 
     let(:families) { [family1]}
 
@@ -20,13 +20,13 @@ context "shows families", dbclean: :after_each do
     end
 
     it 'should check consumer role' do
-      family1.primary_applicant.person.consumer_role = FactoryGirl.build(:consumer_role)
+      family1.primary_applicant.person.consumer_role = FactoryBot.build(:consumer_role)
       render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
       expect(rendered).to have_selector(".consumer_role_present", text: 'Yes')
     end
 
     it 'should check employee role' do
-      family1.primary_applicant.person.employee_roles = [FactoryGirl.build(:employee_role)]
+      family1.primary_applicant.person.employee_roles = [FactoryBot.build(:employee_role)]
       allow(family1.primary_applicant.person).to receive(:active_employee_roles).and_return(true)
       render partial: 'broker_agencies/profiles/families_table_for_broker', :collection => [families] , as: :families
       expect(rendered).to have_selector(".employee_role_present", text: 'Yes')

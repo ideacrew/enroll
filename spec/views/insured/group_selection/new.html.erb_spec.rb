@@ -36,9 +36,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   end
   let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
 
-    let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
-    let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }    
+    let(:person) { FactoryBot.create(:person, is_incarcerated: false, us_citizen: true) }
+    let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }    
     let(:benefit_group) { current_benefit_package }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990, 10, 10), full_name: "member", person: person) }
@@ -52,7 +52,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household_members) { [double("coverage household member 2", family_member: family_member2), double("coverage household member 1", family_member: family_member1), double("coverage household member 3", family_member: family_member3), double("coverage household member 4", family_member: family_member4)] }
     let(:hbx_enrollment) { double("hbx enrollment", id: "hbx_id", coverage_kind: "health", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false) }
     let(:coverage_kind) { hbx_enrollment.coverage_kind }
-    let(:current_user) { FactoryGirl.create(:user) }
+    let(:current_user) { FactoryBot.create(:user) }
     let(:effective_on) { benefit_group.effective_on_for(employee_role.hired_on) }
 
     before(:each) do
@@ -137,14 +137,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "coverage selection with incarcerated" do
-      let(:jail_person) { FactoryGirl.create(:person, is_incarcerated: true) }
-      let(:person2) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 1.year) }
-      let(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
-      let(:consumer_role) { FactoryGirl.create(:consumer_role, person: jail_person, is_incarcerated: 'yes') }
-      let(:consumer_role2) { FactoryGirl.create(:consumer_role, person: person2, is_incarcerated: 'no', dob: TimeKeeper.date_of_record - 1.year) }
-      let(:consumer_role3) { FactoryGirl.create(:consumer_role, person: person3, is_incarcerated: 'no') }
+      let(:jail_person) { FactoryBot.create(:person, is_incarcerated: true) }
+      let(:person2) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 1.year) }
+      let(:person3) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role, person: jail_person, is_incarcerated: 'yes') }
+      let(:consumer_role2) { FactoryBot.create(:consumer_role, person: person2, is_incarcerated: 'no', dob: TimeKeeper.date_of_record - 1.year) }
+      let(:consumer_role3) { FactoryBot.create(:consumer_role, person: person3, is_incarcerated: 'no') }
 
-      let(:benefit_package) { FactoryGirl.build(:benefit_package,
+      let(:benefit_package) { FactoryBot.build(:benefit_package,
         title: "individual_health_benefits_2015",
         elected_premium_credit_strategy: "unassisted",
         benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
@@ -168,7 +168,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       let(:coverage_household_jail) { instance_double("CoverageHousehold", coverage_household_members: coverage_household_members) }
       let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
       let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
-      let(:current_user) {FactoryGirl.create(:user)}
+      let(:current_user) {FactoryBot.create(:user)}
       before(:each) do
         assign(:person, jail_person)
         assign(:coverage_household, coverage_household_jail)
@@ -263,7 +263,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: true,
         primary_relationship: "self",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+        person:  FactoryBot.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -276,7 +276,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: false,
         primary_relationship: "child",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+        person:  FactoryBot.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -287,7 +287,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:coverage_household) { instance_double("CoverageHousehold", coverage_household_members: coverage_household_members) }
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: new_benefit_group, person: person) }
     let(:hbx_enrollment) {HbxEnrollment.new}
-    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    let(:employer_profile) { FactoryBot.build(:employer_profile) }
     let(:effective_on) { benefit_group.effective_on_for(employee_role.hired_on) }
 
 
@@ -329,7 +329,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: true,
         primary_relationship: "self",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+        person:  FactoryBot.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -342,7 +342,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         full_name: "full_name_#{random_value}",
         is_primary_applicant?: false,
         primary_relationship: "child",
-        person:  FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true)
+        person:  FactoryBot.create(:person, is_incarcerated: false, us_citizen: true)
       )
     end
 
@@ -350,7 +350,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { instance_double("Person", id: "Person.id") }
     let(:coverage_household_members) {[double("new coverage household member", family_member: new_family_member), double("new coverage household member 1", family_member: new_family_member_1)]}
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
-    let(:employer_profile) {FactoryGirl.build(:employer_profile)}
+    let(:employer_profile) {FactoryBot.build(:employer_profile)}
     let(:employee_role) { instance_double("EmployeeRole", id: "EmployeeRole.id", benefit_group: nil, employer_profile: employer_profile, person: person) }
     let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: nil)}
 
@@ -387,15 +387,15 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   context "change plan", dbclean: :after_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
+    let(:person) { FactoryBot.create(:person, :with_employee_role) }
+    let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:benefit_group) { current_benefit_package }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
     let(:employer_profile) { benefit_sponsorship.profile }
-    let(:current_user) { FactoryGirl.create(:user) }
+    let(:current_user) { FactoryBot.create(:user) }
 
 
     before :each do
@@ -492,8 +492,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   context "waive plan" do
     let(:person) { employee_role.person }
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
 
     let(:hbx_enrollment) {HbxEnrollment.new}
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
@@ -526,9 +526,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   end
 
   context "market_kind" do
-    let(:person) { FactoryGirl.create(:person) }
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
@@ -579,9 +579,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "change plan with consumer role" do
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-      let(:employee_role) { FactoryGirl.create(:employee_role) }
-      let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:employee_role) { FactoryBot.create(:employee_role) }
+      let(:benefit_group) { FactoryBot.create(:benefit_group) }
       let(:coverage_household) { double("coverage household", coverage_household_members: []) }
       let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
@@ -618,9 +618,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   end
 
   context "change plan with ee role" do
-    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:person) { FactoryBot.create(:person, :with_employee_role) }
+    let(:employee_role) { FactoryBot.create(:employee_role) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
     let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
 
@@ -655,7 +655,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { double("Person", id: 'person_id')}
     let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: benefit_group)}
     let(:employee_role) { double("EmployeeRole", id: 'er_id', person: person, census_employee: census_employee)}
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
 
     before do
       assign(:person, person)
@@ -688,11 +688,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "change plan with both roles" do
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-      let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
-      let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
-      let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
-      let(:benefit_group) { FactoryGirl.create(:benefit_group, :with_valid_dental, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_employee_role) }
+      let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
+      let(:census_employee) { FactoryBot.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+      let(:benefit_group_assignment) { FactoryBot.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group) }
+      let(:benefit_group) { FactoryBot.create(:benefit_group, :with_valid_dental, dental_reference_plan_id: "9182391823912", elected_dental_plan_ids: ['12313213','123132321']) }
       let(:coverage_household) { double("coverage household", coverage_household_members: []) }
       let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
       let(:adapter) { instance_double(GroupSelectionPrevaricationAdapter) }
@@ -762,10 +762,10 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       context "consumer with both roles but employee isn't offering dental" do
-        let(:benefit_group_no_dental) { FactoryGirl.create(:benefit_group, dental_reference_plan_id: '', elected_dental_plan_ids: []) }
-        let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
-        let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
-        let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group_no_dental) }
+        let(:benefit_group_no_dental) { FactoryBot.create(:benefit_group, dental_reference_plan_id: '', elected_dental_plan_ids: []) }
+        let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
+        let(:census_employee) { FactoryBot.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+        let(:benefit_group_assignment) { FactoryBot.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group_no_dental) }
 
         before(:each) do 
           allow(adapter).to receive(:can_shop_shop?).and_return(true)

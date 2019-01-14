@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:person_two) { FactoryGirl.create(:person, first_name: 'iajsdias') }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:household) { FactoryGirl.create(:household, family: family) }
-  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: household) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:person_two) { FactoryBot.create(:person, first_name: 'iajsdias') }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:household) { FactoryBot.create(:household, family: family) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household) }
   let(:hbx_enrollment_member_one) { double("hbx_enrollment_member") }
   let(:hbx_enrollment_member_two) { double("hbx_enrollment_member") }
   let(:mock_group){double("membergroup", count: 4)}

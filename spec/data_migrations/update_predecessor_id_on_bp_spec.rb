@@ -27,14 +27,14 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     let!(:product_package_1) { old_benefit_market_catalog.product_packages.first }
     let!(:product_package_2) { renewing_benefit_market_catalog.product_packages.first }
 
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     let(:benefit_sponsorship) do
-      FactoryGirl.create(
+      FactoryBot.create(
         :benefit_sponsors_benefit_sponsorship,
         :with_rating_area,
         :with_service_areas,
@@ -49,20 +49,20 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     let(:start_on)  { TimeKeeper.date_of_record}
     let(:old_effective_period)  { start_on.next_month.beginning_of_month - 1.year ..start_on.end_of_month }
     let!(:old_benefit_application) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: old_effective_period, aasm_state: :active)
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: old_effective_period, aasm_state: :active)
       application.benefit_sponsor_catalog.save!
       application
     }
 
     let(:renewing_effective_period)  { start_on.next_month.beginning_of_month..start_on.end_of_month + 1.year }
     let!(:renewing_benefit_application) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: renewing_effective_period, aasm_state: :renewing_enrolling, predecessor_id: old_benefit_application.id)
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: renewing_effective_period, aasm_state: :renewing_enrolling, predecessor_id: old_benefit_application.id)
       application.benefit_sponsor_catalog.save!
       application
     }
 
-    let!(:old_benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: old_benefit_application, product_package: product_package_1) }
-    let!(:renewing_benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewing_benefit_application, product_package: product_package_1) }
+    let!(:old_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: old_benefit_application, product_package: product_package_1) }
+    let!(:renewing_benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewing_benefit_application, product_package: product_package_1) }
     before(:each) do
       ENV["old_benefit_package_id"] = organization.employer_profile.benefit_applications.first.benefit_packages.first.id
       ENV["renewing_benefit_package_id"] = organization.employer_profile.benefit_applications.second.benefit_packages.first.id

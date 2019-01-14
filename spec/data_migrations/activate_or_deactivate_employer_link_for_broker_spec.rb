@@ -6,13 +6,13 @@ describe ActivateOrDeactivateEmployerLinkForBroker do
   let(:given_task_name) { "activate_or_deactivate_employer_link_for_broker" }
   subject { ActivateOrDeactivateEmployerLinkForBroker.new(given_task_name, double(:current_scope => nil)) }
 
-  let!(:rating_area)                    { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-  let!(:service_area)                   { FactoryGirl.create_default :benefit_markets_locations_service_area }
+  let!(:rating_area)                    { FactoryBot.create_default :benefit_markets_locations_rating_area }
+  let!(:service_area)                   { FactoryBot.create_default :benefit_markets_locations_service_area }
   let!(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)                   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)                   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)               { organization.employer_profile }
-  let!(:broker_organization)            { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
-  let!(:broker_agency_profile1)         { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+  let!(:broker_organization)            { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+  let!(:broker_agency_profile1)         { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
   let(:active_plan_design_organization) {
                                           SponsoredBenefits::Organizations::PlanDesignOrganization.new(
                                             owner_profile_id: broker_agency_profile1._id,

@@ -3,7 +3,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearReminderAfterSoftDeadLine', dbclean: :around_each do
-  
+
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
   include_context "setup employees with benefits"
@@ -13,7 +13,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
 
   let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:current_effective_date)  { renewal_effective_date.prev_year }
-  let(:employer_profile) { abc_profile }  
+  let(:employer_profile) { abc_profile }
   let(:model_instance) { renewal_application }
   let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1 )}
 
@@ -118,4 +118,3 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerPublishPlanYearRemi
     end
   end
 end
-

@@ -1,7 +1,7 @@
 module GAWorld
   def general_agency(*traits)
     attributes = traits.extract_options!
-    @general_agency ||= FactoryGirl.create :general_agency, *traits, attributes.merge(:general_agency_traits => :with_staff)
+    @general_agency ||= FactoryBot.create :general_agency, *traits, attributes.merge(:general_agency_traits => :with_staff)
   end
 end
 World(GAWorld)
@@ -20,7 +20,7 @@ Then /^they should see the new general agency form$/ do
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
-  FactoryGirl.create(:rating_area, zip_code: "01002", county: "Franklin", rating_area: Settings.aca.rating_areas.first)
+  FactoryBot.create(:rating_area, zip_code: "01002", county: "Franklin", rating_area: Settings.aca.rating_areas.first)
   fill_in 'organization[first_name]', with: Forgery(:name).first_name
   fill_in 'organization[last_name]', with: Forgery(:name).last_name
   fill_in 'jq_datepicker_ignore_organization[dob]', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
@@ -163,7 +163,7 @@ Given /^a general agency, approved, confirmed, exists$/ do
   staff.person.emails.last.update(kind: 'work')
   staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
-  user = FactoryGirl.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+  user = FactoryBot.create(:user, email: "ga1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
   staff.person.user = user
   staff.person.save
@@ -172,11 +172,11 @@ Given /^a general agency, approved, confirmed, exists$/ do
 end
 
 And /^a broker exists$/ do
-  organization = FactoryGirl.create(:organization, legal_name: 'Acarehouse Inc', dba: 'Acarehouse')
-  broker_agency = FactoryGirl.create(:broker_agency_profile, organization: organization)
+  organization = FactoryBot.create(:organization, legal_name: 'Acarehouse Inc', dba: 'Acarehouse')
+  broker_agency = FactoryBot.create(:broker_agency_profile, organization: organization)
   person = broker_agency.primary_broker_role.person
   person.emails.last.update(kind: 'work')
-  user = FactoryGirl.create(:user, email: "broker1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+  user = FactoryBot.create(:user, email: "broker1@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
   person.user = user
   person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({broker_agency_profile: broker_agency, aasm_state: 'active'})
   person.save
@@ -194,10 +194,10 @@ And /^a broker exists$/ do
 end
 
 And /^an employer exists for ga$/ do
-  organization = FactoryGirl.create(:organization, legal_name: 'EmployerA Inc', dba: 'EmployerA')
-  employer_profile = FactoryGirl.create :employer_profile, organization: organization
-  user = FactoryGirl.create :user, :with_family, :employer_staff, email: 'employer1@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
-  FactoryGirl.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
+  organization = FactoryBot.create(:organization, legal_name: 'EmployerA Inc', dba: 'EmployerA')
+  employer_profile = FactoryBot.create :employer_profile, organization: organization
+  user = FactoryBot.create :user, :with_family, :employer_staff, email: 'employer1@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
+  FactoryBot.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
 end
 
 When /^the employer login in$/ do
@@ -362,12 +362,12 @@ When /^the ga click the back link$/ do
 end
 
 Given /^another general agency-ga2, approved, confirmed, exists$/ do
-  general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
+  general_agency = FactoryBot.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
   staff = general_agency.general_agency_profile.general_agency_staff_roles.last
   staff.person.emails.last.update(kind: 'work')
   staff.approve!
   email_address = general_agency.general_agency_profile.general_agency_staff_roles.last.email_address
-  user = FactoryGirl.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
+  user = FactoryBot.create(:user, email: "ga2@dc.gov", password: "1qaz@WSX", password_confirmation: "1qaz@WSX")
 
   staff.person.user = user
   staff.person.save

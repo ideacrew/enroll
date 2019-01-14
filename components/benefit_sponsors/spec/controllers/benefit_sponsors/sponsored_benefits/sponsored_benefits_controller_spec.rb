@@ -4,10 +4,10 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
 
   routes { BenefitSponsors::Engine.routes }
 
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, :person => person)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, :person => person)}
   let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let(:benefit_sponsor)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
+  let(:benefit_sponsor)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile_initial_application, site: site) }
   let(:benefit_sponsorship)    { benefit_sponsor.active_benefit_sponsorship }
   let(:benefit_application)    { benefit_sponsorship.benefit_applications.first }
   let(:benefit_package)    { benefit_application.benefit_packages.first }
@@ -20,7 +20,7 @@ RSpec.describe BenefitSponsors::SponsoredBenefits::SponsoredBenefitsController, 
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   }
-  let(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+  let(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
   let(:product_package_kind) { :single_product }
   let(:sponsored_benefit_kind) { "dental" }
   let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind, product_kind: sponsored_benefit_kind).first }

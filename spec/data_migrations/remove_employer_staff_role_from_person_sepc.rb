@@ -13,7 +13,7 @@ describe RemoveEmployerStaffRoleFromPerson do
 
   describe "remove_employer_staff_role_from_person" do
 
-    let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role)}
+    let(:employer_staff_role) {FactoryBot.create(:employer_staff_role)}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(employer_staff_role.person.hbx_id)
       allow(ENV).to receive(:[]).with("employer_staff_role_id").and_return(employer_staff_role.id.to_s)

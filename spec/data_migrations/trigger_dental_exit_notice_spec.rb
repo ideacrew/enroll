@@ -13,8 +13,8 @@ describe TriggerDentalExitNotice do
   end
 
   describe "triggering dental notice for renewal groups", dbclean: :after_each do
-    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
-    let(:organization2) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:organization2) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
 
     before(:each) do
       organization.employer_profile.renewing_plan_year.update_attribute(:start_on, Date.new(2018, 1, 1))

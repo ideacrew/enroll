@@ -1,6 +1,6 @@
 require 'rails_helper'
 RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => :controller do
-  let(:user){ FactoryGirl.create(:user, :consumer) }
+  let(:user){ FactoryBot.create(:user, :consumer) }
 
   context "When individual market is disabled" do
     before do
@@ -17,11 +17,11 @@ end
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => :controller do
-  let(:user){ FactoryGirl.create(:user, :consumer) }
-  let(:person){ FactoryGirl.build(:person) }
+  let(:user){ FactoryBot.create(:user, :consumer) }
+  let(:person){ FactoryBot.build(:person) }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember") }
-  let(:consumer_role){ FactoryGirl.build(:consumer_role) }
+  let(:consumer_role){ FactoryBot.build(:consumer_role) }
   let(:bookmark_url) {'localhost:3000'}
 
   before do
@@ -227,7 +227,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   context "PUT update", dbclean: :after_each do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.create(:person) }
+    let(:person){ FactoryBot.create(:person) }
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
     "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
 
@@ -313,9 +313,9 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   context "GET immigration_document_options", dbclean: :after_each do
-    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
     let(:params) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
-    let(:family_member) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family_member) {FactoryBot.create(:person, :with_consumer_role)}
     before :each do
       sign_in user
     end
@@ -401,7 +401,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => "true", ssn: "333224444", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname", :match_census_employees => []) }
     let(:mock_resident_candidate) { instance_double("Forms::ResidentCandidate", :valid? => "true", ssn: "", dob: Date.new(1975, 8, 15), :first_name => "fname", :last_name => "lname") }
     let(:found_person){ [] }
-    let(:resident_role){ FactoryGirl.build(:resident_role) }
+    let(:resident_role){ FactoryBot.build(:resident_role) }
 
     before(:each) do
       allow(user).to receive(:idp_verified?).and_return false
@@ -447,7 +447,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   describe "Get edit consumer role", dbclean: :after_each do
-    let(:consumer_role2){ FactoryGirl.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
+    let(:consumer_role2){ FactoryBot.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
     before(:each) do
       current_user = user
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)

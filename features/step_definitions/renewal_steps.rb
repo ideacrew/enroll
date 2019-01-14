@@ -5,7 +5,7 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
   person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
 
   benefit_group = ce.active_benefit_group_assignment.benefit_group
-  FactoryGirl.create(:hbx_enrollment,
+  FactoryBot.create(:hbx_enrollment,
     household: person_rec.primary_family.active_household,
     coverage_kind: "health",
     effective_on: benefit_group.start_on,

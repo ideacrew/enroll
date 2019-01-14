@@ -6,9 +6,9 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
-  let(:family)                        { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household)                     { family.households.first }
-  let(:tax_household)                 { FactoryGirl.create(:tax_household, household: household) }
+  let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
   let(:determined_on)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }

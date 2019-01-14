@@ -15,25 +15,25 @@ describe TriggeringAutoRenewals, dbclean: :after_each do
   describe "deleting existing waived renewal enrollment and creating auto renewing enrollment", dbclean: :after_each do
 
     let(:organization) {
-      org = FactoryGirl.create :organization, legal_name: "Corp 1"
-      employer_profile = FactoryGirl.create :employer_profile, organization: org, profile_source: "conversion"
-      active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :created_at => Date.new(2015,9,1), :start_on => Date.new(2015,12,1), :end_on => Date.new(2016,11,30),
+      org = FactoryBot.create :organization, legal_name: "Corp 1"
+      employer_profile = FactoryBot.create :employer_profile, organization: org, profile_source: "conversion"
+      active_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :created_at => Date.new(2015,9,1), :start_on => Date.new(2015,12,1), :end_on => Date.new(2016,11,30),
       :open_enrollment_start_on => Date.new(2015,10,1), :open_enrollment_end_on => Date.new(2015, 11, 10), fte_count: 37
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :created_at => Date.new(2016,9,1), :start_on => Date.new(2016,12,1), :end_on => Date.new(2017,11,30),
+      renewing_plan_year = FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolling, :created_at => Date.new(2016,9,1), :start_on => Date.new(2016,12,1), :end_on => Date.new(2017,11,30),
       :open_enrollment_start_on => Date.new(2016,10,12), :open_enrollment_end_on => Date.new(2016, 11, 13), fte_count: 37
-      benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
-      renewing_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewing_plan_year
-      1.times{|i| FactoryGirl.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
+      benefit_group = FactoryBot.create :benefit_group, plan_year: active_plan_year
+      renewing_benefit_group = FactoryBot.create :benefit_group, plan_year: renewing_plan_year
+      1.times{|i| FactoryBot.create :census_employee, :old_case, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
       employer_profile.census_employees.each do |ce|
         ce.add_benefit_group_assignment benefit_group, benefit_group.start_on
         ce.add_renew_benefit_group_assignment([renewing_benefit_group])
-        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+        person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({:employee_role =>  employee_role })
         ce.update_attribute(:ssn, ce.employee_role.person.ssn)
         family = Family.find_or_build_from_employee_role(employee_role)
-        renewal_plan = FactoryGirl.create(:plan)
-        plan = FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)
+        renewal_plan = FactoryBot.create(:plan)
+        plan = FactoryBot.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)
 
 
         enrollment_two = HbxEnrollment.create_from(

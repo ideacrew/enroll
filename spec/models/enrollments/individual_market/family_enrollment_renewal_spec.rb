@@ -13,26 +13,26 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
   let(:assisted) { nil }
 
   let!(:family) {
-    primary = FactoryGirl.create(:person, :with_consumer_role, dob: primary_dob)
-    FactoryGirl.create(:family, :with_primary_family_member, :person => primary)
+    primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob)
+    FactoryBot.create(:family, :with_primary_family_member, :person => primary)
   }
 
   let!(:spouse_rec) { 
-    FactoryGirl.create(:person, dob: spouse_dob)
+    FactoryBot.create(:person, dob: spouse_dob)
   }
 
   let!(:spouse) { 
-    FactoryGirl.create(:family_member, person: spouse_rec, family: family)
+    FactoryBot.create(:family_member, person: spouse_rec, family: family)
   }
 
   let!(:child1) { 
-    child = FactoryGirl.create(:person, dob: child1_dob)
-    FactoryGirl.create(:family_member, person: child, family: family)
+    child = FactoryBot.create(:person, dob: child1_dob)
+    FactoryBot.create(:family_member, person: child, family: family)
   }
 
   let!(:child2) { 
-    child = FactoryGirl.create(:person, dob: child2_dob)
-    FactoryGirl.create(:family_member, person: child, family: family)
+    child = FactoryBot.create(:person, dob: child2_dob)
+    FactoryBot.create(:family_member, person: child, family: family)
   }
 
   let(:primary_dob){ current_date.next_month - 57.years }
@@ -41,7 +41,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
   let(:child2_dob) { current_date.next_month - 20.years }
 
   let!(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment, :with_enrollment_members,
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
       enrollment_members: enrollment_members,
       household: family.active_household,
       coverage_kind: coverage_kind,
@@ -55,8 +55,8 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
 
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:coverage_kind) { 'health' }
-  let(:current_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
-  let(:renewal_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.next_year.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let(:current_plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
+  let(:renewal_plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.next_year.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
 
   subject { 
     enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -99,7 +99,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     # Are we using is_disabled flag in the system
     context "When a child person record is disabled" do
       let!(:spouse_rec) { 
-        FactoryGirl.create(:person, dob: spouse_dob, is_disabled: true)
+        FactoryBot.create(:person, dob: spouse_dob, is_disabled: true)
       }
 
       it "should not include child person record" do
@@ -131,9 +131,9 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
   describe ".renewal_plan" do
     context "When consumer covered under catastrophic plan" do
 
-      let!(:cat_age_off_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122300-01", csr_variant_id: "01") }
-      let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'catastrophic', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'catastrophic', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, cat_age_off_renewal_plan_id: cat_age_off_plan.id) }
+      let!(:cat_age_off_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122300-01", csr_variant_id: "01") }
+      let!(:renewal_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'catastrophic', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let!(:current_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'catastrophic', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, cat_age_off_renewal_plan_id: cat_age_off_plan.id) }
 
       let(:enrollment_members) { [child1, child2] }
 
@@ -157,10 +157,10 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
 
   describe ".assisted_renewal_plan", dbclean: :after_each do
     context "When individual currently enrolled under CSR plan" do
-      let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
-      let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_plan_id: renewal_plan.id) }
-      let!(:csr_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
-      let!(:csr_01_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
+      let!(:renewal_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
+      let!(:current_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_plan_id: renewal_plan.id) }
+      let!(:csr_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
+      let!(:csr_01_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
 
       context "and have different CSR amount for renewal plan year" do
         let(:aptc_values) {{ csr_amt: "87" }}
@@ -188,8 +188,8 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     end
 
     context "When individual not enrolled under CSR plan" do
-      let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
+      let!(:renewal_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let!(:current_plan) { FactoryBot.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
 
       it "should return regular renewal plan" do
         expect(subject.assisted_renewal_plan).to eq renewal_plan.id

@@ -1,18 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop, :dbclean => :after_each do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,household: family.active_household, plan_id: plan.id, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
-  let(:person) { FactoryGirl.create(:person)}
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,household: family.active_household, plan_id: plan.id, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
+  let(:person) { FactoryBot.create(:person)}
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:employer_profile_id) { employer_profile.id }
-  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-  let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
-  let(:organization) {FactoryGirl.create(:organization, legal_name: "Delta Dental")}
-  let(:carrier_profile) {FactoryGirl.create(:carrier_profile, organization: organization)}
-  let(:plan) {FactoryGirl.create(:plan, :with_dental_coverage, carrier_profile: carrier_profile, market: "shop")}
-  let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
-  let(:benefit_group)     { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+  let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
+  let(:organization) {FactoryBot.create(:organization, legal_name: "Delta Dental")}
+  let(:carrier_profile) {FactoryBot.create(:carrier_profile, organization: organization)}
+  let(:plan) {FactoryBot.create(:plan, :with_dental_coverage, carrier_profile: carrier_profile, market: "shop")}
+  let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile)}
+  let(:benefit_group)     { FactoryBot.create(:benefit_group, plan_year: plan_year)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal EEs Dental Carriers are Exiting SHOP market notice',
                             :notice_template => 'notices/shop_employee_notices/notify_renewal_employees_dental_carriers_exiting_shop',

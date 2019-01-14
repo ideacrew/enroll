@@ -13,11 +13,11 @@ describe CancelPlanYear do
   end
 
   describe "cancel plan year", dbclean: :after_each do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group], aasm_state: "enrolled")}
-    let!(:plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "active")}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
+    let(:benefit_group) { FactoryBot.create(:benefit_group)}
+    let(:plan_year) { FactoryBot.create(:plan_year, benefit_groups: [benefit_group], aasm_state: "enrolled")}
+    let!(:plan_year2) { FactoryBot.create(:plan_year, aasm_state: "active")}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
     before(:each) do
       allow(ENV).to receive(:[]).with('plan_year_state').and_return(plan_year.aasm_state)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)

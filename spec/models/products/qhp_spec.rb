@@ -21,8 +21,8 @@ describe Products::Qhp, :type => :model do
   # FIXME: Re-enable once we have compliant SERFF templates from Kaiser
   #  it { should validate_presence_of :summary_benefit_and_coverage_url }
 
-  let(:plan){ FactoryGirl.create(:plan) }
-  let(:qhp) { FactoryGirl.build(:products_qhp) }
+  let(:plan){ FactoryBot.create(:plan) }
+  let(:qhp) { FactoryBot.build(:products_qhp) }
 
   it "should set plan_id" do
     qhp.plan = plan

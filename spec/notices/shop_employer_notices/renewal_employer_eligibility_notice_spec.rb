@@ -8,7 +8,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
   let(:end_on) { start_on.next_year.prev_day }
   let(:open_enrollment_start_on) { start_on.prev_month }
   let(:open_enrollment_end_on) { open_enrollment_start_on + 10.days}
-  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: "renewing_enrolling", start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
+  let!(:active_plan_year) { FactoryBot.create :plan_year, employer_profile: employer_profile, aasm_state: "renewing_enrolling", start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',

@@ -4,7 +4,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   let(:family) { double }
   let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role }
   let(:benefit_package) {double}
 
@@ -79,7 +79,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "age_on_benefit_end_on" do
-    let(:consumer_role) { (FactoryGirl.create(:person, :with_consumer_role, dob: (TimeKeeper.date_of_record - 20.years))).consumer_role}
+    let(:consumer_role) { (FactoryBot.create(:person, :with_consumer_role, dob: (TimeKeeper.date_of_record - 20.years))).consumer_role}
     let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package) }
     let(:end_on) { Date.new(2016, 12, 31) }
 
@@ -127,9 +127,9 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       @consumer_role = mike.consumer_role
     end
 
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-    let(:benefit_package_with_current_date_start_on) { FactoryGirl.build(:benefit_package) }
+    let(:benefit_package_with_current_date_start_on) { FactoryBot.build(:benefit_package) }
 
     it "should return true when csr_kind is blank" do
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
@@ -259,9 +259,9 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "is_lawful_presence_status_satisfied?" do
-    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
-    let(:benefit_eligibility_element_group) {FactoryGirl.build(:benefit_eligibility_element_group)}
+    let(:benefit_eligibility_element_group) {FactoryBot.build(:benefit_eligibility_element_group)}
     let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
 
     before do
@@ -365,7 +365,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
 
     context "#primary applicant" do
-      let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+      let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
       it "should return family member record of primary applicant" do
         pa = family.family_members.where(is_primary_applicant: true).first
         expect(rule.send(:primary_applicant)).to eq pa
@@ -373,18 +373,18 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
 
     context "#is_family_relationships_satisfied?" do
-      let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
-      let(:consumer_role_two) {FactoryGirl.create(:consumer_role, person: person)}
+      let(:consumer_role) {FactoryBot.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
+      let(:consumer_role_two) {FactoryBot.create(:consumer_role, person: person)}
       let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family) }
       let(:family) {
-        family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent, person: person)
+        family = FactoryBot.build(:family, :with_primary_family_member_and_dependent, person: person)
         persn = family.family_members.where(is_primary_applicant: false).first.person
         persn.dob = person.dob
         persn.gender = person.gender
         persn.save
         family
        }
-      let(:person) { FactoryGirl.create(:person)}
+      let(:person) { FactoryBot.create(:person)}
       before :each do
         person.person_relationships << PersonRelationship.new({
           :kind => 'child',
@@ -424,7 +424,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       end
 
       context "if person has two families one as primary & other as dependent" do
-        let(:family_two) { FactoryGirl.build(:family, :with_primary_family_member, person: family.family_members.where(is_primary_applicant: false).first.person)}
+        let(:family_two) { FactoryBot.build(:family, :with_primary_family_member, person: family.family_members.where(is_primary_applicant: false).first.person)}
         let(:rule2) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family_two) }
         let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, family: family) }
 
@@ -444,7 +444,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   end
 
   context "rule satisfied?" do
-    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:consumer_role) {FactoryBot.create(:consumer_role)}
     let(:benefit_package) {double}
 
     before :each do

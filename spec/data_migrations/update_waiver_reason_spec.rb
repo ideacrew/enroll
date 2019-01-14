@@ -13,8 +13,8 @@ describe UpdateWaiverReason, dbclean: :after_each do
   end
 
   describe "update waiver reason" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, waiver_reason: "this is the reason")}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, waiver_reason: "this is the reason")}
 
     before :each do 
       allow(ENV).to receive(:[]).with("id").and_return("#{hbx_enrollment.hbx_id}")

@@ -13,8 +13,8 @@ describe MapDentalPlans do
 
   describe "update the previous year renewal plan_id" do
 
-    let(:previous_year_plan){ FactoryGirl.create(:plan, active_year: "2016", hios_id: "14171AB0010203", coverage_kind: "dental", dental_level: "low", market: "shop") }
-    let(:current_year_plan){ FactoryGirl.create(:plan, active_year: "2017", hios_id: "14171AB0010203", coverage_kind: "dental", dental_level: "low", market: "shop") }
+    let(:previous_year_plan){ FactoryBot.create(:plan, active_year: "2016", hios_id: "14171AB0010203", coverage_kind: "dental", dental_level: "low", market: "shop") }
+    let(:current_year_plan){ FactoryBot.create(:plan, active_year: "2017", hios_id: "14171AB0010203", coverage_kind: "dental", dental_level: "low", market: "shop") }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("previous_year").and_return("2016")

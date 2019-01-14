@@ -162,7 +162,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
   let(:ssa_response_ssn_false) { EventResponse.new({:received_at => response_date, :body => body_no_ssn_verified_element}) }
   let(:dhs_response_false) { EventResponse.new({:received_at => response_date, :body => body_dhs_presense_false}) }
   let(:dhs_response_true) { EventResponse.new({:received_at => response_date, :body => body_dhs_presense_true}) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
   shared_examples_for "consumer verification status" do |action, old_status, new_status|
     it "#{action} #{old_status} in #{new_status}" do

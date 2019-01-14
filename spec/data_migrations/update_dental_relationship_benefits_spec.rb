@@ -14,7 +14,7 @@ describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
   end
 
   describe "change person relationships kind" do
-    let!(:benefit_group)  {FactoryGirl.create(:benefit_group, :with_valid_dental)}
+    let!(:benefit_group)  {FactoryBot.create(:benefit_group, :with_valid_dental)}
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(benefit_group.employer_profile.organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(benefit_group.plan_year.start_on)

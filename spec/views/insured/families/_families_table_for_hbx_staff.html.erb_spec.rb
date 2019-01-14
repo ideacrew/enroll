@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_families_table_for_hbx_staff.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:current_user) {FactoryGirl.create(:user, person: person)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:current_user) {FactoryBot.create(:user, person: person)}
   let(:family) { double(is_eligible_to_enroll?: true) }
-  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:family1) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:families) { family1}
   before(:each) do
     

@@ -8,23 +8,23 @@ module BenefitSponsors
       }
     }
     let(:service_class) { BenefitSponsors::Services::UpdateBrokerAgencyService }
-    let!(:broker_agency_account) {FactoryGirl.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile)}
+    let!(:broker_agency_account) {FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile)}
 
 
-    let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:rating_area)                  { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)                 { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)              { organization.employer_profile }
     let(:active_benefit_sponsorship)    { sponsor = employer_profile.add_benefit_sponsorship
                                           sponsor.broker_agency_accounts << broker_agency_account
                                           sponsor.organization.save
                                           sponsor}
 
-    let!(:broker_organization)    { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site)}
-    let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
-    let!(:person1) { FactoryGirl.create(:person) }
-    let!(:broker_role1) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
+    let!(:broker_organization)    { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+    let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
+    let!(:person1) { FactoryBot.create(:person) }
+    let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1) }
 
 
 
@@ -47,9 +47,9 @@ module BenefitSponsors
       let(:formed_params) { {
           hbx_id: person.hbx_id
       }}
-      let(:person) { FactoryGirl.create(:person, :with_broker_role)}
+      let(:person) { FactoryBot.create(:person, :with_broker_role)}
       let!(:old_broker_agency_profile) { BenefitSponsors::Organizations::BrokerAgencyProfile.new }
-      let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id, person: person) }
+      let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id, person: person) }
 
       it "should update profile_id" do
         service_obj = service_class.new(params)

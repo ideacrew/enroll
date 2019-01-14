@@ -2,23 +2,23 @@ require "rails_helper"
 
 =begin
 RSpec.describe "insured/show" do
-  let(:employee_role){FactoryGirl.create(:employee_role)}
-  let(:plan){FactoryGirl.create(:plan)}
-  let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-  let(:hbx_enrollment_member_one) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-  let(:family) { FactoryGirl.build_stubbed(:family, person: person, family_members: [hbx_enrollment_member_one]) }
+  let(:employee_role){FactoryBot.create(:employee_role)}
+  let(:plan){FactoryBot.create(:plan)}
+  let(:benefit_group){ FactoryBot.build(:benefit_group) }
+  let(:hbx_enrollment_member_one) { FactoryBot.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
+  let(:family) { FactoryBot.build_stubbed(:family, person: person, family_members: [hbx_enrollment_member_one]) }
   let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group,
     hbx_enrollment_members: [hbx_enrollment_member_one],
     employee_role: employee_role,
     effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
-  let(:broker_agency_profile){FactoryGirl.create(:broker_agency_profile)}
-  let(:broker_role){FactoryGirl.build(:broker_role, broker_agency_profile_id: broker_agency_profile.id)}
-  let(:broker_person){ FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
-  let(:person) {FactoryGirl.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
-  let(:consumer_role) {FactoryGirl.create(:consumer_role, person: person)}
-  let(:current_broker_user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'],
+  let(:broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
+  let(:broker_role){FactoryBot.build(:broker_role, broker_agency_profile_id: broker_agency_profile.id)}
+  let(:broker_person){ FactoryBot.create(:person, :first_name=>'fred', :last_name=>'flintstone')}
+  let(:person) {FactoryBot.create(:person, :first_name=> 'wilma', :last_name=>'flintstone')}
+  let(:consumer_role) {FactoryBot.create(:consumer_role, person: person)}
+  let(:current_broker_user) { FactoryBot.create(:user, :roles => ['broker_agency_staff'],
      :person => broker_person) }
-  let(:consumer_user){FactoryGirl.create(:user, :roles => ['consumer'], :person => person)}
+  let(:consumer_user){FactoryBot.create(:user, :roles => ['consumer'], :person => person)}
 
   before :each do
     allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
@@ -63,7 +63,7 @@ RSpec.describe "insured/show" do
   end
 
   it 'should not identify Broker control in the header when signed in as Consumer' do
-    FactoryGirl.create(:consumer_role, person: consumer_user.person)
+    FactoryBot.create(:consumer_role, person: consumer_user.person)
     allow(consumer_user).to receive(:identity_verified_date).and_return(true)
     sign_in consumer_user
     render :template => 'layouts/_header.html.erb'

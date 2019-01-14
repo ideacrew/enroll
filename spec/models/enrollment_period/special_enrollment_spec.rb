@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
-  let(:family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
                               title: "Entered into a legal domestic partnership",
                               action_kind: "add_benefit",
@@ -231,15 +231,15 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
   let(:event_date) { TimeKeeper.date_of_record }
   let(:expired_event_date) { TimeKeeper.date_of_record - 1.year }
   let(:first_of_following_month) { TimeKeeper.date_of_record.end_of_month + 1 }
-  let(:qle_effective_date) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
-  let(:qle_first_of_month) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
+  let(:qle_effective_date) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
+  let(:qle_first_of_month) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
 
   describe "it should set SHOP Special Enrollment Period dates based on QLE kind" do
     let(:sep_effective_date) { EnrollmentPeriod::SpecialEnrollment.new(qualifying_life_event_kind: qle_effective_date, effective_on_kind: 'date_of_event', qle_on: event_date) }
     let(:sep_first_of_month) { EnrollmentPeriod::SpecialEnrollment.new(qualifying_life_event_kind: qle_first_of_month, effective_on_kind: 'first_of_month', qle_on: event_date) }
     let(:sep_expired) { EnrollmentPeriod::SpecialEnrollment.new(qualifying_life_event_kind: qle_first_of_month, qle_on: expired_event_date) }
     let(:sep) { EnrollmentPeriod::SpecialEnrollment.new }
-    let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
 
     context "SHOP QLE and event date are specified" do
       it "should set start_on date to date of event" do

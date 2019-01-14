@@ -14,10 +14,10 @@ describe RemoveConsumerRole do
   end
 
   describe "remove consumer role for person with consumer and resident roles", dbclean: :after_each do
-    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, :with_consumer_role, hbx_id:'58e3dc7dqwewqewqe') }
-    let!(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member, person: person1) }
+    let!(:person1) { FactoryBot.create(:person, :with_resident_role, :with_consumer_role, hbx_id:'58e3dc7dqwewqewqe') }
+    let!(:primary_family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
     let!(:ivl_enrollment) do
-      FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: primary_family.active_household,
+      FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: primary_family.active_household,
         kind: 'individual', consumer_role_id: person1.consumer_role.id, resident_role_id: person1.resident_role.id)
     end
 

@@ -29,7 +29,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
   describe "GET show_profile" do
 
     let(:user) { double("user") }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
     it "should redirect" do
       sign_in(user)
@@ -41,7 +41,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
   describe "GET show" do
 
     let(:user) { double("user") }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
     it "should redirect" do
       sign_in(user)
@@ -80,8 +80,8 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
 
   describe "GET export_census_employees", dbclean: :after_each do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
     it "should export cvs" do
       sign_in(user)
@@ -91,8 +91,8 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
   end
 
   describe "GET new Document", dbclean: :after_each do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
     it "should load upload Page" do
       sign_in(user)
       xhr :get, :new_document, id: employer_profile
@@ -102,8 +102,8 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
 
   describe "POST Upload Document", dbclean: :after_each do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
     #let(:params) { { id: employer_profile.id, file:'test/JavaScript.pdf', subject: 'JavaScript.pdf' } }
 
     let(:subject){"Employee Attestation"}
@@ -131,8 +131,8 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
   end
 
   describe "Delete Document", dbclean: :after_each do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
 
     it "should delete documents" do
       sign_in(user)

@@ -13,7 +13,7 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
   end
 
   describe "update census dependent ssn" do
-    let(:census_employee)  { FactoryGirl.create(:census_employee)}
+    let(:census_employee)  { FactoryBot.create(:census_employee)}
     let(:census_dependent) { CensusDependent.new(first_name:'David', last_name:'Henry', ssn: "", employee_relationship: "spouse", dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
 
     before(:each) do

@@ -11,9 +11,9 @@ describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
     end
   end
   describe "change the general agency staff role" do
-    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role) }
-    let(:incorrect_person) {FactoryGirl.create(:person) }
-    let(:correct_person) { FactoryGirl.create(:person) }
+    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role) }
+    let(:incorrect_person) {FactoryBot.create(:person) }
+    let(:correct_person) { FactoryBot.create(:person) }
     before(:each) do
         allow(ENV).to receive(:[]).with("incorrect_person_hbx_id").and_return(incorrect_person.hbx_id)
         allow(ENV).to receive(:[]).with("correct_person_hbx_id").and_return(correct_person.hbx_id)   

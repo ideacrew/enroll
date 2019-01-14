@@ -4,13 +4,13 @@ require File.join(Rails.root, "spec", "support", "acapi_vocabulary_spec_helpers"
 RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
 
   describe "given a employer" , dbclean: :after_each do
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+    let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
     let!(:benefit_market) { site.benefit_markets.first }
     let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_aca_shop_cca_employer_profile_initial_application, site:site)}
-    let(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
-    let(:mailing_address){ FactoryGirl.build(:benefit_sponsors_locations_address, kind: "mailing")}
-    let(:mailing_office){ FactoryGirl.build(:benefit_sponsors_locations_office_location,address:mailing_address)}
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,:with_aca_shop_cca_employer_profile_initial_application, site:site)}
+    let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,:with_site,:with_broker_agency_profile)}
+    let(:mailing_address){ FactoryBot.build(:benefit_sponsors_locations_address, kind: "mailing")}
+    let(:mailing_office){ FactoryBot.build(:benefit_sponsors_locations_office_location,address:mailing_address)}
     let(:employer_profile) {
       organization.employer_profile.office_locations <<  mailing_office
       organization.employer_profile
@@ -18,11 +18,11 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     let(:benefit_application) { employer_profile.latest_benefit_application }
     let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: :single_issuer).first }
     let!(:dental_product_package) {benefit_market_catalog.product_packages.where(product_kind: :dental).first}
-    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+    let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
     let!(:health_sponsored_benefit) {benefit_package.health_sponsored_benefit}
-    let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let!(:update_products)  { product_package.products.update_all(issuer_profile:issuer_profile) }
-    let(:sponsor_contribution) {FactoryGirl.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
+    let(:sponsor_contribution) {FactoryBot.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: product_package,sponsored_benefit:health_sponsored_benefit)}
 
     let!(:update_benefit) {
       benefit_application.aasm_state = :active
@@ -34,9 +34,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     }
     let!(:update_sponsored_benefit_products)  { health_sponsored_benefit.product_package.products.update_all(issuer_profile:issuer_profile, service_area_id:health_sponsored_benefit.recorded_service_area_ids.first) }
     let!(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
-    let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
-    let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone)}
-    let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active',person:person_broker)}
+    let(:staff) { FactoryBot.create(:person, :with_work_email, :with_work_phone)}
+    let(:person_broker) {FactoryBot.build(:person,:with_work_email, :with_work_phone)}
+    let(:broker) {FactoryBot.build(:broker_role,aasm_state:'active',person:person_broker)}
     let(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
     let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
@@ -136,10 +136,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "with dental plans" do
       context "is_offering_dental? is true" do
 
-        let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package,dental_sponsored_benefit:true,  dental_product_package:dental_product_package) }
+        let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package,dental_sponsored_benefit:true,  dental_product_package:dental_product_package) }
         let!(:dental_sponsored_benefit) {benefit_package.dental_sponsored_benefit}
         let!(:update_dental_product) {dental_sponsored_benefit.reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
-        let(:dental_sponsor_contribution) {FactoryGirl.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
+        let(:dental_sponsor_contribution) {FactoryBot.create(:benefit_sponsors_sponsored_benefits_sponsor_contribution,product_package: dental_product_package,sponsored_benefit:dental_sponsored_benefit)}
 
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
@@ -197,7 +197,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
     context "when manual gen of cv = true" do
 
       context "non termination case" do
-        let!(:renewal_benefit_application){ FactoryGirl.build(:benefit_sponsors_benefit_application,:with_benefit_package, aasm_state: :enrollment_eligible, benefit_sponsorship: employer_profile.active_benefit_sponsorship)}
+        let!(:renewal_benefit_application){ FactoryBot.build(:benefit_sponsors_benefit_application,:with_benefit_package, aasm_state: :enrollment_eligible, benefit_sponsorship: employer_profile.active_benefit_sponsorship)}
         let(:renewal_benefit_package){ renewal_benefit_application.benefit_packages.first}
         let!(:update_renewal){
           renewal_benefit_application.predecessor_id = benefit_application.id

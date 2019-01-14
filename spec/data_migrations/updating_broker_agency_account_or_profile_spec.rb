@@ -4,17 +4,17 @@ require File.join(Rails.root, "app", "data_migrations", "updating_broker_agency_
 describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do
   
   let!(:given_task_name) { "delinking_broker" }
-  let!(:person) { FactoryGirl.create(:person,:with_broker_role)}
-  let!(:organization1) {FactoryGirl.create(:organization)}
-  let!(:organization) {FactoryGirl.create(:organization)}
+  let!(:person) { FactoryBot.create(:person,:with_broker_role)}
+  let!(:organization1) {FactoryBot.create(:organization)}
+  let!(:organization) {FactoryBot.create(:organization)}
   let!(:fein){"929129912"}
-  let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
-  let!(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile, organization: organization1)}
-  let!(:office_locations_contact) {FactoryGirl.build(:phone, kind: "work")}
-  let!(:office_locations) {FactoryGirl.build(:address, kind: "branch")}
-  let!(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: person.broker_role.id, is_active: true, employer_profile: employer_profile)}
-  let!(:new_person) { FactoryGirl.create(:person)}
-  let!(:family) {FactoryGirl.create(:family,:with_primary_family_member, person:new_person, broker_agency_accounts:[broker_agency_account])}
+  let!(:employer_profile) { FactoryBot.create(:employer_profile, organization: organization)}
+  let!(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, organization: organization1)}
+  let!(:office_locations_contact) {FactoryBot.build(:phone, kind: "work")}
+  let!(:office_locations) {FactoryBot.build(:address, kind: "branch")}
+  let!(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: person.broker_role.id, is_active: true, employer_profile: employer_profile)}
+  let!(:new_person) { FactoryBot.create(:person)}
+  let!(:family) {FactoryBot.create(:family,:with_primary_family_member, person:new_person, broker_agency_accounts:[broker_agency_account])}
 
   subject { UpdatingBrokerAgencyAccountOrProfile.new(given_task_name, double(:current_scope => nil)) }
   

@@ -9,9 +9,9 @@ describe "employers/census_employees/new.html.erb", dbclean: :after_each do
   let(:census_employee) { CensusEmployee.new }
 
   before :each do
-    @user = FactoryGirl.create(:user)
-    p=FactoryGirl.create(:person, user: @user)
-    @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
+    @user = FactoryBot.create(:user)
+    p=FactoryBot.create(:person, user: @user)
+    @hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: p)
 
     sign_in @user
     assign(:employer_profile, abc_profile)

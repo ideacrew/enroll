@@ -1,8 +1,8 @@
 # require 'rails_helper'
 
 # RSpec.describe "general_agencies/profiles/_employers.html.erb" do
-#   let(:employer) { FactoryGirl.create(:employer_profile) }
-#   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+#   let(:employer) { FactoryBot.create(:employer_profile) }
+#   let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
 #   before :each do
 #     allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
 #     assign :employers, [employer] 

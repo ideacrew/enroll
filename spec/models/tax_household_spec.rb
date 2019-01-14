@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TaxHousehold, type: :model do
-  let(:family)  { FactoryGirl.create(:family) }
+  let(:family)  { FactoryBot.create(:family) }
 
 
 
@@ -122,7 +122,7 @@ RSpec.describe TaxHousehold, type: :model do
 =end
 
   context "aptc_ratio_by_member" do
-    let!(:plan) {FactoryGirl.build(:plan, :with_premium_tables)}
+    let!(:plan) {FactoryBot.build(:plan, :with_premium_tables)}
     #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
     let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
     let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
@@ -166,7 +166,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member2) { double(applicant_id: 'member2') }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
     let(:household) { double }
-    let!(:plan) {FactoryGirl.build(:plan, :with_premium_tables)}
+    let!(:plan) {FactoryBot.build(:plan, :with_premium_tables)}
     let(:decorated_plan) {double}
 
     before :each do

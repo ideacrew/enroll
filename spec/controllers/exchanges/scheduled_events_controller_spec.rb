@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Exchanges::ScheduledEventsController do
 
   let(:user){ double(:save => double("user")) }
-  let(:person) { FactoryGirl.create(:person) }
+  let(:person) { FactoryBot.create(:person) }
   let(:event_params) { {
       type: 'holiday',
       event_name: 'Christmas',
@@ -50,7 +50,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "destroy" do
-    let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+    let(:scheduled_event) { FactoryBot.create(:scheduled_event) }
     before :each do
       xhr :delete, :destroy, id: scheduled_event.id
     end
@@ -62,7 +62,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
   describe "update" do
     context "remove event exceptions" do
-      let!(:event_exception) { FactoryGirl.create(:event_exception) }
+      let!(:event_exception) { FactoryBot.create(:event_exception) }
       let!(:scheduled_event) { ScheduledEvent.all.first }
       it "delete event exceptions" do
         xhr :put, :update, id: scheduled_event.id, scheduled_event: event_params
@@ -72,7 +72,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
       end
     end
     context "Add recurring rules" do
-      let!(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+      let!(:scheduled_event) { FactoryBot.create(:scheduled_event) }
       it "set one time false with recurring rules" do
         scheduled_event.update_attributes!(recurring_rules: "{\"interval\":1,\"until\":null,\"count\":null,\"validations\":{\"day_of_week\":{},\"day_of_month\":[22]},\"rule_type\":\"IceCube::MonthlyRule\",\"week_start\":0}")
         xhr :put, :update, id: scheduled_event.id, scheduled_event: event_params
@@ -83,7 +83,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "GET index" do
-    let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+    let(:scheduled_event) { FactoryBot.create(:scheduled_event) }
     let(:scheduled_events) { [scheduled_event] }
     it 'assigns scheduled_events' do
       xhr :get, :index, scheduled_event: event_params
@@ -107,7 +107,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "POST#delete_current_event" do
-    let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+    let(:scheduled_event) { FactoryBot.create(:scheduled_event) }
     let(:time) { Date.new(2017, 8, 22) }
     before do
       scheduled_event.update_attributes!(recurring_rules: "{\"interval\":1,\"until\":null,\"count\":null,\"validations\":{\"day_of_week\":{},\"day_of_month\":[22]},\"rule_type\":\"IceCube::MonthlyRule\",\"week_start\":0}")

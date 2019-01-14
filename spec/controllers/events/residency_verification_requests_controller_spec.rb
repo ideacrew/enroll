@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Events::ResidencyVerificationRequestsController do
   describe "#call with a person" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:outbound_event_name) { "acapi.info.events.residency.verification_request" }
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }

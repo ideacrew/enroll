@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "employers/broker_agency/_active_broker_modal.html.erb" do
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-  let(:broker_role1) { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
-  let(:person1) {FactoryGirl.create(:person)}
-  let(:email) {FactoryGirl.build(:email)}
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
+  let(:broker_role1) { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
+  let(:person1) {FactoryBot.create(:person)}
+  let(:email) {FactoryBot.build(:email)}
 
   before :each do
     allow(person1).to receive(:broker_role).and_return(broker_role1)

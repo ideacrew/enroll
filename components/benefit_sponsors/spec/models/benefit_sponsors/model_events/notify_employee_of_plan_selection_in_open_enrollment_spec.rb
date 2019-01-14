@@ -5,20 +5,20 @@ module BenefitSponsors
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:start_on)                { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
     let!(:site)                   { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)           { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { organization.employer_profile }
     let(:benefit_sponsorship)     { employer_profile.add_benefit_sponsorship }
-    let!(:benefit_application)    { FactoryGirl.create(:benefit_sponsors_benefit_application,
+    let!(:benefit_application)    { FactoryBot.create(:benefit_sponsors_benefit_application,
                                   :with_benefit_package,
                                   :benefit_sponsorship => benefit_sponsorship,
                                   :aasm_state => 'active',
                                   :effective_period =>  start_on..(start_on + 1.year) - 1.day
     )}
-    let(:person)                  { FactoryGirl.create(:person, :with_family) }
+    let(:person)                  { FactoryBot.create(:person, :with_family) }
     let(:family)                  { person.primary_family }
-    let!(:census_employee)        { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
-    let!(:employee_role)          { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
-    let!(:model_instance)         { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
+    let!(:census_employee)        { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
+    let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+    let!(:model_instance)         { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
                                     household: family.active_household, 
                                     aasm_state: "shopping",
                                     submitted_at: benefit_application.open_enrollment_period.max,

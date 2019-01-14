@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "shared/census_dependent_fields.html.erb", dbclean: :after_each do
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:census_employee) { CensusEmployee.new }
 
   before :each do

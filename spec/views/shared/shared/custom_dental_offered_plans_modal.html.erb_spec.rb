@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 describe "shared/custom_dental_offered_plans_modal.html.erb" do
-  let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
-  let(:plan_year) { FactoryGirl.build_stubbed(:plan_year) }
-  let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
-  let(:plan) { FactoryGirl.build_stubbed(:plan) }
+  let(:employer_profile) { FactoryBot.build_stubbed(:employer_profile) }
+  let(:plan_year) { FactoryBot.build_stubbed(:plan_year) }
+  let(:benefit_group) { FactoryBot.build_stubbed(:benefit_group, :with_valid_dental, plan_year: plan_year ) }
+  let(:plan) { FactoryBot.build_stubbed(:plan) }
 
   before :each do
     render :partial => "shared/custom_dental_offered_plans_modal.html.erb", :locals => {:bg => benefit_group}

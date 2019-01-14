@@ -3,12 +3,12 @@ require File.join(Rails.root, "app", "data_migrations", "add_existing_family_mem
 
 describe AddExistingFamilyMemberAsDependentToEnrollment, dbclean: :after_each do
   subject { AddExistingFamilyMemberAsDependentToEnrollment.new("remove dependent from ee enrollment", double(:current_scope => nil)) }
-  let(:family){FactoryGirl.create(:family,:with_primary_family_member)}
-  let(:person) { FactoryGirl.create(:person) }
-  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
-  let!(:hbx_enrollment){FactoryGirl.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member], household:family.active_household)}
+  let(:family){FactoryBot.create(:family,:with_primary_family_member)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let!(:hbx_enrollment){FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member], household:family.active_household)}
 
-  let(:family_member){FactoryGirl.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person)}
+  let(:family_member){FactoryBot.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person)}
   context "won't add enrollment memeber if not found hbx_enrollment" do
     before do
       allow(ENV).to receive(:[]).with("hbx_enrollment_id").and_return('')

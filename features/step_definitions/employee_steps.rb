@@ -1,11 +1,11 @@
 Given (/a matched Employee exists with only employee role/) do
-  FactoryGirl.create(:user)
-  person = FactoryGirl.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
-  org = FactoryGirl.create :organization, :with_active_plan_year
+  FactoryBot.create(:user)
+  person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
+  org = FactoryBot.create :organization, :with_active_plan_year
   @benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
-  bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @benefit_group
+  bga = FactoryBot.build :benefit_group_assignment, benefit_group: @benefit_group
   @employee_role = person.employee_roles[0]
-  ce =  FactoryGirl.build(:census_employee,
+  ce =  FactoryBot.build(:census_employee,
           first_name: person.first_name, 
           last_name: person.last_name, 
           dob: person.dob, 
@@ -35,8 +35,8 @@ Given (/(.*) has a matched employee role/) do |name|
 end
 
 Given (/a person exists with dual roles/) do
-  FactoryGirl.create(:user)
-  FactoryGirl.create(:person, :with_employee_role, :with_consumer_role, :with_family, first_name: "Dual Role Person", last_name: "E", user: user)
+  FactoryBot.create(:user)
+  FactoryBot.create(:person, :with_employee_role, :with_consumer_role, :with_family, first_name: "Dual Role Person", last_name: "E", user: user)
 end
 
 Then (/(.*) sign in to portal/) do |name|

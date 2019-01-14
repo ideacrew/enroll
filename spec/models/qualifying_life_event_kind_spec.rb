@@ -68,9 +68,9 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
   end
 
   describe "instance methods" do
-    let(:esi_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Dependent loss of employer-sponsored insurance because employee is enrolling in Medicare ", reason: "employee_gaining_medicare")}
-    let(:moved_qlek) {FactoryGirl.create(:qualifying_life_event_kind, title: "Moved or moving to the #{Settings.aca.state_name}", reason: "relocate")}
-    let(:qle) {FactoryGirl.create(:qualifying_life_event_kind, title: "Employer did not pay premiums on time", reason: 'employer_sponsored_coverage_termination')}
+    let(:esi_qlek) {FactoryBot.create(:qualifying_life_event_kind, title: "Dependent loss of employer-sponsored insurance because employee is enrolling in Medicare ", reason: "employee_gaining_medicare")}
+    let(:moved_qlek) {FactoryBot.create(:qualifying_life_event_kind, title: "Moved or moving to the #{Settings.aca.state_name}", reason: "relocate")}
+    let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Employer did not pay premiums on time", reason: 'employer_sponsored_coverage_termination')}
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, 15))
@@ -93,12 +93,12 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
 
     context "individual?" do
       it "return true" do
-        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "individual")
         expect(qle.individual?).to eq true
       end
 
       it "return false" do
-        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "shop")
+        qle = FactoryBot.build(:qualifying_life_event_kind, market_kind: "shop")
         expect(qle.individual?).to eq false
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
     context "family_structure_changed?" do
       it "return true" do
           %w(birth adoption marriage divorce domestic_partnership).each do |reason|
-          qle = FactoryGirl.build(:qualifying_life_event_kind, reason: reason)
+          qle = FactoryBot.build(:qualifying_life_event_kind, reason: reason)
           expect(qle.family_structure_changed?).to eq true
         end
       end

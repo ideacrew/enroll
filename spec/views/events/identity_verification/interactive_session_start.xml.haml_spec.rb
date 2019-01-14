@@ -11,7 +11,7 @@ RSpec.describe "events/identity_verification/interactive_session_start.xml.haml"
       download_vocabularies
     end
 
-    let(:individual) { FactoryGirl.build_stubbed :generative_individual }
+    let(:individual) { FactoryBot.build_stubbed :generative_individual }
 
     before :each do
       render :template => "events/identity_verification/interactive_session_start.xml", :locals => { :individual => individual }

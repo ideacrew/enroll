@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Events::VlpVerificationRequestsController do
   describe "#call with a person" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:outbound_event_name) { "acapi.info.events.lawful_presence.vlp_verification_request" }
     let(:rendered_template) { double }
     let(:coverage_start_date) { double }

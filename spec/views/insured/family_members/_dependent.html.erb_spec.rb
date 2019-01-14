@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 describe "insured/family_members/_dependent.html.erb", dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:family) { Family.new }
   let(:family_member) { family.family_members.new }
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
-  let(:employee_role) { FactoryGirl.build(:employee_role) }
-  let(:address) {FactoryGirl.build(:address)}
+  let(:employee_role) { FactoryBot.build(:employee_role) }
+  let(:address) {FactoryBot.build(:address)}
 
   before :each do
     sign_in user

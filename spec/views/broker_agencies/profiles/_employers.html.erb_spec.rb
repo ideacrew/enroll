@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :after_each do
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, organization: organization) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile, organization: organization) }
   before :each do
     assign :broker_agency_profile, broker_agency_profile
     assign :employer_profiles, [employer_profile]

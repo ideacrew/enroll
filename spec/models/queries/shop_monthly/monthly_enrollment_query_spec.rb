@@ -21,11 +21,11 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
 
       let(:initial_employer) {
-        FactoryGirl.create(:employer_with_planyear, start_on: effective_on, plan_year_state: 'enrolled')
+        FactoryBot.create(:employer_with_planyear, start_on: effective_on, plan_year_state: 'enrolled')
       }
 
       let(:initial_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
+        FactoryBot.create_list(:census_employee_with_active_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
           benefit_group: initial_employer.published_plan_year.benefit_groups.first)
       }
 
@@ -135,11 +135,11 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
 
       let(:renewing_employer) {
-        FactoryGirl.create(:employer_with_renewing_planyear, start_on: effective_on, renewal_plan_year_state: 'renewing_enrolled')
+        FactoryBot.create(:employer_with_renewing_planyear, start_on: effective_on, renewal_plan_year_state: 'renewing_enrolled')
       }
 
       let(:renewing_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 3, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
           benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
           renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
       }
@@ -243,8 +243,8 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
   end
 
   def create_person(ce, employer_profile)
-    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
     ce.update_attributes({employee_role: employee_role})
     Family.find_or_build_from_employee_role(employee_role)
     employee_role
@@ -252,7 +252,7 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
 
   def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health')
     benefit_group = benefit_group_assignment.benefit_group
-    FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+    FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
       enrollment_members: [family.primary_applicant],
       household: family.active_household,
       coverage_kind: coverage_kind,

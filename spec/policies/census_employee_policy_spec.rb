@@ -2,10 +2,10 @@ require "rails_helper"
 
 describe CensusEmployeePolicy, dbclean: :after_each do
   subject { described_class }
-  let(:employer_profile){ FactoryGirl.create(:employer_profile)}
-  let(:person) { FactoryGirl.create(:person) }
-  let(:admin_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
-  let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
+  let(:employer_profile){ FactoryBot.create(:employer_profile)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
 
   before do 
     allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
@@ -13,53 +13,53 @@ describe CensusEmployeePolicy, dbclean: :after_each do
 
   permissions :delink? do
     context "already linked" do
-      let(:employee) { FactoryGirl.build(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "employee_role_linked") }
+      let(:employee) { FactoryBot.build(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "employee_role_linked") }
 
       context "with perosn with appropriate roles" do
         it "grants access when hbx_staff" do
-          expect(subject).to permit(FactoryGirl.create(:user, :hbx_staff, person: admin_person), employee)
+          expect(subject).to permit(FactoryBot.create(:user, :hbx_staff, person: admin_person), employee)
         end
 
         it "grants access when broker" do
-          expect(subject).to permit(FactoryGirl.create(:user, :broker, person: broker_person), employee)
+          expect(subject).to permit(FactoryBot.create(:user, :broker, person: broker_person), employee)
         end
 
         it "grants access when broker_agency_staff" do
-          expect(subject).to permit(FactoryGirl.create(:user, :broker_agency_staff, person: broker_person), employee)
+          expect(subject).to permit(FactoryBot.create(:user, :broker_agency_staff, person: broker_person), employee)
         end
       end
 
       it "denies access when normal user" do
-        expect(subject).not_to permit(FactoryGirl.create(:user), employee)
+        expect(subject).not_to permit(FactoryBot.create(:user), employee)
       end
     end
 
     context "not linked" do
-      let(:employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
+      let(:employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
 
       it "denies access when hbx_staff" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :hbx_staff, person: admin_person), employee)
+        expect(subject).not_to permit(FactoryBot.create(:user, :hbx_staff, person: admin_person), employee)
       end
 
       it "denies access when broker" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :broker, person: broker_person), employee)
+        expect(subject).not_to permit(FactoryBot.create(:user, :broker, person: broker_person), employee)
       end
 
       it "denies access when broker_agency_staff" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, :broker_agency_staff, person: broker_person), employee)
+        expect(subject).not_to permit(FactoryBot.create(:user, :broker_agency_staff, person: broker_person), employee)
       end
 
       it "denies access when normal user" do
-        expect(subject).not_to permit(FactoryGirl.create(:user, person: person), employee)
+        expect(subject).not_to permit(FactoryBot.create(:user, person: person), employee)
       end
     end
   end
 
   permissions :update? do
-    let(:employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
+    let(:employee) { FactoryBot.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: "eligible") }
 
     context "when is hbx_staff user" do
-      let(:user) { FactoryGirl.create(:user, :hbx_staff, person: admin_person) }
+      let(:user) { FactoryBot.create(:user, :hbx_staff, person: admin_person) }
 
       it "grants access when change dob" do
         employee.dob = TimeKeeper.date_of_record
@@ -73,7 +73,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     end
 
     context "when is normal user" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
 
       it "denies access when change dob" do
         employee.dob = TimeKeeper.date_of_record
@@ -87,7 +87,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     end
 
     context "when is broker user" do
-      let(:user) { FactoryGirl.create(:user, :broker, person: person) }
+      let(:user) { FactoryBot.create(:user, :broker, person: person) }
 
       context "current user is broker of employer_profile" do
         before :each do
@@ -108,7 +108,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
 
       context "current user is not broker of employer_profile" do
         before :each do
-          allow(employer_profile).to receive(:active_broker).and_return FactoryGirl.build(:person)
+          allow(employer_profile).to receive(:active_broker).and_return FactoryBot.build(:person)
           allow(employee).to receive(:employer_profile).and_return employer_profile
         end
 
@@ -125,7 +125,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
     end
 
     context "when is employer_staff user" do
-      let(:user) { FactoryGirl.create(:user, :employer_staff) }
+      let(:user) { FactoryBot.create(:user, :employer_staff) }
 
       context "not linked" do
         before do
@@ -220,9 +220,9 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       end
     end
     context "when is general agency user", dbclean: :after_each do
-      let(:user) { FactoryGirl.create(:user, :general_agency_staff, person: person) }
+      let(:user) { FactoryBot.create(:user, :general_agency_staff, person: person) }
       context "current user is broker of employer_profile" do
-        let(:person) { FactoryGirl.create(:person, :with_general_agency_staff_role) }
+        let(:person) { FactoryBot.create(:person, :with_general_agency_staff_role) }
         before do
           allow(EmployerProfile).to receive(:find_by_general_agency_profile).and_return [employee.employer_profile]
         end
@@ -239,7 +239,7 @@ describe CensusEmployeePolicy, dbclean: :after_each do
       end
 
       context "current user is not broker of general agency role" do
-        let(:user) { FactoryGirl.create(:user, person: person) }
+        let(:user) { FactoryBot.create(:user, person: person) }
         it "denies access when change dob" do
           employee.dob = TimeKeeper.date_of_record
           expect(subject).not_to permit(user, employee)

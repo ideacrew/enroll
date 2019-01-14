@@ -14,7 +14,7 @@ describe UpdateBookMarkUrlForEmployeerole, dbclean: :after_each do
 
   describe "update bookmark url" do
 
-    let!(:employee_role) { FactoryGirl.create(:employee_role, bookmark_url: "https://enroll.dchealthlink.com")}
+    let!(:employee_role) { FactoryBot.create(:employee_role, bookmark_url: "https://enroll.dchealthlink.com")}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)

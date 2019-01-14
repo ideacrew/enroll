@@ -5,7 +5,7 @@ module BenefitSponsors
 
     let(:model_event) { "application_submitted" }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
 
     let(:benefit_market)      { site.benefit_markets.first }
@@ -14,11 +14,11 @@ module BenefitSponsors
                                             title: "SHOP Benefits for #{current_effective_date.year}",
                                             application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                           }
-    let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { organization.employer_profile }
     let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
     let!(:model_instance) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: start_on..start_on.next_year.prev_day, open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: start_on..start_on.next_year.prev_day, open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)
       application.benefit_sponsor_catalog.save!
       application
     }

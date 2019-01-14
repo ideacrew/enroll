@@ -73,14 +73,14 @@ When(/^Consumer click the link of homepage$/) do
 end
 
 Given(/^Consumer role exists$/) do
-  user = FactoryGirl.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX' ,identity_final_decision_code: 'acc'
-  FactoryGirl.create(:consumer_role, person: user.person)
+  user = FactoryBot.create :user, :with_family, :consumer, email: 'consumer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX' ,identity_final_decision_code: 'acc'
+  FactoryBot.create(:consumer_role, person: user.person)
 end
 
 Given(/^Employer role exists$/) do
-  employer_profile = FactoryGirl.create :employer_profile
-  user = FactoryGirl.create :user, :with_family, :employer_staff, email: 'employer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
-  FactoryGirl.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
+  employer_profile = FactoryBot.create :employer_profile
+  user = FactoryBot.create :user, :with_family, :employer_staff, email: 'employer@dc.gov', password: '1qaz@WSX', password_confirmation: '1qaz@WSX'
+  FactoryBot.create :employer_staff_role, person: user.person, employer_profile_id: employer_profile.id
 end
 
 Then(/^.+ should not see announcement$/) do
@@ -100,7 +100,7 @@ When(/^Employer login$/) do
 end
 
 Given(/^Announcement prepared for Consumer role$/) do
-  FactoryGirl.create :announcement, audiences: ['IVL'], content: 'msg content'
+  FactoryBot.create :announcement, audiences: ['IVL'], content: 'msg content'
 end
 
 When(/^Consumer login$/) do

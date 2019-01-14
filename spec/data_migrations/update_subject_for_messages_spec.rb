@@ -13,10 +13,10 @@ describe UpdateSubjectForMessages, dbclean: :after_each do
 
   describe "updating subject for messages" do
     let!(:site)                 { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)         { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:organization)         { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)     { organization.employer_profile }
     let!(:benefit_sponsorship)  { employer_profile.add_benefit_sponsorship }
-    let (:message) {FactoryGirl.build(:message, subject: "Welcome to MA Health Link")}
+    let (:message) {FactoryBot.build(:message, subject: "Welcome to MA Health Link")}
 
     before(:each) do
       employer_profile.inbox.post_message(message)

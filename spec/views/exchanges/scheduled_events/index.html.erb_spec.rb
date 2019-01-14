@@ -1,14 +1,14 @@
 require 'rails_helper'
 describe "exchanges/scheduled_events/index.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, :person => person) }
-  let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, :person => person) }
+  let(:scheduled_event) { FactoryBot.create(:scheduled_event) }
   before :each do
     assign(:scheduled_event, scheduled_event)
     allow(view).to receive(:policy_helper).and_return(double("Policy", view_admin_tabs?: true))
     sign_in user
-    @calendar_events = [FactoryGirl.create(:scheduled_event)]
-    @scheduled_events = [FactoryGirl.create(:scheduled_event)]
+    @calendar_events = [FactoryBot.create(:scheduled_event)]
+    @scheduled_events = [FactoryBot.create(:scheduled_event)]
   end
 
   it "should display index page info" do

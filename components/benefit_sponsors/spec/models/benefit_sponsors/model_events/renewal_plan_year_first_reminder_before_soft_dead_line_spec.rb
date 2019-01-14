@@ -10,7 +10,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
 
   let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:current_effective_date)  { renewal_effective_date.prev_year }
-  let(:employer_profile) { abc_profile }  
+  let(:employer_profile) { abc_profile }
   let(:model_instance) { renewal_application }
 
   let!(:date_mock_object) { double("Date", day: Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 )}
@@ -18,7 +18,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
   before do
     model_instance.update_attributes(:effective_period =>  renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)
   end
-  
+
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.each do |observer|

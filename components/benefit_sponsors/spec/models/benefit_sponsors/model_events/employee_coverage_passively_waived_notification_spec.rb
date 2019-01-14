@@ -15,12 +15,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeCoveragePassivelyWaivedNot
   let(:current_effective_date)  { renewal_effective_date.prev_year }
   let(:employer_profile) { abc_profile }
 
-  let!(:person){ FactoryGirl.create(:person, :with_family)}
+  let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
-  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
-  let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
 
-  let!(:hbx_enrollment) {  FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+  let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         aasm_state: "renewing_waived",
                         effective_on: renewal_application.start_on,

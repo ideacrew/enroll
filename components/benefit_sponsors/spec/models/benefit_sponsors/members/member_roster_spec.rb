@@ -3,14 +3,14 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Members::MemberRoster, type: :model, :dbclean => :after_each do
 
-    let(:employee_1)    { FactoryGirl.build(:benefit_sponsors_members_employee_member, :as_male) }
+    let(:employee_1)    { FactoryBot.build(:benefit_sponsors_members_employee_member, :as_male) }
 
-    let(:employee_2)    { FactoryGirl.build(:benefit_sponsors_members_employee_member, :as_male) }
-    let(:spouse_2)      { FactoryGirl.build(:benefit_sponsors_members_dependent_member, :as_spouse) }
+    let(:employee_2)    { FactoryBot.build(:benefit_sponsors_members_employee_member, :as_male) }
+    let(:spouse_2)      { FactoryBot.build(:benefit_sponsors_members_dependent_member, :as_spouse) }
 
-    let(:employee_3)    { FactoryGirl.build(:benefit_sponsors_members_employee_member,  :as_female) }
-    let(:spouse_3)      { FactoryGirl.build(:benefit_sponsors_members_dependent_member, :as_female_domestic_partner) }
-    let(:child_3)       { FactoryGirl.build(:benefit_sponsors_members_dependent_member, :as_child) }
+    let(:employee_3)    { FactoryBot.build(:benefit_sponsors_members_employee_member,  :as_female) }
+    let(:spouse_3)      { FactoryBot.build(:benefit_sponsors_members_dependent_member, :as_female_domestic_partner) }
+    let(:child_3)       { FactoryBot.build(:benefit_sponsors_members_dependent_member, :as_child) }
 
     let(:member_group_1)  { Members::MemberGroup.new([employee_1]) }
     let(:member_group_2)  { Members::MemberGroup.new([employee_2, spouse_2]) }

@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe ShopEmployeeNotices::EmployeeEligibilityNotice, :dbclean => :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:person){ create :person }
-  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-  let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship_id: employer_profile.benefit_sponsorships.first.id) }
+  let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let(:census_employee) { FactoryBot.create(:census_employee, employee_role_id: employee_role.id, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship_id: employer_profile.benefit_sponsorships.first.id) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employee Eligibility Notice',
                             :notice_template => 'notices/shop_employee_notices/employee_eligibility_notice',
@@ -21,9 +21,9 @@ RSpec.describe ShopEmployeeNotices::EmployeeEligibilityNotice, :dbclean => :afte
         :template => application_event.notice_template
     }}
 
-    let(:site) { FactoryGirl.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
+    let(:site) { FactoryBot.create(:benefit_sponsors_site,  :with_benefit_market, :dc, :as_hbx_profile) }
 
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization,
+    let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization,
       :with_aca_shop_dc_employer_profile_initial_application,
       site: site
      )}

@@ -26,7 +26,7 @@ describe Subscribers::LawfulPresence do
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
 
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
 
     before do

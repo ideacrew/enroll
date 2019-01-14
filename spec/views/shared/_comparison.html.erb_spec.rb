@@ -7,8 +7,8 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   include_context 'setup benefit market with market catalogs and product packages'
   include_context 'setup initial benefit application'
 
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
     enrollment_members: family.family_members,
     household: family.active_household,
     product_id: product.id,
@@ -18,7 +18,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
   let(:primary_family_member) { family.family_members.first }
 
-  let(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member,
+  let(:hbx_enrollment_member) { FactoryBot.create(:hbx_enrollment_member,
     applicant_id: primary_family_member.id,
     hbx_enrollment: hbx_enrollment,
     is_subscriber: primary_family_member.is_primary_applicant,
@@ -28,7 +28,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
   let(:product) {health_products[0]}
 
-  let(:plan) { FactoryGirl.create(:plan,
+  let(:plan) { FactoryBot.create(:plan,
    provider_directory_url: "http://www.example1.com",
    rx_formulary_url: "http://www.example.com") } # QHP still checking for old plan instance for rx_formulary_url & provider_directory_url in view file.
   

@@ -30,7 +30,7 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:message) { { "body" => xml } }
       let(:xml) { File.read(file) }
       let(:parser) { Parsers::Xml::Cv::VerifiedFamilyParser.new.parse(File.read(file)).first }
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
 
       context "simulating consumer role controller create action" do
         let(:primary) { parser.family_members.detect{ |fm| fm.id == parser.primary_family_member_id } }

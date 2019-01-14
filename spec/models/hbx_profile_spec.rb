@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe HbxProfile, :type => :model do
-  let(:organization) { FactoryGirl.create(:organization) }
+  let(:organization) { FactoryBot.create(:organization) }
 
   let(:cms_id)  { "DC0" }
   let(:us_state_abbreviation)  { "DC" }
@@ -35,7 +35,7 @@ RSpec.describe HbxProfile, :type => :model do
       end
 
       context "and it is saved" do
-        let!(:hbx_profile) { FactoryGirl.create :hbx_profile }
+        let!(:hbx_profile) { FactoryBot.create :hbx_profile }
 
         it "should return all HBX instances" do
           expect(HbxProfile.all.size).to eq @hp_count + 2
@@ -47,8 +47,8 @@ RSpec.describe HbxProfile, :type => :model do
       end
 
       context ".search_random", dbclean: :after_each do
-        let(:broker_agency_profile1) { FactoryGirl.create(:broker_agency_profile)}
-        let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile)}
+        let(:broker_agency_profile1) { FactoryBot.create(:broker_agency_profile)}
+        let(:broker_agency_profile2) { FactoryBot.create(:broker_agency_profile)}
 
         before do
           DatabaseCleaner.clean

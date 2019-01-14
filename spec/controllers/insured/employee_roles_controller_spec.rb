@@ -11,10 +11,10 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:effective_date) { double }
     let(:person_id) { BSON::ObjectId::new }
     let(:employee_role) { double(:id => employee_role_id, :employer_profile => employer_profile, employer_profile_id: employer_profile.id, :benefit_group => benefit_group, :census_employee => census_employee) }
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) {FactoryGirl.create(:user)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:user) {FactoryBot.create(:user)}
     let(:role_form) { Forms::EmployeeRole.new(person, employee_role)}
-    let(:address) {FactoryGirl.create(:address, :person => person)}
+    let(:address) {FactoryBot.create(:address, :person => person)}
 
     before(:each) do
       allow(Person).to receive(:find).with(person_id).and_return(person)
@@ -317,8 +317,8 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   end
 
   describe "GET search" do
-    let(:user) { FactoryGirl.build(:user) }
-    let(:person) { FactoryGirl.build(:person) }
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) { FactoryBot.build(:person) }
 
     before(:each) do
       allow(user).to receive(:person).and_return(person)
@@ -340,7 +340,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
   describe "GET privacy" do
     let(:user) { double("user") }
     let(:person) { double("person")}
-    let(:employee_role) {FactoryGirl.create(:employee_role)}
+    let(:employee_role) {FactoryBot.create(:employee_role)}
 
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:person).and_return(person)
@@ -365,8 +365,8 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     end
   end
   describe "GET show" do
-    let(:user) { FactoryGirl.build(:user) }
-    let(:person) { FactoryGirl.build(:person) }
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) { FactoryBot.build(:person) }
 
     before(:each) do
       allow(user).to receive(:person).and_return(person)

@@ -14,27 +14,27 @@ describe "CcaEmployerProfilesMigration" do
   describe ".up" do
 
     before :all do
-      organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
-      FactoryGirl.create(:broker_agency_profile, organization: organization)
+      organization = FactoryBot.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
+      FactoryBot.create(:broker_agency_profile, organization: organization)
 
-      organization1 = FactoryGirl.create(:organization, legal_name: "Delta Dental")
-      FactoryGirl.create(:carrier_profile, organization: organization1)
+      organization1 = FactoryBot.create(:organization, legal_name: "Delta Dental")
+      FactoryBot.create(:carrier_profile, organization: organization1)
 
-      employer_profile = FactoryGirl.create(:employer_profile)
-      document1 = FactoryGirl.build(:document)
-      document2 = FactoryGirl.build(:document)
+      employer_profile = FactoryBot.create(:employer_profile)
+      document1 = FactoryBot.build(:document)
+      document2 = FactoryBot.build(:document)
       employer_profile.organization.documents << document1
       employer_profile.documents << document2
       employer_profile.documents.first.update_attributes(title: "MonthlyInvoiceAvailableNotice", creator: "hbx_staff", subject: "notice", description: nil, publisher: "dchl", type: "text", format: "application/pdf", identifier: "urn:openhbx:terms:v1:file_storage:s10:buckt:dchbx-enroll-notices-dev#92a6d67d", source: "enroll_system", language: "en", _type: "Document")
 
       # employer_profile.organization.home_page = nil
-      inbox = FactoryGirl.create(:inbox, :with_message, recipient: employer_profile)
+      inbox = FactoryBot.create(:inbox, :with_message, recipient: employer_profile)
       inbox.messages.first.update_attributes(body: "<br>Your invoice is now available in your employer profile under the Billing tab. For more information, please download your <a href=/document/authorized_download/EmployerProfile/#{employer_profile.id}/documents/#{document1.id}?content_type=application/pdf&filename=MonthlyInvoiceAvailableNotice.pdf&disposition=inline target='_blank'>MonthlyInvoiceAvailableNotice</a>")
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
+      FactoryBot.create(:employer_staff_role, employer_profile_id: employer_profile.id)
 
-      FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+      FactoryBot.create(:employee_role, employer_profile: employer_profile)
       site = BenefitSponsors::Site.all.first
-      benefit_market = FactoryGirl.create(:benefit_markets_benefit_market)
+      benefit_market = FactoryBot.create(:benefit_markets_benefit_market)
       site.benefit_markets << benefit_market
       site.save!
       BenefitSponsors::Organizations::Organization.employer_profiles.delete_all

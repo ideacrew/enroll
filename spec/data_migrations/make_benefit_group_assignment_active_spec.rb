@@ -15,11 +15,11 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
   describe "creates an inactive benefit group assignment" do
 
 
-    let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:plan_year) { FactoryGirl.create(:plan_year) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, :old_case, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
+    let!(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year)}
+    let(:plan_year) { FactoryBot.create(:plan_year) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
+    let(:census_employee) { FactoryBot.create(:census_employee, :old_case, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)

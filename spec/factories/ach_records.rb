@@ -3,5 +3,5 @@ FactoryBot.define do
     routing_number { '123456789' }
     bank_name { 'GNB' }
   end
-
+  
 end

@@ -3,22 +3,22 @@ require File.join(Rails.root, "app", "data_migrations", "cancel_plan_years_group
 
 describe "Importing data", dbclean: :after_each do
     let!(:given_task_name)    {"cancel_plan_years_group"}
-    let!(:organization_1)     { FactoryGirl.create(:organization, :fein => 122121789) }
-    let!(:organization_2)     { FactoryGirl.create(:organization, :fein => 122144789) }
-    let!(:employer_profile_1) { FactoryGirl.create(:employer_profile, organization: organization_1) }
-    let!(:employer_profile_2) { FactoryGirl.create(:employer_profile, organization: organization_2) }
-    let!(:benefit_group_1)    { FactoryGirl.build(:benefit_group)}
-    let!(:benefit_group_2)    { FactoryGirl.build(:benefit_group)}
+    let!(:organization_1)     { FactoryBot.create(:organization, :fein => 122121789) }
+    let!(:organization_2)     { FactoryBot.create(:organization, :fein => 122144789) }
+    let!(:employer_profile_1) { FactoryBot.create(:employer_profile, organization: organization_1) }
+    let!(:employer_profile_2) { FactoryBot.create(:employer_profile, organization: organization_2) }
+    let!(:benefit_group_1)    { FactoryBot.build(:benefit_group)}
+    let!(:benefit_group_2)    { FactoryBot.build(:benefit_group)}
     let!(:start_on)           { Date.strptime('07/01/2017','%m/%d/%Y').to_date}
     let!(:start_on_1)         { Date.strptime('08/01/2017','%m/%d/%Y').to_date}
-    let!(:plan_year1)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_1], aasm_state: "application_ineligible", start_on: start_on, employer_profile: employer_profile_1) }
-    let!(:plan_year2)         { FactoryGirl.create(:plan_year, aasm_state: "active", employer_profile: employer_profile_1 )}
-    let!(:plan_year3)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on, employer_profile: employer_profile_2) }
-    let!(:plan_year4)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on_1, employer_profile: employer_profile_2) }
-    let!(:plan_year5)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "publish_pending", start_on: start_on, employer_profile: employer_profile_2) }
+    let!(:plan_year1)         { FactoryBot.create(:plan_year, benefit_groups: [benefit_group_1], aasm_state: "application_ineligible", start_on: start_on, employer_profile: employer_profile_1) }
+    let!(:plan_year2)         { FactoryBot.create(:plan_year, aasm_state: "active", employer_profile: employer_profile_1 )}
+    let!(:plan_year3)         { FactoryBot.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on, employer_profile: employer_profile_2) }
+    let!(:plan_year4)         { FactoryBot.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "draft", start_on: start_on_1, employer_profile: employer_profile_2) }
+    let!(:plan_year5)         { FactoryBot.create(:plan_year, benefit_groups: [benefit_group_2], aasm_state: "publish_pending", start_on: start_on, employer_profile: employer_profile_2) }
     subject { CancelPlanYearsGroup.new(given_task_name, double(:current_scope => nil)) }
-    
-    before :each do   
+
+    before :each do
       allow(ENV).to receive(:[]).with('file_name').and_return "spec/test_data/cancel_plan_years/CancelPlanYears.csv"
     end
 

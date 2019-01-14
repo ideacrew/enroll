@@ -13,15 +13,15 @@ describe ChangeErToApplicantState do
   end
 
   describe "change employer profile to applicant state", dbclean: :after_each do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group], aasm_state: "canceled")}
-    let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
-    let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
-    let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
-    let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-    let(:employee_role)   { FactoryGirl.build(:employee_role, employer_profile: employer_profile )}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
+    let(:benefit_group) { FactoryBot.create(:benefit_group)}
+    let(:plan_year) { FactoryBot.create(:plan_year, benefit_groups: [benefit_group], aasm_state: "canceled")}
+    let(:employer_profile)     { FactoryBot.build(:employer_profile, plan_years: [plan_year]) }
+    let(:organization) { FactoryBot.create(:organization, employer_profile:employer_profile)}
+    let(:family) { FactoryBot.build(:family, :with_primary_family_member)}
+    let(:census_employee)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+    let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household, aasm_state: "coverage_enrolled", benefit_group_id: plan_year.benefit_groups.first.id)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with('plan_year_state').and_return(plan_year.aasm_state)

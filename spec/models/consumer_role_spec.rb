@@ -18,13 +18,13 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :gender }
   it { should validate_presence_of :dob }
 
-  let(:address)       {FactoryGirl.build(:address)}
-  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
-  let(:saved_person_no_ssn)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
-  let(:saved_person_no_ssn_invalid)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
+  let(:address)       {FactoryBot.build(:address)}
+  let(:saved_person)  {FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+  let(:saved_person_no_ssn)  {FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
+  let(:saved_person_no_ssn_invalid)  {FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
   let(:is_applicant)          { true }
   let(:citizen_error_message) { "test citizen_status is not a valid citizen status" }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   describe ".new" do
     let(:valid_params) do
       {
@@ -142,7 +142,7 @@ describe "#find_vlp_document_by_key" do
 end
 
 describe "#build_nested_models_for_person" do
-  let(:person) {FactoryGirl.create(:person)}
+  let(:person) {FactoryBot.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
 
   before do
@@ -169,7 +169,7 @@ end
 
 describe "#latest_active_tax_household_with_year" do
   include_context "BradyBunchAfterAll"
-  let(:family) { FactoryGirl.build(:family)}
+  let(:family) { FactoryBot.build(:family)}
   let(:consumer_role) { ConsumerRole.new }
   before :all do
     create_tax_household_for_mikes_family
@@ -187,28 +187,28 @@ describe "#latest_active_tax_household_with_year" do
 end
 
 context "Verification process and notices" do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
   describe "#has_docs_for_type?" do
     before do
       person.consumer_role.vlp_documents=[]
     end
     context "vlp exist but document is NOT uploaded" do
       it "returns false for vlp doc without uploaded copy" do
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil )
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => nil )
         expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_falsey
       end
       it "returns false for Immigration type" do
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => nil, :verification_type  => "Immigration type")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => nil, :verification_type  => "Immigration type")
         expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_falsey
       end
     end
     context "vlp with uploaded copy" do
       it "returns true if person has uploaded documents for this type" do
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Citizenship")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => "identifier", :verification_type  => "Citizenship")
         expect(person.consumer_role.has_docs_for_type?("Citizenship")).to be_truthy
       end
       it "returns false if person has NO documents for this type" do
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
         expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_truthy
       end
     end
@@ -242,7 +242,7 @@ context "Verification process and notices" do
       end
       it "return false if documents uploaded" do
         person.consumer_role.ssn_validation = "ne"
-        person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => "Social Security Number")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => "Social Security Number")
         expect(person.consumer_role.is_type_outstanding?("Social Security Number")).to be_falsey
       end
       it "return false for verified ssn" do
@@ -288,7 +288,7 @@ context "Verification process and notices" do
       types = ["Social Security Number", "Citizenship", "Immigration status", "American Indian Status"]
       types.each do |type|
         it "returns false for #{type} and documents for this type" do
-          person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)
+          person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :verification_type => type)
           expect(person.consumer_role.is_type_outstanding?(type)).to be_falsey
         end
       end
@@ -678,7 +678,7 @@ context "Verification process and notices" do
 
   describe "#check_for_critical_changes" do
     sensitive_fields = ConsumerRole::VERIFICATION_SENSITIVE_ATTR
-    all_fields = FactoryGirl.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
+    all_fields = FactoryBot.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
     mask_hash = all_fields.map{|v| [v, (sensitive_fields.include?(v) ? "call" : "don't call")]}.to_h
     subject { ConsumerRole.new(:person => person) }
     let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
@@ -772,7 +772,7 @@ describe "#find_vlp_document_by_key" do
 end
 
 describe "#build_nested_models_for_person" do
-  let(:person) {FactoryGirl.create(:person)}
+  let(:person) {FactoryBot.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
 
   before do
@@ -798,9 +798,9 @@ describe "#build_nested_models_for_person" do
 end
 
 describe "can_trigger_residency?" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
 
   context "when person has age > 19 & has an active coverage" do
@@ -873,9 +873,9 @@ end
 
 
 describe "is_type_verified?" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
 
   context "when entered type is DC Residency" do
@@ -919,7 +919,7 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
 end
 
 describe "#add_type_history_element" do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
   let(:attr) { {verification_type: "verification_type",
                 action: "action",
                 modifier: "actor",
@@ -933,7 +933,7 @@ describe "#add_type_history_element" do
 end
 
 describe "Verification Tracker" do
-  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) {FactoryBot.create(:person, :with_consumer_role)}
   context "mongoid history" do
     it "stores new record with changes" do
       history_tracker_init =  HistoryTracker.count

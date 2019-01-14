@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :after_each do
-  let(:person) { FactoryGirl.build(:person) }
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
-  let(:employee_role) { FactoryGirl.build(:employee_role) }
-  let(:census_employee) { FactoryGirl.build(:census_employee) }
+  let(:person) { FactoryBot.build(:person) }
+  let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
+  let(:employee_role) { FactoryBot.build(:employee_role) }
+  let(:census_employee) { FactoryBot.build(:census_employee) }
   let(:hbx_enrollments) {double}
-  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-  let(:current_user) { FactoryGirl.create(:user)}
+  let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+  let(:current_user) { FactoryBot.create(:user)}
 
 
   context "with hbx_enrollments" do

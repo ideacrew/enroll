@@ -12,15 +12,16 @@ describe AddPrimaryFamily, dbclean: :after_each do
     end
   end
   describe "Add Primary Family to the Person" do
-    let(:person) { FactoryGirl.create(:person)}
+    # let(:person) { FactoryBot.create(:person)}
     before(:each) do
-      load File.expand_path("#{Rails.root}/lib/tasks/migrations/add_primary_family.rake", __FILE__)
-      Rake::Task.define_task(:environment)
-      hbx_id = person.hbx_id
-      ENV['dep_hbx_id'] = hbx_id
-      Rake::Task["migrations:add_primary_family"].invoke()
+      # load File.expand_path("#{Rails.root}/lib/tasks/migrations/add_primary_family.rake", __FILE__)
+      # Rake::Task.define_task(:environment)
+      # hbx_id = person.hbx_id
+      # ENV['dep_hbx_id'] = hbx_id
+      # Rake::Task["migrations:add_primary_family"].invoke()
     end
       it 'should create a family with person as primary applicant' do
+        binding.pry
       expect(person.primary_family.primary_applicant.person).to eq person
     end
   end

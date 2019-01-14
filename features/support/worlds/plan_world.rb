@@ -1,7 +1,7 @@
 module PlanWorld
   def plan(*traits)
     attributes = traits.extract_options!
-    @plan ||= FactoryGirl.create :plan, *traits, attributes
+    @plan ||= FactoryBot.create :plan, *traits, attributes
   end
 end
 

@@ -14,7 +14,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::PlanYearAutoPublished', dbclean: :
 
   let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:current_effective_date)  { renewal_effective_date.prev_year }
-  let(:employer_profile) { abc_profile }  
+  let(:employer_profile) { abc_profile }
   let(:model_instance) { renewal_application }
 
   before do

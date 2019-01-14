@@ -8,12 +8,12 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
 
   let(:employer_profile) { abc_profile }
   let(:plan_year) { initial_application }
-  let(:person) { FactoryGirl.create(:person) }
-  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  let(:enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-  let(:individual_family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:individual_enrollment) {FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: individual_family.active_household)}
+  let(:person) { FactoryBot.create(:person) }
+  let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+  let(:individual_family) { FactoryBot.create(:family, :with_primary_family_member)}
+  let(:individual_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: individual_family.active_household)}
 
   before :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -70,8 +70,8 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
   end
 
   describe "SET optional_effective_on date on a SEP" do
-    let(:person_with_consumer_role) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:person_with_employee_role) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person_with_consumer_role) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:person_with_employee_role) { FactoryBot.create(:person, :with_employee_role) }
 
     context "for shop market" do
       before do

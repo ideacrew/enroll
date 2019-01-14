@@ -3,8 +3,8 @@ require 'rails_helper'
 =begin
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :after_each do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
-  let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person, :with_family ) }
 
   let(:plan) do
     double(plan_type: "ppo",
@@ -54,8 +54,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     allow(plan).to receive(:is_csr?).and_return false
     family = person.primary_family
     active_household = family.households.first
-    tax_household = FactoryGirl.create(:tax_household, household: active_household )
-    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+    tax_household = FactoryBot.create(:tax_household, household: active_household )
+    eligibility_determination = FactoryBot.create(:eligibility_determination, tax_household: tax_household )
   end
 
   context "deductible" do

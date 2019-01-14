@@ -2,26 +2,26 @@
 
 # RSpec.describe QuoteBenefitGroup, dbclean: :before_each do
 
-#   let(:quote) {FactoryGirl.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month)}
-#   let(:quote_family) {FactoryGirl.create(:quote, :with_two_families, start_on: TimeKeeper.date_of_record.beginning_of_month)}
-#   let(:quote_next_year) {FactoryGirl.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month + 1.year)}
+#   let(:quote) {FactoryBot.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month)}
+#   let(:quote_family) {FactoryBot.create(:quote, :with_two_families, start_on: TimeKeeper.date_of_record.beginning_of_month)}
+#   let(:quote_next_year) {FactoryBot.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month + 1.year)}
 
 #   context 'benefit group calculations' do
 
 #     before :all do
 #       Plan.all.delete
-#       @plan_silver = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'silver')
-#       @plan_gold = FactoryGirl.create(:plan, :with_premium_tables, metal_level: 'gold')
-#       @dental_this_year = FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables)
-#       @dental_next_year = FactoryGirl.create(:plan, :with_dental_coverage, :with_next_year_premium_tables)
-#       @plan_silver_next_year = FactoryGirl.create(:plan, :with_next_year_premium_tables)
+#       @plan_silver = FactoryBot.create(:plan, :with_premium_tables, metal_level: 'silver')
+#       @plan_gold = FactoryBot.create(:plan, :with_premium_tables, metal_level: 'gold')
+#       @dental_this_year = FactoryBot.create(:plan, :with_dental_coverage, :with_premium_tables)
+#       @dental_next_year = FactoryBot.create(:plan, :with_dental_coverage, :with_next_year_premium_tables)
+#       @plan_silver_next_year = FactoryBot.create(:plan, :with_next_year_premium_tables)
 #       Caches::PlanDetails.load_record_cache!
 #       sleep 1
 #       @current_year = TimeKeeper.date_of_record.year
 #       @next_year = @current_year + 1
 #       Plan.shop_health_plans @current_year
 #       Plan.shop_health_plans @next_year
-#       @quote = FactoryGirl.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month)
+#       @quote = FactoryBot.create(:quote, :with_household_and_members, start_on: TimeKeeper.date_of_record.beginning_of_month)
 
 #       @silver_age_29 =  Proc.new {|bg| Caches::PlanDetails.lookup_rate(@plan_silver.id, bg.quote.start_on, 29)}
 #       @silver_age_30 = Proc.new {|bg| Caches::PlanDetails.lookup_rate(@plan_silver.id, bg.quote.start_on, 30)}

@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe "shared/_qle_progress.html.erb" do
-  let(:plan) { FactoryGirl.build(:plan) }
+  let(:plan) { FactoryBot.build(:plan) }
   let(:enrollment) { double(id: 'hbx_id') }
-  let(:person) { FactoryGirl.create(:person)}
+  let(:person) { FactoryBot.create(:person)}
   context "step 1" do
     before :each do
       assign :change_plan, "change"

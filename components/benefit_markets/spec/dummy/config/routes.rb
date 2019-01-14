@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+# Rails.application.routes.draw do
 
-  mount BenefitMarkets::Engine => "/benefit_markets"
-end
+#   mount BenefitMarkets::Engine => "/benefit_markets"
+# end

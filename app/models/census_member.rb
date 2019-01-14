@@ -2,8 +2,8 @@ class CensusMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include UnsetableSparseFields
-  include SponsoredBenefits::Concerns::Ssn
-  include SponsoredBenefits::Concerns::Dob
+  # include SponsoredBenefits::Concerns::Ssn
+  # include SponsoredBenefits::Concerns::Dob
 
   validates_with Validations::DateRangeValidator
 

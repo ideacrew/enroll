@@ -187,7 +187,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
   describe "is_office_location_address_valid?" do
 
-    let(:phone) { FactoryGirl.build(:phone) }
+    let(:phone) { FactoryBot.build(:phone) }
     let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
@@ -210,8 +210,8 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
   describe "is_office_location_phone_valid?" do
 
-    let(:phone) { FactoryGirl.build(:phone, kind:'home') }
-    let(:phone1) { FactoryGirl.build(:phone, kind:'phone main main') }
+    let(:phone) { FactoryBot.build(:phone, kind:'home') }
+    let(:phone1) { FactoryBot.build(:phone, kind:'phone main main') }
     let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}

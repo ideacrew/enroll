@@ -15,8 +15,8 @@ describe ChangeFeinNewModel, dbclean: :after_each do
 
   describe "changing organization's fein in new model" do
     let(:site)            { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
-    let(:exempt_organization) { FactoryGirl.create(:benefit_sponsors_organizations_exempt_organization, profiles: [issuer_profile], fein: old_fein)}
+    let(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let(:exempt_organization) { FactoryBot.create(:benefit_sponsors_organizations_exempt_organization, profiles: [issuer_profile], fein: old_fein)}
 
     context "when there is no existing fein" do
       before(:each) do

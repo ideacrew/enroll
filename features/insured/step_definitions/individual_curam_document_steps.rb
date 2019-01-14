@@ -28,7 +28,7 @@ Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$
 end
 
 When(/^selects a Person account and navigates to Verification page$/) do
-  @person = FactoryGirl.create(:person, :with_consumer_role)
+  @person = FactoryBot.create(:person, :with_consumer_role)
   visit verification_insured_families_path
 end
 
@@ -41,6 +41,6 @@ When(/^the user visits messages page$/) do
 end
 
 When(/^selects a Person account and navigates to Messages page$/) do
-  @person = FactoryGirl.create(:person, :with_consumer_role)
+  @person = FactoryBot.create(:person, :with_consumer_role)
   visit inbox_insured_families_path
 end

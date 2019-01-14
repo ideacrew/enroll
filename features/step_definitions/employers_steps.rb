@@ -74,7 +74,7 @@ end
 And(/^.+ should see a form with a fieldset for Employer information, including: legal name, DBA, fein, entity_kind, broker agency, URL, address, and phone$/) do
   @browser.button(value: /Search Employers/).wait_until_present
   screenshot("employer_portal_employer_search_form")
-  @employer_profile = FactoryGirl.create(:employer_profile)
+  @employer_profile = FactoryBot.create(:employer_profile)
 
   @browser.text_field(name: "employer_profile[legal_name]").set(@employer_profile.legal_name)
   @browser.text_field(name: "employer_profile[dba]").set(@employer_profile.dba)
@@ -495,12 +495,12 @@ end
 module EmployeeWorld
   def owner(*traits)
     attributes = traits.extract_options!
-    @owner ||= FactoryGirl.create :user, *traits, attributes
+    @owner ||= FactoryBot.create :user, *traits, attributes
   end
 
   def employees(*traits)
     attributes = traits.extract_options!
-    @employees ||= FactoryGirl.create_list :census_employee, 5, *traits, attributes
+    @employees ||= FactoryBot.create_list :census_employee, 5, *traits, attributes
     # :employer_profile, *traits, attributes.merge(:employer_profiles_traits => :with_staff)
   end
 end
@@ -515,7 +515,7 @@ Given /^the employer has draft plan year$/ do
 end
 
 Given /^the employer has broker agency profile$/ do
-  employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.hire_broker_agency(FactoryBot.create :broker_agency_profile)
   employer.employer_profile.save!
 end
 
@@ -736,8 +736,8 @@ When(/^the employer clicks on claim quote$/) do
 end
 
 Then(/^the employer enters claim code for his quote$/) do
-  person = FactoryGirl.create(:person, :with_broker_role)
-  @quote=FactoryGirl.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  person = FactoryBot.create(:person, :with_broker_role)
+  @quote=FactoryBot.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
   @quote.publish!
   fill_in "claim_code", :with => @quote.claim_code
 end

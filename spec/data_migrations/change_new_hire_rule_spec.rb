@@ -15,10 +15,10 @@ describe ChangeNewHireRule do
   describe "changing new hire rule" do
 
     context " changing effective on kind" do
-      let(:organization) { FactoryGirl.create(:organization)}
-      let(:benefit_group)     { FactoryGirl.build(:benefit_group, effective_on_kind: "date_of_hire")}
-      let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
-      let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
+      let(:organization) { FactoryBot.create(:organization)}
+      let(:benefit_group)     { FactoryBot.build(:benefit_group, effective_on_kind: "date_of_hire")}
+      let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [benefit_group]) }
+      let!(:employer_profile)  { FactoryBot.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
 
       before(:each) do
         allow(ENV).to receive(:[]).with("fein").and_return organization.fein

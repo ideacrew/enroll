@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "insured/families/_navigate_to_curam_for_documents.html.erb" do
 
   context 'Person with consumer_role' do
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) {FactoryBot.create(:person)}
 
     before :each do
       render partial: 'insured/families/navigate_to_curam_for_documents', locals: {display_text: "If you applied for Medicaid and tax credit savings, view additional documents" }

@@ -4,10 +4,10 @@ RSpec.describe OfficeLocation, :type => :model do
 
   it { should validate_presence_of :address }
 
-  let(:organization) {FactoryGirl.create(:organization)}
-  let(:address) {FactoryGirl.build(:address, kind: 'primary')}
-  let(:phone) {FactoryGirl.build(:phone)}
-  let(:email) {FactoryGirl.build(:email)}
+  let(:organization) {FactoryBot.create(:organization)}
+  let(:address) {FactoryBot.build(:address, kind: 'primary')}
+  let(:phone) {FactoryBot.build(:phone)}
+  let(:email) {FactoryBot.build(:email)}
   let(:is_primary) { true }
 
   describe ".new" do

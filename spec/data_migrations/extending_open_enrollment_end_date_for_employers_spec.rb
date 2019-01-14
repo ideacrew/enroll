@@ -15,7 +15,7 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
   describe "changing the open_enrollment_end_on date for conversion ER's" do
 
     context "for renewal employer" do
-      let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+      let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
 
       before(:each) do
         organization.employer_profile.renewing_plan_year.update_attribute(:open_enrollment_end_on, Date.new(2016,11,13))
@@ -43,7 +43,7 @@ describe ExtendingOpenEnrollmentEndDateForEmployers, dbclean: :after_each do
     context "for initial employer" do
       let(:organization) { employer_profile.organization }
       let(:employer_profile) { plan_year.employer_profile }
-      let!(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "active") }
+      let!(:plan_year) { FactoryBot.create(:plan_year, aasm_state: "active") }
 
       before(:each) do
         allow(ENV).to receive(:[]).with("py_start_on").and_return(organization.employer_profile.plan_years.first.start_on)

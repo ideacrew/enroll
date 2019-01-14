@@ -58,7 +58,7 @@ end
 
 Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
   (0...num.to_i).each do |int|
-    FactoryGirl.create(:security_question, title: "Security Question #{int.to_i + 1}")
+    FactoryBot.create(:security_question, title: "Security Question #{int.to_i + 1}")
   end
 end
 

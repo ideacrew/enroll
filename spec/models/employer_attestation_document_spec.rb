@@ -4,7 +4,7 @@ describe EmployerAttestationDocument, dbclean: :after_each do
 
   context ".submit_review" do
 
-    let(:document) { FactoryGirl.create(:employer_attestation_document) }
+    let(:document) { FactoryBot.create(:employer_attestation_document) }
     let(:employer_profile) { document.employer_profile }
     let(:attestation) { document.employer_attestation }
 

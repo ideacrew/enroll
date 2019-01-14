@@ -10,9 +10,9 @@ module Effective
 
       end
 
-      scopes do
-         scope :name, "Hello"
-      end
+      # scopes do
+      #    scope :name, "Hello"
+      # end
 
       def collection
         unless  (defined? @people) && @people.present?

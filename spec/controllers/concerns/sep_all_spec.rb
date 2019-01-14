@@ -5,7 +5,7 @@ class FakesController < ApplicationController
 end
 
 describe FakesController do
-  let(:qle){FactoryGirl.build(:qualifying_life_event_kind)}
+  let(:qle){FactoryBot.build(:qualifying_life_event_kind)}
   let(:fifteen_day_rule) { ["15th of month"] }
   let(:end_month_rule) { ['End of Month'] }
 

@@ -1,2 +1,2 @@
-TransportGateway::Engine.routes.draw do
-end
+# TransportGateway::Engine.routes.draw do
+# end

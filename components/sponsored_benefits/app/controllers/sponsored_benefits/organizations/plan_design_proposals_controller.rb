@@ -78,7 +78,10 @@ module SponsoredBenefits
       @benefit_group = @plan_design_proposal.active_benefit_group
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
       @census_employees = sponsorship.census_employees
+<<<<<<< HEAD
       @broker_agency_profile = broker_agency_profile
+=======
+>>>>>>> running specs and failing at creation of user and person
 
       if @benefit_group
         @plan = @benefit_group.reference_plan
@@ -86,7 +89,11 @@ module SponsoredBenefits
         @employer_health_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@plan)
         @employer_dental_contribution_amount = @benefit_group.monthly_employer_contribution_amount(@dental_plan) if @dental_plan.present?
         @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan
+<<<<<<< HEAD
         @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan if @dental_plan.present?
+=======
+        @benefit_group_dental_costs = @benefit_group.employee_costs_for_dental_reference_plan
+>>>>>>> running specs and failing at creation of user and person
       end
     end
 

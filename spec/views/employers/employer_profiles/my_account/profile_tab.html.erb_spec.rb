@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_profile_tab.html.erb" do
-  let(:employer_profile) {FactoryGirl.build(:employer_profile)}
-  let(:person) {FactoryGirl.build(:person)}
-  let(:organization) {FactoryGirl.build(:organization)}
+  let(:employer_profile) {FactoryBot.build(:employer_profile)}
+  let(:person) {FactoryBot.build(:person)}
+  let(:organization) {FactoryBot.build(:organization)}
 
   context "employer profile tab" do
     before :each do

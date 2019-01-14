@@ -10,7 +10,7 @@ describe ChangePersonDob, dbclean: :after_each do
     end
   end
   describe "changing person's date of birth" do
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with("new_dob").and_return("01/01/2011")

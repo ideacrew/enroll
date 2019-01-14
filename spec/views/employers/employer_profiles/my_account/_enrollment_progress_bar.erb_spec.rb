@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "employers/employer_profiles/my_account/_enrollment_progress_bar.html.erb" do
-  let!(:employer_profile) { FactoryGirl.create(:employer_profile)}
-  let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,1,1)) }
-  let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
+  let!(:employer_profile) { FactoryBot.create(:employer_profile)}
+  let(:plan_year) { FactoryBot.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,1,1)) }
+  let(:benefit_group) { FactoryBot.create(:benefit_group, plan_year: plan_year) }
 
 
   context "when plan year is 1/1 plan year" do

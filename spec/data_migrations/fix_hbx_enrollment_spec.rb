@@ -9,7 +9,7 @@ describe FixHbxEnrollments, dbclean: :after_each do
   verification_states.each do |state|
     obj=(state+"_person").to_sym
     let(obj) {
-      person = FactoryGirl.create(:person, :with_consumer_role)
+      person = FactoryBot.create(:person, :with_consumer_role)
       person.consumer_role.aasm_state = state
       person
     }
@@ -17,12 +17,12 @@ describe FixHbxEnrollments, dbclean: :after_each do
     family_member = (state+"_family_member").to_sym
     let(family_member) { FamilyMember.new(person: eval(obj.to_s)) }
     hbx_enrollment_member = (state+"_enrollment_member").to_sym
-    let(hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: eval(family_member.to_s) ) }
+    let(hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: eval(family_member.to_s) ) }
   end
 
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
+    FactoryBot.create(:hbx_enrollment,
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,

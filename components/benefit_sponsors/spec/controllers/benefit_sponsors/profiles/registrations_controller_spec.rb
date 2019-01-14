@@ -4,14 +4,14 @@ module BenefitSponsors
   RSpec.describe Profiles::RegistrationsController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let(:agency_class) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm }
-    # let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
+    # let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :dc, :with_benefit_market) }
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
-    let(:person) { FactoryGirl.create(:person) }
-    let(:edit_user) { FactoryGirl.create(:user, :person => person)}
-    let(:user) { FactoryGirl.create(:user) }
+    let(:person) { FactoryBot.create(:person) }
+    let(:edit_user) { FactoryBot.create(:user, :person => person)}
+    let(:user) { FactoryBot.create(:user) }
     let(:update_user) { edit_user }
     let(:benefit_sponsor_user) { user }
     let(:broker_agency_user) { nil }
@@ -176,9 +176,9 @@ module BenefitSponsors
         end
 
         context "for new on broker_agency_portal click without user" do
-          let(:broker_person) { FactoryGirl.create(:person, :with_broker_role) }
-          let(:broker_user) { FactoryGirl.create(:user, person: broker_person) }
-          let(:broker_agency_organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+          let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
+          let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+          let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
           let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
 
           before :each do
@@ -289,14 +289,14 @@ module BenefitSponsors
     end
 
     describe "GET edit", dbclean: :after_each do
-      let!(:benefit_sponsor) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let!(:benefit_sponsorship) {
         benefit_sponsorship = benefit_sponsor.profiles.first.add_benefit_sponsorship
         benefit_sponsorship.save }
-      let(:broker_agency)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-      let!(:staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsor.profiles.first.id)}
+      let(:broker_agency)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsor.profiles.first.id)}
       let!(:employer_staff_roles) { person.employer_staff_roles << staff_role }
-      let!(:broker_role) {FactoryGirl.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency.profiles.first.id,person:person)}
+      let!(:broker_role) {FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency.profiles.first.id,person:person)}
       let!(:update_profile) { broker_agency.profiles.first.update_attributes(primary_broker_role_id: broker_role.id)}
 
       shared_examples_for "initialize profile for edit" do |profile_type|
@@ -347,10 +347,10 @@ module BenefitSponsors
 
       context "updating profile" do
 
-        let(:person) { FactoryGirl.create :person}
+        let(:person) { FactoryBot.create :person}
 
-        let(:benefit_sponsor) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-        let(:broker_agency)   { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+        let(:benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+        let(:broker_agency)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
         let(:benefit_sponsor_params) {
           {

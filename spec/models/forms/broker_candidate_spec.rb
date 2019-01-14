@@ -2,8 +2,8 @@ require "rails_helper"
 
 describe Forms::BrokerCandidate do
 
-  let(:broker_role) { FactoryGirl.build(:broker_role, npn: '234567890') }
-  let(:person_obj) { FactoryGirl.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
+  let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890') }
+  let(:person_obj) { FactoryBot.create(:person, first_name: "steve", last_name: "smith", dob: "10/10/1974") }
 
   let(:attributes) { {
     broker_applicant_type: "broker", 
@@ -26,7 +26,7 @@ describe Forms::BrokerCandidate do
   }
 
   before (:all) do
-    @broker_agency_profile = FactoryGirl.create(:broker_agency).broker_agency_profile
+    @broker_agency_profile = FactoryBot.create(:broker_agency).broker_agency_profile
   end
 
   it "should have addresses when initialize" do
@@ -151,7 +151,7 @@ describe Forms::BrokerCandidate do
         }}
       
       before(:each) do
-        2.times { FactoryGirl.create(:person, first_name: "john", last_name: "smith", dob: "10/10/1974") }
+        2.times { FactoryBot.create(:person, first_name: "john", last_name: "smith", dob: "10/10/1974") }
         subject.save
       end
 
@@ -186,7 +186,7 @@ describe Forms::BrokerCandidate do
           }}
 
         before (:each) do 
-          FactoryGirl.create(:person, first_name: 'kevin', last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, first_name: 'kevin', last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with broker role' do
@@ -232,7 +232,7 @@ describe Forms::BrokerCandidate do
           }}
 
         before (:each) do 
-          FactoryGirl.create(:person, first_name: 'joe', last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, first_name: 'joe', last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with broker staff role' do
@@ -259,7 +259,7 @@ describe Forms::BrokerCandidate do
 
         before (:each) do 
           Person.delete_all
-          FactoryGirl.create(:person, first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)
+          FactoryBot.create(:person, first_name: subject.first_name, last_name: subject.last_name, dob: subject.dob)
         end
 
         it 'should update existing person with addresses' do

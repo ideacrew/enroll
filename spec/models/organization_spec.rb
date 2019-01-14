@@ -8,9 +8,9 @@ RSpec.describe Organization, dbclean: :after_each do
   let(:legal_name) {"Acme Brokers, Inc"}
   let(:fein) {"065872626"}
   let(:bad_fein) {"123123"}
-  let(:office_locations) {FactoryGirl.build(:office_locations)}
-  let(:invoice) { FactoryGirl.create(:document) }
-  let(:org) { FactoryGirl.create(:organization) }
+  let(:office_locations) {FactoryBot.build(:office_locations)}
+  let(:invoice) { FactoryBot.create(:document) }
+  let(:org) { FactoryBot.create(:organization) }
   let(:file_path){ "test/hbxid_01012001_invoice_R.pdf"}
   let(:valid_file_names){ ["hbxid_01012001_invoice_R.pdf","hbxid_04012014_invoice_R.pdf","hbxid_10102001_invoice_R.pdf"] }
 
@@ -18,8 +18,8 @@ RSpec.describe Organization, dbclean: :after_each do
 
   let(:valid_office_location_attributes) do
     {
-      address: FactoryGirl.build(:address, kind: "work"),
-      phone: FactoryGirl.build(:phone, kind: "work")
+      address: FactoryBot.build(:address, kind: "work"),
+      phone: FactoryBot.build(:phone, kind: "work")
     }
   end
 
@@ -119,11 +119,11 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   describe "class method", dbclean: :after_each do
-    let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, with_service_areas: 0, organization: organization1, issuer_hios_ids: ['11111'])}
-    let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, with_service_areas: 0, organization: organization2, issuer_hios_ids: ['22222'])}
-    let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
+    let(:organization1) {FactoryBot.create(:organization, legal_name: "Acme Inc")}
+    let!(:carrier_profile_1) {FactoryBot.create(:carrier_profile, with_service_areas: 0, organization: organization1, issuer_hios_ids: ['11111'])}
+    let(:organization2) {FactoryBot.create(:organization, legal_name: "Turner Inc")}
+    let!(:carrier_profile_2) {FactoryBot.create(:carrier_profile, with_service_areas: 0, organization: organization2, issuer_hios_ids: ['22222'])}
+    let(:single_choice_organization) {FactoryBot.create(:organization, legal_name: "Restricted Options")}
     let!(:sole_source_participater) { create(:carrier_profile, with_service_areas: 0, organization: single_choice_organization, offers_sole_source: true) }
 
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
@@ -221,8 +221,8 @@ RSpec.describe Organization, dbclean: :after_each do
           sic_code: '1111'
         }
       end
-      let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
-      let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'enrolling') }
+      let(:renewing_plan_year)    { FactoryBot.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
+      let(:new_plan_year)    { FactoryBot.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'enrolling') }
       let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
       let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
 
@@ -238,8 +238,8 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   describe "Broker Agency Search" do
-    let(:agency_1) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "Health Brokers Inc") }
-    let(:agency_2) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "DC Health Inc") }
+    let(:agency_1) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "Health Brokers Inc") }
+    let(:agency_2) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "DC Health Inc") }
 
     context ".scopes" do
       context 'approved_broker_agencies' do
@@ -256,8 +256,8 @@ RSpec.describe Organization, dbclean: :after_each do
 
       context 'broker_agencies_by_market_kind' do
         context "when individual market is enabled" do
-          let(:agency_1) { FactoryGirl.create(:broker_agency, :ivl_only, legal_name: "IVL Health Brokers Inc") }
-          let(:agency_2) { FactoryGirl.create(:broker_agency, :both_ivl_and_shop, legal_name: "IVL Health Brokers Inc") }
+          let(:agency_1) { FactoryBot.create(:broker_agency, :ivl_only, legal_name: "IVL Health Brokers Inc") }
+          let(:agency_2) { FactoryBot.create(:broker_agency, :both_ivl_and_shop, legal_name: "IVL Health Brokers Inc") }
 
           before do
             stub_const("BrokerAgencyProfile::MARKET_KINDS", %W[individual shop both])
@@ -269,8 +269,8 @@ RSpec.describe Organization, dbclean: :after_each do
           end
         end
         context "when individual market is disabled" do
-          let(:agency_1) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc") }
-          let(:agency_2) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc 2") }
+          let(:agency_1) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc") }
+          let(:agency_2) { FactoryBot.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc 2") }
 
           before do
             stub_const("BrokerAgencyProfile::MARKET_KINDS", %W[shop])
@@ -284,13 +284,13 @@ RSpec.describe Organization, dbclean: :after_each do
       end
 
       context 'by_broker_agency_profile', dbclean: :after_each do
-        let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585", legal_name: "organization 6")}
-        let(:broker_role6) { FactoryGirl.create(:broker_role)}
-        let!(:broker_agency_profile)  {FactoryGirl.create(:broker_agency_profile, organization: organization6, primary_broker_role_id: broker_role6.id)}
-        let!(:organization7)  {FactoryGirl.create(:organization, fein: "724897585", legal_name: "organization 7")}
-        let!(:broker_agency_profile7)  {FactoryGirl.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
-        let(:broker_role7) { FactoryGirl.create(:broker_role)}
-        let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
+        let(:organization6)  {FactoryBot.create(:organization, fein: "024897585", legal_name: "organization 6")}
+        let(:broker_role6) { FactoryBot.create(:broker_role)}
+        let!(:broker_agency_profile)  {FactoryBot.create(:broker_agency_profile, organization: organization6, primary_broker_role_id: broker_role6.id)}
+        let!(:organization7)  {FactoryBot.create(:organization, fein: "724897585", legal_name: "organization 7")}
+        let!(:broker_agency_profile7)  {FactoryBot.create(:broker_agency_profile, organization: organization7, primary_broker_role_id: broker_role7.id)}
+        let(:broker_role7) { FactoryBot.create(:broker_role)}
+        let(:organization3)  {FactoryBot.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
           organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
@@ -447,9 +447,9 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   context "primary_office_location" do
-    let(:organization) {FactoryGirl.build(:organization)}
-    let(:office_location) {FactoryGirl.build(:office_location, :primary)}
-    let(:office_location2) {FactoryGirl.build(:office_location, :primary)}
+    let(:organization) {FactoryBot.build(:organization)}
+    let(:office_location) {FactoryBot.build(:office_location, :primary)}
+    let(:office_location2) {FactoryBot.build(:office_location, :primary)}
 
     it 'should save fail with more than one primary office_location' do
       organization.office_locations = [office_location, office_location2]
@@ -463,8 +463,8 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   context "primary_mailing_address" do
-    let!(:organization) {FactoryGirl.build(:organization)}
-    let!(:office_location) {FactoryGirl.build(:office_location, :with_mailing_address)}
+    let!(:organization) {FactoryBot.build(:organization)}
+    let!(:office_location) {FactoryBot.build(:office_location, :with_mailing_address)}
 
     before :each do
       organization.office_locations = [office_location]
@@ -482,8 +482,8 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   context "Invoice Upload" do
-    let!(:organization) {FactoryGirl.create(:organization, :hbx_id => 'hbxid')}
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+    let!(:organization) {FactoryBot.create(:organization, :hbx_id => 'hbxid')}
+    let!(:employer_profile) { FactoryBot.create(:employer_profile, organization: organization) }
     before do
       allow(Aws::S3Storage).to receive(:save).and_return("urn:openhbx:terms:v1:file_storage:s3:bucket:invoices:asdds123123")
       allow(Organization).to receive(:by_invoice_filename).and_return(organization)
@@ -529,8 +529,8 @@ RSpec.describe Organization, dbclean: :after_each do
   describe "notify_legal_name_or_fein_change" do
 
     context "notify update" do
-      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
-      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+      let(:employer_profile) { FactoryBot.build(:employer_profile) }
+      let(:organization) {FactoryBot.create(:organization, employer_profile:employer_profile)}
       let(:changed_fields) { ["legal_name", "version", "updated_at"] }
       let(:changed_fields1) { ["fein", "version", "updated_at"] }
 
@@ -551,8 +551,8 @@ RSpec.describe Organization, dbclean: :after_each do
   describe "legal_name_or_fein_change_attributes" do
 
     context "changed_attributes" do
-      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
-      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+      let(:employer_profile) { FactoryBot.build(:employer_profile) }
+      let(:organization) {FactoryBot.create(:organization, employer_profile:employer_profile)}
 
       it "legal_name changed_attributes " do
         organization.legal_name = "test1"
@@ -571,8 +571,8 @@ RSpec.describe Organization, dbclean: :after_each do
   describe "check_legal_name_or_fein_changed?" do
 
     context "legal and fein change" do
-      let(:employer_profile) { FactoryGirl.build(:employer_profile) }
-      let(:organization) {FactoryGirl.create(:organization, employer_profile:employer_profile)}
+      let(:employer_profile) { FactoryBot.build(:employer_profile) }
+      let(:organization) {FactoryBot.create(:organization, employer_profile:employer_profile)}
 
       it "return true for legal name update" do
         expect(organization.legal_name_changed?).to eq false #before update
@@ -594,9 +594,9 @@ RSpec.describe Organization, dbclean: :after_each do
     context "employer attestation documents scope" do
       it "should return exact scope match records" do
         ["submitted","approved","pending","denied"].each do |state|
-          FactoryGirl.create(:organization,
-                             employer_profile: FactoryGirl.build(:employer_profile,
-                                                                 employer_attestation:  FactoryGirl.build(:employer_attestation,{aasm_state: state})))
+          FactoryBot.create(:organization,
+                             employer_profile: FactoryBot.build(:employer_profile,
+                                                                 employer_attestation:  FactoryBot.build(:employer_attestation,{aasm_state: state})))
         end
         expect(Organization.employer_attestations_submitted[0].employer_profile.employer_attestation.aasm_state).to eq "submitted"
         expect(Organization.employer_attestations_pending[0].employer_profile.employer_attestation.aasm_state).to eq "pending"

@@ -117,10 +117,10 @@ describe Invitation do
   end
 
   describe "#claim_broker_agency_staff_role" do
-    let(:user) { FactoryGirl.create :user }
+    let(:user) { FactoryBot.create :user }
     let(:redirection_obj) { instance_double(InvitationsController) }
-    let(:general_agency_staff_role) { FactoryGirl.create :general_agency_staff_role }
-    let(:invitation) { FactoryGirl.create :invitation, :general_agency_staff_role, source_id: general_agency_staff_role.id }
+    let(:general_agency_staff_role) { FactoryBot.create :general_agency_staff_role }
+    let(:invitation) { FactoryBot.create :invitation, :general_agency_staff_role, source_id: general_agency_staff_role.id }
 
     subject { invitation.claim_general_agency_staff_role user, redirection_obj }
 
@@ -160,7 +160,7 @@ describe Invitation do
   end
 
   context "broker invitation email" do
-    let(:broker_role) {broker_role=FactoryGirl.create(:broker_role);
+    let(:broker_role) {broker_role=FactoryBot.create(:broker_role);
       broker_role.email=Email.new(kind:"work", address:"broker@email.com");
       broker_role}
 
@@ -172,7 +172,7 @@ describe Invitation do
   end
 
   context "general_agency_staff_role invitation email" do
-    let(:general_agency_staff_role) { FactoryGirl.create(:general_agency_staff_role) }
+    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role) }
     let(:person) { general_agency_staff_role.person }
     let(:invitation) { Invitation.new }
     before :each do

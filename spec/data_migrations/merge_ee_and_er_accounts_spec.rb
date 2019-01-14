@@ -14,10 +14,10 @@ describe MergeEeAndErAccounts, dbclean: :after_each do
 
   describe "merge ee and er roles" do
 
-    let!(:user) { FactoryGirl.create(:user, person: employer_staff_role.person)}
-    let(:person)  {FactoryGirl.create(:person,:with_employee_role, hbx_id: "1234567")}
-    let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role,employer_profile_id:employer_profile.id)}
-    let(:employer_profile){FactoryGirl.create(:employer_profile)}
+    let!(:user) { FactoryBot.create(:user, person: employer_staff_role.person)}
+    let(:person)  {FactoryBot.create(:person,:with_employee_role, hbx_id: "1234567")}
+    let(:employer_staff_role) {FactoryBot.create(:employer_staff_role,employer_profile_id:employer_profile.id)}
+    let(:employer_profile){FactoryBot.create(:employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("employee_hbx_id").and_return(person.hbx_id)

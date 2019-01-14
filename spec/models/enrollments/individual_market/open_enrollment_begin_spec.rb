@@ -5,21 +5,21 @@ RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model 
 
   context "Given a database of Families" do
 
-    let(:family)                              { FactoryGirl.create(:individual_market_family) }
+    let(:family)                              { FactoryBot.create(:individual_market_family) }
 
-    let(:active_individual_health_plan)       { FactoryGirl.create(:active_individual_health_plan) }
-    let(:active_shop_health_plan)             { FactoryGirl.create(:active_shop_health_plan) } 
-    let(:active_individual_dental_plan)       { FactoryGirl.create(:active_individual_dental_plan) } 
-    let(:active_individual_catastophic_plan)  { FactoryGirl.create(:active_individual_catastophic_plan) }
-    let(:active_csr_87_plan)                  { FactoryGirl.create(:active_csr_87_plan) } 
-    let(:active_csr_00_plan)                  { FactoryGirl.create(:active_csr_00_plan) }
+    let(:active_individual_health_plan)       { FactoryBot.create(:active_individual_health_plan) }
+    let(:active_shop_health_plan)             { FactoryBot.create(:active_shop_health_plan) } 
+    let(:active_individual_dental_plan)       { FactoryBot.create(:active_individual_dental_plan) } 
+    let(:active_individual_catastophic_plan)  { FactoryBot.create(:active_individual_catastophic_plan) }
+    let(:active_csr_87_plan)                  { FactoryBot.create(:active_csr_87_plan) } 
+    let(:active_csr_00_plan)                  { FactoryBot.create(:active_csr_00_plan) }
 
-    let(:renewal_individual_health_plan)       { FactoryGirl.create(:renewal_individual_health_plan) }
-    let(:renewal_shop_health_plan)             { FactoryGirl.create(:renewal_shop_health_plan) } 
-    let(:renewal_individual_dental_plan)       { FactoryGirl.create(:renewal_individual_dental_plan) } 
-    let(:renewal_individual_catastophic_plan)  { FactoryGirl.create(:renewal_individual_catastophic_plan) }
-    let(:renewal_csr_87_plan)                  { FactoryGirl.create(:renewal_csr_87_plan) } 
-    let(:renewal_csr_00_plan)                  { FactoryGirl.create(:renewal_csr_00_plan) }
+    let(:renewal_individual_health_plan)       { FactoryBot.create(:renewal_individual_health_plan) }
+    let(:renewal_shop_health_plan)             { FactoryBot.create(:renewal_shop_health_plan) } 
+    let(:renewal_individual_dental_plan)       { FactoryBot.create(:renewal_individual_dental_plan) } 
+    let(:renewal_individual_catastophic_plan)  { FactoryBot.create(:renewal_individual_catastophic_plan) }
+    let(:renewal_csr_87_plan)                  { FactoryBot.create(:renewal_csr_87_plan) } 
+    let(:renewal_csr_00_plan)                  { FactoryBot.create(:renewal_csr_00_plan) }
 
     # let(:family_health_and_dental)      
 

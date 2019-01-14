@@ -48,13 +48,13 @@ module BenefitSponsors
         }
       end
 
-      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application) }
+      let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application) }
       let!(:invalid_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new}
       let!(:invalid_benefit_application) { BenefitSponsors::BenefitApplications::BenefitApplication.new }
 
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
       let(:benefit_sponsorship) do
-        FactoryGirl.create(
+        FactoryBot.create(
           :benefit_sponsors_benefit_sponsorship,
           :with_rating_area,
           :with_service_areas,
@@ -117,15 +117,15 @@ module BenefitSponsors
     end
 
     describe ".load_form_params_from_resource" do
-      let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
-      let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :with_benefit_market_catalog_and_product_packages, :cca) }
+      let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:rating_area)   { FactoryBot.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)  { FactoryBot.create_default :benefit_markets_locations_service_area }
       let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
       let!(:benefit_market) { site.benefit_markets.first }
 
       let(:benefit_sponsorship) do
-        FactoryGirl.create(
+        FactoryBot.create(
           :benefit_sponsors_benefit_sponsorship,
           :with_rating_area,
           :with_service_areas,
@@ -137,8 +137,8 @@ module BenefitSponsors
           employer_attestation: employer_attestation)
       end
 
-      let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
-      let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
       let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
 
       it "should assign the form attributes from benefit application" do
@@ -257,9 +257,9 @@ module BenefitSponsors
     end
 
     # describe ".publish" do
-    #   let(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
-    #   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
-    #   let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
+    #   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_full_package)}
+    #   let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
+    #   let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application, id: benefit_application.id ) }
     #   let(:subject) { BenefitSponsors::Services::BenefitApplicationService.new }
     #
     #   context "has to publish and " do

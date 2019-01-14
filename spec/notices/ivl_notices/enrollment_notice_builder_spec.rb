@@ -2,10 +2,10 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
-  let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
+  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
                             :notice_template => 'notices/ivl/enrollment_notice',
@@ -20,7 +20,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
         :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 
   describe "New" do
     before do
@@ -117,9 +117,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
 
     context "when there are outstanding verification family members" do
-      let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
-      let!(:family_member2) { FactoryGirl.create(:family_member, family: family, is_active: true, person: person2) }
-      let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.prev_month)}
+      let!(:person2) { FactoryBot.create(:person, :with_consumer_role)}
+      let!(:family_member2) { FactoryBot.create(:family_member, family: family, is_active: true, person: person2) }
+      let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.prev_month)}
       it "should return a future date when present" do
         special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record.prev_day, verification_type: "Social Security Number", type: "notice")
         person.consumer_role.special_verifications << special_verification

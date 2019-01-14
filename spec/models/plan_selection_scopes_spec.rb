@@ -6,7 +6,7 @@ describe Plan do
       let(:carrier_id) { BSON::ObjectId.new }
 
       let(:shop_variant_health_plan) do
-        FactoryGirl.build(
+        FactoryBot.build(
           :plan_template,
           :shop_health, :unoffered,
           {
@@ -16,7 +16,7 @@ describe Plan do
       end
 
       let(:ivl_health_plan) do
-        FactoryGirl.build(
+        FactoryBot.build(
           :plan_template,
           :ivl_health,
           {
@@ -26,7 +26,7 @@ describe Plan do
       end
 
       let(:ivl_dental_plan) do
-        FactoryGirl.build(
+        FactoryBot.build(
           :plan_template,
           :ivl_dental,
           {
@@ -37,7 +37,7 @@ describe Plan do
       end
 
       let(:shop_health_plan) do
-        FactoryGirl.build(
+        FactoryBot.build(
           :plan_template,
           :shop_health,
           {
@@ -47,7 +47,7 @@ describe Plan do
       end
 
       let(:shop_dental_plan) do
-        FactoryGirl.build(
+        FactoryBot.build(
           :plan_template,
           :shop_dental,
           {

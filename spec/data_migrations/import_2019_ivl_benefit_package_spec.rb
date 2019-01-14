@@ -13,9 +13,9 @@ describe Import2019IvlBenefitPackage, :dbclean => :after_each do
   end
 
   describe "create 2019 benefit package for IVL market" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-    let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
-    let!(:bcp) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
+    let!(:bcp) { FactoryBot.create(:benefit_coverage_period, start_on: Date.new(2018,1,1), end_on: Date.new(2018,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
 
     before(:each) do
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile

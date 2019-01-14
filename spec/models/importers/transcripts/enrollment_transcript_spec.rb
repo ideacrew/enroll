@@ -4,12 +4,12 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
 
   context ".process" do
 
-    let!(:spouse)  { FactoryGirl.create(:person)}
-    let!(:child1)  { FactoryGirl.create(:person)}
-    let!(:child2)  { FactoryGirl.create(:person)}
+    let!(:spouse)  { FactoryBot.create(:person)}
+    let!(:child1)  { FactoryBot.create(:person)}
+    let!(:child2)  { FactoryBot.create(:person)}
 
     let!(:person) do
-      p = FactoryGirl.build(:person)
+      p = FactoryBot.build(:person)
       p.person_relationships.build(relative: spouse, kind: "spouse")
       p.person_relationships.build(relative: child1, kind: "child")
       p.person_relationships.build(relative: child2, kind: "child")
@@ -19,8 +19,8 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
 
     let(:source_effective_on) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
     let(:other_effective_on) { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
-    let!(:other_plan) { FactoryGirl.create(:plan, market: 'individual') }
-    let!(:source_plan) { FactoryGirl.create(:plan, market: 'individual') }
+    let!(:other_plan) { FactoryBot.create(:plan, market: 'individual') }
+    let!(:source_plan) { FactoryBot.create(:plan, market: 'individual') }
 
     let(:other_family) {
       family = Family.new({

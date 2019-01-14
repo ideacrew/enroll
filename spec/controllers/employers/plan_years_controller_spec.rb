@@ -11,9 +11,9 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:address) { double(:address, zip: '11111', county: 'county', state: Settings.aca.state_abbreviation) }
   let(:office_location) { double(:office_location, address: address) }
 
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, user: user) }
-  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.create(:person, user: user) }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
 
   describe "GET reference_plan_summary" do
     let(:qhp_cost_share_variance){ Products::QhpCostShareVariance.new }
@@ -120,7 +120,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
 
     describe "GET edit" do
-      let(:plan_year) {FactoryGirl.build(:plan_year)}
+      let(:plan_year) {FactoryBot.build(:plan_year)}
 
       before :each do
         allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
@@ -240,7 +240,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
     allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
     allow(benefit_group).to receive(:build_estimated_composite_rates)
-      #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
+      #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryBot.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
       allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
@@ -373,7 +373,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
 
   allow(benefit_group).to receive(:default=)
-      #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
+      #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryBot.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(benefit_group).to receive(:sole_source?).and_return(false)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -430,7 +430,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET reference_plan_options" do
-    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile) { FactoryBot.create(:carrier_profile) }
     before :each do
       sign_in
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -642,7 +642,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET search_reference_plan" do
-    let(:plan) {FactoryGirl.create(:plan)}
+    let(:plan) {FactoryBot.create(:plan)}
     let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
 
     before :each do
@@ -666,13 +666,13 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET employee_costs" do
     let(:plan_year){ double }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:benefit_group) { FactoryBot.create(:benefit_group) }
+    let(:census_employee) { FactoryBot.build(:census_employee) }
     let(:census_employees) { double }
     let(:plan) { double }
     before do
       allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
-      @employer_profile = FactoryGirl.create(:employer_profile)
+      @employer_profile = FactoryBot.create(:employer_profile)
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
       @census_employees = [census_employee, census_employee]
@@ -728,17 +728,17 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         }
       end
 
-      let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
-      let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+      let(:default_benefit_group)     { FactoryBot.build(:benefit_group, default: true)}
+      let(:benefit_group)     { FactoryBot.build(:benefit_group)}
       let(:plan_year)         do
-        py = FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group])
+        py = FactoryBot.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group])
         py.open_enrollment_end_on = py.open_enrollment_start_on - 1.day
         py
       end
       let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
-      let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
-      let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
+      let(:new_benefit_group)     { FactoryBot.build(:benefit_group)}
+      let(:new_plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [new_benefit_group]) }
       let(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
 
       before do
@@ -798,13 +798,13 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       }
     end
 
-    let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
-    let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
+    let(:default_benefit_group)     { FactoryBot.build(:benefit_group, default: true)}
+    let(:benefit_group)     { FactoryBot.build(:benefit_group)}
+    let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
     let(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
-    let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
-    let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
+    let(:new_benefit_group)     { FactoryBot.build(:benefit_group)}
+    let(:new_plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [new_benefit_group]) }
     let(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
 
     before :each do

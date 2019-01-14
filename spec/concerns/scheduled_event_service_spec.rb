@@ -14,7 +14,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@individual_market_monthly_enrollment_due_on,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'ivl_monthly_enrollment_due_on'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'ivl_monthly_enrollment_due_on'})
       expect(ScheduledEvent.individual_market_monthly_enrollment_due_on).to eq scheduled_event.start_time.day
     end
 
@@ -32,7 +32,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_binder_payment_due_on,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_binder_payment_due_on'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_binder_payment_due_on'})
       expect(ScheduledEvent.shop_market_binder_payment_due_on).to eq scheduled_event.start_time.day
     end
 
@@ -50,7 +50,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_initial_application_publish_due_day_of_month,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_initial_application_publish_due_day_of_month'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_initial_application_publish_due_day_of_month'})
       expect(ScheduledEvent.shop_market_initial_application_publish_due_day_of_month).to eq scheduled_event.start_time.day
     end
 
@@ -68,7 +68,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_renewal_application_monthly_open_enrollment_end_on,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_renewal_application_monthly_open_enrollment_end_on'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_renewal_application_monthly_open_enrollment_end_on'})
       expect(ScheduledEvent.shop_market_renewal_application_monthly_open_enrollment_end_on).to eq scheduled_event.start_time.day
     end
 
@@ -87,7 +87,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_renewal_application_publish_due_day_of_month,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_renewal_application_publish_due_day_of_month'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_renewal_application_publish_due_day_of_month'})
       expect(ScheduledEvent.shop_market_renewal_application_publish_due_day_of_month).to eq scheduled_event.start_time.day
     end
 
@@ -105,7 +105,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_renewal_application_force_publish_day_of_month,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_renewal_application_force_publish_day_of_month'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_renewal_application_force_publish_day_of_month'})
       expect(ScheduledEvent.shop_market_renewal_application_force_publish_day_of_month).to eq scheduled_event.start_time.day
     end
 
@@ -123,7 +123,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_open_enrollment_monthly_end_on,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_open_enrollment_monthly_end_on'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_open_enrollment_monthly_end_on'})
       expect(ScheduledEvent.shop_market_open_enrollment_monthly_end_on).to eq scheduled_event.start_time.day
     end
 
@@ -141,7 +141,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_group_file_new_enrollment_transmit_on,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_group_file_new_enrollment_transmit_on'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_group_file_new_enrollment_transmit_on'})
       expect(ScheduledEvent.shop_market_group_file_new_enrollment_transmit_on).to eq scheduled_event.start_time.day
     end
 
@@ -159,7 +159,7 @@ describe "ScheduledEventService"  do
 
     it "should return from scheduled_event day" do
       ScheduledEvent.instance_variable_set(:@shop_market_group_file_update_transmit_day_of_week,nil)
-      scheduled_event = FactoryGirl.create(:scheduled_event,{ :event_name => 'shop_group_file_update_transmit_day_of_week'})
+      scheduled_event = FactoryBot.create(:scheduled_event,{ :event_name => 'shop_group_file_update_transmit_day_of_week'})
       expect(ScheduledEvent.shop_market_group_file_update_transmit_day_of_week).to eq scheduled_event.start_time.day
     end
 

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe DocumentsController, :type => :controller do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
-  let(:consumer_role) {FactoryGirl.build(:consumer_role)}
-  let(:document) {FactoryGirl.build(:vlp_document)}
-  let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family) }
+  let(:consumer_role) {FactoryBot.build(:consumer_role)}
+  let(:document) {FactoryBot.build(:vlp_document)}
+  let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
+  let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
 
   before :each do
     sign_in user
@@ -14,7 +14,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
   describe "destroy" do
     before :each do
-      family_member = FactoryGirl.build(:family_member, person: person, family: family)
+      family_member = FactoryBot.build(:family_member, person: person, family: family)
       person.families.first.family_members << family_member
       allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       person.consumer_role.vlp_documents = [document]

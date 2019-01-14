@@ -89,8 +89,8 @@ describe Address, "with proper validations" do
     it { should validate_presence_of :zip }
 
     let(:person) {Person.new(first_name: "John", last_name: "Doe", gender: "male", dob: "10/10/1974", ssn: "123456789" )}
-    let(:address) {FactoryGirl.create(:address)}
-    let(:employer){FactoryGirl.create(:employer_profile)}
+    let(:address) {FactoryBot.create(:address)}
+    let(:employer){FactoryBot.create(:employer_profile)}
 
 
     context "accepts all valid values" do
@@ -215,8 +215,8 @@ describe '#matches_addresses?' do
 end
 
 describe "#kind" do
-  let(:office_location) {FactoryGirl.build(:office_location, :primary)}
-  let(:address) {FactoryGirl.build(:address)}
+  let(:office_location) {FactoryBot.build(:office_location, :primary)}
+  let(:address) {FactoryBot.build(:address)}
 
   context "write kind" do
     it "kind should be work with primary office_location when primary" do

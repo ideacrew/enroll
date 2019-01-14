@@ -12,7 +12,7 @@ describe Subscribers::LocalResidency do
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "residency_verification_payloads", "response.xml")) }
     let(:xml_hash) { {residency_verification_response: 'ADDRESS_NOT_IN_AREA'} }
     let(:xml_hash2) { {residency_verification_response: 'ADDRESS_IN_AREA'} }
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:consumer_role) { person.consumer_role }
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
@@ -79,7 +79,7 @@ describe Subscribers::LocalResidency do
   context "response saving" do
 
     let(:consumer_role) {
-      FactoryGirl.create(:consumer_role_object)
+      FactoryBot.create(:consumer_role_object)
     }
 
     let(:person_id) { consumer_role.person.id }

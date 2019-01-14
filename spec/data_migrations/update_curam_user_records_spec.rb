@@ -5,7 +5,7 @@ require File.join(Rails.root, "app", "data_migrations", "update_curam_user_recor
 describe UpdateCuramUserRecords, dbclean: :after_each do
 
   let(:given_task_name) { "update_curam_user_records" }
-  let(:curam_user) { FactoryGirl.create(:curam_user, username: 'user!123')}
+  let(:curam_user) { FactoryBot.create(:curam_user, username: 'user!123')}
   subject { UpdateCuramUserRecords.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do

@@ -6,7 +6,7 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
   let(:file) {
     double("", :tempfile => tempfile)
   }
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:sheet) {
     Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
   }
@@ -67,7 +67,7 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
     let(:file) {
       double("", :tempfile => tempfile)
     }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
     let(:sheet) {
       Roo::Spreadsheet.open(file.tempfile.path).sheet(0)
     }
@@ -91,8 +91,8 @@ RSpec.describe CensusEmployeeImport, dbclean: :after_each, :type => :model do
   context "terminate employee" do
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 3.xlsx') }
     let(:file) { double("", :tempfile => tempfile) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), employer_profile: employer_profile}) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:census_employee) { FactoryBot.create(:census_employee, {ssn: "111111111", dob: Date.new(1987, 12, 12), employer_profile: employer_profile}) }
 
     context "employee does not exist" do
       it "should fail" do

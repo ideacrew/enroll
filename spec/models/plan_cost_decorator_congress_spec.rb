@@ -15,7 +15,7 @@ RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
   # let!(:cd_child_1)         { double("CensusDependent_Child_1", class: CensusDependent, age_on: 18, employee_relationship: "child_under_26") }
   # let!(:cd_child_2)         { double("CensusDependent_Child_2", class: CensusDependent, age_on: 13, employee_relationship: "child_under_26") }
   # let!(:cd_child_3)         { double("CensusDependent_Child_3", class: CensusDependent, age_on: 10, employee_relationship: "child_under_26") }
-  let!(:chosen_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'shop') }
+  let!(:chosen_plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'shop') }
 
   before do
     allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * premium_constant}

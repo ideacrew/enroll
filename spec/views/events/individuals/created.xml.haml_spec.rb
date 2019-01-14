@@ -12,7 +12,7 @@ RSpec.describe "events/individuals/created.haml.erb", dbclean: :after_each do
         download_vocabularies
       end
 
-      let(:individual) { FactoryGirl.build_stubbed :generative_individual }
+      let(:individual) { FactoryBot.build_stubbed :generative_individual }
 
       before :each do
         render :template => "events/individuals/created", :locals => { :individual => individual}

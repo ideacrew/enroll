@@ -9,11 +9,11 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_sho
   let(:employer_profile) { abc_profile }
   let(:benefit_application) { initial_application }
   let(:benefit_group) { current_benefit_package }
-  let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:user) { FactoryGirl.create(:user) }
-  let(:issuer_profile) { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile)}
+  let(:census_employee1) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employee2) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:census_employee3) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
   let(:reference_product) { current_benefit_package.sponsored_benefits[0].reference_product }
 
   before :each do

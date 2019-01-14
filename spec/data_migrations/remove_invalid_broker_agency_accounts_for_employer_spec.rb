@@ -13,13 +13,13 @@ describe RemoveInvalidBrokerAgencyAccountsForEmployer, dbclean: :after_each do
 
   describe "employer profile with broker agency accounts", dbclean: :after_each do
 
-    let(:organization) {FactoryGirl.create(:organization)}
-    let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile, organization: organization)}
-    let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
-    let(:invalid_broker_agency_account) {FactoryGirl.create(:broker_agency_account)}
-    let(:valid_broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile)}
-    let(:employer_profile){ FactoryGirl.build(:employer_profile,broker_agency_accounts:[invalid_broker_agency_account,valid_broker_agency_account]) }
-    let(:organization1) {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:organization) {FactoryBot.create(:organization)}
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile, organization: organization)}
+    let(:broker_role) { FactoryBot.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+    let(:invalid_broker_agency_account) {FactoryBot.create(:broker_agency_account)}
+    let(:valid_broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile: broker_agency_profile)}
+    let(:employer_profile){ FactoryBot.build(:employer_profile,broker_agency_accounts:[invalid_broker_agency_account,valid_broker_agency_account]) }
+    let(:organization1) {FactoryBot.create(:organization,employer_profile:employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization1.fein)

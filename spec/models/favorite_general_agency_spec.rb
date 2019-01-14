@@ -2,8 +2,8 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe FavoriteGeneralAgency, type: :model do
-  let(:general_agency_profile) { FactoryGirl.build(:general_agency_profile) }
-  let(:broker_role) { FactoryGirl.build(:broker_role) }
+  let(:general_agency_profile) { FactoryBot.build(:general_agency_profile) }
+  let(:broker_role) { FactoryBot.build(:broker_role) }
 
   let(:valid_params) do
     {

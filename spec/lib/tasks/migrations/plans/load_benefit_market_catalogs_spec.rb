@@ -15,40 +15,40 @@ describe "load_benefit_market_catalogs", dbclean: :after_each do
     application_period = Time.utc(start_date.year, start_date.month, start_date.day)..Time.utc(end_date.year, end_date.month, end_date.day)
 
     issuer_profiles = BenefitSponsors::Organizations::Organization.issuer_profiles.all
-    FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[0].issuer_profile.id,
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[0].issuer_profile.id,
                        application_period: application_period, benefit_market_kind: :aca_shop,
                        kind: :health, product_package_kinds: [:single_issuer])
 
-    FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[1].issuer_profile.id,
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[1].issuer_profile.id,
                        application_period: application_period, benefit_market_kind: :aca_shop,
                        kind: :health, product_package_kinds: [:single_issuer])
 
-    FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[2].issuer_profile.id,
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[2].issuer_profile.id,
                        application_period: application_period, benefit_market_kind: :aca_shop,
                        kind: :health, product_package_kinds: [:metal_level])
 
-    FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id,
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[3].issuer_profile.id,
                        application_period: application_period, benefit_market_kind: :aca_shop,
                        kind: :health, product_package_kinds: [:single_issuer])
 
-    FactoryGirl.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[4].issuer_profile.id,
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile_id: issuer_profiles[4].issuer_profile.id,
                        application_period: application_period, benefit_market_kind: :aca_shop,
                        kind: :health, product_package_kinds: [:single_product])
 
   end
 
-  let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)}
-  let!(:bm) {FactoryGirl.create(:benefit_markets_benefit_market, site: site, site_urn: :cca)}
-  let!(:pp_issuer) {FactoryGirl.build(:benefit_markets_products_product_package, package_kind: :single_issuer)}
-  let!(:pp_product) {FactoryGirl.build(:benefit_markets_products_product_package, package_kind: :single_product)}
-  let!(:pp_metal) {FactoryGirl.build(:benefit_markets_products_product_package, package_kind: :metal_level)}
-  let!(:bmc) {FactoryGirl.create(:benefit_markets_benefit_market_catalog, benefit_market: bm, product_packages: [pp_issuer, pp_metal, pp_product])}
-  let!(:bmcm) {FactoryGirl.create(:benefit_markets_contribution_models_contribution_model, title: "MA Composite Contribution Model")}
-  let!(:bmpm) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA Composite Price Model")}
-  let!(:bmcm2) {FactoryGirl.create(:benefit_markets_contribution_models_contribution_model, title: "MA List Bill Shop Contribution Model")}
-  let!(:bmpm2) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA List Bill Shop Pricing Model")}
-  let!(:bmcm3) {FactoryGirl.create(:benefit_markets_contribution_models_contribution_model, title: "MA Shop Simple List Bill Contribution Model")}
-  let!(:bmpm3) {FactoryGirl.create(:benefit_markets_pricing_models_pricing_model, name: "MA Shop Simple List Bill Pricing Model")}
+  let!(:site) {FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :mhc)}
+  let!(:bm) {FactoryBot.create(:benefit_markets_benefit_market, site: site, site_urn: :cca)}
+  let!(:pp_issuer) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :single_issuer)}
+  let!(:pp_product) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :single_product)}
+  let!(:pp_metal) {FactoryBot.build(:benefit_markets_products_product_package, package_kind: :metal_level)}
+  let!(:bmc) {FactoryBot.create(:benefit_markets_benefit_market_catalog, benefit_market: bm, product_packages: [pp_issuer, pp_metal, pp_product])}
+  let!(:bmcm) {FactoryBot.create(:benefit_markets_contribution_models_contribution_model, title: "MA Composite Contribution Model")}
+  let!(:bmpm) {FactoryBot.create(:benefit_markets_pricing_models_pricing_model, name: "MA Composite Price Model")}
+  let!(:bmcm2) {FactoryBot.create(:benefit_markets_contribution_models_contribution_model, title: "MA List Bill Shop Contribution Model")}
+  let!(:bmpm2) {FactoryBot.create(:benefit_markets_pricing_models_pricing_model, name: "MA List Bill Shop Pricing Model")}
+  let!(:bmcm3) {FactoryBot.create(:benefit_markets_contribution_models_contribution_model, title: "MA Shop Simple List Bill Contribution Model")}
+  let!(:bmpm3) {FactoryBot.create(:benefit_markets_pricing_models_pricing_model, name: "MA Shop Simple List Bill Pricing Model")}
   let!(:catalogs) {bm.benefit_market_catalogs}
   let!(:packages) {catalogs.map(&:product_packages).flatten}
 

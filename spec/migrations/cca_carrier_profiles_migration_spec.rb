@@ -14,17 +14,17 @@ describe "CcaCarrierProfilesMigration" do
   describe ".up" do
 
     before :all do
-      FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
-      organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
-      FactoryGirl.create(:broker_agency_profile, organization: organization)
+      FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
+      organization = FactoryBot.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
+      FactoryBot.create(:broker_agency_profile, organization: organization)
 
 
       create_list(:carrier_profile, 9)
 
-      @employer_profile = FactoryGirl.create(:employer_profile)
-      FactoryGirl.create(:inbox, :with_message, recipient: @employer_profile)
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: @employer_profile.id)
-      FactoryGirl.create(:employee_role, employer_profile: @employer_profile)
+      @employer_profile = FactoryBot.create(:employer_profile)
+      FactoryBot.create(:inbox, :with_message, recipient: @employer_profile)
+      FactoryBot.create(:employer_staff_role, employer_profile_id: @employer_profile.id)
+      FactoryBot.create(:employee_role, employer_profile: @employer_profile)
 
       @migrated_organizations = BenefitSponsors::Organizations::Organization.issuer_profiles
       @old_organizations = Organization.exists(carrier_profile: true)

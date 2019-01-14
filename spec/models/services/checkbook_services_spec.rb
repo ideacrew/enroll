@@ -6,11 +6,11 @@ end
 
 describe ::Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
-  let(:census_employee) { FactoryGirl.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
-  let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
-  let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
-  let(:person) { FactoryGirl.create(:person, :with_family)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
+  let(:census_employee) { FactoryBot.build(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id)}
+  let(:household) { FactoryBot.create(:household, family: person.primary_family)}
+  let(:employee_role) { FactoryBot.create(:employee_role, person: person)}
+  let(:person) { FactoryBot.create(:person, :with_family)}
+  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, employee_role_id: employee_role.id)}
 
   describe "when employee is not congress" do
     subject { ::Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }

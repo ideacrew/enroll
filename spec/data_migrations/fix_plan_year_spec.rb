@@ -14,15 +14,15 @@ describe FixPlanYear, dbclean: :after_each do
 
   describe "updating plan year and enrollments" do
 
-    let(:organization) { FactoryGirl.create(:organization)}
-    let(:benefit_group)     { FactoryGirl.build(:benefit_group, effective_on_kind: "date_of_hire")}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
-    let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
+    let(:organization) { FactoryBot.create(:organization)}
+    let(:benefit_group)     { FactoryBot.build(:benefit_group, effective_on_kind: "date_of_hire")}
+    let(:plan_year)         { FactoryBot.build(:plan_year, benefit_groups: [benefit_group]) }
+    let!(:employer_profile)  { FactoryBot.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
     let (:term_date) {TimeKeeper.date_of_record.at_beginning_of_month.next_month}
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
-    let(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
+    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, benefit_group_id:benefit_group.id,household: family.active_household)}
 
     context "termianted plan year to active plan year" do
 

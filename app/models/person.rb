@@ -6,8 +6,8 @@ class Person
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Mongoid::Attributes::Dynamic
-  include SponsoredBenefits::Concerns::Ssn
-  include SponsoredBenefits::Concerns::Dob
+  # include SponsoredBenefits::Concerns::Ssn
+  # include SponsoredBenefits::Concerns::Dob
 
   include Notify
   include UnsetableSparseFields

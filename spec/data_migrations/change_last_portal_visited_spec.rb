@@ -9,7 +9,7 @@ describe ChangeLastPortalVisited, dbclean: :after_each do
     end
   end
   describe "change the last portal visited for a user" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("user_oimid").and_return(user.oim_id)
       allow(ENV).to receive(:[]).with("new_url").and_return("/insured/families/search")
@@ -23,7 +23,7 @@ describe ChangeLastPortalVisited, dbclean: :after_each do
     end
   end
   describe "not change the last visited url if the user not found" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     before(:each) do
       allow(ENV).to receive(:[]).with("user_oimid").and_return("")
       allow(ENV).to receive(:[]).with("new_url").and_return("newemail@gmail.com")

@@ -10,11 +10,11 @@ describe ChangeEnrollmentMemberApplicantId, dbclean: :after_each do
     end
   end
   describe "do not change enrollment member if no enrollment_member was found", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:family_member){FactoryGirl.create(:family_member,family:family)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
-    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
-    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:family_member){FactoryBot.create(:family_member,family:family)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
     before do
       allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment.hbx_id
       allow(ENV).to receive(:[]).with('enrollment_member_id').and_return ''
@@ -29,11 +29,11 @@ describe ChangeEnrollmentMemberApplicantId, dbclean: :after_each do
     end
   end
   describe "do not change enrollment member if no enrollment was found", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:family_member){FactoryGirl.create(:family_member,family:family)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
-    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
-    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:family_member){FactoryBot.create(:family_member,family:family)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
     before do
       allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return ''
       allow(ENV).to receive(:[]).with('enrollment_member_id').and_return hbx_enrollment_member1.id
@@ -48,11 +48,11 @@ describe ChangeEnrollmentMemberApplicantId, dbclean: :after_each do
     end
   end
   describe "do not change enrollment member if no family member", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:family_member){FactoryGirl.create(:family_member,family:family)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
-    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
-    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:family_member){FactoryBot.create(:family_member,family:family)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
     before do
       allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment.hbx_id
       allow(ENV).to receive(:[]).with('enrollment_member_id').and_return hbx_enrollment_member1.id
@@ -67,11 +67,11 @@ describe ChangeEnrollmentMemberApplicantId, dbclean: :after_each do
     end
   end
   describe "change enrollment member if all correct information provided", dbclean: :after_each do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:family_member){FactoryGirl.create(:family_member,family:family)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
-    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
-    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:family_member){FactoryBot.create(:family_member,family:family)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.last.id,is_subscriber: false, eligibility_date:Date.today )}
     before do
       allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment.hbx_id
       allow(ENV).to receive(:[]).with('enrollment_member_id').and_return hbx_enrollment_member1.id

@@ -12,8 +12,8 @@ describe FixBenefitGroupAssignmentsForConversionErWithoutActivePlanYear, dbclean
   end
 
   describe "changing organization's fein" do
-    let(:organization) { FactoryGirl.create(:organization, :with_conversion_expired_and_renewing_canceled_plan_years) }
-    let!(:census_employee) { FactoryGirl.create :census_employee, employer_profile_id: organization.employer_profile.id }
+    let(:organization) { FactoryBot.create(:organization, :with_conversion_expired_and_renewing_canceled_plan_years) }
+    let!(:census_employee) { FactoryBot.create :census_employee, employer_profile_id: organization.employer_profile.id }
 
     it "should not have any active_benefit_group_assignment" do
       expect(census_employee.active_benefit_group_assignment).to eq nil

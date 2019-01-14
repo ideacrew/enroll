@@ -1,7 +1,7 @@
 Given /(\w+) is a person$/ do |name|
-  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
+  SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
 
-  person = FactoryGirl.create(:person, first_name: name)
+  person = FactoryBot.create(:person, first_name: name)
   @pswd = 'aA1!aA1!aA1!'
   email = Forgery('email').address
   user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
@@ -15,12 +15,12 @@ end
 Given /(\w+) has already provided security question responses/ do |name|
   security_questions = []
   3.times do
-    security_questions << FactoryGirl.create(:security_question)
+    security_questions << FactoryBot.create(:security_question)
   end
   User.all.each do |u|
     next if u.security_question_responses.count == 3
     security_questions.each do |q|
-      u.security_question_responses << FactoryGirl.build(:security_question_response, security_question_id: q.id, question_answer: 'answer')
+      u.security_question_responses << FactoryBot.build(:security_question_response, security_question_id: q.id, question_answer: 'answer')
     end
     u.save!
   end
@@ -28,11 +28,11 @@ end
 
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
-  FactoryGirl.create(:person, first_name: person.first_name,
-                     last_name: person.last_name, dob: '06/06/1976')
+  FactoryBot.create(:person, first_name: person.first_name,
+            last_name: person.last_name, dob: '06/06/1976')
 end
 Given /(\w+) is a person who has not logged on$/ do |name|
-  person = FactoryGirl.create(:person, first_name: name)
+  person = FactoryBot.create(:person, first_name: name)
 end
 
 Then  /(\w+) signs in to portal/ do |name|
@@ -49,7 +49,7 @@ Then  /(\w+) signs in to portal/ do |name|
 end
 
 Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
-  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
+  SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
 
   email = Forgery('email').address
   visit '/'
@@ -100,15 +100,16 @@ end
 
 Then(/(\w+) is the staff person for an employer$/) do |name|
   person = Person.where(first_name: name).first
-  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, benefit_sponsor_employer_profile_id: employer_profile.id)
+  employer_profile = FactoryBot.create(:employer_profile)
+  employer_staff_role = FactoryBot.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
 end
 
 Given(/^Sarah is the staff person for an organization with employer profile and broker agency profile$/) do
   person = Person.where(first_name: "Sarah").first
-  organization = FactoryGirl.create(:organization)
-  employer_profile = FactoryGirl.create(:employer_profile, organization: organization)
-  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
-  broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
+  organization = FactoryBot.create(:organization)
+  employer_profile = FactoryBot.create(:employer_profile, organization: organization)
+  employer_staff_role = FactoryBot.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
+  broker_agency_profile = FactoryBot.create(:broker_agency_profile, organization: organization)
 end
 
 Then(/he should have an option to select paper or electronic notice option/) do
@@ -120,12 +121,12 @@ end
 
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
-  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)
+  employer_staff_role = FactoryBot.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)
 end
 
 Then(/(\w+) is applicant staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
-  employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id, aasm_state: 'is_applicant')
+  employer_staff_role = FactoryBot.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id, aasm_state: 'is_applicant')
 end
 
 When(/(\w+) accesses the Employer Portal/) do |name|
@@ -138,6 +139,7 @@ When(/(\w+) accesses the Employer Portal/) do |name|
 end
 
 Then /(\w+) decides to Update Business information/ do |person|
+  FactoryBot.create(:sic_code, sic_code: "0111")
   find('.interaction-click-control-update-business-info', :wait => 10).click
   wait_for_ajax(10,2)
   screenshot('update_business_info')
@@ -249,7 +251,7 @@ end
 
 Given /(\w+) has HBXAdmin privileges/ do |name|
   person = Person.where(first_name: name).first
-  role = FactoryGirl.create(:hbx_staff_role, person: person)
+  role = FactoryBot.create(:hbx_staff_role, person: person)
   Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                     send_broker_agency_message: true, approve_broker: true, approve_ga: true,
                     modify_admin_tabs: true, view_admin_tabs: true)
@@ -258,10 +260,10 @@ Given /(\w+) has HBXAdmin privileges/ do |name|
 end
 
 Given /a FEIN for an existing company/ do
-  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
+  SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
   @fein = 100000000+rand(10000)
-  o=FactoryGirl.create(:organization, fein: @fein)
-  @employer_profile= FactoryGirl.create(:employer_profile, organization: o)
+  o=FactoryBot.create(:organization, fein: @fein)
+  @employer_profile= FactoryBot.create(:employer_profile, organization: o)
 end
 
 Given /a FEIN for a new company/ do

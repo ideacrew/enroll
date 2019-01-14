@@ -3,8 +3,9 @@ module EmployerWorld
     attributes = traits.extract_options!
     traits.push(:with_aca_shop_cca_employer_profile) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
-    @organization[legal_name] ||= FactoryGirl.create(
-      :benefit_sponsors_organizations_general_organization, *traits,
+    @organization[legal_name] ||= FactoryBot.create(
+      :benefit_sponsors_organizations_general_organization,
+      :with_aca_shop_cca_employer_profile,
       attributes.merge(site: site)
     )
   end

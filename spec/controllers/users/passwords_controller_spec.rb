@@ -3,7 +3,7 @@ require 'rails_helper'
  RSpec.describe Users::PasswordsController do
   let(:curam_user){ double("CuramUser") }
   let(:email){ "test@example.com" }
-  let(:user) { FactoryGirl.create :user}
+  let(:user) { FactoryBot.create :user}
 
   context "create" do
 

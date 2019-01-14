@@ -4,8 +4,8 @@ require File.join(Rails.root, "app", "data_migrations", "delink_user_and_person"
 describe DelinkUserAndPerson do
 
   let(:given_task_name) { "delink_user_and_person" }
-  let!(:person) { FactoryGirl.create(:person)}
-  let!(:user) {FactoryGirl.create(:user,person:person)}
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:user) {FactoryBot.create(:user,person:person)}
 
   subject { DelinkUserAndPerson.new(given_task_name, double(:current_scope => nil)) }
 

@@ -13,7 +13,7 @@ describe UpdateCarrierName, dbclean: :after_each do
   end
 
   describe "update carrier legal name" do
-    let(:organization)  { FactoryGirl.create(:organization)}
+    let(:organization)  { FactoryBot.create(:organization)}
     let(:new_legal_name) { "New Legal Name" }
 
     before(:each) do

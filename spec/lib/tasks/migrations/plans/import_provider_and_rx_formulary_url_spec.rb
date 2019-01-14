@@ -10,7 +10,7 @@ describe "import_provider_and_rx_formulary_url" do
 
     read_excel(@files.first)
 
-    @plan = FactoryGirl.create(:plan, hios_id: "59763MA0030014-01", active_year: year,
+    @plan = FactoryBot.create(:plan, hios_id: "59763MA0030014-01", active_year: year,
                                rx_formulary_url: nil,
                                provider_directory_url:nil,
                                is_standard_plan: nil,
@@ -19,7 +19,7 @@ describe "import_provider_and_rx_formulary_url" do
                                is_horizontal: nil,
                                is_vertical: nil)
 
-    @plan2 = FactoryGirl.create(:plan, hios_id: "42690MA1300103-01", active_year: year,
+    @plan2 = FactoryBot.create(:plan, hios_id: "42690MA1300103-01", active_year: year,
                                 rx_formulary_url: nil,
                                 provider_directory_url:nil,
                                 is_standard_plan: nil,
@@ -28,7 +28,7 @@ describe "import_provider_and_rx_formulary_url" do
                                 is_horizontal: nil,
                                 is_vertical: nil)
 
-    @health_product = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "59763MA0030014-01",
+    @health_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "59763MA0030014-01",
                                          application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31),
                                          rx_formulary_url: nil,
                                          provider_directory_url:nil,
@@ -36,7 +36,7 @@ describe "import_provider_and_rx_formulary_url" do
                                          network_information: nil,
                                          product_package_kinds: nil)
 
-    @health_product2 = FactoryGirl.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1300103-01",
+    @health_product2 = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1300103-01",
                                           application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31),
                                           rx_formulary_url: nil,
                                           provider_directory_url:nil,

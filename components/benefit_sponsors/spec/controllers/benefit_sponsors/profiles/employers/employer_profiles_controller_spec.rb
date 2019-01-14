@@ -4,16 +4,16 @@ module BenefitSponsors
   RSpec.describe Profiles::Employers::EmployerProfilesController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:user) { FactoryGirl.create(:user, :person => person)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:user) { FactoryBot.create(:user, :person => person)}
 
     let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_sponsor)       { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:benefit_sponsor)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { benefit_sponsor.employer_profile }
-    let!(:rating_area)           { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)          { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)          { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     before do
@@ -38,7 +38,7 @@ module BenefitSponsors
 
     describe "GET show" do
       let!(:employees) {
-        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+        FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
       }
 
       before do
@@ -61,7 +61,7 @@ module BenefitSponsors
 
     describe "GET coverage_reports" do
       let!(:employees) {
-        FactoryGirl.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+        FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
       }
 
       before do

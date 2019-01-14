@@ -27,14 +27,14 @@ describe ChangeEnrollmentDetails do
 
   describe "changing enrollment attributes" do
 
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-    let(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
-    let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
-    let(:term_enrollment2) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
-    let(:term_enrollment3) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual")}
-    let(:new_plan) { FactoryGirl.create(:plan) }
-    let(:new_benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment2) { FactoryBot.create(:hbx_enrollment, household: family.active_household)}
+    let(:term_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household)}
+    let(:term_enrollment2) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household)}
+    let(:term_enrollment3) { FactoryBot.create(:hbx_enrollment, :terminated, household: family.active_household, kind: "individual")}
+    let(:new_plan) { FactoryBot.create(:plan) }
+    let(:new_benefit_group) { FactoryBot.create(:benefit_group) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")

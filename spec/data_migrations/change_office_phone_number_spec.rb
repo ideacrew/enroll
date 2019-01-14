@@ -12,9 +12,9 @@ describe ChangeOfficePhoneNumber do
     end
   end
   describe "changing the phone number of a given organization with country code ", dbclean: :after_each do
-    let(:organization) { FactoryGirl.create(:organization) }
-    let(:office_location) {FactoryGirl.create(:office_location,:primary, organization:organization)}
-    let(:phone) { FactoryGirl.create(:phone, kind: "work", office_location:office_location) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:office_location) {FactoryBot.create(:office_location,:primary, organization:organization)}
+    let(:phone) { FactoryBot.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")
@@ -52,9 +52,9 @@ describe ChangeOfficePhoneNumber do
     end
   end
   describe "changing the phone number of a given office with no country code ", dbclean: :after_each do
-    let(:organization) { FactoryGirl.create(:organization) }
-    let(:office_location) {FactoryGirl.create(:office_location,:primary, organization:organization)}
-    let(:phone) { FactoryGirl.create(:phone, kind: "work", office_location:office_location) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:office_location) {FactoryBot.create(:office_location,:primary, organization:organization)}
+    let(:phone) { FactoryBot.create(:phone, kind: "work", office_location:office_location) }
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("full_phone_number").and_return("20212345678")

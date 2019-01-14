@@ -16,8 +16,8 @@ describe DelinkBrokerGeneralAgency, dbclean: :around_each do
     let(:phone) { Phone.new(kind: 'phone main', country_code: '', area_code: '301', number: '9227984', extension: '', primary: nil, full_phone_number: '3019227984') }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let!(:organization){  Organization.new(:legal_name => "Alvin Frager", :fein => "521698168", :dba => "Alvin Frager Insurance", office_locations: [office_location]) }
-    let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, :organization => organization) }
-    let!(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :organization => organization) }
+    let!(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile, :organization => organization) }
+    let!(:general_agency_profile) { FactoryBot.create(:general_agency_profile, :organization => organization) }
 
     it "should delink general and broker agency" do
       expect(broker_agency_profile.fein).to eq general_agency_profile.fein

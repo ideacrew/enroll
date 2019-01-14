@@ -12,9 +12,9 @@ describe RemoveCoverageHouseHoldMemberForInactiveFamilyMember, dbclean: :after_e
   end
   describe "remove coverage household member for inactive family member", dbclean: :after_each do
 
-    let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:family_member){ FactoryGirl.create(:family_member,family: family)}
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member){ FactoryBot.create(:family_member,family: family)}
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
       allow(ENV).to receive(:[]).with('family_member_hbx_id').and_return family_member.hbx_id

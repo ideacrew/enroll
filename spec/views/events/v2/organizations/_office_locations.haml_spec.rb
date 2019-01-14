@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "app/views/events/v2/organizations/_office_location.xml.haml" do
 
   describe "office location xml" do
-    let(:office_location) { FactoryGirl.build(:office_location, is_primary:true) }
+    let(:office_location) { FactoryBot.build(:office_location, is_primary:true) }
 
     context "phone" do
       context "kind = work" do

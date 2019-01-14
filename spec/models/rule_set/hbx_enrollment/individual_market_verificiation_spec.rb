@@ -46,7 +46,7 @@ describe RuleSet::HbxEnrollment::IndividualMarketVerification do
     verification_states.each do |state|
       obj=(state+"_person").to_sym
       let(obj) {
-        person = FactoryGirl.create(:person, :with_consumer_role)
+        person = FactoryBot.create(:person, :with_consumer_role)
         person.consumer_role.aasm_state = state
         person
       }

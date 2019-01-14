@@ -1,8 +1,8 @@
 # require 'rails_helper'
 
 # RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_each do
-#   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-#   let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
+#   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
+#   let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
 #   before :each do
 #     assign :families, [family]
 #     assign :general_agency_profile, general_agency_profile

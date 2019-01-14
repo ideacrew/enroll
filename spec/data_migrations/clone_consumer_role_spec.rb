@@ -13,8 +13,8 @@ describe CloneConsumerRole do
   end
 
   describe "move the user from person1 to person2 ", dbclean: :after_each do
-    let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let!(:person2) { FactoryGirl.create(:person) }
+    let!(:person1) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:person2) { FactoryBot.create(:person) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("old_hbx_id").and_return(person1.hbx_id)
@@ -33,8 +33,8 @@ describe CloneConsumerRole do
   end
 
   describe "not move the consumer role if person1 has no consumer role " do
-    let(:person1) { FactoryGirl.create(:person) }
-    let(:person2){ FactoryGirl.create(:person) }
+    let(:person1) { FactoryBot.create(:person) }
+    let(:person2){ FactoryBot.create(:person) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("old_hbx_id").and_return(person1.hbx_id)

@@ -5,7 +5,7 @@ module BradyBunch
     end
 
     def build_brady_address
-      FactoryGirl.build(:address,
+      FactoryBot.build(:address,
         kind: "home",
         address_1:
         "4222 Clinton Way",
@@ -17,7 +17,7 @@ module BradyBunch
     end
 
     let(:brady_addr) do
-      FactoryGirl.build(:address,
+      FactoryBot.build(:address,
         kind: "home",
         address_1:
         "4222 Clinton Way",
@@ -29,18 +29,18 @@ module BradyBunch
     end
 
     def build_brady_phone 
-      FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)
+      FactoryBot.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)
     end
 
     def female_brady(name, age)
-      FactoryGirl.create(:female, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      FactoryBot.create(:female, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
     end
 
     def male_brady(name, age)
-      FactoryGirl.create(:male, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
+      FactoryBot.create(:male, first_name: name, last_name: "Brady", dob: dob(age), addresses: [build_brady_address], phones: [build_brady_phone])
     end
 
-    let(:brady_ph) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)}
+    let(:brady_ph) {FactoryBot.build(:phone, kind: "home", area_code: "202", number: "7620799", extension: nil)}
     let(:last_name) {"Brady"}
     let(:mikes_age)   {40}
     let(:carols_age)  {35}
@@ -70,7 +70,7 @@ module BradyBunch
       end
       mike.save
 
-      family = FactoryGirl.build(:family)
+      family = FactoryBot.build(:family)
       family.add_family_member(mike, is_primary_applicant: true)
       (bradys - [mike]).each do |brady|
         family.add_family_member(brady)
@@ -86,7 +86,7 @@ module BradyBunch
       end
       carol.save
 
-      family = FactoryGirl.build(:family)
+      family = FactoryBot.build(:family)
       family.add_family_member(carol, is_primary_applicant: true)
       (bradys - [carol]).each do |brady|
         family.add_family_member(brady)
@@ -102,7 +102,7 @@ module BradyBunch
     include_context "BradyBunch"
 
     let(:mikes_work_addr) do
-      FactoryGirl.build(:address,
+      FactoryBot.build(:address,
         kind: "work",
         address_1:
         "6345 Reagan Road",
@@ -112,36 +112,36 @@ module BradyBunch
         zip: "20011"
       )
     end
-    let(:mikes_work_phone) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "5069292", extension: nil)}
+    let(:mikes_work_phone) {FactoryBot.build(:phone, kind: "home", area_code: "202", number: "5069292", extension: nil)}
     let(:mikes_office_location) do
-      FactoryGirl.build(:office_location,
+      FactoryBot.build(:office_location,
                         address: mikes_work_addr,
                         phone: mikes_work_phone
       )
     end
     let(:mikes_organization) do
-      FactoryGirl.create(:organization,
+      FactoryBot.create(:organization,
                          legal_name: "Mike's Architects Limited",
                          dba: "MAL",
                          office_locations: [mikes_office_location]
       )
     end
     let(:mikes_hired_on) {1.year.ago.beginning_of_year.to_date}
-    let!(:mikes_employer) {FactoryGirl.build(:employer_profile, organization: mikes_organization)}
-    let(:mikes_benefit_group_assignments){FactoryGirl.build(:benefit_group_assignment)}
+    let!(:mikes_employer) {FactoryBot.build(:employer_profile, organization: mikes_organization)}
+    let(:mikes_benefit_group_assignments){FactoryBot.build(:benefit_group_assignment)}
     let(:mikes_census_employee) do
-      FactoryGirl.build(:census_employee,
+      FactoryBot.build(:census_employee,
                         first_name: mike.first_name,  last_name: mike.last_name,
                         dob: mike.dob, address: mike.address, hired_on: mikes_hired_on,
                         employer_profile_id: mikes_employer.id,
                         benefit_group_assignments: [mikes_benefit_group_assignments]
       )
     end
-    let(:mikes_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
-    let!(:mikes_plan_year) {FactoryGirl.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
+    let(:mikes_benefit_group) {FactoryBot.build(:benefit_group, plan_year: nil)}
+    let!(:mikes_plan_year) {FactoryBot.create(:plan_year, employer_profile: mikes_employer, benefit_groups: [mikes_benefit_group])}
 
     let(:carols_work_addr) do
-      FactoryGirl.build(:address,
+      FactoryBot.build(:address,
         kind: "work",
         address_1:
         "1321 Carter Court",
@@ -151,33 +151,33 @@ module BradyBunch
         zip: "20011"
       )
     end
-    let(:carols_work_ph) {FactoryGirl.build(:phone, kind: "home", area_code: "202", number: "6109987", extension: nil)}
+    let(:carols_work_ph) {FactoryBot.build(:phone, kind: "home", area_code: "202", number: "6109987", extension: nil)}
     let(:carols_office_location) do
-      FactoryGirl.build(:office_location,
+      FactoryBot.build(:office_location,
                         address: carols_work_addr,
                         phone: carols_work_phone
       )
     end
     let(:carols_hired_on) {1.year.ago.beginning_of_year.to_date}
-    let(:carols_employer) {FactoryGirl.build(:employer_profile)}
+    let(:carols_employer) {FactoryBot.build(:employer_profile)}
     let(:carols_organization) do
-      FactoryGirl.create(:organization,
+      FactoryBot.create(:organization,
                          legal_name: "Care Real S Tates",
                          dba: "CRST",
                          office_locations: [carols_office_location],
                          employer_profile: carols_employer
       )
     end
-    let(:carols_benefit_group_assignments){FactoryGirl.build(:benefit_group_assignment)}
+    let(:carols_benefit_group_assignments){FactoryBot.build(:benefit_group_assignment)}
     let(:carols_census_employee) do
-      FactoryGirl.build(:employer_census_employee,
+      FactoryBot.build(:employer_census_employee,
                         first_name: carol.first_name,  last_name: carol.last_name,
                         dob: carol.dob, address: carol.address, hired_on: carols_hired_on,
                         employer_profile_id: carols_employer.id,
                         benefit_group_assignments: [carols_benefit_group_assignments]
       )
     end
-    let(:carols_benefit_group) {FactoryGirl.build(:benefit_group, plan_year: nil)}
-    let!(:carols_plan_year) {FactoryGirl.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])}
+    let(:carols_benefit_group) {FactoryBot.build(:benefit_group, plan_year: nil)}
+    let!(:carols_plan_year) {FactoryBot.create(:plan_year, employer_profile: carols_employer, benefit_groups: [carols_benefit_group])}
   end
 end

@@ -10,10 +10,10 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
     end
   describe "census employee not in terminated state" do
     subject {ChangeAasmStateDotCensusEmployee.new("change_aasm_state_dot_census_employee", double(:current_scope => nil)) }
-       let(:benefit_group){ FactoryGirl.create(:benefit_group) }
-      let(:plan_year){ FactoryGirl.create(:plan_year,benefit_groups:[benefit_group]) }
+       let(:benefit_group){ FactoryBot.create(:benefit_group) }
+      let(:plan_year){ FactoryBot.create(:plan_year,benefit_groups:[benefit_group]) }
       let(:employer_profile_id){ plan_year.employer_profile.id }
-      let(:census_employee){ FactoryGirl.create(:census_employee,employer_profile_id:employer_profile_id)}
+      let(:census_employee){ FactoryBot.create(:census_employee,employer_profile_id:employer_profile_id)}
 
       before :each do
         allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id

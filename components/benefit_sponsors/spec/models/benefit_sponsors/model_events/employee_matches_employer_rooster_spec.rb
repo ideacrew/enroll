@@ -7,11 +7,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeMatchesEmployerRooster', :
   let(:current_effective_date)  { TimeKeeper.date_of_record }
 
   let!(:person){ create :person}
-  let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile)}
-  let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
+  let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile)}
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
 
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+  let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
   let!(:benefit_market) { site.benefit_markets.first }
@@ -21,7 +21,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeMatchesEmployerRooster', :
                                   application_period: (start_on.beginning_of_year..start_on.end_of_year))
                                 }
   let!(:benefit_application) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
+    application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
       benefit_sponsorship: benefit_sponsorship, 
       effective_period: start_on..start_on.next_year.prev_day, 
       open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)

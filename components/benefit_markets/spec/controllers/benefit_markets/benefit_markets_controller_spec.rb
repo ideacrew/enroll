@@ -115,7 +115,7 @@ module BenefitMarkets
     end
 
     describe "GET edit" do
-      let(:benefit_market) { FactoryGirl.create(:benefit_markets_benefit_market, site: site) }
+      let(:benefit_market) { FactoryBot.create(:benefit_markets_benefit_market, site: site) }
 
       before do
         put :edit, :id => benefit_market.id
@@ -133,7 +133,7 @@ module BenefitMarkets
     describe "POST update" do
       include_context 'params'
 
-      let(:benefit_market) { FactoryGirl.create(:benefit_markets_benefit_market, site: site) }
+      let(:benefit_market) { FactoryBot.create(:benefit_markets_benefit_market, site: site) }
 
       context "with valid params" do
         before do

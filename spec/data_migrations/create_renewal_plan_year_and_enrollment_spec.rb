@@ -26,18 +26,18 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
     let(:aasm_state) { :active }
     let!(:save_catalog){ benefit_market.benefit_market_catalogs.map(&:save)}
     let(:business_policy) { instance_double("some_policy", success_results: "validated successfully")}
-    let!(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id:nil, benefit_package: current_benefit_package, is_active:false)}
-    let(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
-    let(:employee_role) { FactoryGirl.build(:employee_role, benefit_sponsors_employer_profile_id:abc_profile.id)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, dob: TimeKeeper.date_of_record - 21.year, employer_profile_id: nil, benefit_sponsors_employer_profile_id: abc_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
-    let(:person) {FactoryGirl.create(:person,dob: TimeKeeper.date_of_record - 21.year, ssn:census_employee.ssn)}
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person:person)}
+    let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id:nil, benefit_package: current_benefit_package, is_active:false)}
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+    let(:employee_role) { FactoryBot.build(:employee_role, benefit_sponsors_employer_profile_id:abc_profile.id)}
+    let(:census_employee) { FactoryBot.create(:census_employee, dob: TimeKeeper.date_of_record - 21.year, employer_profile_id: nil, benefit_sponsors_employer_profile_id: abc_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
+    let(:person) {FactoryBot.create(:person,dob: TimeKeeper.date_of_record - 21.year, ssn:census_employee.ssn)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
     let(:active_household) {family.active_household}
     let(:sponsored_benefit) {current_benefit_package.sponsored_benefits.first}
     let(:reference_product) {current_benefit_package.sponsored_benefits.first.reference_product}
-    let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true, coverage_start_on: current_benefit_package.start_on, eligibility_date: current_benefit_package.start_on, applicant_id: family.family_members.first.id) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member],product: reference_product, sponsored_benefit_package_id: current_benefit_package.id, effective_on:initial_application.effective_period.min, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id, benefit_sponsorship_id:benefit_sponsorship.id)}
-    let!(:issuer_profile)  { FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true, coverage_start_on: current_benefit_package.start_on, eligibility_date: current_benefit_package.start_on, applicant_id: family.family_members.first.id) }
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, hbx_enrollment_members:[hbx_enrollment_member],product: reference_product, sponsored_benefit_package_id: current_benefit_package.id, effective_on:initial_application.effective_period.min, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id, benefit_sponsorship_id:benefit_sponsorship.id)}
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let!(:update_reference_product) {reference_product.update_attributes(issuer_profile_id:issuer_profile.id)}
 
     before(:each) do

@@ -14,9 +14,9 @@ describe UpdateInitialInvoiceTitle, dbclean: :after_each do
 
   describe "update initial invoice title", dbclean: :after_each do
 
-    let!(:benefit_markets_location_rating_area) { FactoryGirl.create_default(:benefit_markets_locations_rating_area) }
-    let!(:benefit_markets_location_service_area) { FactoryGirl.create_default(:benefit_markets_locations_service_area) }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
+    let!(:benefit_markets_location_rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
+    let!(:benefit_markets_location_service_area) { FactoryBot.create_default(:benefit_markets_locations_service_area) }
+    let!(:security_question)  { FactoryBot.create_default :security_question }
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
 
@@ -27,23 +27,23 @@ describe UpdateInitialInvoiceTitle, dbclean: :after_each do
                                             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
                                           }
 
-    let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { organization.employer_profile }
     let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
     let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitPackageForm }
-    let(:person) { FactoryGirl.create(:person) }
-    let!(:user) { FactoryGirl.create :user, person: person}
+    let(:person) { FactoryBot.create(:person) }
+    let!(:user) { FactoryBot.create :user, person: person}
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
     let!(:benefit_application) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!
       application
     }
     let!(:benefit_application_id) { benefit_application.id.to_s }
-    let!(:issuer_profile)  { FactoryGirl.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
 
@@ -56,7 +56,7 @@ describe UpdateInitialInvoiceTitle, dbclean: :after_each do
         })
     }
 
-    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
+    let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
 
     let(:initial_invoice) {organization.employer_profile.documents.new({ title: "SomeTitle",
       date: TimeKeeper.date_of_record,
