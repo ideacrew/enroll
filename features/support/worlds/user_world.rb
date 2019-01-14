@@ -98,3 +98,19 @@ end
 Then(/^the user will not see the Create Plan Year button$/) do
   expect(page).to_not have_css('.btn.btn-xs', text: 'Create Plan Year')
 end
+
+Given(/^that the user has clicked the Create Plan Year button for this Employer$/) do
+  find('.btn.btn-xs', text: 'Create Plan Year').click
+end
+
+When(/^the user selects an input in the Effective Start date drop down$/) do
+  find('a', text: 'Effective Start Date')
+end
+
+Then(/^the Effective End Date will populate with a date equal to one year minus (\d+) day from the Effective Start Date$/) do |arg1|
+  pending # Write code here that turns the phrase above into concrete actions
+end
+
+Then(/^the Effective End Date will not be editable\.$/) do
+  pending # Write code here that turns the phrase above into concrete actions
+end
