@@ -3,7 +3,7 @@
     <div class="col-md-12">
       <h3 class="title-inline"><%= l10n("general_agencies")%></h3>
       <%=pundit_span HbxProfile, :modify_admin_tabs? %>
-        <%#= link_to "#{l10n('broker_agencies.profiles.clear_default_ga')}", set_default_ga_broker_agencies_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
+        <%= link_to "CLEAR DEFAULT GA", set_default_ga_profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
       </span>
     </div>
     <div class="col-md-12">
@@ -46,8 +46,8 @@
             </td>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
-            <td><%#= general_agency_profile.entity_kind.titleize %></td>
-            <td><%#= general_agency_profile.market_kind.titleize %></td>
+            <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") %></td>
+            <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") %></td>
             <td><%#= general_agency_profile.current_state %></td>
             <td>
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
