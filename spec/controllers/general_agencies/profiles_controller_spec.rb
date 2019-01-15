@@ -259,6 +259,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     before(:each) do
       FactoryBot.create(:hbx_profile) if HbxProfile.count == 0
       sign_in(user)
+      general_agency_staff.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Move/remove these old specs
       post :update_staff, id: general_agency_staff.id, approve: 'true'
     end
 
