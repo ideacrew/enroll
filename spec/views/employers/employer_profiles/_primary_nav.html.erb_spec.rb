@@ -117,8 +117,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
   let(:person) { FactoryGirl.create(:person, :first_name=>'fred', :last_name=>'flintstone'  )}
   let(:current_user) { FactoryGirl.create(:user, :roles => ['general_agency_staff'], :person => person) }
   before :each do
-    general_agency = FactoryGirl.create :general_agency, legal_name: 'Zooxy', general_agency_traits: :with_staff
-    staff = general_agency.general_agency_profile.general_agency_staff_roles.last
+    staff = FactoryGirl.create(:general_agency_staff_role, person: person)
     staff.person.emails.last.update(kind: 'work')
     user = FactoryGirl.create(:user, :roles => ['general_agency_staff'], :person => staff.person)
 
