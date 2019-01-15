@@ -57,5 +57,8 @@ class Permission
     def developer
       Permission.where(name: 'developer').first
     end
+    def super_admin
+      Permission.where(name: 'super_admin').first
+    end
   end
 end
