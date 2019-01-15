@@ -56,7 +56,7 @@ module BenefitSponsors
               class_name: "BenefitSponsors::Organizations::Organization"
 
     # Curated collections of benefits intended for specific sponsor and member groups
-    has_many :benefit_markets,
+    has_many :benefit_markets,inverse_of: :site_benefit_market,
              class_name: "::BenefitMarkets::BenefitMarket"
 
 

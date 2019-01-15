@@ -2,18 +2,18 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   # Acheived by adding Initializer in engine
-  # FactoryBot.definition_file_paths = [
+  # FactoryGirl.definition_file_paths = [
   #   File.expand_path('../../../components/benefit_markets/spec/factories', __FILE__),
   #   File.expand_path('../../../components/benefit_sponsors/spec/factories', __FILE__),
   # ]
-  # FactoryBot.find_definitions
+  # FactoryGirl.find_definitions
 
   config.before(:suite) do
     begin
-      # DatabaseCleaner.start
-      # FactoryBot.lint
+      DatabaseCleaner.start
+      # FactoryGirl.lint
     ensure
-      # DatabaseCleaner.clean
+      DatabaseCleaner.clean
     end
   end
 

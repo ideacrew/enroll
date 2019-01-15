@@ -5,6 +5,7 @@ class Person
   include SetCurrentUser
   include Mongoid::Timestamps
   # include Mongoid::Versioning
+  include Ssn
   include Mongoid::Attributes::Dynamic
   # include SponsoredBenefits::Concerns::Ssn
   # include SponsoredBenefits::Concerns::Dob
@@ -17,28 +18,28 @@ class Person
   # verification history tracking
   include Mongoid::History::Trackable
 
-  track_history :on => [:first_name,
-                        :middle_name,
-                        :last_name,
-                        :full_name,
-                        :alternate_name,
-                        :encrypted_ssn,
-                        :dob,
-                        :gender,
-                        :is_incarcerated,
-                        :is_disabled,
-                        :ethnicity,
-                        :race,
-                        :tribal_id,
-                        :no_dc_address,
-                        :no_dc_address_reason,
-                        :is_active,
-                        :no_ssn],
-                :modifier_field => :modifier,
-                :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
-                :track_destroy => true     # track document destruction, default is false
+  # track_history :on => [:first_name,
+  #                       :middle_name,
+  #                       :last_name,
+  #                       :full_name,
+  #                       :alternate_name,
+  #                       :encrypted_ssn,
+  #                       :dob,
+  #                       :gender,
+  #                       :is_incarcerated,
+  #                       :is_disabled,
+  #                       :ethnicity,
+  #                       :race,
+  #                       :tribal_id,
+  #                       :no_dc_address,
+  #                       :no_dc_address_reason,
+  #                       :is_active,
+  #                       :no_ssn],
+  #               :modifier_field => :modifier,
+  #               :version_field => :tracking_version,
+  #               :track_create  => true,    # track document creation, default is false
+  #               :track_update  => true,    # track document updates, default is true
+  #               :track_destroy => true     # track document destruction, default is false
 
 
   extend Mongorder
@@ -92,22 +93,25 @@ class Person
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
-  belongs_to :user
+  belongs_to :user, optional: true
 
   belongs_to :employer_contact,
                 class_name: "EmployerProfile",
                 inverse_of: :employer_contacts,
-                index: true
+                index: true,
+                optional: true
 
   belongs_to :broker_agency_contact,
                 class_name: "BrokerAgencyProfile",
                 inverse_of: :broker_agency_contacts,
-                index: true
+                index: true,
+                optional: true
 
   belongs_to :general_agency_contact,
                 class_name: "GeneralAgencyProfile",
                 inverse_of: :general_agency_contacts,
-                index: true
+                index: true,
+                optional: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :resident_role, cascade_callbacks: true, validate: true
@@ -244,6 +248,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)

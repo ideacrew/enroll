@@ -1,1 +1,1 @@
-require 'factory_girl'
+require 'Factory_bot'
