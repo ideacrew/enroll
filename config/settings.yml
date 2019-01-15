@@ -143,7 +143,7 @@ aca:
   dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
-  address_query_county: true
+  address_query_county: false
   broker_routing_information: false
   recaptcha_enabled: false
   security_questions: true

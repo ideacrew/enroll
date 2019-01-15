@@ -530,7 +530,7 @@ def employer_poc
     end
     session[:person_id] = nil
     session[:dismiss_announcements] = nil
-    @unread_messages = 0
+    @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
   # GET /exchanges/hbx_profiles/new
