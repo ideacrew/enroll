@@ -1,5 +1,7 @@
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
@@ -545,6 +547,45 @@ module BenefitSponsors
           xit "should deactivate active benefit group assignment" do
             expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
+        end
+      end
+    end
+
+    describe "enrollments_till_given_effective_on" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      context "No hbx_enrollments for the benefit application" do
+        it "No hbx_enrollment under the benefit application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).to eq 0
+        end
+      end
+
+      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+        before do
+          enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
+          enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
+          benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment
+          benefit_sponsorship.benefit_applications.first.hbx_enrollments << enrollment1
+          benefit_sponsorship.benefit_applications.first.save
+        end
+        it "Benefit application should have enrollment under the application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).not_to eq 0
+        end
+
+        it "Benefit application should have enrollment under the application" do
+          expect(benefit_sponsorship.benefit_applications.first.hbx_enrollments.count).to eq 2
+        end
+
+        it "Should return the enrollments only with the effective date as next month start date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).not_to eq 0
+        end
+
+        it "should not return enrollment outside given date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month).count).to eq 1
+        end
+
+        it "should return enrollments within the given date" do
+          expect(benefit_sponsorship.benefit_applications.first.enrollments_till_given_effective_on(Date.today.next_month.beginning_of_month + 2.months).count).to eq 2
         end
       end
     end
