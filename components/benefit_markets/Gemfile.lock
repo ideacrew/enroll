@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 4.8.0)
+      aasm (~> 4.8)
       active_model_serializers (~> 0.10)
       config (~> 1.7)
       language_list (~> 1)
@@ -17,7 +17,8 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (4.8.0)
+    aasm (4.12.3)
+      concurrent-ruby (~> 1.0)
     actioncable (5.2.2)
       actionpack (= 5.2.2)
       nio4r (~> 2.0)

@@ -5,20 +5,14 @@ FactoryBot.define do
     # middle_name 'X'
     sequence(:last_name) {|n| "Smith#{n}" }
     # name_sfx 'Jr'
-    user { FactoryBot.build(:user) }
-
     dob "1972-04-04".to_date
     is_incarcerated false
     is_active true
     gender "male"
-    us_citizen "true"
-    # profile { FactoryBot.build(:hbx_profile) }
-
-    # profile         { FactoryBot.create(:hbx_profile) }
-
+    # us_citizen "true"
     # indian_tribe_member "false"
     # naturalized_citizen "false"
-    association :employee_role, strategy: :build
+    # association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|
       create_list(:address, 2, person: p)

@@ -171,7 +171,7 @@ end
 # gem 'coffee-rails', '~> 4.1.0'
 # gem 'cucumber', '2.3.3'
 # gem 'devise', '>= 3.5.4'
-# gem 'factory_girl_rails', '4.6.0'
+# gem 'Factory_bot_rails', '4.6.0'
 # gem 'jbuilder', '~> 2.0'
 # gem 'mongoid', '~> 5.4.0'
 # gem 'mongoid_rails_migrations', git: 'https://github.com/adacosta/mongoid_rails_migrations.git', branch: 'master'

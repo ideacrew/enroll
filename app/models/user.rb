@@ -89,7 +89,7 @@ class User
   before_save :strip_empty_fields
 
   # Enable polymorphic associations
-  belongs_to :profile, polymorphic: true
+  belongs_to :profile, polymorphic: true, optional: true
 
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create

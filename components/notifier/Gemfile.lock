@@ -139,10 +139,10 @@ GEM
       dry-types (~> 0.13.1)
     equalizer (0.0.11)
     erubi (1.8.0)
-    factory_girl (4.9.0)
+    Factory_bot (4.9.0)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.9.0)
-      factory_girl (~> 4.9.0)
+    Factory_bot_rails (4.9.0)
+      Factory_bot (~> 4.9.0)
       railties (>= 3.0.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -291,7 +291,7 @@ PLATFORMS
 DEPENDENCIES
   capybara
   database_cleaner
-  factory_girl_rails
+  Factory_bot_rails
   notifier!
   rspec
   rspec-rails

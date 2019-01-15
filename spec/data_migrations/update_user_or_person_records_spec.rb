@@ -9,6 +9,7 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
 
   describe "given a task name" do
     it "has the given task name" do
+      binding.pry
       expect(subject.name).to eql given_task_name
     end
   end

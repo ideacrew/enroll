@@ -1,2 +1,2 @@
-# Enable factory_girl
+# Enable Factory_bot
 World(FactoryBot::Syntax::Methods)

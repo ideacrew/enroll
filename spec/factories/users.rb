@@ -91,7 +91,7 @@ FactoryBot.define do
     end
 
     after :create do |user, evaluator|
-      #person = FactoryBot.create :person, :with_family, :user => user
+      # person = FactoryBot.create :person, :with_family, :user => user
       evaluator.organization.employer_profile = FactoryBot.create(:employer_profile,
         employee_roles: [ FactoryBot.create(:employee_role, :person => user.person) ],
         organization: evaluator.organization)
