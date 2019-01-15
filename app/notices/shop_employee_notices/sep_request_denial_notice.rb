@@ -31,7 +31,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
       future_py_start_on,open_enrollment_end_date_py = if renewing_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
                                                          [renewing_plan_year.start_on, active_plan_year]
                                                        else
-                                                         [renewing_plan_year.end_on + 1, renewing_plan_year]
+                                                         [renewing_plan_year.end_on + 1.day, renewing_plan_year]
                                                        end
     end
 
@@ -39,9 +39,9 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
     upcoming_plan_year_start_on = future_py_start_on.present? ? future_py_start_on : (active_plan_year.end_on + 1.day)
 
     notice.plan_year = PdfTemplates::PlanYear.new({
-      :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on.strftime("%m/%d/%Y"),
-      :open_enrollment_start_on => open_enrollment_py.start_on.strftime("%m/%d/%Y"),
-      :start_on => upcoming_plan_year_start_on.strftime("%m/%d/%Y")
+      :open_enrollment_end_on => open_enrollment_py.open_enrollment_end_on,
+      :open_enrollment_start_on => open_enrollment_py.start_on,
+      :start_on => upcoming_plan_year_start_on
       })
   end
 end

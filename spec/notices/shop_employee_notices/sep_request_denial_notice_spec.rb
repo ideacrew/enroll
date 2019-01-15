@@ -29,21 +29,26 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
                             :notice_template => 'notices/shop_employee_notices/sep_request_denial_notice',
                             :notice_builder => 'ShopEmployeeNotices::SepRequestDenialNotice',
                             :mpi_indicator => 'SHOP_D035',
-                            :event_name => 'sep_request_denial_notice',
+                            :event_name => 'employee_notice_for_sep_denial',
                             :title => "Special Enrollment Period Denial"})
-                          }
+  }
+  let(:qle_on) { TimeKeeper.date_of_record + 10.days }
+  let(:end_on) { qle_on + 30.days }
+  let(:qle_title) { "Had a baby" }
+
   let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
-      :options=>{:qle_reported_date=> TimeKeeper.date_of_record + 10.days,:qle_title=>"Had a baby"}
+      :options=> {:qle_event_on=> qle_on, :qle_title=> qle_title}
   }}
 
+  before do
+    @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
+  end
+
   describe "New" do
-    before do
-      @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-    end
     context "valid params" do
       it "should initialze" do
         expect{ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)}.not_to raise_error
@@ -61,36 +66,25 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
   end
 
   describe "Build" do
-    before do
-      @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-    end
     it "should build notice with all necessory info" do
-
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq abc_profile.organization.legal_name.titleize
     end
   end
 
-  #ToDo Fix in DC new model after udpdating the notice builder
-  xdescribe "append data" do
-    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
-    let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 18)}
+  describe "append data" do
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
     let(:sep1) {family.special_enrollment_periods.new}
     let(:sep2) {family.special_enrollment_periods.new}
     let(:order) {[sep1,sep2]}
 
-    before do
-      @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-    end
-
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.sep.start_on).to eq qle_reported_date
-      expect(@employee_notice.notice.sep.end_on).to eq qle_reported_date+30.days
-      expect(@employee_notice.notice.sep.title).to eq title
-      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
+      expect(@employee_notice.notice.sep.start_on).to eq qle_on
+      expect(@employee_notice.notice.sep.end_on).to eq end_on
+      expect(@employee_notice.notice.sep.title).to eq qle_title
+      expect(@employee_notice.notice.plan_year.start_on).to eq renewal_application.start_on+1.year
     end
   end
 end

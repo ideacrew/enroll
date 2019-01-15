@@ -50,6 +50,7 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   }}
 
   before do
+    allow(census_employee).to receive(:employer_profile).and_return(employer_profile)
     @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
   end
 

@@ -2,8 +2,10 @@ require 'rails_helper'
 
 RSpec.describe ShopEmployerNotices::EmployerAccountCreationNotice, :dbclean => :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
-  let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
-  let(:person){ create :person}
+  let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
+  let(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site) }
+  let(:employer_profile)    { organization.employer_profile }
+  let(:person){ FactoryGirl.create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Welcome to DC Health Link',
                             :notice_template => 'notices/shop_employer_notices/employer_account_creation_notice',
@@ -49,7 +51,7 @@ RSpec.describe ShopEmployerNotices::EmployerAccountCreationNotice, :dbclean => :
     it "should build notice with all necessory information" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
     end
   end
 

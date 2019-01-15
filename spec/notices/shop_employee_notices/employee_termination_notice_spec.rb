@@ -86,11 +86,11 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
     end
 
     it "should return plan name" do
-      expect(@employee_notice.notice.census_employee.enrollments.first.plan.plan_name).to eq hbx_enrollment.plan.name
+      expect(@employee_notice.notice.census_employee.enrollments.first.plan.plan_name).to eq hbx_enrollment.product.name
     end
 
     it "should return coverage kind" do
-      expect(@employee_notice.notice.census_employee.enrollments.first.plan.coverage_kind).to eq hbx_enrollment.coverage_kind
+      expect(@employee_notice.notice.census_employee.enrollments.first.plan.coverage_kind).to eq hbx_enrollment.product.kind.to_s
     end
 
     it "should return enrolled count" do

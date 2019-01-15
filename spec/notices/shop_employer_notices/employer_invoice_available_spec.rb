@@ -23,10 +23,13 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable, dbclean: :after_ea
       :template => application_event.notice_template
   }}
 
+  before :each do
+    DatabaseCleaner.clean
+    allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
+    @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(abc_profile, valid_parmas)
+  end
+
   describe "New" do
-    before do
-      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
-    end
     context "valid params" do
       it "should initialze" do
         expect{ShopEmployerNotices::EmployerInvoiceAvailable.new(abc_profile, valid_parmas)}.not_to raise_error
@@ -44,10 +47,6 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable, dbclean: :after_ea
   end
 
   describe "Build" do
-    before do
-      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(abc_profile, valid_parmas)
-    end
     it "should build notice with all necessary info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
@@ -58,10 +57,7 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable, dbclean: :after_ea
 
   describe "append_data" do
     let(:terminated_employer_plan_year) { BenefitSponsors::BenefitApplications::BenefitApplication.new(aasm_state:"terminated")}
-    before do
-      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(abc_profile, valid_parmas)
-    end
+
     it "should append necessary information" do
       scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       due_date = scheduler.calculate_open_enrollment_date(initial_application.start_on)[:binder_payment_due_date]
@@ -78,13 +74,11 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable, dbclean: :after_ea
   end
 
   describe "Render template & Generate PDF" do
-    before do
-      allow(abc_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(abc_profile, valid_parmas)
-    end
+
     it "should render renewal_employer_available_notice" do
       expect(@employer_notice.template).to eq "notices/shop_employer_notices/employer_invoice_available_notice"
     end
+
     it "should generate pdf" do
       @employer_notice.build
       @employer_notice.append_data

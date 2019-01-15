@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :before_each do
+RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :after_each do
   before(:all) do
 
     @site =  FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
@@ -66,11 +66,11 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :before_
         allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
         @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)
       end
-      # builder is not in use and not updated as per new model(will work in DC)
-      xit "should build notice with all necessary info" do
+
+      it "should build notice with all necessary info" do
         @employer_notice.build
         expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
-        expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+        expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
         expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
       end
   end
@@ -106,10 +106,11 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice, dbclean: :before_
     it "should render notice" do
       expect(@eligibility_notice.template).to eq "notices/shop_employer_notices/employer_broker_fired_notice"
     end
-    # builder is not in use and not updated as per new model(will work in DC)
-    xit "should generate pdf" do
+
+    it "should generate pdf" do
       @eligibility_notice.append_hbe
       @eligibility_notice.build
+      @eligibility_notice.append_data
       file = @eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
