@@ -4,6 +4,13 @@ module FormWorld
     select(first_element, :from => "baStartDate")
     find('#fteCount').set(5)
   end
+
+  def fill_in_partial_create_plan_year_form
+    first_element = find("#baStartDate > option:nth-child(2)").text
+    select(first_element, :from => "baStartDate")
+    find('#fteCount').set(5)
+    find('#open_enrollment_end_on').set('')
+  end
 end
 
 World(FormWorld)

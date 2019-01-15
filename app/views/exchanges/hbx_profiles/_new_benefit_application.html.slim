@@ -10,7 +10,7 @@
         | Effective Start Date
       br
       .input-group
-        = select_tag :start_on, options_for_select(@benefit_application_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange: "selectedDate(this)", id:'baStartDate'}
+        = select_tag :start_on, options_for_select(@benefit_application_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange:"selectedDate(this); validateInputs()", id:'baStartDate'}
     .col-md-4
       label[for="effectiveEndDate" style="font-weight:bold"]
         | Effective End Date
@@ -23,7 +23,10 @@
       label[for="fullTimeEmployees" style="font-weight:bold"]
         | Full Time Employees
       br
-      = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()"
+      = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
+      .required-item.hidden
+        |
+          Please provide full time employees count.
     / .col-md-4
     /   label[for="binderDueDate" style="font-weight:bold"]
     /     | Binder Payment Due Date
@@ -39,30 +42,64 @@
         | Open Enrollment Start Date
       br
       .input-group
-        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", :"data-date-min" => @benefit_application_form.start_on ? (Date.strptime(@benefit_application_form.start_on, "%m/%d/%Y") - 2.months) : ""
-        span.input-group-addon
-          i.fas.fa-calendar-alt
+        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @benefit_application_form.start_on ? (Date.strptime(@benefit_application_form.start_on, "%m/%d/%Y") - 2.months) : ""
+        .required-item.hidden
+          |
+            Please provide Open Enrollment Start On date.
     .col-md-4
       label[for="openEnrollmentEndDate" style="font-weight:bold"]
         | Open Enrollment End Date
       br
       .input-group
-        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", onchange: "enableDisableSubmit()"
-        span.input-group-addon
-          i.fas.fa-calendar-alt
+        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
+        .required-item.hidden
+          |
+            Please provide Open Enrollment Start On date.
   br
   .row
     .col-md-12
-      button#adminCreatePyButton.pull-right.btn.btn-primary[type="submit"]
+      button#adminCreatePyButton.pull-right.btn.btn-primary.disabled[type="submit"]
         | Submit
 
 javascript:
   $( function() {
-    $('#adminCreatePyButton').addClass('disabled');
     $("#open_enrollment_start_on").datepicker();
     $("#open_enrollment_end_on").datepicker();
     $("#binder_due_date").datepicker();
   } );
+
+  function selectedDate(element) {
+    if (element && element.value) {
+      assignBenefitApplicationDates(element.value)
+    } else {
+      resetInputOptions()
+    }
+    enableDisableSubmit()
+  }
+
+  function checkifValid(element) {
+    input = element.closest('input');
+    label = element.closest('.col-md-4').getElementsByTagName('label')[0];
+    feedback = element.nextSibling;
+    if (!element.value) {
+      label.setAttribute("class", "required-feedback");
+      input.setAttribute("class", "required-input");
+      feedback.classList.remove('hidden');
+    } else {
+      feedback.classList.add('hidden');
+      label.classList.remove('required-feedback');
+      input.classList.remove('required-input');
+    }
+  }
+
+  function validateInputs() {
+    inputs = document.getElementsByClassName('admin-plan-year-form')[0].querySelectorAll('input');
+    for (input of inputs) {
+      if (input.id === 'open_enrollment_start_on' || input.id === 'open_enrollment_end_on') {
+        checkifValid(input);
+      }
+    }
+  }
 
   function closeRow(element) {
     element.closest('tr').remove();
@@ -103,11 +140,18 @@ javascript:
     document.querySelector("input#open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
   }
 
-  function selectedDate(element) {
-    if (element && element.value) {
-      assignBenefitApplicationDates(element.value)
-    } else {
-      resetInputOptions()
-    }
-    enableDisableSubmit()
+css:
+  .required-feedback {
+    color: #dc3545;
+  }
+  .required-item {
+    color: #dc3545;
+    margin-top:5px;
+  }
+  .required-input {
+    border-color: #dc3545;
+    border-radius: .25rem;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
   }

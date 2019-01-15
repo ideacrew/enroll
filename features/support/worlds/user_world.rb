@@ -124,6 +124,10 @@ When(/^the user completely fills out the Create Plan Year Form$/) do
   fill_in_admin_create_plan_year_form
 end
 
+When(/^the user partially fills out the Create Plan Year Form$/)  do
+  fill_in_partial_create_plan_year_form
+end
+
 When(/^the user clicks the X icon on the Create Plan Year form$/) do
   find('#closeBAForm').trigger('click')
 end
