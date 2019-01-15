@@ -18,7 +18,7 @@ module BenefitSponsors
       end
 
       def calculate_start_on_dates(admin_datatable_action = false)
-        start_on = if (!admin_datatable_action && (TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)))
+        start_on = if !admin_datatable_action && (TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true))
           TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         else
           TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
@@ -135,7 +135,7 @@ module BenefitSponsors
 
         open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
 
-        if (admin_datatable_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days))
+        if admin_datatable_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
           open_enrollment_end_on = (open_enrollment_start_on + oe_min_days)
         end
         open_enrollment_start_on..open_enrollment_end_on

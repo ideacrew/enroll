@@ -1,4 +1,4 @@
-= form_tag create_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: @benefit_application_form.benefit_sponsorship_id),class:'admin-plan-year-form', :method => :post, :remote => true do
+= form_tag create_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: @ba_form.benefit_sponsorship_id),class:'admin-plan-year-form', :method => :post, :remote => true do
   = hidden_field_tag :employer_actions_id, params["employer_actions_id"]
   br
   .row
@@ -10,7 +10,7 @@
         | Effective Start Date
       br
       .input-group
-        = select_tag :start_on, options_for_select(@benefit_application_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange:"selectedDate(this); validateInputs()", id:'baStartDate'}
+        = select_tag :start_on, options_for_select(@ba_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange:"selectedDate(this); validateInputs()", id:'baStartDate'}
     .col-md-4
       label[for="effectiveEndDate" style="font-weight:bold"]
         | Effective End Date
@@ -42,7 +42,7 @@
         | Open Enrollment Start Date
       br
       .input-group
-        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @benefit_application_form.start_on ? (Date.strptime(@benefit_application_form.start_on, "%m/%d/%Y") - 2.months) : ""
+        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @ba_form.start_on ? (Date.strptime(@ba_form.start_on, "%m/%d/%Y") - 2.months) : ""
         .required-item.hidden
           |
             Please provide Open Enrollment Start On date.
@@ -134,7 +134,7 @@ javascript:
   }
 
   function assignBenefitApplicationDates(targetDate) {
-    var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
+    var date = JSON.parse('#{@ba_form.start_on_options.to_json.html_safe}');
     document.querySelector('input#end_on').value = getFormattedDate(date[targetDate]["benefit_application_end_on"]);
     document.querySelector("input#open_enrollment_start_on").value = getFormattedDate(date[targetDate]["open_enrollment_start_on"]);
     document.querySelector("input#open_enrollment_end_on").value = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);

@@ -1,10 +1,10 @@
-<% if @error_on_save %>
+<% if @save_error %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%= @error_on_save %>
+    <%= @save_error %>
   </div>
   <% message_for_display = "Could not create a draft plan year" %>
 <% else %>
-  <% message_for_display = "Succesfully created a draft plan year" %>
+  <% message_for_display = "Successfully created a draft plan year" %>
 <% end %>
 
 <div class="container bottom-pd">

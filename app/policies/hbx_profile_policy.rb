@@ -32,7 +32,7 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def new_benefit_application_for_employer?
     return true unless role = user.person.hbx_staff_role
-    role.subrole == "super_admin"
+    role.subrole == 'super_admin'
   end
 
   def show?
