@@ -20,6 +20,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal, :dbclean =
                                             external_enrollment: false,
                                             rating_area_id: rating_area.id )
   }
+  let(:product) { hbx_enrollment.product }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Open Enrollment available for Employee',
                             :notice_template => 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
@@ -67,20 +68,18 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal, :dbclean =
     end
   end
 
-  #ToDo Fix in DC new model after udpdating the notice builder
-  xdescribe "append data" do
+  describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal.new(census_employee, valid_parmas)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should append data" do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
-      renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
       enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
-      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
-      expect(@employee_notice.notice.plan.plan_name).to eq plan.name
+      expect(@employee_notice.notice.plan_year.start_on).to eq renewal_application.start_on
+      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewal_application.open_enrollment_end_on
+      expect(@employee_notice.notice.plan.plan_name).to eq product.name
     end
   end
 end

@@ -6,7 +6,7 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice, dbclean: :aft
     @organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: @site) 
     @employer_profile = @organization.employer_profile
     @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
-    @broker_agency_organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: @site)
+    @broker_agency_organization = FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: @site)
     @broker_agency_profile = @broker_agency_organization.broker_agency_profile
     @broker_agency_account = FactoryGirl.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: @broker_agency_profile, benefit_sponsorship: @benefit_sponsorship)
     @broker_role = FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id)
@@ -66,11 +66,11 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice, dbclean: :aft
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_params)
     end
-    #builder is not in use and not updated as per new model(will work in DC)
-    xit "should build notice with all necessary info" do
+
+    it "should build notice with all necessary info" do
       @employer_notice.build
       expect(@employer_notice.notice.primary_fullname).to eq person.full_name.titleize
-      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name.titleize
       expect(@employer_notice.notice.primary_identifier).to eq employer_profile.hbx_id
       
       expect(@employer_notice.notice.broker.first_name).to eq person.first_name 
@@ -95,8 +95,7 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice, dbclean: :aft
       expect(@employer_notice.mpi_indicator).to eq 'SHOP_D049'
     end
 
-    # builder is not in use and not updated as per new model(will work in DC)
-    xit "should generate pdf" do
+    it "should generate pdf" do
       @employer_notice.append_hbe
       @employer_notice.build
       file = @employer_notice.generate_pdf_notice

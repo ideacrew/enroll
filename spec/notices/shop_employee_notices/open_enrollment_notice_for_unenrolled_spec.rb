@@ -59,16 +59,14 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled, :dbclean 
     end
   end
 
-  #ToDo Fix in DC new model after udpdating the notice builder
-  xdescribe "append data" do
+  describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled.new(census_employee, valid_parmas)
     end
     it "should append data" do
-      renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
-      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
+      expect(@employee_notice.notice.plan_year.start_on).to eq renewal_application.start_on
+      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewal_application.open_enrollment_end_on
     end
   end
 end
