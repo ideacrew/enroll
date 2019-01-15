@@ -42,6 +42,11 @@ class EmployerStaffRole
   end
 
   def profile
-    BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
+    return @profile if defined? @profile
+    if benefit_sponsor_employer_profile_id.present?
+      @profile = BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
+    else
+      @profile = EmployerProfile.find(employer_profile_id)
+    end
   end
 end

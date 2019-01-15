@@ -4,8 +4,11 @@ if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe ShopGeneralAgencyNotices::GeneralAgencyHiredNotice, :dbclean => :after_each do
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, organization: organization) }
   let!(:person) { FactoryGirl.create(:person, :with_work_email, :with_hbx_staff_role) }
-  let!(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-  let!(:general_agency_staff_role) {FactoryGirl.create(:general_agency_staff_role, general_agency_profile: general_agency_profile, person: person)}
+  let!(:general_agency_profile) {
+    general_agency_staff_role.unset(:benefit_sponsors_general_agency_profile_id) # ToDo - Fix/Move to new model
+    general_agency_staff_role.general_agency_profile
+  }
+  let!(:general_agency_staff_role) {FactoryGirl.create(:general_agency_staff_role, person: person)}
   let!(:organization) {FactoryGirl.create(:organization)}
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
   let!(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization ) }
