@@ -595,8 +595,8 @@ module BenefitSponsors
       end
 
       context '.may_transmit_initial_enrollment?' do
-        let(:initial_application_state) { :enrollment_eligible }
-        let(:sponsorship_state) { :initial_enrollment_eligible }
+        let(:initial_application_state) { :binder_paid }
+        let(:sponsorship_state) { :applicant }
 
         let!(:april_ineligible_initial_sponsors)  { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
                                                                 :with_initial_benefit_application, initial_application_state: :enrollment_ineligible,

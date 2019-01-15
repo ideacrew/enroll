@@ -103,11 +103,10 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         before do
           allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
           allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
-          expect_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_renewing?).at_least(:once).and_return(true)
         end
 
         it "should update the benefit application" do
-          benefit_application.update_attributes!(aasm_state: "enrollment_ineligible", benefit_packages: [])
+          benefit_application.update_attributes!(aasm_state: :enrollment_ineligible, benefit_packages: [])
           # benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_ineligible")
           expect(benefit_application.aasm_state).to eq :enrollment_ineligible
           # expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
