@@ -68,7 +68,7 @@
           <tbody>
             <%- if provider.try(:inbox).try(:messages) %>
             <% sorted_inbox_messages = provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
-            <%= render partial: "benefit_sponsors/shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: provider} %>
+            <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: provider} %>
             <% end %>
           </tbody>
         </table>
