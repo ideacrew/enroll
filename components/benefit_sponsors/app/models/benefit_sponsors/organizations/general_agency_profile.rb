@@ -135,6 +135,39 @@ module BenefitSponsors
 
           organization.profiles.where(id: BSON::ObjectId.from_string(id)).first if organization.present?
         end
+
+        def list_embedded(parent_list)
+          parent_list.reduce([]) { |list, parent_instance| list << parent_instance.general_agency_profile }
+        end
+
+        def all
+          list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.order_by([:legal_name]).to_a
+        end
+
+        def filter_by(status="is_applicant")
+          if status == 'all'
+            all
+          else
+            list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.where(:'profiles.aasm_state' => status).order_by([:legal_name]).to_a
+          end
+        rescue
+          []
+        end
+
+        def all_by_broker_role(broker_role, options={})
+          favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:benefit_sponsors_general_agency_profile_id) rescue []
+          all_ga = if options[:approved_only]
+                     all.select{|ga| ga.aasm_state == 'is_approved'}
+                   else
+                     all
+                   end
+
+          if favorite_general_agency_ids.present?
+            all_ga.sort {|ga| favorite_general_agency_ids.include?(ga.id) ? 0 : 1 }
+          else
+            all_ga
+          end
+        end
       end
 
       aasm do #no_direct_assignment: true do
