@@ -46,6 +46,7 @@
             <td><%= general_agency_profile.fein %></td>
             <td><%= general_agency_profile.entity_kind.split(" ").map{|word| word.capitalize}.join(" ") %></td>
             <td><%= general_agency_profile.market_kind.to_s.split(" ").map{|word| word.capitalize}.join(" ") %></td>
+            <%# UnComment spec too after uncommenting below line %>
             <td><%#= general_agency_profile.current_state %></td>
             <td><%#= link_to 'Send Secure Message'.html_safe,
             new_broker_agencies_inbox_path(id: general_agency_profile.id, profile_id: @profile._id), class: "btn btn-default", remote: true %></td>
