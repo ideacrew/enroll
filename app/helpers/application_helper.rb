@@ -747,6 +747,7 @@ module ApplicationHelper
       :draft => :draft,
       :enrollment_open => :enrolling,
       :enrollment_eligible => :enrolled,
+      :binder_paid => :enrolled,
       :approved => :published,
       :pending => :publish_pending
     }
