@@ -12,7 +12,7 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
   let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
                               :with_benefit_package,
                               :benefit_sponsorship => benefit_sponsorship,
-                              :effective_period => start_on..start_on.next_year.prev_day, 
+                              :effective_period => start_on..start_on.next_year.prev_day,
                               :aasm_state => 'active',
                               :open_enrollment_period => open_enrollment_start_on..open_enrollment_start_on+20.days
   )}
@@ -21,17 +21,17 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
   let(:family)       { person.primary_family }
   let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile)}
   let(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, employee_role_id: employee_role.id, first_name: person.first_name, last_name: person.last_name ) }
-  
-  let!(:hbx_enrollment) { 
-    hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                        household: family.active_household, 
+
+  let!(:hbx_enrollment) {
+    hbx_enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
                         aasm_state: "coverage_selected",
                         rating_area_id: benefit_application.recorded_rating_area_id,
                         sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:benefit_application.benefit_sponsorship.id, 
+                        benefit_sponsorship_id:benefit_application.benefit_sponsorship.id,
                         employee_role_id: employee_role.id
-                        ) 
+                        )
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
