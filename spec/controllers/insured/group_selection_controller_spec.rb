@@ -129,7 +129,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     hbx_enrollment.save
     hbx_enrollment.reload
 
-    FactoryGirl.create(:special_enrollment_period, family: family, effective_on: "2018-10-01 00:00:00 UTC")
+    FactoryGirl.create(:special_enrollment_period, family: family)
   end
 
   context "GET new" do
