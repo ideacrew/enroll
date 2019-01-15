@@ -16,7 +16,8 @@ module BenefitMarkets
 
 
     belongs_to  :rating_area,
-                class_name: "BenefitMarkets::Locations::RatingArea"
+                class_name: "BenefitMarkets::Locations::RatingArea",
+                optional: true
 
     embeds_many :premium_tuples,
                 class_name: "BenefitMarkets::Products::PremiumTuple"

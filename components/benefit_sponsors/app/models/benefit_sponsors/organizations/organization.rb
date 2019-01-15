@@ -54,7 +54,8 @@ module BenefitSponsors
       # org_a.divisions << org_b  # org_b.agency => org_a
       # org_x.agency = org_y      # org_y.divisions => [org_x]
       belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
-                  class_name: "BenefitSponsors::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization",
+                  optional: true
 
       has_many    :divisions, inverse_of: :agency, autosave: true,
                   class_name: "BenefitSponsors::Organizations::Organization"
@@ -84,10 +85,12 @@ module BenefitSponsors
 
       # Organizations with EmployerProfile and HbxProfile belong to a Site
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
-                  class_name: "BenefitSponsors::Site"
+                  class_name: "BenefitSponsors::Site",
+                  optional: true
 
       belongs_to  :site_owner, inverse_of: :owner_organization,
-                  class_name: "BenefitSponsors::Site"
+                  class_name: "BenefitSponsors::Site",
+                  optional: true
 
       embeds_many :profiles,
                   class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true

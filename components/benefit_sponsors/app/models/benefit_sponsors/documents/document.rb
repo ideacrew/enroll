@@ -19,7 +19,7 @@ module BenefitSponsors
 
       add_observer ::BenefitSponsors::Observers::DocumentObserver.new, [:notifications_send]
 
-      belongs_to :documentable, polymorphic: true
+      belongs_to :documentable, polymorphic: true, optional: true
 
       # Dublin Core metadata elements
       field :title, type: String, default: "untitled"

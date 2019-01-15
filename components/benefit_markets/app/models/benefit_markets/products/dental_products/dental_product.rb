@@ -19,11 +19,14 @@ module BenefitMarkets
 
       belongs_to  :renewal_product,
                   inverse_of: nil,
-                  class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct"
+                  class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct",
+                  optional: true
+  
 
       validates :metal_level_kind,
                 presence: true,
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
+
 
       alias_method :is_standard_plan?, :is_standard_plan
 
