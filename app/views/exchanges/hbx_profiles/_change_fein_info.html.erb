@@ -1,0 +1,22 @@
+<div id=“change_fein”>
+  <div class="bottom-pd">
+    <%= form_for @organization, remote: true, url: "#", method: "post", class: "form" do |f|%>
+        <div class="row no-buffer form-wrapper-buffer">
+          <h3 class="title">Change FEIN</h3>
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+            <div class="title col-md-12 no-pd col-sm-12 col-xs-12">
+              NEW FEIN
+              <%= f.text_field :fein, placeholder: "FEIN", class: "required fien_field input_txt", :value => params[:new_fein].present? ? params[:new_fein] : @organization.fein, required: params[:new_fein].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'}
+              %>
+            </div>
+          </div>
+        </div>
+        <div class="row no-buffer child-row">
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>
+            <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px', :disabled => true %>
+          </div>
+        </div>
+    <% end %>
+  </div>
+</div>
