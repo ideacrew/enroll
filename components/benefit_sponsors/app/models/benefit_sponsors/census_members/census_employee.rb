@@ -5,7 +5,8 @@ module BenefitSponsors::CensusMembers
     field :is_business_owner, type: Boolean, default: false
 
     belongs_to  :benefit_sponsorship,
-            class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+            optional: true
 
 
     has_many :census_survivors, class_name: "BenefitSponsors::CensusMembers::CensusSurvivor"

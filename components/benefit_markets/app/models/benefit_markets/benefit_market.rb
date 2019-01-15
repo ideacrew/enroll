@@ -13,7 +13,7 @@ module BenefitMarkets
     field :title,       type: String, default: "" # => DC Health Link SHOP Market
     field :description, type: String, default: ""
 
-    belongs_to  :site, class_name: "::BenefitSponsors::Site", inverse_of: nil
+    belongs_to  :site, class_name: "::BenefitSponsors::Site", inverse_of: nil, optional: true
     # has_many    :benefit_sponsorships,  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
     has_many    :benefit_market_catalogs,
                 class_name: "BenefitMarkets::BenefitMarketCatalog"

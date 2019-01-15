@@ -75,7 +75,6 @@ require 'active_support/concern'
           return nil
         end
         ssn_val = val.to_s.gsub(/\D/, '')
-        binding.pry
         SymmetricEncryption.encrypt(ssn_val)
       end
 

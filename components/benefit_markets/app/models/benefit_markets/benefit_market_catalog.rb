@@ -32,7 +32,8 @@ module BenefitMarkets
     delegate    :kind, to: :benefit_market, prefix: true
 
     belongs_to  :benefit_market,
-                class_name: "BenefitMarkets::BenefitMarket"
+                class_name: "BenefitMarkets::BenefitMarket",
+                optional: true
 
     embeds_one  :sponsor_market_policy,
                 class_name: "::BenefitMarkets::MarketPolicies::SponsorMarketPolicy"

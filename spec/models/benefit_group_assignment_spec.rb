@@ -26,6 +26,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       let(:params) {{}}
 
       it "should not save" do
+        # binding.pry
         expect(BenefitGroupAssignment.create(**params).save).to be_falsey
       end
     end
