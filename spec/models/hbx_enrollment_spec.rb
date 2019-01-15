@@ -988,7 +988,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
   end
 
   context "Benefits are terminated" do
-    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month - 1.month}
+    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month}
     let!(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
 
     context "Individual benefit" do
