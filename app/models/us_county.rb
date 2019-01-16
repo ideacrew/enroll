@@ -1,7 +1,7 @@
 class UsCounty
   include Mongoid::Document
 
-  belongs_to :geographic_rating_area
+  belongs_to :geographic_rating_area, optional: true
 
   field :state_postal_code, type: String
   field :state_fips_code, type: String

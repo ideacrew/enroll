@@ -2,6 +2,7 @@ class CensusMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include UnsetableSparseFields
+  include Ssn 
   # include SponsoredBenefits::Concerns::Ssn
   # include SponsoredBenefits::Concerns::Dob
 

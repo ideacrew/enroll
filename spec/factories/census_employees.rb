@@ -12,7 +12,7 @@ FactoryBot.define do
     association :address, strategy: :build
     association :email, strategy: :build
     association :employer_profile, strategy: :create
-    association :benefit_sponsorship, :with_organization_cca_profile, factory: :benefit_sponsors_benefit_sponsorship
+    # association :benefit_sponsorship, :with_organization_cca_profile, factory: :benefit_sponsors_benefit_sponsorship
 
     before(:create) do |instance|
       FactoryBot.create(:application_event_kind,:out_of_pocket_notice)

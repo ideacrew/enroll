@@ -39,7 +39,7 @@ class Family
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
 
-  belongs_to  :person
+  belongs_to  :person, optional: true
 
   # Collection of insured:  employees, consumers, residents
 
