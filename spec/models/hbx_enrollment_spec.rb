@@ -1489,6 +1489,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     context 'When family passively renewed', dbclean: :after_each do
       include_context "setup renewal application"
 
+      let(:predecessor_application_catalog) { true }
       let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
       let(:renewal_state) { :enrollment_open }
       let(:open_enrollment_period)  { TimeKeeper.date_of_record..(effective_period.min - 10.days) }
