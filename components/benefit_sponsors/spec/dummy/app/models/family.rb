@@ -27,7 +27,7 @@ class Family
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
 
-  belongs_to  :person
+  belongs_to  :person, optional: true
 
   embeds_many :family_members, cascade_callbacks: true
   embeds_many :special_enrollment_periods, cascade_callbacks: true

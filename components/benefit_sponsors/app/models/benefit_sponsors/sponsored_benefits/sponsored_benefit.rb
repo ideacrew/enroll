@@ -14,7 +14,7 @@ module BenefitSponsors
       field :product_option_choice, type: String # carrier id / metal level
       field :source_kind, type: Symbol, default: :benefit_sponsor_catalog
 
-      belongs_to :reference_product, class_name: "::BenefitMarkets::Products::Product", inverse_of: nil
+      belongs_to :reference_product, class_name: "::BenefitMarkets::Products::Product", inverse_of: nil, optional: true
 
       embeds_one  :sponsor_contribution, 
                   class_name: "::BenefitSponsors::SponsoredBenefits::SponsorContribution"

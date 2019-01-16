@@ -38,7 +38,7 @@ class CensusEmployee < CensusMember
     cascade_callbacks: true,
     validate: true
 
-  belongs_to :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+  belongs_to :benefit_sponsorship, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
 
   embeds_many :workflow_state_transitions, as: :transitional
 

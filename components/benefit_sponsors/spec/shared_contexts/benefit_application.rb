@@ -13,6 +13,7 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
     benefit_sponsorship = abc_profile.add_benefit_sponsorship
     benefit_sponsorship.aasm_state = benefit_sponsorship_state
     benefit_sponsorship.save
+
     benefit_sponsorship
   }
   
