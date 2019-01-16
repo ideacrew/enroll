@@ -41,7 +41,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.2)
       slim (~> 3.0)
-      symmetric-encryption (~> 4.0.1)
+      symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
 
 PATH
@@ -62,7 +62,7 @@ PATH
       rails (~> 5.2.2)
       roo (~> 2.1)
       slim (~> 3.0)
-      symmetric-encryption (~> 4.0.1)
+      symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
 
 PATH
@@ -102,7 +102,7 @@ PATH
       mongoid (~> 7.0)
       rails (= 5.2.2)
       rubyzip (>= 1.2.1)
-      symmetric-encryption (~> 4.0.1)
+      symmetric-encryption (~> 3.9.1)
       transport_gateway
 
 GEM
@@ -1370,7 +1370,7 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machine (1.2.0)
-    symmetric-encryption (4.0.1)
+    symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.0)
     terrapin (0.6.0)
@@ -1522,7 +1522,7 @@ DEPENDENCIES
   slim-rails (~> 3.2)
   spring (~> 1.6)
   spring-watcher-listen (~> 2.0)
-  symmetric-encryption (~> 4.0.1)
+  symmetric-encryption (~> 3.9.1)
   test-prof (~> 0.5.0)
   transport_gateway!
   transport_profiles!
