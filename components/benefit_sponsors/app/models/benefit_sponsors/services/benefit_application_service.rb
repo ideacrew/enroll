@@ -29,17 +29,39 @@ module BenefitSponsors
           form.benefit_packages << BenefitSponsors::Forms::BenefitPackageForm.for_edit({id: benefit_package.id.to_s, benefit_application_id: benefit_application.id.to_s}, false)
         end
       end
-  
+
       def save(form)
         model_attributes = form_params_to_attributes(form)
         find_benefit_sponsorship(form)
-        benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes) # build cca/dc application
+        create_or_cancel_draft_ba(form, model_attributes)
+      end
 
-        save_result, persisted_object = store(form, benefit_application)
-        if save_result
-          cancel_draft_and_ineligible_applications(persisted_object)
+      def can_create_draft_ba?
+        bas = benefit_sponsorship.benefit_applications
+
+        states = [:imported, :terminated, :expired, :canceled]
+        if bas.map(&:aasm_state).any? { |state| states.include?(state) }
+          bas.active_states_per_dt_action.present? ? false : true
+        elsif bas.where(aasm_state: :termination_pending).present? && bas.active_states_per_dt_action.present?
+          false
+        else
+          false
         end
-        [save_result, persisted_object]
+      end
+
+      def create_or_cancel_draft_ba(form, model_attributes)
+        if form.admin_datatable_action && !can_create_draft_ba?
+          form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
+          [false, nil]
+        else
+          #build cca/dc application
+          benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
+          save_result, persisted_object = store(form, benefit_application)
+          if save_result
+            cancel_draft_and_ineligible_applications(persisted_object)
+          end
+          [save_result, persisted_object]
+        end
       end
 
       def cancel_draft_and_ineligible_applications(benefit_application)
@@ -83,14 +105,14 @@ module BenefitSponsors
         end
         [saved_result, benefit_application]
       end
-     
-      def update(form) 
+
+      def update(form)
         benefit_application = find_model_by_id(form.id)
         model_attributes = form_params_to_attributes(form)
         benefit_application.assign_attributes(model_attributes)
         store(form, benefit_application)
       end
-    
+
       # TODO: Test this query for benefit applications cca/dc
       # TODO: Change it back to find once find method on BenefitApplication is fixed.
       def find_model_by_id(id)
@@ -178,7 +200,7 @@ module BenefitSponsors
       def map_model_error_attribute(model_attribute_name)
         model_attribute_name
       end
-      
+
     end
   end
 end

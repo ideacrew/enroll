@@ -1,6 +1,8 @@
-<% if @save_error %>
+<% if @save_errors.present? %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%= @save_error %>
+    <% @save_errors.each do |err| %>
+      <%= err %>
+    <% end %>
   </div>
   <% message_for_display = "Could not create a draft plan year" %>
 <% else %>

@@ -60,7 +60,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def create_benefit_application
     @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
     authorize @ba_form, :updateable?
-    @save_error = benefit_application_error_messages(@ba_form) unless @ba_form.save
+    @save_errors = benefit_application_error_messages(@ba_form) unless @ba_form.save
     @element_to_replace_id = params[:employer_actions_id]
   end
 
@@ -615,7 +615,7 @@ def employer_poc
 private
 
   def benefit_application_error_messages(obj)
-    obj.errors.full_messages.inject('') { |memo, error| '#{memo}<li>#{error}</li>' }.html_safe
+    obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }
   end
 
   def new_ba_params
@@ -623,9 +623,9 @@ private
   end
 
   def create_ba_params
-    params.merge!({ pte_count: '0', msp_count: '0' })
+    params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
     params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
-                  :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id)
+                  :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
   end
 
   def modify_admin_tabs?
