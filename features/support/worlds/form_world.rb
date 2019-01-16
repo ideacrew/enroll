@@ -36,3 +36,27 @@ Then(/^the Create Plan Year option row will no longer be visible$/) do
   expect(page).to_not have_css('label', text: 'Open Enrollment Start Date')
   expect(page).to_not have_css('label', text: 'Open Enrollment End Date')
 end
+
+Then(/^the Effective End Date for the Create Plan Year form will be blank$/) do
+  expect(find('#end_on').value.blank?).to eq true
+end
+
+Then(/^the Open Enrollment Start Date for the Create Plan Year form will be disabled$/) do
+  expect(page.find("#open_enrollment_start_on")[:class].include?("blocking")).to eq true
+end
+
+Then(/^the Open Enrollment End Date for the Create Plan Year form will be disabled$/) do
+  expect(page.find("#open_enrollment_end_on")[:class].include?("blocking")).to eq true
+end
+
+Then(/^the Open Enrollment Start Date for the Create Plan Year form will be enabled$/) do
+  expect(page.find("#open_enrollment_start_on")[:class].include?("blocking")).to eq false
+end
+
+Then(/^the Open Enrollment End Date for the Create Plan Year form will be enabled$/) do
+  expect(page.find("#open_enrollment_end_on")[:class].include?("blocking")).to eq false
+end
+
+Then(/^the Effective End Date for the Create Plan Year form will be filled in$/) do
+  expect(find('#end_on').value.blank?).to eq false
+end

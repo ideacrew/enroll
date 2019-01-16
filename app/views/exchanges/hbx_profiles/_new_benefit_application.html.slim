@@ -42,7 +42,7 @@
         | Open Enrollment Start Date
       br
       .input-group
-        = text_field_tag :open_enrollment_start_on, nil, class:'form-control', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @ba_form.start_on ? (Date.strptime(@ba_form.start_on, "%m/%d/%Y") - 2.months) : ""
+        = text_field_tag :open_enrollment_start_on, nil, class:'form-control blocking', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @ba_form.start_on ? (Date.strptime(@ba_form.start_on, "%m/%d/%Y") - 2.months) : ""
         .required-item.hidden
           |
             Please provide Open Enrollment Start On date.
@@ -51,7 +51,7 @@
         | Open Enrollment End Date
       br
       .input-group
-        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
+        = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on blocking", onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
         .required-item.hidden
           |
             Please provide Open Enrollment Start On date.
@@ -71,6 +71,8 @@ javascript:
   function selectedDate(element) {
     if (element && element.value) {
       assignBenefitApplicationDates(element.value)
+      document.getElementById('open_enrollment_start_on').classList.remove('blocking');
+      document.getElementById('open_enrollment_end_on').classList.remove('blocking');
     } else {
       resetInputOptions()
     }

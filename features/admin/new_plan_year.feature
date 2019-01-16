@@ -27,3 +27,16 @@ Feature: As a Super Admin I will be the only user
     #Then the user will see the Create Plan Year option row
     #When the user clicks the X icon on the Create Plan Year form
     #Then the Create Plan Year option row will no longer be visible
+
+  Scenario: Open Enrollment Start Date and Open Enrollment End Date will be disabled until user selects a Start Date
+    When the user clicks the Create Plan Year button for this Employer
+    Then the Effective End Date for the Create Plan Year form will be blank
+    Then the Open Enrollment Start Date for the Create Plan Year form will be disabled
+    Then the Open Enrollment End Date for the Create Plan Year form will be disabled
+
+  Scenario: Open Enrollment Start Date and Open Enrollment End Date will be disabled until user selects a Start Date
+    When the user clicks the Create Plan Year button for this Employer
+    #Then the user selects an Effective Start Date from the Create Plan Year form
+    #Then the Effective End Date for the Create Plan Year form will be filled in
+    #Then the Open Enrollment Start Date for the Create Plan Year form will be enabled
+    #Then the Open Enrollment End Date for the Create Plan Year form will be enabled

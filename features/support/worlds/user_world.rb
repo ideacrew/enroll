@@ -111,7 +111,7 @@ Then(/^the user will see the Create Plan Year option row$/) do
   expect(page).to have_css('label', text: 'Open Enrollment End Date')
 end
 
-When(/^the user selects an Effective Start Date from the Create Plan Year form$/) do
+Then(/^the user selects an Effective Start Date from the Create Plan Year form$/) do
   first_element = find("#baStartDate > option:nth-child(2)").text
   select(first_element, :from => "baStartDate")
 end
