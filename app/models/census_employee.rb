@@ -12,6 +12,7 @@ class CensusEmployee < CensusMember
   include ::Eligibility::EmployeeBenefitPackages
   include BenefitSponsors::Concerns::Observable
   include BenefitSponsors::ModelEvents::CensusEmployee
+  include Ssn
 
   require 'roo'
 

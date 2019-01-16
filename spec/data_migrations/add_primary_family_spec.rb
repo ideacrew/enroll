@@ -21,7 +21,6 @@ describe AddPrimaryFamily, dbclean: :after_each do
       # Rake::Task["migrations:add_primary_family"].invoke()
     end
       it 'should create a family with person as primary applicant' do
-        binding.pry
       expect(person.primary_family.primary_applicant.person).to eq person
     end
   end
