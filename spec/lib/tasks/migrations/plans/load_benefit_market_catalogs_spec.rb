@@ -11,8 +11,8 @@ describe "load_benefit_market_catalogs" do
     load glob_pattern
     load_cca_issuer_profiles_seed
 
-    start_date = TimeKeeper.date_of_record.all_quarter.min + 1.year
-    end_date = TimeKeeper.date_of_record.all_quarter.max + 1.year
+    start_date = Date.new(2019,01,01) - 1.year
+    end_date = Date.new(2019,12,31) - 1.year
     application_period = Time.utc(start_date.year, start_date.month, start_date.day)..Time.utc(end_date.year, end_date.month, end_date.day)
 
     issuer_profiles = BenefitSponsors::Organizations::Organization.issuer_profiles.all
@@ -78,7 +78,7 @@ describe "load_benefit_market_catalogs" do
     it "should have only 6 packages for two catalogs" do
       invoke_bmc_task
       bm.reload
-      expect(bm.benefit_market_catalogs.map(&:product_packages).flatten.count).to eq 7
+      expect(bm.benefit_market_catalogs.map(&:product_packages).flatten.count).to eq 6
     end
 
     it "should have only 11 products for 6 packages" do
@@ -95,5 +95,5 @@ end
 
 def invoke_bmc_task
   Rake::Task["load:benefit_market_catalog"].reenable
-  Rake::Task["load:benefit_market_catalog"].invoke
+  Rake::Task["load:benefit_market_catalog"].invoke(2018)
 end
