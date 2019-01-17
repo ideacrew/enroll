@@ -145,7 +145,7 @@ module BenefitSponsors
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state => :enrollment_eligible }}
+        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state.in => [:enrollment_eligible, :binder_paid] }}
       )
     }
 
