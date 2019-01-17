@@ -171,26 +171,29 @@ end
 
 describe BenefitGroup, type: :model do
 
-  context 'deleting the benefit group' do
+  context 'disabling the benefit group' do
     let(:plan_year) { FactoryGirl.create(:plan_year)}
     let!(:benefit_group_one) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "1st one") }
     let!(:benefit_group_two) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "2nd one")}
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: benefit_group_one.plan_year.employer_profile)}
     
     it "should have a default benefit group assignment with 1st benefit group" do
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
     end
 
-    it "should delete the benfit group assignments under the 1st benefit group" do
-      benefit_group_one.destroy!
+    it "should disable the benfit group assignments under the 1st benefit group" do
+      benefit_group_one.disable_benefits
       census_employee.reload
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 0
+
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_falsey
     end
 
     it "should create new benefit group assignment for census employee with 2nd benefit group" do
-      benefit_group_one.destroy!
+      benefit_group_one.disable_benefits
       census_employee.reload
-      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 1
+
+      expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).first.is_active).to be_truthy
     end
 
     context 'when deleting the new benefit group & EE already has bga with old benefit group in inactive state' do
@@ -204,11 +207,10 @@ describe BenefitGroup, type: :model do
       end
 
       it "should move the existing benefit group assignment from inactive to active" do
-        benefit_group_two.destroy!
+        benefit_group_two.disable_benefits
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).size).to eq 0
-        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).size).to eq 1
         expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_one.id).first.is_active).to be_truthy
+        expect(census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group_two.id).first.is_active).to be_falsey
       end
     end
   end
@@ -455,14 +457,26 @@ describe BenefitGroup, type: :model do
       let(:organization)            { FactoryGirl.create(:organization) }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
       let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
-      let(:elected_plan_set) do
+      let!(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+      let!(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+      let!(:elected_plan_set) do
         plans = [1, 2, 3].collect do
           FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice])
         plans
+      end
+
+      context '.carriers_offered' do    
+        before do
+          benefit_group.plan_option_kind = :metal_level
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = elected_plan_set
+        end
+
+        it "should return the carrier ids" do
+          expect(benefit_group.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+        end
       end
 
       context "and the reference plan is not in the elected plan set" do
@@ -488,8 +502,7 @@ describe BenefitGroup, type: :model do
 
         it "should be invalid" do
           expect(benefit_group.valid?).to be_falsey
-          expect(benefit_group.errors[:elected_plans].any?)
-          .to be_truthy
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
           expect(benefit_group.errors[:elected_plans].first).to match(/not all from the same carrier as reference plan/)
         end
       end
@@ -748,13 +761,16 @@ describe BenefitGroup, type: :model do
     end
 
     context "renewing conversion employer" do
+      let(:is_conversion) { false }
       let!(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: 'conversion', registered_on: Date.new(2016, 4, 1)) }
-      let!(:off_exchange_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,7,1), end_on: Date.new(2016,6,30), open_enrollment_start_on: Date.new(2015, 5, 3), open_enrollment_end_on: Date.new(2015, 6, 10), aasm_state: 'active') }
+      let!(:off_exchange_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2015,7,1), end_on: Date.new(2016,6,30), open_enrollment_start_on: Date.new(2015, 5, 3), open_enrollment_end_on: Date.new(2015, 6, 10), aasm_state: 'active', is_conversion: is_conversion) }
       let!(:offexchange_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: off_exchange_planyear, effective_on_kind: "first_of_month", effective_on_offset: 0)}
       let!(:renewing_planyear) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: Date.new(2016,7,1), end_on: Date.new(2017,6,30), open_enrollment_start_on: Date.new(2016, 5, 3), open_enrollment_end_on: Date.new(2016, 6, 13), aasm_state: 'renewing_published') }
       let(:hired_on) { Date.new(2016, 5, 10) }
 
       context 'when plan is off-exchange plan year' do
+        let(:is_conversion) { true }
+
         context '.valid_plan_year' do 
           it 'should return renewing plan year' do
             expect(offexchange_benefit_group.valid_plan_year).to eq renewing_planyear

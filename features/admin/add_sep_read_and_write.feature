@@ -6,16 +6,16 @@ Feature: Add Sep with read and write permissions
   Background:
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
-    And the Hbx Admin clicks on the Families tab
+    When Hbx Admin clicks on Families link
     And the Hbx Admin clicks on the Action button
 
   Scenario: Click on Add Sep
-    Then the Add SEP option should be disabled
+    Then the Add SEP option should be enabled
 
   Scenario: Click on Cancel Enrollment
-    Then the Cancel Enrollment option should be disabled
+    Then the Cancel Enrollment option should be enabled
 
   Scenario: Click on Terminate Enrollment
-    Then the Terminate Enrollment option should be disabled
+    Then the Terminate Enrollment option should be enabled
 
-  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented  
+  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented

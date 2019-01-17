@@ -5,8 +5,8 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
     model.class.find(model.id)
   end
 
-  let(:hired_on) { Date.today - 30.days }
-  let(:terminated_on) { Date.today - 1.days }
+  let(:hired_on) { TimeKeeper.date_of_record - 30.days }
+  let(:terminated_on) { TimeKeeper.date_of_record - 1.days }
   let(:dob) { employee_role.dob }
   let(:ssn) { employee_role.ssn }
 
@@ -17,6 +17,7 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
       aasm_state: "published"
     )
   }
+
   let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year) }
   let!(:census_employee) {
     FactoryGirl.create(:census_employee,
@@ -27,45 +28,35 @@ describe Factories::EnrollmentFactory, "starting with unlinked employee_family a
       employer_profile: employer_profile
     )
   }
-  let!(:benefit_group_assignment) {
-    FactoryGirl.create(:benefit_group_assignment,
-      benefit_group: benefit_group,
-      census_employee: census_employee,
-      start_on: TimeKeeper.date_of_record
-    )
-  }
 
-  let!(:employee_role) {
-    FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+  let(:employee_role) {
+    FactoryGirl.build(:employee_role, employer_profile: employer_profile)
   }
 
   describe "After performing the link" do
 
     before(:each) do
       Factories::EnrollmentFactory.link_census_employee(census_employee, employee_role, employer_profile)
-      census_employee.save
-      employee_role.save
-      employer_profile.save
     end
 
     it "should set employee role id on the census employee" do
-      expect(p(census_employee).employee_role_id).to eq employee_role.id
+      expect(census_employee.employee_role_id).to eq employee_role.id
     end
 
     it "should set employer profile id on the employee_role" do
-      expect(p(employee_role).employer_profile_id).to eq employer_profile.id
+      expect(employee_role.employer_profile_id).to eq employer_profile.id
     end
 
     it "should set census employee id on the employee_role" do
-      expect(p(employee_role).census_employee_id).to eq census_employee.id
+      expect(employee_role.census_employee_id).to eq census_employee.id
     end
 
     it "should set hired on on the employee_role" do
-      expect(p(employee_role).hired_on).to eq hired_on
+      expect(employee_role.hired_on).to eq hired_on
     end
 
     it "should set terminated on on the employee_role" do
-      expect(p(employee_role).terminated_on).to eq terminated_on
+      expect(employee_role.terminated_on).to eq terminated_on
     end
   end
 end
@@ -694,7 +685,8 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "dob" => primary.person_demographics.birth_date,
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
-          "gender" => primary.person_demographics.sex.split('#').last
+          "gender" => primary.person_demographics.sex.split('#').last,
+          "is_applying_coverage" => false
         }
       }
     end
@@ -712,6 +704,11 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     it "should not crash on updating the e_case_id" do
       expect {person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")}.not_to raise_error
     end
+
+    it "should is_applying_coverage should be false" do
+      expect(person.consumer_role.is_applying_coverage).to eq false
+    end
+
   end
 
   context "with errors initializing the person" do
@@ -760,11 +757,15 @@ describe Factories::EnrollmentFactory, "with an exisiting consumer role" do
 
   context ".build_family" do
     let(:subject) { Factories::EnrollmentFactory }
-    let(:person) { FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 
     it "should add a family to a person without one" do
       subject.build_family(person,[])
       expect(person.primary_family).to be_truthy
+    end
+
+    it "should is_applying_coverage should be false" do
+      expect(person.consumer_role.is_applying_coverage).to eq true
     end
 
   end

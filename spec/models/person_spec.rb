@@ -279,7 +279,7 @@ describe Person do
           end
         end
       end
-      
+
       context "has_employer_benefits?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:benefit_group) { FactoryGirl.build(:benefit_group)}
@@ -321,50 +321,25 @@ describe Person do
 
       context "has_multiple_active_employers?" do
         let(:person) { FactoryGirl.build(:person) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-        let(:ce2) { FactoryGirl.build(:census_employee) }
+        let(:er1) { double("EmployeeRole1") }
+        let(:er2) { double("EmployeeRole2") }
 
         it "should return false without census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return([])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return false with only one census_employee" do
-          allow(person).to receive(:active_census_employees).and_return([ce1])
+          allow(person).to receive(:active_employee_roles).and_return([er1])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return true with two census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([ce1, ce2])
+          allow(person).to receive(:active_employee_roles).and_return([er1, er2])
           expect(person.has_multiple_active_employers?).to be_truthy
         end
       end
 
-      context "active_census_employees" do
-        let(:person) { FactoryGirl.build(:person) }
-        let(:employee_role) { FactoryGirl.build(:employee_role) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-
-        it "should get census_employees by active_employee_roles" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get census_employees by CensusEmployee match" do
-          allow(person).to receive(:active_employee_roles).and_return([])
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get uniq census_employees" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
-        end
-      end
-      
       context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
@@ -389,6 +364,7 @@ describe Person do
       context "consumer fields validation" do
         let(:params) {valid_params}
         let(:person) { Person.new(**params) }
+        let!(:consumer_role) { FactoryGirl.create(:consumer_role, citizen_status: nil)}
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
@@ -399,16 +375,17 @@ describe Person do
 
         shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
           before do
+            allow(person).to receive(:consumer_role).and_return consumer_role
             person.instance_variable_set(:@is_consumer_role, true)
             person.instance_variable_set(:@indian_tribe_member, native)
             person.instance_variable_set(:@us_citizen, citizenship)
             person.instance_variable_set(:@eligible_immigration_status, immigration_status)
             person.instance_variable_set(:@naturalized_citizen, naturalized)
-            person.instance_variable_set(:@indian_tribe_member, native)
             person.tribal_id = tribal_id
             person.is_incarcerated = incarceration
             person.valid?
           end
+
           it "#{is_valid ? 'pass' : 'fails'} validation" do
             expect(person.valid?).to eq is_valid
           end
@@ -429,18 +406,39 @@ describe Person do
         it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
       end
 
-      context "has_active_consumer_role?" do
-        let(:person) {FactoryGirl.build(:person)}
-        let(:consumer_role) {double(is_active?: true)}
+      context "is_consumer_role_active?" do
+        let(:person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
 
         it "should return true" do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          expect(person.has_active_consumer_role?).to eq true
+          expect(person.is_consumer_role_active?).to eq true
         end
 
-        it "should return false" do
+        it "should return false as person doesn't have consumer_role imt" do
+          allow(person).to receive(:is_consumer_role_active?).and_return(false)
+          expect(person.is_consumer_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have consumer_role" do
           allow(person).to receive(:consumer_role).and_return(nil)
-          expect(person.has_active_consumer_role?).to eq false
+          expect(person.is_consumer_role_active?).to eq false
+        end
+      end
+
+      context "is_resident_role_active?" do
+        let(:person) {FactoryGirl.create(:person, :with_resident_role, :with_active_resident_role)}
+
+        it "should return true" do
+          expect(person.is_resident_role_active?).to eq true
+        end
+
+        it "should return false as person doesn't have resident_role imt" do
+          allow(person).to receive(:is_resident_role_active?).and_return(false)
+          expect(person.is_resident_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have resident_role" do
+          allow(person).to receive(:resident_role).and_return(nil)
+          expect(person.is_resident_role_active?).to eq false
         end
       end
 
@@ -486,6 +484,7 @@ describe Person do
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
     after(:all) do
@@ -539,6 +538,21 @@ describe Person do
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
+
+    it 'ssn present, dob present, first_name, last_name present and person inactive' do
+      @p4.update_attributes(is_active:false)
+      expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name, ssn: '123123123').size).to eq 0
+    end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
+    end
   end
 
   describe '.active', :dbclean => :after_each do
@@ -576,11 +590,11 @@ describe Person do
     end
   end
 
-  describe '#find_all_staff_roles_by_employer_profile' do
-    employer_profile = FactoryGirl.build(:employer_profile)
-    person = FactoryGirl.build(:person)
-    FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
+  describe '#find_all_staff_roles_by_employer_profile', dbclean: :after_each do
     it "should have the same search criteria" do
+      employer_profile = FactoryGirl.build(:employer_profile)
+      person = FactoryGirl.build(:person)
+      FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
       allow(Person).to receive(:where).and_return([person])
       expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq [person]
     end
@@ -704,7 +718,7 @@ describe Person do
       expect(person.emails.first.address).to eq 'sam@example.com'
     end
   end
-  
+
   describe '#work_email_or_best' do
     it "expects to get a work email address or home address" do
       person = Person.new
@@ -751,93 +765,10 @@ describe Person do
     end
   end
 
-  describe "need_to_notify?" do
-    let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryGirl.create(:person, :with_employee_role) }
-    let(:person3) { FactoryGirl.create(:person, :with_employer_staff_role) }
-
-    it "should return true when update consumer_role" do
-      consumer_role = person1.consumer_role
-      consumer_role.birth_location = 'DC'
-      person1.updated_at = TimeKeeper.datetime_of_record
-      expect(person1.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update consumer_role's bookmark_url" do
-      consumer_role = person1.consumer_role
-      consumer_role.bookmark_url = '/families/home'
-      expect(person1.need_to_notify?).to be_falsey
-    end
-
-    it "should return true when update employee_roles" do
-      employee_role = person2.employee_roles.first
-      employee_role.language_preference = "Spanish"
-      expect(person2.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update employee_role's bookmark_url" do
-      employee_role = person2.employee_roles.first
-      employee_role.bookmark_url = "/families/home"
-      expect(person2.need_to_notify?).to be_falsey
-    end
-
-    it "should return true when update employer_staff_role" do
-      employer_staff_role = person3.employer_staff_roles.first
-      employer_staff_role.is_owner = false
-      expect(person3.need_to_notify?).to be_truthy
-    end
-
-    it "should return false when update employer_staff_role's bookmark_url" do
-      employer_staff_role = person3.employer_staff_roles.first
-      employer_staff_role.bookmark_url = "/families"
-      expect(person3.need_to_notify?).to be_falsey
-    end
-
-    context "call notify" do
-      it "when change person record" do
-        expect(person1).to receive(:notify).exactly(1).times
-        person1.first_name = "Test"
-        person1.save
-      end
-
-      it "when change consumer_role record" do
-        expect(person1).to receive(:notify).exactly(1).times
-        person1.consumer_role.update_attribute(:birth_location, 'DC')
-      end
-
-      it "when change employee_role record" do
-        expect(person2).to receive(:notify).exactly(1).times
-        person2.employee_roles.last.update_attribute(:language_preference, 'Spanish')
-      end
-
-      #it "when change employer_staff_role record" do
-      #  expect(person3).to receive(:notify).exactly(1).times
-      #  person3.employer_staff_roles.first.update_attribute(:aasm_state, 'is_closed')
-      #end
-    end
-
-    context "should not call notify" do
-      it "when change consumer_role's bookmark_url" do
-        expect(person1).to receive(:notify).exactly(0).times
-        person1.consumer_role.update_attribute(:bookmark_url, '/families/home')
-      end
-
-      it "when change employee_role's bookmark_url" do
-        expect(person2).to receive(:notify).exactly(0).times
-        person2.employee_roles.last.update_attribute(:bookmark_url, '/families/home')
-      end
-
-      it "when change employer_staff_role's bookmark_url" do
-        expect(person3).to receive(:notify).exactly(0).times
-        person3.employer_staff_roles.last.update_attribute(:bookmark_url, '/families/home')
-      end
-    end
-  end
-
-
-  describe "does not allow two people with the same user ID to be saved" do
+  describe "does not allow two people with the same user ID to be saved", dbclean: :around_each do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
+    before do Person.collection.indexes.create_one({user_id: 1}, {sparse:true, unique: true}) end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new
@@ -1065,53 +996,33 @@ describe Person do
     end
   end
 
-  describe "verification types" do
-    let(:person) {FactoryGirl.create(:person)}
+  describe 'ridp_verification_types' do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role, user: user) }
 
-    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+    shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
       before do
-        allow(person).to receive(:ssn).and_return(ssn) if ssn
-        allow(person).to receive(:us_citizen).and_return(citizen)
-        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
+        person.consumer_role.update_attributes!(is_applicant: is_applicant)
       end
-      it "returns array of verification types" do
-        expect(person.verification_types).to be_a Array
+      it 'returns array of verification types' do
+        expect(person.ridp_verification_types).to be_a Array
       end
 
       it "returns #{types_count} verification types" do
-        expect(person.verification_types.count).to eq types_count
+        expect(person.ridp_verification_types.count).to eq types_count
       end
 
-      it "contains #{v_types} verification types" do
-        expect(person.verification_types).to eq v_types
+      it "contains #{ridp_types} verification types" do
+        expect(person.ridp_verification_types).to eq ridp_types
       end
     end
-
-    context "SSN + Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true
+    context 'ridp verification types for person' do
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, false
     end
-
-    context "SSN + Immigrant" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false
-    end
-
-    context "SSN + Native Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native"
-    end
-
-    context "Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true
-    end
-
-    context "Immigrant with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false
-    end
-
-    context "Native Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native"
-    end
-
   end
+
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}
@@ -1160,7 +1071,7 @@ describe Person do
   describe ".deactivate_employer_staff_role" do
     let(:person) {FactoryGirl.create(:person)}
     let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, person: person)}
-    let(:employer_staff_roles) { FactoryGirl.create_list(:employer_staff_role, 3, person: person) } 
+    let(:employer_staff_roles) { FactoryGirl.create_list(:employer_staff_role, 3, person: person) }
     context 'does not find the person' do
       before {@status, @result = Person.deactivate_employer_staff_role(1, employer_staff_role.employer_profile_id)}
       it 'returns false' do
@@ -1197,7 +1108,7 @@ describe Person do
       end
 
       it 'has more than one employer_staff_role' do
-        employer_staff_roles 
+        employer_staff_roles
         expect(person.employer_staff_roles.count).to eq (employer_staff_roles << employer_staff_role).count
       end
 
@@ -1261,7 +1172,7 @@ describe Person do
 
     context "person has active employee roles" do
       before(:each) do
-        person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person, 
+        person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person,
                                                                        census_employee_id: census_employee.id).attributes)
         person.employee_roles.pluck(:census_employee).each { |census_employee| census_employee.update_attribute(:aasm_state, 'eligible') }
       end
@@ -1286,9 +1197,9 @@ describe Person do
       expect(person.agent?).to be_truthy
     end
   end
-  
+
   describe "dob_change_implication_on_active_enrollments" do
-    
+
     let(:persons_dob) { TimeKeeper.date_of_record - 19.years }
     let(:person) { FactoryGirl.create(:person, dob: persons_dob) }
     let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -1300,9 +1211,9 @@ describe Person do
                                             )}
     let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
     let(:new_dob_without_premium_implication) { TimeKeeper.date_of_record - 17.years }
-    
+
     let(:premium_implication_hash) { {enrollment.id => true} }
-    let(:empty_hash) { {} } 
+    let(:empty_hash) { {} }
 
     before do
       allow(person).to receive(:primary_family).and_return(primary_family)
@@ -1316,27 +1227,27 @@ describe Person do
     it "should return an EMPTY hash if DOB change DOES NOT RESULT in premium change" do
       expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_without_premium_implication)).to eq empty_hash
     end
-    
+
     context 'edge case when DOB change makes person 61' do
-      
+
       let(:age_older_than_sixty_one) { TimeKeeper.date_of_record - 75.years }
       let(:person_older_than_sixty_one) { FactoryGirl.create(:person, dob: age_older_than_sixty_one) }
       let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
       let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
       let(:enrollment)   { FactoryGirl.create( :hbx_enrollment, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
       let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
-  
+
       before do
         allow(person_older_than_sixty_one).to receive(:primary_family).and_return(primary_family)
         allow(primary_family).to receive(:enrollments).and_return([enrollment])
       end
 
       it "should return an EMPTY hash if a person more than 61 year old changes their DOB so that they are 61 on the day the coverage starts" do
-        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash 
+        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash
       end
 
     end
-  end 
+  end
 
   describe "given a consumer role" do
     let(:consumer_role) { ConsumerRole.new }
@@ -1365,57 +1276,93 @@ describe Person do
     end
 
     it "should return true if user present & got paper in session variable" do
-      expect(person.check_for_paper_application('paper')).to eq true
+      expect(person.set_ridp_for_paper_application('paper')).to eq true
     end
 
     it "should return nil if no user present" do
       allow(person).to receive(:user).and_return nil
-      expect(person.check_for_paper_application('paper')).to eq nil
+      expect(person.set_ridp_for_paper_application('paper')).to eq nil
     end
 
     it "should return nil if session variable is not paper" do
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
 
     it "should return nil if session variable is nil" do
-      expect(person.check_for_paper_application(nil)).to eq nil
+      expect(person.set_ridp_for_paper_application(nil)).to eq nil
     end
 
     it "should return nil if no user present & if session var is not paper" do
       person.user.destroy!
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
   end
 
-  describe "changing the bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, user: user) }
-    let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
-    let(:user) { FactoryGirl.create(:user)}
-    before(:each) do
-      allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
-    end
 
-    it "should not change the bookmark_url if they not passed RIDP" do
-      person.user.update_attributes(:idp_verified => false)
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
-    end
+  describe "staff_for_employer" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
-    it "should not change the bookmark_url if they don't have addresses" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.addresses.to_a.each do |add|
-        add.delete
+    context "employer has no staff roles assigned" do
+      it "should return an empty array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq []
       end
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
-    it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/families/home"
+    context "employer has an active staff role" do
+      let(:person) { FactoryGirl.build(:person) }
+      let(:staff_params)  {{ person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active }}
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params)
+        person.save!
+      end
+
+      it "should return the person object in an array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+    end
+
+
+    context "multiple employers have same person as staff" do
+      let(:employer_profile2) { FactoryGirl.build(:employer_profile) }
+      let(:person) { FactoryGirl.build(:person) }
+
+      let(:staff_params1) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active} }
+
+      let(:staff_params2) { {person: person, employer_profile_id: employer_profile2.id, aasm_state: :is_active} }
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params1)
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+        person.save!
+      end
+
+      it "should return the person object in an array for employer 1" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+
+      it "should return the person object in an array for employer 2" do
+        expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+      end
+
+      context "target employer has staff role in inactive state" do
+        let(:staff_params3) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_closed} }
+
+        before do
+          person.employer_staff_roles = []
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params3)
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+          person.save!
+        end
+
+        it "should return empty array for target employer" do
+          expect(Person.staff_for_employer(employer_profile)).to eq []
+        end
+
+        it "should return the person object in an array for employer 2" do
+          expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+        end
+      end
     end
   end
 end

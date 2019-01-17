@@ -2,18 +2,21 @@ class Insured::FamiliesController < FamiliesController
   include VlpDoc
   include Acapi::Notifiers
   include ApplicationHelper
+
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    authorize @family, :show?
-    @active_admin_sep = @family.active_admin_seps.last
+    set_admin_bookmark_url
+    @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -39,8 +42,9 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
+    set_admin_bookmark_url
     @family_members = @family.active_family_members
-    @resident = @person.has_active_resident_role?
+    @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
@@ -75,7 +79,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -86,10 +89,11 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.market_kind = qle.market_kind == "shop" ? "shop" : "ivl"
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
@@ -101,10 +105,10 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
 
     @family_members = @family.active_family_members
-    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.has_active_consumer_role?
-    @person.consumer_role.build_nested_models_for_person if @person.has_active_consumer_role?
-    @person.resident_role.build_nested_models_for_person if @person.has_active_resident_role?
-    @resident = @person.resident_role.present?
+    @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
+    @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
+    @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
+    @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
     end
@@ -115,14 +119,15 @@ class Insured::FamiliesController < FamiliesController
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
     @provider = @person
+    @family_members = @family.active_family_members
   end
 
   def verification
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
   def upload_application
-    @family_members = @person.primary_family.family_members.active
+    @family_members = @person.primary_family.has_active_resident_family_members
   end
 
   def check_qle_date
@@ -136,25 +141,32 @@ class Insured::FamiliesController < FamiliesController
       end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
+      @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
 
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
+      sep_request_denial_notice
+    elsif is_ee_sep_request_accepted?
+      ee_sep_request_accepted_notice
+    end
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase
@@ -232,7 +244,81 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def sep_request_denial_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
+  end
+
+  def is_ee_sep_request_accepted?
+    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
+  end
+
+  def ee_sep_request_accepted_notice
+    employee_role = @person.active_employee_roles.first
+    if employee_role.present? && employee_role.census_employee.present?
+      begin
+        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
+      rescue Exception => e
+        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
+      end
+    end
+  end
+
+  def transition_family_members
+    @row_id = params[:family_actions_id]
+    @family_members = @family.active_family_members
+    @non_shop_market_kinds = Person::NON_SHOP_ROLES
+    respond_to do |format|
+      format.js { render "insured/families/transition_family_members" }
+    end
+  end
+
+  def transition_family_members_update
+    @row_id = params[:family_actions_id]
+
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.transition_family_members
+    @family = Family.find(params[:family])
+
+    @consumer_people = []
+    @resident_people = []
+    @result[:success].each do |person|
+      @resident_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "resident"
+      @consumer_people << person.id.to_s if person.individual_market_transitions.order("created_at DESC").first.role_type == "consumer"
+    end
+    trigger_ivl_to_cdc_transition_notice if @resident_people.present?
+    trigger_cdc_to_ivl_transition_notice  if @consumer_people.present?
+
+    respond_to do |format|
+      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
+    end
+  end
+
   private
+
+  def trigger_ivl_to_cdc_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
+
+  def trigger_cdc_to_ivl_transition_notice
+    person =  @family.primary_applicant.person
+    begin
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family: @family.id.to_s, result: {:people => @consumer_people}} )
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
+    end
+  end
 
   def updateable?
     authorize Family, :updateable?
@@ -274,22 +360,23 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role == "shop_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         @multiroles = @person.has_multiple_roles?
         @manually_picked_role = params[:market] ? params[:market] : "shop_market_events"
-        @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role if @manually_picked_role
+        if @manually_picked_role == "individual_market_events"
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+        else
+          @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_admin' if @manually_picked_role
+        end
       end
     else
       if @person.active_employee_roles.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
-        end
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_without_transition_member_action
         else
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         end
@@ -302,13 +389,20 @@ class Insured::FamiliesController < FamiliesController
       if @person.addresses.blank?
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
-    elsif @person.has_active_consumer_role?
+    elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    return false if current_user.has_hbx_staff_role?
+    consumer = @person.consumer_role
+    not_verified = ((@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified?) ? false : true
+    @person.user && not_verified
   end
 
   def update_changing_hbxs(hbxs)

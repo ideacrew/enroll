@@ -40,6 +40,7 @@ db/seedfiles/cms/**/*.zip
 # Ignore Saml Yaml
 config/saml.yml
 config/symmetric-encryption.yml
+config/symmetric-encryption*
 
 # Ignore the gem folder
 /gems
@@ -60,3 +61,14 @@ plan_xmls.zip
 
 # Ignore .idea
 .idea
+
+# Make sure no PII is accidently commited
+# add w/ git add --force if actually docs
+*.csv
+*.txt
+*.xml
+*.xls
+*.xlst
+*.xlsx
+*.doc
+*.docx

@@ -23,6 +23,8 @@ class FamilyMember
   # Immediately preceding family where this person was a member
   field :former_family_id, type: BSON::ObjectId
 
+  validate :no_duplicate_family_members
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
@@ -58,6 +60,7 @@ class FamilyMember
   delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
+  delegate :is_applying_coverage, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -81,6 +84,15 @@ class FamilyMember
 
   def households
     # TODO parent.households.coverage_households.where()
+  end
+
+  def aptc_benchmark_amount
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
+    slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
+    ehb = benefit_coverage_period.second_lowest_cost_silver_plan.ehb
+    cost = slcsp.premium_for(TimeKeeper.datetime_of_record, person.age_on(TimeKeeper.datetime_of_record))
+    cost * ehb
   end
 
   def broker=(new_broker)
@@ -136,5 +148,14 @@ class FamilyMember
     return [] if family_member_id.nil?
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
+  end
+
+  private 
+
+  def no_duplicate_family_members
+    return unless family
+    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+    end
   end
 end

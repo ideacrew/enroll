@@ -9,6 +9,7 @@ module Forms
 
     attr_accessor :user_id
     attr_accessor :dob_check
+    attr_accessor :is_applying_coverage
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -18,9 +19,9 @@ module Forms
     #include Validations::USDate.on(:date_of_birth)
 
     validate :does_not_match_a_different_users_person
-    validates :ssn,
-              length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
-              numericality: true
+    # validates :ssn,
+    #           length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
+    #           numericality: true
     validate :dob_not_in_future
 
     attr_reader :dob
@@ -31,7 +32,11 @@ module Forms
 
     # TODO fix and use as the only way to match census employees for the employee flow or blow this away
     def match_census_employees
-      CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
+      if no_ssn == "1"
+        CensusEmployee.matchable_by_dob_lname_fname(dob, first_name, last_name).to_a
+      else
+        CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
+      end
     end
 
     def match_person

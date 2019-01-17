@@ -2,6 +2,24 @@ require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#deductible_display" do
+    let(:hbx_enrollment) {double(hbx_enrollment_members: [double, double])}
+    let(:plan) { double("Plan", deductible: "$500", family_deductible: "$500 per person | $1000 per group",) }
+
+    before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
+    end
+
+    it "should return family deductible if hbx_enrollment_members count > 1" do
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.family_deductible.split("|").last.squish
+    end
+
+    it "should return individual deductible if hbx_enrollment_members count <= 1" do
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([double])
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.deductible
+    end
+  end
+
   describe "#dob_in_words" do
     it "returns date of birth in words for < 1 year" do
       expect(helper.dob_in_words(0, "20/06/2015".to_date)).to eq time_ago_in_words("20/06/2015".to_date)
@@ -70,11 +88,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
-    context ">100 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 101, employer_profile: employer_profile) }
+    context ">200 census employees" do
+      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      context "greater than 200 employees " do
+        context "active employees count greater than 200" do
+          it "does not display if active census employees > 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+          end
+        end
 
-      it "does not display" do
-        expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to eq nil
+        context "active employees count greater than 200" do
+
+          before do
+            employees.take(5).each do |census_employee|
+              census_employee.terminate_employee_role!
+            end
+          end
+
+          it "should display progress bar if active census employees < 200" do
+            expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
+          end
+        end
       end
     end
 
@@ -133,13 +167,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "consumer_portal" do
       it "should return correct options for consumer portal" do
         expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Domestic Partner/mi)
-        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/other tax dependent/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Spouse/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).not_to match(/other tax dependent/mi)
       end
     end
 
     context "employee portal" do
       it "should not match options that are in consumer portal" do
-        expect(helper.relationship_options(dependent, "")).not_to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "")).to match(/Domestic Partner/mi)
         expect(helper.relationship_options(dependent, "")).not_to match(/other tax dependent/mi)
       end
     end
@@ -190,7 +225,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
@@ -297,7 +332,27 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
+   describe "#show_oop_pdf_link" , dbclean: :after_each do
+       context 'valid aasm_state' do
+         it "should return true" do
+           PlanYear::PUBLISHED.each do |state|
+             expect(helper.show_oop_pdf_link(state)).to be true
+           end
 
+          PlanYear::RENEWING_PUBLISHED_STATE.each do |state|
+             expect(helper.show_oop_pdf_link(state)).to be true
+           end
+         end
+       end
+
+        context 'invalid aasm_state' do
+          it "should return false" do
+            ["draft", "renewing_draft"].each do |state|
+              expect(helper.show_oop_pdf_link(state)).to be false
+            end
+          end
+        end
+     end
 
 
   describe "find_plan_name", dbclean: :after_each do
@@ -331,7 +386,148 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return nil given an invalid enrollment ID" do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
-
   end
 
+  describe "#is_new_paper_application?" do
+    let(:person_id) { double }
+    let(:admin_user) { FactoryGirl.create(:user, :hbx_staff)}
+    let(:user) { FactoryGirl.create(:user)}
+    let(:person) { FactoryGirl.create(:person, user: user)}
+    before do
+      allow(admin_user).to receive(:person_id).and_return person_id
+    end
+
+    it "should return true when current user is admin & doing new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "paper")).to eq true
+    end
+
+    it "should return false when the current user is not an admin & working on new paper application" do
+      expect(helper.is_new_paper_application?(user, "paper")).to eq nil
+    end
+
+    it "should return false when the current user is an admin & not working on new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "")).to eq false
+    end
+  end
+
+  describe "#previous_year" do
+
+    it "should return past year" do
+      expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)
+    end
+
+    it "should not return current year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year)
+    end
+
+    it "should not return next year" do
+      expect(helper.previous_year).not_to eq (TimeKeeper.date_of_record.year + 1)
+    end
+end
+
+  describe ".notify_employer_when_employee_terminate_coverage" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:person) {FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person:person)}
+    let(:active_plan_year){ FactoryGirl.build(:plan_year,start_on:TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month,aasm_state: "active",benefit_groups:[benefit_group]) }
+    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year]) }
+    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:employee_role) { FactoryGirl.create(:employee_role)}
+    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment],employee_role_id:employee_role.id) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_id: benefit_group.id, household:family.active_household,benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id:employee_role.id)}
+
+    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:enrollment_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(enrollment).to receive(:census_employee).and_return(census_employee)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      helper.notify_employer_when_employee_terminate_coverage(enrollment)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).not_to be_empty
+      expect(queued_job[:args].include?('notify_employer_when_employee_terminate_coverage')).to be_truthy
+      expect(queued_job[:args].include?("#{enrollment.employer_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq enrollment.hbx_id.to_s
+    end
+  end
+
+
+  describe "convert_to_bool" do
+    let(:val1) {true }
+    let(:val2) {false }
+    let(:val3) {"true" }
+    let(:val4) {"false" }
+    let(:val5) {0 }
+    let(:val6) {1 }
+    let(:val7) {"0" }
+    let(:val8) {"1" }
+    let(:val9) {"khsdbfkjs" }
+
+
+    it "should be true when true is passed" do
+      expect(helper.convert_to_bool(val1)).to eq true
+    end
+
+    it "should be false when false is passed" do
+      expect(helper.convert_to_bool(val2)).to eq false
+    end
+
+    it "should be true when string 'true' is passed" do
+      expect(helper.convert_to_bool(val3)).to eq true
+    end
+
+    it "should be false when string 'false' is passed" do
+      expect(helper.convert_to_bool(val4)).to eq false
+    end
+
+    it "should be false when int 0 is passed" do
+      expect(helper.convert_to_bool(val5)).to eq false
+    end
+
+    it "should be true when int 1 is passed" do
+      expect(helper.convert_to_bool(val6)).to eq true
+    end
+
+    it "should be false when string '0' is passed" do
+      expect(helper.convert_to_bool(val7)).to eq false
+    end
+
+    it "should be true when string '1' is passed" do
+      expect(helper.convert_to_bool(val8)).to eq true
+    end
+
+    it "should raise error when non boolean values are passed" do
+      expect{helper.convert_to_bool(val9)}.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "can_access_pay_now_button" do
+    let!(:person1){FactoryGirl.create(:person, user: user1)}
+    let!(:user1){FactoryGirl.create(:user)}
+    let!(:hbx_staff_role1) { FactoryGirl.create(:hbx_staff_role, person: person1, subrole: "hbx_staff", permission_id: permission.id)}
+    let!(:person2){FactoryGirl.create(:person, user: user2)}
+    let!(:user2){FactoryGirl.create(:user)}
+    let!(:hbx_staff_role2) { FactoryGirl.create(:hbx_staff_role, person: person2, subrole: "hbx_read_only", permission_id: permission.id)}
+    let!(:person3){FactoryGirl.create(:person, user: user3)}
+    let!(:user3){FactoryGirl.create(:user)}
+    let!(:permission) { FactoryGirl.create(:permission)}
+
+    it "should return true when hbx staff login as admin " do
+      a = user1.person.hbx_staff_role.permission
+      expect(a.can_access_pay_now).not_to eq true
+    end
+
+    it "should return false when hbx readonly login as admin " do
+      b = user2.person.hbx_staff_role.permission
+      expect(b.can_access_pay_now).to eq false
+    end
+
+    it "should return nil when there is no staff role for person " do
+      expect(user3.person.hbx_staff_role).to eq nil
+    end
+  end
 end

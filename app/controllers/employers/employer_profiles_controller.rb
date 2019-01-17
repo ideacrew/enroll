@@ -2,8 +2,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form,
-                                       :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :wells_fargo_sso]
-
+                                       :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :wells_fargo_sso, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -31,11 +30,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -191,6 +188,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
+          employer_account_creation_notice if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -262,6 +260,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def bulk_employee_upload_form
   end
 
+
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
+    redirect_to action: :show, :tab => :employees
+  end
+
   def download_invoice
     options={}
     options[:content_type] = @invoice.type
@@ -303,9 +308,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def wells_fargo_sso
-
     staff_email = @employer_profile.try(:staff_roles).try(:first).try(:work_email_or_best)
-
     sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id,@employer_profile.legal_name, staff_email)
     sso_req.token
     @redirct_url = sso_req.url
@@ -315,6 +318,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       binding.pry
       flash[:error] = "Not Able to communicate with Bill Pay server"
       redirect_to employers_employer_profile_path(tab:"home")
+    end
+  end
+
+  def employer_account_creation_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
     end
   end
 
@@ -387,7 +398,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def paginate_families
     #FIXME add paginate
-    @employees = @employer_profile.employee_roles.to_a
+    @employees = @employer_profile.employee_roles.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
   end
 
   def check_employer_staff_role
@@ -455,7 +466,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},

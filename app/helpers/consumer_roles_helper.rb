@@ -61,4 +61,57 @@ module ConsumerRolesHelper
 
     shop_for_plans.blank? && (hbx_enrollment.effective_on.year == (new_effective_on.present? ? new_effective_on.year : nil))
   end
+
+  def is_applying_coverage_value_consumer(use_person, person, consumer_role)
+    first_checked = true
+    second_checked = false
+    if use_person.present?
+      first_checked = person.is_applying_coverage == 'true'
+      second_checked = person.is_applying_coverage == 'false'
+    elsif consumer_role.present?
+      first_checked = consumer_role.is_applying_coverage
+      second_checked = !consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
+  end
+
+  def paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
+    if admin_user && (app_verified || id_verified)
+      return consumer.admin_bookmark_url
+    elsif id_verified
+      return consumer.admin_bookmark_url
+    end
+  end
+
+  def in_person_type(id_verified, admin_user, consumer)
+    if admin_user && id_verified
+      return consumer.admin_bookmark_url
+    elsif id_verified
+      return consumer.admin_bookmark_url
+    end
+  end
+
+  def ridp_redirection_link(person)
+    consumer = person.consumer_role
+    app_type = person.primary_family.application_type
+    admin_user =  current_user.has_hbx_staff_role?
+    id_verified = consumer.identity_verified?
+    app_verified = consumer.application_verified?
+    case app_type
+      when 'Paper'
+        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
+      when 'In Person'
+        in_person_type(id_verified, admin_user, consumer)
+      when 'Phone'
+        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
+      when 'Curam'
+        consumer.admin_bookmark_url
+      when 'Mobile'
+        return consumer.admin_bookmark_url
+      else
+        if id_verified
+          return consumer.admin_bookmark_url
+        end
+    end
+  end
 end

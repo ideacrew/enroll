@@ -4,6 +4,7 @@ FactoryGirl.define do
     sequence(:last_name) {|n| "Vedder#{n}" }
     dob "1964-10-23".to_date
     gender "male"
+    employer_profile_id "12345"
     employee_relationship "self"
     hired_on "2015-04-01".to_date
     sequence(:ssn) { |n| 222222220 + n }
@@ -12,6 +13,10 @@ FactoryGirl.define do
     association :email, strategy: :build
     association :employer_profile, strategy: :build
 
+    before(:create) do |instance|
+      FactoryGirl.create(:application_event_kind,:out_of_pocket_notice)
+    end
+
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }
@@ -19,6 +24,12 @@ FactoryGirl.define do
 
     trait :owner do
       is_business_owner  true
+    end
+
+    trait :termination_details do
+      # aasm_state "employment_terminated"
+      employment_terminated_on {TimeKeeper.date_of_record.last_month}
+      coverage_terminated_on {TimeKeeper.date_of_record.last_month.end_of_month}
     end
 
     trait :with_enrolled_census_employee do
@@ -42,7 +53,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

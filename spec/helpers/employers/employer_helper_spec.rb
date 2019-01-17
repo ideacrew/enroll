@@ -96,7 +96,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return health enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)"
         end
       end
 
@@ -106,7 +106,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return dental enrollment status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Dental)"
         end
       end
 
@@ -116,7 +116,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return enrollment status for both health & dental" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
+          expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)<Br/> Enrolled (Dental)"
         end
       end
 
@@ -127,9 +127,21 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Terminated (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Terminated (Health)"
         end
       end
+
+      context 'when coverage termination pending' do
+        before do
+          health_enrollment.schedule_coverage_termination!
+          allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
+        end
+
+        it "should return termination pending status" do
+          expect(helper.enrollment_state(census_employee)).to eq "Coverage Termination Pending (Health)"
+        end
+      end
+
 
       context 'when coverage waived' do
         before do
@@ -138,7 +150,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
         end
 
         it "should return terminated status" do
-          expect(helper.enrollment_state(census_employee)).to eq "Coverage Waived (Health)"
+          expect(helper.enrollment_state(census_employee)).to eq "Waived (Health)"
         end
       end
     end

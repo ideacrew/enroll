@@ -57,7 +57,7 @@ module Parser
         formulary_id: formulary_id.gsub(/\n/,'').strip,
         is_new_plan: is_new_plan.gsub(/\n/,'').strip,
         plan_type: plan_type.gsub(/\n/,'').strip,
-        metal_level: metal_level.gsub(/\n/,'').strip,
+        metal_level: metal_level.gsub(/\n/,'').strip.downcase == "expanded bronze" ? "bronze" : metal_level.gsub(/\n/,'').strip,
         unique_plan_design: unique_plan_design.gsub(/\n/,'').strip,
         qhp_or_non_qhp: qhp_or_non_qhp.gsub(/\n/,'').strip,
         insurance_plan_pregnancy_notice_req_ind: insurance_plan_pregnancy_notice_req_ind.gsub(/\n/,'').strip,

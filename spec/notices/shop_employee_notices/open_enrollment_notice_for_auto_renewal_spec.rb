@@ -17,6 +17,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal do
                             :notice_template => 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
                             :notice_builder => 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
                             :mpi_indicator => 'MPI_SHOP8A',
+                            :event_name => 'employee_open_enrollment_auto_renewal',
                             :title => "Your Health Plan Open Enrollment Period has Begun"})
                           }
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan)}
@@ -26,6 +27,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal do
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
@@ -69,11 +71,12 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
       enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
+      total_employee_cost = ActiveSupport::NumberHelper.number_to_currency(enrollment.total_employee_cost)
       @employee_notice.append_data
       expect(@employee_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
       expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
       expect(@employee_notice.notice.plan.plan_name).to eq renewal_plan.name
-      expect(@employee_notice.notice.enrollment.employee_cost).to eq enrollment.total_employee_cost.to_s
+      expect(@employee_notice.notice.enrollment.employee_cost).to eq total_employee_cost
       expect(@employee_notice.notice.enrollment.enrollees).to eq enrollment.hbx_enrollment_members.map(&:person).map(&:full_name)
     end
   end
