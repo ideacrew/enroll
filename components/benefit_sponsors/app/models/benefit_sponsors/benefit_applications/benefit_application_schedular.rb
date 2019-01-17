@@ -33,10 +33,10 @@ module BenefitSponsors
       end
 
       # Responsible for calculating all the possible dataes
-      def start_on_options_with_schedule(admin_datatable_action = nil)
+      def start_on_options_with_schedule(admin_datatable_action = false)
         possible_dates = Hash.new
         calculate_start_on_dates(admin_datatable_action).each do |date|
-          next unless is_start_on_valid?(date)
+          next if !admin_datatable_action && !is_start_on_valid?(date)
           possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(date, admin_datatable_action))
         end
         possible_dates

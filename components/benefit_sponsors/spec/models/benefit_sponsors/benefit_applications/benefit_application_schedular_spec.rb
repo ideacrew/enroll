@@ -68,6 +68,24 @@ module BenefitSponsors
       it "should return today's date for start_on" do
         expect(dates_hash.values.first[:open_enrollment_start_on]).to eq TimeKeeper.date_of_record
       end
+
+      context "if the TimeKeeper's day is after monthly_end_on" do
+        before :each do
+          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2019, 01, 29))
+        end
+
+        it 'should return hash with 2 date keys' do
+          ba_schedular = subject.start_on_options_with_schedule(true)
+          [Date.new(2019, 02, 01), Date.new(2019, 03, 01)].each do |date|
+            expect(ba_schedular.keys.include?(date)).to be_truthy
+          end
+        end
+
+        it 'should return hash with only 1 date key' do
+          ba_schedular = subject.start_on_options_with_schedule(false)
+          expect(ba_schedular.keys).to eq [Date.new(2019, 03, 01)]
+        end
+      end
     end
 
     describe 'calculate_start_on_dates' do
