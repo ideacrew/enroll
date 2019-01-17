@@ -18,13 +18,14 @@ module BenefitSponsors
       end
 
       def calculate_start_on_dates(admin_datatable_action = false)
-        start_on = if !admin_datatable_action && (TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true))
-          TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+        current_date = TimeKeeper.date_of_record
+        start_on = if !admin_datatable_action && (current_date.day > open_enrollment_minimum_begin_day_of_month(true))
+          current_date.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         else
-          TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+          current_date.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         end
 
-        end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
+        end_on = (current_date - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
         dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
       end
 
