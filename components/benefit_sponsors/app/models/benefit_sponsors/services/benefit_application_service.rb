@@ -38,15 +38,7 @@ module BenefitSponsors
 
       def can_create_draft_ba?
         bas = benefit_sponsorship.benefit_applications
-
-        states = [:imported, :terminated, :expired, :canceled]
-        if bas.map(&:aasm_state).any? { |state| states.include?(state) }
-          bas.active_states_per_dt_action.present? ? false : true
-        elsif bas.where(aasm_state: :termination_pending).present? && bas.active_states_per_dt_action.present?
-          false
-        else
-          false
-        end
+        bas.active_states_per_dt_action.present? ? false : true
       end
 
       def create_or_cancel_draft_ba(form, model_attributes)
