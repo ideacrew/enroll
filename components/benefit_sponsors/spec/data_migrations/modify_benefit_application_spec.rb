@@ -1,5 +1,7 @@
 require "rails_helper"
 require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
@@ -13,53 +15,62 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
   end
 
   describe "modifying benefit application", dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
 
-    let(:current_effective_date)  { TimeKeeper.date_of_record }
-    let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                          }
-    let(:benefit_market)      { site.benefit_markets.first }
-    let!(:product_package) { benefit_market_catalog.product_packages.first }
-
-    let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    let!(:security_question)  { FactoryGirl.create_default :security_question }
-
-    let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    let(:benefit_sponsorship) do
-      FactoryGirl.create(
-        :benefit_sponsors_benefit_sponsorship,
-        :with_rating_area,
-        :with_service_areas,
-        supplied_rating_area: rating_area,
-        service_area_list: [service_area],
-        organization: organization,
-        profile_id: organization.profiles.first.id,
-        benefit_market: site.benefit_markets[0],
-        employer_attestation: employer_attestation)
-    end
-
-    let(:start_on)  { current_effective_date.prev_month }
+    let(:start_on)  { TimeKeeper.date_of_record.beginning_of_month }
+    let(:current_effective_date)  { start_on.prev_year }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
-    let!(:benefit_application) {
-      application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
-      application.benefit_sponsor_catalog.save!
-      application
-    }
+    let(:organization) { abc_organization }
+    let(:benefit_application) { initial_application }
 
-    let!(:benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package, is_active: true) }
+    # let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    # let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+    #                                         benefit_market: benefit_market,
+    #                                         title: "SHOP Benefits for #{current_effective_date.year}",
+    #                                         application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+    #                                       }
+    # let(:benefit_market)      { site.benefit_markets.first }
+    # let!(:product_package) { benefit_market_catalog.product_packages.first }
+
+    # let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    # let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    # let!(:security_question)  { FactoryGirl.create_default :security_question }
+
+    # let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    # let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
+    # let(:benefit_sponsorship) do
+    #   FactoryGirl.create(
+    #     :benefit_sponsors_benefit_sponsorship,
+    #     :with_rating_area,
+    #     :with_service_areas,
+    #     supplied_rating_area: rating_area,
+    #     service_area_list: [service_area],
+    #     organization: organization,
+    #     profile_id: organization.profiles.first.id,
+    #     benefit_market: site.benefit_markets[0],
+    #     employer_attestation: employer_attestation)
+    # end
+
+    # let(:start_on)  { current_effective_date.prev_month }
+    # let(:effective_period)  { start_on..start_on.next_year.prev_day }
+
+    # let!(:benefit_application) {
+    #   application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
+    #   application.benefit_sponsor_catalog.save!
+    #   application
+    # }
+
+    let(:benefit_package) { current_benefit_package }
     let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
-
     let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
+
     let(:census_employee) { FactoryGirl.create(:census_employee,
       employer_profile: benefit_sponsorship.profile,
       benefit_sponsorship: benefit_sponsorship,
       benefit_group_assignments: [benefit_group_assignment]
     )}
+
     let(:person) { FactoryGirl.create(:person) }
     let(:family) { double }
     let(:hbx_enrollment) { double(kind: "employer_sponsored", effective_on: start_on, employee_role_id: employee_role.id,
@@ -209,6 +220,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
     context "Should force publish the benefit application", dbclean: :after_each do
       let(:effective_date) { start_on }
+      let(:benefit_sponsorship_state) { :applicant }
+
       
       before do
         allow(ENV).to receive(:[]).with("action").and_return("force_submit_application")
