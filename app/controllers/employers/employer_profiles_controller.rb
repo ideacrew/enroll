@@ -315,7 +315,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     unless @redirct_url.nil?
       redirect_to @redirct_url
     else
-      binding.pry
       flash[:error] = "Not Able to communicate with Bill Pay server"
       redirect_to employers_employer_profile_path(tab:"home")
     end
