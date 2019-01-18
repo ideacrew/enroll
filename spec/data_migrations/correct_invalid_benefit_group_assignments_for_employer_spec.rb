@@ -25,7 +25,7 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer do
     let(:census_employee) { employer_profile.census_employees.non_business_owner.first }
     let!(:benefit_group_assignment) {
       census_employee.active_benefit_group_assignment.update(is_active: false) 
-      ce = build(:benefit_group_assignment, census_employee: census_employee, start_on: benefit_start_on, end_on: benefit_end_on)
+      ce = build(:benefit_group_assignment, census_employee: census_employee, start_on: benefit_start_on, end_on: benefit_end_on, aasm_state: "coverage_selected")
       ce.save(:validate => false)
       ce
     }
@@ -89,6 +89,17 @@ describe CorrectInvalidBenefitGroupAssignmentsForEmployer do
           census_employee.reload
           expect(census_employee.active_benefit_group_assignment.valid?).to be_truthy
           expect(census_employee.active_benefit_group_assignment.end_on).to eq benefit_group.end_on
+        end
+      end
+      
+      context "when benefit group assignment is in coverage selected state and has no hbx_enrollment" do    
+        it "should change the state to initialized" do
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_falsey
+          expect(census_employee.active_benefit_group_assignment.aasm_state).to eq "coverage_selected"
+          subject.migrate
+          census_employee.reload
+          expect(census_employee.active_benefit_group_assignment.valid?).to be_truthy
+          expect(census_employee.active_benefit_group_assignment.aasm_state).to eq "initialized"
         end
       end
     end
