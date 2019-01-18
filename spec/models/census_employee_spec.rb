@@ -1593,16 +1593,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
 
     let!(:employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear, start_on: plan_year_start_on, plan_year_state: 'active', renewal_plan_year_state: 'renewing_enrolled') }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:person) { FactoryGirl.create(:person, :with_family, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
     let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
     let!(:employee_role) { person.employee_roles.create( employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
-    let!(:shop_family)  { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+    let!(:shop_family)  { person.primary_family }
 
     let(:effective_date)  { plan_year_start_on }
     let(:plan_year) { employer_profile.active_plan_year }
     let(:renewing_plan_year) { employer_profile.renewing_plan_year }
 
-    let!(:expired_plan_year) { 
+    let!(:expired_plan_year) {
       py = FactoryGirl.create(:plan_year,
         start_on: plan_year_start_on - 2.years,
         employer_profile: employer_profile,
@@ -1622,7 +1622,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         start_on: plan_year_start_on - 2.years,
         is_active: false
       })
-    }  
+    }
 
     let!(:renewal_benefit_group_assignment) {
       census_employee.renewal_benefit_group_assignment
@@ -1650,6 +1650,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       household: shop_family.latest_household,
       coverage_kind: "dental",
       effective_on: effective_date - 2.years,
+      terminated_on: effective_date - 1.year,
       enrollment_kind: "open_enrollment",
       kind: "employer_sponsored",
       submitted_at: effective_date - 24.months,
@@ -1721,7 +1722,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.enrollments_for_display).to include(health_enrollment)
       end
 
-      it 'should return current shop dental coverage' do 
+      it 'should return current shop dental coverage' do
         expect(census_employee.enrollments_for_display).to include(dental_enrollment)
       end
 
@@ -1730,38 +1731,38 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
 
       it 'should not return expired shop coverages' do
-        expect(census_employee.enrollments_for_display).not_to include(expired_health_enrollment) 
+        expect(census_employee.enrollments_for_display).not_to include(expired_health_enrollment)
       end
 
       it 'should not return terminated shop coverages' do
-        expect(census_employee.enrollments_for_display).not_to include(terminated_dental_enrollment) 
+        expect(census_employee.enrollments_for_display).not_to include(terminated_dental_enrollment)
       end
 
-      it 'should not return individual coverages' do 
-        expect(census_employee.enrollments_for_display).not_to include(ivl_dental_enrollment) 
-        expect(census_employee.enrollments_for_display).not_to include(ivl_expired_dental_enrollment) 
+      it 'should not return individual coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(ivl_dental_enrollment)
+        expect(census_employee.enrollments_for_display).not_to include(ivl_expired_dental_enrollment)
       end
     end
 
     context '.past_enrollments' do
 
-      before do 
+      before do
         allow(census_employee).to receive(:employee_role).and_return(employee_role)
       end
 
       it 'should return expired shop coverages' do
-        expect(census_employee.past_enrollments).to include(expired_health_enrollment) 
+        expect(census_employee.past_enrollments).to include(expired_health_enrollment)
       end
 
       it 'should return terminated shop coverages' do
-        expect(census_employee.past_enrollments).to include(terminated_dental_enrollment) 
+        expect(census_employee.past_enrollments).to include(terminated_dental_enrollment)
       end
 
       it 'should not return current shop health coverage' do
         expect(census_employee.past_enrollments).not_to include(health_enrollment)
       end
 
-      it 'should not return current shop dental coverage' do 
+      it 'should not return current shop dental coverage' do
         expect(census_employee.past_enrollments).not_to include(dental_enrollment)
       end
 
@@ -1769,9 +1770,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         expect(census_employee.past_enrollments).not_to include(auto_renewing_enrollment)
       end
 
-      it 'should not return individual coverages' do 
-        expect(census_employee.past_enrollments).not_to include(ivl_dental_enrollment) 
-        expect(census_employee.past_enrollments).not_to include(ivl_expired_dental_enrollment) 
+      it 'should not return individual coverages' do
+        expect(census_employee.past_enrollments).not_to include(ivl_dental_enrollment)
+        expect(census_employee.past_enrollments).not_to include(ivl_expired_dental_enrollment)
       end
     end
   end
