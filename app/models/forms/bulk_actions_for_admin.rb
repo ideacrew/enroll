@@ -41,7 +41,11 @@ module Forms
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
             termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-            hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
+            if hbx.is_shop? && (termination_date > ::TimeKeeper.date_of_record)
+              hbx.schedule_coverage_termination!(termination_date) if hbx.may_schedule_coverage_termination?
+            else
+              hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
+            end
             @result[:success] << hbx
             terminated_enrollments_transmission_info[hbx.id] = params.key?("transmit_hbx_#{hbx.id.to_s}") ? true : false
           rescue
@@ -71,9 +75,9 @@ module Forms
             @result[:success] << person
             # creation of roles for a person
             @family = Family.find(params[:family])
-            person.consumer_role.move_to_expired if person.consumer_role.present? && person.is_resident_role_active?
-            build_consumer_role(person, @family) if person.is_consumer_role_active? && !person.consumer_role.present?
-            build_resident_role(person, @family) if person.is_resident_role_active? && !person.resident_role.present?
+            person.consumer_role.move_to_expired if person.consumer_role.present? && person.active_individual_market_role == "resident"
+            build_consumer_role(person, @family) if person.active_individual_market_role == "consumer" && !person.consumer_role.present?
+            build_resident_role(person, @family) if person.active_individual_market_role == "resident" && !person.resident_role.present?
 
             # creation of SEP?
             qle = QualifyingLifeEventKind.find(params[:qle_id])

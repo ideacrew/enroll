@@ -16,83 +16,17 @@ class IvlEnrollmentsPublisher
   end
 end
 
-enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
-active_statuses = %w(coverage_selected auto_renewing enrolled_contingent unverified)
+enrollment_query = Queries::IvlEnrollmentsQuery.new(start_time, end_time)
 
-purchases = Family.collection.aggregate([
-  {"$match" => {
-    "households.hbx_enrollments.workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => active_statuses},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    }
-  }},
-  {"$unwind" => "$households"},
-  {"$unwind" => "$households.hbx_enrollments"},
-  {"$match" => {
-    "households.hbx_enrollments.workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => active_statuses},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    },
-    "households.hbx_enrollments.kind" => {"$nin" => enrollment_kinds}
-  }},
-  {"$group" => {
-    "_id" => "$households.hbx_enrollments.hbx_id",
-    "enrollment_state" => {"$last" => "$households.hbx_enrollments.aasm_state"}
-  }},
-  {"$project" => {
-    "_id" => 1,
-    "enrollment_state" => "$enrollment_state"
-  }}
-])
-
-terms = Family.collection.aggregate([
-  {"$match" => {
-    "households.hbx_enrollments.workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    }
-  }},
-  {"$unwind" => "$households"},
-  {"$unwind" => "$households.hbx_enrollments"},
-  {"$match" => {
-    "households.hbx_enrollments.workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    },
-    "households.hbx_enrollments.kind" => {"$nin" => enrollment_kinds}
-  }},
-  {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
-])
-
-puts purchases.count
-puts terms.count
+purchases = enrollment_query.purchases
+terms = enrollment_query.terminations
 
 purchase_event = "acapi.info.events.hbx_enrollment.coverage_selected"
 purchases.each do |rec|
   pol_id = rec["_id"]
   Rails.logger.info "-----publishing #{pol_id}"
 
-  if rec["enrollment_state"] == 'auto_renewing'
+  if rec["enrollment_state"] == 'auto_renewing' || rec["enrollment_state"] == 'auto_renewing_contingent'
     IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#auto_renew")
   else
     IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")

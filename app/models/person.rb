@@ -84,6 +84,7 @@ class Person
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
 
+
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
@@ -245,6 +246,9 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$in" => [:pending] })}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$in" => [:pending] })}
+  scope :for_admin_approval, -> { any_of([outstanding_identity_validation.selector, outstanding_application_validation.selector]) }
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
@@ -407,13 +411,14 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
-  def first_name_last_name_and_suffix
-    [first_name, last_name, name_sfx].compact.join(" ")
+  def first_name_last_name_and_suffix(seperator=nil)
+    seperator = seperator.present? ? seperator : " "
+    [first_name, last_name, name_sfx].compact.join(seperator)
     case name_sfx
       when "ii" ||"iii" || "iv" || "v"
-        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(seperator)
       else
-        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
+        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(seperator)
       end
   end
 
@@ -451,6 +456,14 @@ class Person
 
   def verification_type_by_name(type)
     verification_types.find_by(:type_name => type)
+  end
+
+# collect all ridp_verification_types user in case of unsuccessful ridp
+  def ridp_verification_types
+    ridp_verification_types = []
+    ridp_verification_types << 'Identity' if consumer_role  && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Application' if consumer_role && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types
   end
 
   def relatives
@@ -639,11 +652,11 @@ class Person
   end
 
   def is_consumer_role_active?
-    self.active_individual_market_role == "consumer" ? true : false
+    (self.consumer_role.present? && self.active_individual_market_role == "consumer") ? true : false
   end
 
   def is_resident_role_active?
-     self.active_individual_market_role == "resident" ? true : false
+    (self.resident_role.present? && self.active_individual_market_role == "resident") ? true : false
   end
 
   class << self

@@ -1,4 +1,3 @@
-<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <br>
@@ -9,14 +8,9 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -24,48 +18,31 @@
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
 <% end %>
 
-<% if notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
+<% if notice.aqhp_individuals.present? && notice.renewal_health_enrollments.present? && notice.renewal_dental_enrollments.present?  %>
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH AND DENTAL PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
-
+<% elsif notice.aqhp_individuals.present? && notice.renewal_health_enrollments.present? %>
     <table class="total_table" border="0">
       <tbody>
       <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-<% elsif notice.renewal_health_enrollments.present?  %>
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></h3></td>
-      </tr>
-      </tbody>
-    </table>
-
-    <table class="total_table" border="0">
-      <tbody>
-      <tr>
-        <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR HEALTH PLAN ENROLLMENT AND COST SAVINGS FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -75,16 +52,10 @@
   <table class="total_table" border="0">
     <tbody>
       <tr>
-        <td><h3>YOUR DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></h3></td>
+        <td><h3>YOUR DENTAL PLAN ENROLLMENT FOR <%= notice.coverage_year %></br>
+          PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3>
+        </td>
       </tr>
-    </tbody>
-  </table>
-
-  <table class="total_table" border="0">
-    <tbody>
-    <tr>
-      <td><h3>PAYMENT DEADLINE: JANUARY 1, <%= notice.coverage_year %></h3></td>
-    </tr>
     </tbody>
   </table>
 <% end %>
@@ -99,10 +70,10 @@
 
 <% if notice.aqhp_enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "We recently renewed your insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
+        content: "We recently renewed your insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
 <% else%>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-        content: "We recently renewed your insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
+        content: "We recently renewed your insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year. "} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -115,15 +86,21 @@
 <%= render partial: 'notices/shared/custom_listing', locals: {
     listing: "<strong>If you have auto-pay set up</strong> through your health and/or dental insurance plan(s), you must contact your insurance company to <strong>update your autopay</strong>. The same is true if you set-up auto-pay through another method, such as through your bank. <strong>If you do not make an update, your plan may be terminated</strong>"} %>
 
-<% if notice.documents_needed %>
+<% if notice.aqhp_enrollments.present? && notice.documents_needed %>
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
         content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
         previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline.",
         listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
-<% end %>
+<% elsif notice.documents_needed %>
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+        content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
 
+    <%= render partial: 'notices/shared/unordered_list', locals: {
+        previous: "You need to send us documents to #{Settings.site.short_name}. We need them to verify your eligibility. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by this deadline.",
+        listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["The people listed were enrolled for #{notice.coverage_year} in the plan(s) shown below:"],
@@ -245,7 +222,7 @@
 
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
+    content: "If you end your health plan, and don’t replace it, you may have to pay a penalty on your DC taxes for the months you don’t have health insurance.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
@@ -266,7 +243,7 @@
 
 <% if notice.documents_needed == true %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-        listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+        listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong> If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
 <br>

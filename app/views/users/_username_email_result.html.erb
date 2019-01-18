@@ -1,0 +1,42 @@
+<div class="container">
+  <%if @matches != true %>
+    <h4 class="title">User Account Updated Successfully</h4>
+    <table class="table table-border">
+      <thead></thead>
+      <tbody>
+      <tr>
+        <td>
+          <h5><b>Name:</b> <%=@user.person.full_name%></h5>
+        </td>
+        <td>
+          <h5><b>HBX ID:</b> <%=@user.person.hbx_id%></h5>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h5><b>Username:</b> <%=@user.oim_id%></h5>
+        </td>
+        <td>
+          <h5><b>User_Email:</b> <%=@user.email%></h5>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    </div>
+  <%else%>
+    <h3>User Account Update Failed</h3>
+    <% if @username_taken.present? %>
+      <h4>The username matches with the following user:</h4>
+      First Name :<b><%= @username_taken.person.first_name %></b> <br />
+      Last Name:  <b><%= @username_taken.person.last_name %></b>  <br />
+      HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br />
+    <% end %>
+    <% if @email_taken.present? %>
+      <h4>The email matches with the following user:</h4>
+      First Name :<b><%= @email_taken.person.first_name %></b> <br />
+      Last Name:  <b><%= @email_taken.person.last_name %></b>  <br />
+      HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br />
+    <% end %>
+    <h5>Please resolve the match issue.</h5>
+  <%end%>
+  </div>
