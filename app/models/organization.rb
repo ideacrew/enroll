@@ -297,8 +297,6 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if ["042674079"].include?(org.fein)
-
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
           if filters[:active_year]
@@ -312,7 +310,7 @@ class Organization
         if (filters[:sole_source_only]) ## Only sole source carriers requested
           next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
         end
-        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.with_premium_tables.valid_shop_health_plans("carrier", org.carrier_profile.id).select{|a| a.premium_tables.present? }.present?
         carrier_names
       end
     end
@@ -343,7 +341,6 @@ class Organization
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
         ## don't enable Tufts for now
-        next carrier_names if ["042674079"].include?(org.fein)
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
           if filters[:active_year]
