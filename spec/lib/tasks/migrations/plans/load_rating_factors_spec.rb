@@ -8,7 +8,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
       FactoryGirl.create(:benefit_sponsors_organizations_issuer_profile, issuer_hios_ids: [hios_id], assigned_site: site)
     end
-
+    CompositeRatingTierFactorSet.delete_all
     invoke_factors_task
   end
 

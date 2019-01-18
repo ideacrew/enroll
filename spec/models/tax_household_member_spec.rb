@@ -28,6 +28,7 @@ RSpec.describe TaxHouseholdMember, type: :model do
 
   context "age_on_effective_date" do
     it "should return current age for coverage start on month is equal to dob month" do
+      tax_household_member1.person.update_attributes(dob: Date.new(1999, TimeKeeper.date_of_record.month, TimeKeeper.date_of_record.day))
       age = TimeKeeper.date_of_record.year-person.dob.year
       expect(tax_household_member1.age_on_effective_date).to eq age
     end

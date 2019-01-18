@@ -310,7 +310,7 @@ class Organization
         if (filters[:sole_source_only]) ## Only sole source carriers requested
           next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
         end
-        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.with_premium_tables.valid_shop_health_plans("carrier", org.carrier_profile.id).select{|a| a.premium_tables.present? }.present?
         carrier_names
       end
     end
