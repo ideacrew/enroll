@@ -10,6 +10,11 @@ module BenefitSponsors
 
           if BenefitSponsors::ModelEvents::BenefitApplication::EMPLOYER_EVENTS.include?(new_model_event.event_key)
             notify_employer_event(new_model_event)  # notifies employer events
+
+            if new_model_event.event_key == :benefit_coverage_period_terminated_voluntary
+              benefit_application = new_model_event.klass_instance
+              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
+            end
           end
 
           if BenefitSponsors::ModelEvents::BenefitApplication::REGISTERED_EVENTS.include?(new_model_event.event_key)
@@ -154,17 +159,6 @@ module BenefitSponsors
                     end
                   end
                 # end
-              end
-            end
-          end
-
-          if BenefitSponsors::ModelEvents::BenefitApplication::OTHER_EVENTS.include?(new_model_event.event_key)
-            benefit_application = new_model_event.klass_instance
-            if new_model_event.event_key == :group_advance_termination_confirmation
-              deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
-
-              benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
-                deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination") if ce.employee_role
               end
             end
           end
