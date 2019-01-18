@@ -1,15 +1,17 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+                                       :bulk_employee_upload, :bulk_employee_upload_form,
+                                       :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :wells_fargo_sso, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
-  before_action :check_and_download_invoice, only: [:download_invoice]
+  before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  after_action :nfp_soap_request, only: [:find_employer]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -115,6 +117,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+      when 'accounts'
+        collect_and_sort_invoices(params[:sort_order])
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -269,6 +274,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     send_data Aws::S3Storage.find(@invoice.identifier) , options
   end
 
+  def show_invoice
+    options={}
+    options[:filename] = @invoice.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
+    send_data Aws::S3Storage.find(@invoice.identifier) , options
+  end
+
   def bulk_employee_upload
     file = params.require(:file)
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
@@ -294,6 +307,19 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def wells_fargo_sso
+    staff_email = @employer_profile.try(:staff_roles).try(:first).try(:work_email_or_best)
+    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id,@employer_profile.legal_name, staff_email)
+    sso_req.token
+    @redirct_url = sso_req.url
+    unless @redirct_url.nil?
+      redirect_to @redirct_url
+    else
+      flash[:error] = "Not Able to communicate with Bill Pay server"
+      redirect_to employers_employer_profile_path(tab:"home")
+    end
+  end
+
   def employer_account_creation_notice
     begin
       ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
@@ -304,12 +330,20 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
+  def nfp_soap_request
+    @employer_profile.notify_enrollment_data_request
+    @employer_profile.notify_payment_history_request
+    @employer_profile.notify_pdf_request
+    @employer_profile.notify_statement_summary_request
+  end
+
   def updateable?
     authorize EmployerProfile, :updateable?
   end
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
+    @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
