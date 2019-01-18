@@ -223,8 +223,8 @@ describe DefinePermissions, dbclean: :after_each do
             subject.hbx_admin_can_force_publish
           end
 
-          it 'returns false' do
-            expect(hbx_tier3.hbx_staff_role.permission.can_force_publish).to be false
+          it 'returns true' do
+            expect(hbx_tier3.hbx_staff_role.permission.can_force_publish).to be true
           end
         end
       end
