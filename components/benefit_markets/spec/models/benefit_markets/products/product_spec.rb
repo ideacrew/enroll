@@ -265,8 +265,6 @@ module BenefitMarkets
 
     end
 
-
-
     context "An open file in SERFF template format" do
       context "and the contents are Qualified Health Plans" do
       end
