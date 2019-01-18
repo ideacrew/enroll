@@ -1186,6 +1186,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -1197,7 +1198,7 @@ shop_notice_triggers = [
         name: 'Confirmation notice to employer after group termination',
         notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
         notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
-        mpi_indicator: 'MPI_D043',
+        mpi_indicator: 'SHOP_D043',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

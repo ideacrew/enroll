@@ -29,7 +29,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice confirms you have elected to terminate <strong>#{notice.employer_name}<strong>’s employer sponsored coverage offered through the #{Settings.site.short_name}. Your group’s coverage, including coverage for all employees, will end on <strong>#{notice.plan_year.end_on}</strong>.", top_margin: '10px'} %>
+  content: "This notice confirms you have elected to terminate <strong>#{notice.employer_name}</strong>’s employer sponsored coverage offered through the #{Settings.site.short_name}. Your group’s coverage, including coverage for all employees, will end on <strong>#{notice.plan_year.end_on}</strong>.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>.", top_margin: '10px', bottom_margin: '10px'} %>  
