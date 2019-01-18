@@ -3,19 +3,19 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::AcaShopBenefitSponsorshipService, dbclean: :after_each do
 
-    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
-    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
-    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
-    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
+    let!(:previous_rating_area)   { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
+    let!(:previous_service_area)  { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
+    let!(:rating_area)            { create_default(:benefit_markets_locations_rating_area) }
+    let!(:service_area)           { create_default(:benefit_markets_locations_service_area) }
 
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:benefit_market)  { site.benefit_markets.first }
+    let(:site)                    { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:benefit_market)          { site.benefit_markets.first }
 
     let(:employer_organization)   { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)        { employer_organization.employer_profile }
 
     let!(:rating_area)                    { FactoryGirl.create(:benefit_markets_locations_rating_area)  }
-    let!(:service_area)                    { FactoryGirl.create(:benefit_markets_locations_service_area)  }
+    let!(:service_area)                   { FactoryGirl.create(:benefit_markets_locations_service_area)  }
     let(:this_year)                       { TimeKeeper.date_of_record.year }
 
     let(:april_effective_date)            { Date.new(this_year,4,1) }
@@ -96,8 +96,9 @@ module BenefitSponsors
     end
 
     describe '.end_open_enrollment' do 
+      let(:current_date)                    { april_effective_date - 2.days }
       let(:sponsorship_state)               { :initial_enrollment_open }
-      let(:business_policy) { double(success_results: [], fail_results: []) }
+      let(:business_policy)                 { double(success_results: [], fail_results: []) }
 
       before do
         allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:business_policy_satisfied_for?).and_return(true)
