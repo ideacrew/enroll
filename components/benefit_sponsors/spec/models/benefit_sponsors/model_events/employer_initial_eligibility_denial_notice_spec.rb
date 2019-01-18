@@ -1,34 +1,18 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice', dbclean: :after_each  do
-  let(:notice_event) { "employer_initial_eligibility_denial_notice" }
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
 
-  let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
-  let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
-  let(:current_effective_date)  { TimeKeeper.date_of_record }
-  let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}
-  let(:valid_effective_date)   { (prior_month_open_enrollment_start - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
-  let(:benefit_application_end_on)   { (valid_effective_date + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day) }
-
-  let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:employer_profile)    { organization.employer_profile }
-  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_market) { site.benefit_markets.first }
-  let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                  benefit_market: benefit_market,
-                                  title: "SHOP Benefits for #{current_effective_date.year}",
-                                  application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                }
-
-  let!(:model_instance) {
-    application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package,
-      benefit_sponsorship: benefit_sponsorship, 
-      effective_period: start_on..start_on.next_year.prev_day, 
-      open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)
-    application.benefit_sponsor_catalog.save!
-    application
-  }
+  let(:notice_event)            { "employer_initial_eligibility_denial_notice" }
+  let(:aasm_state)              { :draft }
+  let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_month.prev_year }
+  let(:start_on)                { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+  let(:effective_period)        { start_on..start_on.next_year.prev_day }
+  let(:employer_profile)        { abc_profile }
+  let!(:model_instance)         { initial_application }
 
   before :each do
     allow(model_instance).to receive(:is_renewing?).and_return(false)
