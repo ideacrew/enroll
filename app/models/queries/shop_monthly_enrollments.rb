@@ -96,10 +96,9 @@ module Queries
     def quiet_period
       # quiet period check not needed for renewal application(quiet period: OE close to 26th of month) just for initial(quiet period: OE close to 8th of next month)
       # transmission date 26th of month
-
-      quiet_period_start= Date.new( @effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+      quiet_period_start = Date.new( @effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
       quiet_period_end =  @effective_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
-      quiet_period_start..quiet_period_end
+      TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
     end
 
     def quiet_period_expression
@@ -114,7 +113,7 @@ module Queries
 
     def quiet_period_coverage_expression
       {
-        "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
+        "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
         "households.hbx_enrollments.kind" => "employer_sponsored",
         "households.hbx_enrollments.workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
