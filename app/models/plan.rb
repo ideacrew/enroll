@@ -494,20 +494,15 @@ class Plan
       date = start_on_date || PlanYear.calculate_start_on_dates[0]
       return false if date.blank?
 
-      carrier_count = Plan.where(active_year: date.year).pluck(:carrier_profile_id).uniq.size
-      result = Plan.collection.aggregate([
-        {"$match" => {"active_year" => date.year}},
-        {"$unwind" => '$premium_tables'},
-        {"$match" => {"premium_tables.start_on" => { "$lte" => date}}},
-        {"$match" => {"premium_tables.end_on" => { "$gte" => date}}},
-        {"$group" => {
-          "_id" => {"carrier_profile" => "$carrier_profile_id"}, "count" => {"$sum" => 1}
-          }
-        },
-      ],
-      :allow_disk_use => true).map{|a| a["count"]}
-
-      carrier_count == result.size
+      Rails.cache.fetch("#{date.to_s}", expires_in: 2.days) do
+        Plan.collection.aggregate([
+          {"$match" => {"active_year" => date.year}},
+          {"$match" => {"coverage_kind" => "health"}},
+          {"$unwind" => '$premium_tables'},
+          {"$match" => {"premium_tables.start_on" => { "$lte" => date}}},
+          {"$match" => {"premium_tables.end_on" => { "$gte" => date}}},
+        ],:allow_disk_use => true).to_a.present?
+      end
     end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)

@@ -6,6 +6,11 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
   let(:given_task_name) { "update_fields_of_employee_role" }
   subject { UpdateFieldsOfEmployeeRole.new(given_task_name, double(:current_scope => nil)) }
 
+  before :each do
+    allow(ENV).to receive(:[]).with("census_employee_id").and_return(nil)
+    allow(ENV).to receive(:[]).with("organization_fein").and_return(nil)
+  end
+
   describe "given a task name", dbclean: :after_each do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -56,7 +61,7 @@ describe UpdateFieldsOfEmployeeRole, dbclean: :after_each do
   end
 
 
-describe "update census employee id for an employee_role", dbclean: :after_each do
+  describe "update census employee id for an employee_role", dbclean: :after_each do
     let(:office_location)                 { FactoryGirl.build(:office_location, :primary) }
     let(:old_organization)               { FactoryGirl.create(:organization, office_locations: [office_location]) }
     let(:old_employer_profile)           { FactoryGirl.create(:employer_profile, organization: old_organization) }
@@ -106,6 +111,27 @@ describe "update census employee id for an employee_role", dbclean: :after_each 
       it "should exit and should not change the census_employee_id" do
         subject.migrate
         expect(employee_role.census_employee_id.to_s).not_to eq census_employee.id.to_s
+      end
+    end
+  end
+
+  describe "#update_with_given_census_employee_id" do
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+    let(:person) { FactoryGirl.create(:person, :with_employee_role)}
+    let(:employee_role) { person.employee_roles.first }
+
+    context "should update census_employee_id by using employee_role" do
+      before :each do
+        allow(ENV).to receive(:[]).with("census_employee_id").and_return(census_employee.id.to_s)
+        allow(ENV).to receive(:[]).with("employee_role_id").and_return(employee_role.id.to_s)
+        allow(ENV).to receive(:[]).with("action").and_return("update_with_given_census_employee_id")
+      end
+
+      it "should update census_employee_id by using employee_role" do
+        expect(employee_role.census_employee_id.to_s).not_to eq census_employee.id.to_s
+        subject.migrate
+        employee_role.reload
+        expect(employee_role.census_employee_id.to_s).to eq census_employee.id.to_s
       end
     end
   end
