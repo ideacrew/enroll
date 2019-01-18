@@ -54,6 +54,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employee.notify_employee_of_group_advance_termination"
+          expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
+          expect(payload[:event_object_kind]).to eq 'BenefitSponsors::BenefitApplications::BenefitApplication'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.notifications_send(model_instance, model_event)
       end
     end

@@ -14,6 +14,12 @@ module BenefitSponsors
             if new_model_event.event_key == :benefit_coverage_period_terminated_voluntary
               benefit_application = new_model_event.klass_instance
               deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: "group_advance_termination_confirmation")
+              census_employees = benefit_application.benefit_sponsorship.census_employees.non_terminated
+              census_employees.each do |ce|
+               begin
+                 deliver(recipient: ce.employee_role, event_object: benefit_application, notice_event: "notify_employee_of_group_advance_termination")
+               end
+             end
             end
           end
 
