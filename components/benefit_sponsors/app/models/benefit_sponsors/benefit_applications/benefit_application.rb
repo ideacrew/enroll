@@ -221,7 +221,6 @@ module BenefitSponsors
       )
     }
 
-
     # Migration map for plan_year to benefit_application
     def matching_state_for(plan_year)
       plan_year_to_benefit_application_states_map[plan_year.aasm_state.to_sym]
@@ -1021,7 +1020,7 @@ module BenefitSponsors
     private
 
     def set_expiration_date
-      write_attribute(:expiration_date, effective_period.min) if expiration_date.blank?
+      update_attribute(:expiration_date, effective_period.min) unless expiration_date
     end
 
     def refresh_recorded_rating_area
