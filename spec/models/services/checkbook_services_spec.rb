@@ -29,9 +29,7 @@ describe Services::CheckbookServices::PlanComparision do
     it "should generate non-congressional link" do
       if ApplicationHelperModStubber.plan_match_dc
         allow(subject).to receive(:construct_body_shop).and_return({})
-        allow(HTTParty).to receive(:post).with("https://checkbook_url/shop/",
-          {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
-          and_return(result)
+        allow(HTTParty).to receive(:post).and_return(result)
         # expect(subject.generate_url).to eq Rails.application.config.checkbook_services_congress_url+"#{hbx_enrollment.effective_on.year}/"
         expect(subject.generate_url).to eq checkbook_url
       end
@@ -117,11 +115,12 @@ describe Services::CheckbookServices::PlanComparision do
 
   describe "when employee is congress member" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    let(:checkbook_url) {"http://checkbook_url"}
 
     it "should generate congressional url" do
      if ApplicationHelperModStubber.plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
-       expect(subject.generate_url).to eq("https://checkbook_url/congress/2019/")
+       expect(subject.generate_url).to eq checkbook_url
       end
     end
   end
