@@ -8,7 +8,7 @@
         <%= link_to "Claim Quote", "", data: { toggle: "modal", target: "#claimQUoteModal" }, class: 'btn btn-default btn-block' %>
       <% end %>
       <%= pundit_span EmployerProfile,:updateable? %>
-        <% if @plan_years.present? && @employer_profile.published_plan_year.blank? && !@employer_profile.draft_plan_year.present? %>
+        <% if @plan_years.present? && (@employer_profile.published_plan_year.blank? || (@employer_profile.active_plan_year.present? && @employer_profile.plan_years.renewing_canceled.select{|py| py.start_on > @employer_profile.active_plan_year.end_on}.present?)) && !@employer_profile.draft_plan_year.present? %>
         <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-default btn-block", style: "margin-top: 6px;", data: {loading_text: "Loading..."} %>
         <% end %>
       </span>
@@ -464,7 +464,6 @@
     <br/>
 
     <div class="col-xs-12"></div>
-
     <%= render "employers/plan_years/publish_modal", plan_year: plan_year %>
     <%= render "employers/plan_years/revert_modal", plan_year: plan_year %>
 

@@ -21,7 +21,6 @@ field_names  = %w(
       )
 file_name = "#{Rails.root}/projected_eligibility_notice_1_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
-#open enrollment information
 hbx = HbxProfile.current_hbx
 bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == TimeKeeper.date_of_record.next_year.year.to_s }
 CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -31,13 +30,13 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   notice_trigger = event_kind.notice_triggers.first
   @data_hash.each do |family_id , members|
     begin
-      primary_member = members.detect{ |m| m["is_dependent"].upcase == "FALSE"}
-      next if primary_member.nil?
-      next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] && primary_member["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
+      subscriber = members.detect{ |m| m["is_dependent"].upcase == "FALSE"}
+      primary_person = HbxEnrollment.by_hbx_id(members.first["policy.id"]).first.family.primary_person rescue nil
+      next if primary_person.nil?
+      next if (subscriber.present? && subscriber["policy.subscriber.person.is_dc_resident?"] && subscriber["policy.subscriber.person.is_dc_resident?"].upcase == "FALSE")
       next if members.select{ |m| (m["policy.subscriber.person.is_incarcerated"] && m["policy.subscriber.person.is_incarcerated"].upcase == "TRUE")}.present?
       next if (members.any?{ |m| m["policy.subscriber.person.citizen_status"].blank? || (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
-      person = Person.where(:hbx_id => primary_member["policy.subscriber.person.hbx_id"]).first
-      consumer_role = person.consumer_role
+      consumer_role = primary_person.consumer_role
       if consumer_role.present?
         begin
           builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -45,7 +44,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
               subject: event_kind.title,
               :event_name => event_kind.event_name,
               mpi_indicator: notice_trigger.mpi_indicator,
-              person: person,
+              person: primary_person,
               open_enrollment_start_on: bc_period.open_enrollment_start_on,
               open_enrollment_end_on: bc_period.open_enrollment_end_on,
               data: members
@@ -54,15 +53,15 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           builder.deliver
           csv << [
             family_id,
-            person.hbx_id,
-            person.full_name
+            primary_person.hbx_id,
+            primary_person.full_name
           ]
-          puts "***************** Notice delivered to #{person.hbx_id} *****************" unless Rails.env.test?
+          puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?
         rescue Exception => e
-          puts "Unable to deliver to #{person.hbx_id} due to the following error #{e}" unless Rails.env.test?
+          puts "Unable to deliver to #{primary_person.hbx_id} due to the following error #{e}" unless Rails.env.test?
         end
       else
-        puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
+        puts "No consumer role for #{primary_person.hbx_id} -- #{e}" unless Rails.env.test?
       end
     rescue => e
       puts "Unable to process family_id: #{family_id} due to the following error #{e}" unless Rails.env.test?

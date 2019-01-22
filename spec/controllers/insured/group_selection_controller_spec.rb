@@ -38,6 +38,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(user).to receive(:has_hbx_staff_role?).and_return false
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
@@ -220,7 +221,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(HbxEnrollment.aasm.state_machine.events[:terminate_coverage].transitions[0].opts.values.include?(:propogate_terminate)).to eq true
       expect(hbx_enrollment.termination_submitted_on).to eq nil
       post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
-      expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(hbx_enrollment.termination_submitted_on.to_time).to be_within(5.seconds).of(TimeKeeper.datetime_of_record)
       expect(response).to redirect_to(family_account_path)
     end
 
