@@ -230,16 +230,19 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
   describe "modifying benefit application", dbclean: :after_each do
     context "Should update effective period and approve renewing benefit application", dbclean: :after_each do
-
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
 
       let(:effective_date) { Date.new(TimeKeeper.date_of_record.year, 7, 1) }
       let(:new_start_date) { effective_date }
       let(:new_end_date)   { effective_date.next_year.prev_day }
-
       let(:renewal_effective_date) { Date.new(TimeKeeper.date_of_record.year, 6, 1) }
       let(:current_effective_date) { renewal_effective_date.prev_year }
+      let!(:renewal_benefit_sponsor_catalog) { 
+        catalog = renewal_application.benefit_sponsor_catalog 
+        catalog.save
+        catalog
+      }
 
       before(:each) do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 5, 10))
