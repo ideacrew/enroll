@@ -93,7 +93,7 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
 
   let(:predecessor_application_catalog) { false }
 
-  let!(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+  let!(:renewal_application)  { application = create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                       :with_benefit_package, :with_predecessor_application,
                                       predecessor_application_state: predecessor_state,
                                       benefit_sponsorship: benefit_sponsorship,
@@ -106,7 +106,10 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
                                       dental_package_kind: dental_package_kind,
                                       dental_sponsored_benefit: dental_sponsored_benefit,
                                       predecessor_application_catalog: predecessor_application_catalog
-                                      ) }
+                                      ) 
+        application.benefit_sponsor_catalog.save
+        application
+  }
 
   let(:predecessor_application) { renewal_application.predecessor }
 

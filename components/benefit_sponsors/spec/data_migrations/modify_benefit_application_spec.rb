@@ -24,43 +24,6 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     let(:organization) { abc_organization }
     let(:benefit_application) { initial_application }
 
-    # let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    # let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-    #                                         benefit_market: benefit_market,
-    #                                         title: "SHOP Benefits for #{current_effective_date.year}",
-    #                                         application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-    #                                       }
-    # let(:benefit_market)      { site.benefit_markets.first }
-    # let!(:product_package) { benefit_market_catalog.product_packages.first }
-
-    # let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-    # let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-    # let!(:security_question)  { FactoryGirl.create_default :security_question }
-
-    # let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    # let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-    # let(:benefit_sponsorship) do
-    #   FactoryGirl.create(
-    #     :benefit_sponsors_benefit_sponsorship,
-    #     :with_rating_area,
-    #     :with_service_areas,
-    #     supplied_rating_area: rating_area,
-    #     service_area_list: [service_area],
-    #     organization: organization,
-    #     profile_id: organization.profiles.first.id,
-    #     benefit_market: site.benefit_markets[0],
-    #     employer_attestation: employer_attestation)
-    # end
-
-    # let(:start_on)  { current_effective_date.prev_month }
-    # let(:effective_period)  { start_on..start_on.next_year.prev_day }
-
-    # let!(:benefit_application) {
-    #   application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
-    #   application.benefit_sponsor_catalog.save!
-    #   application
-    # }
-
     let(:benefit_package) { current_benefit_package }
     let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_package)}
     let(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
@@ -189,32 +152,51 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "Should update effective period and approve initial benefit application", dbclean: :after_each do
-      let(:effective_date) { start_on }
-      let(:new_start_date) { start_on.next_month }
-      let(:new_end_date) { new_start_date + 1.year }
+      let(:aasm_state)     { :draft}
+      let(:benefit_sponsorship_state) { :applicant }
+
+      let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 6, 1) }
+      let(:effective_period)       { current_effective_date..current_effective_date.next_year.prev_day }
+
+      let(:effective_date) { Date.new(TimeKeeper.date_of_record.year, 7, 1) }
+      let(:new_start_date) { effective_date }
+      let(:new_end_date)   { effective_date.next_year.prev_day }
+
+      before(:each) do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 5, 10))
+      end
+
+      after(:each) do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
 
       before do
         allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
-        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+        allow(ENV).to receive(:[]).with("effective_date").and_return(current_effective_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("new_start_date").and_return(new_start_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("new_end_date").and_return(new_end_date.strftime("%m/%d/%Y"))
       end
 
-      it "should update the initial benefit application and transition the benefit sponsorship" do
-        benefit_application.update_attributes!(aasm_state: "draft")
-        expect(benefit_application.effective_period.min.to_date).to eq start_on
-        subject.migrate
-        benefit_application.reload
-        benefit_sponsorship.reload
-        expect(benefit_application.start_on.to_date).to eq new_start_date
-        expect(benefit_application.end_on.to_date).to eq new_end_date
-        expect(benefit_application.aasm_state).to eq :approved
-        expect(benefit_application.benefit_sponsorship.aasm_state).to eq :initial_application_approved
+      context "when application is in draft state" do 
+        it "should update the initial benefit application and transition the benefit sponsorship" do
+          expect(benefit_application.effective_period.min.to_date).to eq current_effective_date
+          subject.migrate
+          benefit_application.reload
+          benefit_sponsorship.reload
+          expect(benefit_application.start_on.to_date).to eq new_start_date
+          expect(benefit_application.end_on.to_date).to eq new_end_date
+          expect(benefit_application.aasm_state).to eq :approved
+          expect(benefit_application.benefit_sponsorship.aasm_state).to eq :initial_application_approved
+        end
       end
 
-      it "should not update the initial benefit application" do
-        expect { subject.migrate }.to raise_error(RuntimeError)
-        expect { subject.migrate }.to raise_error("No benefit application found.")
+      context "when application not in draft state" do 
+        let(:aasm_state)     { :approved }
+
+        it "should not update the initial benefit application" do
+          expect { subject.migrate }.to raise_error(RuntimeError)
+          expect { subject.migrate }.to raise_error("No benefit application found.")
+        end
       end
     end
 
@@ -222,7 +204,6 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:effective_date) { start_on }
       let(:benefit_sponsorship_state) { :applicant }
 
-      
       before do
         allow(ENV).to receive(:[]).with("action").and_return("force_submit_application")
         allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
@@ -245,88 +226,57 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect { subject.migrate }.to raise_error("Found 0 benefit applications with that start date")
       end
     end
+  end
 
-
+  describe "modifying benefit application", dbclean: :after_each do
     context "Should update effective period and approve renewing benefit application", dbclean: :after_each do
-      let(:effective_date) {start_on.next_month.beginning_of_month}
-      let(:new_start_date) { (start_on + 2.months).beginning_of_month}
-      let(:new_end_date) { new_start_date + 1.year }
-      let(:current_effective_date)  { TimeKeeper.date_of_record }
-      let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let!(:renewing_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            application_period: ((current_effective_date.beginning_of_year)-1.year..(current_effective_date.end_of_year)-1.year))
-                                          }
-      let(:benefit_market)      { site.benefit_markets.first }
-      let!(:product_package_1) { benefit_market_catalog.product_packages.first }
-      let!(:product_package_2) { renewing_benefit_market_catalog.product_packages.first }
 
-      let!(:rating_area)   { FactoryGirl.create_default :benefit_markets_locations_rating_area }
-      let!(:service_area)  { FactoryGirl.create_default :benefit_markets_locations_service_area }
-      let!(:security_question)  { FactoryGirl.create_default :security_question }
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
 
-      let(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-      let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
-      let(:benefit_sponsorship) do
-        FactoryGirl.create(
-          :benefit_sponsors_benefit_sponsorship,
-          :with_rating_area,
-          :with_service_areas,
-          supplied_rating_area: rating_area,
-          service_area_list: [service_area],
-          organization: organization,
-          profile_id: organization.profiles.first.id,
-          benefit_market: site.benefit_markets[0],
-          employer_attestation: employer_attestation)
+      let(:effective_date) { Date.new(TimeKeeper.date_of_record.year, 7, 1) }
+      let(:new_start_date) { effective_date }
+      let(:new_end_date)   { effective_date.next_year.prev_day }
+
+      let(:renewal_effective_date) { Date.new(TimeKeeper.date_of_record.year, 6, 1) }
+      let(:current_effective_date) { renewal_effective_date.prev_year }
+
+      before(:each) do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 5, 10))
       end
 
-      let(:start_on)  { current_effective_date.prev_month}
-      let(:old_effective_period)  { start_on.next_month.beginning_of_month - 1.year ..start_on.end_of_month }
-      let!(:old_benefit_application) {
-        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: old_effective_period, aasm_state: :active)
-        application.benefit_sponsor_catalog.save!
-        application
-      }
-
-      let(:renewing_effective_period)  { start_on.next_month.beginning_of_month..start_on.end_of_month + 1.year }
-      let!(:renewing_benefit_application) {
-        unless benefit_market.benefit_market_catalogs.map(&:product_active_year).include?(new_start_date.year)
-          create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                 benefit_market: benefit_market,
-                 title: "SHOP Benefits for #{effective_date.year}",
-                 application_period: (new_start_date.beginning_of_year..new_start_date.end_of_year))
-
-        end
-        application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: renewing_effective_period, aasm_state: :renewing_enrolling, predecessor_id: old_benefit_application.id)
-        application.benefit_sponsor_catalog.save!
-        application
-      }
-
-      let!(:old_benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: old_benefit_application, product_package: product_package_1) }
-      let!(:renewing_benefit_package) { FactoryGirl.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: renewing_benefit_application, product_package: product_package_2) }
+      after(:each) do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
 
       before do
         allow(ENV).to receive(:[]).with("action").and_return("update_effective_period_and_approve")
-        allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
+        allow(ENV).to receive(:[]).with("effective_date").and_return(renewal_effective_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("new_start_date").and_return(new_start_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("new_end_date").and_return(new_end_date.strftime("%m/%d/%Y"))
+        allow(ENV).to receive(:[]).with("fein").and_return(abc_organization.fein)
       end
 
-      it "should update the renewing benefit application and transition the benefit sponsorship" do
-        renewing_benefit_application.update_attributes!(aasm_state: "draft")
-        expect(renewing_benefit_application.effective_period.min.to_date).to eq effective_date
-        subject.migrate
-        renewing_benefit_application.reload
-        benefit_sponsorship.reload
-        expect(renewing_benefit_application.start_on.to_date).to eq new_start_date
-        expect(renewing_benefit_application.end_on.to_date).to eq new_end_date
-        expect(renewing_benefit_application.aasm_state).to eq :approved
-        expect(renewing_benefit_application.benefit_sponsorship.aasm_state).to eq :active
+      context "when renewal application in draft state" do 
+        it "should update the renewing benefit application and transition the benefit sponsorship" do
+          expect(renewal_application.effective_period.min.to_date).to eq renewal_effective_date
+          subject.migrate
+          renewal_application.reload
+          benefit_sponsorship.reload
+          expect(renewal_application.start_on.to_date).to eq new_start_date
+          expect(renewal_application.end_on.to_date).to eq new_end_date
+          expect(renewal_application.aasm_state).to eq :approved
+          expect(renewal_application.benefit_sponsorship.aasm_state).to eq :active
+        end
       end
-      it "should not update the renewing benefit application" do
-        expect { subject.migrate }.to raise_error(RuntimeError)
-        expect { subject.migrate }.to raise_error("No benefit application found.")
+
+      context "when renewal application not in draft state" do 
+        let(:renewal_state)           { :approved }
+
+        it "should not update the renewing benefit application" do
+          expect { subject.migrate }.to raise_error(RuntimeError)
+          expect { subject.migrate }.to raise_error("No benefit application found.")
+        end
       end
     end
 
