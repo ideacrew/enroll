@@ -6,10 +6,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
   before_action :check_access_to_organization, only: [:edit]
-  before_action :check_and_download_invoice, only: [:download_invoice]
+  before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  before_action :wells_fargo_sso, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -115,6 +116,21 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+      when 'accounts'
+        collect_and_sort_invoices(params[:sort_order])
+        @employer_profile_account = @employer_profile.employer_profile_account
+        @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+        #only exists if coming from redirect from sso failing
+        @page_num = params[:page_num] if params[:page_num].present?
+        if @page_num.present?
+          retrieve_payments_for_page(@page_num)
+        else
+          retrieve_payments_for_page(1)
+        end
+        respond_to do |format|
+          format.js {render 'employers/employer_profiles/my_account/accounts/payment_history'}
+          format.html
+        end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -269,6 +285,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     send_data Aws::S3Storage.find(@invoice.identifier) , options
   end
 
+  def show_invoice
+    options={}
+    options[:filename] = @invoice.title
+    options[:type] = 'application/pdf'
+    options[:disposition] = 'inline'
+    send_data Aws::S3Storage.find(@invoice.identifier) , options
+  end
+
   def bulk_employee_upload
     file = params.require(:file)
     @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
@@ -304,12 +328,39 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   private
 
+  def wells_fargo_sso
+    id_params = params.permit(:id, :employer_profile_id, :tab)
+    id = id_params[:id] || id_params[:employer_profile_id]
+    employer_profile = EmployerProfile.find(id)
+    #grab url for WellsFargoSSO and store in insance variable
+    email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.emails.first &&
+      employer_profile.staff_roles.first.emails.first.address) || nil
+
+    if email.present?
+      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
+    end
+
+    if wells_fargo_sso.present?
+      if wells_fargo_sso.token.present?
+        @wf_url = wells_fargo_sso.url
+      end
+    end
+  end
+
+  def retrieve_payments_for_page(page_no)
+    if @payments = @employer_profile.premium_payments
+      @payments = @payments.order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
+    end
+  end
+
   def updateable?
     authorize EmployerProfile, :updateable?
   end
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
+    #@invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
+    @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
@@ -416,7 +467,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def find_employer
-    id_params = params.permit(:id, :employer_profile_id)
+    id_params = params.permit(:id, :employer_profile_id, :tab)
     id = id_params[:id] || id_params[:employer_profile_id]
     @employer_profile = EmployerProfile.find(id)
     render file: 'public/404.html', status: 404 if @employer_profile.blank?

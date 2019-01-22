@@ -1,0 +1,4 @@
+$('#payments-table').empty();
+<% if @employer_profile.has_premium_payments? %>
+$('#payments-table').append("<%= escape_javascript(render 'employers/employer_profiles/my_account/accounts/payment_history') %>");
+<% end %>
