@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem "sponsored_benefits", path: "components/sponsored_benefits"
+
 gem 'aasm', '~> 4.8.0'
 gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.3.1'
 gem 'addressable', '2.3.8'
