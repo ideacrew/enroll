@@ -16,7 +16,7 @@ describe "QhpRateBuilder" do
   let!(:ra3) {FactoryGirl.create(:benefit_markets_locations_rating_area, active_year: 2018, exchange_provided_code: "R-MA003")}
   let!(:ra4) {FactoryGirl.create(:benefit_markets_locations_rating_area, active_year: 2018, exchange_provided_code: "R-MA007")}
 
-  let!(:current_time) {TimeKeeper.date_of_record}
+  let!(:current_time) {Date.new(2018,01,01)}
   let!(:premium_start_date) {current_time.all_quarter.min}
   let!(:premium_end_date) {current_time.all_quarter.max}
   let!(:premium_period) {Time.utc(premium_start_date.year, premium_start_date.month, premium_start_date.day)..Time.utc(premium_end_date.year, premium_end_date.month, premium_end_date.day)}
