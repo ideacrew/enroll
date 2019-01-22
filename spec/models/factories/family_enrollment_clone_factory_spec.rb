@@ -7,7 +7,8 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
-
+  
+  let(:predecessor_application_catalog) { true }
   let!(:sponsored_benefit_package) { predecessor_application.benefit_packages[0] }
   let!(:sponsored_benefit) { sponsored_benefit_package.health_sponsored_benefit }
   let!(:product) { sponsored_benefit.reference_product }
