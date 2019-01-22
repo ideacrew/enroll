@@ -1,7 +1,6 @@
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-include BenefitSponsors::ApplicationHelper
 
 RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_show_profile", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
@@ -18,6 +17,8 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_sho
   let(:reference_product) { current_benefit_package.sponsored_benefits[0].reference_product }
 
   before :each do
+    view.extend Pundit
+    view.extend BenefitSponsors::ApplicationHelper
     view.extend BenefitSponsors::Engine.routes.url_helpers
     @employer_profile = employer_profile
     assign(:census_employees, [census_employee1, census_employee2, census_employee3])
