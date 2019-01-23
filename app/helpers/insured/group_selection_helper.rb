@@ -62,7 +62,7 @@ module Insured
         qle = QualifyingLifeEventKind.find(params[:qle_id])
         return qle.market_kind
       end
-      if person.has_active_employee_role?
+      if (person.has_active_employee_role? && person.has_employer_benefits?)
         'shop'
       elsif person.is_consumer_role_active?
         'individual'
@@ -99,9 +99,10 @@ module Insured
       employer_profile = employee_role.employer_profile
       py = employer_profile.plan_years.detect { |py| is_covered_plan_year?(py, family.current_sep.effective_on)} || employer_profile.published_plan_year
       enrollments = family.active_household.hbx_enrollments
-      if py.present? && py.is_renewing?
+      return nil if py.blank?
+      if py.is_renewing?
         renewal_enrollment(enrollments, employee_role)
-      else
+      elsif py.is_published?
         active_enrollment(enrollments, employee_role)
       end
     end
