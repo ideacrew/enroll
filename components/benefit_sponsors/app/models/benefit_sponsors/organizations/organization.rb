@@ -316,10 +316,10 @@ module BenefitSponsors
                 agencies_matching_advanced_criteria = orgs2.where({ "$and" => build_query_params(search_params) })
                 return filter_brokers_by_agencies(agencies_matching_advanced_criteria, brokers)
               end
-            elsif value.to_s == "true"
+            elsif value
               return self.search_agencies_by_criteria(search_params)
             end
-          elsif !search_params[:q].present? && value.to_s == "true"
+          elsif !search_params[:q].present? && value
             return []
           end
 

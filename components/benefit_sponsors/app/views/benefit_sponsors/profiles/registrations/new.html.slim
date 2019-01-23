@@ -53,18 +53,20 @@ javascript:
   validateForm();
 
   $("#tabs").tabs({
-      activate: function (event, ui) {
-          if (ui.newPanel.selector == "#tabs-2") {
-              var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
-              $.ajax({
-                url: url,
-                type: "GET",
-                success: function (data) {
-                    $("#tabs-2").html(data)
-                    initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"),new Date("#{Date.today.end_of_month-18.years}"));
-                }
-              })
-          }
+    activate: function (event, ui) {
+      if (ui.newPanel.selector == "#tabs-2") {
+        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
+        if(!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: {profile_type: "broker_agency_staff"},
+            success: function (data) {
+              $("#tabs-2").html(data)
+                initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+            }
+          })
+        }
       }
+    }
   });
-

@@ -38,7 +38,7 @@ module BenefitSponsors
         if person_ids.count == 1 && person_ids.first.to_s == form[:person_id]
           return false, 'Please add another staff role before deleting this role'
         else
-          form[:is_broker_agency_staff_profile?] ? Person.deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
+          form[:is_broker_agency_staff_profile?] ? deactivate_broker_agency_staff_role(form[:person_id], form[:profile_id]) : Person.deactivate_employer_staff_role(form[:person_id], form[:profile_id])
         end
       end
 
@@ -84,8 +84,14 @@ module BenefitSponsors
       end
 
       def persist_broker_agency_staff_role!(profile)
-        exisiting_brokers_with_same_profile =  person.broker_agency_staff_roles.select{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id }
-        if exisiting_brokers_with_same_profile.present?
+
+        terminated_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_terminated"}
+        active_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "active"}
+
+        if terminated_brokers_with_same_profile.present?
+          terminated_brokers_with_same_profile.broker_agency_active!
+          return true, person
+        elsif active_brokers_with_same_profile.present?
           return false,  "you are already associated with this Broker Agency"
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
@@ -106,6 +112,44 @@ module BenefitSponsors
         end
       end
 
+      def add_broker_agency_staff_role(first_name, last_name, dob, email, broker_agency_profile)
+        person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
+
+        return false, 'Person does not exist on the Exchange' if person.count == 0
+        return false, 'Person count too high, please contact HBX Admin' if person.count > 1
+        return false, 'Person already has a staff role for this broker' if Person.staff_for_broker_including_pending(broker_agency_profile).include?(person.first)
+
+        terminated_brokers_with_same_profile =  person.first.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == broker_agency_profile.id && role.aasm_state == "broker_agency_terminated"}
+
+        if terminated_brokers_with_same_profile.present?
+          terminated_brokers_with_same_profile.broker_agency_active!
+          return true, person.first
+        else
+          broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+          broker_agency_staff_role.save
+
+          return true, person.first
+        end
+      end
+
+      def deactivate_broker_agency_staff_role(person_id, broker_agency_profile_id)
+        begin
+          person = Person.find(person_id)
+        rescue
+          return false, 'Person not found'
+        end
+
+        broker_agency_staff_role = person.broker_agency_staff_roles.detect{ |role|
+          (role.benefit_sponsors_broker_agency_profile_id.to_s || role.broker_agency_profile_id.to_s) == broker_agency_profile_id.to_s && role.is_open?
+        }
+
+        if broker_agency_staff_role
+          broker_agency_staff_role.broker_agency_terminate!
+          return true, 'Broker Agency Staff Role is inactive'
+        else
+          return false, 'No matching Broker Agency Staff role'
+        end
+      end
 
       def add_person_contact_info(form)
         person.add_work_email(form.email)

@@ -17,11 +17,6 @@ module BenefitSponsors
           return true if can_edit?
         end
 
-        def create_broker_staff?
-          return true if admin?
-          return true if can_edit?
-        end
-
         def edit?
           return true if admin?
           return true if can_edit?
