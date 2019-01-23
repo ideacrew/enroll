@@ -111,7 +111,6 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def terminate_benefit_application(benefit_applications)
-    termination_notice = ENV['termination_notice'].to_s
     termination_kind = ENV['termination_kind']
     termination_date = Date.strptime(ENV['termination_date'], "%m/%d/%Y")
     notify_trading_partner = (ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true) ? true : false
@@ -119,7 +118,6 @@ class ModifyBenefitApplication< MongoidMigrationTask
     benefit_applications.each do |benefit_application|
       service = initialize_service(benefit_application)
       service.terminate(end_on, termination_date, notify_trading_partner, termination_kind)
-      trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
     end
   end
 
@@ -174,9 +172,5 @@ class ModifyBenefitApplication< MongoidMigrationTask
 
   def initialize_service(benefit_application)
     BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-  end
-
-  def trigger_advance_termination_request_notice(benefit_application)
-    benefit_application.trigger_model_event(:group_advance_termination_confirmation)
   end
 end

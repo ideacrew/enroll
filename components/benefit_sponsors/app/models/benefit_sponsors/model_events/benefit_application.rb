@@ -39,10 +39,6 @@ module BenefitSponsors
           :initial_employer_final_reminder_to_publish_plan_year
       ]
 
-      OTHER_EVENTS = [
-        :group_advance_termination_confirmation
-      ]
-
       # Events triggered by state changes on individual instances
       def notify_on_save
         return if self.is_conversion?
@@ -144,13 +140,6 @@ module BenefitSponsors
           rescue Exception => e
             Rails.logger.info { "Benefit Application REGISTERED_EVENTS: #{event} unable to notify observers" }
           end
-        end
-      end
-
-      def trigger_model_event(event_name, event_options = {})
-        if OTHER_EVENTS.include?(event_name)
-          BenefitSponsors::BenefitApplications::BenefitApplication.add_observer(BenefitSponsors::Observers::BenefitApplicationObserver.new, [:notifications_send])
-          notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end
 
