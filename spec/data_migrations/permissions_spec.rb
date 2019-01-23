@@ -224,7 +224,7 @@ describe DefinePermissions, dbclean: :after_each do
           end
 
           it 'returns false' do
-            expect(hbx_tier3.hbx_staff_role.permission.can_change_fein).to be false
+            expect(hbx_tier3.hbx_staff_role.permission.can_change_fein).to be true
           end
         end
       end
