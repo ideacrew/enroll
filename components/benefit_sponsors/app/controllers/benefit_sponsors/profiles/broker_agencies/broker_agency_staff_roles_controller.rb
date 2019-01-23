@@ -6,8 +6,8 @@ module BenefitSponsors
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           respond_to do |format|
-            format.html { render 'new', layout: false}
-            format.js
+            format.html { render 'new', layout: false} if params[:profile_type]
+            format.js  { render 'new_staff_form'}
           end
         end
 
@@ -61,8 +61,8 @@ module BenefitSponsors
         end
 
         def search_broker_agency
-          @broker_agencies = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
-          @broker_agency_profiles =  @broker_agencies.broker_agency_search
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
+          @broker_agency_profiles =   @staff.broker_agency_search
         end
 
         private

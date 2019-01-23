@@ -36,8 +36,6 @@ BenefitSponsors::Engine.routes.draw do
         end
         member do
           get :approve
-          get :new_staff_form
-          post :create_broker_staff
         end
       end
     end

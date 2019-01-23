@@ -139,5 +139,45 @@ module BenefitSponsors
         end
       end
     end
+
+    describe ".is_broker_agency_registered?" do
+
+      let(:profile_form) {BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_id: broker_agency_profile.id )}
+      let(:user1) { FactoryGirl.create(:user)}
+      let(:person1) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')], user: user1) }
+      let!(:broker_agency_staff_role) { FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "coverage_terminated",  person: person1 )}
+
+
+      it 'should return false if broker staff role or broker role exists for the user' do
+        params = { profile_id: broker_agency_profile.id, profile_type:"broker_agency_staff"}
+        service = subject.new params
+        expect(service.is_broker_agency_registered?(user, profile_form)). to eq false
+      end
+
+      it 'should return true if broker staff role or broker role does not exists for the user' do
+        params = { profile_id: broker_agency_profile.id, profile_type:"broker_agency_staff"}
+        service = subject.new params
+        expect(service.is_broker_agency_registered?(user1, profile_form)). to eq true
+      end
+
+    end
+
+    describe ".is_staff_for_agency?" do
+      context "Staff for broker agency profile" do
+
+        it  "should return true if broker staff is assigned to a broker agency profile" do
+          params = { profile_id: broker_agency_profile.id, profile_type:"broker_agency_staff"}
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, nil)). to eq true
+        end
+
+        it  "should return false if broker staff is not assigned to a broker agency profile" do
+          person.broker_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_broker_agency_profile_id: nil)}
+          params = { profile_id: broker_agency_profile.id, profile_type:"broker_agency_staff"}
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, nil)). to eq false
+        end
+      end
+    end
   end
 end

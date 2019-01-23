@@ -259,5 +259,110 @@ module BenefitSponsors
       end
 
     end
+
+    describe ".add_broker_agency_staff_role", dbclean: :after_each  do
+
+      let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
+      let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
+      let(:person1) {FactoryGirl.create(:person, person_params)}
+
+      context 'duplicate person PII' do
+        before do
+          FactoryGirl.create(:person, person_params)
+          @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+        end
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'zero matching person PII' do
+        before {@status, @result = subject.add_broker_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )}
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+      end
+
+      context 'matching one person PII' do
+        before {@status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )}
+
+        it 'returns true' do
+          expect(@status).to eq true
+        end
+
+        it 'returns the person' do
+          expect(@result).to eq person1
+        end
+      end
+
+      context 'person already has broker role with this broker agency' do
+        before {
+          subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+          @status, @result = subject.add_broker_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', broker_agency_profile )
+        }
+
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns the person' do
+          expect(@result).to be_instance_of String
+        end
+      end
+    end
+
+    describe ".deactivate_broker_agency_staff_role" do
+      let(:person) {FactoryGirl.create(:person)}
+      let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+      let(:broker_agency_profile_second) {FactoryGirl.create(:broker_agency_profile)}
+      before{
+        FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      }
+
+      context 'finds the person and deactivates the role' do
+        before{
+          @status, @result = subject.deactivate_broker_agency_staff_role(person.id, broker_agency_profile.id)
+        }
+        it 'returns true' do
+          expect(@status).to be true
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should terminate broker agency staff role' do
+          expect(person.reload.broker_agency_staff_roles.first.aasm_state).to eq "broker_agency_terminated"
+        end
+      end
+
+      context 'person does not have broker agency staff role' do
+        before{
+          @status, @result = subject.deactivate_broker_agency_staff_role(person.id, broker_agency_profile_second.id)
+        }
+        it 'returns false' do
+          expect(@status).to eq false
+        end
+
+        it 'returns msg' do
+          expect(@result).to be_instance_of String
+        end
+
+        it 'should not terminate other broker agency staff role' do
+          expect(person.reload.broker_agency_staff_roles.first.aasm_state).to eq "active"
+        end
+      end
+    end
+
+
   end
 end
