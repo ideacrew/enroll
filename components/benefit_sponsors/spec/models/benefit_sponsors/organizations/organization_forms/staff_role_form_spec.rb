@@ -264,7 +264,7 @@ module BenefitSponsors
       let!(:params) {
         {
             filter_criteria: {"q" => broker_agency_profile.legal_name},
-            is_broker_registration_page: "true"
+            is_broker_registration_page: true
         }
       }
 
