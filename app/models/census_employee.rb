@@ -9,6 +9,7 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Insured::FamiliesHelper
 
   require 'roo'
 
@@ -915,6 +916,16 @@ class CensusEmployee < CensusMember
       else
         unset_sparse("encrypted_ssn")
       end
+    end
+  end
+
+  #sort and display latest expired enrollments in desc order
+  def past_enrollments
+    if employee_role.blank?
+      []      
+    else
+      enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
     end
   end
 
