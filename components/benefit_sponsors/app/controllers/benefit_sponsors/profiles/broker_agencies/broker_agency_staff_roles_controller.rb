@@ -6,46 +6,27 @@ module BenefitSponsors
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           respond_to do |format|
-            format.html { render 'new', layout: false}
-          end
-        end
-
-        def new_staff_form
-          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
-          @staff.profile_type = "broker_agency_staff"
-          respond_to do |format|
-            format.html
-            format.js
+            format.html { render 'new', layout: false} if params[:profile_type]
+            format.js  { render 'new_staff_form'}
           end
         end
 
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
-          @status , @result = @staff.save
-          unless @status
-            @messages = (' Broker Staff Role was not added because '  + @result)
-          else
-            @messages = "Broker Staff Role added"
-          end
-          respond_to do |format|
-            format.js
-          end
-        end
-
-        def create_broker_staff
-          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
-          authorize @staff
           begin
             @status , @result = @staff.save
-            if @status
-              flash[:notice] = "Role added sucessfully"
-            else
-              flash[:error] = "Role was not added because " + @result
+            unless @staff.is_broker_registration_page
+              flash[:notice] = "Role added sucessfully" if @status
+              flash[:error] = "Role was not added because " + @result unless @status
             end
           rescue Exception => e
             flash[:error] = "Role was not added because " + e.message
           end
-          redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])
+
+          respond_to do |format|
+            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id])}
+            format.js
+          end
         end
 
         def approve
@@ -81,8 +62,8 @@ module BenefitSponsors
         end
 
         def search_broker_agency
-          @broker_agencies = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
-          @broker_agency_profiles =  @broker_agencies.broker_agency_search
+          @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
+          @broker_agency_profiles =   @staff.broker_agency_search
         end
 
         private

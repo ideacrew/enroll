@@ -20,7 +20,7 @@ module BenefitSponsors
       attribute :profile_type, String
 
       attribute :filter_criteria, Hash
-      attribute :is_broker_registration_page, String
+      attribute :is_broker_registration_page, Boolean, default: false
 
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
@@ -56,6 +56,10 @@ module BenefitSponsors
         rescue
           return nil
         end
+      end
+
+      def is_broker_registration_page=(val)
+        @is_broker_registration_page = val.blank? ? false : val == "true"
       end
 
       def is_broker_profile?
