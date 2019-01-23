@@ -32,7 +32,7 @@ class ForcePublishPlanYears < MongoidMigrationTask
         completion_check(start_on_date, current_date)  unless Rails.env.test?
       end
     end
-  
+    
     def plan_years_in_aasm_state(aasm_states, start_on_date)
       Organization.where({
         :'employer_profile.plan_years' =>
