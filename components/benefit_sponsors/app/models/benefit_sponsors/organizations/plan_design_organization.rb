@@ -5,10 +5,10 @@ module BenefitSponsors
 
 
       belongs_to  :plan_design_organization, inverse_of: :plan_design_organizations, counter_cache: true,
-                  class_name: "BenefitSponsors::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization", optional: true
 
       belongs_to  :subject_organization, inverse_of: :plan_design_subject_organizations,
-                  class_name: "BenefitSponsors::Organizations::Organization"
+                  class_name: "BenefitSponsors::Organizations::Organization", optional: true
 
       embeds_many :plan_design_proposals, class_name: "BenefitSponsors::Organizations::PlanDesignProposal", cascade_callbacks: true
 

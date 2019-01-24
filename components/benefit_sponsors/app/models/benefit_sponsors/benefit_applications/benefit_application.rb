@@ -76,7 +76,7 @@ module BenefitSponsors
 
     field :predecessor_id,          type: BSON::ObjectId
 
-    field :recorded_rating_area_id,     type: BSON::ObjectId
+    field :recorded_rating_area_id,     type: BSON::ObjectId 
     field :recorded_service_area_ids,   type: Array, default: []
 
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId

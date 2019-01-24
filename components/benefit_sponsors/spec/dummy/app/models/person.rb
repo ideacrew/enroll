@@ -49,7 +49,7 @@ class Person
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
-  belongs_to :user
+  belongs_to :user, optional: true
 
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
   embeds_one :consumer_role, cascade_callbacks: true, validate: true

@@ -198,8 +198,7 @@ class HbxEnrollment
 
   embeds_many :workflow_state_transitions, as: :transitional
 
-  belongs_to :benefit_sponsorship,
-              class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
+  belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
   embeds_many :hbx_enrollment_members
   accepts_nested_attributes_for :hbx_enrollment_members, reject_if: :all_blank, allow_destroy: true

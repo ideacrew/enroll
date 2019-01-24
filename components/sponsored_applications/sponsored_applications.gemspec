@@ -18,13 +18,13 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 5.2.2"
   s.add_dependency "slim", "3.0.8" 
-  s.add_dependency "mongoid", "~> 5.0.1" 
+  s.add_dependency "mongoid", "~> 7.0.2" 
   s.add_dependency 'aasm', '~> 4.8  ' 
 
   s.add_development_dependency 'rspec-rails' 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'shoulda-matchers'
-  s.add_development_dependency 'Factory_bot_rails'
+  s.add_development_dependency 'factory_bot_rails'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'pry-rails'
