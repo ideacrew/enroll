@@ -9,6 +9,14 @@
   <% message_for_display = "Successfully created a draft plan year" %>
 <% end %>
 
-<div class="container bottom-pd">
+<div class="container bottom-pd text-center">
   <h4 class="title"><%= message_for_display %></h4>
+  <table class="table">
+    <thead> </thead>
+    <tbody>
+      <tr>
+        <td> <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n(".cancel") %> </span> </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
