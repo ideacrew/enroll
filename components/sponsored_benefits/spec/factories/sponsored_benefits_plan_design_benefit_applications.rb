@@ -5,7 +5,7 @@ FactoryGirl.define do
 
     trait :with_benefit_group do
       after(:create) do |application, evaluator|
-        FactoryGirl.build(:sponsored_benefits_benefit_applications_benefit_group, benefit_application: application)
+        FactoryGirl.create(:sponsored_benefits_benefit_applications_benefit_group, benefit_application: application)
       end
     end
   end
