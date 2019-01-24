@@ -103,6 +103,7 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_create_benefit_application
     Permission.super_admin.update_attributes(can_create_benefit_application: true)
+    Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
   end
 
   def grant_super_admin_access
