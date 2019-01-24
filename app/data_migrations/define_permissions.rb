@@ -110,6 +110,10 @@ class DefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+  end
+
   def hbx_admin_can_extend_open_enrollment
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
   end

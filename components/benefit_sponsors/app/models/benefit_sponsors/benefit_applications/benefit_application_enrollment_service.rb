@@ -2,11 +2,13 @@ module BenefitSponsors
   class BenefitApplications::BenefitApplicationEnrollmentService
     include Config::AcaModelConcern
 
-    attr_reader   :benefit_application, :business_policy
+    attr_reader   :benefit_application, :business_policy, :errors, :messages
 
 
     def initialize(benefit_application)
       @benefit_application = benefit_application
+      @errors = []
+      @messages = {}
     end
 
     def renew_application
@@ -75,18 +77,28 @@ module BenefitSponsors
     end
 
     def force_submit_application
-      if is_application_valid? && is_application_eligible?
+      if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.auto_approve_application!
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
+            @messages['notice'] = 'Employer(s) Plan Year was successfully published.'
+          else
+            raise 'Employer(s) Plan Year date has not matched.'
           end
+        else
+          @messages['notice'] = 'Employer(s) Plan Year could not be processed'
         end
+      elsif benefit_application.may_submit_for_review?
+        benefit_application.submit_for_review!
+        @messages['notice'] = 'Employer(s) Plan Year was successfully submitted for review.'
+        @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       else
-        benefit_application.submit_for_review! if benefit_application.may_submit_for_review?
-        errors = application_errors.merge(open_enrollment_date_errors)
-        [false, benefit_application, errors]
+        @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+        @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       end
+    rescue => e
+      @errors = [e.message]
     end
 
     def begin_open_enrollment
@@ -287,6 +299,17 @@ module BenefitSponsors
     end
 
     private
+
+    def submit_application_warnings
+      [application_errors.values + application_eligibility_warnings.values].flatten.reject(&:blank?)
+    end
+
+    def force_publish_warnings
+      submit_warnings = []
+      submit_warnings += business_policy.fail_results.values unless business_policy.fail_results.values.blank?
+      submit_warnings += submit_application_warnings unless submit_application_warnings.blank?
+      submit_warnings
+    end
 
     def business_policy_satisfied_for?(event_name)
       business_policy_name = policy_name(event_name)
