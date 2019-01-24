@@ -818,15 +818,13 @@ class Person
     end
 
     def staff_for_broker_including_pending(broker_profile)
-      #This query (and similar one below) handles both old broker profile model and new broker profile model.
       Person.where(:broker_agency_staff_roles => {
           '$elemMatch' => {
               '$and' =>[
                   {
                       '$or' =>
                           [
-                              {benefit_sponsors_broker_agency_profile_id: broker_profile.id },
-                              {broker_agency_profile_id: broker_profile.id}
+                              {benefit_sponsors_broker_agency_profile_id: broker_profile.id }
                           ],
                   },
                   {'$or' =>

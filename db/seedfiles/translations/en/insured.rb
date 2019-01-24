@@ -99,7 +99,6 @@ INSURED_TRANSLATIONS = {
   "en.last_name" => "Last Name",
   "en.middle_name" => "Middle Name",
   "en.first_name" => "First Name",
-  "en.date_of_birth" => "Date of Birth",
   "en.invalid_first_name" => "Please provide a first name.",
   "en.invalid_last_name" => "Please provide a last name.",
   "en.invalid_dob" => "Please provide a date of birth.",
