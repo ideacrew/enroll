@@ -21,6 +21,14 @@ describe "a monthly inital employer quiet period enrollments query" do
          - One health enrollment during OE(Enrollment 8)
          - One health enrollment during Quiet Period(Enrollment 9)
          - Another health enrollment during Quiet Period(Enrollment 10)
+
+         - One new hire health enrollment during OE (Enrollment 11) with effective GREATER than plan year start date
+         - One new hire health enrollment during Quiet Period (Enrollment 12) with effective GREATER than plan year start date
+         - One new hire dental enrollment during OE (Enrollment 13) with effective GREATER than plan year start date
+         - One new hire dental enrollment during Quiet Period (Enrollment 14) with effective GREATER than plan year start date
+
+         - One new hire health enrollment during OE (Enrollment 15) with effective as start date of the plan year
+
     ", dbclean: :after_each do
 
       include_context "setup benefit market with market catalogs and product packages"
@@ -122,6 +130,26 @@ describe "a monthly inital employer quiet period enrollments query" do
         create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: quiet_period_end_date.prev_day, enrollment_kind: 'special_enrollment', parent: enrollment_9)
       }
 
+      let!(:enrollment_11) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on.next_month)
+      }
+
+      let!(:enrollment_12) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: quiet_period_end_date - 2.days, effective_date: plan_year.start_on.next_month)
+      }
+
+      let!(:enrollment_13) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, coverage_kind: 'dental', employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on.next_month)
+      }
+
+      let!(:enrollment_14) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, coverage_kind: 'dental', employee_role: employee_E, submitted_at: quiet_period_end_date - 2.days, effective_date: plan_year.start_on.next_month)
+      }
+
+      let!(:enrollment_15) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on)
+      }
+
       it "does not include enrollment 1" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).not_to include(enrollment_1.hbx_id)
@@ -175,6 +203,31 @@ describe "a monthly inital employer quiet period enrollments query" do
       it "includes enrollment 10" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).to include(enrollment_10.hbx_id)
+      end
+
+      it "includes enrollment 11" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_11.hbx_id)
+      end
+
+      it "includes enrollment 12" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_12.hbx_id)
+      end
+
+      it "includes enrollment 13" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_13.hbx_id)
+      end
+
+      it "includes enrollment 14" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_14.hbx_id)
+      end
+
+      it "includes enrollment 15" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).not_to include(enrollment_15.hbx_id)
       end
     end
 
