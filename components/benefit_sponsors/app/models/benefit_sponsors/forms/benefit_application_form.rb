@@ -28,6 +28,7 @@ module BenefitSponsors
 
       validates_presence_of :fte_count, :pte_count, :msp_count, :benefit_sponsorship_id
 
+      validate :validate_oe_dates
       # validates :validate_application_dates
       attr_reader :service, :show_page_model
 
@@ -115,6 +116,12 @@ module BenefitSponsors
       def update_attributes(params)
         self.attributes = params
         persist(update: true)
+      end
+
+      def validate_oe_dates
+        if admin_datatable_action && open_enrollment_end_on <= open_enrollment_start_on
+          errors.add(:base, "Open Enrollment Start Date can't be later than the Open Enrollment End Date")
+        end
       end
 
       def validate_application_dates
