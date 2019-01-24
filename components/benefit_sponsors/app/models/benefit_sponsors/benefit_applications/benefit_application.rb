@@ -97,6 +97,7 @@ module BenefitSponsors
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+    scope :draft_and_exception, ->{ any_in(aasm_state: [:draft] + APPLICATION_EXCEPTION_STATES) }
     scope :draft_state,         ->{ where(aasm_state: :draft) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
 
