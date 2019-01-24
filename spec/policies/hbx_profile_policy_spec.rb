@@ -124,7 +124,7 @@ describe HbxProfilePolicy do
 end
 
 describe HbxProfilePolicy do
-  context '.new_benefit_application_for_employer?' do
+  context '.can_create_benefit_application?' do
     let!(:super_admin_permission)  { FactoryGirl.create(:permission, :super_admin) }
     let!(:hbx_tier3_permission)    { FactoryGirl.create(:permission, :hbx_tier3) }
     let!(:user10)                  { FactoryGirl.create(:user) }
@@ -134,12 +134,12 @@ describe HbxProfilePolicy do
 
     it 'should return false' do
       person.hbx_staff_role.update_attributes!(permission_id: hbx_tier3_permission.id)
-      expect(subject.new_benefit_application_for_employer?).to eq false
+      expect(subject.can_create_benefit_application?).to eq false
     end
 
     it 'should return true' do
       person.hbx_staff_role.update_attributes!(permission_id: super_admin_permission.id)
-      expect(subject.new_benefit_application_for_employer?).to eq true
+      expect(subject.can_create_benefit_application?).to eq true
     end
   end
 end

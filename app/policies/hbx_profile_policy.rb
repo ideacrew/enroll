@@ -30,7 +30,7 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_extend_open_enrollment
   end
 
-  def new_benefit_application_for_employer?
+  def can_create_benefit_application?
     return true unless role = user.person.hbx_staff_role
     role.permission.can_create_benefit_application?
   end

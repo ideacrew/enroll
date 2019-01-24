@@ -52,7 +52,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def new_benefit_application
-    authorize HbxProfile, :new_benefit_application_for_employer?
+    authorize HbxProfile, :can_create_benefit_application?
     @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_ba_params)
     @element_to_replace_id = params[:employer_actions_id]
   end
