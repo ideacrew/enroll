@@ -3,7 +3,11 @@ FactoryGirl.define do
     
     trait :with_profile do
       after(:create) do |proposal, evaluator|
-        create(:shop_cca_employer_profile, plan_design_proposal: proposal)
+        if Settings.aca.state_abbreviation == "DC" # toDo
+          create(:shop_dc_employer_profile, plan_design_proposal: proposal)
+        else
+          create(:shop_cca_employer_profile, plan_design_proposal: proposal)
+        end
       end
     end
   end
