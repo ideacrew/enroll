@@ -45,12 +45,16 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
     let(:start_on)  { current_effective_date }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
+    let!(:package)  {FactoryBot.create(:benefit_markets_products_product_package, 
+    packagable: benefit_market_catalog
+  )}
     let!(:benefit_application) {
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
+
+      binding.pry
       application.benefit_sponsor_catalog.save!
       application
-    }
-
+  }
     let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package, is_active: true) }
     let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
 

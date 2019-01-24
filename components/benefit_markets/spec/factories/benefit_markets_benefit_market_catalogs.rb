@@ -36,6 +36,7 @@ FactoryBot.define do
           case product_kind
           when :health
             evaluator.health_product_package_kinds.each do |package_kind|
+              binding.pry
               create_product_package(product_kind, package_kind, benefit_market_catalog, evaluator)
             end
           when :dental

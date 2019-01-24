@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails",                     "~> 5.2.2"
 
-  s.add_dependency "mongoid",                   "~> 7.0"
+  s.add_dependency "mongoid",                   "~> 7.0.2"
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
 
   s.add_dependency "aasm",                      "~> 4.8"

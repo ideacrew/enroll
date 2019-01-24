@@ -18,11 +18,11 @@ PATH
       config (~> 1.7)
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.0)
+      mongoid (~> 7.0.2)
       pundit (~> 2.0)
       rails (~> 5.2.2)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.6)
+      symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
 
 PATH
@@ -36,7 +36,7 @@ PATH
       config
       curl
       money-rails (~> 1.13)
-      mongoid (~> 7.0)
+      mongoid (~> 7.0.2)
       non-stupid-digest-assets
       rails (~> 5.2.2)
       redcarpet (~> 3.4.0)
@@ -58,13 +58,13 @@ PATH
       interactor-rails (~> 2.2)
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.0)
+      mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 5.2.2)
       roo (~> 2.1)
       slim (~> 3.0)
-      symmetric-encryption (~> 3.6)
+      symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
 
 GEM

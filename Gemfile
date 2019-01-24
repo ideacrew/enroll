@@ -42,7 +42,7 @@ gem "transport_profiles", path: "components/transport_profiles"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '~> 7.0'
+gem 'mongoid',                  '~> 7.0.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'

@@ -1,0 +1,11 @@
+  
+  
+  policies = Policy.where(:carrier_specific_plan_id => /\.0/)
+  
+  policies.each do |py|
+ puts "#{py.carrier_specific_plan_id}"
+ csp_id = py.carrier_specific_plan_id.split(".")[0]
+ py.update_attributes!(carrier_specific_plan_id: csp_id)
+ puts "#{py.carrier_specific_plan_id} \n"
+ puts "---------------------------"
+ end
