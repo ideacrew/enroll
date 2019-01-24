@@ -26,7 +26,7 @@ qs.evaluate.each do |r|
   enroll_pol_ids << r['hbx_id']
 end
 
-glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip)
+glue_list = File.read("policies_to_pull_renewals.txt").split("\n").map(&:strip)
 enroll_pol_ids = enroll_pol_ids - (glue_list + excluded_ids)
 clean_pol_ids = enroll_pol_ids
 
@@ -39,7 +39,7 @@ def matching_plan_details(enrollment, hen, plan_cache)
   return false if hen.plan_id.blank?
   new_plan = plan_cache[enrollment.plan_id]
   old_plan = plan_cache[hen.plan_id]
-  (old_plan.carrier_profile_id == new_plan.carrier_profile_id) && (old_plan.active_year == new_plan.active_year - 1)
+  (old_plan.carrier_profile_id == new_plan.carrier_profile_id) && (old_plan.active_year == new_plan.active_year - 1) && (old_plan.coverage_kind == new_plan.coverage_kind)
 end
 
 dependent_add_same_carrier = []
@@ -54,7 +54,7 @@ clean_pol_ids.each do |p_id|
   renewal_enrollments = enrollment.family.households.flat_map(&:hbx_enrollments).select do |hen|
     hen.is_shop? && (hen.employee_role_id == enrollment.employee_role_id) &&
     hen.terminated_on.blank? && matching_plan_details(enrollment, hen, plan_cache) &&
-    (!%w(coverage_terminated unverified void shopping coverage_canceled inactive).include?(hen.aasm_state))
+    (!%w(coverage_terminated unverified void shopping coverage_canceled inactive renewing_waived).include?(hen.aasm_state))
   end
 
   if renewal_enrollments.any?
