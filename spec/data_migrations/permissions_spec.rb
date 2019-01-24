@@ -43,6 +43,8 @@ describe DefinePermissions, dbclean: :after_each do
         User.all.delete
         Person.all.delete
         @hbx_staff_person = FactoryGirl.create(:person)
+        @super_admin = FactoryGirl.create(:person)
+        @hbx_tier3 = FactoryGirl.create(:person)
         @hbx_read_only_person = FactoryGirl.create(:person)
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         @hbx_csr_tier1_person = FactoryGirl.create(:person)
@@ -52,12 +54,16 @@ describe DefinePermissions, dbclean: :after_each do
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        super_admin = FactoryGirl.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        hbx_tier3 = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         subject.hbx_admin_can_view_username_and_email
       end
 
       it "updates can_view_username_and_email to true" do
-        expect(Person.all.count).to eq(5)
+        expect(Person.all.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_username_and_email).to be true
+        expect(@super_admin.hbx_staff_role.permission.can_view_username_and_email).to be true
+        expect(@hbx_tier3.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_username_and_email).to be true
@@ -74,17 +80,23 @@ describe DefinePermissions, dbclean: :after_each do
         User.all.delete
         Person.all.delete
         @hbx_staff_person = FactoryGirl.create(:person)
+        @super_admin = FactoryGirl.create(:person)
+        @hbx_tier3 = FactoryGirl.create(:person)
         @hbx_read_only_person = FactoryGirl.create(:person)
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        super_admin = FactoryGirl.create(:hbx_staff_role, person: @super_admin, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        hbx_tier3 = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
         subject.hbx_admin_can_add_sep
       end
 
       it "updates can_complete_resident_application to true" do
-        expect(Person.all.count).to eq(3)
+        expect(Person.all.count).to eq(5)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
+        expect(@super_admin.hbx_staff_role.permission.can_add_sep).to be true
+        expect(@hbx_tier3.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be false
         #verifying that the rake task updated only the correct subroles
