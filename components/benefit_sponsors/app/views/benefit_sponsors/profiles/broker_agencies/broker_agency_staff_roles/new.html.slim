@@ -11,10 +11,9 @@
               = l10n("select_your_broker_agency")
             .col-md-4.col-sm-6.col-xs-12.input-group.input-no-pd
               = f.hidden_field :profile_id
-              = hidden_field_tag :profile_type, "broker_agency_staff"
-              = text_field_tag :agency_search, nil, placeholder: 'Agency/Broker Name,NPN', class: 'form-control'
+              = f.hidden_field :profile_type, value: "broker_agency_staff"
+              = f.text_field :agency_search, placeholder: 'Agency/Broker Name,NPN', class: 'form-control'
               .input-group-btn
-                = hidden_field_tag :broker_registration_page, true
                 a.btn.btn-select.search[href="#" onclick="brokerSearch();" data-loading-text="Loading..."]
                   i.fa.fa-search
                   = l10n("search").to_s.downcase
@@ -34,14 +33,13 @@ javascript:
   validateAjaxForm();
 
   function brokerSearch() {
-    var broker_agency_search = document.getElementById('agency_search').value
-    var broker_registration_page = document.getElementById('broker_registration_page').value
+    var broker_agency_search = document.getElementById('staff_agency_search').value
     document.getElementById('broker-staff-btn').disabled = true;
     if (broker_agency_search != undefined) {
         $.ajax({
           url: '/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/search_broker_agency.js',
           type: "GET",
-          data: {'q': broker_agency_search, "broker_registration_page": broker_registration_page}
+          data: {'q': broker_agency_search}
         });
     };
 

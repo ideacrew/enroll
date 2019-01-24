@@ -58,10 +58,6 @@ module BenefitSponsors
         end
       end
 
-      def is_broker_registration_page=(val)
-        @is_broker_registration_page = val.blank? ? false : val == "true"
-      end
-
       def is_broker_profile?
         profile_type == "broker_agency"
       end

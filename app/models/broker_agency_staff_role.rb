@@ -48,6 +48,10 @@ class BrokerAgencyStaffRole
     event :broker_agency_active, :after => :record_transition do
       transitions from: :broker_agency_terminated, to: :active
     end
+
+    event :broker_agency_pending, :after => :record_transition do
+      transitions from: :broker_agency_terminated, to: :broker_agency_pending
+    end
   end
 
   def send_invitation

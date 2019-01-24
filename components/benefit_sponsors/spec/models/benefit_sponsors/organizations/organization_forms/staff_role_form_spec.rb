@@ -275,7 +275,7 @@ module BenefitSponsors
 
         it "should assign the params for broker_search_form" do
           expect(broker_search_form.filter_criteria.class).to eq Hash
-          expect(broker_search_form.is_broker_registration_page).to eq "true"
+          expect(broker_search_form.is_broker_registration_page).to eq true
         end
 
         context '#broker_agency_search!' do

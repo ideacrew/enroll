@@ -87,10 +87,13 @@ module BenefitSponsors
 
         terminated_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_terminated"}
         active_brokers_with_same_profile =  person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "active"}
+        pending_brokers_with_same_profile = person.broker_agency_staff_roles.detect{|role| role if role.benefit_sponsors_broker_agency_profile_id == profile.id && role.aasm_state == "broker_agency_pending"}
 
         if terminated_brokers_with_same_profile.present?
-          terminated_brokers_with_same_profile.broker_agency_active!
+          terminated_brokers_with_same_profile.broker_agency_pending!
           return true, person
+        elsif pending_brokers_with_same_profile.present?
+          return false,  "your application status was in pending with this Broker Agency"
         elsif active_brokers_with_same_profile.present?
           return false,  "you are already associated with this Broker Agency"
         else
@@ -103,7 +106,7 @@ module BenefitSponsors
       end
 
       def broker_agency_search!(form)
-        results = BenefitSponsors::Organizations::Organization.broker_agencies_with_matching_agency_or_broker(form[:filter_criteria].symbolize_keys!, form[:is_broker_registration_page])
+        results = BenefitSponsors::Organizations::Organization.broker_agencies_with_matching_agency_or_broker(form[:filter_criteria].symbolize_keys!, form.is_broker_registration_page)
         if results.first.is_a?(Person)
           @filtered_broker_roles  = results.map(&:broker_role)
           @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
