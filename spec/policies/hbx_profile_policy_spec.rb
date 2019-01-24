@@ -125,17 +125,21 @@ end
 
 describe HbxProfilePolicy do
   context '.new_benefit_application_for_employer?' do
-    let!(:user10) { FactoryGirl.create(:user) }
-    let!(:person) { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
-    subject { HbxProfilePolicy.new(user10, nil) }
+    let!(:super_admin_permission)  { FactoryGirl.create(:permission, :super_admin) }
+    let!(:hbx_tier3_permission)    { FactoryGirl.create(:permission, :hbx_tier3) }
+    let!(:user10)                  { FactoryGirl.create(:user) }
+    let!(:person)                  { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
+
+    subject                        { HbxProfilePolicy.new(user10, nil) }
 
     it 'should return false' do
-      expect(subject.new_benefit_application_for_employer?).to be_falsey
+      person.hbx_staff_role.update_attributes!(permission_id: hbx_tier3_permission.id)
+      expect(subject.new_benefit_application_for_employer?).to eq false
     end
 
     it 'should return true' do
-      person.hbx_staff_role.update_attributes!(subrole: 'super_admin')
-      expect(subject.new_benefit_application_for_employer?).to be_truthy
+      person.hbx_staff_role.update_attributes!(permission_id: super_admin_permission.id)
+      expect(subject.new_benefit_application_for_employer?).to eq true
     end
   end
 end

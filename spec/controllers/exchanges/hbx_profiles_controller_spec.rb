@@ -716,10 +716,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "benefit application creation" do
-    let!(:user) { FactoryGirl.create(:user) }
-    let!(:person) { FactoryGirl.create(:person, user: user) }
-    let!(:permission) { FactoryGirl.create(:permission, name: "super_admin") }
-    let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person, subrole: "super_admin", permission_id: permission.id) }
+    let!(:user)           { FactoryGirl.create(:user) }
+    let!(:person)         { FactoryGirl.create(:person, user: user) }
+    let!(:permission)     { FactoryGirl.create(:permission, :super_admin) }
+    let!(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id) }
 
     before :each do
       sign_in(user)

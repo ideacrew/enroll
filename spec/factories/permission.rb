@@ -82,6 +82,7 @@ FactoryGirl.define do
     end
 
     trait :hbx_tier3 do
+      name 'hbx_tier3'
       modify_family true
       modify_employer false
       revert_application false
@@ -94,9 +95,11 @@ FactoryGirl.define do
     end
 
     trait :super_admin do
+      name 'super_admin'
       can_complete_resident_application true
       can_add_sep true
       can_extend_open_enrollment true
+      can_create_benefit_application true
     end
   end
 end
