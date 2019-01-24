@@ -16,6 +16,7 @@ module BenefitSponsors
       attribute :number, String
       attribute :extension, String
       attribute :profile_id, String
+      attribute :agency_search, String
 
       attribute :profile_type, String
 
@@ -56,6 +57,10 @@ module BenefitSponsors
         rescue
           return nil
         end
+      end
+
+      def is_broker_registration_page=(val)
+        @is_broker_registration_page = val.blank? ? false : val == "true"
       end
 
       def is_broker_profile?
