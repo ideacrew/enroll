@@ -33,10 +33,6 @@ When(/^the user clicks on Force Publish button$/) do
   find('.btn.btn-xs', text: 'Force Publish').trigger('click')
 end
 
-Then(/^the force published action should display '(.*?)'$/) do |message|
-  expect(page).to have_content(message)
-end
-
 When (/^(.*?) FTE count is (less than or equal|more than) to shop:small_market_employee_count_maximum$/) do |employer, compare|
   if compare == 'less than or equal'
     initial_application.update_attributes(fte_count: fte_max_count - 1 )

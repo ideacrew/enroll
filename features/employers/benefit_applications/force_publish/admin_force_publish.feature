@@ -20,20 +20,6 @@ Feature: As an admin user I should have the ability to extend the OE
       | greater            | earliest_start_prior_to_effective_on | less         | not see |
       | less               | monthly open enrollment end_on       | greater      | see     |
 
-  Scenario Outline: As an HBX Staff with Super Admin subroles should see <display_message> based on open_enrollment_period start date of benefit application
-    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
-    And the user is on the Employer Index of the Admin Dashboard
-    When the system date is <system_date_value> open_enrollment_period start date
-    And the user clicks Action for that Employer
-    Then the user will see the Force Publish button
-    When the user clicks on Force Publish button
-    Then the force published action should display <display_message>
-
-    Examples:
-      | system_date_value  | display_message                                      |
-      | less than          | 'Employer(s) Plan Year date has not matched.'        |
-      | greater than       | 'Employer(s) Plan Year was successfully published'   |
-
   Scenario: Draft application published between submission deadline & OE End date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
