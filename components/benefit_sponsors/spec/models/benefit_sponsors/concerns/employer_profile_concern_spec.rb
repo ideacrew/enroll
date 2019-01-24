@@ -1,4 +1,6 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :after_each do
@@ -33,16 +35,15 @@ module BenefitSponsors
         end
 
         context "For renewal employer" do
+          include_context "setup benefit market with market catalogs and product packages"
+          include_context "setup renewal application"
 
-          let(:organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization,
-            :with_site,
-            :with_aca_shop_cca_employer_profile_renewal_application
-          )}
-
-          let(:renewal_application) { application.successors.first }
+          let(:renewal_state)           { :enrollment_open }
+          let(:renewal_effective_date)  { TimeKeeper.date_of_record.beginning_of_month }
+          let(:current_effective_date)  { renewal_effective_date.prev_year }
+          let(:profile) { abc_profile }
 
           it "should return renewal published application effective date & renewal start on date" do
-            renewal_application
             expect(profile.billing_benefit_application).to eq [renewal_application, TimeKeeper.date_of_record.next_month]
           end
         end

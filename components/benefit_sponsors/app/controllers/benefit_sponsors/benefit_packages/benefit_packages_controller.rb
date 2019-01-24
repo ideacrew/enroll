@@ -2,12 +2,13 @@ module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
 
+      before_action :check_for_late_rates, only: [:new]
+
       include Pundit
 
       layout "two_column"
 
       def new
-        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
         authorize @benefit_package_form, :updateable?
       end
 
@@ -84,6 +85,14 @@ module BenefitSponsors
       end
 
       private
+
+      def check_for_late_rates
+        @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
+        date = @benefit_package_form.service.benefit_application.start_on.to_date
+        if BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
+          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
+        end
+      end
 
       def error_messages(object)
         object.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
