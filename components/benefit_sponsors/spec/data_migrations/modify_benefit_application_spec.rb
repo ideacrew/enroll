@@ -51,7 +51,6 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     let!(:benefit_application) {
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
 
-      binding.pry
       application.benefit_sponsor_catalog.save!
       application
   }

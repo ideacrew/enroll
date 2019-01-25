@@ -67,7 +67,7 @@ module BenefitSponsors
 
       def lookup_package_products(coverage_date)
         return [reference_product] if product_package_kind == :single_product
-        BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(recorded_service_area_ids), coverage_date)
+        BenefitMarkets::Products::Product.by_coverage_date(product_package.products_for_plan_option_choice(product_option_choice).by_service_areas(s_area_ids), coverage_date)
       end
 
       def product_package
