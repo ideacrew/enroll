@@ -55,6 +55,10 @@ module PermissionsWorld
     Permission.hbx_staff.update_attributes(can_reset_password: true)
   end
 
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+  end
+  
   def hbx_admin_can_extend_open_enrollment
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
   end
@@ -67,6 +71,7 @@ module PermissionsWorld
     hbx_admin_can_lock_unlock
     hbx_admin_can_view_username_and_email
     hbx_admin_can_reset_password
+    hbx_admin_can_force_publish
     hbx_admin_can_extend_open_enrollment
   end
 end
