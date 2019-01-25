@@ -186,7 +186,7 @@ module BenefitSponsors
       else
         where(:benefit_applications => {
                   :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
-                    :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
+                    :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => transition_at.beginning_of_day, "$lt" => transition_at.end_of_day}}}
                   }},
               :aasm_state => :initial_enrollment_eligible
         )
@@ -203,7 +203,7 @@ module BenefitSponsors
       else
         where(:benefit_applications => {
                   :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
-                                  :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
+                                  :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => transition_at.beginning_of_day, "$lt" => transition_at.end_of_day}}}
                   }},
               :aasm_state => :active
         )

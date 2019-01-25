@@ -128,7 +128,7 @@ module BenefitSponsors
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
         start_on = new_date.next_month.beginning_of_month
-        transition_at = (new_date.prev_day.mday + 1) > aca_shop_market_employer_transmission_day_of_month ? new_date : nil
+        transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
         benefit_sponsors.may_transmit_renewal_enrollment?(start_on, transition_at).each do |benefit_sponsorship|
