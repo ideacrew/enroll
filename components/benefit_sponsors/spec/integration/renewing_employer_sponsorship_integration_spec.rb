@@ -48,7 +48,6 @@ RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
       :site => ::BenefitSponsors::Site.first
     })
     employer_organization.profiles.first
-    binding.pry
   end
 
   def create_census_employee(employer_profile, benefit_sponsorship)
@@ -141,8 +140,12 @@ RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
         open_enrollment_period: (Date.new(2017,1,1)..Date.new(2017,11,15)),
         fte_count: 5,
         pte_count: 0,
-        msp_count: 0
+        msp_count: 0,
+        recorded_sic_code: "1",
+
       )
+      benefit_application.recorded_rating_area_id = BenefitMarkets::Locations::RatingArea.first.id
+      benefit_application.recorded_service_area_ids << BenefitMarkets::Locations::ServiceArea.first.id
       benefit_application.save!
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
       benefit_application.save!
@@ -228,8 +231,12 @@ RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
         open_enrollment_period: (Date.new(2017,1,1)..Date.new(2017,11,15)),
         fte_count: 5,
         pte_count: 0,
-        msp_count: 0
+        msp_count: 0,
+        recorded_sic_code:"1",
+
       )
+      benefit_application.recorded_rating_area_id = BenefitMarkets::Locations::RatingArea.first.id
+      benefit_application.recorded_service_area_ids << BenefitMarkets::Locations::ServiceArea.first.id
       benefit_application.save!
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
       benefit_application.save!
@@ -304,8 +311,11 @@ RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
         open_enrollment_period: (Date.new(2017,1,1)..Date.new(2017,11,15)),
         fte_count: 5,
         pte_count: 0,
-        msp_count: 0
+        msp_count: 0,
+        recorded_sic_code:"1"
       )
+      benefit_application.recorded_rating_area_id = BenefitMarkets::Locations::RatingArea.first.id
+      benefit_application.recorded_service_area_ids << BenefitMarkets::Locations::ServiceArea.first.id
       benefit_application.save!
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
       benefit_application.save!

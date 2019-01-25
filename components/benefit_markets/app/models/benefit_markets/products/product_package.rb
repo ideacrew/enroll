@@ -1,4 +1,4 @@
-# ProductPackage provides the composite package for Benefits that may be purchased.  Site
+# ProductPackage provides the composite package for benefits that may be purchased.  Site
 # exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses
 # all Products via ProductPackage.
 # ProductPackage functions:
