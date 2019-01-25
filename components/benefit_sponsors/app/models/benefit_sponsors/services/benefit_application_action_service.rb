@@ -22,9 +22,9 @@ module BenefitSponsors
           # Terminates current application
           service = initialize_service(benefit_application)
           result, ba, errors = if args[:end_on] >= TimeKeeper.date_of_record
-            service.schedule_termination(args[:end_on], TimeKeeper.date_of_record, args[:termination_kind], args[:transmit_to_carrier])
+            service.schedule_termination(args[:end_on], TimeKeeper.date_of_record, args[:termination_kind], args[:termination_reason], args[:transmit_to_carrier])
           else
-            service.terminate(args[:end_on], TimeKeeper.date_of_record, args[:termination_kind], args[:transmit_to_carrier])
+            service.terminate(args[:end_on], TimeKeeper.date_of_record, args[:termination_kind], args[:termination_reason], args[:transmit_to_carrier])
           end
           map_errors_for(errors, onto: failed_results) if errors.present?
           [result, ba, failed_results]

@@ -42,6 +42,24 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     end
   end
 
+  context 'When a plan year is selected' do
+
+    include_context "setup initial benefit application"
+
+    let(:employer_profile) { benefit_sponsorship.profile }
+
+    before :each do
+      sign_in(user)
+      assign :employer_profile, employer_profile
+      assign :benefit_sponsorship, benefit_sponsorship
+      render "exchanges/employer_applications/index", employers_action_id: "employers_action_#{employer_profile.id}", employer_id: benefit_sponsorship
+    end
+
+    it 'should display termination reasons' do
+      expect(rendered).to have_content('Please select terminate reason')
+    end
+  end
+
   context 'When employer doesnt have valid plan years' do
 
     let!(:organization) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }

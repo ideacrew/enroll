@@ -125,6 +125,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       before do
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
+        allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
         allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
         allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
         allow(ENV).to receive(:[]).with("action").and_return("terminate")
@@ -326,6 +327,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       before do
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
+        allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
         allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
         allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
         allow(ENV).to receive(:[]).with("action").and_return("terminate")

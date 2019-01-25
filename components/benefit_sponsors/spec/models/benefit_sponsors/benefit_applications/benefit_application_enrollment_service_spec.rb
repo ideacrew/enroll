@@ -473,7 +473,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 
@@ -495,7 +495,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 
