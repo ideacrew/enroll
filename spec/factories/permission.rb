@@ -92,6 +92,7 @@ FactoryGirl.define do
       approve_ga false
       modify_admin_tabs false
       view_admin_tabs  true
+      can_create_benefit_application true
     end
 
     trait :super_admin do

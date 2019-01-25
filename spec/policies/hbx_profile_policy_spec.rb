@@ -125,21 +125,32 @@ end
 
 describe HbxProfilePolicy do
   context '.can_create_benefit_application?' do
-    let!(:super_admin_permission)  { FactoryGirl.create(:permission, :super_admin) }
-    let!(:hbx_tier3_permission)    { FactoryGirl.create(:permission, :hbx_tier3) }
     let!(:user10)                  { FactoryGirl.create(:user) }
     let!(:person)                  { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
 
     subject                        { HbxProfilePolicy.new(user10, nil) }
 
-    it 'should return false' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_tier3_permission.id)
-      expect(subject.can_create_benefit_application?).to eq false
+
+    (Permission::PERMISSION_KINDS - ['super_admin', 'hbx_tier3']).each do |kind|
+      context "for permissions which doesn't allow the user" do
+        let(:bad_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return false' do
+          person.hbx_staff_role.update_attributes!(permission_id: bad_permission.id)
+          expect(subject.can_create_benefit_application?).to eq false
+        end
+      end
     end
 
-    it 'should return true' do
-      person.hbx_staff_role.update_attributes!(permission_id: super_admin_permission.id)
-      expect(subject.can_create_benefit_application?).to eq true
+    ['super_admin', 'hbx_tier3'].each do |kind|
+      context "for permissions which doesn't allow the user" do
+        let(:good_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return true' do
+          person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+          expect(subject.can_create_benefit_application?).to eq true
+        end
+      end
     end
   end
 end
