@@ -3,6 +3,8 @@ class Permission
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
+
   field :name, type: String
 
   field :modify_family, type: Boolean, default: false
