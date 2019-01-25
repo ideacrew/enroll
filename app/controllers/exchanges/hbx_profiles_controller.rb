@@ -51,6 +51,19 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
+  def new_benefit_application
+    authorize HbxProfile, :can_create_benefit_application?
+    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_ba_params)
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def create_benefit_application
+    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
+    authorize @ba_form, :updateable?
+    @save_errors = benefit_application_error_messages(@ba_form) unless @ba_form.save
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
   def binder_paid
     if params[:ids]
       begin
@@ -574,7 +587,6 @@ def employer_poc
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-
   # Enrollments for APTC / CSR
   def aptc_csr_family_index
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
@@ -612,13 +624,27 @@ def employer_poc
 
 private
 
-   def modify_admin_tabs?
-     authorize HbxProfile, :modify_admin_tabs?
-   end
+  def benefit_application_error_messages(obj)
+    obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }
+  end
 
-   def view_admin_tabs?
-     authorize HbxProfile, :view_admin_tabs?
-   end
+  def new_ba_params
+    params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def create_ba_params
+    params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
+    params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
+                  :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def modify_admin_tabs?
+    authorize HbxProfile, :modify_admin_tabs?
+  end
+
+  def view_admin_tabs?
+    authorize HbxProfile, :view_admin_tabs?
+  end
 
   def setting_params
     params.require(:setting).permit(:name, :value)

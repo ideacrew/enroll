@@ -97,6 +97,7 @@ module BenefitSponsors
 
     # Use chained scopes, for example: approved.effective_date_begin_on(start, end)
     scope :draft,               ->{ any_in(aasm_state: APPLICATION_DRAFT_STATES) }
+    scope :draft_and_exception, ->{ any_in(aasm_state: [:draft] + APPLICATION_EXCEPTION_STATES) }
     scope :draft_state,         ->{ where(aasm_state: :draft) }
     scope :approved,            ->{ any_in(aasm_state: APPLICATION_APPROVED_STATES) }
 
@@ -117,6 +118,9 @@ module BenefitSponsors
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
     scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
+
+    # Used for specific DataTable Action only
+    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending]) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
