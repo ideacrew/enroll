@@ -262,7 +262,9 @@ module BenefitSponsors
 
     describe ".add_broker_agency_staff_role", dbclean: :after_each  do
 
-      let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
+      let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+      let(:broker_agency_profile) { broker_organization.broker_agency_profile }
       let(:person_params) {{first_name: Forgery('name').first_name, last_name: Forgery('name').first_name, dob: '1990/05/01'}}
       let(:person1) {FactoryGirl.create(:person, person_params)}
 
@@ -322,8 +324,12 @@ module BenefitSponsors
 
     describe ".deactivate_broker_agency_staff_role" do
       let(:person) {FactoryGirl.create(:person)}
-      let(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
-      let(:broker_agency_profile_second) {FactoryGirl.create(:broker_agency_profile)}
+      let!(:broker_organization)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+      let(:broker_agency_profile) { broker_organization.broker_agency_profile }
+      let!(:broker_organization_second)                  { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+      let(:broker_agency_profile_second) { broker_organization_second.broker_agency_profile }
       before{
         FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile_id:broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
       }
