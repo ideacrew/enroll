@@ -17,7 +17,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	'en.hbx_profiles.effective_end_date' => 'Effective End Date',
 	'en.hbx_profiles.full_time_employees' => 'Full Time Employees',
 	'en.hbx_profiles.oe_start_date' => 'Open Enrollment Start Date',
-	'en.hbx_profiles.oe_end_date' => 'Open Enrollment End Date',
 	'en.hbx_profiles.provide_fte_count' => 'Please provide full time employees count.',
 	'en.hbx_profiles.provide_oe_start_date' => 'Please provide Open Enrollment Start On date.',
 	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.'
