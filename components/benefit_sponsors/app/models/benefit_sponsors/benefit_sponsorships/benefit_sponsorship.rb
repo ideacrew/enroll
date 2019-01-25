@@ -177,18 +177,37 @@ module BenefitSponsors
       )
     }
 
-    scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible}},
-        :aasm_state => :initial_enrollment_eligible
-      )
+    scope :may_transmit_initial_enrollment?, -> (compare_date = TimeKeeper.date_of_record, transition_at = nil) {
+      if  transition_at.blank?
+        where(:benefit_applications => {
+                  :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+              :aasm_state => :initial_enrollment_eligible
+        )
+      else
+        where(:benefit_applications => {
+                  :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
+                    :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
+                  }},
+              :aasm_state => :initial_enrollment_eligible
+        )
+      end
+
     }
 
-    scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
-      where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
-        :aasm_state => :active
-      )
+    scope :may_transmit_renewal_enrollment?, -> (compare_date = TimeKeeper.date_of_record, transition_at = nil) {
+      if transition_at.blank?
+        where(:benefit_applications => {
+                  :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible }},
+              :aasm_state => :active
+        )
+      else
+        where(:benefit_applications => {
+                  :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
+                                  :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
+                  }},
+              :aasm_state => :active
+        )
+      end
     }
 
     scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
