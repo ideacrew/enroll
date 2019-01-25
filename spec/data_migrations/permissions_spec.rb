@@ -341,6 +341,22 @@ describe DefinePermissions, dbclean: :after_each do
         end
       end
     end
+
+    describe 'super_admin can update plan years from admin index' do
+      before do
+        User.all.delete
+        Person.all.delete
+      end
+      let(:super_admin) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:hbx_staff_role, person: person, subrole: "super_admin", permission_id: Permission.super_admin.id)
+        end
+      end
+
+      it 'returns true' do
+        expect(super_admin.hbx_staff_role.permission.can_modify_plan_year).to be true
+      end
+    end
   end
 
   describe 'build test roles', dbclean: :after_each do

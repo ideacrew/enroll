@@ -902,7 +902,7 @@ module BenefitSponsors
     end
 
     def notify_application(notify = false)
-     @notify = notify
+      @notify = notify
     end
 
     def is_application_trading_partner_publishable?
