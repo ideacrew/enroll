@@ -27,4 +27,6 @@
 
   <%= render "broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
   <%= render "office_locations", office_locations: @broker_agency_profile.organization.office_locations %>
+  <%= render "broker_agency_staff_table", broker_staff: Person.staff_for_broker_including_pending(@broker_agency_profile) %>
+
 </div>

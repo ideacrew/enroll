@@ -383,6 +383,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :broker_agency_staff_roles, :only => [:new, :create, :destroy] do
+      member do
+        get :approve
+      end
+    end
+
 
     resources :broker_roles do
 
