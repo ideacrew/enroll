@@ -120,6 +120,16 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  def force_publish
+      @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+      benefit_application = @benfit_sponsorships.first.benefit_applications.draft_state.last
+      @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
+      @service.force_submit_application
+      respond_to do |format|
+       format.js
+     end
+  end
+
   def employer_invoice
     # Dynamic Filter values for upcoming 30, 60, 90 days renewals
     @next_30_day = TimeKeeper.date_of_record.next_month.beginning_of_month

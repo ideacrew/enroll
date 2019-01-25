@@ -37,7 +37,6 @@ module UserWorld
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
       @admin = FactoryGirl.create(:user, :person => person)
-
     end
   end
 
@@ -138,4 +137,16 @@ end
 
 Then(/^the Effective End Date will not be editable\.$/) do
   pending # Write code here that turns the phrase above into concrete actions
+end
+
+Then(/^the user will( not)? see the Force Publish button$/) do |visible|
+  if visible.blank?
+    expect(page).to have_css('.btn.btn-xs', text: 'Force Publish')
+  else
+    expect(page).to_not have_css('.btn.btn-xs', text: 'Force Publish')
+  end
+end
+
+And(/^system date is between submission deadline & OE End date$/) do
+  allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.open_enrollment_period.max - 1.day))
 end
