@@ -11,4 +11,14 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.last_updated_at" => "Last Updated At",
 	"en.hbx_profiles.edit_open_enrollment" => "Edit Open Enrollment",
 	"en.hbx_profiles.close_open_enrollment" => "Close Open Enrollment",
+	'en.hbx_profiles.ba_fail_message' => 'Could not create a draft plan year',
+	'en.hbx_profiles.ba_success_message' => 'Successfully created a draft plan year',
+	'en.hbx_profiles.effective_start_date' => 'Effective Start Date',
+	'en.hbx_profiles.effective_end_date' => 'Effective End Date',
+	'en.hbx_profiles.full_time_employees' => 'Full Time Employees',
+	'en.hbx_profiles.oe_start_date' => 'Open Enrollment Start Date',
+	'en.hbx_profiles.oe_end_date' => 'Open Enrollment End Date',
+	'en.hbx_profiles.provide_fte_count' => 'Please provide full time employees count.',
+	'en.hbx_profiles.provide_oe_start_date' => 'Please provide Open Enrollment Start On date.',
+	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.'
 }

@@ -7,13 +7,13 @@
   .row
     .col-md-4
       label[for="effectiveStartDate" style="font-weight:bold"]
-        | Effective Start Date
+        = l10n("hbx_profiles.effective_start_date")
       br
       .input-group
         = select_tag :start_on, options_for_select(@ba_form.start_on_options.keys), {:prompt => "SELECT START ON", class:'form-control floatlabel benefit-application-start-date', onchange:"selectedDate(this); validateInputs()", id:'baStartDate'}
     .col-md-4
       label[for="effectiveEndDate" style="font-weight:bold"]
-        | Effective End Date
+        = l10n("hbx_profiles.effective_end_date")
       br
       .input-group
         = text_field_tag :end_on, nil, class:'form-control', readonly: true
@@ -21,40 +21,29 @@
           i.fas.fa-calendar-alt
     .col-md-4
       label[for="fullTimeEmployees" style="font-weight:bold"]
-        | Full Time Employees
+        = l10n("hbx_profiles.full_time_employees")
       br
       = text_field_tag :fte_count, nil, class:'form-control', id:'fteCount', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
       .required-item.hidden
-        |
-          Please provide full time employees count.
-    / .col-md-4
-    /   label[for="binderDueDate" style="font-weight:bold"]
-    /     | Binder Payment Due Date
-    /   br
-    /   .input-group
-    /     = text_field_tag :binder_due_date, nil, class:'form-control', onchange: "enableDisableSubmit()"
-    /     span.input-group-addon
-    /       i.fas.fa-calendar-alt
+        = l10n("hbx_profiles.provide_fte_count")
   br
   .row
     .col-md-4
       label[for="openEnrollmentStartDate" style="font-weight:bold"]
-        | Open Enrollment Start Date
+        = l10n('hbx_profiles.oe_start_date')
       br
       .input-group
         = text_field_tag :open_enrollment_start_on, nil, class:'form-control blocking', onchange: "enableDisableSubmit()", onblur: "checkifValid(this)", :"data-date-min" => @ba_form.start_on ? (Date.strptime(@ba_form.start_on, "%m/%d/%Y") - 2.months) : ""
         .required-item.hidden
-          |
-            Please provide Open Enrollment Start On date.
+          = l10n("hbx_profiles.provide_oe_start_date")
     .col-md-4
       label[for="openEnrollmentEndDate" style="font-weight:bold"]
-        | Open Enrollment End Date
+        = l10n('hbx_profiles.oe_end_date')
       br
       .input-group
         = text_field_tag :open_enrollment_end_on, nil, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on blocking", onchange: "enableDisableSubmit()", onblur: "checkifValid(this)"
         .required-item.hidden
-          |
-            Please provide Open Enrollment Start On date.
+          = l10n("hbx_profiles.provide_oe_end_date")
   br
   .row
     .col-md-12
