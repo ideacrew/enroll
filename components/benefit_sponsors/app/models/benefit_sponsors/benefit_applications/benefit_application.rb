@@ -52,21 +52,21 @@ module BenefitSponsors
 
     VOLUNTARY_TERM_REASONS = [
       "Company went out of business/bankrupt",
-      "Customer Service issues",
+      "Customer Service did not solve problem/poor experience",
+      "Connector website too difficult to use/navigate",
+      "Health Connector does not offer desired product",
       "Group is now > 50 lives",
       "Group no longer has employees",
-      "Unhappy with current carrier",
-      "Unhappy with Connector online tool",
-      "Added/changed broker",
-      "Plan design (I.e. group wants a PPO)",
-      "Company is no longer offering insurance",
       "Went to carrier directly",
-      "Went to an association directl",
+      "Went to an association directly",
+      "Added/changed broker that does not work with Health Connector",
+      "Company is no longer offering insurance",
+      "Company moved out of Massachusetts",
       "Other"
     ]
 
     NON_PAYMENT_TERM_REASONS = [
-      "Non payment"
+      "Non-payment of premium"
     ]
 
     # The date range when this application is active
