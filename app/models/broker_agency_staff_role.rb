@@ -43,6 +43,7 @@ class BrokerAgencyStaffRole
 
     event :broker_agency_terminate, :after => :record_transition do 
       transitions from: :active, to: :broker_agency_terminated
+      transitions from: :broker_agency_pending, to: :broker_agency_terminated
     end
 
     event :broker_agency_active, :after => :record_transition do
