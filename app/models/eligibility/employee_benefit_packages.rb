@@ -96,5 +96,11 @@ module Eligibility
       (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
       (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
     end
+
+    def benefit_group_assignments_for(plan_year)
+      benefit_group_assignments.where({
+        :benefit_group_id.in => plan_year.benefit_groups.pluck(:id)
+        })
+    end
   end
 end

@@ -5,6 +5,10 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:date_of_record_to_use) { Date.new(calender_year, 5, 1) }
 
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+  end
+
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
@@ -37,9 +41,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     }
 
     context 'with valid published plan year' do
-      before do
-        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-      end
 
       it 'should begin the plan year' do
         employer_profile = organization.employer_profile
@@ -61,9 +62,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     end
 
     context 'without a valid published plan year' do
-      before do
-        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-      end
 
       it 'should not begin the plan year' do
         employer_profile = organization.employer_profile
@@ -83,23 +81,38 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
   end
 
   context "Renewing employer" do
-    let(:organization) {
-      org = FactoryGirl.create :organization, legal_name: "Corp 1"
-      employer_profile = FactoryGirl.create :employer_profile, organization: org
-      active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5
-      renewing_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
-      benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
-      renewing_benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year
-      owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
-      2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
-      employer_profile.census_employees.each do |ce|
-        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+
+    let(:organization) { create :organization, legal_name: "Corp 1" }
+    let(:employer_profile) { create :employer_profile, organization: organization }
+
+    let(:active_plan_year) {
+      create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
+        :open_enrollment_start_on => Date.new(calender_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calender_year - 1, 4, 10), fte_count: 5 
+    }
+
+    let!(:benefit_group) { create :benefit_group, :with_valid_dental, plan_year: active_plan_year}
+
+    let(:renewing_plan_year) {
+      create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_enrolled, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
+        :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10), fte_count: 5
+    }
+
+    let!(:renewing_benefit_group) { create :benefit_group, :with_valid_dental, plan_year: renewing_plan_year }
+
+    let!(:owner) { create :census_employee, :owner, employer_profile: employer_profile }
+    let!(:non_owner_employees) { 
+      2.times{|i| create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days } 
+      employer_profile.census_employees.non_business_owner
+    }
+
+    let!(:census_employees) { employer_profile.census_employees }
+
+    let!(:employee_enrollments) {
+      census_employees.each do |ce|
+        person = create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
         ce.update_attributes({employee_role: employee_role})
         family = Family.find_or_build_from_employee_role(employee_role)
-
 
         enrollment = HbxEnrollment.create_from(
           employee_role: employee_role,
@@ -117,14 +130,9 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
           )
         enrollment.update_attributes(:aasm_state => 'auto_renewing')
       end
-
-      org
     }
 
     context 'Renewing Employer with renewing published plan year' do
-      before do
-        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-      end
 
       it 'should begin renewing plan year' do
         employer_profile = organization.employer_profile
@@ -150,9 +158,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
     end
 
     context 'Renewing Employer without valid renewing published plan year' do
-      before do
-        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-      end
 
       it 'should not begin renewing plan year' do
         employer_profile = organization.employer_profile
@@ -177,6 +182,38 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
           expect(ce.active_benefit_group_assignment.aasm_state).to eq 'initialized'
         end
         expect(employer_profile.aasm_state).to eq 'applicant'
+      end
+    end
+
+    context 'with successfully enrolled renewal plan year' do
+      let(:employee_without_coverage) { non_owner_employees[1] }
+      let(:census_employees) { [owner, non_owner_employees[0]] }
+
+      context 'when some employees are not enrolled' do
+     
+        it "should activate their renewal benefit group assignments" do 
+
+          employer_profile.census_employees.each do |ce|
+            expect(ce.active_benefit_group_assignment.benefit_group).to eq active_plan_year.benefit_groups.first
+          end
+
+          employer_enroll_factory = Factories::EmployerEnrollFactory.new
+          employer_enroll_factory.date = date_of_record_to_use
+          employer_enroll_factory.employer_profile = employer_profile
+          employer_enroll_factory.begin
+
+          expect(renewing_plan_year.active?).to be_truthy
+          employee_without_coverage.reload
+
+          expect(employee_without_coverage.active_benefit_group_assignment.benefit_group).to eq renewing_plan_year.benefit_groups.first
+          expect(employee_without_coverage.active_benefit_group_assignment.aasm_state).to eq 'initialized'
+
+          census_employees.each do |ce|
+            ce.reload
+            expect(ce.active_benefit_group_assignment.benefit_group).to eq renewing_plan_year.benefit_groups.first
+            expect(ce.active_benefit_group_assignment.aasm_state).to eq 'coverage_selected'
+          end
+        end
       end
     end
   end
@@ -222,10 +259,6 @@ RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_e
       }
 
       let(:active_plan_year) { organization.employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (TimeKeeper.date_of_record)).first }
-
-      before do
-        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
-      end
 
       it 'should expire plan year with previous year enrollments' do
         employer_profile = organization.employer_profile
