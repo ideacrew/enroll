@@ -1,7 +1,7 @@
 module ModelMatcherHelpers
-  RSpec::Matchers.define :have_errors_on do |prop|
+  RSpec::Matchers.define :have_errors_on do |attribute|
      match do |model|
-       !model.errors.get(prop.to_sym).blank?
+     	model.errors.include?(attribute.to_sym)
      end
   end
 
