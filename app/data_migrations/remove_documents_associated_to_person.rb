@@ -12,14 +12,3 @@ class RemoveDocumentsAssociatedToPerson < MongoidMigrationTask
     end
   end
 end
-
-
-
-
-
-
-
-
-# Person.where(hbx_id:"3383180").first.inbox.messages.where(id: '5b52395bf209f24936000016')
-
-

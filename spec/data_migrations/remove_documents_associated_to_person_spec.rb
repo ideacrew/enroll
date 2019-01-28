@@ -28,3 +28,4 @@ describe RemoveDocumentsAssociatedToPerson, dbclean: :after_each do
     end  
   end
 end
+
