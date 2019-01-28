@@ -583,6 +583,14 @@ module BenefitSponsors
         it "should update end date on benefit application" do
           expect(initial_application.end_on).to eq end_date
         end
+
+        it "should update the termination kind" do
+          expect(initial_application.termination_kind).to eq "voluntary"
+        end
+
+        it "should update the termination reason" do
+          expect(initial_application.termination_reason).to eq "Company went out of business/bankrupt"
+        end
       end
     end
 

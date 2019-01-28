@@ -146,6 +146,14 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect(benefit_application.terminated_on).to eq termination_date
       end
 
+      it "should update the termination kind" do
+        expect(benefit_application.termination_kind).to eq "voluntary"
+      end
+
+      it "should update the termination reason" do
+        expect(benefit_application.termination_reason).to eq "Company went out of business/bankrupt"
+      end
+
       it "should terminate any active employee enrollments" do
         benefit_application.hbx_enrollments.each { |hbx_enrollment| expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"}
       end

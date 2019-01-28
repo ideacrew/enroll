@@ -118,7 +118,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     end_on = Date.strptime(ENV['end_on'], "%m/%d/%Y")
     benefit_applications.each do |benefit_application|
       service = initialize_service(benefit_application)
-      service.terminate(end_on, termination_date, notify_trading_partner, termination_kind, termination_reason)
+      service.terminate(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner)
     end
   end
 
