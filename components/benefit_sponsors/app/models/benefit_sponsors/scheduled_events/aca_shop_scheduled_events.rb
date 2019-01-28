@@ -120,6 +120,7 @@ module BenefitSponsors
 
       def auto_transmit_monthly_benefit_sponsors
         if aca_shop_market_transmit_scheduled_employers
+           # [26, 27, 28, 29, 30, 31] >= 26
           if (new_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_benefit_sponsors(new_date)
           end
@@ -127,7 +128,7 @@ module BenefitSponsors
       end
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
-        start_on = new_date.next_month.beginning_of_month
+        start_on = new_date.prev_day.next_month.beginning_of_month
         transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?

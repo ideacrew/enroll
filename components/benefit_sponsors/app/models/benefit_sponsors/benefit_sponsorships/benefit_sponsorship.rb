@@ -185,10 +185,10 @@ module BenefitSponsors
         )
       else
         where(:benefit_applications => {
-                  :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
+                  :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_eligible, :active],
                     :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => transition_at.beginning_of_day, "$lt" => transition_at.end_of_day}}}
                   }},
-              :aasm_state => :initial_enrollment_eligible
+              :aasm_state.in => [:initial_enrollment_eligible, :active]
         )
       end
 
@@ -202,7 +202,7 @@ module BenefitSponsors
         )
       else
         where(:benefit_applications => {
-                  :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_eligible,
+                  :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_eligible, :active],
                                   :workflow_state_transitions => {"$elemMatch" => {"to_state" => :enrollment_eligible, "transition_at" => { "$gte" => transition_at.beginning_of_day, "$lt" => transition_at.end_of_day}}}
                   }},
               :aasm_state => :active
@@ -461,6 +461,11 @@ module BenefitSponsors
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
     end
 
+    def late_renewal_benefit_application  # use this only for EDI
+      benefit_applications.order_by(:"created_at".desc).detect {|application|
+        application.predecessor.present? && [:active, :enrollment_eligible].include?(application.aasm_state) }
+    end
+
     def active_benefit_application
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
     end
@@ -487,7 +492,8 @@ module BenefitSponsors
 
     #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?
-      renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?
+      renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible? ||
+          late_renewal_benefit_application.present? && (late_renewal_benefit_application.enrollment_eligible? || late_renewal_benefit_application.active?)
     end
 
     def is_renewal_carrier_drop?
@@ -499,7 +505,8 @@ module BenefitSponsors
     end
 
     def carriers_dropped_for(product_kind)
-      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind) if renewal_benefit_application.present?
+      late_renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - late_renewal_benefit_application.issuers_offered_for(product_kind) if late_renewal_benefit_application.present?
     end
     
     ####
@@ -639,8 +646,8 @@ module BenefitSponsors
         deny_initial_enrollment_eligibility! if may_deny_initial_enrollment_eligibility?
       when :active
         begin_coverage! if may_begin_coverage?
-      when :expired
-        cancel! if may_cancel?
+      # when :expired
+      #   cancel! if may_cancel?
       when :canceled
         if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
           cancel! if may_cancel?
