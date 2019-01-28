@@ -65,7 +65,7 @@ class ForcePublishPlanYears < MongoidMigrationTask
           if py.application_errors.present?
             org.employer_profile.census_employees.each do |ce|
               if ce.benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-                unless ce.aasm_state == "employment_terminated" || ce.aasm_state == "rehired"
+                unless ce.aasm_state == "employment_terminated" || ce.aasm_state == "rehired" ||  ce.aasm_state == "cobra_terminated"
                   data = [org.fein, org.legal_name, ce.full_name, ce.id]  
                   csv << data
                   ce.try(:save!)
