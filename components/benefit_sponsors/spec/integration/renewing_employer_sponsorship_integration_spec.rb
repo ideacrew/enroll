@@ -319,6 +319,8 @@ RSpec.describe "an MA ACA Employer", :dbclean => :after_each do
       benefit_application.save!
       benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.recorded_service_areas, benefit_application.effective_period.begin)
       benefit_application.save!
+      require 'pry'
+      binding.pry
       benefit_application.benefit_sponsor_catalog.save!
       @benefit_application = benefit_application
       create_sole_source_benefit_package(benefit_application)
