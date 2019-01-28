@@ -12,20 +12,19 @@ describe RemoveDocumentsAssociatedToPerson, dbclean: :after_each do
   end
   describe 'remove_documents_associated_to_person', dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person)}
-    let(:document) {FactoryGirl.build(:document, subject:'notices', title:'Sample Notice')}
-    let(:bucket_name)         { 'notices' }
+    let(:inbox) { FactoryGirl.create(:inbox, person: person) }
 
     before(:each) do
-      person.documents << document
+      binding.pry
       allow(ENV).to receive(:[]).with('hbx_id').and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with('doc_id').and_return(document.id)
-      allow(ENV).to receive(:[]).with('title').and_return('Sample Notice')
+      allow(ENV).to receive(:[]).with('message_id').and_return(person.inbox.messages.first.id)
     end
+
     it 'should remove the documents based on id' do
-      doc = person.documents.count
+      secure_messages = person.inbox.messages
       subject.migrate
       person.reload
-      expect(person.documents.count).not_to eq doc
-    end
+      expect(person.inbox.messages.size).not_to eq secure_messages.size
+    end  
   end
 end
