@@ -492,8 +492,7 @@ module BenefitSponsors
 
     #### TODO FIX Move these methods to domain logic layer
     def is_renewal_transmission_eligible?
-      renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible? ||
-          late_renewal_benefit_application.present? && (late_renewal_benefit_application.enrollment_eligible? || late_renewal_benefit_application.active?)
+      (renewal_benefit_application.present? && renewal_benefit_application.enrollment_eligible?) || late_renewal_benefit_application.present?
     end
 
     def is_renewal_carrier_drop?
