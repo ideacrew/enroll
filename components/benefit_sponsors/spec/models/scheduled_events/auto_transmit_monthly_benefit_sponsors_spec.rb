@@ -77,6 +77,14 @@ module BenefitSponsors
         expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
         BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(renewal_employer_transmission_day)
       end
+
+      it "should notify carrier drop event if renewal employer switch's carrier" do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(renewal_employer_transmission_day)
+        allow_any_instance_of(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(renewal_employer_transmission_day)
+      end
     end
 
     context "should trigger late renewal employer's that come b/w after transmission day to end of month" do
@@ -92,6 +100,18 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
           renewal_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: date.prev_day)
           expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
+        end
+      end
+      
+      it "should notify renewal employer event and carrier drop event if late employer switch's carrier" do
+        # 27..31 for late renewal employers
+        ((renewal_employer_transmission_day + 1.day)..renewal_effective_date).to_a.each do |date|
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
+          allow_any_instance_of(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
+          renewal_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: date.prev_day)
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
           BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
         end
       end
