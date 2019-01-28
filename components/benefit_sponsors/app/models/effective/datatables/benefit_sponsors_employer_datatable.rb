@@ -2,6 +2,8 @@ module Effective
   module Datatables
     class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
       include Config::AcaModelConcern
+      include Config::SiteHelper
+
 
       SOURCE_KINDS = ([:all]+ BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
 
@@ -66,6 +68,7 @@ module Effective
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', "#", "disabled"],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [@employer_profile.organization.active_benefit_sponsorship]), generate_invoice_link_type(@employer_profile)],
+           ['Force Publish', force_publish_exchanges_hbx_profiles_path(ids: [row]), *force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
 
           if individual_market_is_enabled?
@@ -98,6 +101,32 @@ module Effective
 
       def generate_invoice_link_type(row)
         row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
+      end
+
+      def get_latest_draft_benefit_application(benefit_sponsorship)
+        draft_apps = benefit_sponsorship.benefit_applications.draft_state
+        draft_apps.present? ? draft_apps.last : ""
+      end
+
+      def business_policy_accepted?(draft_application)
+        current_date = TimeKeeper.date_of_record
+        current_date <= draft_application.open_enrollment_period.max && current_date.day > publish_due_day_of_month && current_date > (draft_application.effective_period.min - 2.months)
+      end
+
+      def force_publish_link_type(benefit_sponsorship, allow)
+        draft_application = get_latest_draft_benefit_application(benefit_sponsorship)
+        policy_accepted_and_allow = draft_application.present? && business_policy_accepted?(draft_application) && allow
+        if policy_accepted_and_allow
+          ['post_ajax_with_confirmation', 'Can not publish due to fte count out range or primary office location out of MA, Publish anyway?']
+        elsif policy_accepted_and_allow
+          ['post_ajax']
+        else
+          ['hide']
+        end
+      end
+
+      def eligible_for_publish?(benefit_application)
+        (1..fte_max_count).include?(benefit_application.fte_count) && benefit_application.sponsor_profile.is_primary_office_local?
       end
 
       def collection
