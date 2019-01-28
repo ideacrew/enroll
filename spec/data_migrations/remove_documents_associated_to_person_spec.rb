@@ -15,7 +15,6 @@ describe RemoveDocumentsAssociatedToPerson, dbclean: :after_each do
     let(:inbox) { FactoryGirl.create(:inbox, person: person) }
 
     before(:each) do
-      binding.pry
       allow(ENV).to receive(:[]).with('hbx_id').and_return(person.hbx_id)
       allow(ENV).to receive(:[]).with('message_id').and_return(person.inbox.messages.first.id)
     end
