@@ -56,8 +56,4 @@ class BrokerAgencies::BrokerAgencyStaffRolesController < ApplicationController
     policy.authorize_edit(broker_agency_profile, self)
   end
 
-
 end
-
-
-

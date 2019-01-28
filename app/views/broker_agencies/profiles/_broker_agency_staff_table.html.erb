@@ -9,7 +9,9 @@
       <th><%= l10n("email")%></th>
       <th><%= l10n("phone")%></th>
       <th><%= l10n("status")%></th>
-      <th><%= l10n("remove_role")%></th>
+      <% unless show_destroy_for_staff?(current_user) %>
+        <th><%= l10n("remove_role")%></th>
+      <% end %>
       </thead>
       <% broker_staff.each do |staff| %>
         <tbody>
@@ -28,8 +30,10 @@
         </td>
 
         <td>
-          <%=  link_to(broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id), method: 'delete', data: {confirm: 'Delete this role?'}) do %>
-            <i class="fa fa-trash-o fa-2x role-trashcan"></i>
+          <% unless show_destroy_for_staff?(current_user) %>
+            <%=  link_to(broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id), hidden: is_primary_broker?(staff) , method: 'delete', data: {confirm: 'Delete this role?'}) do %>
+              <i class="fa fa-trash-o fa-2x role-trashcan"></i>
+            <% end %>
           <% end %>
         </td>
 

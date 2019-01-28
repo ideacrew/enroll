@@ -2,18 +2,22 @@ require 'rails_helper'
 
 RSpec.describe BrokerAgencies::BrokerAgencyStaffRolesController do
 
-  let!(:user) {FactoryGirl.create(:user)}
+  let!(:user) {FactoryGirl.create(:user, person: person)}
   let!(:person) {FactoryGirl.create(:person, first_name: 'hello', last_name: 'world', dob: Date.new(1988,3,10))}
+  let!(:new_person) {FactoryGirl.create(:person, first_name: 'new', last_name: 'person', dob: Date.new(1988,3,10))}
   let!(:broker_agency_profile) {FactoryGirl.create(:broker_agency_profile)}
+  let!(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id )}
 
   before :all do
     DatabaseCleaner.clean
   end
 
   describe 'GET new', dbclean: :after_each do
+    let(:params) { {id: broker_agency_profile.id}}
     before do
+      person.broker_agency_staff_roles << broker_agency_staff_role
       sign_in user
-      xhr :get, :new, format: :js
+      xhr :get, :new, params, format: :js
     end
 
 
@@ -29,16 +33,18 @@ RSpec.describe BrokerAgencies::BrokerAgencyStaffRolesController do
   describe 'POST create', dbclean: :after_each do
 
     context 'Person exists on an exchange' do
-      let(:params) { {id: broker_agency_profile.id, email: 'hello@gmail.com',  :person => {first_name: person.first_name, last_name: person.last_name, dob: person.dob} }}
+      let(:params) { {id: broker_agency_profile.id, email: 'hello@gmail.com',  :person => {first_name: new_person.first_name, last_name: new_person.last_name, dob: new_person.dob} }}
 
       before do
+        person.broker_agency_staff_roles << broker_agency_staff_role
         sign_in user
         post :create, params
       end
+
       it 'should successfully add broker agency staff role in active state' do
-        person.reload
-        expect(person.broker_agency_staff_roles.count). to eq 1
-        expect(person.broker_agency_staff_roles[0].aasm_state). to eq 'active'
+        new_person.reload
+        expect(new_person.broker_agency_staff_roles.count). to eq 1
+        expect(new_person.broker_agency_staff_roles[0].aasm_state). to eq 'active'
       end
 
       it 'should render a flash success message' do
@@ -54,13 +60,9 @@ RSpec.describe BrokerAgencies::BrokerAgencyStaffRolesController do
       let(:params) { {id: broker_agency_profile.id, email: 'hello@gmail.com',  :person => {first_name: Forgery('name').first_name, last_name: Forgery('name').last_name, dob: Date.new(1988,3,10)} }}
 
       before do
+        person.broker_agency_staff_roles << broker_agency_staff_role
         sign_in user
         post :create, params
-      end
-
-      it 'should not add broker agency staff role in active state' do
-        person.reload
-        expect(person.broker_agency_staff_roles.count). to eq 0
       end
 
       it 'should render a flash error message' do
@@ -77,14 +79,11 @@ RSpec.describe BrokerAgencies::BrokerAgencyStaffRolesController do
         2.times { FactoryGirl.create(:person, first_name: 'john', last_name: 'smith', dob: Date.new(1988,3,10)) }
       end
       let(:params) { {id: broker_agency_profile.id, email: 'hello@gmail.com',  :person => {first_name: 'john', last_name: 'smith', dob: Date.new(1988,3,10)} }}
+
       before do
+        person.broker_agency_staff_roles << broker_agency_staff_role
         sign_in user
         post :create, params
-      end
-
-      it 'should not add broker agency staff role in active state' do
-        person.reload
-        expect(person.broker_agency_staff_roles.count). to eq 0
       end
 
       it 'should render a flash error message' do
@@ -280,9 +279,10 @@ RSpec.describe BrokerAgencies::BrokerAgencyStaffRolesController do
 
     context 'Person record does not exist in enroll' do
 
-      let!(:params) { {id: broker_agency_profile.id, staff_id: "843567876345" }}
+      let!(:params) { {id: broker_agency_profile.id, staff_id: '843567876345' }}
 
       it 'should render a flash success message' do
+        person.broker_agency_staff_roles << broker_agency_staff_role
         delete :destroy, params
         expect(flash[:error]).to eq 'Role was not deactivated because Person not found'
       end
