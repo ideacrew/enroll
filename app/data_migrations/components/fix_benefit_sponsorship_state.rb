@@ -1,0 +1,14 @@
+require File.join(Rails.root, "lib/mongoid_migration_task")
+
+class FixBenefitSponsorshipState < MongoidMigrationTask
+  def migrate
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.each do |benefit_sponsorship|
+      if benefit_sponsorship.benefit_applications.any?{|b| b.active?} && benefit_sponsorship.aasm_state != :active
+        before_update = benefit_sponsorship.aasm_state
+        benefit_sponsorship.aasm_state = :active
+        benefit_sponsorship.save
+        puts "Benefit Sponsorship state updated from #{before_update} to #{benefit_sponsorship.aasm_state}" unless Rails.env.test?
+      end
+    end
+  end
+end
