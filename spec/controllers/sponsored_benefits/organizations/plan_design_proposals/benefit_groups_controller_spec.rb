@@ -33,13 +33,8 @@ module SponsoredBenefits
         delete :destroy, plan_design_proposal_id: plan_design_proposal.id, id: benefit_group.id, benefit_group: {kind: 'dental'}
       end
 
-      it "destroys the requested prospect_plan_design_form" do
-        # delete :destroy, plan_design_proposal_id: plan_design_proposal.id, id: benefit_group.id, benefit_group: {kind: 'health'}
-
-      end
-
       it "redirects to new_organizations_plan_design_proposal_plan_selection_path" do
-        expect(response).to redirect_to(new_organizations_plan_design_proposal_plan_selection_path(proposal_id: ))
+        expect(response).to redirect_to(new_organizations_plan_design_proposal_plan_selection_path(proposal_id: plan_design_proposal.id))
       end
     end
   end
