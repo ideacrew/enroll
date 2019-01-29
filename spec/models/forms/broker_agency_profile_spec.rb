@@ -339,7 +339,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
   let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }
   let(:attributes) { {
     id: organization.id,
-    first_name: 'joe',
+    first_name: person.first_name,
     last_name: 'smith',
     dob: "2015-06-01",
     email: 'useraccount@gmail.com',
@@ -401,7 +401,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
 
   it "should update person info" do
     person.reload
-    expect(@form.first_name).to eq "joe"
-    expect(person.first_name).to eq "joe"
+    expect(@form.first_name).to eq person.first_name
+    expect(person.first_name).to eq person.first_name
   end
 end
