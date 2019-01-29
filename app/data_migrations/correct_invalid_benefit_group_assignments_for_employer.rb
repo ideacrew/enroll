@@ -23,6 +23,10 @@ class CorrectInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
             next
           end
 
+          if bga.aasm_state == "coverage_selected" && bga.hbx_enrollment.blank?
+            bga.update_attributes(aasm_state: "initialized")
+          end
+
           if !(benefit_group.start_on..benefit_group.end_on).cover?(bga.start_on)
             bga.update_attribute(:start_on, [bga.benefit_group.start_on, ce.hired_on].compact.max)
             puts "Updating the start date of benefit group assignment for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name}" unless Rails.env.test?
