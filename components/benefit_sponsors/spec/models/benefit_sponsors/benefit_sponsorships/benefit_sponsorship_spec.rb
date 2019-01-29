@@ -670,7 +670,7 @@ module BenefitSponsors
             expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
           end
         end
-        
+
         context 'initial_enrollment with matching workflow state transition ' do
           let!(:april_eligible_benefit_sponsorhip_1)  { april_sponsors[0]}
           let!(:april_eligible_benefit_sponsorhip_2)  { april_sponsors[1]}
@@ -954,7 +954,29 @@ module BenefitSponsors
             end 
           end
         end
-      end 
+      end
+    end
+    
+    describe ".application_event_subscriber(aasm)", :dbclean => :after_each do
+      let(:aasm_state) { :active }
+      let(:sponsorship_state)               { :active }
+      let(:effective_date)            { TimeKeeper.date_of_record.next_month.beginning_of_month.last_year  }
+      let!(:benefit_sponsorship)                  { create(:benefit_sponsors_benefit_sponsorship,
+                                                     :with_organization_cca_profile, :with_initial_benefit_application,
+                                                     default_effective_period: (effective_date..(effective_date + 1.year - 1.day)),
+                                                     site: site, aasm_state: sponsorship_state, initial_application_state: aasm_state)
+      }
+      let(:application) { benefit_sponsorship.benefit_applications.detect{|app| app.start_on == effective_date} }
+
+
+      context "when benefit application is expired" do
+
+        it "should not update benefit sponsorship when benefit application is expired" do
+          application.expire!
+          expect(benefit_sponsorship.aasm_state).to eq :active
+        end
+      end
+
     end
   end
 end
