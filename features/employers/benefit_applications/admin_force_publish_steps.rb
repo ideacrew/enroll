@@ -37,7 +37,6 @@ And(/^the user clicks submit button$/) do
   find_button('Submit').trigger('click')
 end
 
-
 When (/^(.*?) FTE count is (less than or equal|more than) to shop:small_market_employee_count_maximum$/) do |employer, compare|
   if compare == 'less than or equal'
     initial_application.update_attributes(fte_count: fte_max_count - 1 )
