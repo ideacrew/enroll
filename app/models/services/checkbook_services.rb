@@ -27,7 +27,7 @@ module Services
         #return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
         begin
-          construct_body = {}
+          construct_body = []
           if is_congress
             construct_body = construct_body_congress
           else
