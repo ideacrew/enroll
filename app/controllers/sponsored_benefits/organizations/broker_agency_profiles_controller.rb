@@ -17,13 +17,13 @@ module SponsoredBenefits
       end
       @broker_role = current_user.person.broker_role || nil
       puts "@broker_role #{@broker_role.inspect}"
-      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true) if general_agency_is_enabled? and @broker_role
+      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true) if @broker_role
     end
 
   private
 
     def find_broker_agency_profile
-      @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
       @id = @broker_agency_profile.id
     end
   end
