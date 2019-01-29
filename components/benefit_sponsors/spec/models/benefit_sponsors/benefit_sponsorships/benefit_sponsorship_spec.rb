@@ -644,6 +644,32 @@ module BenefitSponsors
           expect(applications & april_ineligible_initial_sponsors).to be_empty
           expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
         end
+
+        context 'initial_enrollment and sponsorship with active state' do
+
+          let(:initial_application_state) { :active }
+          let(:sponsorship_state) { :active }
+
+          let!(:april_ineligible_initial_sponsors)  { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+                                                                  :with_initial_benefit_application, initial_application_state: :enrollment_ineligible,
+                                                                  default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: sponsorship_state)
+
+          }
+
+          let!(:april_wrong_sponsorship_initial_sponsors)  { create_list(:benefit_sponsors_benefit_sponsorship, 2, :with_organization_cca_profile,
+                                                                         :with_initial_benefit_application, initial_application_state: :enrollment_ineligible,
+                                                                         default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_ineligible)
+
+          }
+
+          it "should fetch only valid initial applications" do
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date)
+
+            expect(applications & april_sponsors).to eq april_sponsors
+            expect(applications & april_ineligible_initial_sponsors).to be_empty
+            expect(applications & april_wrong_sponsorship_initial_sponsors).to be_empty
+          end
+        end
         
         context 'initial_enrollment with matching workflow state transition ' do
           let!(:april_eligible_benefit_sponsorhip_1)  { april_sponsors[0]}
