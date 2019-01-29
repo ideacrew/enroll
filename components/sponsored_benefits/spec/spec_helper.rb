@@ -20,6 +20,7 @@ require 'database_cleaner'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'factory_girl_rails'
+require 'shared_contexts/sponsored_benefits'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
@@ -99,4 +100,6 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+  # Including set up that build data for sponsored benefits
+  config.include_context "set up"
 end
