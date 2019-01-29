@@ -1,8 +1,8 @@
 - if can_employee_shop?(f.parent.start_on.try(:to_date))
-.alert.alert-info role="alert"
-  strong
-    i.fa.fa-exclamation-triangle aria-hidden="true"
-    = Settings.site.late_rates_message
+  .alert.alert-info role="alert"
+    strong
+      i.fa.fa-exclamation-triangle aria-hidden="true"
+      = Settings.site.late_rates_message
 - show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 .col-md-12.col-xs-12
