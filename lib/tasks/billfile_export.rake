@@ -4,57 +4,70 @@ namespace :billfile do
   desc "Create a BillFile for Wells Fargo."
   # Usage rake billfile:from_file_path
   task :export => [:environment] do
-    orgs = Organization.all
 
     FILE_PATH = Rails.root.join "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
-    Title = "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
-    # keeps value two decimal places from right
-    def format_total_due(total_due)
-      ("%.2f" % total_due)
-    end
+    TITLE = "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
 
     CSV.open(FILE_PATH, "w") do |csv|
       headers = ["Reference Number", "Other Data", "Company Name", "Due Date", "Amount Due"]
       csv << headers
   
-      orgs.each do |org|
-        reference_number = org.hbx_id
-        secondary_auth = org.fein
-        consolidated_legal_name = org.legal_name.gsub(',','')
-        invoice = org.documents.order(date: :desc).limit(1).first
-  
-        if invoice.present?
-          nfp = NfpIntegration::SoapServices::Nfp.new(reference_number)
-          due_date = invoice.date.end_of_month.strftime("%m/%d/%Y")
-          if nfp.present?
-            total_due = format_total_due(nfp.statement_summary.xpath("//TotalDue").text)
+      Organization.all_employer_profiles.each do |org|
+        begin
+          employer_profile = org.employer_profile
+          employer_profile_account = employer_profile.employer_profile_account
+          if employer_profile && employer_profile_account
+            due_date = format_due_date(current_statement_date.end_of_month)
+            # due_date = pull_due_date(employer_profile_account)
+            total_due = format_total_due(employer_profile_account.total_due)
+            row = []
+
+            row += [org.hbx_id, org.fein, org.legal_name.gsub(',',''), due_date, total_due]
+            if row.present?
+              csv << row
+            end
           end
-          row = []
-          row += [reference_number, secondary_auth, consolidated_legal_name, due_date, total_due]
-          if row.present?
-            csv << row
-          end
+        rescue Exception => e
+          puts "Unable to pull account information for #{org.legal_name} due to #{e}"
         end
       end #Closes orgs
       puts "Saved to #{FILE_PATH}"
     end #Closes CSV
+    upload_and_save_reference
   end
-  
-  task :save_to_s3 => [:environment] do
-    bill_file = Aws::S3Storage.save(FILE_PATH, 'billfile')
-    if bill_file.present?
-      BillFile.create(urn: bill_file, creation_date: Date.today, name: Title)
+
+  # keeps value two decimal places from right
+  def format_total_due(total_due)
+    ("%.2f" % total_due)
+  end
+
+  def upload_and_save_reference
+    uri = upload_to_amazon
+    if uri.present?
+      BillFile.create(urn: uri, creation_date: Date.today, name: TITLE)
     else
       raise "No file present to save to S3."
     end
   end
-  
-  task :from_file_path => [:environment] do
+
+  def upload_to_amazon
+    begin
+      Aws::S3Storage.save(FILE_PATH, 'billfile')
+    rescue Exception => e
+      raise "unable to upload to Amazon S3 due to #{e}"
+    end
+  end
+
+  def format_due_date(date)
+    date.try(:strftime, '%m/%d/%Y')
+  end
+
+  def delete_bill_file
     File.delete(FILE_PATH)
   end
-  
-  #task :remove_from_s3 => [:environment] do
-  #end
-  
-  Rake::Task[:from_file_path].enhance [:export, :save_to_s3]
+
+  def pull_due_date(account)
+    current_statement_date = account.current_statement_date
+    format_due_date(account.current_statement_activity.where(:posting_date.gt => current_statement_date).sort_by(&:coverage_month).last.coverage_month.end_of_month)
+  end
 end
