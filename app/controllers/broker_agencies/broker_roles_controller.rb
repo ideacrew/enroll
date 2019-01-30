@@ -61,7 +61,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
       # if verify_recaptcha(model: @broker_candidate, message: failed_recaptcha_message) && @broker_candidate.save
       if @broker_candidate.save
         flash[:notice] = notice
-        render 'confirmation'
+        render 'staff_confirmation'
       else
         @filter = params[:person][:broker_applicant_type]
         render 'new'

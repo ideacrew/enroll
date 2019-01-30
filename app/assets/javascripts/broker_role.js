@@ -50,19 +50,12 @@ $(document).on('click', '.broker-agency-search a.search', function() {
   };
 });
 
-function selectBrokereAgency(element) {
-    debugger;
-    var result = document.querySelectorAll('.result');
-    result.forEach(function (result) {
-        var element = result.querySelectorAll('.select-broker');
-        element.forEach(function (ele) {
-            ele.classList.remove("agency-selected");
-        })
-    });
-    document.getElementById('person_broker_agency_id').value = element.dataset.broker_agency_profile_id;
-    element.closest(".select-broker").classList.add('agency-selected');
+$(document).on('click', "a.select-broker-agency", function() {
+    $('.result .form-border').removeClass("agency-selected");
+    $('#person_broker_agency_id').val($(this).data('broker_agency_profile_id'));
+    $(this).parents(".select-broker").addClass("agency-selected");
     document.getElementById('broker-staff-btn').disabled = false;
-}
+});
 
 $(document).on('click', '.general-agency-search a.search', function() {
   $('.general-agency-search .result').empty();

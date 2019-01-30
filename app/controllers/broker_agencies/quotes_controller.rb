@@ -26,6 +26,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   # displays index page of quotes
   def my_quotes
     @all_quotes = Quote.where("broker_role_id" => @broker.id)
+    @broker_agency_profile_id = @broker.broker_agency_profile.id
     Effective::Datatables::QuoteDatatable.broker_role_id = @broker.id
     @datatable = Effective::Datatables::QuoteDatatable.new
     respond_to do |format|
