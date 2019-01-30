@@ -121,8 +121,8 @@ module Services
 
       def construct_body_congress
         {
-          "remote_access_key": Settings.checkbook_services.remote_access_key ,
-          "reference_id": Settings.checkbook_services.reference_id,
+          "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
+          "reference_id": Rails.application.config.checkbook_services_reference_id,
           "enrollment_year": Settings.checkbook_services.current_year,
           "family": build_congress_employee_age,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
