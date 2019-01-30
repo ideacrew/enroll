@@ -7,6 +7,7 @@ class FixBenefitSponsorshipState < MongoidMigrationTask
         before_update = benefit_sponsorship.aasm_state
         benefit_sponsorship.aasm_state = :active
         benefit_sponsorship.save
+        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(from_state: before_update, to_state: :active)
         puts "Benefit Sponsorship state updated from #{before_update} to #{benefit_sponsorship.aasm_state}" unless Rails.env.test?
       end
     end

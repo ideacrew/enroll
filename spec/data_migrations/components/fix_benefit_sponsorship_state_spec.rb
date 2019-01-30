@@ -29,6 +29,13 @@ describe FixBenefitSponsorshipState, dbclean: :after_each do
         benefit_sponsorship.reload
         expect(benefit_sponsorship.aasm_state).to eq :active
       end
+
+      it "should create workflow state transition applicant -> active state" do
+        expect(benefit_sponsorship.workflow_state_transitions.where(from_state: :applicant, to_state: :active).count).to eq 0
+        subject.migrate
+        benefit_sponsorship.reload
+        expect(benefit_sponsorship.workflow_state_transitions.where(from_state: :applicant, to_state: :active).count).to eq 1
+      end
     end
 
     context "should not update benefit sponsorship, when sponsorship has no active benefit application" do
