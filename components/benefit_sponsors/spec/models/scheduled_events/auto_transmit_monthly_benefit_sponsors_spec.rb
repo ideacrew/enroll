@@ -6,133 +6,575 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe "initial employer monthly transmission", dbclean: :after_each do
 
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup initial benefit application"
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
+    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
+    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
+    let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
+    let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
 
-    let(:current_effective_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
-    let(:effective_on) { current_effective_date }
-    let(:aasm_state) { :enrollment_eligible }
-    let(:benefit_sponsorship_state) { :initial_enrollment_eligible }
-    let(:initial_benefit_sponsorship) {initial_application.benefit_sponsorship}
-    let!(:initial_employer_transmission_day) { Date.new(current_effective_date.prev_month.year,current_effective_date.prev_month.month, 26)}
+    describe "initial employer monthly transmission for the month MARCH:
+       - employer A came as initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid
+
+       - employer B came as initial employer:
+         - published benefit application
+         - Open Enrollment Closed
+         - binder not paid.
+
+        - employer C came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 26th
+
+       - employer D came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 27th
+
+       - employer E came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 28th
+
+       - employer F came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 29th
+
+       - employer G came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 30th
+
+       - employer H came as late initial employer :
+         - published benefit application
+         - Open Enrollment Closed
+         - binder paid after employer monthly transmission date i.e 31th
+    ", dbclean: :after_each do
+
+      let(:initial_application_state)       { :active }
+      let!(:this_year)                       { TimeKeeper.date_of_record.year }
+      let(:april_effective_date)            { Date.new(this_year,4,1) }
+
+      let!(:employer_A)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                     :with_initial_benefit_application, initial_application_state: :enrollment_eligible,
+                                                     default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_eligible)
+      }
+
+      let!(:employer_B)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_ineligible,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_ineligible)
+      }
+
+      let!(:employer_C)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+
+      }
+
+      let!(:employer_D)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+      }
+
+      let!(:employer_E)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+      }
+      let!(:employer_F)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+      }
+      let!(:employer_G)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+      }
+      let!(:employer_H)                 { create(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                                 :with_initial_benefit_application, initial_application_state: :enrollment_closed,
+                                                 default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
+      }
+
+      context "inital employer on transmission day => 26th of month" do
 
 
-      context "should trigger monthly inital employer on transmission day i.e 26 of the month" do
-        it "should notify inital employer event" do
-          # 26 monthly initial employer
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(initial_employer_transmission_day)
-          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: initial_benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(initial_employer_transmission_day)
+
+        it "should transmit only employer_A " do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,26))
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,26))
+        end
+
+        it "should not transmit employer_B, C, D, E, F, G, H" do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,26))
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,26))
         end
       end
 
-    context "should trigger late inital employer's that come b/w after transmission day to end of month" do
+      context "transmission day for late inital employer => 27th of month" do
 
-      it "should notify inital employer event" do
-        # 27..31 late employers
-        ((initial_employer_transmission_day + 1.day)..effective_on).to_a.each do |date|
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
-          initial_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: date.prev_day)
-          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: initial_benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,27))
+          employer_C.approve_initial_enrollment_eligibility!
+          benefit_app = employer_C.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26) )
+        end
+
+        it "should transmit only employer_C " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,27))
+        end
+
+        it "should not transmit employer_A, B, D, E, F, G, H" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,27))
+        end
+      end
+
+      context "transmission day for late inital employer => 28th of month" do
+
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,28))
+          employer_D.approve_initial_enrollment_eligibility!
+          benefit_app = employer_D.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27) )
+        end
+
+
+        it "should transmit only employer_D " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,28))
+        end
+
+        it "should not transmit employer_A, B, C, E, F, G, H" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,28))
+        end
+      end
+
+      context "transmission day for late inital employer => 29th of month" do
+
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,29))
+          employer_E.approve_initial_enrollment_eligibility!
+          benefit_app = employer_E.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28) )
+        end
+
+
+        it "should transmit only employer_E " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,29))
+        end
+
+        it "should not transmit employer_A, B, C, D, F, G, H" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,29))
+        end
+      end
+
+      context "transmission day for late inital employer => 30th of month" do
+
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,30))
+          employer_F.approve_initial_enrollment_eligibility!
+          benefit_app = employer_F.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29) )
+        end
+
+
+        it "should transmit only employer_F " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,30))
+        end
+
+        it "should not transmit employer_A, B, C, D, E, G, H" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,30))
+        end
+      end
+
+      context "transmission day for late inital employer => 31th of month" do
+
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,31))
+          employer_G.approve_initial_enrollment_eligibility!
+          benefit_app = employer_G.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30) )
+        end
+
+
+        it "should transmit only employer_G " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,31))
+        end
+
+        it "should not transmit employer_A, B, C, D, E, F, H" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,31))
+        end
+      end
+
+      context "transmission day for late inital employer => 01th of month" do
+
+        before :each do
+          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,4,1))
+          employer_H.approve_initial_enrollment_eligibility!
+          benefit_app = employer_H.benefit_applications.where(aasm_state: :enrollment_eligible).first
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31) )
+        end
+
+
+        it "should transmit only employer_H " do
+          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,4,1))
+        end
+
+        it "should not transmit employer_A, B, C, D, E, F, G" do
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,4,1))
         end
       end
     end
 
-    context "should not trigger employer's who already transmitted on 26th of the month in late employer extended period." do
+  describe "renewal employer monthly transmission for the month MARCH:
+       - employer A renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state
 
-      before do
-        initial_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: initial_employer_transmission_day - 4.day)
+       - employer B renewing benefit application:
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_ineligible state
+
+       - employer C renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 27th
+
+       - employer D renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 29th
+
+       - employer E renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 28th
+
+       - employer F renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 29th
+
+       - employer G renewing benefit application :
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 30th
+
+       - employer H renewing benefit application :
+         - employer switched carrier in renewal application
+         - published renewal benefit application
+         - Open Enrollment Closed
+         - benefit application moved to enrollment_eligible state i.e on 31th
+    ", dbclean: :after_each do
+
+
+    let(:initial_application_state)       { :active }
+    let!(:this_year)                       { TimeKeeper.date_of_record.year }
+    let(:april_effective_date)            { Date.new(this_year,4,1) }
+
+    let!(:employer_A)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                                :with_renewal_benefit_application, initial_application_state: :active,
+                                renewal_application_state: :enrollment_eligible,
+                                default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                                aasm_state: :active)}
+
+    let!(:employer_B)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_ineligible,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+
+    let!(:employer_C)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+
+    let!(:employer_D)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+
+    let!(:employer_E)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+
+    let!(:employer_F)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+    let!(:employer_G)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+    let!(:employer_H)  { build(:benefit_sponsors_benefit_sponsorship, :with_organization_cca_profile,
+                               :with_renewal_benefit_application, initial_application_state: :active,
+                               renewal_application_state: :enrollment_closed,
+                               default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
+                               aasm_state: :active)}
+
+    context "renewal employer on transmission day => 26th of month" do
+
+      before :each do
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
       end
 
-      it "should not notify event" do
-        ((initial_employer_transmission_day + 1.day)..effective_on).to_a.each do |date|
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
-          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: initial_benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
-        end
+      it "should transmit only employer_A " do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,26))
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,26))
+      end
+
+      it "should not transmit employer_B, C, D, E, F, G, H" do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,26))
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,26))
+      end
+    end
+
+    context "transmission day for late renewal employer => 27th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,27))
+        benefit_app = employer_C.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26) )
+      end
+
+      it "should transmit only employer_C " do
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,27))
+      end
+
+      it "should not transmit employer_A, B, D, E, F, G, H" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,27))
+      end
+    end
+
+    context "transmission day for late renewal employer => 28th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,28))
+        benefit_app = employer_D.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27) )
+      end
+
+
+      it "should transmit only employer_D " do
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,28))
+      end
+
+      it "should not transmit employer_A, B, C, E, F, G, H" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,28))
+      end
+    end
+
+    context "transmission day for late renewal employer => 29th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,29))
+        benefit_app = employer_E.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28) )
+      end
+
+
+      it "should transmit only employer_E " do
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,29))
+      end
+
+      it "should not transmit employer_A, B, C, D, F, G, H" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,29))
+      end
+    end
+
+    context "transmission day for late renewal employer => 30th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,30))
+        benefit_app = employer_F.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29) )
+      end
+
+
+      it "should transmit only employer_F " do
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,30))
+      end
+
+      it "should not transmit employer_A, B, C, D, E, G, H" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,30))
+      end
+    end
+
+    context "transmission day for late renewal employer => 31th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,31))
+        benefit_app = employer_G.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30) )
+      end
+
+
+      it "should transmit only employer_G " do
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,31))
+      end
+
+      it "should not transmit employer_A, B, C, D, E, F, H" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,3,31))
+      end
+    end
+
+    context "transmission day for late renewal employer => 01th of month" do
+
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,4,1))
+        benefit_app = employer_H.benefit_applications.where(aasm_state: :enrollment_closed).first
+        benefit_app.approve_enrollment_eligiblity!
+        active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
+        employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31) )
+      end
+
+      it "should transmit only employer_H " do
+        allow_any_instance_of( BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: employer_H.profile.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,4,1))
+      end
+
+      it "should not transmit employer_A, B, C, D, E, F, G" do
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_A.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_B.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_C.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_D.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_E.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_F.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: employer_G.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(Date.new(TimeKeeper.date_of_record.year,4,1))
       end
     end
   end
-
-  RSpec.describe "renewal employer monthly transmission", dbclean: :after_each do
-
-    include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup renewal application"
-
-    let(:renewal_state)           { :enrollment_eligible }
-    let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month  }
-    let!(:renewal_employer_transmission_day) { Date.new(renewal_effective_date.prev_month.year,renewal_effective_date.prev_month.month, 26)}
-
-    context "should trigger monthly renewal employer on transmission day i.e 26 of the month" do
-
-      before do
-        benefit_sponsorship.aasm_state = :active
-        benefit_sponsorship.save
-      end
-
-      it "should notify renewal employer event" do
-        # 26th monthly renewal transmission day for employer
-        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(renewal_employer_transmission_day)
-        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(renewal_employer_transmission_day)
-      end
-
-      it "should notify carrier drop event if renewal employer switch's carrier" do
-        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(renewal_employer_transmission_day)
-        allow_any_instance_of(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
-        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-        expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
-        BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(renewal_employer_transmission_day)
-      end
-    end
-
-    context "should trigger late renewal employer's that come b/w after transmission day to end of month" do
-
-      before do
-        benefit_sponsorship.aasm_state = :active
-        benefit_sponsorship.save
-      end
-
-      it "should notify renewal employer event" do
-        # 27..31 for late renewal employers
-        ((renewal_employer_transmission_day + 1.day)..renewal_effective_date).to_a.each do |date|
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
-          renewal_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: date.prev_day)
-          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
-        end
-      end
-      
-      it "should notify renewal employer event and carrier drop event if late employer switch's carrier" do
-        # 27..31 for late renewal employers
-        ((renewal_employer_transmission_day + 1.day)..renewal_effective_date).to_a.each do |date|
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
-          allow_any_instance_of(BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:is_renewal_carrier_drop?).and_return(true)
-          renewal_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: date.prev_day)
-          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-          expect(ActiveSupport::Notifications).to receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
-        end
-      end
-    end
-
-    context "should not trigger renewal employer's who already transmitted on 26th of the month in late employer extended period." do
-
-      before do
-        benefit_sponsorship.aasm_state = :active
-        benefit_sponsorship.save
-        renewal_application.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: renewal_employer_transmission_day - 4.day)
-      end
-
-      it "should not notify event" do
-        ((renewal_employer_transmission_day + 1.day)..renewal_effective_date).to_a.each do |date|
-          allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(date)
-          expect(ActiveSupport::Notifications).to_not receive(:instrument).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: benefit_sponsorship.profile.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
-          BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.new(date)
-        end
-      end
-    end
   end
 end
 
