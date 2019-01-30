@@ -33,6 +33,8 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
   field :can_access_user_account_tab, type: Boolean, default: false
+  field :can_force_publish, type: Boolean, default: false
+
   
   class << self
     def hbx_staff
