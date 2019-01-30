@@ -10,8 +10,8 @@ module Insured::PlanFilterHelper
   end
 
   def estimate_your_costs
-    if @market_kind == "shop" && @coverage_kind == "health"
-      link_to(l10n("estimate_your_costs"), @dc_checkbook_url , target: '_blank')
+      if @market_kind == "shop" && @coverage_kind == "health"
+      link_to('Estimate Your Costs','',data: {toggle: "modal", target: "#plan_match_shop"})
     end
   end
 
