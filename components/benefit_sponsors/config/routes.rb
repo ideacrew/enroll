@@ -1,5 +1,4 @@
 BenefitSponsors::Engine.routes.draw do
-  resources :sites
 
   namespace :profiles do
     resources :registrations do
@@ -75,6 +74,7 @@ BenefitSponsors::Engine.routes.draw do
 
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
+      get 'late_rates_check', on: :collection
       post 'revert'
       post 'submit_application'
       post 'force_submit_application'

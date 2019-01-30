@@ -33,7 +33,7 @@ describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
     }
 
     let(:renewing_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 4, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer,
         benefit_group: renewing_employer.active_plan_year.benefit_groups.first,
         renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
     }

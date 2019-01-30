@@ -56,17 +56,18 @@ module BenefitSponsors
         form
       end
 
-      def self.for_update(id)
+      def self.for_update(args)
         # for update why are we creating new
-        form = self.new(id: id)
+        form = self.new(id: args[:id], benefit_sponsorship_id: args[:benefit_sponsorship_id])
         form.service.load_form_params_from_resource(form)
         form.service.load_form_metadata(form)
         form
       end
 
-      def self.fetch(id)
+      def self.fetch(args)
         #why are we creating new insted of fetching
-        form = self.new(id: id)
+        form = self.new(id: args[:benefit_application_id], benefit_sponsorship_id: args[:benefit_sponsorship_id])
+        form.service.load_form_metadata(form)
         form
       end
 

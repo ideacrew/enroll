@@ -3,7 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
 
   RSpec.describe Organizations::OrganizationForms::RegistrationForm, type: :model, dbclean: :after_each do
-    let!(:site)  { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
+    let(:site)  { create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, :cca) }
     let!(:benefit_market)  { benefit_market = site.benefit_markets.first
                               benefit_market.save }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
@@ -72,6 +72,8 @@ module BenefitSponsors
                    "languages_spoken"=>["", "en"],
                    "working_hours"=>"1",
                    "accept_new_clients"=>"1",
+                   "referred_by"=>"Other",
+                   "referred_reason"=>"other reason",
                    "office_locations_attributes"=>
                        {"0"=>
                             {"address_attributes"=>{"address_1"=>"new address", "kind"=>"primary", "address_2"=>"", "city"=>"ma_city", "state"=>"MA","zip"=>"01026", "county"=>"Berkshire"},

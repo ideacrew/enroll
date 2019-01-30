@@ -118,6 +118,14 @@ module BenefitSponsors
         sign_in user
         get :new, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id
       end
+
+      it "should route to benefits tab if rates are not present" do
+        future_date = TimeKeeper.date_of_record + 1.year
+        benefit_application.effective_period = future_date.beginning_of_year..future_date.end_of_year
+        benefit_application.save
+        sign_in_and_do_new
+        expect(response).to redirect_to(profiles_employers_employer_profile_path(assigns(:benefit_package_form).service.employer_profile, :tab=>'benefits'))
+      end
     end
 
     describe "POST create", dbclean: :after_each do

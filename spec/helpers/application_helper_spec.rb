@@ -1,6 +1,19 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ApplicationHelper, :type => :helper do
+
+  describe "#can_employee_shop??" do
+    it "should return false if date is empty" do
+      expect(helper.can_employee_shop?(nil)).to eq false
+    end
+
+    it "should return true if date is present and rates are present" do
+      allow(Plan).to receive(:has_rates_for_all_carriers?).and_return(false)
+      expect(helper.can_employee_shop?("10/01/2018")).to eq true
+    end
+  end
 
   describe "#rates_available?" do
     let(:employer_profile){ double("EmployerProfile") }
@@ -14,6 +27,32 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return empty string when false" do
       allow(employer_profile).to receive(:applicant?).and_return(false)
       expect(helper.rates_available?(employer_profile)).to eq ""
+    end
+  end
+
+  describe "#product_rates_available?", :dbclean => :after_each  do
+    let!(:product) { FactoryGirl.create(:benefit_markets_products_health_products_health_product) }
+    let(:benefit_sponsorship){ double("benefit_sponsorship") }
+
+    context "when active_benefit_application is present" do
+      it "should return false" do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(true)
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
+    end
+
+    context "when active_benefit_application is not present" do
+      before(:each) do
+        allow(benefit_sponsorship).to receive(:active_benefit_application).and_return(false)
+        allow(benefit_sponsorship).to receive(:applicant?).and_return(true)
+      end
+      it "should return false if not in late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship)).to eq false
+      end
+
+      it "should return true if during late rates" do
+        expect(helper.product_rates_available?(benefit_sponsorship, TimeKeeper.date_of_record + 1.year)).to eq true
+      end
     end
   end
 
@@ -91,16 +130,21 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
 
-  describe "#enrollment_progress_bar" do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile) }
+  describe "#enrollment_progress_bar", :dbclean => :after_each  do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application" do
+      let(:aasm_state) { :enrollment_open }
+    end
+
+    let!(:employer_profile)    { abc_profile }
+    let!(:plan_year) { initial_application }
 
     it "display progress bar" do
       expect(helper.enrollment_progress_bar(plan_year, 1, minimum: false)).to include('<div class="progress-wrapper employer-dummy">')
     end
 
     context ">200 census employees" do
-      let!(:employees) { FactoryGirl.create_list(:census_employee, 201, employer_profile: employer_profile) }
+      let!(:census_employees) { create_list(:census_employee, 201, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
       context "greater than 200 employees " do
         context "active employees count greater than 200" do
           it "does not display if active census employees > 200" do
@@ -111,7 +155,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
         context "active employees count greater than 200" do
 
           before do
-            employees.take(5).each do |census_employee|
+            census_employees.take(5).each do |census_employee|
               census_employee.terminate_employee_role!
             end
           end

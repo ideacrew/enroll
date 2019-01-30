@@ -25,6 +25,16 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.approve_ga
   end
 
+  def can_extend_open_enrollment?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.can_extend_open_enrollment
+  end
+
+  def can_force_publish?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.can_force_publish
+  end
+
   def show?
     @user.has_role?(:hbx_staff) or
       @user.has_role?(:csr) or

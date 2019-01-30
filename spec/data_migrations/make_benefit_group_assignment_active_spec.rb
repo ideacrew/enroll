@@ -19,7 +19,7 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, start_on: TimeKeeper.date_of_record)}
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
+    let(:census_employee) { FactoryGirl.create(:census_employee, :old_case, employer_profile_id: plan_year.employer_profile.id, benefit_group_assignments:[benefit_group_assignment])}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)

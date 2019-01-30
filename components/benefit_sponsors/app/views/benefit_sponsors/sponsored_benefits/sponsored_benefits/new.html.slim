@@ -1,6 +1,6 @@
 = content_for :navigation do
   = render :partial => "ui-components/v1/navs/employers_navigation", :locals => {:active_tab=>params[:tab], organization: @sponsored_benefit_form.service.organization, profile: @sponsored_benefit_form.service.profile}
-.container
+.container style="max-width: 100%"
   h1.heading-text Dental - Set up Benefit Package
   
   h1.heading-text Select Your Plan Offering

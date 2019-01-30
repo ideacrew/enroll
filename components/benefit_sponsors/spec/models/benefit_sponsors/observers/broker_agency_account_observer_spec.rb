@@ -37,6 +37,24 @@ module BenefitSponsors
         end
       end
 
+      context 'when a family account hires a broker agency' do
+        let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
+        let(:account) { build :benefit_sponsors_accounts_broker_agency_account, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, writing_agent_id: broker_role.id}
+
+        before do
+          subject.broker_hired?(account)
+          subject.broker_fired?(account)
+        end
+
+        it 'should not notify hired event' do
+          expect(subject).not_to have_received(:notify).with("acapi.info.events.employer.broker_added", {employer_id: employer_profile.hbx_id, event_name: "broker_added"})
+        end
+
+        it 'should not notify fired event' do
+          expect(subject).not_to have_received(:notify).with("acapi.info.events.employer.broker_terminated", {employer_id: employer_profile.hbx_id, event_name: "broker_terminated"})
+        end
+      end
+
       context 'when employer fired a broker' do
 
         let(:account) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }

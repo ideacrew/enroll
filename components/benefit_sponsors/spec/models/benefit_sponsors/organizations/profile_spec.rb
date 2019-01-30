@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
 module BenefitSponsors
   RSpec.describe Organizations::Profile, type: :model, :dbclean => :after_each do
@@ -9,7 +10,7 @@ module BenefitSponsors
     let(:fein)              { "100001001" }
     let(:entity_kind)       { :c_corporation }
     let(:contact_method)    { :paper_and_electronic }
-    let!(:site)             { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                 site: site,
                                 hbx_id: hbx_id,
