@@ -189,7 +189,7 @@ class PlanYear
   def enrollments_for_plan_year
     id_list = self.benefit_groups.map(&:id)
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector]
+    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector, HbxEnrollment::terminated.selector]
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of(enrollment_selector).to_a
     end
@@ -212,11 +212,15 @@ class PlanYear
         hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
         hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
       else
-        if py_end_on < TimeKeeper.date_of_record
+        if hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < py_end_on)
+          #do nothing
+        elsif py_end_on < TimeKeeper.date_of_record
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.terminate_coverage!(py_end_on)
-            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
-            hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > py_end_on))
+              hbx_enrollment.terminate_coverage!(py_end_on)
+              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
+              hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            end
           end
         else
           if hbx_enrollment.may_schedule_coverage_termination?
@@ -1048,7 +1052,7 @@ class PlanYear
 
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
-      transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
+      transitions from: [:terminated,:termination_pending], to: :active, after: :reset_termination_and_end_date
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1085,6 +1089,14 @@ class PlanYear
 
     event :conversion_expire, :after => :record_transition do
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
+    end
+
+    event :close_open_enrollment, :after => :record_transition do 
+      transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
+      transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
     end
   end
 
@@ -1298,7 +1310,7 @@ class PlanYear
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     begin
-      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+      self.employer_profile.trigger_notices("initial_employer_ineligibility_notice", "acapi_trigger" => true)
     rescue Exception => e
       Rails.logger.error { "Unable to deliver employer initial ineligibiliy notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
     end

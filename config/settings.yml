@@ -9,10 +9,13 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  forms: "https://dchealthlink.com/forms#en"
+  website_url: "www.healthcare.gov"
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
 
   social_media:
     facebook_url: ""
@@ -37,7 +40,7 @@ aca:
 #
 
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 16
     verification_outstanding_window:
       days: 0
     verification_due:

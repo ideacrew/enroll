@@ -214,6 +214,10 @@ describe EventsHelper, "selecting plan years to be exported" do
 
 
     context "draft plan year" do
+      before do
+        plan_year.update_attributes({:aasm_state => "draft"})
+      end
+
       it "should return []" do
         expect(subject.plan_years_for_manual_export(employer_profile)).to eq []
       end
