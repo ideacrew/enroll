@@ -70,6 +70,18 @@ module BenefitSponsors
         end
       end
 
+      context ".save" do
+        it "benefit application form has benefit sponsorship with terminated state should revert to applicant state on save" do
+          service_obj = Services::BenefitApplicationService.new(benefit_application_factory)
+          benefit_sponsorship.update_attributes(aasm_state: :terminated)
+          benefit_application_form['benefit_sponsorship_id'] = benefit_sponsorship.id
+          service_obj.save(benefit_application_form)
+          benefit_sponsorship.reload
+          expect(benefit_sponsorship.aasm_state).to eq :applicant
+
+        end
+      end
+
       context "has received invalid attributes" do
         it "should map the errors to benefit application" do
           allow(benefit_application_factory).to receive(:validate).with(invalid_benefit_application).and_return false

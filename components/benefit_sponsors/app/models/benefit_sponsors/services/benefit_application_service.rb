@@ -37,6 +37,7 @@ module BenefitSponsors
 
         save_result, persisted_object = store(form, benefit_application)
         if save_result
+          benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
           cancel_draft_and_ineligible_applications(persisted_object)
         end
         [save_result, persisted_object]
