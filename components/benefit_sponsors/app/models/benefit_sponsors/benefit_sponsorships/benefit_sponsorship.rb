@@ -547,7 +547,7 @@ module BenefitSponsors
         transitions from: [:applicant, :initial_application_approved,
                           :initial_application_under_review, :initial_application_denied,
                           :initial_enrollment_closed, :initial_enrollment_eligible, :binder_reversed,
-                          :initial_enrollment_ineligible], to: :applicant
+                          :initial_enrollment_ineligible, :terminated], to: :applicant
       end
 
       event :terminate do
