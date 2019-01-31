@@ -17,7 +17,7 @@ namespace :billfile do
           employer_profile = org.employer_profile
           employer_profile_account = employer_profile.employer_profile_account
           if employer_profile && employer_profile_account
-            due_date = format_due_date(current_statement_date.end_of_month)
+            due_date = format_due_date(employer_profile_account.current_statement_date.end_of_month)
             # due_date = pull_due_date(employer_profile_account)
             total_due = format_total_due(employer_profile_account.total_due)
             row = []
