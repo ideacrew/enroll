@@ -226,10 +226,10 @@ module Queries
         benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein:  fein).first.active_benefit_sponsorship
 
         if benefit_sponsorship.present?
-          benefit_application = benefit_sponsorship.benefit_applications.where(:"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
+          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
         end
 
-        if benefit_application.blank? || benefit_application.imported?
+        if benefit_application.blank?
           id_list
         else
           id_list += benefit_application.benefit_packages.map(&:sponsored_benefits).flatten.map(&:id)
