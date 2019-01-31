@@ -29,6 +29,8 @@ describe "a monthly inital employer quiet period enrollments query" do
 
          - One new hire health enrollment during OE (Enrollment 15) with effective as start date of the plan year
 
+         - One health enrollment during Quiet Period(Enrollment 16) with renewal benefit application
+
     ", dbclean: :after_each do
 
       include_context "setup benefit market with market catalogs and product packages"
@@ -150,6 +152,10 @@ describe "a monthly inital employer quiet period enrollments query" do
         create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on)
       }
 
+      let!(:enrollment_16) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on + 3.day, effective_date: plan_year.start_on)
+      }
+
       it "does not include enrollment 1" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).not_to include(enrollment_1.hbx_id)
@@ -225,9 +231,23 @@ describe "a monthly inital employer quiet period enrollments query" do
         expect(result).to include(enrollment_14.hbx_id)
       end
 
-      it "includes enrollment 15" do
+      it "does not includes enrollment 15" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).not_to include(enrollment_15.hbx_id)
+      end
+
+      context "enrollment with renewal application" do
+
+        before do
+          plan_year.predecessor_id = BSON::ObjectId.new
+          plan_year.save
+        end
+
+        it "does not includes enrollment 16" do
+          result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+          expect(result).not_to include(enrollment_16.hbx_id)
+        end
+
       end
     end
 
