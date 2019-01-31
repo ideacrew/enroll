@@ -1,5 +1,6 @@
 require 'rails_helper'
 require_relative '../../../concerns/observable_spec.rb'
+require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
 module BenefitSponsors
   RSpec.describe Organizations::AcaShopCcaEmployerProfile, type: :model, dbclean: :after_each do
@@ -15,10 +16,7 @@ module BenefitSponsors
     let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP", site_urn: "site_urn", description: "description") }
     let(:benefit_sponsorship) { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new }
 
-
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-
-    # let!(:site)               { FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_hbx_profile)}
+    let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
 
     let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
                                   site: site,
@@ -35,6 +33,8 @@ module BenefitSponsors
     let(:office_locations)  { [office_location] }
 
     let(:sic_code)          { '1111' }
+    let(:referred_by)       { 'Other' }
+    let(:referred_reason)   { 'Other reason' }
     let(:rating_area)       { ::BenefitMarkets::Locations::RatingArea.new }
 
 
@@ -42,7 +42,9 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        sic_code: sic_code
+        sic_code: sic_code,
+        referred_by: referred_by,
+        referred_reason: referred_reason
       }
     end
 

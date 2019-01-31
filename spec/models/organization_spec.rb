@@ -299,6 +299,7 @@ RSpec.describe Organization, dbclean: :after_each do
         end
 
         it 'broker agency_profile match does not count unless active account' do
+          allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
           employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)

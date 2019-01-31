@@ -1,5 +1,4 @@
 require 'rails_helper'
-include Config::BankHolidaysHelper
 
 =begin
 describe PlanYear, :type => :model, :dbclean => :after_each do

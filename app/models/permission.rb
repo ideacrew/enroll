@@ -20,6 +20,8 @@ class Permission
   field :can_lock_unlock, type: Boolean, default: false
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
+  field :can_extend_open_enrollment, type: Boolean, default: false
+  field :can_force_publish, type: Boolean, default: false
 
   class << self
     def hbx_staff
@@ -37,8 +39,14 @@ class Permission
     def hbx_csr_tier2
       Permission.where(name: 'hbx_csr_tier2').first
     end
+    def hbx_tier3
+      Permission.where(name: 'hbx_tier3').first
+    end
     def developer
       Permission.where(name: 'developer').first
+    end
+    def super_admin
+      Permission.where(name: 'super_admin').first
     end
   end
 end

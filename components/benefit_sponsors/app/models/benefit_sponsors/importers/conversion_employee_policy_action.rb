@@ -8,7 +8,7 @@ module BenefitSponsors
         return nil unless census_employee
 
         found_employer = find_employer
-        benefit_application = current_benefit_application(found_employer)
+        benefit_application = fetch_application_based_sponsored_kind
 
         if benefit_application
           candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))

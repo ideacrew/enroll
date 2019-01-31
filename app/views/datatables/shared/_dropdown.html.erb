@@ -18,6 +18,8 @@
 				<%= link_to line[0], line[1], method: :post, class: "btn btn-xs" %>
       <%when "post_ajax"%>
         <%= link_to line[0], line[1], method: :post, class: "btn btn-xs",remote: true  %>
+      <%when "post_ajax_with_confirmation"%>
+        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs", remote: true, data: { confirm: line[3] }  %>
       <%when "ajax"%>
         <%= link_to line[0], line[1], class: "btn btn-xs", remote: true %>
       <%when "ajax with confirm"%>

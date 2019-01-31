@@ -1,4 +1,6 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
@@ -271,6 +273,35 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       xhr :get, :generate_invoice, {"employerId"=>[organization.id], ids: [organization.id]} ,  format: :js
       expect(response).to have_http_status(:success)
       # expect(organization.invoices.size).to eq 1
+    end
+  end
+
+  describe "#force_publish" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:ben_app) { initial_application }
+
+    before :each do
+      ben_app.update_attributes(aasm_state: "draft")
+    end
+
+    context 'does not force published if not admin' do
+      it "does not force publish benefit application for employer" do
+        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+        expect(response).to have_http_status(302)
+      end
+    end
+
+    context 'force publish benefit application for employer' do
+      before do
+        sign_in(user)
+        xhr :get, :force_publish, {ids: [benefit_sponsorship.id]} ,  format: :js
+      end
+
+      it { expect(response).to have_http_status(:success) }
+      it { expect(response).to render_template('force_publish') }
+
     end
   end
 
@@ -594,6 +625,123 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
       it "should populate the row id to instance variable" do
         expect(assigns(:element_to_replace_id)).to eq "#{employer_id}"
+      end
+    end
+  end
+
+  describe "extend open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
+    let(:benefit_applications) { [ double ]}
+
+    before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(::BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:find).and_return(benefit_sponsorship)
+      sign_in(user)
+    end
+
+    context '.oe_extendable_applications' do 
+      let(:benefit_applications) { [ double(may_extend_open_enrollment?: true) ]}
+
+      before do 
+        allow(benefit_sponsorship).to receive(:oe_extendable_benefit_applications).and_return(benefit_applications)
+      end
+
+      it "renders open enrollment extendable applications" do
+        xhr :get, :oe_extendable_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extendable_applications")
+      end
+    end
+
+    context '.oe_extended_applications' do
+      let(:benefit_applications) { [ double(enrollment_extended?: true) ]}
+
+      before do 
+        allow(benefit_sponsorship).to receive(:oe_extended_applications).and_return(benefit_applications)
+      end
+
+      it "renders open enrollment extended applications" do
+        xhr :get, :oe_extended_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extended_applications")
+      end
+    end
+
+    context '.edit_open_enrollment' do
+      let(:benefit_application) { double }
+
+      before do
+        allow(benefit_applications).to receive(:find).and_return(benefit_application)
+      end
+
+      it "renders edit open enrollment" do
+        xhr :get, :edit_open_enrollment
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/edit_open_enrollment")
+      end
+    end
+    
+    context '.extend_open_enrollment' do  
+      let(:benefit_application) { double }
+
+      before do
+        allow(benefit_applications).to receive(:find).and_return(benefit_application)
+        allow(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain(:new,:extend_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :extend_open_enrollment, open_enrollment_end_date: "11/26/2018"
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      end
+    end
+  end
+
+  describe "close open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:benefit_sponsorship) { double(benefit_applications: benefit_applications) }
+    let(:benefit_applications) { [ double ]}
+
+    before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(::BenefitSponsors::BenefitSponsorships::BenefitSponsorship).to receive(:find).and_return(benefit_sponsorship)
+      sign_in(user)
+    end
+
+    context '.close_extended_open_enrollment' do 
+      let(:benefit_application) { double }
+
+      before do
+        allow(benefit_applications).to receive(:find).and_return(benefit_application)
+        allow(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive_message_chain(:new,:end_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :close_extended_open_enrollment
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
       end
     end
   end

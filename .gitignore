@@ -63,6 +63,7 @@ fixture_dumps
 
 # Ignore .idea
 .idea
+
 .yardoc
 *.log
 
@@ -78,3 +79,13 @@ fixture_dumps
 yarn-debug.log*
 .yarn-integrity
 
+# Make sure no PII is accidently commited
+# add w/ git add --force if actually docs
+*.csv
+*.txt
+*.xml
+*.xls
+*.xlst
+*.xlsx
+*.doc
+*.docx

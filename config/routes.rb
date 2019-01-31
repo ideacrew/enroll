@@ -97,6 +97,7 @@ Rails.application.routes.draw do
         get :employer_datatable
         post :employer_invoice_datatable
         post :generate_invoice
+        post :force_publish
         get :broker_agency_index
         get :general_agency_index if Settings.aca.general_agency_enabled
         get :issuer_index
@@ -125,6 +126,11 @@ Rails.application.routes.draw do
         get :calendar_index
         get :user_account_index
         get :get_user_info
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
       end
 
       member do
