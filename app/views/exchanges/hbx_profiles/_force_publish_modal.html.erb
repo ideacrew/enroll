@@ -14,8 +14,8 @@
         <% end %>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Force Publish Anyways', update_force_publish_exchanges_hbx_profiles_path(ids: [@organization], row_actions_id: "family_actions_#{@organization.id.to_s}"), method: :post, :class => 'btn btn-danger', remote: true %>
-        <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+        <%= link_to 'Force Publish Anyways', update_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}"), method: :post, :class => 'btn btn-danger', remote: true %>
+        <button class="btn btn-default" data-dismiss="modal" type="button"><%= l10n(".cancel") %></button>
       </div>
     </div>
   </div>

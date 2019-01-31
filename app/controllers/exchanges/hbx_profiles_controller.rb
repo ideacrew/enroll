@@ -437,15 +437,8 @@ def employer_poc
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
     @plan_year = @organization.employer_profile.draft_plan_year.last
-    if @plan_year.may_force_publish? && @plan_year.application_errors.empty?
+    if @plan_year.may_force_publish?
       @plan_year.force_publish!
-    else
-      @plan_year.workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: @plan_year.aasm_state,
-      to_state: 'enrolling'
-      )
-      @plan_year.update_attribute(:aasm_state, 'enrolling')
-      @plan_year.save!
     end
   end
 
