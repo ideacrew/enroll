@@ -8,7 +8,7 @@ class CreateEmployerStaffRole < MongoidMigrationTask
       person = Person.where(hbx_id: person_hbx_id).first
       current_user = person.user if person
       if current_user
-        person.employer_staff_roles << ::EmployerStaffRole.new(person: person, :benefit_sponsor_employer_profile_id => employer_profile_id, is_owner: true, aasm_state: 'is_active')
+        person.employer_staff_roles << ::EmployerStaffRole.new(person: person, benefit_sponsor_employer_profile_id: employer_profile_id, is_owner: true, aasm_state: 'is_active')
         current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
         current_user.save!
         person.save!
