@@ -4,6 +4,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
 
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.create(:person, user: user) }
+  let(:person2) { FactoryGirl.create(:person) }
 
   describe 'disable_edit_broker_agency?' do
 
@@ -24,30 +25,21 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
 
   end
 
-  describe 'show_destroy_for_staff?' do
+  describe 'can_show_destroy?' do
 
-    it 'should return false if current user has broker role' do
+    it 'should return true if current user is logged in' do
       allow(person).to receive(:broker_role).and_return true
-      expect(helper.show_destroy_for_staff?(user)). to eq false
+      expect(helper.can_show_destroy?(user, person)). to eq true
     end
 
-    it 'should return true if current user does not have broker role' do
-      allow(person).to receive(:broker_role).and_return false
-      expect(helper.show_destroy_for_staff?(user)). to eq true
-    end
-
-  end
-
-  describe 'is_primary_broker?' do
-
-    it 'should return false if current user has broker role' do
+    it 'should return true if staff has broker role' do
       allow(person).to receive(:broker_role).and_return true
-      expect(helper.is_primary_broker?(person)). to eq true
+      expect(helper.can_show_destroy?(user, person)). to eq true
     end
 
-    it 'should return true if current user does not have broker role' do
+    it 'should return false if staff has broker role' do
       allow(person).to receive(:broker_role).and_return false
-      expect(helper.is_primary_broker?(person)). to eq false
+      expect(helper.can_show_destroy?(user, person2)). to eq nil
     end
 
   end
