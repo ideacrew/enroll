@@ -8,5 +8,5 @@ if ( $('tr.child-row:visible').length > 0 ) {
 if ( $parent_row.next().hasClass('child-row') ) {
 }
 else {
-  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "update_force_publish"%></td></tr>');
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "force_publish"%></td></tr>');
 }

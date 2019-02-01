@@ -433,7 +433,7 @@ def employer_poc
     @organization = Organization.find(@element_to_replace_id.split("_").last)
   end
 
-  def update_force_publish
+  def force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
     @plan_year = @organization.employer_profile.draft_plan_year.last

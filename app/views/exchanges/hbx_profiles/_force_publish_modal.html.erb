@@ -10,11 +10,11 @@
           As submitted, this application is ineligible for coverage under the <%= Settings.site.short_name %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= Settings.site.short_name %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
         </p>
         <% plan_year.application_eligibility_warnings.each_value do |warning| %>
-          <ul class="application-warnings"> <%= warning %> </ul>
+          <ul class="application-warnings"> <li> <%= warning %> </li> </ul>
         <% end %>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Force Publish Anyways', update_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}"), method: :post, :class => 'btn btn-danger', remote: true %>
+        <%= link_to 'Force Publish Anyways', force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{@organization.id.to_s}"), method: :post, :class => 'btn btn-danger', remote: true %>
         <button class="btn btn-default" data-dismiss="modal" type="button"><%= l10n(".cancel") %></button>
       </div>
     </div>
