@@ -94,6 +94,7 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   let(:current_dental_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
   let(:predeccesor_dental_product_package)    { current_benefit_market_catalog.product_packages.detect { |package| package.product_kind == :dental } }
 
+  let(:predecessor_application_catalog) { false }
 
   let!(:renewal_application)  { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                       :with_benefit_package, :with_predecessor_application,
@@ -106,11 +107,13 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
                                       recorded_service_areas: recorded_service_areas,
                                        package_kind: package_kind,
                                        dental_package_kind: dental_package_kind,
-                                       dental_sponsored_benefit: dental_sponsored_benefit
+                                       dental_sponsored_benefit: dental_sponsored_benefit,
+                                       predecessor_application_catalog: predecessor_application_catalog
                                     ) }
 
   let(:predecessor_application) { renewal_application.predecessor }
 
   let(:product_package)           { renewal_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-  let(:benefit_package)   { renewal_application.benefit_packages[0] }
+  let(:benefit_package)           { renewal_application.benefit_packages[0] }
+  let(:current_benefit_package)   { predecessor_application.benefit_packages[0] }
 end
