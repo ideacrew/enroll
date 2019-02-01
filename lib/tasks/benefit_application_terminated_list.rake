@@ -3,7 +3,7 @@ namespace :reports do
   namespace :shop do
     # Following task will generate daily report with terminated benefit applications
     # RAILS_ENV=production bundle exec rake reports:shop:benefit_application_terminated_list['termination_date']
-    # RAILS_ENV=production bundle exec rake reports:shop:benefit_application_terminated_list[02/01/2017']
+    # RAILS_ENV=production bundle exec rake reports:shop:benefit_application_terminated_list['02/01/2017']
 
     desc "Report of Benefit Applications Terminated"
     task :benefit_application_terminated_list, [:termination_date] => :environment do |task, args|
@@ -11,7 +11,7 @@ namespace :reports do
 
       window_date = Date.strptime(args[:termination_date], "%m/%d/%Y")
 
-      valid_states = [:termination, :termination_pending]
+      valid_states = [:terminated, :termination_pending]
       terminated_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
         "benefit_applications" => {
           "$elemMatch" => {
