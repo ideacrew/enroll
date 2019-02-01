@@ -150,6 +150,9 @@ Rails.application.routes.draw do
       put :terminate
       put :cancel
       put :reinstate
+      collection do
+        get :get_term_reasons
+      end
     end
 
     resources :agents do

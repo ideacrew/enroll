@@ -18,11 +18,12 @@ module BenefitSponsors
       let(:past_end_on)  { TimeKeeper.date_of_record.prev_month }
       let(:future_end_on)  { TimeKeeper.date_of_record.next_month }
       let(:termination_kind) { "voluntary" }
+      let(:termination_reason) { "Company went out of business/bankrupt" }
 
       context 'when terminated with future date' do
 
         before do
-          subject.new(initial_application, {end_on: future_end_on, termination_kind: termination_kind, transmit_to_carrier: false}).terminate_application
+          subject.new(initial_application, {end_on: future_end_on, termination_kind: termination_kind, termination_reason: termination_reason, transmit_to_carrier: false}).terminate_application
           initial_application.reload
         end
 
@@ -34,7 +35,7 @@ module BenefitSponsors
       context 'when terminated with past date' do
 
         before do
-          subject.new(initial_application, {end_on: past_end_on, termination_kind: termination_kind, transmit_to_carrier: false}).terminate_application
+          subject.new(initial_application, {end_on: past_end_on, termination_kind: termination_kind, termination_reason: termination_reason,transmit_to_carrier: false}).terminate_application
           initial_application.reload
         end
 
@@ -49,7 +50,7 @@ module BenefitSponsors
         let!(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
 
         before do
-          subject.new(initial_application, {end_on: past_end_on, termination_kind: termination_kind, transmit_to_carrier: false}).terminate_application
+          subject.new(initial_application, {end_on: past_end_on, termination_kind: termination_kind, termination_reason: termination_reason, transmit_to_carrier: false}).terminate_application
           renewal_application.reload
         end
 

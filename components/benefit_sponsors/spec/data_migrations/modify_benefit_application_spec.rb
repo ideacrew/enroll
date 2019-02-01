@@ -125,6 +125,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       before do
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
+        allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
         allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
         allow(ENV).to receive(:[]).with("action").and_return("terminate")
         allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
@@ -143,6 +144,14 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       it "should update end on date on benefit application" do
         expect(benefit_application.terminated_on).to eq termination_date
+      end
+
+      it "should update the termination kind" do
+        expect(benefit_application.termination_kind).to eq "voluntary"
+      end
+
+      it "should update the termination reason" do
+        expect(benefit_application.termination_reason).to eq "Company went out of business/bankrupt"
       end
 
       it "should terminate any active employee enrollments" do

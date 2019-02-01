@@ -175,11 +175,11 @@ module BenefitSponsors
       end
     end
 
-    def terminate(end_on, termination_date, termination_kind, notify_trading_partner = false)
+    def terminate(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner = false)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_terminate_enrollment?
           updated_dates = benefit_application.effective_period.min.to_date..end_on
-          benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind)
+          benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind, termination_reason: termination_reason)
           benefit_application.terminate_enrollment!(notify_trading_partner)
         end
       else
@@ -187,11 +187,11 @@ module BenefitSponsors
       end
     end
 
-    def schedule_termination(end_on, termination_date, termination_kind, notify_trading_partner = false)
+    def schedule_termination(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner = false)
       if business_policy_satisfied_for?(:terminate_benefit)
         if benefit_application.may_schedule_enrollment_termination?
           updated_dates = benefit_application.effective_period.min.to_date..end_on
-          benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind)
+          benefit_application.update_attributes!(:effective_period => updated_dates, :terminated_on => termination_date, termination_kind: termination_kind, termination_reason: termination_reason)
           benefit_application.schedule_enrollment_termination!(notify_trading_partner)
         end
       else

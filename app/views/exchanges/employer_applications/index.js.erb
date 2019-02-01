@@ -11,6 +11,7 @@ var actionSelected = "";
 var applicationId = "";
 var employerId = "";
 var pyEndDate = "";
+var termKind = "";
 var termReason = "";
 
 if ( $parent_row.next().hasClass('child-row') ) {
@@ -82,30 +83,34 @@ function initDatePicker() {
   $('input.date').datepicker({dateFormat: "mm/dd/yy"})
 }
 
-function validateFormat(element, pyStartOn, pyEndOn) {
-  pyEndDate = element.value;
-  
+function validateFormat(id, pyStartOn, pyEndOn) {
+  ele2 = $('#' + 'term_reason_'+ applicationId).val()
+  element = $('#' + 'date_picker_'+ applicationId).val()
+  applicationId = id
+  pyEndDate = element;
+
   setTimeout(function() {
-    if (element.value.length != 10 || element.value.indexOf("/") != 2) {
-      element.value = "";
-      alert("Please use mm/dd/yyyy format");
+    if (element.length != 10 || element.indexOf("/") != 2 || checkTermReason(ele2)) {
+      if (element.length > 0 && (checkTermReason(ele2) == false)) {
+        element = "";
+        alert("Please use mm/dd/yyyy format");
+      }
       disableSubmitButton();
     } else {
-      enableSubmitButton()
-    }
-    start = pyStartOn.split("/");
-    end = pyEndOn.split("/")
-    value = element.value.split("/")
-    startDate = new Date(start[2],start[0]-1,start[1]).setHours(0,0,0,0);
-    endDate = new Date(end[2],end[0]-1,end[1]).setHours(0,0,0,0);
-    currentDate = new Date(value[2],value[0]-1,value[1]).setHours(0,0,0,0);
-    // Checks if date is in range
-    if (startDate > currentDate || currentDate > endDate) {
-      element.value = "";
-      alert("Please select date within Start Date and End Date");
-      disableSubmitButton();
-    } else {
-      enableSubmitButton()
+      start = pyStartOn.split("/");
+      end = pyEndOn.split("/")
+      value = element.split("/")
+      startDate = new Date(start[2],start[0]-1,start[1]).setHours(0,0,0,0);
+      endDate = new Date(end[2],end[0]-1,end[1]).setHours(0,0,0,0);
+      currentDate = new Date(value[2],value[0]-1,value[1]).setHours(0,0,0,0);
+      // Checks if date is in range
+      if (startDate > currentDate || currentDate > endDate) {
+        element = "";
+        alert("Please select date within Start Date and End Date");
+        disableSubmitButton();
+      } else {
+        enableSubmitButton()
+      }
     }
   },400);
 }
@@ -204,14 +209,46 @@ function pyAction(action, id, employer_id, term_date, start_on) {
     date.value = "";
   }
 }
+
+function addTermReasons(reason, id) {
+  applicationId = id
+  $.ajax({
+    type: 'get',
+    datatype: 'js',
+    url: '/exchanges/employer_applications/get_term_reasons',
+    data: { reason_type_id: reason.id },
+    success: function (response) {
+      var select = document.getElementById('term_reason_'+ applicationId);
+      select.options.length = 1;
+      for (i = 0; i < response.length; i++) {
+        var newOption = document.createElement('option')
+        newOption.value = response[i]
+        newOption.innerHTML = response[i];
+        select.options.add(newOption)
+      }
+    }
+  });
+  return true
+}
+
+function checkTermReason(element) {
+  if (element == undefined || element == "") {
+    return true
+  }
+  else {
+    return false
+  }
+}
+
 // You can use the actionSelected here
 function submitPlanActions() {
-  termReason = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
+  termKind = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
+  termReason = $('#term_reason_' + applicationId).val()
   transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
   $.ajax({
     url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
     method: 'PUT',
-    data: { employer_id: employerId, end_on: pyEndDate, term_reason: termReason, transmit_to_carrier: transmit_to_carrier }
+    data: { employer_id: employerId, end_on: pyEndDate, term_kind: termKind, term_reason: termReason, transmit_to_carrier: transmit_to_carrier }
   });
 }
 

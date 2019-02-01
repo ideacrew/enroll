@@ -50,8 +50,24 @@ module BenefitSponsors
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
 
+    VOLUNTARY_TERM_REASONS = [
+      "Company went out of business/bankrupt",
+      "Customer Service did not solve problem/poor experience",
+      "Connector website too difficult to use/navigate",
+      "Health Connector does not offer desired product",
+      "Group is now > 50 lives",
+      "Group no longer has employees",
+      "Went to carrier directly",
+      "Went to an association directly",
+      "Added/changed broker that does not work with Health Connector",
+      "Company is no longer offering insurance",
+      "Company moved out of Massachusetts",
+      "Other"
+    ]
 
-
+    NON_PAYMENT_TERM_REASONS = [
+      "Non-payment of premium"
+    ]
 
     # The date range when this application is active
     field :effective_period,        type: Range
@@ -93,6 +109,7 @@ module BenefitSponsors
     field :benefit_sponsor_catalog_id,  type: BSON::ObjectId
 
     field :termination_kind,       type: String
+    field :termination_reason,     type: String
 
     delegate :benefit_market, to: :benefit_sponsorship
 

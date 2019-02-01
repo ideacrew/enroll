@@ -572,7 +572,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 
@@ -582,6 +582,14 @@ module BenefitSponsors
 
         it "should update end date on benefit application" do
           expect(initial_application.end_on).to eq end_date
+        end
+
+        it "should update the termination kind" do
+          expect(initial_application.termination_kind).to eq "voluntary"
+        end
+
+        it "should update the termination reason" do
+          expect(initial_application.termination_reason).to eq "Company went out of business/bankrupt"
         end
       end
     end
@@ -594,7 +602,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 
