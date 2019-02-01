@@ -272,6 +272,52 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "GET edit_force_publish" do
+    context "of an hbx super admin clicks Force Publish" do
+      let(:organization){ FactoryGirl.create(:organization) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+
+      it "renders edit_force_publish" do
+        sign_in(user)
+        xhr :get, :edit_force_publish, row_actions_id: "family_actions_#{organization.id.to_s}"
+        expect(response).to render_template('edit_force_publish')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST force_publish" do
+    context "of an hbx super admin clicks Submit in Force Publish window" do
+      let!(:organization){ FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+      let!(:draft_plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+
+      it "renders force_publish" do
+        sign_in(user)
+        xhr :post, :force_publish, row_actions_id: "family_actions_#{organization.id.to_s}"
+        expect(response).to render_template('force_publish')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
     let(:person) { double("person")}
