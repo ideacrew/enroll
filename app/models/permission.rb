@@ -3,6 +3,7 @@ class Permission
   include SetCurrentUser
   include Mongoid::Timestamps
 
+  PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
   field :name, type: String
 
   field :modify_family, type: Boolean, default: false
@@ -33,7 +34,8 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
   field :can_access_user_account_tab, type: Boolean, default: false
-  
+  field :can_create_plan_year, type: Boolean, default: false
+
   class << self
     def hbx_staff
       Permission.where(name: 'hbx_staff').first

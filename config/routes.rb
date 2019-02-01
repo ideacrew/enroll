@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
-  
+
   resources :users do
     member do
       get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
@@ -91,6 +91,8 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :get_user_info
+        get :new_plan_year
+        post :create_plan_year
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
