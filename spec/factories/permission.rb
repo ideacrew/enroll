@@ -99,5 +99,16 @@ FactoryGirl.define do
       view_admin_tabs  false
       name 'developer'
     end
+
+    trait :super_admin do
+      can_complete_resident_application true
+      can_add_sep true
+      can_access_new_consumer_application_sub_tab true
+      can_access_identity_verification_sub_tab true
+      can_access_outstanding_verification_sub_tab true
+      can_view_username_and_email true
+      can_extend_open_enrollment true
+      name 'super_admin'
+    end
   end
 end
