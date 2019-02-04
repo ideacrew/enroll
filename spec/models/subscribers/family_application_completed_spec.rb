@@ -181,19 +181,18 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
 
       let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-      let(:tax_household_db) { family_db.active_household.tax_households.first }
+      let(:tax_household_db) { family_db.active_household.latest_active_tax_household }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
 
       context "with npn that does not exist with a broker" do
-        it "should not log any errors" do
-          person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
-          expect(subject).to receive(:log) do |arg1, arg2|
-            expect(arg1).to eq(message["body"])
-            expect(arg2[:error_message]).to match(/Failed to match broker with npn/)
-            expect(arg2[:severity]).to eq('critical')
-          end
+        it "should not log any errors & continue with THH creation" do
+          family = person.primary_family
+          family.update_attribute(:e_case_id, "curam_landing_for#{person.id}")
+          expect(family.active_household.tax_households.count).to be 0
           subject.call(nil, nil, nil, nil, message)
+          family.active_household.reload
+          expect(family.active_household.tax_households.count).to be 1
         end
       end
 

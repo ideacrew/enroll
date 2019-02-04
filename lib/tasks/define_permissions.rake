@@ -37,15 +37,72 @@ namespace :permissions do
 end
 
 namespace :permissions do
+  desc 'hbx admin can view application types of consumer'
+  DefinePermissions.define_task :hbx_admin_can_view_application_types => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin and csr view personal information page of consumer'
+  DefinePermissions.define_task :hbx_admin_csr_view_personal_info_page => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin and csr view new consumer application link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_new_consumer_application_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin and csr view identity verification link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_identity_verification_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can view outstanding verification link tab'
+  DefinePermissions.define_task :hbx_admin_can_access_outstanding_verification_sub_tab => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can access accept reject identity documents'
+  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_identity_documents => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin and all csr access accept reject paper application documents'
+  DefinePermissions.define_task :hbx_admin_can_access_accept_reject_paper_application_documents => :environment
+end
+
+namespace :permissions do
+  desc 'hbx admin can delete identity and paper application documents'
+  DefinePermissions.define_task :hbx_admin_can_delete_identity_application_documents => :environment
+end
+
+namespace :permissions do
+  desc 'hbx_admin_can_access_pay_now'
+  DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
+end
+
+namespace :permissions do
   desc 'hbx admin can transition family members'
   DefinePermissions.define_task :hbx_admin_can_transition_family_members => :environment
 end
 
-#rake permissions:initial_hbx
-#rake permissions:migrate_hbx
-#rake permissions:hbx_admin_can_update_ssn
-#rake permissions:hbx_admin_can_complete_resident_application
+namespace :permissions do
+  desc 'hbx admin can access user account tab'
+  DefinePermissions.define_task :hbx_admin_can_access_user_account_tab => :environment
+end
 
+#RAILS_ENV=production bundle exec rake permissions:initial_hbx
+#RAILS_ENV=production bundle exec rake permissions:migrate_hbx
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_update_ssn
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_complete_resident_application
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_view_application_types
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_csr_view_personal_info_page
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_new_consumer_application_sub_tab
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_identity_verification_sub_tab
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_outstanding_verification_sub_tab
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_accept_reject_identity_documents
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_access_accept_reject_paper_application_documents
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_delete_identity_application_docum
 #rake permissions:hbx_admin_can_transition_family_members
-
+#rake permissions:hbx_admin_can_access_user_account_tab
 #rake permissions:hbx_admin_can_add_pdc

@@ -20,9 +20,16 @@ class CorrectEnrollmentStatus < MongoidMigrationTask
 
   def fix_enrollment(enrollment)
     members = get_members(enrollment)
-    return enrollment.move_to_contingent! if members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)
-    return enrollment.move_to_pending! if members.any?(&:ssa_pending?) || members.any?(&:dhs_pending?)
-    enrollment.move_to_enrolled! if members.all?(&:fully_verified?)
+    if members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)
+      enrollment.update_attributes!(is_any_enrollment_member_outstanding: true)
+      enrollment.move_to_enrolled! if enrollment.may_move_to_enrolled?
+    elsif members.any?(&:ssa_pending?) || members.any?(&:dhs_pending?)
+    enrollment.update_attributes!(is_any_enrollment_member_outstanding: false)
+     enrollment.move_to_pending!
+    elsif members.all?(&:fully_verified?)
+    enrollment.update_attributes!(is_any_enrollment_member_outstanding: false)
+    enrollment.move_to_enrolled!
+    end
   end
 
   def migrate

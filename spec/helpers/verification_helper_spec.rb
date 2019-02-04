@@ -30,6 +30,33 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  describe '#ridp_type_status' do
+    let(:types) { ['Identity', 'Application'] }
+    shared_examples_for 'ridp type status' do |current_state, ridp_type, uploaded_doc, status|
+      before do
+        uploaded_doc ? person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => ridp_type) : person.consumer_role.ridp_documents = []
+        if current_state == "valid"
+          person.consumer_role.identity_validation = "valid"
+          person.consumer_role.application_validation = "valid"
+        else
+          person.consumer_role.identity_validation = "outstanding"
+          person.consumer_role.application_validation = "outstanding"
+        end
+      end
+      it "returns #{status} status for #{ridp_type} #{uploaded_doc ? 'with uploaded doc' : 'without uploaded docs'}" do
+        expect(helper.ridp_type_status(ridp_type, person)).to eq status
+      end
+    end
+    context 'consumer role' do
+      it_behaves_like 'ridp type status', 'outstanding', 'Identity', false, 'outstanding'
+      it_behaves_like 'ridp type status', 'valid', 'Identity', false, 'valid'
+      it_behaves_like 'ridp type status', 'outstanding', 'Identity', true, 'in review'
+      it_behaves_like 'ridp type status', 'outstanding', 'Application', false, 'outstanding'
+      it_behaves_like 'ridp type status', 'valid', 'Application', false, 'valid'
+      it_behaves_like 'ridp type status', 'outstanding', 'Application', true, 'in review'
+    end
+  end
+
   describe "#enrollment_group_unverified?" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
 
@@ -52,16 +79,46 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.person.consumer_role.verification_types.each{|type| type.validation_status = "verified" }
         member.save
       end
-      expect(helper.enrollment_group_unverified?(person)).to eq false
+    end
+  end
+
+  describe '#ridp_type_class' do
+    context 'ridp type status verified' do
+      it 'returns success IDENTITY valid' do
+        person.consumer_role.identity_validation = 'valid'
+        expect(helper.ridp_type_class('Identity', person)).to eq('success')
+      end
+
+      it 'returns success APPLICATION verified' do
+        person.consumer_role.application_validation = 'valid'
+        expect(helper.ridp_type_class('Application', person)).to eq('success')
+      end
     end
 
-    it "returns false if all family members have verification type state as curam" do
-      family.family_members.each do |member|
-        member.person = FactoryGirl.create(:person, :with_consumer_role)
-        member.person.consumer_role.verification_types.each{|type| type.validation_status = "curam" }
-        member.save
+    context 'ridp type status in review' do
+      it 'returns warning  for IDENTITY with docs' do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Identity')
+        expect(helper.ridp_type_class('Identity', person)).to eq('warning')
       end
-      expect(helper.enrollment_group_unverified?(person)).to eq false
+
+      it 'returns warning  for APPLICATION with docs' do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Application')
+        expect(helper.ridp_type_class('Application', person)).to eq('warning')
+      end
+    end
+
+    context 'ridp type status outstanding' do
+      it 'returns danger outstanding IDENTITY' do
+        person.consumer_role.ridp_documents = []
+        person.consumer_role.identity_validation = 'outstanding'
+        expect(helper.ridp_type_class('Identity', person)).to eq('danger')
+      end
+
+      it 'returns danger outstanding APPLICATION' do
+        person.consumer_role.ridp_documents = []
+        person.consumer_role.application_validation = 'outstanding'
+        expect(helper.ridp_type_class('Application', person)).to eq('danger')
+      end
     end
   end
 
@@ -159,33 +216,17 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
   end
-
-  describe '#review button class' do
-    let(:obj) { double }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    before :each do
-      family.active_household.hbx_enrollments << HbxEnrollment.new(:aasm_state => "enrolled_contingent")
-      allow(obj).to receive_message_chain("family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+ 
+  describe '#has_active_consumer_dependent?' do
+    let(:person1) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+    let(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, :person => person) }
+    let(:dependent){ double(family_member: double) }
+    it 'returns true the person has active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person1, dependent)).to eq true
     end
-
-    it 'returns default when the status is verified' do
-       allow(helper).to receive(:get_person_v_type_status).and_return(['outstanding'])
-       expect(helper.review_button_class(family)).to eq('default')
-    end
-
-    it 'returns info when the status is in review and outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'outstanding'])
-      expect(helper.review_button_class(family)).to eq('info')
-    end
-
-    it 'returns success when the status is in review ' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review'])
-      expect(helper.review_button_class(family)).to eq('success')
-    end
-
-    it 'returns sucsess when the status is verified and in review but no outstanding' do
-      allow(helper).to receive(:get_person_v_type_status).and_return(['review', 'verified'])
-      expect(helper.review_button_class(family)).to eq('success')
+    it 'returns false the person has no active consumer dependent' do
+      expect(helper.has_active_consumer_dependent?(person2, dependent)).to eq false
     end
   end
 
@@ -234,6 +275,43 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   end
 
+  describe '#show_ridp_type' do
+    context 'IDENTITY' do
+      it 'returns in review if documents for identity uploaded' do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Identity')
+        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+      end
+
+      it 'returns verified if identity_validation is valid' do
+        person.consumer_role.identity_validation = 'valid'
+        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+      end
+
+      it 'returns outstanding if identity_validation is outstanding' do
+        person.consumer_role.ridp_documents = []
+        person.consumer_role.identity_validation = 'outstanding'
+        expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
+      end
+    end
+
+    context 'APPLICATION' do
+      it 'returns in review if documents for applicationuploaded' do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => 'Application')
+        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
+      end
+
+      it 'returns verified if identity_validation is valid' do
+        person.consumer_role.application_validation = 'valid'
+        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+      end
+
+      it 'returns outstanding if identity_validation is outstanding' do
+        person.consumer_role.application_validation = 'outstanding'
+        expect(helper.show_ridp_type('Application', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
+      end
+    end
+  end
+
   describe "#documents_list" do
     shared_examples_for "documents uploaded for one verification type" do |v_type, docs, result|
       context "#{v_type}" do
@@ -261,6 +339,54 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
     it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#ridp_documents_list" do
+    shared_examples_for "ridp documents uploaded for one verification type" do |v_type, docs, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.ridp_documents=[]
+          docs.to_i.times { person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => v_type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    shared_examples_for "ridp documents uploaded for multiple verification types" do |v_type, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.ridp_documents=[]
+          ['Identity', 'Application'].each {|type| person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    it_behaves_like "ridp documents uploaded for one verification type", "Identity", 1, 1
+    it_behaves_like "ridp documents uploaded for one verification type", "Application", 1, 1
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return status
+      end
+      it "returns admin actions array" do
+        person.consumer_role.update_attributes(aasm_state: "#{state}")
+        expect(helper.build_admin_actions_list(type, person)).to eq actions
+      end
+    end
+
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","unverified", ["Verify","Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review","unverified", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding","verification_outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "DC Residency", "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 
   describe "#request response details" do
@@ -343,6 +469,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "request response details", "Social Security Number", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Citizenship", "ssa_response", "ssa_verification_response"
     it_behaves_like "request response details", "Immigration status", "vlp_response", "lawful_presence_response"
+  end
+
+  describe "#build_ridp_admin_actions_list" do
+    shared_examples_for "ridp admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:ridp_type_status).and_return status
+      end
+      it "returns ridp admin actions array" do
+        expect(helper.build_ridp_admin_actions_list(type, person)).to eq actions
+      end
+    end
+
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "outstanding", ["Verify"]
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "verified", ["Verify", "Reject"]
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "in review", ["Verify", "Reject"]
   end
 
   describe "#build_reject_reason_list" do

@@ -6,6 +6,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def index
     set_bookmark_url
+    set_admin_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
     if (params[:resident_role_id].present? && params[:resident_role_id])
@@ -40,6 +41,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.market_kind = qle.market_kind == "shop" ? "shop" : "ivl"
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
       @market_kind = qle.market_kind
@@ -151,6 +153,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def resident_index
     set_bookmark_url
+    set_admin_bookmark_url
     @resident_role = @person.resident_role
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
