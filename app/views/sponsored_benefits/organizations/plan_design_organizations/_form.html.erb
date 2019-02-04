@@ -1,4 +1,5 @@
-<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' if employer_has_sic_enabled? %>
+
 
 <%= render "entity_name_and_type_fields_autofill", f: f, entity_kinds: Organization::ENTITY_KINDS %>
 <br>
