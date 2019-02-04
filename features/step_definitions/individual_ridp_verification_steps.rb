@@ -213,7 +213,7 @@ end
 
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
-  find('#no_qle_checkbox').click
+  find(:xpath, '//*[@id="no_qle_checkbox"]').trigger('click')
   expect(page).to have_content 'To enroll before open enrollment'
 end
 
