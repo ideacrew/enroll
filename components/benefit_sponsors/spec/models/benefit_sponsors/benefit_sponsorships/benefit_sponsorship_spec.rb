@@ -674,18 +674,19 @@ module BenefitSponsors
         context 'initial_enrollment with matching workflow state transition ' do
           let!(:april_eligible_benefit_sponsorhip_1)  { april_sponsors[0]}
           let!(:april_eligible_benefit_sponsorhip_2)  { april_sponsors[1]}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
           let!(:create_workflow_state_transition){
-            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: TimeKeeper.date_of_record)
-            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: TimeKeeper.date_of_record - 1.day)
+            april_eligible_benefit_sponsorhip_1.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at)
+            april_eligible_benefit_sponsorhip_2.benefit_applications.first.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at - 1.day)
           }
 
           it "should fetch only valid initial applications with matching transition state and time" do
-            applications = subject.may_transmit_initial_enrollment?(april_effective_date, TimeKeeper.date_of_record)
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at )
             expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_1]
           end
 
           it "should fetch only valid initial applications with matching transition state and time" do
-            applications = subject.may_transmit_initial_enrollment?(april_effective_date, TimeKeeper.date_of_record - 1.day)
+            applications = subject.may_transmit_initial_enrollment?(april_effective_date, transition_at - 1.day)
             expect(applications & april_sponsors).to eq [april_eligible_benefit_sponsorhip_2]
           end
         end
@@ -724,10 +725,11 @@ module BenefitSponsors
 
           let!(:april_renewal_app_1)  { april_renewal_eligible_benefit_sponsorhip_1.benefit_applications.where(aasm_state: :enrollment_eligible).first}
           let!(:april_renewal_app_2)  { april_renewal_eligible_benefit_sponsorhip_2.benefit_applications.where(aasm_state: :enrollment_eligible).first}
+          let(:transition_at) {TimeKeeper.start_of_exchange_day_from_utc(TimeKeeper.date_of_record)}
 
           let!(:create_workflow_state_transition){
-            april_renewal_app_1.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: TimeKeeper.date_of_record)
-            april_renewal_app_2.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: TimeKeeper.date_of_record - 1.day)
+            april_renewal_app_1.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at)
+            april_renewal_app_2.workflow_state_transitions.create(from_state: :enrollment_closed, to_state: :enrollment_eligible, transition_at: transition_at- 1.day)
           }
 
           it "should fetch only valid renewal applications with matching transition state and time" do
