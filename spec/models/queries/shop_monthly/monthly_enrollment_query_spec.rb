@@ -1,12 +1,8 @@
 require "rails_helper"
 
 describe "a monthly shop enrollment query" do
-
-
-  # commenting out specs
   # TODO Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on) updated to new model in
   # app/models/queries/named_enrollment_queries.rb
-
   describe "given an employer who has completed their first open enrollment" do
     describe "with employees who have made the following plan selections:
        - employee A has purchased:

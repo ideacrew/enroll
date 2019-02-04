@@ -1,12 +1,8 @@
 require "rails_helper"
 
 describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
-
-  # commenting out specs
   # TODO Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on) updated to new model in
   # app/models/queries/named_enrollment_queries.rb
-
-
   context "Shop Monthly Queries" do
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
@@ -114,9 +110,6 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
         )
     end
     skip "shop monthly queries updated here in new model app/models/queries/named_enrollment_queries.rb need to move." do
-
-
-
       # context ".shop_monthly_enrollments", dbclean: :after_each do
       #
       #   context 'When passed employer FEINs and plan year effective date', dbclean: :after_each do
