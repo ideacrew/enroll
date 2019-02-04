@@ -10,6 +10,9 @@ Layout/EmptyLinesAroundBlockBody:
 Layout/LeadingCommentSpace:
   Enabled: false
 
+Layout/ExtraSpacing:
+  Enabled: false
+
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
