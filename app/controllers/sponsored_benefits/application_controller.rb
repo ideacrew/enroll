@@ -1,6 +1,5 @@
 module SponsoredBenefits
   class ApplicationController < ActionController::Base
-    include SponsoredBenefits::ApplicationHelper
     before_action :set_broker_agency_profile_from_user
 
     private
