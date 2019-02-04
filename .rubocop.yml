@@ -4,13 +4,22 @@ Rails:
 Rails/ActiveRecordAliases:
   Enabled: false
 
+Layout/EmptyLines:
+  Enabled: false
+
 Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
 Layout/LeadingCommentSpace:
   Enabled: false
 
+Layout/ExtraSpacing:
+  Enabled: false
+
 Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/SpaceBeforeBlockBraces:
   Enabled: false
 
 Layout/SpaceInsideHashLiteralBraces:
