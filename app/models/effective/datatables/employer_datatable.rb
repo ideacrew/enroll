@@ -65,9 +65,14 @@ module Effective
         row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
       end
 
+      def business_policy_accepted?(draft_plan_year)
+        current_date = TimeKeeper.date_of_record
+        current_date <= draft_plan_year.open_enrollment_end_on && current_date.day > draft_plan_year.due_date_for_publish.day && current_date.month <= Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months && current_date <= draft_plan_year.effective_date
+      end
+
       def force_publish_link_type(row, allow)
-        draft_plan_year = row.employer_profile.draft_plan_year
-        draft_plan_year_and_allow = draft_plan_year.present? && allow
+        draft_plan_year = row.employer_profile.draft_plan_year.last
+        draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
         draft_plan_year_and_allow ? 'ajax' : 'hide'
       end
 
