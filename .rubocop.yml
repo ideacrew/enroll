@@ -2,7 +2,7 @@ Rails:
   Enabled: true
 
 Metrics/LineLength:
-  Max: 300
+  Max: 120
 
 Style/HashSyntax:
   Enabled: false
