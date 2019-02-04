@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pundit
   include Acapi::Notifiers
-
   after_action :update_url, :unless => :format_js?
 
   def format_js?
@@ -77,6 +76,7 @@ class ApplicationController < ActionController::Base
   end
 
   private
+    
     def secure_message(from_provider, to_provider, subject, body)
       message_params = {
         sender_id: from_provider.id,
