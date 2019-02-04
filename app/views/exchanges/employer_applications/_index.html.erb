@@ -55,7 +55,7 @@
               </div>
             </td>
             <td colspan="2">
-              <div>
+              <div class="term_action_radios hidden">
                 <%= select_tag "term_reason_#{application.id}", options_for_select(@reasons), onchange: "validateFormat('#{application.id}', '#{TimeKeeper.format_date(application.start_on)}', '#{TimeKeeper.format_date(application.end_on)}')", include_blank: l10n("exchange.employer_applications.select_term_reason") %>
               </div>
             </td>
