@@ -22,6 +22,9 @@ Layout/SpaceInsideBlockBraces:
 Metrics/LineLength:
   Max: 200
 
+Style/BracesAroundHashParameters:
+  Enabled: false
+
 Style/HashSyntax:
   Enabled: false
 
