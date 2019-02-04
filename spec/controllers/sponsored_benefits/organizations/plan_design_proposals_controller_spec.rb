@@ -14,7 +14,7 @@ module SponsoredBenefits
     let(:open_enrollment_start_on) { (beginning_of_next_month - 15.days).prev_month }
     let(:beginning_of_next_month) { Date.today.next_month.beginning_of_month }
     let(:end_of_month) { Date.today.end_of_month }
-    let(:initial_enrollment_period) { (beginning_of_next_month..(end_of_month + 1.year)) }
+    let(:initial_enrollment_period) { (beginning_of_next_month..(beginning_of_next_month + 1.year - 1.day)) }
 
     let(:valid_attributes) {
       {
