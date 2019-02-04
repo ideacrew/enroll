@@ -31,6 +31,8 @@ aca:
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
   market_kinds: ["individual", "shop"]
+  employer_has_sic_field: false
+  employer_has_county_validation: false
 #
   qle:
     with_in_sixty_days: 60

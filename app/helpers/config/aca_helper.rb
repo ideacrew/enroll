@@ -210,7 +210,6 @@ module Config::AcaHelper
   end
 
   def aca_broker_routing_information
-    binding.pry
     Settings.aca.broker_routing_information
   end
 
