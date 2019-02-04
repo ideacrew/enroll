@@ -125,7 +125,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,27))
           employer_C.approve_initial_enrollment_eligibility!
           benefit_app = employer_C.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26).to_time.utc)
         end
 
         it "should transmit only employer_C " do
@@ -151,7 +151,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,28))
           employer_D.approve_initial_enrollment_eligibility!
           benefit_app = employer_D.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27).to_time.utc)
         end
 
 
@@ -178,7 +178,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,29))
           employer_E.approve_initial_enrollment_eligibility!
           benefit_app = employer_E.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28).to_time.utc)
         end
 
 
@@ -205,7 +205,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,30))
           employer_F.approve_initial_enrollment_eligibility!
           benefit_app = employer_F.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29).to_time.utc)
         end
 
 
@@ -232,7 +232,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,31))
           employer_G.approve_initial_enrollment_eligibility!
           benefit_app = employer_G.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30).to_time.utc)
         end
 
 
@@ -259,7 +259,7 @@ module BenefitSponsors
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,4,1))
           employer_H.approve_initial_enrollment_eligibility!
           benefit_app = employer_H.benefit_applications.where(aasm_state: :enrollment_eligible).first
-          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31) )
+          benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31).to_time.utc)
         end
 
 
@@ -409,7 +409,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,26).to_time.utc)
       end
 
       it "should transmit only employer_C " do
@@ -437,7 +437,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,27).to_time.utc)
       end
 
 
@@ -466,7 +466,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,28).to_time.utc)
       end
 
 
@@ -495,7 +495,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,29).to_time.utc)
       end
 
 
@@ -524,7 +524,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,30).to_time.utc)
       end
 
 
@@ -553,7 +553,7 @@ module BenefitSponsors
         benefit_app.approve_enrollment_eligiblity!
         active_benefit_app = employer_A.benefit_applications.where(aasm_state: :active).first
         employer_A.benefit_applications.where(aasm_state: :enrollment_eligible).first.update_attributes(predecessor_id: active_benefit_app.id)
-        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31) )
+        benefit_app.workflow_state_transitions.where(to_state: :enrollment_eligible).first.update_attributes(transition_at: Date.new(TimeKeeper.date_of_record.year,3,31).to_time.utc)
       end
 
       it "should transmit only employer_H " do
@@ -577,8 +577,3 @@ module BenefitSponsors
   end
   end
 end
-
-
-
-
-
