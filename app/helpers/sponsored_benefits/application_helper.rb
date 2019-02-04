@@ -12,5 +12,9 @@ module SponsoredBenefits
       end
       links
     end
+
+    def eligibility_criteria(employer)
+      # toDo - See why do we have this dependency in DC.
+    end
   end
 end
