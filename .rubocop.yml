@@ -1,6 +1,12 @@
 Rails:
   Enabled: true
 
+Rails/ActiveRecordAliases:
+  Enabled: false
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 120
 
