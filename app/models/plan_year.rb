@@ -7,15 +7,16 @@ class PlanYear
 
   embedded_in :employer_profile
 
-  PUBLISHED = %w(published enrolling enrolled active suspended)
-  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
-  RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
+  PUBLISHED = %w(published enrolling enrollment_extended enrolled active suspended)
+  RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrollment_extended renewing_enrolled renewing_publish_pending)
+  RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrollment_extended renewing_enrolled)
+  TERMINATED_STATE = %w(termination_pending terminated expired)
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
-  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
-  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
-  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
+  OPEN_ENROLLMENT_STATE   = %w(enrolling enrollment_extended renewing_enrolling renewing_enrollment_extended)
+  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrollment_extended enrolled)
+  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrollment_extended enrolled) 
 
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
@@ -73,6 +74,7 @@ class PlanYear
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
+  scope :published_or_renewing_published_or_terminated, -> { any_in(aasm_state: PUBLISHED + RENEWING_PUBLISHED_STATE + TERMINATED_STATE) }
 
   scope :by_date_range,     ->(begin_on, end_on) { where(:"start_on".gte => begin_on, :"start_on".lte => end_on) }
   scope :published_plan_years_within_date_range, ->(begin_on, end_on) {
@@ -106,6 +108,15 @@ class PlanYear
     )
   }
 
+  scope :by_overlapping_coverage_period, ->(start_on, end_on) {
+    where(
+      "$or" => [
+        { :"start_on" => {"$gte" => start_on, "$lte" => end_on }},
+        { :"end_on" => {"$gte" => start_on, "$lte" => end_on }}
+      ]
+    )
+  }
+
   after_update :update_employee_benefit_packages
 
   def update_employee_benefit_packages
@@ -117,6 +128,17 @@ class PlanYear
         end
       end
     end
+  end
+
+  # This is being used by Open enrollment extension feature
+  # Admin can't choose date before regular monthly open enrollment end date
+  # Admin can't choose a date beyond the effective month of the application. 
+  #   ex: For 1/1 application we limit calender from 12/10 to 1/31.
+  def open_enrollment_date_bounds
+    {
+      min: [TimeKeeper.date_of_record, PlanYear.calculate_open_enrollment_date(start_on)[:open_enrollment_end_on]].max,
+      max: effective_date.end_of_month
+    }
   end
 
   #Updating end_on with start_on for XML purposes only.
@@ -931,6 +953,7 @@ class PlanYear
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
     state :enrolling, :after_enter => [:send_employee_invites, :link_census_employees]  # Published plan has entered open enrollment
+    state :enrollment_extended
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -943,6 +966,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
+    state :renewing_enrollment_extended
     state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
@@ -1092,11 +1116,30 @@ class PlanYear
     end
 
     event :close_open_enrollment, :after => :record_transition do 
-      transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+      transitions from: [:enrolling, :enrollment_extended], to: :enrolled,                :guards => [:is_enrollment_valid?]
+      transitions from: [:enrolling, :enrollment_extended], to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
 
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+      transitions from: [:renewing_enrolling, :renewing_enrollment_extended],  to: :renewing_enrolled,   :guards => [:is_enrollment_valid?]
+      transitions from: [:renewing_enrolling, :renewing_enrollment_extended],  to: :renewing_application_ineligible, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+    end
+
+    event :extend_open_enrollment, :after => :record_transition do
+      transitions from: [:canceled, :application_ineligible, :enrollment_extended, :enrolling ], to: :enrollment_extended
+      transitions from: [:canceled, :renewing_application_ineligible, :renewing_enrollment_extended, :renewing_enrolling ], to: :renewing_enrollment_extended
+    end
+  end
+
+  def extend_open_enrollment(new_end_date = TimeKeeper.date_of_record)
+    if may_extend_open_enrollment?
+      self.update(:open_enrollment_end_on => new_end_date)
+      self.extend_open_enrollment!
+    end
+  end
+
+  def end_open_enrollment(end_date = nil)
+    if may_close_open_enrollment?
+      self.update(open_enrollment_end_on: end_date) if end_date.present?
+      self.close_open_enrollment!
     end
   end
 
@@ -1445,7 +1488,7 @@ class PlanYear
   end
 
   def open_enrollment_date_checks
-    return if canceled? || expired? || renewing_canceled?
+    return if canceled? || expired? || renewing_canceled? || enrollment_extended? || renewing_enrollment_extended?
     return if start_on.blank? || end_on.blank? || open_enrollment_start_on.blank? || open_enrollment_end_on.blank?
     return if imported_plan_year
 

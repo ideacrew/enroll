@@ -12,6 +12,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+  before_action :find_employer_profile, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -19,6 +20,35 @@ class Exchanges::HbxProfilesController < ApplicationController
   def index
     @organizations = Organization.exists(hbx_profile: true)
     @hbx_profiles = @organizations.map {|o| o.hbx_profile}
+  end
+
+  def oe_extendable_applications
+    @plan_years  = @employer_profile.oe_extendable_plan_years
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def oe_extended_applications
+    @plan_years  = @employer_profile.oe_extended_plan_years
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def edit_open_enrollment
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+  end
+
+  def extend_open_enrollment
+    authorize HbxProfile, :can_extend_open_enrollment?
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+    open_enrollment_end_date = Date.strptime(params["open_enrollment_end_date"], "%m/%d/%Y")
+    @plan_year.extend_open_enrollment(open_enrollment_end_date)
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
+  end
+
+  def close_extended_open_enrollment
+    authorize HbxProfile, :can_extend_open_enrollment?
+    @plan_year = @employer_profile.plan_years.find(params[:plan_year_id])
+    @plan_year.end_open_enrollment(TimeKeeper.date_of_record)
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
   def binder_paid
@@ -702,5 +732,9 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
+  end
+
+  def find_employer_profile
+    @employer_profile = EmployerProfile.find (params[:id])
   end
 end
