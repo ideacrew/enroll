@@ -1,5 +1,6 @@
 module SponsoredBenefits
   class ApplicationController < ActionController::Base
+    include SponsoredBenefits::ApplicationHelper
     before_action :set_broker_agency_profile_from_user
 
     private
@@ -15,8 +16,7 @@ module SponsoredBenefits
           @broker_agency_profile = ::BrokerAgencyProfile.find(current_person.broker_role.broker_agency_profile_id) # Deprecate this 
           @broker_agency_profile ||= BenefitSponsors::Organizations::Profile.find(current_person.broker_role.benefit_sponsors_broker_agency_profile_id)
         elsif active_user.has_hbx_staff_role? && params[:plan_design_organization_id].present?
-          @broker_agency_profile = ::BrokerAgencyProfile.find(params[:plan_design_organization_id]) # Deprecate this 
-          @broker_agency_profile ||= BenefitSponsors::Organizations::Profile.find(params[:plan_design_organization_id])
+           @broker_agency_profile = SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:plan_design_organization_id]).broker_agency_profile
         elsif params[:plan_design_proposal_id].present?
           org = SponsoredBenefits::Organizations::PlanDesignProposal.find(params[:plan_design_proposal_id]).plan_design_organization
           @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id) # Deprecate this

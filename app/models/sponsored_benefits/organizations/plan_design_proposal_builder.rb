@@ -30,7 +30,7 @@ module SponsoredBenefits
                                   enrollment_frequency = :rolling_month, 
                                   contact_method = :paper_and_electronic)
 
-        @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships:BenefitSponsorship.new( benefit_market: @benefit_market, 
+        @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new( benefit_market: @benefit_market,
                                                                                               enrollment_frequency: @enrollment_frequency,
                                                                                               contact_method: @contact_method,
                                                                                               annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
