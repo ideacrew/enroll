@@ -240,7 +240,7 @@ describe EmployerProfile, dbclean: :after_each do
 
    context "binder paid methods" do
      let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
-     let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+     let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'enrolling') }
      let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
      let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
 
@@ -301,7 +301,7 @@ describe EmployerProfile, dbclean: :after_each do
 
     context 'when upcoming month plan year present' do
 
-    let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'renewing_published') }
+    let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'renewing_published') }
       it 'should return upcoming month plan year' do
         plan_year, billing_date = employer_profile.billing_plan_year
 
