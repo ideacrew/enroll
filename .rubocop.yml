@@ -7,13 +7,28 @@ Rails/ActiveRecordAliases:
 Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
 Metrics/LineLength:
-  Max: 120
+  Max: 200
 
 Style/HashSyntax:
   Enabled: false
 
 Style/StringLiterals:
+  Enabled: false
+
+Style/SymbolArray:
   Enabled: false
 
 # Deprecated
