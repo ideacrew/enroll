@@ -399,10 +399,10 @@ RSpec.describe Organization, dbclean: :after_each do
       end
     end
 
-    context 'no search params are passed' do
+    context 'search params passed for broker staff' do
 
-      it 'should return search params with empty values' do
-        search_params = {}
+      it 'should return search params with array of empty hash' do
+        search_params = {is_staff_registration: 'true'}
         expect(Organization.build_query_params(search_params)).to eq [{}]
       end
     end
