@@ -116,6 +116,7 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
+  general_agency_enabled: true
 
 notices:
   individual_market:
