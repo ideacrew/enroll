@@ -54,12 +54,6 @@ class Employers::BrokerAgencyController < ApplicationController
       end
       # send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
-      #notice to broker
-      @employer_profile.trigger_notices('broker_hired')
-      #notice to broker agency
-      @employer_profile.trigger_notices('broker_agency_hired')
-      #notice to employer
-      @employer_profile.trigger_notices("broker_hired_confirmation_notice")
     end
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
