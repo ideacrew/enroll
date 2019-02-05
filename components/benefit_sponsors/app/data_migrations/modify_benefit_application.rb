@@ -28,7 +28,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     oe_end_date = Date.strptime(ENV['oe_end_date'], "%m/%d/%Y") if ENV['oe_end_date'].present?
 
     benefit_sponsorship = get_benefit_sponsorship
-    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_ineligible, :canceled], :"effective_period.min" => effective_date).first
+    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:canceled, :enrollment_ineligible, :enrollment_extended, :enrollment_open, :enrollment_closed], :"effective_period.min" => effective_date).first
 
     raise "Unable to find benefit application!!" if benefit_application.blank?
 

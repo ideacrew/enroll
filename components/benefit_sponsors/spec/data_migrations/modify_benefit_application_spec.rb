@@ -70,6 +70,43 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
     end
 
+    context "extend open enrollment" do
+        let!(:start_on)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
+        let!(:effective_period)  { start_on..start_on.next_year.prev_day }
+        let!(:ineligible_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
+
+        before do
+          allow(ENV).to receive(:[]).with("action").and_return("extend_open_enrollment")
+          allow(ENV).to receive(:[]).with("effective_date").and_return(start_on.strftime("%m/%d/%Y"))
+          allow(ENV).to receive(:[]).with("oe_end_date").and_return(start_on.prev_day.strftime("%m/%d/%Y"))
+        end
+
+        it "should extend open enrollment from enrollment ineligible" do
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_ineligible
+          subject.migrate
+          ineligible_benefit_application.reload
+          benefit_sponsorship.reload
+          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+        end
+
+        it "should extend open enrollment from enrollment open" do
+          ineligible_benefit_application.update_attributes!(aasm_state: "enrollment_open")
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_open
+          subject.migrate
+          ineligible_benefit_application.reload
+          benefit_sponsorship.reload
+          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+        end
+
+        it "should not extend open enrollment from draft" do
+          ineligible_benefit_application.update_attributes!(aasm_state: "draft")
+          expect(ineligible_benefit_application.aasm_state).to eq :draft
+          expect { subject.migrate }.to raise_error("Unable to find benefit application!!")
+        end
+    end
+
     context "Update assm state to enrollment open" do
       context "update aasm state to enrollment open for non renewing ER" do
         let(:effective_date) { start_on }
@@ -325,5 +362,32 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect { subject.migrate }.to raise_error("No benefit application found.")
       end
     end
-  end
+
+    context "should trigger termination notice", dbclean: :after_each do
+
+      let(:termination_date) { start_on.next_month.next_day }
+      let(:end_on)           { start_on.next_month.end_of_month }
+
+      before do
+        allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
+        allow(ENV).to receive(:[]).with("action").and_return("terminate")
+        allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
+        allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
+      end
+
+      let(:model_instance) { benefit_application }
+
+      context "should trigger termination notice to employer and employees" do
+        it "should trigger model event" do
+          model_instance.class.observer_peers.keys.each do |observer|
+            expect(observer).to receive(:notifications_send) do |instance, model_event|
+              expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
+              expect(model_event).to have_attributes(:event_key => :group_advance_termination_confirmation, :klass_instance => model_instance, :options => {})
+            end
+          end
+          subject.migrate
+        end
+      end
+    end
+   end
 end
