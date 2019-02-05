@@ -1,4 +1,4 @@
-# Insured Translations
+"# Insured Translations
 INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.alien_number" => "Alien Number",
   "en.insured.consumer_roles.docs_shared.alien_number_title" => "• When entering an Alien Number, only include the numbers. Do not enter the 'A' or any other characters or letters. For example: If your Alien Number is 'A123456789' then please enter '123456789'. • You must enter exactly 9 digits into the Alien Number field. For Alien Numbers with fewer than 9 digits, add one zero (0) to the beginning of an 8-digit Alien Number and two zeroes (00) to the beginning of a 7-digit Alien Number. For example: If your Alien Number is 'A1234567' then please enter '001234567'. • Pre-1956 certificates do not contain an Alien Number. In this case, enter '999999999' for the Alien Number. (check for 9 digit numbers).",
@@ -405,5 +405,15 @@ INSURED_TRANSLATIONS = {
   "en.insured.plan_shoppings.thankyou.review_your_current_plan_selection" => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
  "en.important" => "Important",
  "en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll" => "You must complete these steps to enroll.",
- "en.insured.plan_shoppings.thankyou.additional_administration_msg" => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
+ "en.insured.plan_shoppings.thankyou.additional_administration_msg" => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
+ "en.hbx_profiles.ba_fail_message" => "Could not create a draft plan year",
+ "en.hbx_profiles.ba_success_message" => "Successfully created a draft plan year",
+ "en.hbx_profiles.effective_start_date" => "Effective Start Date",
+ "en.hbx_profiles.effective_end_date" => "Effective End Date",
+ "en.hbx_profiles.full_time_employees" => "Full Time Employees",
+ "en.hbx_profiles.oe_start_date" => "Open Enrollment Start Date",
+ "en.hbx_profiles.oe_end_date" => "Open Enrollment End Date",
+ "en.hbx_profiles.provide_fte_count" => "Please provide full time employees count.",
+ "en.hbx_profiles.provide_oe_start_date" => "Please provide Open Enrollment Start On date.",
+ "en.hbx_profiles.provide_oe_end_date" => "Please provide Open Enrollment End On date."
 }
