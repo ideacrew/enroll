@@ -1,28 +1,34 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
+  include Acapi::Notifiers
   queue_as :default
 
-  def perform(recipient, event_object, notice_event, notice_params: {})
-    Resque.logger.level = Logger::DEBUG
-
-    resource_hash = {:employee => "employee_role", :employer => "employer", :broker_agency => "broker_role", :consumer_role => "consumer_role", :broker => "broker_role", :general_agency => "general_agent_profile"}
-    resource   = Notifier::ApplicationEventMapper.map_resource(recipient.class)
-    event_kind = ApplicationEventKind.where(event_name: notice_event, resource_name: resource_hash[resource.resource_name]).first
-    recipient = recipient.class.to_s == "EmployeeRole" ? recipient.census_employee : recipient
-
-    if event_kind.present?
+  def perform(id, event, options = {})
+    recipient = EmployerProfile.find(id) || GeneralAgencyProfile.find(id) || CensusEmployee.where(id: id).first
+    if  options['acapi_trigger'].present? && options['acapi_trigger']
+      begin
+        resource = ApplicationEventMapper.map_resource(recipient.class)
+        event_name = ApplicationEventMapper.map_event_name(resource, event)
+        notify(event_name, {
+          resource.identifier_key => recipient.send(resource.identifier_method).to_s,
+          :event_object_kind => recipient.class.to_s, #no event object in legacy way of trigger notices
+          :event_object_id   => recipient.id.to_s, #passing in recipient as of now
+          :notice_params => options
+          })
+      rescue Exception => e
+        Rails.logger.error { "Could not deliver #{event} notice due to #{e}" }
+        raise e if Rails.env.test? # RSpec Expectation Not Met Error is getting rescued here
+      end
+    else
+      Resque.logger.level = Logger::DEBUG
+      event_kind = ApplicationEventKind.where(:event_name => event).first
       notice_trigger = event_kind.notice_triggers.first
-
       builder = notice_trigger.notice_builder.camelize.constantize.new(recipient, {
-        template: notice_trigger.notice_template,
-        subject: event_kind.title,
-        event_name: notice_event,
-        options: build_options(event_object, notice_params),
-        mpi_indicator: notice_trigger.mpi_indicator,
-        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+                template: notice_trigger.notice_template,
+                subject: event_kind.title,
+                event_name: event,
+                options: options,
+                mpi_indicator: notice_trigger.mpi_indicator,
+                }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
     end
-  end
-
-  def build_options(event_object, notice_params)
-    {event_object: event_object}.merge(notice_params)
   end
 end
