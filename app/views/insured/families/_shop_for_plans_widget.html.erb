@@ -96,8 +96,8 @@
                 </p>
               <% end %>
 
-              <% if @family.earliest_effective_sep.present? %>
-                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.earliest_effective_sep.qualifying_life_event_kind.title %>"
+              <% if @family.latest_active_sep %>
+                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                   <br/>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
                   <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>
