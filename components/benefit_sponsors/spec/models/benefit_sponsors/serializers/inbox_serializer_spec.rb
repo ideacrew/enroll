@@ -3,8 +3,8 @@ require 'spec_helper'
 module BenefitSponsors
   RSpec.describe Serializers::InboxSerializer, :dbclean => :after_each do
 
-    describe '.unread_messages_count' do
-      let!(:site) do
+    describe '.unread_messages_count', dbclean: :after_each do
+      let(:site) do
         FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, :with_benefit_market, site_key: :cca)
       end
       let(:organization) do
