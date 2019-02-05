@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper do
+RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :after_each do
   include BenefitSponsors::ApplicationHelper
 
   describe '.profile_unread_messages_count', dbclean: :after_each do
@@ -26,7 +26,9 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper do
       let(:broker_organization) { FactoryGirl.build(:benefit_sponsors_organizations_general_organization, site: site) }
       let(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
 
-      it { expect(profile_unread_messages_count(broker_agency_profile)).to eq(0) }
+      it "has the correct number of unread messages" do
+        expect(profile_unread_messages_count(broker_agency_profile)).to eq(0)
+      end
     end
   end
 end

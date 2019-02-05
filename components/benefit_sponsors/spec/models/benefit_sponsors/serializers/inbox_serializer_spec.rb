@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module BenefitSponsors
-  RSpec.describe Serializers::InboxSerializer, :dbclean => :after_each do
+  RSpec.describe Serializers::InboxSerializer do
 
     describe '.unread_messages_count', dbclean: :after_each do
       let(:site) do
@@ -14,7 +14,9 @@ module BenefitSponsors
 
       let(:inbox_serializer) { Serializers::InboxSerializer.new(inbox) }
 
-      it { expect(inbox_serializer.unread_messages_count).to eq(2) }
+      it "has the correct number of unread messages" do
+        expect(inbox_serializer.unread_messages_count).to eq(2)
+      end
     end
 
   end
