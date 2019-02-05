@@ -32,7 +32,7 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true, can_extend_open_enrollment: true, can_change_fein: true)
+      view_admin_tabs: true, can_extend_open_enrollment: true)
 
     permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
@@ -112,6 +112,10 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_change_fein
     Permission.super_admin.update_attributes(can_change_fein: true)
+  end
+
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
   end
 
   def hbx_admin_can_extend_open_enrollment
