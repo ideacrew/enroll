@@ -3,7 +3,12 @@ module Effective
   module Datatables
     class IdentityVerificationDataTable < Effective::MongoidDatatable
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => Proc.new { |row|
+          if invalid_redirection(row)
+            link_to(row.full_name, service_unavailable_insured_interactive_identity_verifications_path(:person_id => row.id))
+          else
+            link_to(row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id))
+          end }, :filter => false, :sortable => false
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
@@ -14,6 +19,11 @@ module Effective
 
       scopes do
          scope :legal_name, "Hello"
+      end
+
+      def invalid_redirection(person)
+        consumer_role = person.consumer_role
+        ((consumer_role.identity_validation == "pending") && (consumer_role.admin_bookmark_url.include? '/families/home')) rescue false
       end
 
       def collection
