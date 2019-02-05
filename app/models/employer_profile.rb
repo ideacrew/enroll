@@ -26,6 +26,7 @@ class EmployerProfile
 
 
   ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+
   INACTIVE_STATES = ["suspended", "ineligible"]
 
   PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]

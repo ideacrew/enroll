@@ -7,7 +7,7 @@ class RemoveDocumentsAssociatedToPerson < MongoidMigrationTask
       message = person.inbox.messages.where(id: ENV['message_id'].to_s).first rescue nil
       if person.present? 
         message.destroy!
-      puts "successfully removed document and message"
+      puts "successfully removed document and message" unless Rails.env.test?
       end
     end
   end

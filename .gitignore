@@ -75,4 +75,6 @@ config/ssl
 *.xlsx
 *.doc
 *.docx
->>>>>>> origin/master
+
+# Ignore Wells Fargo Key
+config/ssl

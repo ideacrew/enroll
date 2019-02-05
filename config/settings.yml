@@ -35,8 +35,6 @@ contact_center:
   email_address: "info@dchealthlink.com"
   mailing_address: "PO Box 97022"
   city_state_zip: "Washington, DC 20090"
-
-
   mailing_address:
     name: "DC Health Link"
 

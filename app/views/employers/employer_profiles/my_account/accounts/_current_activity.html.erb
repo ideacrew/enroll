@@ -14,8 +14,8 @@
     <!-- Starting Balance -->
     <tr>
       <td><%= @employer_profile_account.current_statement_date %></td>
-      <td>Amount due from <%= @employer_profile_account.current_statement_date %> invoice
-        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Amount Due is the total amount due on the last invoice.  Invoices must be paid in full or else the group is at risk of going into arrears.  Any payment or enrollment activity that occurs after the invoice date will be reflected on the next invoice."></i>
+      <td>Remaining amount due from <%= @employer_profile_account.current_statement_date %> invoice
+        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="This amount is the remaining amount due from the last invoice balance due minus any advanced credits for enrollment changes, or payments made since the last invoice date. Invoices must be paid in full or else the group is at risk of going into arrears. Any payment or enrollment activity that occurs after the last invoice date will be reflected on the next invoice."></i>
       </td>
       <td>
         <%= number_to_currency(@employer_profile_account.total_due) || "Data not available" %>
