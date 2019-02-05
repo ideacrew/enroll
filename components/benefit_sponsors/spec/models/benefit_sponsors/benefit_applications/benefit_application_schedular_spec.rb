@@ -54,6 +54,7 @@ module BenefitSponsors
 
     describe 'start_on_options_with_schedule' do
       let(:dates_hash) { subject.start_on_options_with_schedule(true) }
+      let(:first_oe_date) { dates_hash.values.first[:open_enrollment_start_on] }
 
       it 'should return a instance of Hash' do
         expect(dates_hash).to be_a Hash
@@ -65,8 +66,10 @@ module BenefitSponsors
         end
       end
 
-      it "should return today's date for start_on" do
-        expect(dates_hash.values.first[:open_enrollment_start_on]).to eq TimeKeeper.date_of_record
+      if (TimeKeeper.date_of_record).future?
+        it "should return today's date for start_on" do
+          expect(first_oe_date).to eq TimeKeeper.date_of_record
+        end
       end
 
       context "if the TimeKeeper's day is after monthly_end_on" do
@@ -136,6 +139,7 @@ module BenefitSponsors
       let(:later_date) { Date.new(2019, 01, 28) }
       let(:default_monthly_end_on_date) { Date.new(2019, 01, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
+      let(:oe_start_date) { (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months) }
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
         before :each do
@@ -144,13 +148,13 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 1 date' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (later_date..default_monthly_end_on_date)
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (oe_start_date..default_monthly_end_on_date)
           end
         end
 
         context 'not an admin data table action' do
           it 'should return 2 dates' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (later_date..(later_date+oe_min_days))
+            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (oe_start_date..default_monthly_end_on_date)
           end
         end
       end
@@ -162,13 +166,13 @@ module BenefitSponsors
 
         context 'not an admin data table action' do
           it 'should return 1 date' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (previous_date..default_monthly_end_on_date)
+            expect(subject.open_enrollment_period_by_effective_date(start_on, false)).to eq (oe_start_date..default_monthly_end_on_date)
           end
         end
 
         context 'not an admin data table action' do
           it 'should return 2 dates' do
-            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (previous_date..default_monthly_end_on_date)
+            expect(subject.open_enrollment_period_by_effective_date(start_on, true)).to eq (oe_start_date..default_monthly_end_on_date)
           end
         end
       end
