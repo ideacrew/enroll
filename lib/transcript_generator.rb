@@ -1,4 +1,5 @@
 class TranscriptGenerator
+  load 'app/models/parsers/xml/cv/importers/enrollment_parser.rb'
 
   attr_accessor :cv_path, :identifier
 
