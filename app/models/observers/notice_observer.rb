@@ -164,6 +164,12 @@ module Observers
             if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
               deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
             end
+
+            if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
+              binding.pry
+              notice_event = hbx_enrollment.benefit_group.is_congress ? "congressional_employee_plan_selection_confirmation_sep_new_hire" : "non_congress_employee_plan_selection_confirmation_sep_new_hire"
+              deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: notice_event)
+            end
           end
         end
 
@@ -259,6 +265,7 @@ module Observers
       if special_enrollment_period.is_shop?
         primary_applicant = special_enrollment_period.family.primary_applicant
         if employee_role = primary_applicant.person.active_employee_roles[0]
+          binding.pry
           deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted")
         end
       end
