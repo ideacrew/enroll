@@ -3,7 +3,7 @@ module ApplicationHelper
   def can_employee_shop?(date)
     return false if date.blank?
     date = Date.strptime(date.to_s,"%m/%d/%Y")
-    # Plan.has_rates_for_all_carriers?(date) == false
+    Plan.has_rates_for_all_carriers?(date) == false
   end
 
   def deductible_display(hbx_enrollment, plan)
