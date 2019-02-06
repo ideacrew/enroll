@@ -333,8 +333,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     id = id_params[:id] || id_params[:employer_profile_id]
     employer_profile = EmployerProfile.find(id)
     #grab url for WellsFargoSSO and store in insance variable
-    email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.emails.first &&
-      employer_profile.staff_roles.first.emails.first.address) || nil
+    email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.work_email_or_best) || nil
 
     if email.present?
       wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
