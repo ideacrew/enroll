@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe "a monthly shop enrollment query" do
+describe "a monthly shop enrollment query", dbclean: :after_each do
   describe "given an employer who has completed their first open enrollment" do
     describe "with employees who have made the following plan selections:
        - employee A has purchased:
