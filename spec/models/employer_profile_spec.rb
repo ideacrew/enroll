@@ -482,10 +482,10 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   before { organization0; organization1; organization2 }
 
   describe '.find_by_broker_agency_profile' do
-    let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
-    let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
-    let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
-    let(:broker_agency_profile7)  {organization7.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "7754985")}
+    let(:broker_role6)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+    let(:broker_agency_profile)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role6.id)}
+    let(:broker_role7)   { FactoryGirl.create(:broker_role, aasm_state:'active') }
+    let(:broker_agency_profile7)  { FactoryGirl.create(:broker_agency_profile, market_kind: "both", primary_broker_role_id: broker_role7.id)}
     let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
@@ -518,8 +518,6 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       expect(employers_with_broker7.size).to eq 1
       employer = Organization.find(employer.organization.id).employer_profile
       employer.hire_broker_agency(broker_agency_profile)
-      expect(employer).to receive(:employer_broker_fired)
-      employer.employer_broker_fired
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
       expect(employers_with_broker7.size).to eq 0
