@@ -1,4 +1,4 @@
-"# Insured Translations
+# Insured Translations
 INSURED_TRANSLATIONS = {
   "en.insured.consumer_roles.docs_shared.alien_number" => "Alien Number",
   "en.insured.consumer_roles.docs_shared.alien_number_title" => "• When entering an Alien Number, only include the numbers. Do not enter the 'A' or any other characters or letters. For example: If your Alien Number is 'A123456789' then please enter '123456789'. • You must enter exactly 9 digits into the Alien Number field. For Alien Numbers with fewer than 9 digits, add one zero (0) to the beginning of an 8-digit Alien Number and two zeroes (00) to the beginning of a 7-digit Alien Number. For example: If your Alien Number is 'A1234567' then please enter '001234567'. • Pre-1956 certificates do not contain an Alien Number. In this case, enter '999999999' for the Alien Number. (check for 9 digit numbers).",

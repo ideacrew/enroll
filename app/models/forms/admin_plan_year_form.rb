@@ -34,8 +34,10 @@
       end
 
       def set_start_on_dates
-        start_on_dates = PlanYear.calculate_start_on_options
-        start_on_dates = [start_on_dates[0][1].to_date, start_on_dates[1][1].to_date]
+        start_on_dates = PlanYear.calculate_start_on_options.inject([]) do |dates, date_arr|
+          dates << date_arr.second.to_date
+        end
+
         start_on_dates.each do |date|
           oe_dates_hash = PlanYear.calculate_open_enrollment_date(date)
           oe_dates_hash.keys.each { |key| oe_dates_hash[key] = oe_dates_hash[key].to_s }
