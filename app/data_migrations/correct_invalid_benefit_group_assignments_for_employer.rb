@@ -25,6 +25,7 @@ class CorrectInvalidBenefitGroupAssignmentsForEmployer < MongoidMigrationTask
 
           if bga.aasm_state == "coverage_selected" && bga.hbx_enrollment.blank?
             bga.update_attributes(aasm_state: "initialized")
+            puts "Change invalid benefit group assignments for #{ce.first_name} #{ce.last_name} for ER with legal name #{organizations.first.legal_name} to initialized" unless Rails.env.test?
           end
 
           if !(benefit_group.start_on..benefit_group.end_on).cover?(bga.start_on)
