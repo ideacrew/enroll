@@ -12,12 +12,12 @@ describe ResolveCensusEmployeeValidationFailures do
     end
   end
 
-  describe "employer profile with employees present" do
+  describe "employer profile with employees present", dbclean: :after_each do
 
     let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
     let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
 
-    context 'Renewing employer exists with published plan year' do
+    context 'Renewing employer exists with published plan year', dbclean: :after_each do
 
       let!(:employer) {
         FactoryGirl.create(:employer_with_planyear, start_on: effective_on, reference_plan_id: plan.id, plan_year_state: 'active')

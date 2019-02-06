@@ -11,7 +11,7 @@ describe MoveEmployerStaffRoleBetweenTwoPeople do
     end
   end
 
-  describe "move employer staff role between two people" do
+  describe "move employer staff role between two people", dbclean: :after_each do
     let!(:person1) { FactoryGirl.create(:person)}
     let!(:person2) { FactoryGirl.create(:person)}
     let!(:employer_staff_role) {FactoryGirl.create(:employer_staff_role,person: person1)}
