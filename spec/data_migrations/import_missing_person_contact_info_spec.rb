@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "import_missing_person_contact_info")
 
-describe ImportMissingPersonContactInfo do
+describe ImportMissingPersonContactInfo, dbclean: :after_each do
   subject { ImportMissingPersonContactInfo.new("import_missing_person_Contact_info", double(current_scope: nil)) }
 
   let(:census_employee) { FactoryGirl.create(:census_employee) }

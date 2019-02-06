@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_duplicate_broker_agency_accounts")
 
-describe RemoveDuplicateBrokerAgencyAccounts do
+describe RemoveDuplicateBrokerAgencyAccounts, dbclean: :after_each do
   let(:given_task_name) { "remove_duplicate_broker_agency_accounts" }
   # broker_agency_account moved to engine
   let!(:broker_agency_profile) { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_site, :with_broker_agency_profile).broker_agency_profile}
