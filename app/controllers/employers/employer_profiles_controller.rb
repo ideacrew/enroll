@@ -336,7 +336,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.work_email_or_best) || nil
 
     if email.present?
-      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
+      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba.blank? ? @employer_profile.legal_name : @employer_profile.dba, email)
     end
 
     if wells_fargo_sso.present?
