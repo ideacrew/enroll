@@ -114,6 +114,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_broker_agency_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     elsif current_user.has_hbx_staff_role?
       @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
@@ -143,6 +145,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     page = params.permit([:page])[:page]
     if current_user.has_broker_role?
       @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
+    elsif current_user.has_broker_agency_staff_role?
+      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     elsif current_user.has_hbx_staff_role?
       @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
     else
@@ -178,12 +182,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.by_broker_role(broker_role_id)
     end
     @memo = {}
-    @broker_role = current_user.person.broker_role || nil
+    @broker_role = current_user.person.broker_role || @broker_agency_profile.primary_broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def general_agency_index
-    @broker_role = current_user.person.broker_role || nil
+    @broker_role = current_user.person.broker_role || @broker_agency_profile.primary_broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 

@@ -6,7 +6,7 @@ module PortalHeaderHelper
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path, class: "portal"
     elsif (current_user.person.try(:broker_role?) || current_user.try(:has_broker_agency_staff_role?)) && controller_path.include?("broker_agencies")
-      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: params[:id] || @broker_agency_profile_id), class: "portal"
+      link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: @broker_agency_profile_id || params[:id] ), class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
