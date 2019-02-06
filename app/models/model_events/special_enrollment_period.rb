@@ -6,10 +6,8 @@ module ModelEvents
     ]
 
     def notify_on_save
-      binding.pry
 
       if self._id_changed?
-        binding.pry
         is_employee_sep_request_accepted = true
       end
 
