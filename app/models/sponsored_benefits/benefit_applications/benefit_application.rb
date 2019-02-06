@@ -300,7 +300,7 @@ module SponsoredBenefits
 
 
         def open_enrollment_period_by_effective_date(effective_date)
-          earliest_begin_date = effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
+          earliest_begin_date = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months # toDo - check
           prior_month = effective_date - 1.month
 
           begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
