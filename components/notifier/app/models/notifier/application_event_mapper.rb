@@ -19,6 +19,7 @@ module Notifier
       "BrokerRole" => Resource.new(:broker, :id, :broker_role_id, :find),
       "EmployeeRole" => Resource.new(:employee, :id, :employee_role_id, :find),
       "GeneralAgencyProfile" => Resource.new(:general_agency, :id, :general_agency_profile_id, :find)
+      "ConsumerProfile" => Resource.new(:consumer_role, :id, :consumer_role_id, :find)
     }
 
     REVERSE_LOOKUP_MAP = RESOURCE_MAP.inject({}) do |acc, vals|

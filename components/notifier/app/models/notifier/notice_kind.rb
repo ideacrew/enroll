@@ -8,6 +8,7 @@ module Notifier
     include Notifier::NoticeBuilder
 
     RECIPIENTS = {
+      "Consumer" => "Notifier::MergeDataModels::ConsumerProfile",
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
       "Broker" => "Notifier::MergeDataModels::BrokerProfile",
