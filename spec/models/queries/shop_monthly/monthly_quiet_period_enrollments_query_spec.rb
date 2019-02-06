@@ -133,7 +133,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let!(:enrollment_11) {
-        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on.next_month)
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, status: 'coverage_enrolled', employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 1.day, effective_date: plan_year.start_on.next_month)
       }
 
       let!(:enrollment_12) {

@@ -21,6 +21,7 @@ module Queries
     def query_families_with_quiet_period_enrollments
       # include new hire enrollment that purchased in open enrollment with effective_on date greater benefit application start date,
       # and quiet period enrollments.
+      new_hire_states = @enrollment_statuses == ["coverage_selected"] ? ["coverage_selected", "coverage_enrolled"] : @enrollment_statuses
       add({
         "$match" => {
           "$or" => [
@@ -29,7 +30,7 @@ module Queries
               "households.hbx_enrollments.workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
             ]},
             {"$and" =>[
-              "households.hbx_enrollments.aasm_state" => {"$in" => ["coverage_selected", "coverage_enrolled"]},
+              "households.hbx_enrollments.aasm_state" => {"$in" => new_hire_states},
               "households.hbx_enrollments.effective_on" => {"$gt" => @effective_on},
               "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
               "households.hbx_enrollments.submitted_at" => {"$lt" => quiet_period.begin}
