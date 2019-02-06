@@ -96,9 +96,11 @@ module BenefitSponsors
                                                  default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site, aasm_state: :initial_enrollment_closed)
       }
 
+      before :each do
+        allow_any_instance_of(BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents).to receive(:aca_shop_market_employer_transmission_day_of_month).and_return(26)
+      end
+
       context "inital employer on transmission day => 26th of month" do
-
-
 
         it "should transmit only employer_A " do
           allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year,3,26))
@@ -374,6 +376,10 @@ module BenefitSponsors
                                renewal_application_state: :enrollment_closed,
                                default_effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)), site: site,
                                aasm_state: :active)}
+
+    before :each do
+      allow_any_instance_of(BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents).to receive(:aca_shop_market_employer_transmission_day_of_month).and_return(26)
+    end
 
     context "renewal employer on transmission day => 26th of month" do
 
