@@ -21,7 +21,7 @@
                   To upload documentation of your eligibility, go to the Documents option on the left and follow instructions to upload the documentation of your eligibility.
                 </li>
                 <li>
-                  Once you have uploaded your <%= link_to 'Documents', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'documents') %> you can return to this page and publish your plan year.
+                  Once you have uploaded your <%= link_to 'Documents', benefit_sponsors.profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'documents') %> you can return to this page and publish your plan year.
                 </li>
               </ul>
             </p>
@@ -32,13 +32,22 @@
           <% end %>
         </div>
         <div class="modal-footer">
-          <% unless benefit_application.no_documents_uploaded? %>
-            <%= link_to 'Cancel', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
-            <%= link_to 'Publish Anyways', benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
+          <% if  benefit_application.no_documents_uploaded? %>
+            <% if defined?(admin_override) %>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <% else %>
+              <%= link_to 'Cancel', benefit_sponsors.profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+            <%end %>
           <% else %>
-            <%= link_to 'Cancel', profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+            <% if defined?(admin_override) %>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <%= link_to 'Publish Anyways', publish_url, method: :post, remote: true, :class => 'btn btn-danger' %>
+            <% else %>
+              <%= link_to 'Cancel', benefit_sponsors.profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+              <%= link_to 'Publish Anyways', benefit_sponsors.benefit_sponsorship_benefit_application_force_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, :class => 'btn btn-danger' %>
+            <% end %>
           <% end %>
-          <% error_page = warnings[:primary_office_location].present? ? edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
+          <% error_page = warnings[:primary_office_location].present? ? benefit_sponsors.edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : benefit_sponsors.edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
         </div>
       <%else%>
         <div class="modal-body">

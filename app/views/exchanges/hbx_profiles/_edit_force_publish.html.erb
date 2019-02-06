@@ -6,7 +6,7 @@
       </a>
     </div>
     <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.publish_application") %> </h4>
-    <%= form_tag force_publish_exchanges_hbx_profiles_path(id: @benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{@benefit_sponsorship.organization.employer_profile.id}"),:method => :post, :remote => true do %>
+    <%= form_tag force_publish_exchanges_hbx_profiles_path(id: @benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{@benefit_sponsorship.organization.employer_profile.id}", publish_with_warnings: false),:method => :post, :remote => true do %>
       <table class = "table" style="table-layout: fixed;">
         <thead>
           <tr>
@@ -33,9 +33,12 @@
       <div class="row no-buffer child-row">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12 top-buffer text-center">
           <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n(".cancel") %> </span>
-            <%= submit_tag l10n('.submit'), :class => "btn btn-primary", data: { confirm: force_publish_warning_message }, :remote => true, :size => '100px' %>
+            <%= submit_tag l10n('.submit'), :class => "btn btn-primary", :remote => true, :size => '100px' %>
         </div>
       </div>
     <% end %>
   </div>
 </div>
+
+<%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: @benefit_application, admin_override: true, publish_url: force_publish_exchanges_hbx_profiles_path(id: @benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{@benefit_sponsorship.organization.employer_profile.id}", publish_with_warnings: true) %>
+
