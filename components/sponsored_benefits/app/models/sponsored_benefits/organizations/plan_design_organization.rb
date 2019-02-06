@@ -70,6 +70,7 @@ module SponsoredBenefits
 
 
       def employer_profile
+        return nil if is_prospect?
         ::EmployerProfile.find(sponsor_profile_id) || ::BenefitSponsors::Organizations::Profile.find(sponsor_profile_id)
       end
 
