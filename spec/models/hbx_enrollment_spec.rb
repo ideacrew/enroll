@@ -2224,7 +2224,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
     end
   end
 
-  describe "#notify_enrollment_cancel_or_termination_event, ", :dbclean => :after_each do
+  describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
