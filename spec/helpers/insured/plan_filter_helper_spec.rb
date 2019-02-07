@@ -11,7 +11,7 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
     it "should return link for individual" do
       @market_kind="shop"
       @coverage_kind = "health"
-      expect(find_my_doctor).to eq "<a target=\"_blank\" href=\"https://checkbook_url/dcshopnationwide/\">Find Your Doctor</a>"
+      expect(find_my_doctor).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_doctor_shop\" href=\"\">Find Your Doctor</a>"
     end
   end
   
@@ -21,14 +21,14 @@ RSpec.describe Insured::PlanFilterHelper, :type => :helper do
       @market_kind="shop"
       @dc_checkbook_url=Rails.application.config.checkbook_services_congress_url+"#{hbx_enrollment.coverage_year}/"
       @coverage_kind="health"
-      expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"https://checkbook_url/congress/#{hbx_enrollment.coverage_year}/\">Estimate Your Costs</a>"
+      expect(estimate_your_costs).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_shop\" href=\"\">Estimate Your Costs</a>"
     end
 
     it "should return link for non-congressional employee" do
       @market_kind="shop"
       @coverage_kind = "health"
-      @dc_checkbook_url=Rails.application.config.checkbook_services_base_url
-      expect(estimate_your_costs).to eq "<a target=\"_blank\" href=\"https://checkbook_url\">Estimate Your Costs</a>"
+      @dc_checkbook_url= Settings.checkbook_services.checkbook_services_ee_url
+      expect(estimate_your_costs).to eq "<a data-toggle=\"modal\" data-target=\"#plan_match_shop\" href=\"\">Estimate Your Costs</a>"
     end
   end
 end
