@@ -65,6 +65,14 @@ And(/^ask to confirm intention to publish$/) do
   page.driver.browser.accept_confirm
 end
 
+And(/^the user clicks publish anyways$/) do
+  find('a', :text => "Publish Anyways").click
+end
+
 Then(/^the force publish successful message should be displayed$/) do 
   expect(page).to have_content('Force Publish Successful')
+end
+
+Then(/^the user will see published sucessfully for review message$/) do
+  expect(page).to have_content('Employer(s) Plan Year was successfully submitted for review')
 end

@@ -50,3 +50,17 @@ Feature: As an admin user I should have the ability to extend the OE
       |more than           |        is          |
       |more than           |        is not      |
       |less than or equal  |        is not      |
+
+
+  Scenario: Application force published with eligibility warnings should go to publish pending state
+    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
+    And the user is on the Employer Index of the Admin Dashboard
+    And system date is between submission deadline & application effective date
+    And ABC widgets FTE count is more than to shop:small_market_employee_count_maximum
+    And ABC widgets primary address state is not MA
+    And the user clicks Action for that Employer
+    And the user clicks on Force Publish button
+    And the user clicks submit button
+    Then a warning message will appear
+    And the user clicks publish anyways
+    Then the user will see published sucessfully for review message
