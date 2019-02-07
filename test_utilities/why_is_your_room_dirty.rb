@@ -44,6 +44,13 @@ module FactoryGirl::Syntax::Methods
   end
 
   alias_method_chain :create, :log
+
+  def build_with_log(name, *traits_and_overrides, &block)
+    DirtyDbRoom.room_made_dirty!(name)
+    build_without_log(name, *traits_and_overrides, &block)
+  end
+
+  alias_method_chain :build, :log
 end
 
 DirtyDbRoom.initialize_stern_mom!
