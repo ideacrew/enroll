@@ -31,6 +31,19 @@ contact_center:
   email_address: "info@dchealthlink.com"
 
 notices:
+
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
+
   mailing_address:
     address_1:
     address_2:
@@ -141,19 +154,6 @@ aca:
     transmit_employers_immediately: false
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
-
-notices:
-  individual_market:
-    mail_address:
-      address_1: "PO Box 44018"
-      city: "Washington"
-      zip_code: "20026"
-
-  shop_market:
-    mail_address:
-      address_1: "1225 I Street, NW"
-      address_2: "Suite 400"
-      zip_code: "20005"
 
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
