@@ -5,14 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
-  describe HbxEnrollment, dbclean: :after_each do
+  describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-
-    before(:each) do
-      DatabaseCleaner.clean
-    end
-
+    
     context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
 
       before do

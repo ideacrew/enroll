@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe "a monthly shop renewal termination query" do
+describe "a monthly shop renewal termination query", dbclean: :after_each do
   describe "given a renewing employer who has completed their open enrollment" do
     describe "with employees who have made the following plan selections:
        - employee A has purchased:
