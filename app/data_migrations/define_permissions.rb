@@ -112,6 +112,7 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_change_fein
     Permission.super_admin.update_attributes(can_change_fein: true)
+    Permission.hbx_tier3.update_attributes(can_change_fein: true)
   end
 
   def hbx_admin_can_force_publish
