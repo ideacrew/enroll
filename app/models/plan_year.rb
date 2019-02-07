@@ -605,7 +605,7 @@ class PlanYear
     end
 
     # Application is in ineligible state from prior enrollment activity
-    if aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible"
+    if (aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible") && !(["enrollment_extended", "renewing_enrollment_extended"].include?(aasm.to_state.to_s))
       warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
     end
 
@@ -783,7 +783,7 @@ class PlanYear
   end
 
   def employees_are_matchable?
-    %w(renewing_published renewing_enrolling renewing_enrolled published enrolling enrolled active).include? aasm_state
+    %w(renewing_published renewing_enrolling renewing_enrollment_extended renewing_enrolled published enrolling enrollment_extended enrolled active).include? aasm_state
   end
 
   def application_warnings
@@ -983,7 +983,7 @@ class PlanYear
     state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
-      transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
+      transitions from: [:published, :enrolling, :enrollment_extended, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrollment_extended, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
     end
 
     event :expire, :after => :record_transition do
@@ -994,8 +994,8 @@ class PlanYear
     event :advance_date, :after => :record_transition do
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
-      transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
+      transitions from: [:enrolling, :enrollment_extended],  to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: [:enrolling, :enrollment_extended], to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -1003,8 +1003,8 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
+      transitions from: [:renewing_enrolling, :renewing_enrollment_extended],  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: [:renewing_enrolling, :renewing_enrollment_extended],  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1131,8 +1131,8 @@ class PlanYear
     end
 
     event :extend_open_enrollment, :after => :record_transition do
-      transitions from: [:canceled, :application_ineligible, :enrollment_extended, :enrolling ], to: :enrollment_extended
-      transitions from: [:canceled, :renewing_application_ineligible, :renewing_enrollment_extended, :renewing_enrolling ], to: :renewing_enrollment_extended
+      transitions from: [:canceled, :application_ineligible, :enrollment_extended, :enrolling ], to: :enrollment_extended,                                     :guard => [:is_application_eligible?]
+      transitions from: [:canceled, :renewing_application_ineligible, :renewing_enrollment_extended, :renewing_enrolling ], to: :renewing_enrollment_extended, :guard => [:is_application_eligible?]
     end
   end
 
@@ -1199,7 +1199,7 @@ class PlanYear
 
   def is_eligible_to_match_census_employees?
     (benefit_groups.size > 0) and
-    (published? or enrolling? or enrolled? or active?)
+    (published? or enrolling? or enrollment_extended? or enrolled? or active?)
   end
 
   def is_within_review_period?

@@ -56,6 +56,7 @@ FactoryGirl.define do
       can_view_username_and_email true
       can_lock_unlock true
       can_reset_password true
+      can_extend_open_enrollment true
     end
 
     trait :hbx_csr_tier2 do
