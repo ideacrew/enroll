@@ -12,8 +12,6 @@
       attribute :fte_count, Integer, default: 0
 
       attribute :start_on_options, Hash
-      attribute :admin_datatable_action, Boolean, default: false
-      attribute :employer_profile_id, String
       attribute :organization_id, String
 
       validate :validate_oe_dates
