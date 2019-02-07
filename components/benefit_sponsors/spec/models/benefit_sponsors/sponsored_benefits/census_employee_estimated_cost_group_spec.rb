@@ -90,11 +90,11 @@ module BenefitSponsors
       end
 
       context 'cases based on aasm_states' do
-        it 'should return array with ce1 id' do
+        it 'should return array with ce1 id as it is active' do
           expect(@census_employees.pluck(:id)).to include(ce1.id)
         end
 
-        it 'should return array with ce1 id' do
+        it 'should return array without ce2 id as it is not active' do
           expect(@census_employees.pluck(:id)).not_to include(ce2.id)
         end
       end
