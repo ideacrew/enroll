@@ -137,6 +137,7 @@ checkbook_services:
     plan_match: "DC"
     checkbook_services_congress_url: "https://staging.checkbookhealth.org/congress/dc/api?environment=test&from=dchbx" # This Needs to go to Chef
     checkbook_services_ee_url: "https://staging.checkbookhealth.org/shop/dc/api?environment=test&from=dchbx"
+    ivl_path: "https://staging.checkbookhealth.org/hie/dc/api?environment=test"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

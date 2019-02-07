@@ -8,14 +8,14 @@ module Services
 
       BASE_URL = Settings.checkbook_services.checkbook_services_ee_url
       CONGRESS_URL = Settings.checkbook_services.checkbook_services_congress_url
-      IVL_PATH = Rails.application.config.checkbook_services_ivl_path
+      IVL_PATH = Settings.checkbook_services.ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
       def initialize(hbx_enrollment, is_congress=false)
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"
           @person = @hbx_enrollment.consumer_role.person
-          @url = BASE_URL+IVL_PATH
+          @url = IVL_PATH
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
