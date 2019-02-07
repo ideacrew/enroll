@@ -14,7 +14,7 @@ module IvlAssistanceWorld
     if open_enrollment.cover? TimeKeeper.date_of_record
       open_enrollment_end
     else
-      open_enrollment_start
+      TimeKeeper.date_of_record
     end
   end
 
