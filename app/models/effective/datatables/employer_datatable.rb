@@ -66,8 +66,7 @@ module Effective
       end
 
       def business_policy_accepted?(draft_plan_year)
-        current_date = TimeKeeper.date_of_record
-        current_date <= draft_plan_year.open_enrollment_end_on && current_date.day > draft_plan_year.due_date_for_publish.day && current_date.month <= Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months && current_date <= draft_plan_year.effective_date
+        TimeKeeper.date_of_record > draft_application.last_day_to_publish && TimeKeeper.date_of_record < draft_application.start_on
       end
 
       def force_publish_link_type(row, allow)

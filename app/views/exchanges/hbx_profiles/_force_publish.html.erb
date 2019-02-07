@@ -1,7 +1,11 @@
 <div class="container bottom-pd">
-  <h4 class="title"><%= l10n("hbx_profiles.force_publish_success") %></h4>
+  <% if @plan_year.publish_pending? %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_publish_success") %> </h4>
+  <% else %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_published_application_review") %> </h4>
+  <% end %>
   <table class="table">
-    <thead> Employer(s) Plan Year was successfully submitted for review. </thead>
+    <thead> </thead>
     <tbody>
       <tr>
         <td> <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();"> <%= l10n("close")%> </span> </td>

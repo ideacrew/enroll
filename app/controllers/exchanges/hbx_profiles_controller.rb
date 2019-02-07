@@ -431,14 +431,19 @@ def employer_poc
   def edit_force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
+    @plan_year = @organization.employer_profile.draft_plan_year.last
   end
 
   def force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
     @plan_year = @organization.employer_profile.draft_plan_year.last
-    if @plan_year.may_force_publish?
+    if @plan_year.may_force_publish? && params[:publish_with_warnings] == 'true'
       @plan_year.force_publish!
+    end
+
+    respond_to do |format|
+      format.js
     end
   end
 
