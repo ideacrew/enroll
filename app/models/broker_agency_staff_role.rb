@@ -14,6 +14,8 @@ class BrokerAgencyStaffRole
 
   validates_presence_of :broker_agency_profile_id
 
+  scope :active, ->{where(aasm_state: 'active')}
+
   accepts_nested_attributes_for :person, :workflow_state_transitions
 
   # after_initialize :initial_transition

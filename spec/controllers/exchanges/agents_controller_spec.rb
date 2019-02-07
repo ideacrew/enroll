@@ -88,7 +88,7 @@ RSpec.describe Exchanges::AgentsController do
       it 'should return true if user has broker role or broker agency staff role' do
         sign_in(current_user)
         expect(subject.instance_eval{ user_permission_satisfied? }).to eq true
-      en
+      end
     end
 
     context 'user does not have any roles' do

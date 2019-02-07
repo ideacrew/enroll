@@ -439,7 +439,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def check_broker_agency_staff_role
     if current_user.has_broker_agency_staff_role?
-      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.first.broker_agency_profile_id)
+      redirect_to broker_agencies_profile_path(:id => current_user.person.broker_agency_staff_roles.active.first.broker_agency_profile_id)
     elsif current_user.has_broker_role?
       redirect_to broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id.to_s)
     else
