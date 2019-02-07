@@ -8,7 +8,7 @@ module Effective
           if row.broker_relationship_inactive?
             row.legal_name
           else
-            (link_to row.legal_name, benefit_sponsor_home_url(row))
+            (link_to row.legal_name, eval(benefit_sponsor_home_url(row)))
           end
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
