@@ -17,29 +17,26 @@ Feature: As an admin user I should have the ability to extend the OE
 
     Examples:
       | system_date_value  | date_to_compare_with                 | date_compare | action  |
-      | greater            | earliest_start_prior_to_effective_on | less         | not see |
-      | less               | monthly open enrollment end_on       | greater      | see     |
+      | less               | application_effective_date           | less         | not see |
+      | less               | application_effective_date           | greater      | see     |
+      | greater            | application_effective_date           | greater      | not see |
 
-
-  Scenario: Draft application published between submission deadline & OE End date
+  Scenario: Draft application published between submission deadline & application effective date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And system date is between submission deadline & OE End date
+    And system date is between submission deadline & application effective date
     When ABC widgets FTE count is less than or equal to shop:small_market_employee_count_maximum
     And ABC widgets primary address state is MA
     And the user clicks Action for that Employer
     Then the user will see the Force Publish button
-    When the system date is greater than open_enrollment_period start date
     And the user clicks on Force Publish button
     And the user clicks submit button
-    And a warning message will appear
-    And ask to confirm intention to publish
-    Then the force published action should display 'Force Publish Successful'
+    Then the force publish successful message should be displayed
 
-  Scenario Outline: Draft application published between submission deadline & OE End date
+  Scenario Outline: Draft application published between submission deadline & application effective date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And system date is between submission deadline & OE End date
+    And system date is between submission deadline & application effective date
     And ABC widgets FTE count is <compare_fte> to shop:small_market_employee_count_maximum
     And ABC widgets primary address state <state_check> MA
     And the user clicks Action for that Employer
