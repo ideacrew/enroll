@@ -114,15 +114,23 @@ module SponsoredBenefits
         end
       end
 
-      def employer_profile=(new_employer_profile)
-        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile)
-        self.employer_profile_id = new_employer_profile._id
-        @employer_profile = new_employer_profile
-      end
+      # def employer_profile=(new_employer_profile)
+      #   raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(SponsoredBenefits::Organizations::AcaShopCcaEmployerProfile)
+      #   self.employer_profile_id = new_employer_profile._id
+      #   @employer_profile = new_employer_profile
+      # end
+
+      # def employer_profile
+      #   return @employer_profile if defined? @employer_profile
+      #   @employer_profile = Organizations::PlanDesignProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+      # end
 
       def employer_profile
-        return @employer_profile if defined? @employer_profile
-        @employer_profile = Organizations::PlanDesignProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+        plan_design_organization.employer_profile
+      end
+
+      def plan_design_organization
+        plan_design_proposal.plan_design_organization
       end
 
       def benefit_sponsorship=(benefit_sponsorship)
