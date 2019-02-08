@@ -5,5 +5,5 @@ require File.join(Rails.root, "app", "data_migrations", "components", "fix_benef
 
 namespace :migrations do
   desc "fix benefit sponsorship aasm state"
-  FixEmployerAttestation.define_task :fix_benefit_sponsorship_state => :environment
+  FixBenefitSponsorshipState.define_task :fix_benefit_sponsorship_state => :environment
 end
