@@ -66,7 +66,7 @@ module Effective
       end
 
       def business_policy_accepted?(draft_plan_year)
-        TimeKeeper.date_of_record > draft_application.last_day_to_publish && TimeKeeper.date_of_record < draft_application.start_on
+        TimeKeeper.date_of_record > draft_plan_year.due_date_for_publish && TimeKeeper.date_of_record < draft_plan_year.start_on
       end
 
       def force_publish_link_type(row, allow)
