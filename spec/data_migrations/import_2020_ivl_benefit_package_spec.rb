@@ -14,8 +14,7 @@ require File.join(Rails.root, "app", "data_migrations", "import_2020_ivl_benefit
    describe "create 2020 benefit package for IVL market" do
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let!(:benefit_sponsorship) { FactoryGirl.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
-    let!(:bcp) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), open_enrollment_start_on: Date.new(2017,11,1), open_enrollment_end_on: Date.new(2018,1,31), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
-
+    let!(:bcp) { FactoryGirl.create(:benefit_coverage_period, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), open_enrollment_start_on: Date.new(2018,11,1), open_enrollment_end_on: Date.new(2019,2,8), title: "Individual Market Benefits 2018", benefit_sponsorship: benefit_sponsorship) }
      before(:each) do
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       subject.migrate
@@ -42,4 +41,4 @@ require File.join(Rails.root, "app", "data_migrations", "import_2020_ivl_benefit
       expect(bcp_2019.open_enrollment_end_on).to eq Date.new(2020,1,31)
     end
   end
-end 
+end
