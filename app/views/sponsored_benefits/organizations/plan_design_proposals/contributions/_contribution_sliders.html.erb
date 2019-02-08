@@ -26,10 +26,12 @@
         <div class="col-xs-12">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least <%= aca_shop_market_employer_contribution_percent_minimum %>% of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year. Offering family coverage is optional, but if offered, employers are required to contribute at least <%= aca_shop_market_employer_family_contribution_percent_minimum %>% towards family premiums, except during the special annual enrollment period at the end of each year."></i></div>
       </div>
     </div>
+    <% if f.object.sole_source? %>
     <div class="col-xs-12 benefits-fields">
       <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
         <%= render "shared/composite_tier_contribution_fields", f: rb %>
       <% end %>
     </div>
+      <% end %>
   </div>
 </div>
