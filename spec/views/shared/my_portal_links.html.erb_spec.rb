@@ -1,9 +1,6 @@
 require 'rails_helper'
 
-describe "shared/_my_portal_links.html.haml" do
-  before :each do
-    DatabaseCleaner.clean
-  end
+describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
 
   context "with employee role" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["employee"]) }

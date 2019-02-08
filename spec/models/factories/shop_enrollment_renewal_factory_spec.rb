@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model do
+RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean: :after_each do
 
   describe ".generate_passive_renewal" do
 

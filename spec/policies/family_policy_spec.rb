@@ -56,7 +56,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
   end
 end
 
-describe FamilyPolicy, "given a family where the primary has an active employer broker account" do
+describe FamilyPolicy, "given a family where the primary has an active employer broker account", dbclean: :after_each do
   let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { organization.employer_profile }
