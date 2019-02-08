@@ -15,7 +15,9 @@
       bc_period.start_on = bc_period_2019.start_on.next_year
       bc_period.end_on = bc_period_2019.end_on.next_year
       bc_period.open_enrollment_start_on = bc_period_2019.open_enrollment_start_on.next_year
-      bc_period.open_enrollment_end_on = bc_period_2019.open_enrollment_end_on.next_year
+
+      # adding .last_month.end_of_month because in 2019 we updated the below date to Feb 8th.
+      bc_period.open_enrollment_end_on = bc_period_2019.open_enrollment_end_on.next_year.last_month.end_of_month
 
        bs = hbx.benefit_sponsorship
       bs.benefit_coverage_periods << bc_period
