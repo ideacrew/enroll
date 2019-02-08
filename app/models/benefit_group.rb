@@ -2,6 +2,7 @@ class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
   include ::Eligibility::BenefitGroup
+  include Config::AcaModelConcern
 
   embedded_in :plan_year
 
@@ -377,6 +378,10 @@ class BenefitGroup
     pcd.total_employee_cost
   end
 
+  def sole_source?
+    plan_option_kind == "sole_source"
+  end
+
   def single_plan_type?
     plan_option_kind == "single_plan"
   end
@@ -406,16 +411,37 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
+    if constrain_service_areas?
+      @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, self.start_on.year)
+    end
     case plan_option_kind
+    when "sole_source"
+      Plan.where(id: reference_plan_id).first
     when "single_plan"
       Plan.where(id: reference_plan_id).first
     when "single_carrier"
+
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
+      carrier_profile_id = reference_plan.carrier_profile_id
+
+      if constrain_service_areas?
+        plans = Plan.check_plan_offerings_for_single_carrier # filter by vertical choice(as there should be no bronze plans for one carrier.)
+        plans.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select {|pair| pair.first == carrier_profile_id}).to_a
+      else
+        Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).to_a
+      end
+
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
+      if carrier_for_elected_plan.blank?
+        carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
+      end
+      if constrain_service_areas?
+        Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).select {|pair| pair.metal_level == reference_plan.metal_level}.to_a
+      else
+        Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).select {|pair| pair.metal_level == reference_plan.metal_level}.to_a
+      end
     end
   end
 

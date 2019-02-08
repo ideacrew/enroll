@@ -1,4 +1,5 @@
 class Organization
+  include Config::AcaModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -252,6 +253,13 @@ class Organization
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name
         carrier_names
       end
+    end
+  end
+
+  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil, kind: nil })
+    unless constrain_service_areas?
+      return self.valid_dental_carrier_names  if filters[:kind] == "dental"
+      return self.valid_carrier_names
     end
   end
 

@@ -255,7 +255,31 @@ module Config::AcaHelper
     Settings.contact_center.payment_phone_number
   end
 
+  def employer_has_sic_enabled?
+    Settings.aca.employer_has_sic_field
+  end
+
+  def employer_has_county_validation?
+    Settings.aca.employer_has_county_validation
+  end
+
   def dental_offers_single_plan?
     Settings.aca.dental_plan_options_available.include?("single_plan")
+  end
+
+  def dental_offers_single_carrier?
+    Settings.aca.dental_plan_options_available.include?("single_carrier")
+  end
+
+  def dental_offers_sole_source?
+    Settings.aca.dental_plan_options_available.include?("sole_source")
+  end
+
+  def dental_offers_metal_level?
+    Settings.aca.dental_plan_options_available.include?("metal_level")
+  end
+
+  def dental_offers_custom_creation?
+    Settings.aca.dental_plan_options_available.include?("custom")
   end
 end

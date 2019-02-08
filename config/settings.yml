@@ -44,11 +44,13 @@ aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
   hbx_abbreviation: "DC Health Benefit Exchange"
+  nationwide_markets: true
   market_kinds: ["individual", "shop"]
   employer_has_sic_field: false
   employer_has_county_validation: false
   plan_options_available: ["single_plan", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_carrier", "custom"]
+  offerings_constrained_to_service_areas: false
 #
   qle:
     with_in_sixty_days: 60
@@ -70,6 +72,7 @@ aca:
   shop_market:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
+    employer_family_contribution_percent_minimum: 0
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
