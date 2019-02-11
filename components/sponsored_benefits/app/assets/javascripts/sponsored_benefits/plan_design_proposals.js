@@ -205,7 +205,6 @@ function hidePlanContainer() {
 function carrierSelected() {
   $('.tab-container').hide();
   var elected_plan_kind = $('.plan-design .nav-tabs li.active input').val();
-  console.log(elected_plan_kind)
   selected_rpids = [];
   $('.plan-comparison-container').hide();
 
