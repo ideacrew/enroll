@@ -896,15 +896,16 @@ class EmployerProfile
     end
   end
 
-  def self.transmit_scheduled_employers(start_on, transition_at, feins=[])
-    organization_collection = Organization.where(:fein.in => feins) if feins.any?
+  def self.transmit_scheduled_employers(start_on, transition_at = nil, feins=[])
+
+    organization_collection =  feins.any? ? Organization.where(:fein.in => feins) : Organization
 
     employer_collection = if transition_at.present?
                             # late renewal employer after transmission day.
                             organization_collection.where(:"employer_profile.plan_years" => {
                                                               :$elemMatch => {
                                                                   :start_on => start_on,
-                                                                  :aasm_state => ['active', 'renewing_enrolled'],
+                                                                  :aasm_state.in => ['active', 'renewing_enrolled'],
                                                                   "workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'renewing_enrolled', "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
                                                               }})
                           else
@@ -923,7 +924,7 @@ class EmployerProfile
                             # late initial employer after transmission day.
                             organization_collection.where(:"employer_profile.plan_years" => {
                                                           :$elemMatch => {:start_on => start_on, :aasm_state.in => ['enrolled', 'active']}},
-                                                          :"workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'binder_paid', "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}},
+                                                          :"employer_profile.workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'binder_paid', "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}},
                                                           :"employer_profile.aasm_state".in => ['binder_paid'])
                           else
                             # monthly initial employer on transmission day.
