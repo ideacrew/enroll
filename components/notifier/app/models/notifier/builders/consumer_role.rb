@@ -1,5 +1,5 @@
 module Notifier
-  class Builders::ConsumerProfile
+  class Builders::ConsumerRole
 
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
@@ -7,7 +7,7 @@ module Notifier
     attr_accessor :consumer_role, :merge_model, :payload, :event_name, :sep_id
 
     def initialize
-      data_object = Notifier::MergeDataModels::ConsumerProfile.new
+      data_object = Notifier::MergeDataModels::ConsumerRole.new
       data_object.address = Notifier::MergeDataModels::IvlAddress.new
       data_object.dependents = Notifier::MergeDataModels::Dependent.new
       @merge_model = data_object
@@ -29,6 +29,10 @@ module Notifier
       merge_model.last_name = consumer_role.person.last_name if consumer_role.present?
     end
 
+    def person
+      consumer_role.person
+    end
+
     def append_contact_details
       mailing_address = consumer_role.person.mailing_address
       if mailing_address.present?
@@ -43,12 +47,11 @@ module Notifier
     end
 
     def dependents
-      payload["notice_params"]["dep_hbx_ids"].each do |dep_id|
-        person =  Person.where(hbx_id: dep_id).first.full_name
-        
-        merge_model.dependents = MergeDataModels::Dependent.new({
-          first_name: person.first_name,
-          last_name: person.last_name
+      family = consumer_role.person.primary_family
+      family.active_family_members.each do |member|
+        merge_model.dependents << MergeDataModels::Dependent.new({
+          first_name: member.first_name,
+          last_name: member.last_name
         })
       end
     end
@@ -65,10 +68,34 @@ module Notifier
       merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
     end
 
-    def consumer_profile
-      consumer_role.consumer_profile
-    end   
-    # Using same merge model for special enrollment period and qualifying life event kind
+    def coverage_year
+      year = if self.is_shop?
+                benefit_group.plan_year.start_on.year
+              else
+                plan.try(:active_year) || effective_on.year
+              end
+    end
+
+    def previous_coverage_year
+      coverage_year.to_i - 1
+    end
+
+    def email
+      merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
+    end
+
+    def aqhp
+      person.is_aqhp?
+    end
+
+    def irs_consent
+      notice_params[:irs_consent].upcase == "YES"
+    end
+
+    def shop?
+      false
+    end
+     # Using same merge model for special enrollment period and qualifying life event kind
     def format_date(date)
       return '' if date.blank?
       date.strftime('%m/%d/%Y')

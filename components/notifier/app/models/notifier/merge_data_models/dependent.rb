@@ -15,7 +15,7 @@ module Notifier
 
     def self.stubbed_object
       Notifier::MergeDataModels::Dependent.new({
-        first_name: 'Sam',
+        first_name: 'Kristina',
         last_name: 'Parker',
         age: 28,
         federal_tax_filing_status: 'Single',
