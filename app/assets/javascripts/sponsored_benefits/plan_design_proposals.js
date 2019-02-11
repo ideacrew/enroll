@@ -26,7 +26,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   var kind = fetchBenefitKind();
-  
+
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
@@ -205,6 +205,7 @@ function hidePlanContainer() {
 function carrierSelected() {
   $('.tab-container').hide();
   var elected_plan_kind = $('.plan-design .nav-tabs li.active input').val();
+  console.log(elected_plan_kind)
   selected_rpids = [];
   $('.plan-comparison-container').hide();
 
@@ -215,6 +216,11 @@ function carrierSelected() {
   }else {
     $("#elected_plan_kind").val(elected_plan_kind);
     $("#reference_plan_id").val("");
+  }
+
+  if (elected_plan_kind == "custom") {
+    $(this).closest('.plan-design').find('.carrier-custom-plan-tab').show();
+    $(this).closest('.plan-design').find('.plan-options').slideDown();
   }
 
   if (elected_plan_kind == "single_carrier") {
@@ -255,7 +261,7 @@ function planSelected() {
 }*/
 function setMyPlans(element) {
   // Need to remove jQuery Selectors
-  
+
   var reference_plan_id = element.dataset.planid.replace(/['"]+/g, '');
   var kind = fetchBenefitKind();
 
@@ -418,11 +424,11 @@ function setRadioBtn(element) {
   dotIcons = document.querySelectorAll('.fa-dot-circle');
   icons = document.querySelectorAll('.fa-circle');
   iconId = element.target.dataset.tempId;
-  
+
   dotIcons.forEach(function(icon) {
     icon.classList.add('fa-circle')
   });
-  
+
   icons.forEach(function(icon) {
     if (icon.dataset.tempId == iconId) {
       icon.classList.add('fa-dot-circle')
@@ -741,4 +747,3 @@ function sortPlans() {
 function setCarrierRadio(element) {
   element.checked = true;
 }
-
