@@ -17,6 +17,8 @@ module ShopPolicyCalculations
       [member_provider] + member_provider.census_dependents
     when QuoteHousehold
       member_provider.quote_members
+    when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
+      [member_provider] + member_provider.census_dependents
     end
   end
 
