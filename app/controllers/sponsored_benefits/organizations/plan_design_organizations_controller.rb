@@ -90,7 +90,7 @@ module SponsoredBenefits
         @organization = SponsoredBenefits::Forms::PlanDesignOrganizationSignup.new(params)
         @organization.valid?
       end
-      get_sic_codes if employer_has_sic_enabled?
+      get_sic_codes
     end
 
     def find_broker_agency_profile
@@ -116,6 +116,7 @@ module SponsoredBenefits
     end
 
     def get_sic_codes
+      return unless employer_has_sic_enabled?
       @grouped_options = {}
       ::SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
         @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
