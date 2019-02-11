@@ -9,7 +9,7 @@
        <th><%= l10n("hbx_profiles.oe_end_date")%></th>
        <th><%= l10n("hbx_profiles.application_status")%></th>
        <th><%= l10n("hbx_profiles.submitted_at")%></th>
-       <th><%= l10n("hbx_profiles.last_updated_at")%></th>
+       <th class="pull-left"><%= l10n("hbx_profiles.last_updated_at")%></th>
        <th></th>  
       </tr>
     </thead>
@@ -21,9 +21,9 @@
           <td><%= plan_year.open_enrollment_end_on.strftime('%m/%d/%Y') %></td>
           <td><%= plan_year.aasm_state.to_s.humanize.titleize %></td>
           <td><%= TimeKeeper.local_time(plan_year.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
-          <td><%= TimeKeeper.local_time(plan_year.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
+          <td class="pull-left"><%= TimeKeeper.local_time(plan_year.updated_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to l10n('hbx_profiles.edit_open_enrollment'), edit_open_enrollment_exchanges_hbx_profiles_path(id: @employer_profile.id, plan_year_id: plan_year.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            <%= link_to l10n('hbx_profiles.edit_open_enrollment'), edit_open_enrollment_exchanges_hbx_profiles_path(id: @employer_profile.id, plan_year_id: plan_year.id), :remote => true, :role => 'button', :class => "btn btn-primary pull-right btn-sm" %>
           </td>
         </tr>
         <% end %>
