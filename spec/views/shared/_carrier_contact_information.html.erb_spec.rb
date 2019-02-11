@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'pry'
 
 describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
   let(:plan) {
