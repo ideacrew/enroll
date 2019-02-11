@@ -438,7 +438,6 @@ function disableActionButtons() {
   var minimum_employee_contribution = $("#employer_min_employee_contribution").val();
   var minimum_family_contribution = $("#employer_min_family_contribution").val();
   data = buildBenefitGroupParams();
-  debugger;
   if (proposalIsInvalid(data)){
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
