@@ -274,7 +274,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "GET edit_force_publish" do
     context "of an hbx super admin clicks Force Publish" do
-      let(:organization){ FactoryGirl.create(:organization) }
+      let!(:organization){ FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+      let!(:draft_plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: 'draft', employer_profile: employer_profile) }
       let(:user) { FactoryGirl.create(:user, person: person) }
       let(:person) do
         FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|

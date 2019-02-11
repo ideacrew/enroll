@@ -16,6 +16,7 @@ RSpec.describe "exchanges/hbx_profiles/_edit_force_publish", :dbclean => :after_
 
   before :each do
     assign :organization, organization
+    assign :plan_year, draft_plan_year
     render partial: 'exchanges/hbx_profiles/edit_force_publish.html.erb', locals: {params: params}
   end
 
