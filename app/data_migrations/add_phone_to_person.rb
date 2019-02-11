@@ -10,7 +10,6 @@ class AddPhoneToPerson < MongoidMigrationTask
       if person.nil?
         puts "No person was found by the given hbx_id" unless Rails.env.test?
       else
-        # person.update_attributes(first_name: first_name, last_name: last_name)
         person.phones << Phone.new(full_phone_number: full_phone_number, kind: kind)
         person.save!
         puts "Adding phone to person #{hbx_id}" unless Rails.env.test?
