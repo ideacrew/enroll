@@ -88,25 +88,6 @@
                 <strong> TTY: </strong> 711 <br>
                 <strong> Hours: </strong> 7 AM to 6 PM CST <br/>
               </div>
-            <% when "Altus Dental" %>
-              <div>
-                <strong> Call: </strong>
-                <a href="tel:+18772230588"> 1.877.223.0588 </a> <br>
-                <strong> TTY: </strong> Not at this time <br>
-                <strong> Email: </strong> customerservice@altudental.com <br>
-                <strong> Hours: </strong> Monday - Thursday, 8 am to 7 pm and Friday 8 am to 5 pm, ET. <br/>
-                <strong> INFOLINE: </strong>
-                <a href="tel:+18772230588"> 1.877.223.0588 </a> <br>
-                Infoline,  our automated telephone system, is available 24 hours a day/7 days a week
-              </div>
-            <% when "Dental Dental" %>
-              <div>
-                <strong> Call: </strong>
-                <a href="tel:+18008720500"> 800.872.0500 </a> <br>
-                <strong> TTY: </strong> 711 <br>
-                <strong> Email: </strong> customer.care@deltadentalma.com <br>
-                <strong> Hours: </strong> Monday - Thursday, 8:30 a.m. to 8:00 p.m. EST; Friday, 8:30 a.m. to 4:30 p.m. EST <br/>
-              </div>
             <% when "Tufts Health Direct" %>
               <div>
                 <strong> Call: </strong>
@@ -173,6 +154,25 @@
         <% else %>
           <div class="carrier-numbers">
             <% case plan.issuer_profile.legal_name %>
+            <% when "Altus Dental" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18772230588"> 1.877.223.0588 </a> <br>
+                <strong> TTY: </strong> Not at this time <br>
+                <strong> Email: </strong> customerservice@altudental.com <br>
+                <strong> Hours: </strong> Monday - Thursday, 8 am to 7 pm and Friday 8 am to 5 pm, ET. <br/>
+                <strong> INFOLINE: </strong>
+                <a href="tel:+18772230588"> 1.877.223.0588 </a> <br>
+                Infoline,  our automated telephone system, is available 24 hours a day/7 days a week
+              </div>
+            <% when "Delta Dental" %>
+              <div>
+                <strong> Call: </strong>
+                <a href="tel:+18008720500"> 800.872.0500 </a> <br>
+                <strong> TTY: </strong> 711 <br>
+                <strong> Email: </strong> customer.care@deltadentalma.com <br>
+                <strong> Hours: </strong> Monday - Thursday, 8:30 a.m. to 8:00 p.m. EST; Friday, 8:30 a.m. to 4:30 p.m. EST <br/>
+              </div>
             <% when "CareFirst" %>
                 <div>
                   Call:
