@@ -248,7 +248,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "returns http success" do
       sign_in(user)
-      get :thankyou, id: "id", plan_id: "plan_id", change_plan: "rspec"
+      get :thankyou, id: "id", plan_id: "plan_id"
       expect(response).to have_http_status(:success)
     end
 
