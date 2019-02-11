@@ -438,6 +438,7 @@ function disableActionButtons() {
   var minimum_employee_contribution = $("#employer_min_employee_contribution").val();
   var minimum_family_contribution = $("#employer_min_family_contribution").val();
   data = buildBenefitGroupParams();
+  debugger;
   if (proposalIsInvalid(data)){
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
@@ -446,8 +447,16 @@ function disableActionButtons() {
     $('.plan_design_proposals .plan-selection-button-group').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
-      'data-title':"Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
+      'data-title': fetch_data_title(minimum_employee_contribution, minimum_family_contribution)
    })
+  }
+}
+
+function fetch_data_title(min_employee_contribution, minimum_family_contribution) {
+  if (minimum_family_contribution === "0"){
+    return "Employer premium contribution for Employee Only Health Plans must be at least " + min_employee_contribution + "%"
+  } else {
+    return "Employer premium contribution for Family Health Plans must be at least " + minimum_family_contribution + "%, and Employee Only Health Plans must be at least " + minimum_employee_contribution + "%"
   }
 }
 
