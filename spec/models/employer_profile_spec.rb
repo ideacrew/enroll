@@ -853,6 +853,12 @@ describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Bin
     expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
     EmployerProfile.update_status_to_binder_paid([organization.id])
   end
+
+  it "should create workflow_state_transitions for binder paid state" do
+    EmployerProfile.update_status_to_binder_paid([organization.id])
+    employer_profile.reload
+    expect(employer_profile.workflow_state_transitions.where(to_state: "binder_paid").count).to eq 1
+  end
 end
 
 describe EmployerProfile, "when a binder premium is credited" do
@@ -1280,6 +1286,99 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
           expect(renewing_employer.is_renewal_carrier_drop?).to be_falsey
         end
       end
+    end
+  end
+
+  describe EmployerProfile, "transmit_scheduled_employers: for initial employer", dbclean: :after_each do
+
+    let(:start_date) { Date.today.next_month.beginning_of_month }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile, aasm_state: emp_state) }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "enrolled", start_on: start_date)}
+    let!(:organization) { employer_profile.organization }
+
+
+    shared_examples_for "eligible initial employer" do |emp_state, transition_at|
+      let!(:emp_state) {emp_state}
+
+      before do
+        if transition_at.present?
+          employer_profile.workflow_state_transitions << WorkflowStateTransition.new( to_state: emp_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+        end
+      end
+      it "shoud notify intial employer event" do
+        expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_initial_application_eligible", {employer_id: employer_profile.hbx_id, event_name: 'benefit_coverage_initial_application_eligible'})
+        transition_day =  transition_at.present? ? Date.new(start_date.year, start_date.prev_month.month, transition_at) : nil
+        EmployerProfile.transmit_scheduled_employers(plan_year.start_on, transition_day)
+      end
+    end
+
+    it_behaves_like "eligible initial employer", "binder_paid", nil
+
+    # late employer 16 to 31 of the month
+    (Settings.aca.shop_market.employer_transmission_day_of_month .. TimeKeeper.date_of_record.end_of_month.mday).each do |day|
+      it_behaves_like "eligible initial employer", "binder_paid", day
+    end
+  end
+
+  describe EmployerProfile, "transmit_scheduled_employers: for renewal employer", dbclean: :after_each do
+
+    let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let!(:renewing_employer) {
+      FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status)
+    }
+
+    shared_examples_for "eligible renewal employer" do |py_state, transition_at|
+      let(:plan_year_status) { py_state }
+
+      before do
+        if transition_at.present?
+          renewing_employer.renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new( to_state: py_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+        end
+      end
+      it "shoud notify renewal employer event" do
+        allow_any_instance_of(EmployerProfile).to receive(:is_renewal_carrier_drop?).and_return(false)
+        expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        transition_day =  transition_at.present? ? Date.new(start_date.year, start_date.prev_month.month, transition_at) : nil
+        EmployerProfile.transmit_scheduled_employers(start_date, transition_day)
+      end
+    end
+
+    it_behaves_like "eligible renewal employer", "renewing_enrolled", nil
+
+    # late renewal employer 16 to 31 of the month
+    (Settings.aca.shop_market.employer_transmission_day_of_month .. TimeKeeper.date_of_record.end_of_month.mday).each do |day|
+      it_behaves_like "eligible renewal employer", "renewing_enrolled", day
+    end
+  end
+
+  describe EmployerProfile, "transmit_scheduled_employers: for renewal employer with carrier switch", dbclean: :after_each do
+
+    let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let!(:renewing_employer) {
+      FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status)
+    }
+
+    shared_examples_for "eligible renewal employer with carrier switch" do |py_state, transition_at|
+      let(:plan_year_status) { py_state }
+
+      before do
+        if transition_at.present?
+          renewing_employer.renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new( to_state: py_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+        end
+      end
+      it "shoud notify renewal employer event" do
+        expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
+        transition_day =  transition_at.present? ? Date.new(start_date.year, start_date.prev_month.month, transition_at) : nil
+        EmployerProfile.transmit_scheduled_employers(start_date, transition_day)
+      end
+    end
+
+    it_behaves_like "eligible renewal employer with carrier switch", "renewing_enrolled", nil
+
+    # late renewal employer with carrier switch 16 to 31 of the month
+    (Settings.aca.shop_market.employer_transmission_day_of_month .. TimeKeeper.date_of_record.end_of_month.mday).each do |day|
+      it_behaves_like "eligible renewal employer with carrier switch", "renewing_enrolled", day
     end
   end
 end
