@@ -8,7 +8,7 @@ class Insured::PlanShoppingsController < ApplicationController
   extend Acapi::Notifiers
   include Aptc
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt,:set_elected_aptc]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt,:set_elected_aptc,:plan_selection_callback]
 
   def checkout
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
@@ -85,8 +85,18 @@ class Insured::PlanShoppingsController < ApplicationController
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    if params[:change_plan].present? 
+     @change_plan =  params[:change_plan] 
+    elsif @enrollment.is_special_enrollment?
+      @change_plan = "change_plan"
+    end
+    if params[:enrollment_kind].present? 
+      @enrollment_kind = params[:enrollment_kind] 
+    elsif @enrollment.is_special_enrollment?
+      @enrollment_kind = "sep"
+    else
+       @enrollment_kind = ""
+    end
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
@@ -168,7 +178,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Rails.application.config.checkbook_services_congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
+      @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment,is_congress_employee).generate_url
     elsif @hbx_enrollment.kind == "individual"
       if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
         plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
@@ -187,12 +197,11 @@ class Insured::PlanShoppingsController < ApplicationController
   def plan_selection_callback
     selected_plan= Plan.where(:hios_id=> params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
-      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id], market_kind: "individual"})
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
     else
       redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
     end
   end
-
 
   def set_elected_aptc
     session[:elected_aptc] = params[:elected_aptc].to_f

@@ -252,11 +252,44 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(response).to have_http_status(:success)
     end
 
+     it "when enrollment has change plan" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id", change_plan: "rspec"
+      expect(assigns(:change_plan)).to eq "rspec"
+    end
+
+    it "when enrollment does not have change plan" do
+      sign_in(user)
+      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:change_plan)).to eq "change_plan"
+    end
+
     it "should be enrollable" do
       sign_in(user)
       get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:enrollable)).to be_truthy
     end
+
+    it "When enrollment kind receives" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id", enrollment_kind: "shop"
+      expect(assigns(:enrollment_kind)).to eq "shop"
+    end
+
+    it "when is_special_enrollment " do
+      sign_in(user)
+      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:enrollment_kind)).to eq "sep"
+    end
+
+    it "when no special_enrollment" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:enrollment_kind)).to eq ""
+    end
+
 
     it "should be waivable" do
       sign_in(user)
@@ -632,6 +665,30 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         it "should get default selected_aptc_pct" do
           expect(session[:elected_aptc]).to eq 0
         end
+      end
+    end
+  end
+
+  describe "plan_selection_callback" do
+    let(:coverage_kind){"health"} 
+    let(:market_kind){"individual"}
+    let(:hios_id){"77422DC0110002-01"}
+    let(:person) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
+    let(:user)  { FactoryGirl.create(:user, person: person) }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:plan) { FactoryGirl.create(:plan) }
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: 'individual', effective_on: (TimeKeeper.date_of_record.beginning_of_month).to_date, plan_id: plan.id) }
+
+    context "When a callback is received" do
+      before do
+        sign_in user
+        allow(Plan).to receive(:where).and_return([plan])
+        get :plan_selection_callback, id: hbx_enrollment.id , hios_id:  hios_id,market_kind: market_kind , coverage_kind: coverage_kind
+      end
+
+      it "should assign market kind and coverage_kind" do
+        expect(assigns(:market_kind)).to be_truthy
+        expect(assigns(:coverage_kind)).to be_truthy
       end
     end
   end
