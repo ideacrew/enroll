@@ -41,7 +41,7 @@
             <% when "Fallon Health" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <strong><a href="tel:+18008685200"><%=l10n("plans.fh_phone")%></a></strong> <br>
+                <strong><a href= <%=l10n('plans.fh_href_phone')%> ><%=l10n("plans.fh_phone")%></a></strong> <br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.fh_tty_number")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.fh_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.fh_hours")%>
@@ -50,9 +50,9 @@
             <% when "Health New England" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <strong><%=l10n("plans.local")%></strong> <a href="tel:+14137874004"><%=l10n("plans.hne_local_phone")%></a> <br>
-                <strong><%=l10n("plans.toll_free")%></strong><a href="tel:+18003102835"><%=l10n("plans.hne_toll_free")%></a> <br>
-                <strong><%=l10n("plans.ttd/tty")%></strong><a href="tel:+18004392370"><%=l10n("plans.hne_tty")%></a> <br>
+                <strong><%=l10n("plans.local")%></strong> <a href=<%=l10n('plans.hne_href_local')%> ><%=l10n("plans.hne_local_phone")%></a> <br>
+                <strong><%=l10n("plans.toll_free")%></strong><a href=<%=l10n('plans.hne_href_toll')%> ><%=l10n("plans.hne_toll_free")%></a> <br>
+                <strong><%=l10n("plans.ttd/tty")%></strong><a href=<%=l10n('plans.hne_href_tty')%> ><%=l10n("plans.hne_tty")%></a> <br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hne_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hne_hours")%><br/>
               </div>
@@ -60,8 +60,8 @@
             <% when "Blue Cross Blue Shield MA" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <strong><%=l10n("plans.bcbs_ivl")%><strong><a href="tel:+18008222700"><%=l10n("plans.bcbs_ivl_phone")%></a> <br>
-                <strong><%=l10n("plans.bcbs_small")%></strong><a href="tel:+18007823675"><%=l10n("plans.bcbs_small_phone")%></a> <br>
+                <strong><%=l10n("plans.bcbs_ivl")%><strong><a href=<%=l10n('plans.bcbs_href_ivl_phone')%> ><%=l10n("plans.bcbs_ivl_phone")%></a><br>
+                <strong><%=l10n("plans.bcbs_small")%></strong><a href=<%=l10n('plans.bcbs_small_href_phone')%> ><%=l10n("plans.bcbs_small_phone")%></a> <br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.bcbs_tty_number")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.bcbs_email")%><br/>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.bcbs_hours")%><br>
@@ -70,7 +70,7 @@
             <% when "Harvard Pilgrim Health Care" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18883334742"><%=l10n("plans.hphc_phone")%></a><br>
+                <a href=<%=l10n('plans.hphc_href_phone')%> ><%=l10n("plans.hphc_phone")%></a><br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.hphc_tty")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hphc_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hphc_hours")%><br/>
@@ -79,7 +79,7 @@
             <% when "AllWays Health Partners" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18664145533"><%=l10n("plans.ahp_phone")%></a> <br>
+                <a href=<%=l10n('plans.ahp_href_phone')%> ><%=l10n("plans.ahp_phone")%></a> <br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.ahp_tty")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ahp_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ahp_hours")%><br/>
@@ -89,7 +89,7 @@
             <% when "United Healthcare" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18888424571"><%=l10n("plan.uh_phone")%></a><br>
+                <a href=<%=l10n('plans.uh_href_phone')%> ><%=l10n("plan.uh_phone")%></a><br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.uh_tty")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.uh_hours")%><br/>
               </div>
@@ -97,7 +97,7 @@
             <% when "Tufts Health Direct" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18882571985"><%=l10n("plans.thd_phone")%>(<%=l10n("plans.tty")%><%=l10n("plans.thd_tty")%>)</a><br>
+                <a href=<%=l10n('plans.thd_href_phone')%> ><%=l10n("plans.thd_phone")%>(<%=l10n("plans.tty")%><%=l10n("plans.thd_tty")%>)</a><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.thd_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thd_hours")%><br/>
               </div>
@@ -105,7 +105,7 @@
             <% when "Tufts Health Plan Premier" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18004620224"><%=l10n("plans.thpp_phone")%></a> <br>
+                <a href=<%=l10n("plans.thd_href_phone")%> ><%=l10n("plans.thpp_phone")%></a> <br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thpp_hours")%><br>
                 <strong><%=l10n("plans.email")%></strong><br/>
               </div>
@@ -113,7 +113,7 @@
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18554443119"><%=l10n("plans.cf_phone")%></a>
+                  <a href=<%=l10n('plans.cf_href_phone')%> ><%=l10n("plans.cf_phone")%></a>
                 </strong>
               </div>
             <% when "Aetna" %>
@@ -121,7 +121,7 @@
                 <strong><%=l10n("plans.aetna_ivl_and_family")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18555866959"><%=l10n("plans.aetna_phone")%></a>
+                  <a href=<%=l10n('plans.aetna_href_phone')%>><%=l10n("plans.aetna_phone")%></a>
                 </strong><br/>
                 <%=l10n("plans.aetna_hours")%>
                 <br/>
@@ -129,7 +129,7 @@
                 <strong><%=l10n("plans.aetna_brokers_and_emprs")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18884222128"><%=l10n("plans.aetna_broker_and_emprs_phone")%></a>
+                  <a href=<%=l10n("plans.aetna_href_broker_and_emprs_phone")%> ><%=l10n("plans.aetna_broker_and_emprs_phone")%></a>
                 </strong><br/>
                 <%=l10n("plans.aetna_broker_and_emprs_hours")%>
                 <br/>
@@ -137,7 +137,7 @@
                 <strong><%=l10n("plans.sbe")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+1-855-885-3289"><%=l10n("plans.aetna_sbe_call")%></a>
+                  <a href=<%=l10n('plans.aetna_href_sbe_call')%> ><%=l10n("plans.aetna_sbe_call")%></a>
                 </strong><br/>
                 <%=l10n("plans.aetna_hours")%>
                 <br/>
@@ -146,14 +146,14 @@
               <div>
                 <%=l10n("plans.call")%>
               <strong>
-                <a href="tel:+18007777902"><%=l10n("plans.kaiser_phone")%></a>
+                <a href=<%=l10n('plans.kaiser_href_phone')%> ><%=l10n("plans.kaiser_phone")%></a>
               </strong>
               </div>
             <% when "UnitedHealthcare" %>
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18778562430"><%=l10n("plans.uhc_phone")%></a>
+                  <a href=<%l10n('plans.uhc_href_phone')%> ><%=l10n("plans.uhc_phone")%></a>
                 </strong><br/>
               </div>
             <% end %>
@@ -164,18 +164,18 @@
             <% when "Altus Dental" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18772230588"><%=l10n("plans.ad_phone")%></a> <br>
+                <a href=<%=l10n('plans.ad_href_phone')%> ><%=l10n("plans.ad_phone")%></a> <br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.ad_tty")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ad_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ad_hours")%><br/>
                 <strong><%=l10n("plans.infoline")%></strong>
-                <a href="tel:+18772230588"><%=l10n("plans.ad_phone")%></a><br>
+                <a href=<%=l10n('plans.ad_href_phone')%> ><%=l10n("plans.ad_phone")%></a><br>
                 <%=l10n("plans.ad_infoline")%>
               </div>
             <% when "Delta Dental" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18008720500"><%=l10n("plans.dd_phone")%></a><br>
+                <a href=<%=l10n('plans.dd_href_phone')%> ><%=l10n("plans.dd_phone")%></a><br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.dd_tty")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.dd_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.dd_hours")%><br/>
@@ -184,18 +184,18 @@
                 <div>
                   <%=l10n("plans.call")%>
                   <strong>
-                  <a href="tel:+18554443119"><%=l10n("plans.cf_phone")%></a>
+                  <a href=<%=l10n('plans.cf_href_phone')%> ><%=l10n("plans.cf_phone")%></a>
                   </strong><br/>
                 </div>
             <% when  "Delta Dental"%>
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004710236"><%=l10n("plans.dd_number1")%></a>
+                  <a href=<%l10n('plans.dd_href_number1')%> ><%=l10n("plans.dd_number1")%></a>
                 </strong>
                 or
                 <strong>
-                  <a href="tel:+18004710275"><%=l10n("plans.dd_number2")%></a>
+                  <a href=<%=l10n('plans.dd_href_number2')%> ><%=l10n("plans.dd_number2")%></a>
                 </strong>
                 <br/>
               </div>
@@ -203,28 +203,28 @@
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18556382221"><%=l10n("plans.metlife_phone")%></a>
+                  <a href=<%=l10n('plans.metlife_href_phone')%> ><%=l10n("plans.metlife_phone")%></a>
                 </strong><br/>
               </div>
             <% when "Dentegra" %>
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004710284"><%=l10n("plans_dentegra_phone")%></a>
+                  <a href=<%=l10n('plans.dentegra_href_phone')%> ><%=l10n("plans_dentegra_phone")%></a>
                 </strong><br/>
               </div>
             <% when "Dominion" %>
               <div>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18552243016"><%=l10n("plans.dominion_phone")%></a>
+                  <a href=<%=l10n('plans.dominion_href_phone')%> ><%=l10n("plans.dominion_phone")%></a>
                 </strong><br/>
               </div>
             <% when "BestLife" %>
               <div><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18004330088"><%=l10n("plans.bestlife_phone")%></a>
+                  <a href=<%=l10n('plans.bestlife_href_phone')%> ><%=l10n("plans.bestlife_phone")%></a>
                 </strong><br/>
               </div>
             <% end %>
