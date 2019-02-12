@@ -4,7 +4,7 @@ class VerificationType
 
   embedded_in :person
 
-  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
+  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status", "Social Security File Match"]
   NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
 
   VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired curam)

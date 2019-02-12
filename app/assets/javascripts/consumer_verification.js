@@ -5,6 +5,9 @@ var Verification = (function(){
    function showVerifyType(target){
        $('#'+target_id(target)).fadeIn('slow');
    }
+  function showVerifyTypeSsfm(target){
+       $('#'+target_id(target)+'-ssfm').fadeIn('slow');
+   }
    function showReturnForDef(target){
        $('#'+target_id(target)+'-return').fadeIn('slow');
    }
@@ -42,13 +45,19 @@ var Verification = (function(){
    }
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
+     var array_split = $selected_id.split('-')
+     var $action_last_name = array_split[array_split.length-1]
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
 
      switch ($selected_el_val) {
-         case 'Verify':
+         case 'Verify':             
              hideAllActions($selected_id);
-             showVerifyType($selected_id);
+             if($action_last_name == "Match"){
+             showVerifyTypeSsfm($selected_id);
+             }else{
+             showVerifyType($selected_id);              
+             }
              break;
          case 'Reject':
              hideAllActions($selected_id);

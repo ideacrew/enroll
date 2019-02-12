@@ -212,6 +212,8 @@ module VerificationHelper
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
+    elsif v_type.type_name == 'Social Security File Match'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.map{|el| el == "Call HUB" ? "Reason" : el }
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end

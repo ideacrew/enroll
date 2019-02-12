@@ -666,6 +666,7 @@ class ConsumerRole
       live_types << 'DC Residency'
       live_types << 'Social Security Number' if ssn
       live_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
+      live_types << 'Social Security File Match' if (ssn && person.primary_family.present?)
       if us_citizen
         live_types << 'Citizenship'
       else
