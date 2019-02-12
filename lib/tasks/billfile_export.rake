@@ -5,13 +5,13 @@ namespace :billfile do
   # Usage rake billfile:from_file_path
   task :export => [:environment] do
 
-    FILE_PATH = Rails.root.join "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
-    TITLE = "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
+    TITLE = "DCHEALTHPAY.#{DateTime.now.strftime('%Y%m%d.%H%M%S')}.csv"
+    FILE_PATH = Rails.root.join TITLE
 
     CSV.open(FILE_PATH, "w") do |csv|
       headers = ["Reference Number", "Other Data", "Company Name", "Due Date", "Amount Due"]
       csv << headers
-  
+
       Organization.all_employer_profiles.each do |org|
         begin
           employer_profile = org.employer_profile
@@ -70,4 +70,8 @@ namespace :billfile do
     current_statement_date = account.current_statement_date
     format_due_date(account.current_statement_activity.where(:posting_date.gt => current_statement_date).sort_by(&:coverage_month).last.coverage_month.end_of_month)
   end
+<<<<<<< HEAD
 end
+=======
+end
+>>>>>>> origin/feature-15172
