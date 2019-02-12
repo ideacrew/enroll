@@ -85,7 +85,6 @@ describe Services::CheckbookServices::PlanComparision do
       end
   end
 
-
   describe "#csr_value" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
     context "when active household is present" do
