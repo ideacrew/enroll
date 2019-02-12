@@ -132,6 +132,7 @@ module SponsoredBenefits
       end
 
       def to_benefit_sponsors_benefit_application(organization)
+        # Fix Spec after fixing this method!
         return unless(benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?)
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
