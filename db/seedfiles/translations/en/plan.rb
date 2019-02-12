@@ -1,4 +1,5 @@
 PLAN_TRANSLATIONS = {
+  "en.plans.csl" => "Customer Service Line",
   "en.plans.call" => "Call:",
   "en.plans.tty" => "TTY:",
   "en.plans.tty_number" => "711 TTY",
@@ -64,6 +65,12 @@ PLAN_TRANSLATIONS = {
 
   "en.plans.aetna_phone" => "1-855-586-6959",
   "en.plans.aetna_hours" => "from 8am-6pm EST, Monday - Friday",
+  "en.plans.aetna_ivl_and_family" => "For Customers Enrolled in Individual and Family Plans",
+  "en.plans.aetna_brokers_and_emprs" => "For Brokers and Employers",
+  "en.plans.aetna_broker_and_emprs_phone" => "1-888-422-2128",
+  "en.plans.aetna_broker_and_emprs_hours" => "from 8am-5pm EST, Monday - Friday",
+  "en.plans.aetna_sbe" => "For Small Business Employees",
+  "en.plans.aetna_sbe_call" => "Call 1-855-885-3289",
 
   "en.plans.kaiser_phone" => "1-800-777-7902",
 

@@ -4,7 +4,7 @@
       <div class="modal-header">
         <button class="close" data-dismiss="modal" type="button">&times;</button>
         <h4 class="modal-title"><%= plan.issuer_profile.legal_name %>
-          Customer Service Line</h4>
+          <%=l10n("plans.csl")%></h4>
       </div>
       <div class="modal-body">
         <i class="fa fa-phone fa-3x"></i>
@@ -15,7 +15,7 @@
               <div>
                 <strong><%=l10n("plans.call")%></strong>
                 <strong><a href="tel:+18558338120"><%=l10n("plans.bhp_phone")%></a></strong> <br>
-                <strong><%=("plans.tty")%></strong><%=("plans.tty_number")%><br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_number")%><br>
                 <strong><%=l10n("plans.hours") %></strong><%=l10n("plans.bhp_hours")%>
                  <br>
                 <strong><%=l10n("plans.email") %> </strong><%=l10n("plans.bhp_email")%> <br/>
@@ -24,27 +24,27 @@
               <div>
                 <strong><%=l10n("plans.call")%></strong>
                 <strong><a href="tel:"> </a></strong> <br>
-                <strong><%=("plans.tty")%></strong><%=("plans.tty_number")%><br>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_number")%><br>
                 <strong><%=l10n("plans.hours") %></strong>
                  <br>
-                <strong><%=("plans.email")%></strong>  <br/>
+                <strong><%=l10n("plans.email")%></strong>  <br/>
               </div>
             <% when "Boston Medical Center HealthNet Plan" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
                 <strong><a href="tel:+18558338120"><%=l10n("plans.bmchp_phone")%></a></strong> <br>
-                <strong><%=("plans.tty")%></strong><%=("plans.tty_number")%><br>
-                <strong><%=("plans.email")%></strong><%=("plans.bmchp_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=("plans.bmchp.hours")%>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_number")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.bmchp_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.bmchp.hours")%>
               </div>
 
             <% when "Fallon Health" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
                 <strong><a href="tel:+18008685200"><%=l10n("plans.fh_phone")%></a></strong> <br>
-                <strong><%=("plans.tty")%></strong><%=l10n("plans.fh_tty_number")%><br>
-                <strong><%=("plans.email")%></strong><%=("plans.fh_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=("plans.fh_hours")%>
+                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.fh_tty_number")%><br>
+                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.fh_email")%><br>
+                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.fh_hours")%>
               </div>
 
             <% when "Health New England" %>
@@ -118,7 +118,7 @@
               </div>
             <% when "Aetna" %>
               <div>
-                <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
+                <strong><%=l10n("plans.aetna_ivl_and_family")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
                   <a href="tel:+18555866959"><%=l10n("plans.aetna_phone")%></a>
@@ -126,20 +126,20 @@
                 <%=l10n("plans.aetna_hours")%>
                 <br/>
                 <br/>
-                <strong>For Brokers and Employers</strong><br/>
+                <strong><%=l10n("plans.aetna_brokers_and_emprs")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+18884222128">1-888-422-2128</a>
+                  <a href="tel:+18884222128"><%=l10n("plans.aetna_broker_and_emprs_phone")%></a>
                 </strong><br/>
-                from 8am-5pm EST, Monday - Friday
+                <%=l10n("plans.aetna_broker_and_emprs_hours")%>
                 <br/>
                 <br/>
-                <strong>For Small Business Employees</strong><br/>
+                <strong><%=l10n("plans.sbe")%></strong><br/>
                 <%=l10n("plans.call")%>
                 <strong>
-                  <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
+                  <a href="tel:+1-855-885-3289"><%=l10n("plans.aetna_sbe_call")%></a>
                 </strong><br/>
-                from 8am-6pm EST, Monday - Friday
+                <%=l10n("plans.aetna_hours")%>
                 <br/>
               </div>
             <% when "Kaiser" %>
@@ -164,7 +164,7 @@
             <% when "Altus Dental" %>
               <div>
                 <strong><%=l10n("plans.call")%></strong>
-                <a href="tel:+18772230588"> 1.877.223.0588 </a> <br>
+                <a href="tel:+18772230588"><%=l10n("plans.ad_phone")%></a> <br>
                 <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.ad_tty")%><br>
                 <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ad_email")%><br>
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ad_hours")%><br/>
