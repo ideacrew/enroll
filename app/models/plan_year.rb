@@ -1408,8 +1408,8 @@ class PlanYear
   def renewal_employee_enrollment_confirmation
     self.employer_profile.census_employees.non_terminated.each do |ce|
       begin
-        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
-        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
+        enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+        if enrollments.present? && enrollments.select { |enr| enr.effective_on == start_on}.present?
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation", "acapi_trigger" => true)
         end
       rescue Exception => e
