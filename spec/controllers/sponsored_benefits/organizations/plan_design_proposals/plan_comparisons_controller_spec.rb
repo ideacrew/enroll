@@ -3,29 +3,30 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 USER_ROLES = [:with_hbx_staff_role, :without_hbx_staff_role]
 
 module SponsoredBenefits
-  RSpec.describe Organizations::PlanDesignProposals::PlanComparisonsController, type: :controller, dbclean: :around_each  do
-    include_context "set up"
+  RSpec.describe Organizations::PlanDesignProposals::PlanComparisonsController, type: :controller, dbclean: :after_each  do
+    include_context "set up broker agency profile for BQT, by using configuration settings"
+
     routes { SponsoredBenefits::Engine.routes }
 
-    let!(:person) { FactoryGirl.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person ) }
+    describe "GET new" do
+      let!(:person) { FactoryGirl.create(:person, :with_broker_role).tap do |person|
+                                         person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+      end }
 
-    describe "Get #new", dbclean: :after_each do
+      let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }
+      let(:plans) { FactoryGirl.create_list(:plan, 2, :with_premium_tables, market: 'shop') }
 
-      before do
-        plan_design_census_employee
-        benefit_application
-        person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
+      before :each do
         sign_in user_with_broker_role
-        get :new, plan_design_proposal_id: plan_design_proposal.id, sort_by: "skdhjh"
+        get :new, plan_design_proposal_id: plan_design_proposal.id, sort_by: "", plans: [plans.first.id.to_s, plans.last.id.to_s], format: "js"
       end
 
       it "should return success" do
         expect(response).to have_http_status(:success)
       end
 
-      it "dose not assign a qhps" do
-        expect(assigns(:qhps)).not_to be nil
+      it "do not assign a qhps" do
+        expect(assigns(:qhps)).to be nil
       end
     end
   end

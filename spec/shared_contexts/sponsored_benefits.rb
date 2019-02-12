@@ -1,4 +1,4 @@
-RSpec.shared_context "set up", :shared_context => :metadata do
+RSpec.shared_context "set up broker agency profile for BQT, by using configuration settings", :shared_context => :metadata do
   
   let(:plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization,
     owner_profile_id: owner_profile.id,
