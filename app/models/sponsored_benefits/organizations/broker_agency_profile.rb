@@ -34,7 +34,7 @@ module SponsoredBenefits
               hbx_id: profile.hbx_id,
               legal_name: profile.legal_name,
               dba: profile.dba,
-              office_locations: office_locations(profile),
+              office_locations: office_locations(profile).map(&:attributes),
               broker_agency_profile: self.new
             })
           end
@@ -46,7 +46,7 @@ module SponsoredBenefits
           plan_design_organization = broker_profile.plan_design_organizations.new({
             owner_profile_id: broker_agency._id,
             sponsor_profile_id: employer._id,
-            office_locations: office_locations(employer),
+            office_locations: office_locations(employer).map(&:attributes),
             fein: employer.fein,
             legal_name: employer.legal_name,
             has_active_broker_relationship: true
@@ -61,11 +61,10 @@ module SponsoredBenefits
 
         def assign_employer(broker_agency:, employer:)
           plan_design_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, employer.id)
-
           if plan_design_organization
             plan_design_organization.update_attributes!({
               has_active_broker_relationship: true,
-              office_locations: office_locations(employer),
+              office_locations: office_locations(employer).map(&:attributes),
             })
           else
             init_plan_design_organization(broker_agency, employer)
