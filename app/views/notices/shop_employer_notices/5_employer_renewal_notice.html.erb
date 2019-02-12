@@ -1,13 +1,15 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></h3></td>
+      <td style="padding-top: 10px"><strong>Email notification sent to:</strong> <%= notice.employer_email %></td>
     </tr>
   </tbody>
 </table>
+
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -31,10 +33,9 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Your employees will also have until #{notice.plan_year.start_on.last_month.strftime("%m/#{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on}/%Y")} to make their plan selections."} %>
-<br>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>Continued Eligibility</strong> <br> Your group must continue to meet the eligibility requirements to renew your coverage though <%= Settings.site.short_name %>.  To be eligible to renew your employer-sponsored health coverage with #{Settings.site.short_name}:"} %>
+  content: "<strong>Continued Eligibility</strong> <br> <br> Your group must continue to meet the eligibility requirements to renew your coverage though #{Settings.site.short_name}.  To be eligible to renew your employer-sponsored health coverage with #{Settings.site.short_name}:"} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -45,10 +46,10 @@
           Your group must continue to meet residency requirements:
           <ul>
             <li>
-              Have your principal business address in the #{Settings.aca.state_name} and offer coverage to all full-time employees through #{Settings.site.short_name}, OR
+              Have your principal business address in the <%= Settings.aca.state_name %> and offer coverage to all full-time employees through <%= Settings.site.short_name %>, OR
             </li>
             <li>
-              Continue to offer coverage through #{Settings.site.short_name} to all full-time employees whose primary worksite is located in the #{Settings.aca.state_name} and offer coverage to non-DC based employees through the SHOP exchange serving their primary worksite(s)
+              Continue to offer coverage through <%= Settings.site.short_name %> to all full-time employees whose primary worksite is located in the <%= Settings.aca.state_name %> and offer coverage to non-DC based employees through the SHOP exchange serving their primary worksite(s)
             </li>
           </ul>
         </li>
