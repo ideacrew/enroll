@@ -10,18 +10,36 @@ RSpec.shared_context "set up", :shared_context => :metadata do
     sponsor_profile_id: nil
   )}
 
-  let(:plan_design_proposal) { FactoryGirl.create(:plan_design_proposal,
-    :with_profile,
-    plan_design_organization: plan_design_organization
-  )}
+  let(:plan_design_proposal) {
+    FactoryGirl.create(:plan_design_proposal,
+      :with_profile,
+      plan_design_organization: plan_design_organization
+    ).tap do |proposal|
+      sponsorship = proposal.profile.benefit_sponsorships.first
+      sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
+      sponsorship.save
+    end
+  }
 
-  let(:prospect_plan_design_proposal) { FactoryGirl.create(:plan_design_proposal,
-    :with_profile,
-    plan_design_organization: prospect_plan_design_organization
-  )}
+  let(:prospect_plan_design_proposal) {
+    FactoryGirl.create(:plan_design_proposal,
+      :with_profile,
+      plan_design_organization: prospect_plan_design_organization
+    ).tap do |proposal|
+      sponsorship = proposal.profile.benefit_sponsorships.first
+      sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
+      sponsorship.save
+    end
+  }
 
   let(:proposal_profile) { plan_design_proposal.profile }
   let(:prospect_proposal_profile) {prospect_proposal_profile.profile}
+
+  let(:benefit_sponsorship_enrollment_period) {
+    begin_on = SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates[0]
+    end_on = begin_on + 1.year - 1.day
+    begin_on..end_on
+  }
 
   let(:benefit_sponsorship) { proposal_profile.benefit_sponsorships.first }
   let(:prospect_benefit_sponsorship) { prospect_proposal_profile.benefit_sponsorships.first}
