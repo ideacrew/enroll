@@ -78,7 +78,7 @@ module SponsoredBenefits
       end
 
       def reset_health_benefits
-        benefit_group.composite_tier_contributions.destroy_all
+        benefit_group.composite_tier_contributions.destroy_all if benefit_group.sole_source?
         benefit_group.relationship_benefits.destroy_all
       end
 

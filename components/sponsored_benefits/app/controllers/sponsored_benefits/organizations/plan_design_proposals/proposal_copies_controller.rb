@@ -68,9 +68,10 @@ module SponsoredBenefits
           elected_plans: bg.elected_plans,
           elected_dental_plan_ids: bg.elected_dental_plan_ids
         })
-
-        bg.composite_tier_contributions.each do |contribution|
-          new_bg.composite_tier_contributions << contribution.clone
+        if bg.sole_source?
+          bg.composite_tier_contributions.each do |contribution|
+            new_bg.composite_tier_contributions << contribution.clone
+          end
         end
         bg.relationship_benefits.each do |rb|
           new_bg.relationship_benefits << rb.clone
@@ -79,9 +80,10 @@ module SponsoredBenefits
         bg.dental_relationship_benefits.each do |rb|
           new_bg.dental_relationship_benefits << rb.clone
         end
-
-        new_bg.estimate_composite_rates
-        new_application.benefit_sponsorship.benefit_sponsorable.save!
+        if new_bg.sole_source?
+          new_bg.estimate_composite_rates
+          new_application.benefit_sponsorship.benefit_sponsorable.save!
+        end
       end
 
       def plan_design_proposal
