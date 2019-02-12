@@ -64,11 +64,11 @@ module SponsoredBenefits
       end
 
       def lowest_cost_plan
-        @lowest_cost_plan ||= ::Plan.where(lowest_cost_plan_id)
+        @lowest_cost_plan ||= ::Plan.find(lowest_cost_plan_id)
       end
 
       def highest_cost_plan
-        @highest_cost_plan ||= ::Plan.where(highest_cost_plan_id)
+        @highest_cost_plan ||= ::Plan.find(highest_cost_plan_id)
       end
 
     end
