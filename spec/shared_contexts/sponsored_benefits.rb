@@ -73,6 +73,59 @@ RSpec.shared_context "set up", :shared_context => :metadata do
 
   let(:organization) { plan_design_organization.sponsor_profile.organization }
 
+  let(:health_reference_plan) { health_plan }
+  let(:dental_reference_plan) { dental_plan }
+
+  def health_plan
+    if Settings.aca.state_abbreviation == "DC" # toDo
+      FactoryGirl.create(:plan, coverage_kind: "health")
+    else
+      FactoryGirl.create(:benefit_markets_products_health_products_health_product,
+        :with_renewal_product,
+        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+        product_package_kinds: [:single_issuer, :metal_level, :single_product],
+        service_area: service_area,
+        renewal_service_area: renewal_service_area,
+        metal_level_kind: :gold)
+      }
+    end
+  end
+
+  def dental_plan
+    if Settings.aca.state_abbreviation == "DC" # toDo
+      FactoryGirl.create(:plan, coverage_kind: "dental")
+    else
+      FactoryGirl.create(:benefit_markets_products_dental_products_dental_product,
+        :with_renewal_product,
+        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+        product_package_kinds: [:single_product],
+        service_area: service_area,
+        renewal_service_area: renewal_service_area,
+        metal_level_kind: :dental)
+      }
+    end
+  end
+
+  def service_area
+    return @service_area if defined? @service_area
+    @service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
+      county_zip_ids: [FactoryGirl.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
+      active_year: current_effective_date.year
+    )
+  end
+
+  def renewal_service_area
+    return @renewal_service_area if defined? @renewal_service_area
+
+    @renewal_service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
+      county_zip_ids: service_area.county_zip_ids,
+      active_year: service_area.active_year + 1
+    )
+  end
+
+  def current_effective_date
+    (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
+  end
 
   def broker_agency_profile
     if Settings.aca.state_abbreviation == "DC" # toDo
