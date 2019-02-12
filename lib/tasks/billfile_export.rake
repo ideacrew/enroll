@@ -70,8 +70,4 @@ namespace :billfile do
     current_statement_date = account.current_statement_date
     format_due_date(account.current_statement_activity.where(:posting_date.gt => current_statement_date).sort_by(&:coverage_month).last.coverage_month.end_of_month)
   end
-<<<<<<< HEAD
 end
-=======
-end
->>>>>>> origin/feature-15172
