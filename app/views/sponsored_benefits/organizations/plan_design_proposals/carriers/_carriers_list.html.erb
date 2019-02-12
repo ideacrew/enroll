@@ -50,6 +50,33 @@
     </div>
   </div>
 <% end %>
+<% elsif selected_carrier_level == 'custom' %>
+  <% carrier_names.each do |plan| %>
+    <div class="col-xs-4 carriers">
+      <div class="col-xs-3">
+        <%= check_box_tag plan.name, plan.id, true %>
+        <%= label_tag plan.name do %>
+          <i class="fa fa-check-square-o fa-2x"></i>
+          <i class="fa fa-square-o fa-2x"></i>
+          <% end %>
+      </div>
+
+      <div class="col-xs-10">
+        <div class="panel row">
+          <div class="panel-heading">
+            <h3><%= plan.name %></h3>
+          </div>
+          <div class="panel-body">
+            <span class="plan-label">Type: </span><span><%= plan.plan_type %></span><br>
+            <span class="plan-label">Carrier: </span><span><%= plan.carrier_profile.legal_name %></span><br>
+            <span class="plan-label">Level: </span><span><%= display_dental_metal_level(plan) %></span><br>
+            <span class="plan-label">Network: </span><span><%= plan.nationwide ? 'Nationwide' : 'DC Metro' %></span><br/>
+            <%#= link_to 'View Summary', main_app.reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
+          </div>
+        </div>
+
+      </div>
+  <% end %>
 <% else %>
   <% metal_levels = ::Plan::REFERENCE_PLAN_METAL_LEVELS %>
   <% if check_plan_options_title %>
