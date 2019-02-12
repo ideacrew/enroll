@@ -26,7 +26,7 @@ $(document).on('page:load', pageInit);
 
 function pageInit() {
   var kind = fetchBenefitKind();
-  
+
   if(kind == "dental") {
     var dental_reference_plan_id = $("#dental_reference_plan_id").val();
     if(dental_reference_plan_id != '' && dental_reference_plan_id != undefined) {
@@ -217,6 +217,11 @@ function carrierSelected() {
     $("#reference_plan_id").val("");
   }
 
+  if (elected_plan_kind == "custom") {
+    $(this).closest('.plan-design').find('.carrier-custom-plan-tab').show();
+    $(this).closest('.plan-design').find('.plan-options').slideDown();
+  }
+
   if (elected_plan_kind == "single_carrier") {
     $(this).closest('.plan-design').find('.carriers-tab').show();
     $(this).closest('.plan-design').find('.plan-options').slideDown();
@@ -255,7 +260,7 @@ function planSelected() {
 }*/
 function setMyPlans(element) {
   // Need to remove jQuery Selectors
-  
+
   var reference_plan_id = element.dataset.planid.replace(/['"]+/g, '');
   var kind = fetchBenefitKind();
 
@@ -418,11 +423,11 @@ function setRadioBtn(element) {
   dotIcons = document.querySelectorAll('.fa-dot-circle');
   icons = document.querySelectorAll('.fa-circle');
   iconId = element.target.dataset.tempId;
-  
+
   dotIcons.forEach(function(icon) {
     icon.classList.add('fa-circle')
   });
-  
+
   icons.forEach(function(icon) {
     if (icon.dataset.tempId == iconId) {
       icon.classList.add('fa-dot-circle')
@@ -438,7 +443,6 @@ function disableActionButtons() {
   var minimum_employee_contribution = $("#employer_min_employee_contribution").val();
   var minimum_family_contribution = $("#employer_min_family_contribution").val();
   data = buildBenefitGroupParams();
-  debugger;
   if (proposalIsInvalid(data)){
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
@@ -742,4 +746,3 @@ function sortPlans() {
 function setCarrierRadio(element) {
   element.checked = true;
 }
-
