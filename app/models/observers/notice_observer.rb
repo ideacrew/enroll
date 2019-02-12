@@ -153,6 +153,7 @@ module Observers
 
       if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
         hbx_enrollment = new_model_event.klass_instance
+
         if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
 
           if new_model_event.event_key == :application_coverage_selected
@@ -162,10 +163,7 @@ module Observers
 
             if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
               deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_plan_selection_confirmation_sep_new_hire")
-            end
-
-            if (hbx_enrollment.enrollment_kind == "special_enrollment" || hbx_enrollment.census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record))
-              notice_event = hbx_enrollment.benefit_group.is_congress ? "congressional_employee_plan_selection_confirmation_sep_new_hire" : "non_congress_employee_plan_selection_confirmation_sep_new_hire"
+              notice_event = hbx_enrollment.benefit_group.is_congress ? "employee_mid_year_plan_change_congressional_notice" : "employee_mid_year_plan_change_non_congressional_notice"
               deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: notice_event)
             end
           end
