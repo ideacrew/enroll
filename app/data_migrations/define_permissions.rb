@@ -10,16 +10,17 @@ class DefinePermissions < MigrationTask
   	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
   	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true)
     Permission.create(name: 'hbx_read_only', modify_family: true, list_enrollments: true, view_admin_tabs: true)
-    Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true)
-    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true)
-    Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
+  	Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true)
+  	Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+  	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+  	  modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_extend_open_enrollment:true)
+  	Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true)
     Permission.create(name: 'developer', list_enrollments: true, view_admin_tabs: true)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-                      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_add_sep:true, can_change_fein: true)
+                      modify_admin_tabs: true, view_admin_tabs: true, can_view_username_and_email:true, can_lock_unlock:true, can_reset_password:true, can_add_sep:true, can_change_fein: true,
+                      can_extend_open_enrollment:true)
   	permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
@@ -147,12 +148,11 @@ class DefinePermissions < MigrationTask
 
   def grant_super_admin_access
     raise "User Email Argument expected!!"if ENV['user_email'].blank?
-
     user_emails = ENV['user_email'].split(',')
     hbx_profile = HbxProfile.all.first
     users = User.where(:email.in => user_emails)
     users.each do |user|
-      HbxStaffRole.create!( person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile.id)
+      HbxStaffRole.create!(person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile.id)
     end
   end
 end
