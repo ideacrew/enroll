@@ -53,6 +53,8 @@ RSpec.shared_context "set up", :shared_context => :metadata do
     benefit_sponsorship_id: prospect_benefit_sponsorship.id
   )}
 
+  let(:organization) { plan_design_organization.sponsor_profile.organization }
+
 
   def broker_agency_profile
     if Settings.aca.state_abbreviation == "DC" # toDo
