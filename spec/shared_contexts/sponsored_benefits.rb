@@ -76,34 +76,37 @@ RSpec.shared_context "set up", :shared_context => :metadata do
   let(:health_reference_plan) { health_plan }
   let(:dental_reference_plan) { dental_plan }
 
+  let(:health_reference_product) { health_product }
+  let(:dental_reference_product) { dental_product }
+
   def health_plan
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryGirl.create(:plan, coverage_kind: "health")
-    else
-      FactoryGirl.create(:benefit_markets_products_health_products_health_product,
-        :with_renewal_product,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_issuer, :metal_level, :single_product],
-        service_area: service_area,
-        renewal_service_area: renewal_service_area,
-        metal_level_kind: :gold)
-      }
-    end
+    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health")
+  end
+
+  def health_product
+    FactoryGirl.create(:benefit_markets_products_health_products_health_product,
+      :with_renewal_product,
+      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+      product_package_kinds: [:single_issuer, :metal_level, :single_product],
+      service_area: service_area,
+      renewal_service_area: renewal_service_area,
+      metal_level_kind: :gold
+    )
   end
 
   def dental_plan
-    if Settings.aca.state_abbreviation == "DC" # toDo
-      FactoryGirl.create(:plan, coverage_kind: "dental")
-    else
-      FactoryGirl.create(:benefit_markets_products_dental_products_dental_product,
-        :with_renewal_product,
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-        product_package_kinds: [:single_product],
-        service_area: service_area,
-        renewal_service_area: renewal_service_area,
-        metal_level_kind: :dental)
-      }
-    end
+    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "dental")
+  end
+
+  def dental_product
+    FactoryGirl.create(:benefit_markets_products_dental_products_dental_product,
+      :with_renewal_product,
+      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+      product_package_kinds: [:single_product],
+      service_area: service_area,
+      renewal_service_area: renewal_service_area,
+      metal_level_kind: :dental
+    )
   end
 
   def service_area
