@@ -2639,7 +2639,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   let(:benefit_group_assignment1) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group, end_on: plan_year.end_on)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, benefit_group_assignments: [benefit_group_assignment1],employee_role_id: employee_role.id,employer_profile_id: employer_profile.id) }
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id)}
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id, employee_role_id: employee_role.id)}
 
   py_termination_dates = [TimeKeeper.date_of_record - 8.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 14.days]
 
@@ -2647,6 +2647,7 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+      employee_role.update_attributes(census_employee_id: census_employee.id)
     end
 
     after do
