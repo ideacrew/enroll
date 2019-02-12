@@ -3,6 +3,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.call' => 'Call:',
   'en.plans.tty' => 'TTY:',
   'en.plans.tty_number' => '711 TTY',
+  'en.plans.tty_num' => '711'
   'en.plans.bhp_phone' => '1-855-833-8120',
   'en.plans.bhp_href_phone' => 'tel:+18558338120',
   'en.plans.hours' => 'Hours:',
@@ -38,33 +39,28 @@ PLAN_TRANSLATIONS = {
   'en.plans.bcbs_href_ivl_phone' => 'tel:+18008222700',
   'en.plans.bcbs_small_phone' => '1-800-782-3675',
   'en.plans.bcbs_small_href_phone' => 'tel:+18007823675',
-  'en.plans.bcbs_tty_number' => '711',
   'en.plans.bcbs_email' => 'send secure email after login to member account',
   'en.plans.bcbs_hours' => 'Monday through Friday, 8:00 a.m. to 6:00 p.m. Eastern Time',
 
   'en.plans.hphc_phone' => '888-333-4742',
   'en.plans.hphc_href_phone' => 'tel:+18883334742',
-  'en.plans.hphc_tty' => '711',
   'en.plans.hphc_email' => 'send secure email after login to member account',
   'en.plans.hphc_hours' => 'Monday, Tuesday, & Thursday from 8:00 a.m. to 6:00 p.m.; Wednesday from 10:00 a.m. to 6:00 p.m.; and Friday from 8:00 a.m. to 5:30 p.m',
 
 
   'en.plans.ahp_phone' => '866-414-5533',
   'en.plans.ahp_href_phone' => 'tel:+18664145533',
-  'en.plans.ahp_tty' => '711',
   'en.plans.ahp_email' => 'customerservice@AllWaysHealth.org',
   'en.plans.ahp_hours' => 'Monday, Tuesday, Wednesday, Friday from 8:00 a.m. to 6:00 p.m.; Thursday from 8:00 a.m. to 8:00 p.m.',
 
 
   'en.plans.uh_phone' => '1-888-842-4571',
   'en.plans.uh_href_phone' => 'tel:+18888424571',
-  'en.plans.uh_tty' => '711',
   'en.plans.uh_hours' => '7 AM to 6 PM CST',
 
 
   'en.plans.thd_phone' => '888-257-1985',
   'en.plans.thd_href_phone' => 'tel:+18004620224',
-  'en.plans.thd_tty' => '711',
   'en.plans.thd_email' => 'https://tuftshealthplan.com/contact-us/members-public-plans-form',
   'en.plans.thd_hours' => 'Monday through Friday, from 8 a.m. to 5 p.m., excluding holidays',
 
@@ -103,7 +99,6 @@ PLAN_TRANSLATIONS = {
 
   'en.plans.dd_phone' => '800.872.0500',
   'en.plans.dd_href_phone' => 'tel:+18008720500',
-  'en.plans.dd_tty' => '711',
   'en.plans.dd_email' => 'customer.care@deltadentalma.com',
   'en.plans.dd_hours' => 'Monday - Thursday, 8:30 a.m. to 8:00 p.m. EST; Friday, 8:30 a.m. to 4:30 p.m. EST',
   'en.plans.dd_number1' => '1-800-471-0236',
