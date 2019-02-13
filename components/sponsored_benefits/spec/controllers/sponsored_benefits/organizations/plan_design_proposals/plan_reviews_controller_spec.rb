@@ -28,14 +28,17 @@ module SponsoredBenefits
       end
 
       it "should set the plan_design_organization instance variable" do
-        expect(assigns(:plan_design_organization)).to eq plan_design_organization
+        get :new, plan_design_proposal_id: plan_design_proposal.id
+        expect(assigns(:plan_design_organization)).to eq plan_design_proposal.plan_design_organization
       end
 
       it "should set benefit_group instance variable" do
+        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:benefit_group)).to eq benefit_group
       end
 
       it "should set census_employees instance variable" do
+        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:census_employees)).to eq(plan_design_proposal.profile.benefit_sponsorships.first.census_employees)
       end
     end
@@ -47,14 +50,17 @@ module SponsoredBenefits
       end
 
       it "should set the plan_design_organization instance variable" do
-        expect(assigns(:plan_design_organization)).to eq plan_design_organization
+        get :new, plan_design_proposal_id: plan_design_proposal.id
+        expect(assigns(:plan_design_organization)).to eq plan_design_proposal.plan_design_organization
       end
 
       it "should set the benefit_group instance variable" do
+        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:benefit_group)).to eq benefit_group
       end
 
       it "should set the census_employees instance variable" do
+        get :new, plan_design_proposal_id: plan_design_proposal.id
         expect(assigns(:census_employees)).to eq(plan_design_proposal.profile.benefit_sponsorships.first.census_employees)
       end
     end
