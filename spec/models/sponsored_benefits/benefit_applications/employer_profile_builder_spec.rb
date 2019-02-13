@@ -3,7 +3,7 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 
 module SponsoredBenefits
   RSpec.describe BenefitApplications::EmployerProfileBuilder, type: :model do
-    include_context 'set up'
+    include_context "set up broker agency profile for BQT, by using configuration settings"
 
     context "add_benefit_sponsors_benefit_application", dbclean: :after_each do
       let(:proposal) { plan_design_proposal }
