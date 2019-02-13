@@ -11,12 +11,11 @@ module SponsoredBenefits
 
     describe "POST #create" do
       it "should return a success response" do
-        plan_design_census_employee
-        benefit_application
         person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
         sign_in user_with_broker_role
-        post :create, plan_design_proposal_id: plan_design_proposal.id
-        expect(response).to have_http_status(:success)
+        post :create, plan_design_proposal_id: plan_design_proposal.id.to_s
+        plan_design_census_employee
+        expect(flash[:success]).to eq "Proposal successfully copied"
       end
     end
   end
