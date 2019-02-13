@@ -48,7 +48,12 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     end
 
     it "should build composite tier contributions" do
-      expect(@benefit_group.composite_tier_contributions.present?).to eq true
+      # currently we do not have composite_tier_contributions(DC BQT) model we should only
+      # Build these only when benefit_group plan_option_kind is solesource
+      expect(@benefit_group.composite_tier_contributions.present?).to eq true if @benefit_group.sole_source?
+    end
+
+    it "should not build composite tier contributions if it is not sole source" do
     end
   end
 

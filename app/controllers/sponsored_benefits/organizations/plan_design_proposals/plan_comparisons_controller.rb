@@ -9,6 +9,7 @@ module SponsoredBenefits
           @order = @sort_by == session[:sort_by_copay] ? -1 : 1
           session[:sort_by_copay] = @order == 1 ? @sort_by : ''
           if @sort_by && @sort_by.length > 0
+            # Need research here because no helper with method :get_visit_cost
             @sort_by = @sort_by.strip
             sort_array = []
             qhps.each do |qhp|
