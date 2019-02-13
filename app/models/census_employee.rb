@@ -7,9 +7,12 @@ class CensusEmployee < CensusMember
   # include Validations::EmployeeInfo
   include Autocomplete
   include Acapi::Notifiers
+  extend Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
   include Insured::FamiliesHelper
+  include ModelEvents::CensusEmployee
+  include Concerns::Observable
 
   require 'roo'
 
@@ -71,6 +74,7 @@ class CensusEmployee < CensusMember
 
   before_save :allow_nil_ssn_updates_dependents
   after_save :construct_employee_role
+  after_save :notify_on_save
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -922,7 +926,7 @@ class CensusEmployee < CensusMember
   #sort and display latest expired enrollments in desc order
   def past_enrollments
     if employee_role.blank?
-      []      
+      []
     else
       enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
       enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
