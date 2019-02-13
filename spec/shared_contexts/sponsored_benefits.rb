@@ -5,7 +5,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     sponsor_profile_id: sponsor_profile.id
   )}
 
-  let(:prospect_plan_design_organization) { FactoryGirl.create(:plan_design_organization,
+  let(:prospect_plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization,
     owner_profile_id: owner_profile.id,
     sponsor_profile_id: nil
   )}
