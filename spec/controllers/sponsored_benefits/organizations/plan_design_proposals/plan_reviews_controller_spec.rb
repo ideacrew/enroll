@@ -11,12 +11,7 @@ module SponsoredBenefits
 
     before do
       plan_design_census_employee
-      plan_design_organization
-      plan_design_proposal
-      proposal_profile
-      benefit_sponsorship
       benefit_application
-      benefit_group
       person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
       sign_in user_with_broker_role
     end
