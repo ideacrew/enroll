@@ -24,12 +24,16 @@ var Verification = (function(){
    }
    function hideAllActions(target){
        hideVerifyAction(target);
+       hideVerifySsfm(target);
        hideReturnForDef(target);
        hideHubCall(target);
        hideExtendAction(target);
    }
    function hideVerifyAction(target){
        $('#'+target_id(target)).hide();
+   }
+   function hideVerifySsfm(target){
+       $('#'+target_id(target)+'-ssfm').hide();
    }
    function hideReturnForDef(target){
        $('#'+target_id(target)+'-return').hide();

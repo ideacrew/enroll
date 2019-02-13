@@ -968,7 +968,7 @@ class ConsumerRole
 
   def move_types_to_pending(*args)
     verification_types.each do |type|
-      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status")
+      type.pending_type unless (type.type_name == "DC Residency") || (type.type_name == "American Indian Status") || (type.type_name == "Social Security File Match")
     end
   end
 
