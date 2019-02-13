@@ -3,7 +3,7 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 
 module SponsoredBenefits
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, dbclean: :around_each do
-    include_context "set up"
+    include_context "set up broker agency profile for BQT, by using configuration settings"
 
     # let(:date_range) { (Date.today..1.year.from_now) }
 

@@ -4,7 +4,7 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 module SponsoredBenefits
   RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, type: :controller, dbclean: :around_each do
     routes { SponsoredBenefits::Engine.routes }
-    include_context "set up"
+    include_context "set up broker agency profile for BQT, by using configuration settings"
     let(:broker_double) { double(id: '12345') }
     let(:current_person) { double(:current_person) }
     let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
