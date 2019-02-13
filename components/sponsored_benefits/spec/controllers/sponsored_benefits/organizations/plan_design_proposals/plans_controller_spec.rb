@@ -4,7 +4,7 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignProposals::PlansController, type: :controller, dbclean: :around_each  do
     routes { SponsoredBenefits::Engine.routes }
-    include_context "set up"
+    include_context "set up broker agency profile for BQT, by using configuration settings"
 
     let!(:person) { FactoryGirl.create(:person, :with_broker_role) }
     let!(:user_with_broker_role) { FactoryGirl.create(:user, person: person) }

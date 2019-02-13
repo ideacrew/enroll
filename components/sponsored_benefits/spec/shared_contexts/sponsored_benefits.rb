@@ -1,11 +1,11 @@
-RSpec.shared_context "set up", :shared_context => :metadata do
+RSpec.shared_context "set up broker agency profile for BQT, by using configuration settings", :shared_context => :metadata do
   
   let(:plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization,
     owner_profile_id: owner_profile.id,
     sponsor_profile_id: sponsor_profile.id
   )}
 
-  let(:prospect_plan_design_organization) { FactoryGirl.create(:plan_design_organization,
+  let(:prospect_plan_design_organization) { FactoryGirl.create(:sponsored_benefits_plan_design_organization,
     owner_profile_id: owner_profile.id,
     sponsor_profile_id: nil
   )}
@@ -73,6 +73,62 @@ RSpec.shared_context "set up", :shared_context => :metadata do
 
   let(:organization) { plan_design_organization.sponsor_profile.organization }
 
+  let(:health_reference_plan) { health_plan }
+  let(:dental_reference_plan) { dental_plan }
+
+  let(:health_reference_product) { health_product }
+  let(:dental_reference_product) { dental_product }
+
+  def health_plan
+    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "health")
+  end
+
+  def health_product
+    FactoryGirl.create(:benefit_markets_products_health_products_health_product,
+      :with_renewal_product,
+      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+      product_package_kinds: [:single_issuer, :metal_level, :single_product],
+      service_area: service_area,
+      renewal_service_area: renewal_service_area,
+      metal_level_kind: :gold
+    )
+  end
+
+  def dental_plan
+    FactoryGirl.create(:plan, :with_premium_tables, coverage_kind: "dental")
+  end
+
+  def dental_product
+    FactoryGirl.create(:benefit_markets_products_dental_products_dental_product,
+      :with_renewal_product,
+      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+      product_package_kinds: [:single_product],
+      service_area: service_area,
+      renewal_service_area: renewal_service_area,
+      metal_level_kind: :dental
+    )
+  end
+
+  def service_area
+    return @service_area if defined? @service_area
+    @service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
+      county_zip_ids: [FactoryGirl.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
+      active_year: current_effective_date.year
+    )
+  end
+
+  def renewal_service_area
+    return @renewal_service_area if defined? @renewal_service_area
+
+    @renewal_service_area = FactoryGirl.create(:benefit_markets_locations_service_area,
+      county_zip_ids: service_area.county_zip_ids,
+      active_year: service_area.active_year + 1
+    )
+  end
+
+  def current_effective_date
+    (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year
+  end
 
   def broker_agency_profile
     if Settings.aca.state_abbreviation == "DC" # toDo
