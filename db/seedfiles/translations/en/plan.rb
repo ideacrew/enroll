@@ -55,6 +55,7 @@ PLAN_TRANSLATIONS = {
 
 
   'en.plans.uh_phone' => '1-888-842-4571',
+  'en.plans.uh_href' => 'tel:',
   'en.plans.uh_href_phone' => 'tel:+18888424571',
   'en.plans.uh_hours' => '7 AM to 6 PM CST',
 
