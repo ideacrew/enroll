@@ -9,30 +9,6 @@ module SponsoredBenefits
 
     routes { SponsoredBenefits::Engine.routes }
 
-    # let(:valid_session) { {} }
-    # let(:current_person) { double(:current_person) }
-    # let(:active_user) { double(:active_user) }
-    # let(:employer) { double(:employer, id: "11111", name: 'ABC Company', sic_code: '0197') }
-    # let(:broker) { double(:broker, id: 2) }
-    # let(:broker_role) { double(:broker_role, id: 3) }
-    #
-    # let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
-    # # let(:broker_agency_profile) { double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
-    # #                                 legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization, office_locations: []) }
-    # # let(:old_broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
-    # let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: employer.id,
-    #                                                                     owner_profile_id: broker_agency_profile_id,
-    #                                                                     legal_name: employer.name,
-    #                                                                     sic_code: employer.sic_code ) }
-    #
-    # let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: nil,
-    #                                                                 owner_profile_id: broker_agency_profile_id,
-    #                                                                 legal_name: employer.name,
-    #                                                                 sic_code: employer.sic_code ) }
-    # let(:user) { double(:user) }
-    # let(:datatable) { double(:datatable) }
-    # let(:sic_codes) { double(:sic_codes) }
-
     let(:valid_attributes) {
       {
         "legal_name"  =>  "Some Name",
@@ -76,16 +52,6 @@ module SponsoredBenefits
         }
       }
     }
-
-    # before do
-    #   allow(subject).to receive(:current_person).and_return(current_person)
-    #   allow(current_person).to receive(:broker_role).and_return(broker_role)
-    #   allow(broker_role).to receive(:broker_agency_profile_id).and_return(broker_agency_profile.id)
-    #   allow(subject).to receive(:active_user).and_return(active_user)
-    #   allow(active_user).to receive(:has_hbx_staff_role?).and_return(false)
-    #   allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
-    # end
-
 
     def person(trait)
       FactoryGirl.create(:person, trait).tap do |person|
@@ -158,191 +124,118 @@ module SponsoredBenefits
       end
     end
 
+    describe "GET edit" do
+      USER_ROLES.each do |role|
+        before :each do
+          person = person(role)
+          sign_in user(person)
+          get :edit, id: prospect_plan_design_organization.id
+        end
+        context "for user #{role}" do
 
+          it "returns a success response" do
+            expect(response).to be_success
+          end
+        end
+      end
+    end
 
+    describe "PATCH update" do
+      let(:prospect_organization) {prospect_plan_design_organization}
+      let(:updated_params) {valid_attributes.merge({legal_name: "TOYOTA"})}
 
+      USER_ROLES.each do |role|
+        context "for user #{role} with with valid params" do
 
+          before :each do
+            person = person(role)
+            sign_in user(person)
+            patch :update, organization: updated_params, id: prospect_organization.id.to_s
+          end
 
+          it "should update plan design organization legal_name" do
+            expect(prospect_organization.reload.legal_name).to eq updated_params[:legal_name]
+          end
 
+          it "should re-direct to employers page" do
+            broker_profile = prospect_organization.reload.broker_agency_profile
+            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_profile))
+          end
+        end
 
-    # describe "POST create" do
-    #   USER_ROLES.each do |role|
-    #     context "for user #{role}" do
-    #       before do
-    #         allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
-    #         allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:find_or_initialize_by).with(:fein).and_return("223232323")
-    #         allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
-    #       end
-    #
-    #       # context "with valid params" do
-    #       #   # it "creates a new Organizations::PlanDesignOrganization" do
-    #       #   #   expect {
-    #       #   #     post :create, { organization: valid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}, valid_session
-    #       #   #   }.to change { Organizations::PlanDesignOrganization.all.count }.by(1)
-    #       #   # end
-    #       #
-    #       #   # it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
-    #       #   #   post :create, { organization: valid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}, valid_session
-    #       #   #   expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-    #       #   # end
-    #       # end
-    #
-    #       context "with invalid params" do
-    #         before do
-    #           allow(subject).to receive(:init_organization).and_return(prospect_plan_design_organization)
-    #         end
-    #
-    #         it "creates a new Organizations::PlanDesignOrganization" do
-    #           expect {
-    #             post :create, { organization: invalid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}, valid_session
-    #           }.to change { Organizations::PlanDesignOrganization.all.count }.by(0)
-    #         end
-    #
-    #         it "renders the new view" do
-    #           post :create, { organization: invalid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}, valid_session
-    #           expect(response).to render_template(:new)
-    #         end
-    #       end
-    #     end
-    #   end
-    # end
+        context "for user #{role}" do
+          let(:with_out_office_params) { {legal_name: "TESLA"}}
+          before :each do
+            person = person(role)
+            sign_in user(person)
+            patch :update, organization: with_out_office_params, id: prospect_organization.id.to_s
+          end
 
+          it "should not update legal_name and throw flash error" do
+            expect(prospect_plan_design_organization.legal_name).not_to eq "TESLA"
+            expect(flash[:error]).to match(/Prospect Employer must have one Primary Office Location./)
+            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(prospect_organization.broker_agency_profile))
+          end
+        end
 
+        context "for user #{role} by passing not a prospect employer" do
+          let(:organization) {plan_design_organization}
+          before :each do
+            person = person(role)
+            sign_in user(person)
+            patch :update, id: organization.id.to_s
+          end
 
+          it "should throw a flash Error" do
+            expect(flash[:error]).to match(/Updating of Client employer records not allowed/)
+            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(organization.broker_agency_profile))
+          end
+        end
+      end
+    end
 
+    describe "DELETE destroy" do
+      USER_ROLES.each do |role|
+        context "for user #{role} when organization is not prospect" do
+          let(:organization) {plan_design_organization}
 
+          before :each do
+            person = person(role)
+            sign_in user(person)
+            delete :destroy, id: organization.id.to_s
+          end
 
+          it "should throw a flash Error and should re-direct" do
+            expect(flash[:error]).to match(/Removing of Client employer records not allowed/)
+            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(organization.broker_agency_profile))
+            expect(response).to have_http_status(303)
+          end
+        end
 
-    # describe "GET edit" do
-    #   USER_ROLES.each do |role|
-    #     context "for user #{role}" do
-    #       before do
-    #         allow(subject).to receive(:get_sic_codes).and_return(sic_codes)
-    #         allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
-    #       end
-    #
-    #       it "returns a success response" do
-    #         get :edit, { id: prospect_plan_design_organization.to_param }, valid_session
-    #         expect(response).to be_success
-    #       end
-    #     end
-    #   end
-    # end
-    #
-    # describe "PATCH #update" do
-    #   USER_ROLES.each do |role|
-    #     context "for user #{role}" do
-    #       before do
-    #         allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
-    #         allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:find_or_initialize_by).with(:fein).and_return("223232323")
-    #         allow(subject).to receive(:get_sic_codes).and_return(sic_codes)
-    #         allow(active_user).to receive(:has_hbx_staff_role?).and_return( role == :with_hbx_staff_role ? true : false)
-    #       end
-    #
-    #       context "with valid params" do
-    #         let(:updated_valid_attributes) {
-    #           valid_attributes["legal_name"] = "Some New Name"
-    #           valid_attributes
-    #         }
-    #
-    #         it "updates Organizations::PlanDesignOrganization" do
-    #           expect {
-    #             patch :update, { organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #           }.to change { prospect_plan_design_organization.reload.legal_name }.to('Some New Name')
-    #         end
-    #
-    #         it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
-    #           patch :update, { organization: updated_valid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #           expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-    #         end
-    #
-    #         it "does not create a new Organizations::PlanDesignOrganization" do
-    #           expect {
-    #             patch :update, { organization: valid_attributes, id: prospect_plan_design_organization.id, format: 'js'}, valid_session
-    #           }.to change { Organizations::PlanDesignOrganization.all.count }.by(0)
-    #         end
-    #       end
-    #
-    #       context "with invalid params" do
-    #         it "does not update Organizations::PlanDesignOrganization" do
-    #           expect {
-    #             patch :update, { organization: invalid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #           }.not_to change { prospect_plan_design_organization.reload.legal_name }
-    #         end
-    #
-    #         it "renders edit with flash error" do
-    #           patch :update, { organization: invalid_attributes, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #           expect(response).to render_template(:edit)
-    #         end
-    #       end
-    #
-    #       context "with params missing office_location_attributes" do
-    #         let(:params_missing_ol_attrs) {
-    #           valid_attributes.delete "office_locations_attributes"
-    #           valid_attributes
-    #         }
-    #
-    #         it "does not update Organizations::PlanDesignOrganization" do
-    #           expect {
-    #             patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #           }.not_to change { prospect_plan_design_organization.reload.legal_name }
-    #         end
-    #
-    #         it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile) with flash error" do
-    #           patch :update, { organization: params_missing_ol_attrs, id: prospect_plan_design_organization.id, format: 'js' }, valid_session
-    #            expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-    #            expect(flash[:error]).to match(/Prospect Employer must have one Primary Office Location./)
-    #         end
-    #       end
-    #     end
-    #   end
-    # end
-    #
-    # describe "DELETE #destroy" do
-    #   USER_ROLES.each do |role|
-    #     context "for user #{role}" do
-    #       let(:broker_agency_profile) { double(id: "5ac4cb58be0a6c3ef400009b") }
-    #
-    #       before do
-    #         allow(BrokerAgencyProfile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
-    #       end
-    #
-    #       context "when attempting to delete plan design organizations without existing quotes" do
-    #         let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: nil, owner_profile_id: broker_agency_profile.id,
-    #                                                                             legal_name: 'ABC Company', sic_code: '0197' ) }
-    #
-    #         it "destroys the requested prospect_plan_design_organization" do
-    #           expect {
-    #             delete :destroy, {:id => prospect_plan_design_organization.to_param}, valid_session
-    #           }.to change(SponsoredBenefits::Organizations::PlanDesignOrganization, :count).by(-1)
-    #         end
-    #
-    #         it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
-    #           delete :destroy, {:id => prospect_plan_design_organization.to_param}, valid_session
-    #           expect(response).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-    #         end
-    #       end
-    #
-    #       context "when attempting to delete plan design organizations with existing quotes" do
-    #         let!(:prospect_plan_design_organization) { create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: '1', owner_profile_id: '5ac4cb58be0a6c3ef400009b',
-    #                                                   plan_design_proposals: [ plan_design_proposal ], sic_code: '0197' ) }
-    #         let(:plan_design_proposal) { build(:plan_design_proposal) }
-    #
-    #         it "does not destroy the requested prospect_plan_design_organization" do
-    #           expect {
-    #             delete :destroy, {:id => prospect_plan_design_organization.to_param}, valid_session
-    #           }.to change(SponsoredBenefits::Organizations::PlanDesignOrganization, :count).by(0)
-    #         end
-    #
-    #         it "redirects to employers_organizations_broker_agency_profile_path(broker_agency_profile)" do
-    #           delete :destroy, {:id => prospect_plan_design_organization.to_param}, valid_session
-    #           expect(response).to redirect_to(employers_organizations_broker_agency_profile_path(broker_agency_profile))
-    #         end
-    #       end
-    #
-    #     end
-    #   end
-    # end
+        context "for user #{role} when organization is prospect" do
+          let(:plan_proposal) {plan_design_proposal}
+          let(:plan_design_org_with_praposals) {plan_proposal.plan_design_organization}
 
+          before :each do
+            person = person(role)
+            sign_in user(person)
+          end
+
+          context "when quotes are present" do
+            it "should not delete proposals" do
+              expect(plan_proposal.valid?).to be_truthy
+              delete :destroy, id: plan_design_org_with_praposals.id.to_s
+              expect(plan_design_org_with_praposals.plan_design_proposals.present?).to be_truthy
+            end
+
+            it "should re-direct and throw a flash error" do
+              delete :destroy, id: plan_design_org_with_praposals.id.to_s
+              expect(response).to have_http_status(303)
+              expect(subject).to redirect_to(employers_organizations_broker_agency_profile_path(plan_design_org_with_praposals.broker_agency_profile))
+            end
+          end
+        end
+      end
+    end
   end
 end
