@@ -4,16 +4,12 @@ PLAN_TRANSLATIONS = {
   'en.plans.tty' => 'TTY:',
   'en.plans.tty_number' => '711 TTY',
   'en.plans.tty_num' => '711',
-  'en.plans.bhp_phone' => '1-855-833-8120',
+  'en.plans.bhp_phone' => '855-833-8120',
   'en.plans.bhp_href_phone' => 'tel:+18558338120',
   'en.plans.hours' => 'Hours:',
-  'en.plans.bhp_hours' => 'Monday through Friday from 8:00 a.m. to 6:00 p.m. Eastern Time',
+  'en.plans.bhp_hours' => 'Monday through Friday from 8:00 a.m. to 6:00 p.m.',
   'en.plans.email' => 'Email:',
   'en.plans.bhp_email' => 'memberquestions@bmchp.org',
-
-  'en.plans.bmchp_phone' => '855-833-8120',
-  'en.plans.bmchp_email' => 'memberquestions@bmchp.org',
-  'en.plans.bmchp.hours' => 'Monday through Friday from 8:00 a.m. to 6:00 p.m.',
 
   'en.plans.fh_phone' => '800-868-5200',
   'en.plans.fh_href_phone' => 'tel:+18008685200',
@@ -55,9 +51,11 @@ PLAN_TRANSLATIONS = {
 
 
   'en.plans.uh_phone' => '1-888-842-4571',
-  'en.plans.uh_href' => 'tel:',
-  'en.plans.uh_href_phone' => 'tel:+18888424571',
+  # 'en.plans.uh_href' => 'tel:',
+  # 'en.plans.uh_href_phone' => 'tel:+18888424571',
   'en.plans.uh_hours' => '7 AM to 6 PM CST',
+  # 'en.plans.uhc_phone' => '1-877-856-2430',
+  # 'en.plans.uhc_href_phone' => 'tel:+18778562430',
 
 
   'en.plans.thd_phone' => '888-257-1985',
@@ -86,9 +84,6 @@ PLAN_TRANSLATIONS = {
 
   'en.plans.kaiser_phone' => '1-800-777-7902',
   'en.plans.kaiser_href_phone' => 'tel:+18007777902',
-
-  'en.plans.uhc_phone' => '1-877-856-2430',
-  'en.plans.uhc_href_phone' => 'tel:+18778562430',
 
   'en.plans.ad_tty' => 'Not at this time',
   'en.plans.ad_email' => 'customerservice@altudental.com',

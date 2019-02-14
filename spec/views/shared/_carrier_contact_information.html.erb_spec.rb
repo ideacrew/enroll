@@ -21,20 +21,6 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
 
     it "should display the carrier name and number" do
       expect(rendered).to match issuer_profile.legal_name
-      expect(rendered).to match("1-855-833-8120")
-    end
-  end
-
-
-  context 'for Boston Medical Center HealthNet Plan' do
-    before :each do
-      allow(plan).to receive(:kind).and_return('health')
-      allow(issuer_profile).to receive(:legal_name).and_return('Boston Medical Center HealthNet Plan')
-      render partial: "shared/carrier_contact_information", locals: { plan: plan }
-    end
-
-    it "should display the carrier name and number" do
-      expect(rendered).to match issuer_profile.legal_name
       expect(rendered).to match("855-833-8120")
       expect(rendered).to match("memberquestions@bmchp.org")
       expect(rendered).to match("Monday through Friday from 8:00 a.m. to 6:00 p.m.")
