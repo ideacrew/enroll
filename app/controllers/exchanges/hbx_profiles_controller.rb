@@ -471,7 +471,7 @@ def employer_poc
     end
   end
 
-   def view_terminated_hbx_enrollments
+  def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
@@ -495,6 +495,25 @@ def employer_poc
     end
 
     redirect_to exchanges_hbx_profiles_root_path, flash: message
+  end
+
+  def edit_force_publish
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split("_").last)
+    @plan_year = @organization.employer_profile.draft_plan_year.last
+  end
+
+  def force_publish
+    @element_to_replace_id = params[:row_actions_id]
+    @organization = Organization.find(@element_to_replace_id.split("_").last)
+    @plan_year = @organization.employer_profile.draft_plan_year.last
+    if @plan_year.may_force_publish? && params[:publish_with_warnings] == 'true'
+      @plan_year.force_publish!
+    end
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def verify_dob_change

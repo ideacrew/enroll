@@ -6,9 +6,10 @@ Feature: As a Super Admin & tier3 I will be the only user
     And a Hbx admin logs on to Portal
     And the employer has draft plan year
     And Hbx Admin navigate to main page
+    And system date is between submission deadline & application effective date
     And Hbx Admin clicks on Employers link
     When the Hbx Admin clicks on the Action button
-    And Hbx Admin should <action> an Force Publish button
+    Then Hbx Admin should <action> an Force Publish button
 
     Examples:
       | subrole               | action  |
