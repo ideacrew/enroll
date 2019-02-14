@@ -24,7 +24,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
   let!(:employee_role) { FactoryGirl.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id)}
 
   before do
-    benefit_application.update_attributes!(aasm_state: :enrollment_closed)
     census_employee.update_attributes(employee_role_id: employee_role.id)
   end
 

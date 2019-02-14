@@ -110,7 +110,7 @@ module BenefitSponsors
     embeds_many :general_agency_accounts, class_name: "BenefitSponsors::Accounts::GeneralAgencyAccount",
       validate: true
 
-    embeds_many :benefit_sponsorship_accounts, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorshipAccount"
+    embeds_one  :benefit_sponsorship_account, class_name: "BenefitSponsors::BenefitSponsorships::BenefitSponsorshipAccount"
 
     embeds_one  :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
 
@@ -145,7 +145,7 @@ module BenefitSponsors
 
     scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state => :enrollment_eligible }}
+        :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state.in => [:enrollment_eligible, :binder_paid] }}
       )
     }
 
@@ -497,7 +497,7 @@ module BenefitSponsors
 
     # Workflow for self service
     aasm do
-      state :applicant, initial: true, :after_enter => :publish_benefit_sponsor_event
+      state :applicant, initial: true#, :after_enter => :publish_benefit_sponsor_event
       # state :initial_application_under_review # Sponsor's first application is submitted invalid and under HBX review
       # state :initial_application_denied       # Sponsor's first application is rejected
       # state :initial_application_approved     # Sponsor's first application is submitted and approved
@@ -629,9 +629,9 @@ module BenefitSponsors
       when :terminated
         terminate! if may_terminate?
       when :canceled
-        if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
+        # if aasm.current_event == :activate_enrollment! || aasm.from_state == :enrollment_ineligible
           cancel! if may_cancel?
-        end
+        # end
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       when :enrollment_extended

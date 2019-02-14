@@ -14,7 +14,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
   describe "modifying benefit application", dbclean: :after_each do
 
-    let(:current_effective_date)  { TimeKeeper.date_of_record }
+    let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_month }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
@@ -43,7 +43,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         employer_attestation: employer_attestation)
     end
 
-    let(:start_on)  { current_effective_date.prev_month }
+    let(:start_on)  { current_effective_date }
     let(:effective_period)  { start_on..start_on.next_year.prev_day }
     let!(:benefit_application) {
       application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: effective_period, aasm_state: :active)
@@ -68,6 +68,43 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+    end
+
+    context "extend open enrollment" do
+        let!(:start_on)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
+        let!(:effective_period)  { start_on..start_on.next_year.prev_day }
+        let!(:ineligible_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
+
+        before do
+          allow(ENV).to receive(:[]).with("action").and_return("extend_open_enrollment")
+          allow(ENV).to receive(:[]).with("effective_date").and_return(start_on.strftime("%m/%d/%Y"))
+          allow(ENV).to receive(:[]).with("oe_end_date").and_return(start_on.prev_day.strftime("%m/%d/%Y"))
+        end
+
+        it "should extend open enrollment from enrollment ineligible" do
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_ineligible
+          subject.migrate
+          ineligible_benefit_application.reload
+          benefit_sponsorship.reload
+          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+        end
+
+        it "should extend open enrollment from enrollment open" do
+          ineligible_benefit_application.update_attributes!(aasm_state: "enrollment_open")
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_open
+          subject.migrate
+          ineligible_benefit_application.reload
+          benefit_sponsorship.reload
+          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+        end
+
+        it "should not extend open enrollment from draft" do
+          ineligible_benefit_application.update_attributes!(aasm_state: "draft")
+          expect(ineligible_benefit_application.aasm_state).to eq :draft
+          expect { subject.migrate }.to raise_error("Unable to find benefit application!!")
+        end
     end
 
     context "Update assm state to enrollment open" do
@@ -103,11 +140,10 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         before do
           allow(ENV).to receive(:[]).with("action").and_return("begin_open_enrollment")
           allow(ENV).to receive(:[]).with("effective_date").and_return(effective_date.strftime("%m/%d/%Y"))
-          expect_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:is_renewing?).at_least(:once).and_return(true)
         end
 
         it "should update the benefit application" do
-          benefit_application.update_attributes!(aasm_state: "enrollment_ineligible", benefit_packages: [])
+          benefit_application.update_attributes!(aasm_state: :enrollment_ineligible, benefit_packages: [])
           # benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_ineligible")
           expect(benefit_application.aasm_state).to eq :enrollment_ineligible
           # expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
@@ -126,8 +162,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       before do
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
+        allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
         allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
-        allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
         allow(ENV).to receive(:[]).with("action").and_return("terminate")
         allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
@@ -147,6 +183,14 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect(benefit_application.terminated_on).to eq termination_date
       end
 
+      it "should update the termination kind" do
+        expect(benefit_application.termination_kind).to eq "voluntary"
+      end
+
+      it "should update the termination reason" do
+        expect(benefit_application.termination_reason).to eq "Company went out of business/bankrupt"
+      end
+
       it "should terminate any active employee enrollments" do
         benefit_application.hbx_enrollments.each { |hbx_enrollment| expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"}
       end
@@ -157,9 +201,9 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "cancel benefit application", dbclean: :after_each do
-      let(:past_start_on) {start_on.prev_month}
+      let(:past_start_on) {start_on + 2.months}
       let!(:past_effective_period) {past_start_on..past_start_on.next_year.prev_day }
-      let!(:mid_plan_year_effective_date) {start_on.prev_month.prev_month}
+      let!(:mid_plan_year_effective_date) {start_on.next_month}
       let!(:range_effective_period) { mid_plan_year_effective_date..mid_plan_year_effective_date.next_year.prev_day }
       let!(:draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: past_effective_period)}
       let!(:import_draft_benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported, effective_period: range_effective_period)}
@@ -271,7 +315,6 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
           employer_attestation: employer_attestation)
       end
 
-      let(:start_on)  { current_effective_date.prev_month}
       let(:old_effective_period)  { start_on.next_month.beginning_of_month - 1.year ..start_on.end_of_month }
       let!(:old_benefit_application) {
         application = FactoryGirl.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: old_effective_period, aasm_state: :active)
@@ -320,16 +363,16 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
     end
 
-
     context "should trigger termination notice", dbclean: :after_each do
 
       let(:termination_date) { start_on.next_month.next_day }
       let(:end_on)           { start_on.next_month.end_of_month }
 
       before do
-        allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
-        allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
         allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
+        allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
+        allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
+        allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
         allow(ENV).to receive(:[]).with("action").and_return("terminate")
         allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
@@ -349,5 +392,5 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
       end
     end
-  end
+   end
 end

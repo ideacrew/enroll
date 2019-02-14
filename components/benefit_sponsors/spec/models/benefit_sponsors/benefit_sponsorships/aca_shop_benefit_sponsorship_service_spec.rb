@@ -41,7 +41,7 @@ module BenefitSponsors
       aasm_state: renewal_sponsorship_state)
     }
 
-    let(:current_date)                    { Date.today }
+    let(:current_date)                    { Date.new(this_year,3,14) }
 
     before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
@@ -82,7 +82,6 @@ module BenefitSponsors
 
             expect(sponsor.applicant?).to be_truthy if !benefit_application.is_renewing?
             expect(benefit_application.enrollment_closed?).to be_truthy
-
             sponsorship_service = subject.new(benefit_sponsorship: sponsor)
             sponsorship_service.auto_cancel_ineligible
 
@@ -99,14 +98,14 @@ module BenefitSponsors
     describe '.terminate_pending_sponsor_benefit' do
 
       let(:initial_application_state)   { :termination_pending }
+      let(:ba_start_on) { (current_date.beginning_of_month - 2.months) }
 
       it 'terminate pending benefit application should be terminated when the end on is reached' do
         april_sponsors.each do |sponsor|
           sponsor.benefit_applications.each do |ba|
-            ba.update_attributes!(effective_period: ba.start_on..current_date.prev_day, terminated_on: current_date.prev_month)
+            ba.update_attributes!(effective_period: ba_start_on..current_date.prev_day, terminated_on: current_date.prev_month)
           end
           benefit_application = sponsor.benefit_applications.termination_pending.first
-
           service = subject.new(benefit_sponsorship: sponsor)
           service.terminate_pending_sponsor_benefit
           sponsor.reload

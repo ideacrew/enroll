@@ -28,7 +28,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     oe_end_date = Date.strptime(ENV['oe_end_date'], "%m/%d/%Y") if ENV['oe_end_date'].present?
 
     benefit_sponsorship = get_benefit_sponsorship
-    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:enrollment_ineligible, :canceled], :"effective_period.min" => effective_date).first
+    benefit_application = benefit_sponsorship.benefit_applications.where(:aasm_state.in => [:canceled, :enrollment_ineligible, :enrollment_extended, :enrollment_open, :enrollment_closed], :"effective_period.min" => effective_date).first
 
     raise "Unable to find benefit application!!" if benefit_application.blank?
 
@@ -111,15 +111,14 @@ class ModifyBenefitApplication< MongoidMigrationTask
   end
 
   def terminate_benefit_application(benefit_applications)
-    termination_notice = ENV['termination_notice'].to_s
     termination_kind = ENV['termination_kind']
+    termination_reason = ENV['termination_reason']
     termination_date = Date.strptime(ENV['termination_date'], "%m/%d/%Y")
     notify_trading_partner = (ENV['notify_trading_partner'] == "true" || ENV['notify_trading_partner'] == true) ? true : false
     end_on = Date.strptime(ENV['end_on'], "%m/%d/%Y")
     benefit_applications.each do |benefit_application|
       service = initialize_service(benefit_application)
-      service.terminate(end_on, termination_date, notify_trading_partner, termination_kind)
-      trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
+      service.terminate(end_on, termination_date, termination_kind, termination_reason, notify_trading_partner)
     end
   end
 
@@ -174,9 +173,5 @@ class ModifyBenefitApplication< MongoidMigrationTask
 
   def initialize_service(benefit_application)
     BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application)
-  end
-
-  def trigger_advance_termination_request_notice(benefit_application)
-    benefit_application.trigger_model_event(:group_advance_termination_confirmation)
   end
 end

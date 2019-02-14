@@ -349,13 +349,13 @@ module BenefitSponsors
 
       context "when renewal product missing" do
         let(:hbx_enrollment) { double(product: product_package.products[2], is_coverage_waived?: false, coverage_kind: :health) }
-        let(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(             
+        let!(:sponsored_benefit) { renewal_benefit_package.sponsored_benefits.build(
             product_package_kind: :single_issuer
           ) 
         }
 
         before do
-          allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products[0..1])
+          allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products.reject{ |prod| prod.id == hbx_enrollment.product.renewal_product.id })#removing hbx_enrollment.product.renewal_product from renewal_product_package
           allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
         end
 

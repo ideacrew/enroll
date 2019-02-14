@@ -70,7 +70,7 @@ module BenefitSponsors
       benefit_application = benefit_sponsorship.pending_application_may_terminate_on(new_date)
 
       if benefit_application.present?
-        application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind)
+        application_service_for(benefit_application).terminate(benefit_application.end_on, TimeKeeper.date_of_record, benefit_application.termination_kind, benefit_application.termination_reason)
       end
     end
 
@@ -99,7 +99,7 @@ module BenefitSponsors
     end
 
     def auto_cancel_ineligible
-      benefit_sponsorship.cancel! if benefit_sponsorship.may_cancel?      
+      benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.cancel! if benefit_application.may_cancel? }
     end
 
     def transmit_initial_eligible_event

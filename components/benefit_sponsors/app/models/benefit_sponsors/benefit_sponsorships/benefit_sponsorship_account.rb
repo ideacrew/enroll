@@ -4,7 +4,7 @@ module BenefitSponsors
     include Mongoid::Timestamps
 
     embeds_many :transactions,
-          class_name: "::BenefitSponsors::BenefitSponsorships::Transaction"
+          class_name: "::BenefitSponsors::BenefitSponsorships::FinancialTransaction"
 
   end
 end

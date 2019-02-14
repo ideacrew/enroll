@@ -5,10 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
 
-  describe HbxEnrollment do
+  describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-
+    
     context "an employer defines a plan year with multiple benefit groups, adds employees to roster and assigns benefit groups" do
 
       before do
@@ -507,7 +507,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     end
   end
 
-  describe HbxProfile, "class methods", type: :model do
+  describe HbxProfile, "class methods", type: :model, dbclean: :after_each do
 
     # before :all do
     #   create_brady_census_families
@@ -988,7 +988,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
   end
 
   context "Benefits are terminated" do
-    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month - 1.month}
+    let(:effective_on_date) {TimeKeeper.date_of_record.beginning_of_month}
     let!(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
 
     context "Individual benefit" do
@@ -1030,7 +1030,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     let(:broker_agency_account_1) {double(:start_on => start_on_1, :end_on => end_on_1)}
     let(:broker_agency_account_2) {double(:start_on => start_on_2, :end_on => end_on_2)}
 
-    describe "with both accounts active before the purchase, and the second one unterminated" do
+    describe "with both accounts active before the purchase, and the second one unterminated", dbclean: :after_each do
       let(:start_on_1) {submitted_at - 12.days}
       let(:start_on_2) {submitted_at - 5.days}
       let(:end_on_1) {nil}
@@ -1041,7 +1041,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    describe "with both accounts active before the purchase, and the later one terminated" do
+    describe "with both accounts active before the purchase, and the later one terminated", dbclean: :after_each do
       let(:start_on_1) {submitted_at - 12.days}
       let(:start_on_2) {submitted_at - 5.days}
       let(:end_on_1) {nil}
@@ -1052,7 +1052,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    describe "with one account active before the purchase, and the other active after" do
+    describe "with one account active before the purchase, and the other active after", dbclean: :after_each do
       let(:start_on_1) {submitted_at - 12.days}
       let(:start_on_2) {submitted_at + 5.days}
       let(:end_on_1) {nil}
@@ -1063,7 +1063,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    describe "with one account active before the purchase and terminated before the purchase, and the other active after" do
+    describe "with one account active before the purchase and terminated before the purchase, and the other active after", dbclean: :after_each do
       let(:start_on_1) {submitted_at - 12.days}
       let(:start_on_2) {submitted_at + 5.days}
       let(:end_on_1) {submitted_at - 3.days}
@@ -1082,7 +1082,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       expect(subject.new_hire_enrollment_for_shop?).to eq false
     end
 
-    describe "and given a special enrollment period, with a reason of 'birth'" do
+    describe "and given a special enrollment period, with a reason of 'birth'", dbclean: :after_each do
       let(:qle_on) {Date.today}
 
       before :each do
@@ -1109,7 +1109,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       expect(subject.eligibility_event_has_date?).to eq false
     end
 
-    describe "in the IVL market" do
+    describe "in the IVL market", dbclean: :after_each do
       before :each do
         subject.kind = "unassisted_qhp"
       end
@@ -1127,7 +1127,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    describe "in the SHOP market, purchased outside of open enrollment" do
+    describe "in the SHOP market, purchased outside of open enrollment", dbclean: :after_each do
 
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup initial benefit application"
@@ -1169,7 +1169,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
       end
     end
 
-    describe "in the SHOP market, purchased during open enrollment" do
+    describe "in the SHOP market, purchased during open enrollment", dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup initial benefit application"
 
@@ -1192,7 +1192,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         allow(subject).to receive(:sponsored_benefit_package).and_return(current_benefit_package)
       end
 
-      describe "when coverage start is the same as the plan year" do
+      describe "when coverage start is the same as the plan year", dbclean: :after_each do
         before(:each) do
           subject.effective_on = reference_date
           subject.submitted_at = purchase_time
@@ -1211,7 +1211,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
         end
       end
 
-      describe "when coverage start is the different from the plan year" do
+      describe "when coverage start is the different from the plan year", dbclean: :after_each do
         before(:each) do
           subject.effective_on = reference_date + 12.days
         end
@@ -1489,6 +1489,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :after_each do
     context 'When family passively renewed', dbclean: :after_each do
       include_context "setup renewal application"
 
+      let(:predecessor_application_catalog) { true }
       let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
       let(:renewal_state) { :enrollment_open }
       let(:open_enrollment_period)  { TimeKeeper.date_of_record..(effective_period.min - 10.days) }
@@ -1991,8 +1992,8 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
     let(:dental_sponsored_benefit) { true }
   end
 
-  describe ".renew_benefit" do
-    describe "given an renewing employer just entered open enrollment" do
+  describe ".renew_benefit", :dbclean => :after_each do
+    describe "given an renewing employer just entered open enrollment", dbclean: :after_each do
       describe "with employees who have made the following plan selections previous year:
         - employee A has purchased:
           - One health enrollment (Enrollment 1)         
@@ -2007,7 +2008,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
           - One health waiver (Enrollment 7)
           - One dental waiver (Enrollment 8)
         - employee E has none
-      " do
+      ", dbclean: :after_each do
 
 
         let(:census_employees) {
@@ -2223,7 +2224,7 @@ describe HbxEnrollment, type: :model, :dbclean => :after_each do
     end
   end
 
-  describe "#notify_enrollment_cancel_or_termination_event" do
+  describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }

@@ -123,6 +123,105 @@ module BenefitSponsors
     describe '.force_submit_application' do
       include_context "setup initial benefit application"
 
+      context 'Invoke force_submit_application' do
+        let(:application_errors) do
+          { 'invalid_application' => 'Invalid application error' }
+        end
+        let(:application_warnings) do
+          { 'invalid_application' => 'Invalid application warning' }
+        end
+        subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
+
+        context 'When business_policy_satisfied_for? OR is_application_eligible? AND may_submit_for_review? are is false' do
+
+          it 'should return notice, warnings and state could not be changed' do
+            allow(initial_application).to receive(:open_enrollment_length).and_return(4)
+            allow(initial_application).to receive(:may_submit_for_review?).and_return(false)
+            subject.force_submit_application
+            initial_application.reload
+            expect(subject.messages['notice']).to eq('Employer(s) Plan Year could not be processed')
+            expect(subject.messages['warnings']).to eq(['open enrollment period length 4 day(s) is less than 5 day(s) minimum'])
+            expect(subject.errors).to eq([])
+            expect(initial_application.aasm_state).to eq :active
+          end
+        end
+
+        context 'When business_policy_satisfied_for? OR is_application_eligible? is false AND may_submit_for_review? is true' do
+          context 'state is not draft' do
+            it 'should return error' do
+              allow(subject).to receive(:business_policy_satisfied_for?).and_return(false)
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to include a_string_matching /Event 'submit_for_review' cannot transition from 'active'./
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'state is draft' do
+            before { initial_application.update_attribute(:aasm_state, 'draft') }
+            it 'should return notice, warnings and state could not be changed' do
+              allow(initial_application).to receive(:open_enrollment_length).and_return(4)
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully submitted for review.')
+              expect(subject.messages['warnings']).to eq(['open enrollment period length 4 day(s) is less than 5 day(s) minimum'])
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :pending
+            end
+          end
+        end
+
+        context 'When business_policy_satisfied_for?? AND is_application_eligible? are true' do
+          context 'when benefit_application may_approve_application? is false' do
+            it 'should return notice Plan Year could not be processed' do
+              allow(initial_application).to receive(:may_approve_application?).and_return(false)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year could not be processed')
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'when benefit_application may_approve_application? is true and state is active then' do
+            it 'should return error' do
+              allow(initial_application).to receive(:may_approve_application?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to include a_string_matching /Event 'auto_approve_application' cannot transition from 'active'./
+              expect(initial_application.aasm_state).to eq :active
+            end
+          end
+
+          context 'when benefit_application may_approve_application? is true and state is draft then' do
+            before { initial_application.update_attributes(aasm_state: 'draft') }
+
+            it 'should return error if today is less than open_enrollment_period' do
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              allow(subject).to receive(:today).and_return(initial_application.open_enrollment_period.begin - 1.year)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages).to eq({})
+              expect(subject.errors).to eq(['Employer(s) Plan Year date has not matched.'])
+              expect(initial_application.aasm_state).to eq :approved
+            end
+
+            it 'should return notice, warnings and state could not be changed' do
+              allow(initial_application).to receive(:may_submit_for_review?).and_return(true)
+              subject.force_submit_application
+              initial_application.reload
+              expect(subject.messages['notice']).to eq('Employer(s) Plan Year was successfully published.')
+              expect(subject.errors).to eq([])
+              expect(initial_application.aasm_state).to eq :enrollment_open
+            end
+          end
+        end
+      end
+
       context "renewal application in draft state" do
 
         let(:scheduled_event)  {BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents}
@@ -190,8 +289,6 @@ module BenefitSponsors
         let(:open_enrollment_begin) { TimeKeeper.date_of_record - 5.days }
 
         include_context "setup initial benefit application" do
-          let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
-          let(:open_enrollment_period) { (effective_period.min - 2.months)..open_enrollment_begin }
           let(:aasm_state) { :approved }
         end
 
@@ -335,13 +432,13 @@ module BenefitSponsors
             allow(subject).to receive(:business_policy_satisfied_for?).with(:end_open_enrollment).and_return(true)
           end
 
-          it "should close open enrollment and reset OE end date" do
-            expect(initial_application.open_enrollment_period.max).to eq open_enrollment_close
-            subject.end_open_enrollment(TimeKeeper.date_of_record)
-            initial_application.reload
-            expect(initial_application.open_enrollment_period.max).to eq TimeKeeper.date_of_record
-            expect(initial_application.aasm_state).to eq :enrollment_closed
-          end
+          # it "should close open enrollment and reset OE end date" do
+          #   expect(initial_application.open_enrollment_period.max).to eq open_enrollment_close
+          #   subject.end_open_enrollment(TimeKeeper.date_of_record)
+          #   initial_application.reload
+          #   expect(initial_application.open_enrollment_period.max).to eq TimeKeeper.date_of_record
+          #   expect(initial_application.aasm_state).to eq :enrollment_closed
+          # end
         end
       end
     end
@@ -433,22 +530,36 @@ module BenefitSponsors
     end
 
     describe '.cancel' do
+
+      include_context "setup initial benefit application"
+
+      subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
+
       context "when a benefit application is canceled" do
-        include_context "setup initial benefit application"
-
-        subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
-
         before do
           subject.cancel
           initial_application.reload
         end
 
-        it "should move benefit application to termiantion pending" do
+        it "should move benefit application to canceled" do
           expect(initial_application.aasm_state).to eq :canceled
         end
 
         it "should update end date on benefit application" do
           # expect(initial_application.end_on).to eq initial_application.start_on
+        end
+      end
+
+      context 'when an approved/published benefit application is canceled' do
+
+        before do
+          initial_application.update_attributes(aasm_state: :approved)
+          subject.cancel
+          initial_application.reload
+        end
+
+        it "should move benefit_application to canceled state" do
+          expect(initial_application.aasm_state).to eq :canceled
         end
       end
     end
@@ -461,7 +572,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.schedule_termination(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 
@@ -471,6 +582,14 @@ module BenefitSponsors
 
         it "should update end date on benefit application" do
           expect(initial_application.end_on).to eq end_date
+        end
+
+        it "should update the termination kind" do
+          expect(initial_application.termination_kind).to eq "voluntary"
+        end
+
+        it "should update the termination reason" do
+          expect(initial_application.termination_reason).to eq "Company went out of business/bankrupt"
         end
       end
     end
@@ -483,7 +602,7 @@ module BenefitSponsors
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
         before do
-          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", false)
+          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
           initial_application.reload
         end
 

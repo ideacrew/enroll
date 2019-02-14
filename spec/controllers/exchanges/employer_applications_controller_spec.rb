@@ -95,4 +95,19 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       expect(flash[:error]).to match(/Access not allowed/)
     end
   end
+
+  describe "get term reasons" do
+    let(:user) { instance_double("User", :has_hbx_staff_role? => true, :person => person1) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person1) }
+
+    before :each do
+      allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
+      sign_in(user)
+      get :get_term_reasons, { reason_type_id: "term_actions_nonpayment" },  format: :js
+    end
+
+    it "should be success" do
+      expect(response).to have_http_status(:success)
+    end
+  end
 end
