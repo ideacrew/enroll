@@ -9,6 +9,7 @@ RSpec.describe Insured::FamilyMembersController do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -21,6 +22,7 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
         get :index, :employee_role_id => employee_role_id
@@ -44,6 +46,7 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
         get :index, :employee_role_id => employee_role_id
@@ -72,6 +75,7 @@ RSpec.describe Insured::FamilyMembersController do
       before :each do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
       end
@@ -102,12 +106,17 @@ RSpec.describe Insured::FamilyMembersController do
           get :index, :sep_id => sep.id, qle_id: sep.qualifying_life_event_kind_id
           expect(assigns(:sep).submitted_at.to_date).to eq TimeKeeper.date_of_record
         end
+
+        it "qle market kind is should be shop" do
+          expect(qle.market_kind).to eq "shop"
+        end
       end
     end
 
     it "with qle_id" do
       allow(person).to receive(:primary_family).and_return(test_family)
       allow(person).to receive(:broker_role).and_return(nil)
+      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user
@@ -184,6 +193,24 @@ RSpec.describe Insured::FamilyMembersController do
 
     describe "with a valid dependent" do
       let(:save_result) { true }
+
+      it "should assign the dependent" do
+        expect(assigns(:dependent)).to eq dependent
+      end
+
+      it "should assign the created" do
+        expect(assigns(:created)).to eq true
+      end
+
+      it "should render the show template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+      end
+    end
+
+    describe "with a valid dependent but not applying for coverage" do
+      let(:save_result) { true }
+      let(:dependent_properties) { { "is_applying_coverage" => "false" } }
 
       it "should assign the dependent" do
         expect(assigns(:dependent)).to eq dependent

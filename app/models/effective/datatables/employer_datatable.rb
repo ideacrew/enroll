@@ -8,6 +8,8 @@ module Effective
         bulk_actions_column do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
            bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
+           bulk_action 'Disable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'disable'), data: { confirm: 'disable ssn requirement?', no_turbolink: true }
+           bulk_action 'Enable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'enable'), data: { confirm: 'enable ssn requirement?', no_turbolink: true }
         end
 
         table_column :legal_name, :proc => Proc.new { |row|
@@ -18,7 +20,7 @@ module Effective
         #table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :sortable => false, :filter => false
-        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(@employer_profile) }, :filter => false
+#        table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(@employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
           }, :filter => false
@@ -36,20 +38,22 @@ module Effective
           @latest_plan_year.try(:start_on)
           }, :filter => false, :sortable => true
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
-        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
-        table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
+#        table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
+#        table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
 
-          enrolled = @latest_plan_year.try(:enrolled_summary)
-          waived = @latest_plan_year.try(:waived_summary)
-          enrolled.to_s + "/" + waived.to_s
-          }, :filter => false, :sortable => false
+#          enrolled = @latest_plan_year.try(:enrolled_summary)
+#          waived = @latest_plan_year.try(:waived_summary)
+#          enrolled.to_s + "/" + waived.to_s
+#          }, :filter => false, :sortable => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Transmit XML', transmit_group_xml_exchanges_hbx_profile_path(row.employer_profile), @employer_profile.is_transmit_xml_button_disabled? ? 'disabled' : 'static'],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), generate_invoice_link_type(row)],
-           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled']
+           [text_to_display(row.employer_profile), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.employer_profile.no_ssn), 'post_ajax'],
+           ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
+           ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -82,6 +86,10 @@ module Effective
 
         @employer_collection = employers
 
+      end
+
+      def text_to_display(employer)
+        employer.no_ssn ? "Enable SSN/TIN" : "Disable SSN/TIN"
       end
 
       def global_search?

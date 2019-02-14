@@ -28,7 +28,7 @@ module Factories
         validate_plan_year
 
         @plan_year_start_on = @active_plan_year.end_on + 1.day
-        @plan_year_end_on   = @active_plan_year.end_on + 1.year
+        @plan_year_end_on   = (@active_plan_year.end_on + 1.year).end_of_month
 
         open_enrollment_start_on = @plan_year_start_on - 2.months
         open_enrollment_end_on = Date.new((@plan_year_start_on - 1.month).year, (@plan_year_start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
@@ -53,6 +53,7 @@ module Factories
 
         if @renewal_plan_year.save
           renew_benefit_groups
+          trigger_notice {"employer_renewal_dental_carriers_exiting_notice"} if @renewal_plan_year.start_on < Date.new(2019,1,1)
           @renewal_plan_year
         else
           raise PlanYearRenewalFactoryError,
@@ -62,6 +63,15 @@ module Factories
         end
       rescue Exception => e
         @logger.debug e.inspect
+      end
+    end
+
+    def trigger_notice
+      notice_name = yield
+      begin
+        ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, yield) unless Rails.env.test?
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver #{notice_name} notice to employer #{@employer_profile.legal_name} due to #{e}" }
       end
     end
 
@@ -85,7 +95,7 @@ module Factories
       if @active_plan_year.blank?
         raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} don't have active application for renewal"
       end
-    
+
       @active_plan_year.benefit_groups.each do |benefit_group|
         reference_plan_id = benefit_group.reference_plan.renewal_plan_id
         if reference_plan_id.blank?
@@ -137,7 +147,7 @@ module Factories
       renewal_benefit_group
     end
 
-    def clone_benefit_group(active_group)      
+    def clone_benefit_group(active_group)
       renewal_benefit_group = @renewal_plan_year.benefit_groups.build({
         title: "#{active_group.title} (#{@renewal_plan_year.start_on.year})",
         effective_on_kind: "first_of_month",
@@ -147,7 +157,7 @@ module Factories
         employer_max_amt_in_cents: active_group.employer_max_amt_in_cents,
         is_congress: active_group.is_congress
       })
-     
+
       renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
       renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if is_renewal_dental_offered?(active_group)
       renewal_benefit_group

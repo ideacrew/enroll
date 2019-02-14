@@ -70,8 +70,8 @@ module EventsHelper
                         end
   end
 
-  def employer_plan_years(employer)
-    employer.plan_years.select(&:eligible_for_export?)
+  def employer_plan_years(employer, plan_year_id)
+    employer.plan_years.select{|py| (py.eligible_for_export? || py.id.to_s == plan_year_id) }
   end
 
   def is_initial_or_conversion_employer?(employer)
@@ -92,5 +92,10 @@ module EventsHelper
 
   def is_renewal_or_conversion_employer?(employer)
     is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
+  end
+
+  def plan_years_for_manual_export(employer)
+    plan_year_states = PlanYear::INELIGIBLE_FOR_EXPORT_STATES.delete_if{|py_state| ["renewing_enrolling","enrolling"].include?(py_state)}
+    employer.plan_years.select {|plan_year| !plan_year_states.include?(plan_year.aasm_state)}
   end
 end

@@ -33,7 +33,7 @@ FactoryGirl.define do
 
     transient do
       start_on TimeKeeper.date_of_record.beginning_of_month
-      plan_year_state 'draft'
+      plan_year_state 'active'
       renewal_plan_year_state 'renewing_draft'
       reference_plan_id { FactoryGirl.create(:plan).id }
       renewal_reference_plan_id { FactoryGirl.create(:plan).id }

@@ -65,7 +65,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({email: "test@test"})}
       it 'does not match' do
         expect(User.create(**params).errors[:email].any?).to be_truthy
-        expect(User.create(**params).errors[:email]).to eq ["(optional) is invalid"]
+        expect(User.create(**params).errors[:email]).to eq ["is invalid", "(optional) is invalid"]
       end
     end
 
@@ -85,8 +85,8 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({password: "",})}
       it 'is empty' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["can't be blank"]
-        expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
+        expect(User.create(**params).errors[:password]).to eq ["can't be blank", "can't be blank"]
+        expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password", "doesn't match Password"]
       end
     end
 
@@ -135,8 +135,8 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'does not match' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password_confirmation].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["must have at least 4 alphabetical characters", "is too short (minimum is 8 characters)"]
-        expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
+        expect(User.create(**params).errors[:password]).to eq ["is too short (minimum is 8 characters)", "must have at least 4 alphabetical characters", "is too short (minimum is 8 characters)"]
+        expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password", "doesn't match Password"]
       end
     end
 
@@ -145,7 +145,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'first name is invalid' do
         params[:person][:first_name] = ""
         expect(User.create(**params).errors[:person].any?).to be_truthy
-        expect(User.create(**params).errors[:person]).to eq ["is invalid"]
+        expect(User.create(**params).errors[:person]).to eq ["is invalid", "is invalid"]
         expect(User.create(**params).person.errors[:first_name].any?).to be_truthy
         expect(User.create(**params).person.errors[:first_name]).to eq ["can't be blank"]
       end
@@ -153,7 +153,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'last name is invalid' do
         params[:person][:last_name] = ""
         expect(User.create(**params).errors[:person].any?).to be_truthy
-        expect(User.create(**params).errors[:person]).to eq ["is invalid"]
+        expect(User.create(**params).errors[:person]).to eq ["is invalid", "is invalid"]
         expect(User.create(**params).person.errors[:last_name].any?).to be_truthy
         expect(User.create(**params).person.errors[:last_name]).to eq ["can't be blank"]
       end
@@ -161,7 +161,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'ssn is invalid' do
         params[:person][:ssn] = "123"
         expect(User.create(**params).errors[:person].any?).to be_truthy
-        expect(User.create(**params).errors[:person]).to eq ["is invalid"]
+        expect(User.create(**params).errors[:person]).to eq ["is invalid", "is invalid"]
         expect(User.create(**params).person.errors[:ssn].any?).to be_truthy
         expect(User.create(**params).person.errors[:ssn]).to eq ["SSN must be 9 digits"]
       end

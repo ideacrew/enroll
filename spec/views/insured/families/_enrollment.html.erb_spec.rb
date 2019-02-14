@@ -24,6 +24,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('employer_sponsored')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content(employer_profile.legal_name)
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
 
     it "when kind is employer_sponsored_cobra" do
@@ -36,6 +37,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx).to receive(:kind).and_return('individual')
       render partial: "insured/families/enrollment", collection: [hbx], as: :hbx_enrollment, locals: { read_only: false }
       expect(rendered).to have_content('Individual & Family')
+      expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID:")
     end
   end
 
@@ -72,7 +74,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  covered_members_first_names: ["name"], can_complete_shopping?: false,
                                  enroll_step: 2, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10), consumer_role: nil, census_employee: census_employee,
-                                 employee_role: employee_role, status_step: 2, applied_aptc_amount: 23.00, aasm_state: 'coverage_selected')}
+                                 employee_role: employee_role,  applied_aptc_amount: 23.00, aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => false)}
 
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
@@ -190,7 +192,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected')}
+                                  aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => false)}
    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
@@ -236,7 +238,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
                                  enroll_step: 1, subscriber: nil, coverage_terminated?: false,
                                  may_terminate_coverage?: true, effective_on: Date.new(2015,8,10),
                                  consumer_role: double, applied_aptc_amount: 100, employee_role: employee_role, census_employee: census_employee,
-                                 status_step: 2, aasm_state: 'coverage_selected')}
+                                  aasm_state: 'coverage_selected', :is_ivl_actively_outstanding? => true)}
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
 
     before :each do
