@@ -59,8 +59,16 @@ PLAN_TRANSLATIONS = {
   'en.plans.thd_hours' => 'Monday through Friday, from 8 a.m. to 5 p.m., excluding holidays',
 
 
-  'en.plans.thpp_phone' => '1-800-462-0224',
-  'en.plans.thpp_hours' => 'Monday - Thursday 8:00 am - 7:00pm; Friday 8:00 am - 5:00pm',
+  'en.plans.thpp_phone' => '800.462.0224',
+  'en.plans.thpp_ph' => 'Phone:',
+  'en.plans.thpp_hours' => 'Monday - Thursday 8:00am to 7:00pm; Friday 8:00am to 5:00pm',
+  'en.plans.thpp_time'  => 'Monday - Thursday 8:30am to 5:00pm; Friday 10:00am to 5:00pm',
+  'en.plans.thpp_nurseline' => '24-Hour Nurseline:',
+  'en.plans.thpp_nurseline_number' => '866.201.7919',
+  'en.plans.thpp_under' => 'under Tufts Health Premier',
+  'en.plans.thpp_bh' => 'Behavior Health/Substance Use Services:',
+  'en.plans.thpp_bh_tel' => 'tel:+18002089565',
+  'en.plans.thpp_bh_phone' => '800.208.9565',
 
   'en.plans.cf_phone' => '1-855-444-3119',
   'en.plans.cf_href_phone' => 'tel:+18554443119',

@@ -88,13 +88,19 @@
                 <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thd_hours")%><br/>
               </div>
 
-            <% when "Tufts Health Plan Premier" %>
+            <% when "Tufts Health Premier" %>
               <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <a href=<%=l10n("plans.thd_href_phone")%> ><%=l10n("plans.thpp_phone")%></a> <br>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thpp_hours")%><br>
-                <strong><%=l10n("plans.email")%></strong><br/>
+                <strong><%=l10n("plans.thpp_ph")%></strong>
+                <a href=<%=l10n("plans.thd_href_phone")%> > <%=l10n("plans.thpp_phone")%></a> <br>
+                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br>
+                <strong><%=l10n("plans.hours")%> </strong> <%=l10n("plans.thpp_hours")%><br>
+                <strong><%=l10n("plans.email")%> </strong> <%= link_to "https://tuftshealthplan.com/contact-us/members", "https://tuftshealthplan.com/contact-us/members", target: "_blank"%> <%=l10n("plans.thpp_under")%><br/>
+                <strong><%=l10n("plans.thpp_bh")%> </strong>
+                <a href=<%=l10n("plans.thpp_bh_tel")%> > <%=l10n("plans.thpp_bh_phone")%></a> <br>
+                <%=l10n("plans.thpp_time")%> <br>
+                <strong><%=l10n("plans.thpp_nurseline")%> </strong><%=l10n("plans.thpp_nurseline_number")%><br>
               </div>
+
             <% when "CareFirst" %>
               <div>
                 <%=l10n("plans.call")%>
