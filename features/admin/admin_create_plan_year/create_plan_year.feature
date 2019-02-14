@@ -7,8 +7,7 @@ Feature: Super Admin & tier3 able to see & access "Create Plan Year" Feature.
     When Hbx Admin navigate to main page
     And Hbx Admin clicks on Employers link
     And the Hbx Admin clicks on the Action button
-    And Hbx Admin should see an Create Plan Year button
-
+    
   Scenario: HBX Staff with Super Admin sub roles should see Create Plan Year button
     Then Hbx Admin should see an Create Plan Year button
 

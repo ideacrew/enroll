@@ -8,7 +8,7 @@ Feature: As a Super Admin & tier3 I will be the only user
     And Hbx Admin navigate to main page
     And Hbx Admin clicks on Employers link
     When the Hbx Admin clicks on the Action button
-    And Hbx Admin should <action> an Create Plan Year button
+    Then Hbx Admin should <action> an Create Plan Year button
 
     Examples:
     | subrole      				  | action  |
