@@ -179,7 +179,7 @@ CSV.open("audit_ivl_determinations.csv", "w") do |csv|
                   pers.full_name,
                   pers.dob,
                   pers.gender,
-                  pers.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                  pers.updated_at.strftime("%Y-%m-%d %H:%M:%S.%L"),
                   (pers_record.id == fam.primary_applicant.person_id),
                   relationship_for(pers_record, fam),
                   lpd.citizen_status,
