@@ -63,6 +63,8 @@ module Services
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "-01"
+        elsif @hbx_enrollment.household.tax_households.tax_household_with_year(enrollment_year).active_tax_household.first.tax_household_members.flatten.select{|mem| mem.is_ia_eligible=="false"}.present?
+          return "-01"
         else
           case active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
           when "100"
@@ -80,6 +82,7 @@ module Services
           end
         end
       end
+
 
       def aptc_value
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
