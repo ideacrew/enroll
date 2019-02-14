@@ -2,13 +2,13 @@ module ModelEvents
   module Document
 
     REGISTERED_EVENTS = [
-      # :initial_employer_invoice_available
+      :employer_invoice_available
     ]
 
     def notify_on_save
-      # if subject == 'initial_invoice' && identifier.present?
-      #   is_initial_employer_invoice_available = true
-      # end
+      if subject == 'invoice' && identifier.present? && documentable.invoices.size > 1
+        is_employer_invoice_available = true
+      end
 
       REGISTERED_EVENTS.each do |event|
         if event_fired = instance_eval("is_" + event.to_s)
