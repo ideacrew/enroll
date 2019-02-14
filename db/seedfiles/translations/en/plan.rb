@@ -51,12 +51,7 @@ PLAN_TRANSLATIONS = {
 
 
   'en.plans.uh_phone' => '1-888-842-4571',
-  # 'en.plans.uh_href' => 'tel:',
-  # 'en.plans.uh_href_phone' => 'tel:+18888424571',
   'en.plans.uh_hours' => '7 AM to 6 PM CST',
-  # 'en.plans.uhc_phone' => '1-877-856-2430',
-  # 'en.plans.uhc_href_phone' => 'tel:+18778562430',
-
 
   'en.plans.thd_phone' => '888-257-1985',
   'en.plans.thd_href_phone' => 'tel:+18004620224',
