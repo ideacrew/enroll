@@ -998,7 +998,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
       end
     end
 
-  describe 'set_lowest_and_highest', dbclean: :after_each do
+    describe 'set_lowest_and_highest', dbclean: :after_each do
       let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
       let(:organization)            { employer_profile.organization }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
@@ -1018,6 +1018,5 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
         expect(benefit_group.set_lowest_and_highest(elected_plan_set).present?).to eq true
       end
     end
-
   end
 end
