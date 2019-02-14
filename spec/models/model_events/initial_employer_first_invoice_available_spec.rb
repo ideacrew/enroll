@@ -9,15 +9,6 @@ RSpec.describe 'ModelEvents::InitialEmployerInvoiceAvailable', dbclean: :after_e
   let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
   let(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, aasm_state: 'enrolled') }
 
-
-  describe "ModelEvent" do
-    subject { EmployerInvoice.new(organization)}
-      it "should trigger model event" do
-        expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer_profile, event_object: plan_year, notice_event: notice_event, notice_params: {}).and_return(true)
-        subject.send_first_invoice_available_notice
-      end
-  end
-
   describe "NoticeTrigger" do
     context "when initial invoice is generated" do
       subject { Observers::NoticeObserver.new }
