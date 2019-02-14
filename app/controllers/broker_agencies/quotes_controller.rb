@@ -26,6 +26,7 @@ class BrokerAgencies::QuotesController < ApplicationController
   # displays index page of quotes
   def my_quotes
     @all_quotes = Quote.where("broker_role_id" => @broker.id)
+    @broker_agency_profile_id = @broker.broker_agency_profile.id
     Effective::Datatables::QuoteDatatable.broker_role_id = @broker.id
     @datatable = Effective::Datatables::QuoteDatatable.new
     respond_to do |format|
@@ -93,6 +94,7 @@ class BrokerAgencies::QuotesController < ApplicationController
     #find quote to edit
     @quote = Quote.find(params[:id])
     broker_role_id = @quote.broker_role.id
+    @broker_agency_profile_id = @quote.broker_role.broker_agency_profile_id
     @orgs = Organization.by_broker_role(broker_role_id)
     @employer_profiles =  @orgs.blank? ? [] : @orgs.map {|o| o.employer_profile}.collect{|e| [e.legal_name, e.id]}
     max_family_id = @quote.quote_households.max(:family_id).to_i

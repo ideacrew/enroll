@@ -38,21 +38,27 @@ $(function() {
 $(document).on('click', '.broker-agency-search a.search', function() {
   $('.broker-agency-search .result').empty();
   var broker_agency_search = $('input#agency_search').val();
+    document.getElementById('broker-staff-btn').disabled = true;
   if (broker_agency_search != undefined && broker_agency_search != ""){
     $(this).button('loading');
     $('#person_broker_agency_id').val("");
     $.ajax({
       url: '/broker_agencies/broker_roles/search_broker_agency.js',
       type: "GET",
-      data : { 'broker_agency_search': broker_agency_search }
+      data : { 'q': broker_agency_search, 'is_staff_registration': true }
     });
   };
 });
 
 $(document).on('click', "a.select-broker-agency", function() {
-  $('.result .form-border').removeClass("agency-selected");
-  $('#person_broker_agency_id').val($(this).data('broker_agency_profile_id'));
-  $(this).parents(".form-border").addClass("agency-selected");
+    $('.result').each(function() {
+        $('.select-broker').each(function() {
+            $( this ).removeClass( "agency-selected" );
+        })
+    });
+    $('#person_broker_agency_id').val($(this).data('broker_agency_profile_id'));
+    $(this).parents(".select-broker").addClass("agency-selected");
+    document.getElementById('broker-staff-btn').disabled = false;
 });
 
 $(document).on('click', '.general-agency-search a.search', function() {

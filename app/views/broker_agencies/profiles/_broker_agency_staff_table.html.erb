@@ -1,0 +1,42 @@
+<h3> Broker Agency Staff</h3>
+
+<% if broker_staff %>
+  <div class="table-border">
+    <table class="table">
+      <thead>
+      <th><%= l10n("first_name")%></th>
+      <th><%= l10n("last_name")%></th>
+      <th><%= l10n("email")%></th>
+      <th><%= l10n("phone")%></th>
+      <th><%= l10n("status")%></th>
+      <th><%= l10n("remove_role")%></th>
+      </thead>
+      <% broker_staff.each do |staff| %>
+        <tbody>
+        <td><%= staff.first_name.capitalize %></td>
+        <td><%= staff.last_name.capitalize %></td>
+        <td><%= staff.work_email_or_best %></td>
+        <td><%= staff.work_phone %></td>
+        <td>
+          <%= staff.has_pending_broker_staff_role?(@broker_agency_profile.id) ? "Pending" : "Active"%>
+          <%= staff.user_id ? ' Linked  ' : ' Unlinked  ' %>
+          <% if staff.has_pending_broker_staff_role?(@broker_agency_profile.id) %>
+            <%=  link_to(approve_broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id)) do %>
+              approve
+            <% end %>
+          <% end %>
+        </td>
+
+        <td>
+          <%=  link_to(broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id, staff_id: staff.id), hidden: can_show_destroy?(current_user, staff) , method: 'delete', data: {confirm: 'Delete this role?'}) do %>
+            <i class="fa fa-trash-o fa-2x role-trashcan"></i>
+          <% end %>
+        </td>
+
+        </tbody>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
+<%= link_to 'Add Broker Staff Role', new_broker_agencies_broker_agency_staff_role_path(id:@broker_agency_profile.id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>

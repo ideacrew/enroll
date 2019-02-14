@@ -14,6 +14,8 @@ class BrokerAgencyStaffRole
 
   validates_presence_of :broker_agency_profile_id
 
+  scope :active, ->{where(aasm_state: 'active')}
+
   accepts_nested_attributes_for :person, :workflow_state_transitions
 
   # after_initialize :initial_transition
@@ -34,15 +36,23 @@ class BrokerAgencyStaffRole
 
     event :broker_agency_terminate, :after => :record_transition do 
       transitions from: :active, to: :broker_agency_terminated
+      transitions from: :broker_agency_pending, to: :broker_agency_terminated
+    end
+
+    event :broker_agency_active, :after => :record_transition do
+      transitions from: :broker_agency_terminated, to: :active
+    end
+
+    event :broker_agency_pending, :after => :record_transition do
+      transitions from: :broker_agency_terminated, to: :broker_agency_pending
     end
   end
 
   def send_invitation
     # TODO broker agency staff is not actively supported right now
     # Also this method call sends an employee invitation, which is bug 8028
-    # Invitation.invite_broker_agency_staff!(self)
+     Invitation.invite_broker_agency_staff!(self)
   end
-
   def current_state
     aasm_state.humanize.titleize
   end
@@ -62,7 +72,23 @@ class BrokerAgencyStaffRole
   end
 
   def agency_pending?
-    false
+    aasm_state == "broker_agency_pending"
+  end
+
+  def agency_terminated?
+    aasm_state == "broker_agency_terminated"
+  end
+
+  def approve
+    self.broker_agency_accept!
+  end
+
+  def is_open?
+    self.agency_pending? || self.is_active?
+  end
+
+  def is_active?
+    aasm_state == "active"
   end
 
   ## Class methods

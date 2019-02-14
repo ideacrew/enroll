@@ -63,4 +63,41 @@ describe "shared/_my_portal_links.html.haml" do
     end
   end
 
+  context 'with broker staff role' do
+    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker_agency_staff']) }
+    let!(:person) { FactoryGirl.create(:person, :with_broker_role)}
+    let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', person: person)}
+
+
+    before :each do
+      sign_in(user)
+      allow(user).to receive(:person).and_return(person)
+      render 'shared/my_portal_links'
+    end
+
+    it 'should have broker portal link' do
+      expect(rendered).to have_content('My Broker Agency Portal')
+    end
+
+  end
+
+  context 'with broker staff role and Consumer role' do
+    let(:user) { FactoryGirl.create(:user, person: person, identity_verified_date: TimeKeeper.date_of_record, roles: ['broker_agency_staff', 'consumer']) }
+    let!(:person) { FactoryGirl.create(:person, :with_broker_role, :with_consumer_role)}
+    let!(:broker_agency_staff_role) { FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', person: person)}
+
+    before :each do
+      sign_in(user)
+      allow(user).to receive(:person).and_return(person)
+      render 'shared/my_portal_links'
+    end
+
+    it 'should have portal links and dropdown' do
+      expect(rendered).to have_selector('.dropdown-menu')
+      expect(rendered).to have_content('My Insured Portal')
+      expect(rendered).to have_content("#{broker_agency_staff_role.broker_agency_profile.legal_name}")
+    end
+
+  end
+
 end
