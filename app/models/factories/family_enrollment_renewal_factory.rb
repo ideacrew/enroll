@@ -1,6 +1,7 @@
 module Factories
   class FamilyEnrollmentRenewalFactory
     include Mongoid::Document
+    include ApplicationHelper
 
     attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :disable_notifications, :active_plan_year, :coverage_kind, :is_congressional_employer
 
@@ -113,7 +114,7 @@ module Factories
       if !disable_notifications && coverage_kind == 'health'
         notice_name = yield
         begin
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, "acapi_trigger" => true)# unless Rails.env.test?
+          trigger_notice_observer(census_employee.employee_role, renewing_plan_year, yield)
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
