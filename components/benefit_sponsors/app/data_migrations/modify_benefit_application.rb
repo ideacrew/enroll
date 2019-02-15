@@ -118,10 +118,10 @@ class ModifyBenefitApplication< MongoidMigrationTask
       service.terminate(end_on, termination_date)
       trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
     end
-    revert_benefit_sponsorhip(benefit_applications.first.benefit_sponsorship) if off_cycle_renewal && (off_cycle_renewal.to_s.downcase == "true")
+    revert_benefit_sponsorhip_to_applicant(benefit_applications.first.benefit_sponsorship) if off_cycle_renewal && (off_cycle_renewal.to_s.downcase == "true")
   end
 
-  def revert_benefit_sponsorhip(benefit_sponsorship)
+  def revert_benefit_sponsorhip_to_applicant(benefit_sponsorship)
     from_state = benefit_sponsorship.aasm_state
     benefit_sponsorship.update_attributes!(aasm_state: :applicant)
     benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(

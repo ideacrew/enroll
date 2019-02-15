@@ -175,7 +175,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect(benefit_application.aasm_state).to eq :terminated
       end
 
-      it "should terminate the benefit application" do
+      it "should transition benefit sponsorship to applicant" do
         benefit_sponsorship.reload
         expect(benefit_sponsorship.aasm_state).to eq :applicant
       end
