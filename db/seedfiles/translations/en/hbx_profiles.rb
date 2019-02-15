@@ -19,5 +19,8 @@ HBX_PROFILES_TRANSLATIONS = {
 	'en.hbx_profiles.oe_start_date' => 'Open Enrollment Start Date',
 	'en.hbx_profiles.provide_fte_count' => 'Please provide full time employees count.',
 	'en.hbx_profiles.provide_oe_start_date' => 'Please provide Open Enrollment Start On date.',
-	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.'
+	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.',
+	"en.hbx_profiles.change_fein" => "Change FEIN",
+	"en.hbx_profiles.new_fein" => "New FEIN",
+	"en.hbx_profiles.update_fein_success" => "FEIN Update Successful"
 }

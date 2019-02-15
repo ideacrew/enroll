@@ -69,6 +69,7 @@ module Effective
            ['Transmit XML', "#", "disabled"],
            ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
            ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
+           ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
            ['Force Publish', force_publish_exchanges_hbx_profiles_path(ids: [row]), *force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
           ]
 
@@ -83,7 +84,6 @@ module Effective
           if employer_attestation_is_enabled?
             dropdown.insert(2,['Attestation', main_app.edit_employers_employer_attestation_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
-
           if row.oe_extendable_benefit_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
             dropdown.insert(3,['Extend Open Enrollment', main_app.oe_extendable_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
