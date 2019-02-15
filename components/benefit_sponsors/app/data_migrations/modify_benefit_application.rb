@@ -118,7 +118,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
       service.terminate(end_on, termination_date)
       trigger_advance_termination_request_notice(benefit_application) if benefit_application.terminated? && (termination_notice == "true")
     end
-    revert_benefit_sponsorhip_to_applicant(benefit_applications.first.benefit_sponsorship) if off_cycle_renewal && (off_cycle_renewal.to_s.downcase == "true")
+    revert_benefit_sponsorhip_to_applicant(benefit_applications.first.benefit_sponsorship) if benefit_applications.present? && off_cycle_renewal && (off_cycle_renewal.to_s.downcase == "true")
   end
 
   def revert_benefit_sponsorhip_to_applicant(benefit_sponsorship)
