@@ -64,6 +64,11 @@ module PermissionsWorld
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
   end
 
+  def hbx_admin_can_create_benefit_application
+    Permission.super_admin.update_attributes(can_create_benefit_application: true)
+    Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
+  end
+
   def make_all_permissions
     define_permissions
     hbx_admin_can_update_ssn
@@ -74,6 +79,7 @@ module PermissionsWorld
     hbx_admin_can_reset_password
     hbx_admin_can_force_publish
     hbx_admin_can_extend_open_enrollment
+    hbx_admin_can_create_benefit_application
   end
 end
 
