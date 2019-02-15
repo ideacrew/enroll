@@ -1,8 +1,13 @@
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
-USER_ROLES = [:with_hbx_staff_role, :without_hbx_staff_role]
+
+module UserRoles
+  USER_ROLES = [:with_hbx_staff_role, :with_broker_role] unless const_defined?(:USER_ROLES)
+end
 
 module SponsoredBenefits
+  include UserRoles
+
   RSpec.describe Organizations::PlanDesignProposals::PlanComparisonsController, type: :controller, dbclean: :after_each  do
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
