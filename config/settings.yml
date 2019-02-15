@@ -54,6 +54,8 @@ aca:
   plan_options_available: ["single_plan", "single_carrier", "metal_level"]
   dental_plan_options_available: ["single_carrier", "custom"]
   offerings_constrained_to_service_areas: false
+  rating_areas:
+    - nil
 #
   qle:
     with_in_sixty_days: 60
