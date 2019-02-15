@@ -13,7 +13,7 @@ Then(/^Hbx Admin Tier 3 should see the list of primary applicants and an Action 
 end
 
 When(/^Hbx Admin Tier 3 clicks on the Action button$/) do
-  find(:xpath, "//*[@id='dropdownMenu1']", :wait => 10).trigger("click")
+  find_button('Actions').trigger("click")
 end
 
 Then(/^Hbx Admin Tier 3 should see an edit user link$/) do

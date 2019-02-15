@@ -401,6 +401,10 @@ class Plan
     (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
   end
 
+  def plan_deductible
+    deductible_integer
+  end
+
   def hsa_plan?
     name = self.name
     regex = name.match("HSA")
@@ -409,6 +413,12 @@ class Plan
     else
       return false
     end
+  end
+
+  def plan_hsa
+    name = self.name
+    regex = name.match("HSA")
+    regex.present? ? 'Yes': 'No'
   end
 
   def renewal_plan_type
@@ -430,6 +440,21 @@ class Plan
   end
 
   class << self
+
+    def has_rates_for_all_carriers?(start_on_date = nil)
+      date = start_on_date || PlanYear.calculate_start_on_dates[0]
+      return false if date.blank?
+
+      Rails.cache.fetch("#{date.to_s}", expires_in: 2.days) do
+        Plan.collection.aggregate([
+                                      {"$match" => {"active_year" => date.year}},
+                                      {"$match" => {"coverage_kind" => "health"}},
+                                      {"$unwind" => '$premium_tables'},
+                                      {"$match" => {"premium_tables.start_on" => {"$lte" => date}}},
+                                      {"$match" => {"premium_tables.end_on" => {"$gte" => date}}},
+                                  ], :allow_disk_use => true).to_a.present?
+      end
+    end
 
     def monthly_premium(plan_year, hios_id, insured_age, coverage_begin_date)
       result = []
@@ -488,6 +513,28 @@ class Plan
       else
         shop_dental_plans year
       end
+    end
+
+    def search_options(plans)
+      options ={
+          'plan_type': [],
+          'plan_hsa': [],
+          'metal_level': [],
+          'plan_deductible': []
+      }
+      options.each do |option, value|
+        collected = plans.collect { |plan|
+          if option == :metal_level
+            MetalLevel.new(plan.send(option))
+          else
+            plan.send(option)
+          end
+        }.uniq.sort
+        unless collected.none?
+          options[option] = collected
+        end
+      end
+      options
     end
 
     def shop_health_plans year
@@ -551,5 +598,43 @@ class Plan
       }
       feature_array
     end
+  end
+end
+
+class MetalLevel
+  include Comparable
+  attr_reader :name
+  METAL_LEVEL_ORDER = %w(BRONZE SILVER GOLD PLATINUM)
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    @name
+  end
+
+  def <=>(metal_level)
+    metal_level = safe_assign(metal_level)
+    my_level = self.name.upcase
+    compared_level = metal_level.name.upcase
+    METAL_LEVEL_ORDER.index(my_level) <=> METAL_LEVEL_ORDER.index(compared_level)
+  end
+
+  def eql?(metal_level)
+    metal_level = safe_assign(metal_level)
+    METAL_LEVEL_ORDER.index(self.name) ==  METAL_LEVEL_ORDER.index(metal_level.name)
+  end
+
+  def hash
+    @name.hash
+  end
+
+  private
+
+  def safe_assign(metal_level)
+    if metal_level.is_a? String
+      metal_level = MetalLevel.new(metal_level)
+    end
+    metal_level
   end
 end
