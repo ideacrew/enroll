@@ -66,6 +66,7 @@ describe HbxProfilePolicy do
     end
   end
 end
+
 describe HbxProfilePolicy do
   let(:person){FactoryGirl.create(:person, user: user)}
   let(:user){FactoryGirl.create(:user)}
@@ -119,6 +120,37 @@ describe HbxProfilePolicy do
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
     end
+  end
+end
 
+describe HbxProfilePolicy do
+  context '.can_create_benefit_application?' do
+    let!(:user10)                  { FactoryGirl.create(:user) }
+    let!(:person)                  { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
+
+    subject                        { HbxProfilePolicy.new(user10, nil) }
+
+
+    (Permission::PERMISSION_KINDS - ['super_admin', 'hbx_tier3']).each do |kind|
+      context "for permissions which doesn't allow the user" do
+        let(:bad_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return false' do
+          person.hbx_staff_role.update_attributes!(permission_id: bad_permission.id)
+          expect(subject.can_create_benefit_application?).to eq false
+        end
+      end
+    end
+
+    ['super_admin', 'hbx_tier3'].each do |kind|
+      context "for permissions which doesn't allow the user" do
+        let(:good_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+        it 'should return true' do
+          person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+          expect(subject.can_create_benefit_application?).to eq true
+        end
+      end
+    end
   end
 end

@@ -19,6 +19,7 @@ module BenefitSponsors
       attribute :id, String
       attribute :benefit_sponsorship_id, String
       attribute :start_on_options, Hash
+      attribute :admin_datatable_action, Boolean, default: false
 
       validates :start_on, presence: true
       validates :end_on, presence: true
@@ -27,6 +28,7 @@ module BenefitSponsors
 
       validates_presence_of :fte_count, :pte_count, :msp_count, :benefit_sponsorship_id
 
+      validate :validate_oe_dates
       # validates :validate_application_dates
       attr_reader :service, :show_page_model
 
@@ -35,8 +37,8 @@ module BenefitSponsors
         @service = BenefitSponsors::Services::BenefitApplicationService.new
       end
 
-      def self.for_new(benefit_sponsorship_id)
-        form = self.new(:benefit_sponsorship_id => benefit_sponsorship_id)
+      def self.for_new(params)
+        form = self.new(params)
         form.service.load_default_form_params(form)
         form.service.load_form_metadata(form)
         form
@@ -114,6 +116,12 @@ module BenefitSponsors
       def update_attributes(params)
         self.attributes = params
         persist(update: true)
+      end
+
+      def validate_oe_dates
+        if admin_datatable_action && open_enrollment_end_on <= open_enrollment_start_on
+          errors.add(:base, "Open Enrollment Start Date can't be later than the Open Enrollment End Date")
+        end
       end
 
       def validate_application_dates
