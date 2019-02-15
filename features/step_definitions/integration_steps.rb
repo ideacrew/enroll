@@ -989,3 +989,6 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   employer_profile = FactoryGirl.create :employer_profile, organization: org2
 end
 
+Given /^PENDING/ do
+  pending
+end
