@@ -53,6 +53,7 @@ FactoryGirl.define do
     end
 
     trait :hbx_tier3 do
+      can_create_plan_year true
       can_view_username_and_email true
       can_lock_unlock true
       can_reset_password true
@@ -103,6 +104,7 @@ FactoryGirl.define do
     end
 
     trait :super_admin do
+      can_create_plan_year true
       can_complete_resident_application true
       can_add_sep true
       can_access_new_consumer_application_sub_tab true

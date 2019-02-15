@@ -19,6 +19,7 @@ class PlanYear
   OPEN_ENROLLMENT_STATE   = %w(enrolling enrollment_extended renewing_enrolling renewing_enrollment_extended)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrollment_extended enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrollment_extended enrolled) 
+  ACTIVE_STATES_PER_DT    = %w(publish_pending enrolling enrollment_closed enrolled application_ineligible active)
 
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
@@ -74,6 +75,9 @@ class PlanYear
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
+
+  scope :draft, -> { where(aasm_state: 'draft') }
+  scope :active_states_per_dt, -> { any_in(aasm_state: ACTIVE_STATES_PER_DT)}
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
   scope :published_or_renewing_published_or_terminated, -> { any_in(aasm_state: PUBLISHED + RENEWING_PUBLISHED_STATE + TERMINATED_STATE) }

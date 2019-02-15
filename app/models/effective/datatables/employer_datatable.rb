@@ -61,7 +61,8 @@ module Effective
            ['Change FEIN',  edit_fein_exchanges_hbx_profiles_path(id: row, row_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_change_fein?) ? 'ajax' : 'hide'],
            ['Extend Open Enrollment', oe_extendable_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), extend_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))],
            ['Close Open Enrollment', oe_extended_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), close_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))],
-           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{row.id.to_s}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
+           ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{row.id.to_s}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))],
+            ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false

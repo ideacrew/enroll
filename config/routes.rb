@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
   end
-  
+
   resources :users do
     member do
       get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
@@ -120,7 +120,8 @@ Rails.application.routes.draw do
         get :edit_open_enrollment
         post :extend_open_enrollment
         post :close_extended_open_enrollment
-
+        get :new_plan_year
+        post :create_plan_year
       end
 
       member do
