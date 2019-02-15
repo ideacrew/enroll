@@ -31,10 +31,10 @@ describe FamilyPolicy, "given a family with an active broker agency account" do
   let(:broker_person_id) { double }
   let(:broker_agency_profile_id) { double }
   let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => broker_agency_account) }
-  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => []) }
+  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [], :active_broker_staff_roles => [broker_agency_staff_role]) }
   let(:user) { instance_double(User, :person => broker_person) }
-  let(:broker_role) { instance_double(BrokerRole, :broker_agency_profile_id => broker_agency_profile_id) }
-  let(:broker_person) { instance_double(Person, :id => broker_person_id, :broker_role => broker_role, :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :broker_agency_profile_id => broker_agency_profile_id) }
+  let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
   let(:broker_agency_account) { instance_double(BrokerAgencyAccount, :broker_agency_profile_id => broker_agency_profile_id_account) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
 
@@ -64,10 +64,10 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => nil) }
   let(:employer_profile) { instance_double(EmployerProfile, :active_broker_agency_account => broker_agency_account) }
   let(:employee_role) { instance_double(EmployeeRole, :employer_profile => employer_profile) }
-  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role]) }
+  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role], :active_broker_staff_roles => [broker_agency_staff_role]) }
   let(:user) { instance_double(User, :person => broker_person) }
-  let(:broker_role) { instance_double(BrokerRole, :broker_agency_profile_id => broker_agency_profile_id) }
-  let(:broker_person) { instance_double(Person, :id => broker_person_id, :broker_role => broker_role, :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :broker_agency_profile_id => broker_agency_profile_id) }
+  let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
   let(:broker_agency_account) { instance_double(BrokerAgencyAccount, :broker_agency_profile_id => broker_agency_profile_id_account) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
 
@@ -97,9 +97,10 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
   let(:family) { instance_double(Family, :primary_applicant => primary_member, :active_broker_agency_account => nil) }
   let(:employer_profile) { instance_double(EmployerProfile, :active_broker_agency_account => nil, :active_general_agency_account => general_agency_account) }
   let(:employee_role) { instance_double(EmployeeRole, :employer_profile => employer_profile) }
-  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role]) }
+  let(:person) { instance_double(Person, :id => primary_person_id, :active_employee_roles => [employee_role], :active_broker_staff_roles => [broker_agency_staff_role]) }
+  let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :broker_agency_profile_id => '1234') }
   let(:user) { instance_double(User, :person => ga_person) }
-  let(:ga_person) { instance_double(Person, :id => ga_person_id, :broker_role => nil, :active_general_agency_staff_roles => [general_agency_staff_role], :hbx_staff_role => nil) }
+  let(:ga_person) { instance_double(Person, :id => ga_person_id, :broker_role => nil, :active_general_agency_staff_roles => [general_agency_staff_role], :active_broker_staff_roles => [broker_agency_staff_role], :hbx_staff_role => nil) }
   let(:general_agency_staff_role) { instance_double(GeneralAgencyStaffRole, :general_agency_profile_id => general_agency_profile_id) }
   let(:general_agency_account) { instance_double(GeneralAgencyAccount, :general_agency_profile_id => general_agency_account_profile_id ) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id, :person => person) }
