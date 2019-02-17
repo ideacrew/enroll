@@ -3,12 +3,15 @@ module Notifier
 
     include ActionView::Helpers::NumberHelper
     include Notifier::ApplicationHelper
+    include Config::ContactCenterHelper
+    include Config::SiteHelper
+    #include Notifier::Builders::Dependent
 
     attr_accessor :consumer_role, :merge_model, :payload, :event_name, :sep_id
 
     def initialize
       data_object = Notifier::MergeDataModels::ConsumerRole.new
-      data_object.address = Notifier::MergeDataModels::IvlAddress.new
+      data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.dependents = Notifier::MergeDataModels::Dependent.new
       @merge_model = data_object
     end
@@ -29,6 +32,14 @@ module Notifier
       merge_model.last_name = consumer_role.person.last_name if consumer_role.present?
     end
 
+    def aptc
+      merge_model.aptc = payload["notice_params"]["primary_member"]["aptc"] if payload["notice_params"]["primary_member"]["aptc"].present?
+    end
+
+    def age
+      Date.current.year - Date.parse(payload["notice_params"]["primary_member"]["dob"]).year
+    end
+
     def person
       consumer_role.person
     end
@@ -36,7 +47,7 @@ module Notifier
     def append_contact_details
       mailing_address = consumer_role.person.mailing_address
       if mailing_address.present?
-        merge_model.address = MergeDataModels::IvlAddress.new({
+        merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: mailing_address.address_1,
           street_2: mailing_address.address_2,
           city: mailing_address.city,
@@ -47,11 +58,21 @@ module Notifier
     end
 
     def dependents
-      family = consumer_role.person.primary_family
-      family.active_family_members.each do |member|
+      payload["notice_params"]["dependents"].each do |member|
         merge_model.dependents << MergeDataModels::Dependent.new({
-          first_name: member.first_name,
-          last_name: member.last_name
+          first_name: member["first_name"],
+          last_name: member["last_name"],
+          age: Date.current.year - Date.parse(member["dob"]).year,
+          federal_tax_filing_status: member["federal_tax_filing_status"],
+          expected_income_for_coverage_year: member["expected_income_for_coverage_year"],
+          citizenship: member["citizenship"],
+          dc_resident: member["dc_resident"],
+          tax_household_size: member["tax_household_size"],
+          incarcerated: member["incarcerated"],
+          mec: member["mec"],
+          actual_income: member["actual_income"],
+          aptc: member["aptc"],
+          uqhp_eligible: member["uqhp_eligible"].upcase == "YES"
         })
       end
     end
@@ -69,11 +90,7 @@ module Notifier
     end
 
     def coverage_year
-      year = if self.is_shop?
-                benefit_group.plan_year.start_on.year
-              else
-                plan.try(:active_year) || effective_on.year
-              end
+      TimeKeeper.date_of_record.next_year.year
     end
 
     def previous_coverage_year
@@ -84,15 +101,27 @@ module Notifier
       merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
     end
 
-    def aqhp
-      person.is_aqhp?
+    # def aqhp_eligible?
+    #    payload["notice_params"]["primary_member"]["aqhp_eligible"].upcase == "YES"
+    # end
+
+    # def irs_consent?
+    #   payload["notice_params"]["primary_member"]["irs_consent"].upcase == "YES"
+    # end
+
+    # def aqhp_needed_and_irs_consent_not_needed?
+    #   aqhp? && !irs_consent?
+    # end
+
+    def has_dependent
+      notice_params[:has_dependent].upcase == "YES"
     end
 
-    def irs_consent
-      notice_params[:irs_consent].upcase == "YES"
-    end
+    # def uqhp_eligible?
+    #   payload["notice_params"]["primary_member"]["uqhp_eligible"].upcase == "NO"
+    # end
 
-    def shop?
+    def is_shop?
       false
     end
      # Using same merge model for special enrollment period and qualifying life event kind

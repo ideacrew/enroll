@@ -250,7 +250,7 @@ module Notifier
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole) || resource.is_a?(ConsumerRole))
 
       if self.event_name == 'generate_initial_employer_invoice'
         body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
