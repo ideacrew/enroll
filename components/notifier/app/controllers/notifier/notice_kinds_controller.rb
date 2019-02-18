@@ -48,7 +48,6 @@ module Notifier
     def update
       notice_kind = Notifier::NoticeKind.find(params['id'])
       notice_kind.update_attributes(notice_params)
-
       flash[:notice] = 'Notice content updated successfully'
       redirect_to notice_kinds_path
     end
@@ -138,7 +137,7 @@ module Notifier
     end
 
     def notice_params
-      params.require(:notice_kind).permit(:title, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+      params.require(:notice_kind).permit(:title, :market_kind, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
     end
   end
 end
