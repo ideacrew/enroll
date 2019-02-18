@@ -8,6 +8,9 @@ module Effective
           # bulk_action 'Download', notifier.download_notices_notice_kinds_path, target: '_blank'
         end
 
+        table_column :market_kind, :proc => Proc.new { |row|
+          row.market_kind.to_s.titleize
+        }, :filter => false, :sortable => true
         table_column :mpi_indicator, :proc => Proc.new { |row|
           prepend_glyph_to_text(row)
         }, :filter => false, :sortable => false
