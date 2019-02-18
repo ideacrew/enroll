@@ -33,11 +33,11 @@ module Notifier
     end
 
     def aptc
-      merge_model.aptc = payload["notice_params"]["primary_member"]["aptc"] if payload["notice_params"]["primary_member"]["aptc"].present?
+      merge_model.aptc = payload['notice_params']['primary_member']['aptc'] if payload['notice_params']['primary_member']['aptc'].present?
     end
 
     def age
-      Date.current.year - Date.parse(payload["notice_params"]["primary_member"]["dob"]).year
+      Date.current.year - Date.parse(payload['notice_params']['primary_member']['dob']).year
     end
 
     def person
@@ -77,6 +77,10 @@ module Notifier
       end
     end
 
+    def dependent_first_name
+      "sdsf"
+    end
+
     def ivl_oe_start_date
       merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on
     end
@@ -85,9 +89,9 @@ module Notifier
       merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on
     end
 
-    def email
-      merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
-    end
+    # def email
+    #   merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
+    # end
 
     def coverage_year
       TimeKeeper.date_of_record.next_year.year
@@ -97,33 +101,38 @@ module Notifier
       coverage_year.to_i - 1
     end
 
-    def email
-      merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
+    def aqhp_needed
+      payload['notice_params']['primary_member']['aqhp_needed'].upcase == "YES"
     end
 
-    # def aqhp_eligible?
-    #    payload["notice_params"]["primary_member"]["aqhp_eligible"].upcase == "YES"
-    # end
-
-    # def irs_consent?
-    #   payload["notice_params"]["primary_member"]["irs_consent"].upcase == "YES"
-    # end
-
-    # def aqhp_needed_and_irs_consent_not_needed?
-    #   aqhp? && !irs_consent?
-    # end
-
-    def has_dependent
-      notice_params[:has_dependent].upcase == "YES"
+    def uqhp_eligible
+      payload['notice_params']['primary_member']['uqhp_eligible'].upcase == "YES"
     end
 
-    # def uqhp_eligible?
-    #   payload["notice_params"]["primary_member"]["uqhp_eligible"].upcase == "NO"
+    def incarcerated
+      payload['notice_params']['primary_member']['incarcerated'].upcase == "N"
+    end
+
+    def irs_consent
+      payload['notice_params']['primary_member']['irs_consent'].upcase == "YES"
+    end
+
+    def magi_medicaid
+      payload['notice_params']['primary_member']['magi_medicaid'].upcase == "YES"
+    end
+
+    # def aptc_amount_available
+    #   payload['notice_params']['primary_member']['aptc'].present?
     # end
 
-    def is_shop?
-      false
+    def csr
+      payload['notice_params']['primary_member']['csr'].upcase == "YES"
     end
+
+    def csr_percent
+      Integer(payload['notice_params']['primary_member']['csr_percent'])
+    end
+
      # Using same merge model for special enrollment period and qualifying life event kind
     def format_date(date)
       return '' if date.blank?

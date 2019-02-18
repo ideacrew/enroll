@@ -25,6 +25,13 @@ module Notifier
     attribute :actual_income, Float
     attribute :dependents, Array[MergeDataModels::Dependent]
     attribute :addresses, Array[MergeDataModels::Address]
+    attribute :aqhp_needed, Boolean
+    attribute :uqhp_eligible, Boolean
+    attribute :incarcerated, Boolean
+    attribute :irs_consent, Boolean
+    attribute :magi_medicaid, Boolean
+    attribute :csr, Boolean
+    attribute :csr_percent, Integer
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::ConsumerRole.new({
@@ -63,27 +70,32 @@ module Notifier
     end
 
     def conditions
-      %w[aqhp_eligible? uqhp_eligible? incarcerated? irs_consent? magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid? irs_consent_not_needed? aptc_amount_available? csr? aqhp_eligible_and_irs_consent_not_needed? csr_is_73? csr_is_87? csr_is_94? csr_is_100? csr_is_nil?]
+      %w[aqhp_needed? uqhp_eligible? incarcerated? irs_consent?
+        magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid?
+        irs_consent_not_needed? aptc_amount_available? csr?
+        aqhp_needed_and_irs_consent_not_needed? csr_is_73? csr_is_87?
+        csr_is_94? csr_is_100? csr_is_nil?
+      ]
     end
 
-    def aqhp_eligible?
-      payload["notice_params"]["primary_member"]["aqhp_eligible"].upcase == "YES"
+    def aqhp_needed?
+      aqhp_needed
     end
 
     def uqhp_eligible?
-      payload["notice_params"]["primary_member"]["uqhp_eligible"].upcase == "YES"
+      uqhp_eligible
     end
 
     def incarcerated?
-      payload["notice_params"]["primary_member"]["incarcerated"].upcase == "N"
+      incarcerated
     end
 
     def irs_consent?
-      payload["notice_params"]["primary_member"]["irs_consent"].upcase == "YES"
+      irs_consent
     end
 
     def magi_medicaid?
-      payload["notice_params"]["primary_member"]["magi_medicaid"].upcase == "YES"
+      magi_medicaid
     end
 
     def aqhp_or_non_magi_medicaid?
@@ -95,44 +107,44 @@ module Notifier
     end
 
     def irs_consent_not_needed?
-      payload["notice_params"]["primary_member"]["irs_consent"].upcase == "NO"
+      !irs_consent
     end
 
     def aptc_amount_available?
-      payload["notice_params"]["primary_member"]["aptc"].present?
+      aptc.present?
     end
 
     def csr?
-      payload["notice_params"]["primary_member"]["csr"].upcase == "YES"
+      csr
     end
 
-    def aqhp_eligible_and_irs_consent_not_needed?
-      aqhp_eligible? && !irs_consent?
+    def aqhp_needed_and_irs_consent_not_needed?
+      aqhp_needed? && !irs_consent?
     end
 
     def csr_is_73?
       false if csr?
-      Integer(payload["notice_params"]["primary_member"]["csr_percent"]) == 73
+      csr_percent == 73
     end
 
     def csr_is_87?
       false if csr?
-      Integer(payload["notice_params"]["primary_member"]["csr_percent"]) == 87
+      csr_percent == 87
     end
 
     def csr_is_94?
       false if csr?
-      Integer(payload["notice_params"]["primary_member"]["csr_percent"]) == 94
+      csr_percent == 94
     end
 
     def csr_is_100?
       false if csr?
-      Integer(payload["notice_params"]["primary_member"]["csr_percent"]) == 100
+      csr_percent == 100
     end
 
     def csr_is_nil?
       false if csr?
-      Integer(payload["notice_params"]["primary_member"]["csr_percent"]) == 0
+      csr_percent == 0
     end
   end
 end
