@@ -128,6 +128,16 @@ module Notifier
       end
     end
 
+    def get_recipients
+      market_kind = params['market_kind']
+      recipients = Notifier::Services::NoticeKindService.new(market_kind).recipients
+
+      respond_to do |format|
+        format.html
+        format.json { render json: {recipients: recipients} }
+      end
+    end
+
     private
 
     def check_hbx_staff_role

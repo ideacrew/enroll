@@ -51,26 +51,33 @@
   </div>
 <% end %>
 </div>
-<!-- <span>
-<%#= link_to preview_notice_kind_path(id: notice_kind.id), class: "btn btn-primary notice-preview", target: '_blank' do %>
-    <span class="glyphicon glyphicon-eye-open"></span> Preview
-<%# end %>
-</span> -->
-
-<!-- <a href="#" class="btn btn-primary notice-preview"><span class="glyphicon glyphicon-eye-open"></span> Preview</a>
- -->
-
-
-<!-- <div class='pdf_preview_container'>
-</div> -->
 
 <script>
 
+$(function() {
+
+$('#notice_kind_market_kind').change(function() {
+   $.ajax({
+    type:"GET",
+    url:"notice_kinds/get_recipients",
+    dataType:"json",
+    data: {market_kind: $('#notice_kind_market_kind').val()},
+    success:function(result){
+      var select = $('#notice_kind_recipient');
+      select.empty();
+
+      $.each( result.recipients, function( key, value ) {
+        select.append("<option value='" +value+ "'>" +key+ "</option>");
+      });
+    }
+  });
+});
+
 $('#notice_kind_recipient').change(function() {
-
-for (instance in CKEDITOR.instances){CKEDITOR.instances[instance].destroy();}
-
-CKEDITOR.replace('notice_kind_template_raw_body',{
+  for (instance in CKEDITOR.instances){ 
+    CKEDITOR.instances[instance].destroy(true); 
+  }
+  CKEDITOR.replace('notice_kind_template_raw_body', {});
 });
 
 });
