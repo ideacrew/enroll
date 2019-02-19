@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :after_each do
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:person) { FactoryGirl.create(:person, :with_family ) }
+  let(:person) { FactoryGirl.create(:person) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
 
   let(:plan) do
     double(plan_type: "ppo",
@@ -31,7 +32,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
   end
 
   let(:plan_hsa_status) { Hash.new }
-  let(:hbx_enrollment_members) { [double("HbxEnrollmentMember"), double("HbxEnrollmentMember")]}
+  let(:hbx_enrollment_member1) { double("HbxEnrollmentMember", applicant_id: family.family_members[0].id) }
+  let(:hbx_enrollment_member2) { double("HbxEnrollmentMember", applicant_id: family.family_members[1].id) }
+  let(:hbx_enrollment_members) { [hbx_enrollment_member1, hbx_enrollment_member2]}
   let(:hbx_enrollment) do
     instance_double(
       "HbxEnrollment", id: "hbx enrollment id",
@@ -50,10 +53,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     assign(:carrier_names_map, {})
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
-    family = person.primary_family
-    active_household = family.households.first
-    tax_household = FactoryGirl.create(:tax_household, household: active_household )
+    tax_household = FactoryGirl.create(:tax_household, household: family.active_household )
     eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+    assign(:tax_household, tax_household)
   end
 
   context "deductible" do

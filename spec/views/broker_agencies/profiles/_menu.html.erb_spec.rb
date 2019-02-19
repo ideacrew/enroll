@@ -27,6 +27,18 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
     it "should have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+      expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
+      expect(rendered).to_not have_text(/Brokers/)
+    end
+  end
+
+
+  context "without broker role" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+
+    it "should have right navigation section" do
+      render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
       expect(view.content_for(:horizontal_menu)).to include('multi-line')
       expect(rendered).to_not have_text(/Brokers/)
     end
