@@ -14,6 +14,7 @@ module Notifier
     attribute :broker, MergeDataModels::Broker
     attribute :legal_name, String
     attribute :assignment_date, Date
+    attribute :termination_date, Date
     attribute :employer_name, String
     attribute :employer_poc_firstname, String
     attribute :employer_poc_lastname, String
@@ -27,6 +28,7 @@ module Notifier
         email: 'johnnypepper@ypomail.com',
         legal_name: 'Best General Agency LLC',
         assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         employer_name: 'North America Football Federation',
         employer_poc_firstname: 'David',
         employer_poc_lastname: 'Samules'

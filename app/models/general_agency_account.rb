@@ -3,6 +3,9 @@ class GeneralAgencyAccount
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
+  include Concerns::Observable
+  include ModelEvents::GeneralAgencyAccount
 
   embedded_in :employer_profile
 
@@ -19,6 +22,8 @@ class GeneralAgencyAccount
   scope :inactive, ->{ where(aasm_state: 'inactive') }
 
   validates_presence_of :start_on, :general_agency_profile_id
+
+  before_save :notify_before_save
 
   # belongs_to general_agency_profile
   def general_agency_profile=(new_general_agency_profile)
