@@ -14,7 +14,7 @@ module AccessPolicies
     end
 
     def authorize_index(controller)
-      return true if user.has_hbx_staff_role? || user.has_csr_role? || user.has_broker_role?
+      return true if user.has_hbx_staff_role? || user.has_csr_role? || user.has_broker_role? || user.has_broker_agency_staff_role?
 
       general_agency_profile_id = user.person.general_agency_staff_roles.last.general_agency_profile_id rescue nil
       if user.has_general_agency_staff_role? && general_agency_profile_id.present?
@@ -25,13 +25,13 @@ module AccessPolicies
     end
 
     def authorize_assign(controller, broker_agency_profile)
-      return true if user.has_broker_role? || user.has_hbx_staff_role?
+      return true if user.has_broker_role? || user.has_hbx_staff_role? || user.has_broker_agency_staff_role?
 
       controller.redirect_to_show(broker_agency_profile.id)
     end
 
     def authorize_set_default_ga(controller, broker_agency_profile)
-      return true if user.has_hbx_staff_role? || user.has_broker_role?
+      return true if user.has_hbx_staff_role? || user.has_broker_role? || user.has_broker_agency_staff_role?
 
       controller.redirect_to_show(broker_agency_profile.id)
     end

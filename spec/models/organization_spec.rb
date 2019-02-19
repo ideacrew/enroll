@@ -370,6 +370,40 @@ RSpec.describe Organization, dbclean: :after_each do
             expect(agencies.first.legal_name).to eq(@agency1.legal_name)
           end
         end
+
+        context 'when searching by broker agency name from staff search' do
+          it 'should return matching agencies' do
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name})
+            expect(agencies.count).to eq(2)
+
+            agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'random', is_staff_registartion: 'true' })
+            expect(agencies.count).to eq(0)
+          end
+        end
+      end
+    end
+  end
+
+  describe 'build_query_params' do
+    context 'search params are passed' do
+
+      it 'should return search params with values' do
+        search_params = {q: 'hello' }
+        expect(Organization.build_query_params(search_params)).to eq [{'legal_name'=> /hello/i}]
+      end
+
+      it 'should return search params with languages' do
+        search_params = {languages: ['en'] }
+        expect(Organization.build_query_params(search_params)).to eq [{'broker_agency_profile.languages_spoken'=>{'$in'=>['en']}}]
+      end
+    end
+
+    context 'search params passed for broker staff' do
+
+      it 'should return search params with array of empty hash' do
+        search_params = {is_staff_registration: 'true'}
+        expect(Organization.build_query_params(search_params)).to eq [{}]
       end
     end
   end

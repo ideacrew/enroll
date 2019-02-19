@@ -169,9 +169,11 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
-    let(:person){double(:broker_agency_staff_roles => [double(:broker_agency_profile_id => 5)]) }
+    let(:person){FactoryGirl.create(:person) }
+    let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, aasm_state: 'active', broker_agency_profile_id: '5')}
 
     it "should redirect to myaccount" do
+      person.broker_agency_staff_roles << broker_agency_staff_role
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
@@ -236,6 +238,30 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in current_user
       xhr :get, :family_index, id: broker_agency_profile.id
       expect(response).to render_template("broker_agencies/profiles/family_index")
+    end
+
+    it 'renders the families_index template if current user has hbx_staff_role?' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).to render_template('broker_agencies/profiles/family_index')
+    end
+
+    it 'renders the families_index template if current user has broker_agency_staff_role' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_agency_staff_role?).and_return(true)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).to render_template('broker_agencies/profiles/family_index')
+    end
+
+    it 'should not render the families_index template if current user does not have has broker_agency_staff_role' do
+      current_user = @current_user
+      allow(current_user).to receive(:has_broker_agency_staff_role?).and_return(false)
+      sign_in current_user
+      xhr :get, :family_index, id: broker_agency_profile.id
+      expect(response).not_to render_template('broker_agencies/profiles/family_index')
     end
   end
 
