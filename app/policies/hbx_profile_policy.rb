@@ -108,17 +108,17 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_access_accept_reject_identity_documents?
     return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if (@user.person && @user.person.hbx_staff_role)
-    return false  
+    return false
   end
 
   def can_access_accept_reject_paper_application_documents?
     return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if (@user.person && @user.person.hbx_staff_role)
-    return false  
+    return false
   end
 
   def can_delete_identity_application_documents?
     return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
-    return false  
+    return false
   end
 
   def can_access_user_account_tab?
@@ -134,5 +134,10 @@ class HbxProfilePolicy < ApplicationPolicy
   def can_force_publish?
     return true unless role = user.person.hbx_staff_role
     role.permission.can_force_publish
+  end
+
+  def can_create_plan_year?
+    return true unless role = user.person.hbx_staff_role
+    role.permission.can_create_plan_year?
   end
 end

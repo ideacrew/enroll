@@ -118,7 +118,7 @@ class DefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)  
+    Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents
@@ -144,6 +144,11 @@ class DefinePermissions < MigrationTask
   def hbx_admin_can_force_publish
     Permission.super_admin.update_attributes(can_force_publish: true)
     Permission.hbx_tier3.update_attributes!(can_force_publish: true)
+  end
+
+  def hbx_admin_can_create_plan_year
+   Permission.super_admin.update_attributes(can_create_plan_year: true)
+   Permission.hbx_tier3.update_attributes(can_create_plan_year: true)
   end
 
   def grant_super_admin_access
