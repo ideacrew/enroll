@@ -9,7 +9,7 @@ RSpec.describe 'ModelEvents::ApplicationCoverageSelected', dbclean: :around_each
   let!(:organization) { FactoryGirl.create(:organization) }
   let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active', open_enrollment_start_on: TimeKeeper.date_of_record - 10.days, open_enrollment_start_on: TimeKeeper.date_of_record, start_on: TimeKeeper.date_of_record.beginning_of_month + 2.months, end_on: TimeKeeper.date_of_record.next_year.next_month.end_of_month) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: 'active') }
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, census_employee_id: census_employee.id, person: person) }
   let!(:model_instance) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members,
@@ -66,6 +66,12 @@ RSpec.describe 'ModelEvents::ApplicationCoverageSelected', dbclean: :around_each
         it "should trigger notice event for plan selection in sep or new_hire" do
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
             expect(event_name).to eq "acapi.info.events.employee.employee_plan_selection_confirmation_sep_new_hire"
+            expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
+            expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          end
+
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employer.employee_mid_year_plan_change_non_congressional_notice"
             expect(payload[:event_object_kind]).to eq 'HbxEnrollment'
             expect(payload[:event_object_id]).to eq model_instance.id.to_s
           end
