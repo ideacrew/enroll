@@ -111,7 +111,8 @@ module BenefitSponsors
     scope :coverage_effective,              ->{ any_in(aasm_state: COVERAGE_EFFECTIVE_STATES) }
     scope :terminated,                      ->{ any_in(aasm_state: TERMINATED_STATES) }
     scope :imported,                        ->{ any_in(aasm_state: IMPORTED_STATES) }
-    scope :non_canceled,                    ->{ not_in(aasm_state: TERMINATED_STATES) }
+    scope :non_terminated,                  ->{ not_in(aasm_state: TERMINATED_STATES) }
+    scope :non_canceled,                    ->{ where(:aasm_state.nin => CANCELED_STATES) }
     scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
 

@@ -50,6 +50,7 @@ module BenefitSponsors
           benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
           save_result, persisted_object = store(form, benefit_application)
           if save_result
+            benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
             cancel_draft_and_ineligible_applications(persisted_object)
           end
           [save_result, persisted_object]
