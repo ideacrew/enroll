@@ -121,6 +121,16 @@ module Notifier
     def can_be_published?
     end
 
+    def is_shop?
+      [
+        :employer_profile,
+        :employee_profile,
+        :broker_profile,
+        :broker_agency_profile,
+        :general_agency
+      ].include? recipient_klass_name
+    end
+
     def record_transition
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
