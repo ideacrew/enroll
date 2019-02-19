@@ -25,6 +25,7 @@ namespace :seed do
         :ehb => plan.ehb.nil? ? "0.0" : plan.ehb.to_s,
         :year => plan.active_year,
         :carrier_id => plan.carrier_profile_id.to_s,
+        :fein => plan.carrier_profile.fein,
         :metal_level => plan.metal_level,
         :coverage_type => plan.coverage_kind,
         :renewal_plan_id => plan.renewal_plan_id,

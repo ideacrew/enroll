@@ -60,13 +60,14 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no ssn" do
-      let(:params) {valid_params.except(:ssn)}
-
-      it "should fail validation" do
-        expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
-      end
-    end
+    # No longer valid with NO SSN feature
+    # context "with no ssn" do
+    #   let(:params) {valid_params.except(:ssn)}
+    #
+    #   it "should fail validation" do
+    #     expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+    #   end
+    # end
 
     context "with no dob" do
       let(:params) {valid_params.except(:dob)}
@@ -232,12 +233,32 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                 expect(initial_census_employee.may_link_employee_role?).to be_truthy
               end
 
+              context "and a roster match by dob lname and fname is performed" do
+                context "using non-matching dob lname and fname" do
+                  let(:invalid_person)   { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 5.days, first_name: "john", last_name: "doe") }
+                  let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, person: invalid_person) }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(invalid_person.dob, invalid_person.first_name, invalid_person.last_name)).to eq []
+                  end
+                end
+
+                context "using matching dob lname and fname" do
+                  let(:valid_person) { FactoryGirl.create(:person, first_name: 'Lynyrd', last_name: 'Skynyrd') }
+                  let(:valid_employee_role)     { FactoryGirl.create(:employee_role, dob: initial_census_employee.dob, person: valid_person) }
+
+                  it "should return the roster instance" do
+                    expect(CensusEmployee.matchable_by_dob_lname_fname(valid_employee_role.person.dob, valid_employee_role.person.first_name, valid_employee_role.person.last_name).collect(&:id)).to eq [initial_census_employee.id]
+                  end
+                end
+              end
+
               context "and a roster match by SSN and DOB is performed" do
                 context "using non-matching ssn and dob" do
                   let(:invalid_employee_role)   { FactoryGirl.create(:employee_role, ssn: "777777777", dob: TimeKeeper.date_of_record - 5.days) }
 
                   it "should return an empty array" do
-                    expect(CensusEmployee.matchable(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
+                    expect(CensusEmployee.search_with_ssn_dob(invalid_employee_role.ssn, invalid_employee_role.dob)).to eq []
                   end
                 end
 
@@ -246,7 +267,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                   let!(:user)     { FactoryGirl.create(:user, person: valid_employee_role.person) }
 
                   it "should return the roster instance" do
-                    expect(CensusEmployee.matchable(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
+                    expect(CensusEmployee.search_with_ssn_dob(valid_employee_role.ssn, valid_employee_role.dob).collect(&:id)).to eq [initial_census_employee.id]
                   end
 
                   context "and a link employee role request is received" do
@@ -260,8 +281,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                     end
 
                     context "and the provided employee role identifying information does match a census employee" do
-                      before { 
-                        initial_census_employee.employee_role = valid_employee_role 
+                      before {
+                        initial_census_employee.employee_role = valid_employee_role
                       }
 
                       it "should link the roster instance and employer role" do
@@ -419,6 +440,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
                 end
 
+              end
+
+              context "and a roster match by dependents SSN and DOB is performed" do
+                before do
+                  initial_census_employee.census_dependents = [FactoryGirl.build(:census_dependent)]
+                  initial_census_employee.save
+                end
+
+                context "using non-matching dependent ssn and dob" do
+                  it "should return an empty array" do
+                    expect(CensusEmployee.search_dependent_with_ssn_dob('000000000', Date.new(1700,01,01))).to eq []
+                  end
+                end
+
+                context "using matching dependent ssn and dob" do
+                  let(:valid_census_dependent) { initial_census_employee.census_dependents.first }
+
+                  it "should return an empty array" do
+                    expect(CensusEmployee.search_dependent_with_ssn_dob(valid_census_dependent.ssn, valid_census_dependent.dob).to_a).to eq [initial_census_employee]
+                  end
+                end
               end
 
             end
@@ -887,7 +929,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "generate_and_deliver_checkbook_url" do 
+  context "generate_and_deliver_checkbook_url" do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
@@ -907,23 +949,23 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       allow(ApplicationEventKind).to receive_message_chain(:where,:first).and_return(double("ApplicationEventKind",{:notice_triggers => notice_triggers,:title => "title",:event_name => "OutOfPocketNotice"}))
       allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
     end
-    context "#generate_and_deliver_checkbook_url" do 
+    context "#generate_and_deliver_checkbook_url" do
       it "should create a builder and deliver without expection" do
         expect{census_employee.generate_and_deliver_checkbook_url}.not_to raise_error
       end
-     
-      it 'should trigger deliver' do 
+
+      it 'should trigger deliver' do
         expect(builder).to receive(:deliver)
         census_employee.generate_and_deliver_checkbook_url
       end
     end
 
-    context "#generate_and_save_to_temp_folder " do 
+    context "#generate_and_save_to_temp_folder " do
       it "should builder and save without expection" do
         expect{census_employee.generate_and_save_to_temp_folder}.not_to raise_error
       end
 
-       it 'should not trigger deliver' do 
+       it 'should not trigger deliver' do
         expect(builder).not_to receive(:deliver)
         census_employee.generate_and_save_to_temp_folder
       end
@@ -1485,10 +1527,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "is_cobra_coverage_eligible?" do 
+  context "is_cobra_coverage_eligible?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:hbx_enrollment) { HbxEnrollment.new aasm_state: "coverage_terminated", terminated_on: TimeKeeper.date_of_record , coverage_kind: 'health'}
-  
+
     it "should return true when employement is terminated and " do
       allow(Family).to receive(:where).and_return([hbx_enrollment])
       allow(census_employee).to receive(:employment_terminated_on).and_return(TimeKeeper.date_of_record)
@@ -1502,16 +1544,16 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "cobra_eligibility_expired?" do 
+  context "cobra_eligibility_expired?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
-  
+
     it "should return true when coverage is terminated more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 7.months)
       expect(census_employee.cobra_eligibility_expired?).to be_truthy
     end
 
     it "should return false when coverage is terminated not more that 6 months " do
-      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months) 
+      allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record - 2.months)
       expect(census_employee.cobra_eligibility_expired?).to be_falsey
     end
 
@@ -1547,103 +1589,191 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context '.enrollments_for_display' do
+  context 'Roster Enrollments Display' do
+    let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
 
-    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
-    let(:census_employee) {
-      ce = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years
-      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: organization.employer_profile)
-      ce.update_attributes({employee_role: employee_role})
-      family = Family.find_or_build_from_employee_role(employee_role)
-      ce
+    let!(:employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear, start_on: plan_year_start_on, plan_year_state: 'active', renewal_plan_year_state: 'renewing_enrolled') }
+    let!(:person) { FactoryGirl.create(:person, :with_family, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
+    let!(:employee_role) { person.employee_roles.create( employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
+    let!(:shop_family)  { person.primary_family }
+
+    let(:effective_date)  { plan_year_start_on }
+    let(:plan_year) { employer_profile.active_plan_year }
+    let(:renewing_plan_year) { employer_profile.renewing_plan_year }
+
+    let!(:expired_plan_year) {
+      py = FactoryGirl.create(:plan_year,
+        start_on: plan_year_start_on - 2.years,
+        employer_profile: employer_profile,
+        aasm_state: 'expired',
+        renewing: false
+        )
+      blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+      py.benefit_groups = [blue]
+      py.save(:validate => false)
+      py
     }
 
-    let!(:auto_renewing_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
+    let!(:expired_benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: expired_plan_year.benefit_groups.first,
+        start_on: plan_year_start_on - 2.years,
+        is_active: false
+      })
+    }
+
+    let!(:renewal_benefit_group_assignment) {
+      census_employee.renewal_benefit_group_assignment
+    }
+
+    let!(:benefit_group_assignment) {
+      census_employee.active_benefit_group_assignment
+    }
+
+    let!(:expired_health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
       coverage_kind: "health",
+      effective_on: effective_date - 2.years,
+      enrollment_kind: "open_enrollment",
       kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-      aasm_state: "auto_renewing"
+      submitted_at: effective_date - 24.months,
+      benefit_group_id: expired_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: expired_benefit_group_assignment.id,
+      aasm_state: 'coverage_expired'
       )
     }
 
-    let!(:auto_renewing_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
+    let!(:terminated_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
       coverage_kind: "dental",
+      effective_on: effective_date - 2.years,
+      terminated_on: effective_date - 1.year,
+      enrollment_kind: "open_enrollment",
       kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'renewing_enrolling').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-      aasm_state: "auto_renewing"
+      submitted_at: effective_date - 24.months,
+      benefit_group_id: expired_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: expired_benefit_group_assignment.id,
+      aasm_state: 'coverage_terminated'
       )
     }
 
-    let(:enrollment)   { FactoryGirl.create(:hbx_enrollment,
-      household: census_employee.employee_role.person.primary_family.active_household,
+    let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.active_household,
       coverage_kind: "health",
       kind: "employer_sponsored",
-      benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-      employee_role_id: census_employee.employee_role.id,
-      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+      benefit_group_id: census_employee.employer_profile.active_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id,
       aasm_state: "coverage_selected"
       )
     }
 
+    let!(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.active_household,
+      coverage_kind: "dental",
+      kind: "employer_sponsored",
+      benefit_group_id: census_employee.employer_profile.active_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: benefit_group_assignment.id,
+      aasm_state: "coverage_selected"
+      )
+    }
 
-    shared_examples_for "enrollments for display" do |state, status, result|
+    let!(:auto_renewing_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.active_household,
+      coverage_kind: "dental",
+      kind: "employer_sponsored",
+      benefit_group_id: census_employee.employer_profile.renewing_plan_year.benefit_groups.first.id,
+      employee_role_id: employee_role.id,
+      benefit_group_assignment_id: renewal_benefit_group_assignment.id,
+      aasm_state: "auto_renewing"
+      )
+    }
 
-      let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-        household: census_employee.employee_role.person.primary_family.active_household,
-        coverage_kind: "health",
-        kind: "employer_sponsored",
-        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-        employee_role_id: census_employee.employee_role.id,
-        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-        aasm_state: state
-        )
-      }
+    let!(:ivl_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "dental",
+      effective_on: effective_date - 1.year,
+      enrollment_kind: "open_enrollment",
+      kind: "individual",
+      submitted_at: effective_date - 11.months,
+      aasm_state: 'coverage_selected'
+      )
+    }
 
-      let!(:dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
-        household: census_employee.employee_role.person.primary_family.active_household,
-        coverage_kind: "dental",
-        kind: "employer_sponsored",
-        benefit_group_id: census_employee.employer_profile.plan_years.where(aasm_state: 'active').first.benefit_groups.first.id,
-        employee_role_id: census_employee.employee_role.id,
-        benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
-        aasm_state: state
-        )
-      }
+    let!(:ivl_expired_dental_enrollment)   { FactoryGirl.create(:hbx_enrollment,
+      household: shop_family.latest_household,
+      coverage_kind: "dental",
+      effective_on: effective_date - 2.years,
+      enrollment_kind: "open_enrollment",
+      kind: "individual",
+      submitted_at: effective_date - 24.months,
+      aasm_state: 'coverage_expired'
+      )
+    }
 
-      it "should #{status}return #{state} health enrollment" do
-        expect(census_employee.enrollments_for_display[0].try(:aasm_state) == state).to eq result
+    context '.enrollments_for_display' do
+
+      it 'should return current shop health coverage' do
+        expect(census_employee.enrollments_for_display).to include(health_enrollment)
       end
 
-      it "should #{status}return #{state} dental enrollment" do
-        expect(census_employee.enrollments_for_display[1].try(:aasm_state) == state).to eq result
+      it 'should return current shop dental coverage' do
+        expect(census_employee.enrollments_for_display).to include(dental_enrollment)
+      end
+
+      it 'should return renewing coverage' do
+        expect(census_employee.enrollments_for_display).to include(auto_renewing_enrollment)
+      end
+
+      it 'should not return expired shop coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(expired_health_enrollment)
+      end
+
+      it 'should not return terminated shop coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(terminated_dental_enrollment)
+      end
+
+      it 'should not return individual coverages' do
+        expect(census_employee.enrollments_for_display).not_to include(ivl_dental_enrollment)
+        expect(census_employee.enrollments_for_display).not_to include(ivl_expired_dental_enrollment)
       end
     end
 
-    it_behaves_like "enrollments for display", "coverage_selected", "", true
-    it_behaves_like "enrollments for display", "coverage_enrolled", "", true
-    it_behaves_like "enrollments for display", "coverage_termination_pending", "", true
-    it_behaves_like "enrollments for display", "coverage_terminated", "not ", false
-    it_behaves_like "enrollments for display", "coverage_expired", "not ", false
-    it_behaves_like "enrollments for display", "shopping", "not ", false
+    context '.past_enrollments' do
 
-    it 'should return auto renewing health enrollment' do
-      expect(census_employee.enrollments_for_display[0]).to eq auto_renewing_health_enrollment
-    end
+      before do
+        allow(census_employee).to receive(:employee_role).and_return(employee_role)
+      end
 
-    it 'should return auto renewing dental enrollment' do
-      expect(census_employee.enrollments_for_display[1]).to eq auto_renewing_dental_enrollment
-    end
+      it 'should return expired shop coverages' do
+        expect(census_employee.past_enrollments).to include(expired_health_enrollment)
+      end
 
-    it "should return current and renewing coverages" do
-      enrollment
-      expect(census_employee.enrollments_for_display).to eq [enrollment, auto_renewing_health_enrollment, auto_renewing_dental_enrollment]
+      it 'should return terminated shop coverages' do
+        expect(census_employee.past_enrollments).to include(terminated_dental_enrollment)
+      end
+
+      it 'should not return current shop health coverage' do
+        expect(census_employee.past_enrollments).not_to include(health_enrollment)
+      end
+
+      it 'should not return current shop dental coverage' do
+        expect(census_employee.past_enrollments).not_to include(dental_enrollment)
+      end
+
+      it 'should not return renewing coverage' do
+        expect(census_employee.past_enrollments).not_to include(auto_renewing_enrollment)
+      end
+
+      it 'should not return individual coverages' do
+        expect(census_employee.past_enrollments).not_to include(ivl_dental_enrollment)
+        expect(census_employee.past_enrollments).not_to include(ivl_expired_dental_enrollment)
+      end
     end
   end
 

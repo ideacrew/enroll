@@ -14,7 +14,7 @@ namespace :migrations do
      
         family_members.each do |member|
           if member.person.consumer_role.blank?
-            puts "creating consumer role for #{member.person.full_name}"
+            puts "creating consumer role for #{member.person.full_name}" unless Rails.env.test?
 
             Factories::EnrollmentFactory.add_consumer_role(
               person: member.person, 
