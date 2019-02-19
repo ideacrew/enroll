@@ -28,7 +28,7 @@ module Factories
         validate_plan_year
 
         @plan_year_start_on = @active_plan_year.end_on + 1.day
-        @plan_year_end_on   = @active_plan_year.end_on + 1.year
+        @plan_year_end_on   = @plan_year_start_on + 1.year - 1.day
 
         open_enrollment_start_on = @plan_year_start_on - 2.months
         open_enrollment_end_on = Date.new((@plan_year_start_on - 1.month).year, (@plan_year_start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
