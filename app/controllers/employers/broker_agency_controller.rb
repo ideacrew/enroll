@@ -12,21 +12,25 @@ class Employers::BrokerAgencyController < ApplicationController
       @page_alphabets = page_alphabets(@orgs, "legal_name")
 
       if params[:page].present?
-        page_no = cur_page_no(@page_alphabets.first)
-        @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+        @page_alphabet = cur_page_no(@page_alphabets.first)
+        @organizations = @orgs.where("legal_name" => /^#{@page_alphabet}/i)
       else
-        @organizations = @orgs.to_a.first(10)
+        @organizations = @orgs.limit(12).to_a
       end
-      @broker_agency_profiles = @organizations.map(&:broker_agency_profile).uniq
+      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
     else
       results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
       if results.first.is_a?(Person)
         @filtered_broker_roles  = results.map(&:broker_role)
-        @broker_agency_profiles = results.map{|broker| broker.broker_role.broker_agency_profile}.uniq
+        @broker_agency_profiles = Kaminari.paginate_array(results.map{|broker| broker.broker_role.broker_agency_profile}.uniq).page(params[:organization_page] || 1).per(10)
       else
-        @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
+        @broker_agency_profiles = Kaminari.paginate_array(results.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
       end
     end
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def show
@@ -46,6 +50,7 @@ class Employers::BrokerAgencyController < ApplicationController
       if broker_agency_profile.default_general_agency_profile.present?
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
+        broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
       end
       # send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)

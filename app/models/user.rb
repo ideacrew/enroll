@@ -6,6 +6,9 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
+  include AuthorizationConcern
+  include Mongoid::History::Trackable
+  include PermissionsConcern
 
   attr_accessor :login
 
@@ -23,6 +26,12 @@ class User
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+  
+  scope :datatable_search, ->(query) {
+      search_regex = ::Regexp.compile(/.*#{query}.*/i)
+      person_user_ids = Person.any_of({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
+      User.any_of({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
+    }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -37,7 +46,7 @@ class User
   def password_complexity
     if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-    elsif password.present? and password.match(/#{Regexp.escape(oim_id)}/i)
+    elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
       errors.add :password, "cannot contain username"
     elsif password.present? and password_repeated_chars_limit(password)
       errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
@@ -81,7 +90,7 @@ class User
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     if login = conditions.delete(:login).downcase
-      where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+      where(conditions).where('$or' => [ {:oim_id => /^#{::Regexp.escape(login)}$/i}, {:email => /^#{::Regexp.escape(login)}$/i} ]).first
     else
       where(conditions).first
     end
@@ -153,6 +162,15 @@ class User
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
+
+  track_history   :on => [:oim_id,
+                        :email],
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,
+                  :track_update  => true,
+                  :track_destroy => true
+
 
 
   before_save :strip_empty_fields
@@ -296,11 +314,20 @@ class User
   def has_agent_role?
     has_role?(:csr) || has_role?(:assister)
   end
-
+  
   def can_change_broker?
     if has_employer_staff_role? || has_hbx_staff_role?
       true
     elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+      false
+    end
+  end
+  
+  def has_tier3_subrole?
+    hbx_staff_role = self.try(:person).try(:hbx_staff_role)
+    if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+      true
+    else
       false
     end
   end
@@ -355,8 +382,8 @@ class User
   end
 
   def handle_headless_records
-    headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
-    headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
+    headless_with_email = User.where(email: /^#{::Regexp.quote(email)}$/i)
+    headless_with_oim_id = User.where(oim_id: /^#{::Regexp.quote(oim_id)}$/i)
     headless_users = headless_with_email + headless_with_oim_id
     headless_users.each do |headless|
       headless.destroy if !headless.person.present?
@@ -418,11 +445,11 @@ class User
       announcements.concat(Announcement.current_msg_for_employer) if has_employer_staff_role?
     when portal_path.include?("families/home")
       announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
     when portal_path.include?("employee")
       announcements.concat(Announcement.current_msg_for_employee) if has_employee_role? || (person && person.has_active_employee_role?)
     when portal_path.include?("consumer")
-      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.has_active_consumer_role?)
+      announcements.concat(Announcement.current_msg_for_ivl) if has_consumer_role? || (person && person.is_consumer_role_active?)
     when portal_path.include?("broker_agencies")
       announcements.concat(Announcement.current_msg_for_broker) if has_broker_role?
     when portal_path.include?("general_agencies")
