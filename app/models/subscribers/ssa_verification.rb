@@ -22,7 +22,14 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
 
         consumer_role = person.consumer_role
-        consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: xml})
+        event_response_record = EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.lawful_presence_determination.ssa_responses << event_response_record
+        person.verification_types.active.reject{|type| ["DC Residency", "American Indian Status", "Immigration status"].include? type.type_name}.each do |type|
+          type.add_type_history_element(action: "SSA Hub Response",
+                                        modifier: "external Hub",
+                                        update_reason: "Hub response",
+                                        event_response_record_id: event_response_record.id)
+        end
 
         #TODO change response handler
         if "503" == return_status.to_s

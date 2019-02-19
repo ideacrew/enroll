@@ -116,7 +116,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
 
-  expect(all('.hbx-enrollment-panel').select{|panel| 
+  expect(all('.hbx-enrollment-panel').select{|panel|
     panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   }.present?).to be_truthy
 
@@ -137,8 +137,11 @@ Then(/(.*) should see \"my account\" page with active enrollment/) do |named_per
 end
 
 Then (/(.*) should see passive renewal/) do |named_person|
-  enrollment = page.all('.hbx-enrollment-panel').first
-  enrollment.find('.panel-heading', text: 'Auto Renewing')
+  renewal_start = EmployerProfile.find_by_fein(people[named_person][:fein]).renewing_plan_year.start_on.strftime("%m/%d/%Y")
+  renewal = page.all('.hbx-enrollment-panel').detect{|e| e.find('.enrollment-effective').text.match(renewal_start)}
+
+  expect(renewal.present?).to be_truthy
+  expect(renewal.find('.panel-heading .text-right').text).to eq "Coverage Selected"
 end
 
 Then(/(.*) click on make changes button on passive renewal/) do |named_person|
@@ -158,14 +161,20 @@ end
 Then(/(.*) should see active enrollment with his daughter/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+
   expect(enrollment.find('.family-members')).to have_content 'Soren'
   expect(enrollment.find('.family-members')).to have_content 'Cynthia'
 end
 
-Then(/(.*) should see updated passive renewal with his daughter/) do |named_person|
-  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Auto Renewing' }
-  expect(enrollment.find('.family-members')).to have_content 'Soren'
-  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+Then(/(.*) should see updated renewal with his daughter/) do |named_person|
+  renewal_start = EmployerProfile.find_by_fein(people[named_person][:fein]).renewing_plan_year.start_on.strftime("%m/%d/%Y")
+
+  renewal = page.all('.hbx-enrollment-panel').detect{|e| e.find('.enrollment-effective').text.match(renewal_start)}
+  expect(renewal.present?).to be_truthy
+  expect(renewal.find('.panel-heading .text-right').text).to eq "Coverage Selected"
+
+  expect(renewal.find('.family-members')).to have_content 'Soren'
+  expect(renewal.find('.family-members')).to have_content 'Cynthia'
 end
 
 Then(/(.*) selects make changes on active enrollment/) do |named_person|

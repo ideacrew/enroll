@@ -4,7 +4,13 @@ class Employers::CensusEmployeesController < ApplicationController
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
-    @census_employee = build_census_employee
+    @census_employee = build_census_employee(@employer_profile.try(:id))
+    @no_ssn = @employer_profile.no_ssn || false
+
+    if @no_ssn
+      flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time."
+    end
+
     if params[:modal].present?
       respond_to do |format|
         format.js { render "employers/employer_profiles/upload_employees" }
@@ -14,25 +20,15 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def create
-    @census_employee = CensusEmployee.new
-    @census_employee.build_from_params(census_employee_params, benefit_group_id)
-
-    if renewal_benefit_group_id.present?
-      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
-      if @census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.add_renew_benefit_group_assignment(benefit_group)
-      end
-    end
-
+    @census_employee = CensusEmployee.new(census_employee_params)
+    @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.employer_profile = @employer_profile
+    @census_employee.no_ssn_allowed = true if @employer_profile.no_ssn
+
     if @census_employee.save
-      if benefit_group_id.present?
-        @census_employee.send_invite!
-        @census_employee.construct_employee_role_for_match_person
-        flash[:notice] = "Census Employee is successfully created."
-      else
+      flash[:notice] = "Census Employee is successfully created."
+      if @census_employee.active_benefit_group_assignment.blank?
         flash[:notice] = "Your employee was successfully added to your roster."
-        #flash[:notice] += "Note: an employee must be assigned to a benefit group before they can enroll for benefits"
       end
       redirect_to employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
@@ -55,29 +51,19 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+    @no_ssn = @census_employee.no_ssn_allowed || false
   end
 
   def update
     authorize EmployerProfile, :updateable?
     @status = params[:status]
-    if benefit_group_id.present?
-      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
 
-      if @census_employee.active_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.find_or_create_benefit_group_assignment([benefit_group])
-      end
-    end
-
-    if renewal_benefit_group_id.present?
-      benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
-      if @census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
-        @census_employee.add_renew_benefit_group_assignment(benefit_group)
-      end
-    end
-
+    @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.attributes = census_employee_params
-    destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
+    @census_employee.no_ssn_allowed = true if @employer_profile.no_ssn
 
+
+    destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
     authorize @census_employee, :update?
 
     if @census_employee.attributes[:email].present? && @census_employee.attributes[:email][:address].blank?
@@ -93,14 +79,12 @@ class Employers::CensusEmployeesController < ApplicationController
           census_dependent.delete
         end
       end
+
       flash[:notice] = "Census Employee is successfully updated."
-      if benefit_group_id.present?
-        @census_employee.construct_employee_role_for_match_person
-        flash[:notice] = "Census Employee is successfully updated."
-      else
-        flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
-        flash[:notice] += "Census Employee is successfully updated."
+      if benefit_group_id.blank?
+        flash[:notice] += " Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group."
       end
+
       redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     else
       flash[:error] = @census_employee.errors.full_messages
@@ -121,6 +105,7 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
         @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
+        notify_employee_of_termination
       end
     end
 
@@ -161,9 +146,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?
-          new_census_employee.construct_employee_role_for_match_person
-          new_census_employee.add_default_benefit_group_assignment
-
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -210,14 +192,14 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
-        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
-    } if @census_employee.employee_role.present?
+    @no_ssn = @census_employee.no_ssn_allowed || false
 
-    @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
+
+    if @no_ssn && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.nil?
+      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
+    end
+
   end
 
   def delink
@@ -249,6 +231,14 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+  end
+
+  def notify_employee_of_termination
+    begin
+      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
+    end
   end
 
   private
@@ -302,11 +292,12 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee = CensusEmployee.find(id)
   end
 
-  def build_census_employee
+  def build_census_employee(employer_profile_id = nil)
     @census_employee = CensusEmployee.new
     @census_employee.build_address
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
+    @census_employee.employer_profile_id = employer_profile_id
     @census_employee
   end
   private

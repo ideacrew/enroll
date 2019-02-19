@@ -292,6 +292,27 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "#disable_ssn_requirement" do
+    subject   {xhr :post, :disable_ssn_requirement, {ids: [organization.id]} ,  format: :js}
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+    let(:date) { TimeKeeper.datetime_of_record }
+
+    before :each do
+      sign_in(user)
+    end
+
+    it "renders the 'employer index' template with updated attributes" do
+      expect(employer_profile.no_ssn).to be_falsy
+      expect(employer_profile.disable_ssn_date).to be_nil
+      expect(subject).to redirect_to employer_invoice_exchanges_hbx_profiles_path
+      expect(employer_profile.reload.no_ssn).to be_truthy
+      expect(employer_profile.disable_ssn_date.to_time).to be_within(5.seconds).of(date)
+    end
+  end
+
   describe "GET employer index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
@@ -382,14 +403,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "GET verifications_index_datatable" do
 
     let(:user) { double("User", :has_hbx_staff_role? => true)}
-    
+
     before :each do
       sign_in(user)
-    end
-
-    it "should render json template" do
-      get :verifications_index_datatable, {format: :json}
-      expect(response).to render_template("exchanges/hbx_profiles/verifications_index_datatable")
     end
   end
 
@@ -472,11 +488,86 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe 'GET new_eligibility' do
+    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:permission_yes) { FactoryGirl.create(:permission, can_add_pdc: true) }
+    let(:params) do
+      { person_id: person.id,
+         family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
+         format: 'js'
+       }
+    end
+
+    it "should render the new_eligibility partial" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      xhr :get, :new_eligibility, params
+
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template('new_eligibility')
+    end
+
+    context 'when can_add_pdc permission is not given' do
+      it "should not render the new_eligibility partial" do
+        sign_in(user)
+        xhr :get, :new_eligibility, params
+
+        expect(response).not_to render_template('new_eligibility')
+      end
+    end
+  end
+
+  describe 'POST create_eligibility' do
+    let(:person) { FactoryGirl.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:max_aptc) { 12 }
+    let(:csr) { 100 }
+    let(:reason) { 'Test reason' }
+    let(:params) do
+      { person: {
+          person_id: person.id,
+          family_actions_id: "family_actions_#{person.primary_family.id.to_s}",
+          max_aptc: max_aptc,
+          csr: csr,
+          effective_date: "2018-04-13",
+          family_members: {
+            "#{person.primary_family.active_family_members.first.person.hbx_id}" => {
+              pdc_type: "is_medicaid_chip_eligible",
+              reason: reason
+            }
+          },
+          "jq_datepicker_ignore_person" => { "effective_date" => "04/13/2018" },
+          format: 'js'
+        }
+      }
+    end
+
+    it "should render create_eligibility if save successful" do
+      sign_in(user)
+      xhr :get, :create_eligibility, params
+      active_household = person.primary_family.active_household
+      latest_active_thh = active_household.reload.latest_active_thh
+      eligibility_deter = latest_active_thh.eligibility_determinations.first
+      tax_household_member = latest_active_thh.tax_household_members.first
+
+      expect(response).to have_http_status(:success)
+      expect(eligibility_deter.max_aptc).to eq(max_aptc.to_f)
+      expect(eligibility_deter.csr_percent_as_integer).to eq(csr)
+      expect(tax_household_member.is_medicaid_chip_eligible).to be_truthy
+      expect(tax_household_member.is_ia_eligible).to be_falsy
+      expect(tax_household_member.reason).to eq(reason)
+    end
+  end
+
 
   describe "POST update_dob_ssn" do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:person1) { FactoryGirl.create(:person) }
+    let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
@@ -489,7 +580,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person=>{:pid => person1.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
     end
@@ -501,6 +592,24 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('update_enrollment')
+    end
+
+    it "should set instance variable info changed if consumer role exists" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      xhr :get, :update_dob_ssn, @params
+      expect(assigns(:info_changed)). to eq true
+    end
+
+    it "should set instance variable dc_status if consumer role exists" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person=>{:pid => person.id, :ssn => valid_ssn, :dob => valid_dob },:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      xhr :get, :update_dob_ssn, @params
+      expect(assigns(:dc_status)). to eq false
     end
 
     it "should render update enrollment if the save is successful" do

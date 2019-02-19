@@ -398,7 +398,6 @@ class BenefitGroup
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-
     if dental_plan_option_kind == 'single_plan'
       Plan.where(:id => {"$in" => elected_dental_plan_ids}).pluck(:carrier_profile_id).uniq
     else
@@ -498,9 +497,9 @@ class BenefitGroup
 
     # 2018 contribution schedule
     self.contribution_pct_as_int   = 75
-    self.employee_max_amt = 496.71 if employee_max_amt == 0
-    self.first_dependent_max_amt = 1063.83 if first_dependent_max_amt == 0
-    self.over_one_dependents_max_amt = 1130.09 if over_one_dependents_max_amt == 0
+    self.employee_max_amt = 498.72 if employee_max_amt == 0
+    self.first_dependent_max_amt = 1066.59 if first_dependent_max_amt == 0
+    self.over_one_dependents_max_amt = 1138.19 if over_one_dependents_max_amt == 0
   end
 
   def dollars_to_cents(amount_in_dollars)

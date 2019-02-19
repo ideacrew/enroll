@@ -16,7 +16,7 @@ module Employers::EmployerHelper
   end
   
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").html_safe
+    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").gsub("Coverage Termination Pending", "Coverage Termination Pending").html_safe
   end
 
   def renewal_enrollment_state(census_employee=nil)
@@ -45,7 +45,8 @@ module Employers::EmployerHelper
     assignment_mapping = {
       'coverage_renewing' => HbxEnrollment::RENEWAL_STATUSES,
       'coverage_terminated' => HbxEnrollment::TERMINATED_STATUSES,
-      'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES,
+      'coverage_termination_pending' => ["coverage_termination_pending"],
+      'coverage_selected' => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"],
       'coverage_waived' => HbxEnrollment::WAIVED_STATUSES
     }
 
@@ -143,11 +144,14 @@ module Employers::EmployerHelper
     end.html_safe
   end
 
-  def cobra_button(census_employee)
-    disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    if census_employee.employer_profile.present?
-      disabled = true if census_employee.is_disabled_cobra_action?
+  def cobra_button(census_employee)    
+    disabled = true
+    if census_employee.is_cobra_coverage_eligible?
+      if current_user.has_hbx_staff_role? || !census_employee.cobra_eligibility_expired?
+        disabled = false
+      end
     end
+
     button_text = 'COBRA'
     toggle_class = ".cobra_confirm_"
     if census_employee.cobra_terminated?

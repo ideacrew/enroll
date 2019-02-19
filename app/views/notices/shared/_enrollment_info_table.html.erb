@@ -21,7 +21,7 @@
           <p class="plan_info_margin"><b>Insurance Company: </b><%= rows[1]%></p>
           <p class="plan_info_margin"><b>Phone: </b><%= rows[2]%></p>
           <p class="plan_info_margin"><b>Plan Name: </b><%= rows[3]%></p>
-          <p class="plan_info_margin"><b>Your monthly premium payment: </b><%= rows[4]%></p>
+          <p class="plan_info_margin"><b>Your Monthly Premium Payment: </b><%= rows[4]%></p>
           <% if rows[8] == "health" %>
             <p class="plan_info_margin"><b>Annual Deductible: </b><%= rows[0].size > 1 ? rows[6] : rows[5]%></p>
           <% end %>

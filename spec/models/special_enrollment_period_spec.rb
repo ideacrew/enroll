@@ -140,7 +140,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     context "with invalid next_poss_effective_date" do
-      let(:param_with_invalid_next_poss_effective_date){
+      let(:param_with_valid_next_poss_effective_date){
         {
           family: family,
           qualifying_life_event_kind: ivl_qle,
@@ -150,12 +150,12 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         }
       }
       it "should be invalid" do
-        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_next_poss_effective_date).errors[:next_poss_effective_date].any?).to be_truthy
+        expect(SpecialEnrollmentPeriod.create(**param_with_valid_next_poss_effective_date).errors[:next_poss_effective_date].any?).to be_falsey
       end
     end
 
     context "with invalid optional_effective_on" do
-      let(:param_with_invalid_optional_effective_on){
+      let(:param_with_valid_optional_effective_on){
         {
           family: family,
           qualifying_life_event_kind: ivl_qle,
@@ -165,7 +165,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
         }
       }
       it "should be invalid" do
-        expect(SpecialEnrollmentPeriod.create(**param_with_invalid_optional_effective_on).errors[:optional_effective_on].any?).to be_truthy
+        expect(SpecialEnrollmentPeriod.create(**param_with_valid_optional_effective_on).errors[:optional_effective_on].any?).to be_falsey
       end
     end
 
@@ -522,6 +522,75 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       sep.update_attributes(effective_on_kind: "first_of_month", 
         qle_on: organization.employer_profile.plan_years[0].end_on - 14.days)
       expect(sep.effective_on).to eq organization.employer_profile.plan_years[1].start_on
+    end
+  end
+
+  context "where employee role is not active" do
+    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:primary_applicant) { double }
+    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
+                                          start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
+                                          qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
+                                          qualifying_life_event_kind_id: qualifying_life_event_kind101.id) }
+
+    it "sep should be save" do
+      family100.special_enrollment_periods << special_enrollment_period100
+      expect(family100.special_enrollment_periods.find(special_enrollment_period100.id.to_s).persisted?).to be_truthy
+    end
+
+    it "should not raise Exception" do
+      expect{family100.special_enrollment_periods << special_enrollment_period100}.not_to raise_error
+    end
+  end
+
+  context "where sep is ivl but QLE is shop" do
+    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:primary_applicant) { double }
+    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
+                                          start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
+                                          qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
+                                          qualifying_life_event_kind_id: qualifying_life_event_kind101.id, market_kind: "ivl") }
+
+    before :each do
+      allow(person100).to receive(:has_active_employee_role?).and_return(true)
+    end
+
+    it "should not raise Exception" do
+      expect{family100.special_enrollment_periods << special_enrollment_period100}.not_to raise_error
+    end
+
+
+    it "should add error messages to the instance" do
+      family100.special_enrollment_periods << special_enrollment_period100
+      expect(family100.special_enrollment_periods[0].errors.messages).to eq({:next_poss_effective_date=>["No active plan years present"]})
+    end
+  end
+
+  context "where employee role is active" do
+    let!(:person100)  { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let!(:primary_applicant) { double }
+    let!(:family100)  { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let!(:qualifying_life_event_kind101)  { FactoryGirl.create(:qualifying_life_event_kind) }
+    let!(:special_enrollment_period100)  { SpecialEnrollmentPeriod.new(next_poss_effective_date: TimeKeeper.date_of_record,
+                                          start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 1.month,
+                                          qle_on: TimeKeeper.date_of_record, effective_on_kind: "first_of_next_month",
+                                          optional_effective_on: ["#{TimeKeeper.date_of_record + 5.days}"],
+                                          qualifying_life_event_kind_id: qualifying_life_event_kind101.id) }
+    before :each do
+      allow(person100).to receive(:has_active_employee_role?).and_return(true)
+    end
+
+    it "should not raise Exception" do
+      expect{family100.special_enrollment_periods << special_enrollment_period100}.not_to raise_error
+    end
+
+    it "should add error messages to the instance" do
+      family100.special_enrollment_periods << special_enrollment_period100
+      expect(family100.special_enrollment_periods[0].errors.messages). to eq({:optional_effective_on=>["No active plan years present"]})
     end
   end
 end

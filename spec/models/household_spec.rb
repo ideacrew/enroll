@@ -87,7 +87,6 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     end
   end
 
-
   context "enrolled_including_waived_hbx_enrollments" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let(:household) {FactoryGirl.create(:household, family: family)}
@@ -200,5 +199,113 @@ describe Household, "for dependent with domestic partner relationship", type: :m
   it "should have the extended family member in the extended coverage household" do
      immediate_coverage_members = family.active_household.immediate_family_coverage_household.coverage_household_members
      expect(immediate_coverage_members.length).to eq 2
+  end
+end
+
+describe "multiple taxhouseholds for a family", type: :model, dbclean: :after_each do
+  let!(:person) { FactoryGirl.create(:person, :with_family) }
+  let!(:household) { person.primary_family.households.first }
+  let!(:tax_household1) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household2) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 11, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household3) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-2, 6, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household4) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 7, 1), created_at: "2018-01-15 21:53:54 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household5) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 4, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household6) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 8, 1), created_at: "2018-01-15 21:53:50 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household7) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year-1, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household8) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household9) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:54 UTC", submitted_at: "2018-01-16 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household10) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 15), created_at: "2018-01-15 21:53:55 UTC", submitted_at: "2018-01-15 21:53:52 UTC", is_eligibility_determined: true, effective_ending_on: nil) }
+  let!(:tax_household11) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 5), is_eligibility_determined: true, effective_ending_on: nil) }
+
+
+  it "should have only one active tax household for year 2018" do
+    household.end_multiple_thh
+    expect(household.tax_households.tax_household_with_year(TimeKeeper.date_of_record.year).active_tax_household.count).to be 1
+  end
+
+  it "should have only one active tax household for year 2017" do
+    household.end_multiple_thh
+    expect(household.tax_households.tax_household_with_year(TimeKeeper.date_of_record.year-1).active_tax_household.count).to be 1
+  end
+
+  it "should have only one active tax household for year 2016" do
+    household.end_multiple_thh
+    expect(household.tax_households.tax_household_with_year(TimeKeeper.date_of_record.year-2).active_tax_household.count).to be 1
+  end
+
+  it "should be the latest one in the year 2018" do
+    latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year)
+    expect(latest_active_thh).to be tax_household11
+    household.end_multiple_thh
+    latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year)
+    expect(latest_active_thh).to be tax_household11
+  end
+
+  it "should be the latest one in the year 2017" do
+    latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year-1)
+    expect(latest_active_thh).to be tax_household7
+    household.end_multiple_thh
+    latest_active_thh = household.latest_active_thh_with_year(TimeKeeper.date_of_record.year-1)
+    expect(latest_active_thh).to be tax_household7
+  end
+end
+
+describe "financial assistance eligibiltiy for a family", type: :model, dbclean: :after_each do
+  let!(:person) { FactoryGirl.create(:person, :with_family) }
+  let!(:active_household) { person.primary_family.active_household }
+  let!(:date) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:slcsp) { HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp_id }
+
+  it "should create one active tax household for the specified year" do
+    expect(active_household.tax_households.count).to be 0
+    active_household.build_thh_and_eligibility(60, 94, date, slcsp)
+    expect(active_household.tax_households.count).to be 1
+  end
+
+  it "should create one eligibility determination for respective tax household" do
+    active_household.build_thh_and_eligibility(200, 73, date, slcsp)
+    expect(active_household.latest_active_thh.eligibility_determinations.count).to be 1
+  end
+
+  it "end dates all prior THH for the given year" do
+    2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
+    expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
+  end
+end
+
+describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
+  let!(:person100)      { FactoryGirl.create(:person) }
+  let!(:family100)      { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+  let(:household100)    { family100.active_household }
+  let!(:hbx_profile100) { FactoryGirl.create(:hbx_profile) }
+  let(:current_date)    { TimeKeeper.date_of_record }
+  let(:params)        {
+                        {"person_id"=> person100.id.to_s,
+                          "family_actions_id"=>"family_actions_#{family100.id.to_s}",
+                          "max_aptc"=>"100.00",
+                          "csr"=>"94",
+                          "effective_date"=> "#{current_date.year}-#{current_date.month}-#{current_date.day}",
+                          "family_members"=>
+                            { family100.primary_applicant.person.hbx_id => {"pdc_type"=>"is_ia_eligible", "reason"=>"7hvgds"} }
+                        }
+                      }
+
+  context "create_new_tax_household" do
+    before :each do
+      household100.create_new_tax_household(params)
+    end
+
+    it "should create new tax_household instance" do
+      expect(household100.tax_households).not_to be []
+    end
+
+    it "should create new tax_household_member instance" do
+      expect(household100.tax_households[0].tax_household_members).not_to be []
+    end
+
+    it "should create new eligibility_determination instance" do
+      expect(household100.tax_households[0].eligibility_determinations).not_to be []
+    end
   end
 end

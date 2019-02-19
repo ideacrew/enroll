@@ -4,16 +4,8 @@
       <td><br></br></td>
     </tr>
     <tr>
-      <td><br></br></td>
-    </tr>
-    <tr>
       <td><%= notice.primary_fullname %></td>
     </tr>
-    <% if (notice.shop? && !notice.employee_notice?) %>
-    <tr class="fssize1">
-      <td><%= notice.employer_name %></td>
-    </tr>
-    <% end %>
     <tr class="fssize1">
        <td><%= notice.primary_address.street_1 %></td>
     </tr>
@@ -26,7 +18,7 @@
     <td><%= notice.primary_address.city %>, <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
     <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
     <% if (display_mpi_indicator.nil? && !notice.shop?) %>
-      <td style="text-align: right;">Notice No: <%= notice.mpi_indicator %></td>
+      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
     <% end %>
     </tr>
     <tr>
@@ -34,5 +26,10 @@
         <br>
       </td>
     </tr>
+    <% if !notice.primary_address.street_2.present? %>
+    <tr class="fssize1">
+      <td><br></td>
+    </tr>
+    <% end %>
   </tbody>
 </table>

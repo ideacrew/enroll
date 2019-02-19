@@ -23,6 +23,6 @@ describe "shared/person/_personal_information.html.erb" do
     expect(rendered).to have_selector('input[placeholder="FIRST NAME *"]')
     expect(rendered).to have_selector('input[placeholder="LAST NAME *"]')
     expect(rendered).to have_selector('input[placeholder="DATE OF BIRTH *"]')
-    expect(rendered).to have_selector('input[placeholder="SOCIAL SECURITY *"]')
+    expect(rendered).to have_selector('input[placeholder="SOCIAL SECURITY"]')
   end
 end

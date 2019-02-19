@@ -26,14 +26,41 @@ describe Subscribers::LawfulPresence do
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
 
-    let(:person) { person = FactoryGirl.create(:person)
-    consumer_role = person.build_consumer_role
-    consumer_role = FactoryGirl.build(:consumer_role)
-    person.consumer_role = consumer_role
-    person.consumer_role.aasm_state = "dhs_pending"
-    person.consumer_role.citizen_status = "alien_lawfully_present"
-    person
-    }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+    let(:verif_type) { person.verification_types.active.where(type_name:"Immigration status").first }
+    let(:history_elements) { verif_type.type_history_elements }
+
+    before do
+      consumer_role.aasm_state = "dhs_pending"
+      consumer_role.citizen_status = "alien_lawfully_present"
+      person.us_citizen = false
+      person.save
+    end
+
+    context "stores DHS response in verification history" do
+      let(:payload) { {:individual_id => individual_id, :body => xml} }
+      it "stores verification history element" do
+        history_elements.delete_all
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements.count).to be > 0
+      end
+
+      it "stores verification history element with correct information" do
+        history_elements.delete_all
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(history_elements.first.action).to eq "DHS Hub response"
+      end
+
+      it "stores reference to EventResponse in verification history element" do
+        history_elements.delete_all
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+        expect(BSON::ObjectId.from_string(history_elements.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.vlp_responses.first.id
+      end
+    end
 
     context "lawful_presence_determination" do
       let(:payload) { {:individual_id => individual_id, :body => xml} }
