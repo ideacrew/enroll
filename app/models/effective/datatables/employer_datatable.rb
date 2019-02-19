@@ -55,7 +55,9 @@ module Effective
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
            ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax'],
            ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(row_actions_id: "family_actions_#{row.id.to_s}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))],
-           ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide']
+           ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide'],
+           ['Extend Open Enrollment', oe_extendable_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), extend_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))],
+           ['Close Open Enrollment', oe_extended_applications_exchanges_hbx_profiles_path(id: row.employer_profile.id, employer_actions_id: "family_actions_#{row.id}"), close_oe_link_type(row, pundit_allow(HbxProfile, :can_extend_open_enrollment?))]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -74,6 +76,16 @@ module Effective
         draft_plan_year = row.employer_profile.draft_plan_year.last
         draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
         draft_plan_year_and_allow ? 'ajax' : 'hide'
+      end
+
+      def extend_oe_link_type(row, allow)
+        extendable_plan_years_and_allow = row.employer_profile.oe_extendable_plan_years.present? && allow
+        extendable_plan_years_and_allow ? 'ajax' : 'hide'
+      end
+
+      def close_oe_link_type(row, allow)
+        extended_plan_years_and_allow = row.employer_profile.oe_extended_plan_years.present? && allow
+        extended_plan_years_and_allow ? 'ajax' : 'hide'
       end
 
       def collection

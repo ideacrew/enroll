@@ -37,7 +37,8 @@ class Permission
   field :can_access_user_account_tab, type: Boolean, default: false
   field :can_force_publish, type: Boolean, default: false
   field :can_create_plan_year, type: Boolean, default: false
-
+  field :can_extend_open_enrollment, type: Boolean, default: false
+  
   class << self
     def hbx_staff
       Permission.where(name: 'hbx_staff').first
