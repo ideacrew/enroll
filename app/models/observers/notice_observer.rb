@@ -151,10 +151,9 @@ module Observers
     def hbx_enrollment_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
-      if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key)
-        hbx_enrollment = new_model_event.klass_instance
-        if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.is_active?
-
+      hbx_enrollment = new_model_event.klass_instance
+      if HbxEnrollment::REGISTERED_EVENTS.include?(new_model_event.event_key) && hbx_enrollment.is_shop?
+        if hbx_enrollment.census_employee.is_active?
           if new_model_event.event_key == :application_coverage_selected
             if hbx_enrollment.enrollment_kind == "open_enrollment"
               deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "notify_employee_of_plan_selection_in_open_enrollment") #initial and renewal EE
@@ -171,7 +170,7 @@ module Observers
         end
 
         if new_model_event.event_key == :employee_coverage_termination
-          if hbx_enrollment.is_shop? && (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state) && hbx_enrollment.benefit_group.is_active?
+          if (CensusEmployee::EMPLOYMENT_ACTIVE_STATES - CensusEmployee::PENDING_STATES).include?(hbx_enrollment.census_employee.aasm_state)
             deliver(recipient: hbx_enrollment.employer_profile, event_object: hbx_enrollment, notice_event: "employer_notice_for_employee_coverage_termination")
             deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_notice_for_employee_coverage_termination")
           end
