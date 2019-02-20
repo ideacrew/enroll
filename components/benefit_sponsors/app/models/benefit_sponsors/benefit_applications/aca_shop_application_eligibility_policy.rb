@@ -82,8 +82,10 @@ module BenefitSponsors
 
     rule :all_contribution_levels_min_met,
           validate: -> (benefit_application) {
-            all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
-            all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+            if benefit_application.benefit_packages.map(&:sponsored_benefits).flatten.present?
+              all_contributions = benefit_application.benefit_packages.collect{|c| c.sorted_composite_tier_contributions }
+              all_contributions.flatten.all?{|c| c.contribution_factor >= c.min_contribution_factor }
+            end
           },
           success:  -> (benfit_application)  { "validated successfully" },
           fail:     -> (benefit_application) { "one or more contribution minimum not met" }
