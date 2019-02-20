@@ -2,7 +2,6 @@ module Notifier
   class MergeDataModels::EmployerProfile
     include Virtus.model
     include ActiveModel::Model
-    include Notifier::MergeDataModels::TokenBuilder
 
     DATE_ELEMENTS = %w(current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on)
 

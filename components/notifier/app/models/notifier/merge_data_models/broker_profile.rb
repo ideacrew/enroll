@@ -3,7 +3,6 @@ module Notifier
 
     include Virtus.model
     include ActiveModel::Model
-    include Notifier::MergeDataModels::TokenBuilder
 
     attribute :notice_date, String
     attribute :first_name, String
