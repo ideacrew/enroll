@@ -1,26 +1,24 @@
 module Notifier
   class Services::NoticeKindService
 
-    attr_accessor :market_kind
+    include Notifier::MergeDataModels::TokenBuilder
+
+    attr_accessor :market_kind, :model_builder
 
     def initialize(market_kind)
       @market_kind = market_kind.to_sym
     end
 
-    def placeholders
-      service.placeholders
-    end
-
-    def configurations
-      service.configurations
-    end
-
-    def tokens
-      service.tokens
+    def builder=(builder_str)
+      @model_builder = builder_str.constantize.new
     end
 
     def recipients
       service.recipients
+    end
+
+    def setting_placeholders
+      service.setting_placeholders
     end
 
     def service
