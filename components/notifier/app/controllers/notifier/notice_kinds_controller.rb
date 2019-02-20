@@ -108,29 +108,27 @@ module Notifier
     end
 
     def get_tokens
-      builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
-      token_builder = builder.constantize.new
-      tokens = token_builder.editor_tokens
-      # placeholders = token_builder.place_holders
-
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: {tokens: tokens} }
+        format.json { render json: {tokens: service.editor_tokens} }
       end
     end
 
     def get_placeholders
-      placeholders = Notifier::MergeDataModels::EmployerProfile.new.place_holders
-
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json {render json: placeholders}
+        format.json { render json: { 
+          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
+        } }
       end
     end
 
     def get_recipients
-      market_kind = params['market_kind']
-      recipients = Notifier::Services::NoticeKindService.new(market_kind).recipients
+      recipients = Notifier::Services::NoticeKindService.new(params['market_kind']).recipients
 
       respond_to do |format|
         format.html
@@ -148,6 +146,10 @@ module Notifier
 
     def notice_params
       params.require(:notice_kind).permit(:title, :market_kind, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+    end
+
+    def builder_param
+      params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
     end
   end
 end
