@@ -111,7 +111,7 @@ describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
     it "should display the carrier name and number" do
       expect(rendered).to match issuer_profile.legal_name
       expect(rendered).to match("1.877.223.0588")
-      expect(rendered).to match("customerservice@altudental.com")
+      expect(rendered).to match("customerservice@altusdental.com")
       expect(rendered).to match("Monday - Thursday, 8 am to 7 pm and Friday 8 am to 5 pm, ET.")
     end
   end
