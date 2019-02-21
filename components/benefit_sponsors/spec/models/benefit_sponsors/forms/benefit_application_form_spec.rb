@@ -7,7 +7,7 @@ module BenefitSponsors
 
     describe "model attributes" do
       it {
-        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on].each do |key|
+        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :admin_datatable_action].each do |key|
           expect(subject.attributes.has_key?(key)).to be_truthy
         end
       }
@@ -58,7 +58,7 @@ module BenefitSponsors
       let(:benefit_application_form) { FactoryGirl.build(:benefit_sponsors_forms_benefit_application)}
 
       it "should assign benefit sponsorship" do
-        form = BenefitSponsors::Forms::BenefitApplicationForm.for_new("rspec-id")
+        form = BenefitSponsors::Forms::BenefitApplicationForm.for_new({:benefit_sponsorship_id => "rspec-id"})
         expect(form.service).to be_instance_of(BenefitSponsors::Services::BenefitApplicationService)
         expect(form.start_on_options).not_to be nil
         expect(form.benefit_sponsorship_id).to eq "rspec-id"
@@ -137,7 +137,6 @@ module BenefitSponsors
       end
     end
 
-
     describe ".persist" do
       let!(:benefit_sponsorship) { FactoryGirl.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
@@ -170,10 +169,55 @@ module BenefitSponsors
           expect(benefit_application_form.persist(update: true)).to be_falsy
         end
       end
-
     end
 
+    describe 'validate form for dt action' do
+      let(:valid_params) {
+        {
+          admin_datatable_action: true,
+          benefit_sponsorship_id: 'id',
+          start_on: TimeKeeper.date_of_record + 3.months,
+          end_on: TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
+          open_enrollment_start_on: TimeKeeper.date_of_record + 2.months,
+          open_enrollment_end_on: TimeKeeper.date_of_record + 2.months + 20.day
+        }
+      }
 
+      let(:invalid_params) {
+        {
+          admin_datatable_action: true,
+          benefit_sponsorship_id: 'id',
+          start_on: TimeKeeper.date_of_record + 3.months,
+          end_on:  TimeKeeper.date_of_record + 1.year + 3.months  - 1.day,
+          open_enrollment_start_on: TimeKeeper.date_of_record + 2.months + 20.day,
+          open_enrollment_end_on: TimeKeeper.date_of_record + 2.months
+        }
+      }
+
+      context 'for valid params' do
+        before :each do
+          @ba_form1 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(valid_params)
+        end
+
+        it 'should return true when validated' do
+          expect(@ba_form1.valid?).to be_truthy
+        end
+      end
+
+      context 'for invalid params' do
+        before :each do
+          @ba_form2 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(invalid_params)
+        end
+
+        it 'should return false when validated' do
+          expect(@ba_form2.valid?).to be_falsey
+        end
+
+        it 'should add errors to the form instance' do
+          @ba_form2.valid?
+          expect(@ba_form2.errors.full_messages).to include("Open Enrollment Start Date can't be later than the Open Enrollment End Date")
+        end
+      end
+    end
   end
-
 end
