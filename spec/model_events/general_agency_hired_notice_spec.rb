@@ -126,6 +126,11 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
             expect(payload[:event_object_kind]).to eq 'EmployerProfile'
             expect(payload[:event_object_id]).to eq employer_profile.id.to_s
           end
+          expect(subject.notifier).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.general_agency.default_ga_hired_notice_to_general_agency"
+            expect(payload[:event_object_kind]).to eq 'BrokerAgencyProfile'
+            expect(payload[:event_object_id]).to eq broker_agency_profile.id.to_s
+          end
           subject.broker_agency_profile_update(model_event)
         end
       end
@@ -198,7 +203,7 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
         expect(merge_model.assignment_date).to eq start_on.strftime('%m/%d/%Y')
       end
 
-      it "should return general agency - employer assignment date" do
+      it "should return general agency - employer termination date" do
         expect(merge_model.termination_date).to eq start_on.strftime('%m/%d/%Y')
       end
 
@@ -254,7 +259,7 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
         expect(merge_model.assignment_date).to eq start_on.strftime('%m/%d/%Y')
       end
 
-      it "should return general agency - employer assignment date" do
+      it "should return general agency - employer termination date" do
         expect(merge_model.termination_date).to eq start_on.strftime('%m/%d/%Y')
       end
 
@@ -264,6 +269,57 @@ RSpec.describe 'ModelEvents::GeneralAgencyHiredNotice', dbclean: :around_each  d
 
        it "should return employer poc last name" do
         expect(merge_model.employer_poc_lastname).to eq employer_staff_role.person.last_name
+      end
+
+      it "should return broker first name " do
+        expect(merge_model.broker.primary_first_name).to eq broker_role.person.first_name
+      end
+
+      it "should return broker last name " do
+        expect(merge_model.broker.primary_last_name).to eq broker_role.person.last_name
+      end
+    end
+
+    context "when event is triggered with broker_agency_profile as event_object" do
+
+      let(:data_elements) {
+        [
+            "general_agency.notice_date",
+            "general_agency.first_name",
+            "general_agency.last_name",
+            "general_agency.assignment_date",
+            "general_agency.legal_name",
+            "general_agency.broker.primary_first_name",
+            "general_agency.broker.primary_last_name",
+        ]
+      }
+
+      let(:payload)   {
+        {
+          "event_object_kind" => "BrokerAgencyProfile",
+          "event_object_id" => broker_agency_profile.id.to_s
+        }
+      }
+
+      before do
+        allow(subject).to receive(:resource).and_return(general_agency_profile)
+        allow(subject).to receive(:payload).and_return(payload)
+      end
+
+      it "should return merge model" do
+        expect(merge_model).to be_a(recipient.constantize)
+      end
+
+      it "should return notice date" do
+        expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      end
+
+      it "should return general agency legal name" do
+        expect(merge_model.legal_name).to eq general_agency_profile.legal_name
+      end
+
+      it "should return general agency - broker assignment date" do
+        expect(merge_model.assignment_date).to eq start_on.strftime('%m/%d/%Y')
       end
 
       it "should return broker first name " do

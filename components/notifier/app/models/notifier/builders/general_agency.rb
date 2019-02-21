@@ -78,7 +78,9 @@ module Notifier
       return @broker if defined? @broker
       if general_agency_account
         @broker = BrokerRole.find(general_agency_account.broker_role_id)
-      elsif payload['notice_params']['broker_agency_profile_id']
+      elsif payload['event_object_kind'].constantize == BrokerAgencyProfile
+        @broker = BrokerAgencyProfile.find(payload['event_object_id']).primary_broker_role
+      elsif payload['notice_params'] && payload['notice_params']['broker_agency_profile_id']
         @broker = BrokerAgencyProfile.find(payload['notice_params']['broker_agency_profile_id']).primary_broker_role
       end
     end
@@ -124,7 +126,7 @@ module Notifier
 
     def general_agency_account
       return @general_agency_account if defined? @general_agency_account
-      if payload['notice_params']['general_agency_account_id'].present?
+      if payload['notice_params'].present? && payload['notice_params']['general_agency_account_id'].present?
         employer.general_agency_accounts.find(payload['notice_params']['general_agency_account_id'])
       end
     end
