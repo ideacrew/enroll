@@ -83,7 +83,8 @@ module SponsoredBenefits
       end
 
       def general_agency_profile
-        self.try(:employer_profile).try(:active_general_agency_account)
+        general_agency_account = general_agency_accounts.active.first
+        general_agency_account.general_agency_profile if general_agency_account
       end
 
       def active_employer_benefit_sponsorship

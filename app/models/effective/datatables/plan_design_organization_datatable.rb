@@ -4,6 +4,12 @@ module Effective
       include Config::AcaModelConcern
 
       datatable do
+
+        bulk_actions_column do
+           bulk_action 'Assign General Agency', "#"
+           bulk_action 'Clear General Agency', "#"
+        end if general_agency_enabled? && !on_general_agency_portal?
+
         table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
           if row.broker_relationship_inactive?
             row.legal_name
@@ -37,7 +43,7 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-            ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+            ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row, is_general_agency?: on_general_agency_portal?), 'ajax'],
             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),

@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'config'
   s.add_dependency 'symmetric-encryption', '~> 3.6.0'
   s.add_dependency 'roo', '~> 2.1.0'
+  s.add_dependency 'virtus', '~> 1.0.5'
 
   s.test_files = Dir["spec/**/*"]
 
