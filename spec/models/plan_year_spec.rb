@@ -8,7 +8,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
-  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+  let(:valid_plan_year_end_on)          { (valid_plan_year_start_on + 1.year - 1.day).end_of_month }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
   let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
   let(:valid_fte_count)                 { 5 }
@@ -476,7 +476,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context 'should return correct benefit group assignments for an employee' do
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
-    let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
+    let(:plan_year_end_on) { (TimeKeeper.date_of_record + 1.year).end_of_month }
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
     let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
     let(:effective_date)         { plan_year_start_on }
@@ -1821,7 +1821,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
 
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
-    let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
+    let(:plan_year_end_on)   { (TimeKeeper.date_of_record + 1.year).end_of_month }
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
     let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
     let(:effective_date)         { plan_year_start_on }
@@ -2504,7 +2504,7 @@ describe PlanYear, 'Cancel plan year', type: :model, dbclean: :after_each do
   let(:benefit_group) { FactoryGirl.build(:benefit_group)}
   let(:benefit_group1) { FactoryGirl.build(:benefit_group)}
   let!(:active_plan_year)  { FactoryGirl.create(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
-  let!(:renewal_plan_year)  { FactoryGirl.create(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let!(:renewal_plan_year)  { FactoryGirl.create(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: (TimeKeeper.date_of_record.next_month + 1.year).end_of_month, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
   let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
   let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}
@@ -2643,17 +2643,18 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   let(:household) { FactoryGirl.create(:household, family: person.primary_family)}
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: census_employee.employee_role.person.primary_family.households.first, benefit_group_id: benefit_group.id)}
 
-  before do
-    TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
-  end
-
-  after do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
-  end
-
   py_termination_dates = [TimeKeeper.date_of_record - 8.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 14.days]
 
   context 'when plan year is terminated' do
+
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
     py_termination_dates.each do |py_end_on|
       it "should move the enrollment to coverage terminated/pending status" do
         plan_year.schedule_termination!(py_end_on)
@@ -2671,6 +2672,62 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
       plan_year.schedule_termination!(py_termination_dates[1])
       hbx_enrollment.reload
       expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+    end
+  end
+
+  context 'when coverage_termination_pending enrollments are present', dbclean: :after_each do
+    let(:terminated_on) { start_on + 2.months }
+
+    before do
+      hbx_enrollment.update_attributes(aasm_state: "coverage_termination_pending", terminated_on: terminated_on)
+      TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    context 'when hbx_enrollment terminated_on > plan_year_end_on' do
+
+      let(:plan_year_end_on) { terminated_on.prev_day }
+
+      it "should update terminated_on on hbx_enrollment" do
+        plan_year.terminate_employee_enrollments(plan_year_end_on)
+        expect(hbx_enrollment.reload.terminated_on).to eq plan_year_end_on
+      end
+    end
+
+    context 'when hbx_enrollment terminated_on < plan_year_end_on' do
+
+      let(:plan_year_end_on) { terminated_on.next_day }
+
+      it "should NOT update terminated_on on hbx_enrollment" do
+        plan_year.terminate_employee_enrollments(plan_year_end_on)
+        expect(hbx_enrollment.reload.terminated_on).to eq terminated_on
+      end
+    end
+  end
+
+  context 'when coverage_terminated enrollments are present', dbclean: :after_each do
+    let(:terminated_on) { start_on + 2.months }
+
+    before do
+      hbx_enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: terminated_on)
+      TimeKeeper.set_date_of_record_unprotected!(start_on.next_month)
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    context 'when hbx_enrollment terminated_on < plan_year_end_on' do
+
+      let(:plan_year_end_on) { terminated_on.next_day }
+
+      it "should NOT update terminated_on on hbx_enrollment" do
+        plan_year.terminate_employee_enrollments(plan_year_end_on)
+        expect(hbx_enrollment.reload.terminated_on).to eq terminated_on
+      end
     end
   end
 end
