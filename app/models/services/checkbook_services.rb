@@ -56,19 +56,19 @@ module Services
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "-01"
-        elsif @hbx_enrollment.household.tax_households.tax_household_with_year(enrollment_year).active_tax_household.first.tax_household_members.flatten.select{|mem| mem.is_ia_eligible=="false"}.present?
+        elsif @hbx_enrollment.household.tax_households.tax_household_with_year(enrollment_year).active_tax_household.first.tax_household_members.select{|mem| !mem.is_ia_eligible}.present? 
           return "-01"
         else
-          case active_house_hold.latest_eligibility_determination.csr_percent_as_integer.to_s
-          when "100"
+          case active_house_hold.valid_csr_kind(hbx_enrollment)
+          when "csr_100"
             "-01"
-          when "94"
+          when "csr_94"
             "-06"
-          when "87"
+          when "csr_87"
             "-05"
-          when "73"
+          when "csr_73"
             "-04"
-          when "0"
+          when "csr_0"
              "-02"
           when "limited"
             "-03"
