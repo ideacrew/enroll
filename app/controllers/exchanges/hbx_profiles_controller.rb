@@ -440,16 +440,20 @@ def employer_poc
     enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
     
     if enrollment.present?
-      reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
-      if reinstated_enrollment.present? && params['comments'].present?
-        reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+      begin
+        reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+        if reinstated_enrollment.present? && params['comments'].present?
+          reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+        end
+        message = {notice: "Enrollment Reinstated successfully."}
+      rescue Exception => e
+        message = {error: e.to_s}
       end
-      message = "Enrollment Reinstated successfully."
     else
-      message = "Unable to find Enrollment."
+      message = {notice: "Unable to find Enrollment."}
     end
 
-    redirect_to exchanges_hbx_profiles_root_path, flash: {notice: message}
+    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def verify_dob_change
