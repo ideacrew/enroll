@@ -28,24 +28,31 @@ module Effective
         
         
         table_column :general_agency, :label => "General Agency", :proc => Proc.new { |row|
-          general_agency_profile = row.general_agency_profile
-          if general_agency_profile
-            clear_assign_path =  raw('<br>') + link_to("clear assignment", main_app.clear_assign_for_employer_broker_agencies_profile_path(id: row.owner_profile_id, employer_id: row.sponsor_profile_id), method: :post, remote: true, data: {  confirm: "This will remove this General Agency assignment. Are you sure?" })
-            general_agency = general_agency_profile.legal_name + clear_assign_path
+          general_agency_account = row.general_agency_accounts.active.first
+          if general_agency_account
+            general_agency_account.legal_name
           end
         }, :sortable => false, :filter => false if general_agency_enabled? && !on_general_agency_portal?
 
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
-           ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
-           ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
-           ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
+            ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row), 'ajax'],
+            ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row), 'static'],
+            ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row), edit_employer_link_type(row)],
+            ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
                               remove_employer_link_type(row),
                               "Are you sure you want to remove this employer?"]
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employers_actions_#{row.id.to_s}"}, formats: :html
+
+          if general_agency_enabled? && !on_general_agency_portal?
+            dropdown << ['Assign General Agency', sponsored_benefits.organizations_general_agency_profiles_path(id: row.id, broker_agency_profile_id: attributes[:profile_id], action_id: "plan_design_#{row.id.to_s}"), 'ajax']
+            dropdown << ['Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profile_path(id: row.id, broker_agency_profile_id: attributes[:profile_id]),
+              'post ajax with confirm',
+              "Are you sure to clear General Agency for this Employer?"
+            ]
+          end
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
@@ -99,7 +106,7 @@ module Effective
       end
 
       def on_general_agency_portal?
-        attributes[:is_general_agency]
+        attributes[:is_general_agency?]
       end
 
       def collection
