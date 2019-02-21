@@ -27,6 +27,7 @@ module SponsoredBenefits
             elsif controller_name == "plan_design_organizations"
               SponsoredBenefits::Organizations::PlanDesignOrganization.find(params[:id])
             end
+            return nil if org.blank?
             @broker_agency_profile = ::BrokerAgencyProfile.find(org.owner_profile_id) # Deprecate this
             @broker_agency_profile ||= BenefitSponsors::Organizations::Profile.find(org.owner_profile_id)
           end
