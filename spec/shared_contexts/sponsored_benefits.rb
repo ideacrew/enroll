@@ -59,6 +59,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   let(:owner_profile) { broker_agency_profile }
   let(:broker_agency) { owner_profile.organization }
+  let(:general_agency) { general_agency_profile }
 
   let(:employer_profile) { sponsor_profile }
   let(:benefit_sponsor) { sponsor_profile.organization }
@@ -150,5 +151,9 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
         :with_aca_shop_cca_employer_profile
       ).profiles.first
     end
+  end
+
+  def general_agency_profile
+    FactoryGirl.create(:general_agency_profile)
   end
 end
