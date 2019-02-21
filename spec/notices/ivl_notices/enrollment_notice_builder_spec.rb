@@ -22,6 +22,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
   let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship')}
   let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number')}
+
   before do
     allow(person.consumer_role).to receive_message_chain("person").and_return(person)
   end
@@ -45,6 +46,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "Build" do
     before :each do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
       bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
       @eligibility_notice.build
@@ -112,6 +116,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "min_notice_due_date", dbclean: :after_each do
     before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
@@ -155,6 +162,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "#attach_required_documents" do
     before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
@@ -190,6 +200,9 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "render template and generate pdf" do
     before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive(:families).and_return([family])
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
