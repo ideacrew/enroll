@@ -1,0 +1,14 @@
+<%= form_tag sponsored_benefits.assign_organizations_general_agency_profile_path(id: @form.plan_design_organization_id), method: :post do %>
+  <%= hidden_field_tag "broker_agency_profile_id", @form.broker_agency_profile_id %>
+  <div class="row">
+    <div class="col col-sm-8">
+      <div class="col col-sm-4 mrg-top">
+        <strong><%= label_tag "Select A General Agency:" %></strong>
+      </div>
+      <div class="col col-sm-4">
+        <%= select_tag "general_agency_profile_id", options_for_select(@form.service.agencies.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select a General Agency" %>
+      </div>
+      <%= submit_tag "Submit", class: "btn btn-default" %>
+    </div>
+  </div>
+<% end %>
