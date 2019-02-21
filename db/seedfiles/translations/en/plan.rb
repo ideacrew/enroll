@@ -89,7 +89,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.kaiser_href_phone' => 'tel:+18007777902',
 
   'en.plans.ad_tty' => 'Not at this time',
-  'en.plans.ad_email' => 'customerservice@altudental.com',
+  'en.plans.ad_email' => 'customerservice@altusdental.com',
   'en.plans.ad_hours' => 'Monday - Thursday, 8 am to 7 pm and Friday 8 am to 5 pm, ET.',
   'en.plans.infoline' => 'INFOLINE:',
   'en.plans.ad_phone' => '1.877.223.0588',
