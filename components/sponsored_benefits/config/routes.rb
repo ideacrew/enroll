@@ -18,6 +18,13 @@ SponsoredBenefits::Engine.routes.draw do
       get :employers, on: :member
     end
 
+    resources :general_agency_profiles, only: [:index] do
+      member do
+        post :assign
+        post :fire
+      end
+    end
+
     resources :plan_design_organizations do
       resources :plan_design_proposals do
         resources :contributions, controller: 'plan_design_proposals/contributions', only: [:index]
