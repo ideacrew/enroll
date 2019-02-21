@@ -169,7 +169,7 @@ RSpec.describe Organization, dbclean: :after_each do
         }
       end
       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
-      let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+      let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: (TimeKeeper.date_of_record + 1.year).end_of_month , aasm_state: 'enrolling') }
       let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
       let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
 
@@ -387,6 +387,25 @@ RSpec.describe Organization, dbclean: :after_each do
     it "should save success with one primary office_location" do
       organization.office_locations = [office_location]
       expect(organization.save).to eq true
+    end
+  end
+
+  context "primary_mailing_address" do
+    let!(:organization) {FactoryGirl.build(:organization)}
+    let!(:office_location) {FactoryGirl.build(:office_location, :with_mailing_address)}
+
+    before :each do
+      organization.office_locations = [office_location]
+      organization.primary_mailing_address
+    end
+
+    it 'should return a valid primary_mailing_address for organization' do
+      expect(organization.primary_mailing_address).to eq office_location.address
+      expect(organization.primary_mailing_address.kind).to eq "mailing"
+    end
+
+    it "should not return an invalid address" do
+      expect(organization.primary_mailing_address.kind).not_to eq "branch"
     end
   end
 

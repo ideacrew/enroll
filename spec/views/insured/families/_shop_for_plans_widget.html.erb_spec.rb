@@ -1,7 +1,6 @@
 require 'rails_helper'
-require 'pry'
 
-RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
+RSpec.describe "insured/families/_shop_for_plans_widget.html.erb", :dbclean => :after_each do
   let(:person) { FactoryGirl.build(:person) }
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
   let(:employee_role) { FactoryGirl.build(:employee_role) }
@@ -75,6 +74,19 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       sign_in(current_user)
+    end
+
+    context "during non-open enrollment period" do
+      before :each do
+        allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        @employee_role = employee_role
+        allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+      end
+
+      it "should not have the text 'You are not under open enrollment period.'" do
+        render "insured/families/shop_for_plans_widget"
+        expect(rendered).not_to have_content "You are not under open enrollment period."
+      end
     end
 
     it "should have the updated description with link to 'enroll today' text" do

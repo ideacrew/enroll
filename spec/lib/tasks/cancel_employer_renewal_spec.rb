@@ -6,7 +6,7 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
   let(:benefit_group) { FactoryGirl.create(:benefit_group)}
   let(:benefit_group1) { FactoryGirl.create(:benefit_group)}
   let(:active_plan_year)  { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'active',benefit_groups:[benefit_group]) }
-  let(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: TimeKeeper.date_of_record.next_month.end_of_month+1.year, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
+  let(:renewal_plan_year)  { FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.months, end_on: (TimeKeeper.date_of_record.next_month+1.year).end_of_month, aasm_state:'renewing_enrolling',benefit_groups:[benefit_group1]) }
   let(:employer_profile)     { FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,renewal_plan_year]) }
   let(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile)}
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member)}

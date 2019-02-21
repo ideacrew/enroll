@@ -4,9 +4,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesSearch
   include Pundit
   include SepAll
+  include VlpDoc
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
@@ -60,6 +61,32 @@ class Exchanges::HbxProfilesController < ApplicationController
       format.html { render "employers/employer_profiles/index" }
       format.js {}
     end
+  end
+
+  def disable_ssn_requirement
+    @organizations= Organization.where(:id.in => params[:ids]).all
+    @organizations.each do |org|
+      # logic for both Bulk Action drop down and action column drop down under data table
+      if params[:can_update].present?
+        if params[:can_update] == "disable"
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
+        end
+      else
+        if org.employer_profile.no_ssn.to_s == "false"
+          org.employer_profile.update_attributes(no_ssn: true, disable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully disabled for the roster of selected employer"
+        else
+          org.employer_profile.update_attributes(no_ssn: false, enable_ssn_date: TimeKeeper.datetime_of_record)
+          flash["success"] = "SSN/TIN requirement has been successfully enabled for the roster of selected employer"
+        end
+      end
+    end
+    redirect_to employer_invoice_exchanges_hbx_profiles_path
+    return
   end
 
   def generate_invoice
@@ -203,6 +230,14 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
+  
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
+
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
 
   def outstanding_verification_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
@@ -219,6 +254,7 @@ def employer_poc
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
+
 
   def show_sep_history
     getActionParams
@@ -430,12 +466,22 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-
+    @ssn_fields = @person.employee_roles.map{|e| e.employer_profile.no_ssn} if @person.employee_roles.present?
+    @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
+    elsif @ssn_fields.present? && @ssn_fields.include?(false)
+      @dont_update_ssn = true
     else
       begin
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date, encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
+        @person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
+        if params[:person][:ssn].blank?
+          @person.encrypted_ssn = ""
+        else
+          @person.ssn = params[:person][:ssn]
+        end
+        @person.save!
+        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
         CensusEmployee.update_census_employee_records(@person, current_user)
       rescue Exception => e
         @error_on_save = @person.errors.messages
@@ -445,6 +491,29 @@ def employer_poc
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
       format.js { render "update_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id] }
+    end
+  end
+
+  def new_eligibility
+    authorize  HbxProfile, :can_add_pdc?
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+    respond_to do |format|
+      format.js { render "new_eligibility", person: @person, :family_actions_id => params[:family_actions_id]  }
+    end
+  end
+
+  def create_eligibility
+    @element_to_replace_id = params[:person][:family_actions_id]
+    family = Person.find(params[:person][:person_id]).primary_family
+    family.active_household.create_new_tax_household(params[:person]) rescue nil
+  end
+
+  def eligibility_kinds_hash(value)
+    if value['pdc_type'] == 'is_medicaid_chip_eligible'
+      { is_medicaid_chip_eligible: true, is_ia_eligible: false }.with_indifferent_access
+    elsif value['pdc_type'] == 'is_ia_eligible'
+      { is_ia_eligible: true, is_medicaid_chip_eligible: false }.with_indifferent_access
     end
   end
 

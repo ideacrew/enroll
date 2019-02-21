@@ -4,13 +4,12 @@
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
-          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body"
-                                    title= "Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them." > STANDARD PLAN </i></div>
+          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= l10n("standard_plan").to_s.upcase %> </i></div>
       <% end %>
     </div>
     <div class="row">
       <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
-          <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i>YOUR CURRENT <%= plan.try(:active_year) %> PLAN </h5>
+          <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i><%= l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase %></h5>
       <% end %>
     </div>
     <div class="row">
@@ -30,7 +29,7 @@
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
           <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb, nil, 'shopping', plan.can_use_aptc?)) %></h2>
-          <small>/Month</small>
+          <small>/<%= l10n("month") %></small>
         </div>
       </div>
     </div>
@@ -84,8 +83,8 @@
         </div>
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
-          <% if @person.primary_family.active_household.latest_active_tax_household.present? && params[:market_kind]=='individual'%>
-            <% eligibility_kind = @person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind %>
+          <% if @tax_household.present? && params[:market_kind]=='individual'%>
+            <% eligibility_kind = @tax_household.valid_csr_kind(@hbx_enrollment) %>
             <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
               <%= link_to "Select Plan", "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
               <%= link_to("Select Plan", "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>

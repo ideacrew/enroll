@@ -6,13 +6,19 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  home_forms_url: "https://dchealthlink.com/forms"
+  forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
+  forms: "https://dchealthlink.com/forms#en"
   website_url: "www.healthcare.gov"
+  healthcare_name: "www.healthcare.gov"
+  healthcare_url: "https://www.healthcare.gov/"
+  irs_url: "https://www.irs.gov/"
+  exchange_hbx_id: "DC0"
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
 
   social_media:
     facebook_url: ""
-
-  aca_market_kinds: ["individual", "shop"]
 
 contact_center:
   name: "DC Health Link's Customer Care Center"
@@ -26,7 +32,8 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-
+  hbx_abbreviation: "DC Health Benefit Exchange"
+  market_kinds: ["individual", "shop"]
 #
   qle:
     with_in_sixty_days: 60
@@ -40,8 +47,10 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2017,11,1) %>
-      end_on: <%= Date.new(2018,01,31) %>
+      start_on: <%= Date.new(2018,11,1) %>
+      end_on: <%= Date.new(2019,02,8) %>
+    dc_resident_application: true
+    transition_family_members_link: true
 
   shop_market:
     small_market_employee_count_maximum: 50
@@ -49,6 +58,7 @@ aca:
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
+    small_market_active_employee_limit: 200
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -108,15 +118,31 @@ aca:
     transmit_scheduled_employers: true
     employer_transmission_day_of_month: 16
 
+notices:
+  individual_market:
+    mail_address:
+      address_1: "PO Box 44018"
+      city: "Washington"
+      zip_code: "20026"
+
+  shop_market:
+    mail_address:
+      address_1: "1225 I Street, NW"
+      address_2: "Suite 400"
+      zip_code: "20005"
+
 paper_notice: 'paper-notices'
-checkbook_services: 
-    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
-    base_url:  "https://dc.checkbookhealth.org"
-    url: "https://dc.checkbookhealth.org/shop/dc/"
+# Note: Remote Aceess keys ad URL's Provided by DC checkbook
+
+checkbook_services:
+    current_year: 2019
+    previous_year: 2018
+    plan_match: "DC"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: "Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC."
+  plan_premium_smaller_than_applied: "Applied APTC for any Enrollment cannot be greater than the Plan Premium."
   max_aptc_non_numeric: "Max APTC needs to be a numeric value."
   max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
   max_aptc_too_big: "Max APTC should be less than 9999.99"

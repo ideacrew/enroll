@@ -23,6 +23,7 @@ describe MakeBenefitGroupAssignmentActive, dbclean: :after_each do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("ce_id").and_return(census_employee.id)
+      allow(ENV).to receive(:[]).with("bga_id").and_return(benefit_group_assignment.id)
       allow(benefit_group_assignment).to receive(:plan_year).and_return(plan_year)
       benefit_group_assignments = [benefit_group_assignment]
       allow(census_employee).to receive(:benefit_group_assignments).and_return benefit_group_assignments

@@ -68,7 +68,7 @@ class IvlNotices::ReminderNotice < IvlNotice
 
   def append_unverified_family_members
     family = recipient.primary_family
-    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+    enrollments = family.active_household.hbx_enrollments.select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -84,14 +84,14 @@ class IvlNotices::ReminderNotice < IvlNotice
     end.uniq
     people = family_members.map(&:person).uniq
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-    people.reject!{|person| !person.consumer_role.outstanding_verification_types.present? }
+    people.reject!{|person| !person.consumer_role.types_include_to_notices.present? }
     if people.empty?
       raise 'no family member found with outstanding verification types or verification_outstanding status'
     end
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.outstanding_verification_types.present?
+      if person.consumer_role.types_include_to_notices.present?
         outstanding_people << person
       end
     end
@@ -102,7 +102,7 @@ class IvlNotices::ReminderNotice < IvlNotice
     end
 
     hbx_enrollments = []
-    en = enrollments.select{ |en| en.enrolled_contingent?}
+    en = enrollments.select{ |en| en.is_ivl_actively_outstanding? }
     health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at)
     dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at)
     hbx_enrollments << health_enrollments
@@ -133,43 +133,38 @@ class IvlNotices::ReminderNotice < IvlNotice
   end
 
   def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+    person.consumer_role.types_include_to_notices.map(&:type_name).include?("Social Security Number")
   end
 
   def citizenship_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+    person.consumer_role.types_include_to_notices.map(&:type_name).include?('Citizenship')
   end
 
   def immigration_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Immigration status')
+    person.consumer_role.types_include_to_notices.map(&:type_name).include?('Immigration status')
   end
 
   def residency_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('DC Residency')
+    person.consumer_role.types_include_to_notices.map(&:type_name).include?('DC Residency')
   end
 
   def append_unverified_individuals(people)
     people.each do |person|
-      person.consumer_role.outstanding_verification_types.each do |verification_type|
-        case verification_type
+      person.consumer_role.types_include_to_notices.each do |verification_type|
+        case verification_type.type_name
         when "Social Security Number"
-          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         when "Immigration status"
-          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         when "Citizenship"
-          notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         when "American Indian Status"
-          notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         when "DC Residency"
-          notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: verification_type.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         end
       end
     end
-  end
-
-  def document_due_date(person, verification_type)
-    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
-    special_verification.present? ? special_verification.due_date : nil
   end
 
   def append_address(primary_address)

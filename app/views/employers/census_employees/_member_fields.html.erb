@@ -27,7 +27,8 @@
                                          :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: !may_update_census_employee?(f.object)} %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: true, readonly: !may_update_census_employee?(f.object) %>
+        <% is_required = (@no_ssn == false || (@census_employee.no_ssn_allowed == true && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.present?)? true : false) %>
+        <%= f.text_field :ssn, placeholder: (is_required ? "SOCIAL SECURITY *" : "SOCIAL SECURITY"), class: "required floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}, required: is_required, readonly: !may_update_census_employee?(f.object) %>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd no-border-xs">
