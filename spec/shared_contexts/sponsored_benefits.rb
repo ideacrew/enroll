@@ -10,6 +10,16 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     sponsor_profile_id: nil
   )}
 
+  let(:plan_design_organization_with_assigned_ga) {
+    plan_design_organization.general_agency_accounts.create(
+      start_on: TimeKeeper.date_of_record,
+      general_agency_profile_id: general_agency_profile.id,
+      broker_agency_profile_id: owner_profile.id,
+      broker_role_id: owner_profile.primary_broker_role.id
+    )
+    plan_design_organization
+  }
+
   let(:plan_design_proposal) {
     FactoryGirl.create(:plan_design_proposal,
       :with_profile,
@@ -59,7 +69,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   let(:owner_profile) { broker_agency_profile }
   let(:broker_agency) { owner_profile.organization }
-  let(:general_agency) { general_agency_profile }
+  let(:general_agency_profile) { ga_profile }
 
   let(:employer_profile) { sponsor_profile }
   let(:benefit_sponsor) { sponsor_profile.organization }
@@ -153,7 +163,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
     end
   end
 
-  def general_agency_profile
+  def ga_profile
     FactoryGirl.create(:general_agency_profile)
   end
 end
