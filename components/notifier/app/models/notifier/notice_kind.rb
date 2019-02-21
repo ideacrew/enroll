@@ -43,8 +43,8 @@ module Notifier
     scope :published,         ->{ any_in(aasm_state: ['published']) }
     scope :archived,          ->{ any_in(aasm_state: ['archived']) }
 
-    scope :shop,              ->{ where(market_kind: :aca_shop) }
-    scope :individual,        ->{ where(market_kind: :aca_individual) }
+    scope :shop,              ->{ where(:market_kind.ne => :aca_individual) }
+    scope :individual,        ->{ where(:market_kind => :aca_individual) }
 
     attr_accessor :resource, :payload
 
