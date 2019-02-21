@@ -24,7 +24,7 @@ module Notifier
     attribute :actual_income, Float
     attribute :dependents, Array[MergeDataModels::Dependent]
     attribute :addresses, Array[MergeDataModels::Address]
-    attribute :aqhp_needed, Boolean
+    attribute :aqhp_eligible, Boolean
     attribute :uqhp_eligible, Boolean
     attribute :incarcerated, Boolean
     attribute :irs_consent, Boolean
@@ -69,16 +69,15 @@ module Notifier
     end
 
     def conditions
-      %w[aqhp_needed? uqhp_eligible? incarcerated? irs_consent?
-        magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid?
-        irs_consent_not_needed? aptc_amount_available? csr?
-        aqhp_needed_and_irs_consent_not_needed? csr_is_73? csr_is_87?
-        csr_is_94? csr_is_100? csr_is_nil?
-      ]
+      %w[aqhp_eligible? uqhp_eligible? incarcerated? irs_consent?
+         magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid?
+         irs_consent_not_needed? aptc_amount_available? csr?
+         aqhp_eligible_and_irs_consent_not_needed? csr_is_73? csr_is_87?
+         csr_is_94? csr_is_100? csr_is_nil?]
     end
 
-    def aqhp_needed?
-      aqhp_needed
+    def aqhp_eligible?
+      aqhp_eligible
     end
 
     def uqhp_eligible?
@@ -117,8 +116,8 @@ module Notifier
       csr
     end
 
-    def aqhp_needed_and_irs_consent_not_needed?
-      aqhp_needed? && !irs_consent?
+    def aqhp_eligible_and_irs_consent_not_needed?
+      aqhp_eligible? && !irs_consent?
     end
 
     def csr_is_73?
