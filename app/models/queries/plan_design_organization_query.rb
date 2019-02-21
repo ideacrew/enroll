@@ -62,11 +62,7 @@ module Queries
     end
 
     def general_agency_plan_design_organizations
-      employer_profile_ids = Organization.by_general_agency_profile(
-        BSON::ObjectId.from_string(custom_attributes[:profile_id])
-      ).map(&:employer_profile).map(&:id).compact
-
-      SponsoredBenefits::Organizations::PlanDesignOrganization.where(:"sponsor_profile_id".in => employer_profile_ids)
+      SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_general_agency(custom_attributes[:profile_id])
     end
   end
 end
