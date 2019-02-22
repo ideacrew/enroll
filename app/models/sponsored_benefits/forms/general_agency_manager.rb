@@ -24,6 +24,14 @@ module SponsoredBenefits
         new(attrs)
       end
 
+      def self.for_default(attrs={})
+        new(attrs)
+      end
+
+      def self.for_clear(attrs={})
+        new(attrs)
+      end
+
       def assign
         service.assign_general_agency
         return false if self.errors.present?
@@ -32,6 +40,20 @@ module SponsoredBenefits
 
       def fire!
         service.fire_general_agency
+        return false if self.errors.present?
+        true
+      end
+
+      def set_default!
+        service.set_default_general_agency
+        return false if self.errors.present?
+        true
+      end
+
+      def clear_default!
+        service.clear_default_general_agency
+        return false if self.errors.present?
+        true
       end
 
       def service

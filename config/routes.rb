@@ -162,6 +162,11 @@ Rails.application.routes.draw do
       member do
         get :inbox
       end
+
+      collection do
+        post :set_default
+        post :clear_default
+      end
     end
 
     resources :broker_applicants

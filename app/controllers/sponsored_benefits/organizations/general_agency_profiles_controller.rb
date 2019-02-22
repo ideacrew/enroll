@@ -41,5 +41,32 @@ module SponsoredBenefits
       end
       redirect_to sponsored_benefits.employers_organizations_broker_agency_profile_path(id: @form.broker_agency_profile_id)
     end
+
+    def set_default
+      # Add pundit Authourization
+      @form = SponsoredBenefits::Forms::GeneralAgencyManager.for_default(
+        broker_agency_profile_id: params[:broker_agency_profile_id],
+        general_agency_profile_id: params[:general_agency_profile_id]
+      )
+      if @form.set_default!
+        flash[:notice] = "Setting default general agencies may take a few minutes to update all employers."
+      else
+        flash[:notice] = "Setting Default General Agency Failed: #{@form.errors.full_messages.join(",")}"
+      end
+      redirect_to main_app.general_agency_index_broker_agencies_profile_path(id: @form.broker_agency_profile_id)
+    end
+
+    def clear_default
+      # Add pundit Authourization
+      @form = SponsoredBenefits::Forms::GeneralAgencyManager.for_clear(
+        broker_agency_profile_id: params[:broker_agency_profile_id],
+      )
+      if @form.clear_default!
+        flash[:notice] = "Clearing default general agencies may take a few minutes to update all employers."
+      else
+        flash[:notice] = "Clearing Default General Agency Failed: #{@form.errors.full_messages.join(",")}"
+      end
+      redirect_to main_app.general_agency_index_broker_agencies_profile_path(id: @form.broker_agency_profile_id)
+    end
   end
 end
