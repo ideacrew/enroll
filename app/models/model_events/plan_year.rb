@@ -13,7 +13,7 @@ module ModelEvents
       # # :open_enrollment_began, #not being used
       # :application_denied,
       :renewal_application_denied,
-      # :group_advance_termination_confirmation,
+      :group_advance_termination_confirmation,
       # :zero_employees_on_roster
     ]
 
@@ -82,9 +82,9 @@ module ModelEvents
         #   is_group_advance_termination_confirmation = true
         # end
         
-        # if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
-        #   is_group_advance_termination_confirmation = true
-        # end
+        if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
+          is_group_advance_termination_confirmation = true
+        end
 
         # if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
         #   is_zero_employees_on_roster = true
