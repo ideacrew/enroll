@@ -1,7 +1,9 @@
 require 'rails_helper'
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 module SponsoredBenefits
   RSpec.describe Organizations::PlanDesignOrganization, type: :model, dbclean: :around_each do
+    include_context "set up broker agency profile for BQT, by using configuration settings"
 
     describe "#expire proposals for non Prospect Employer" do
       let(:organization) { create(:sponsored_benefits_plan_design_organization,
@@ -135,31 +137,17 @@ module SponsoredBenefits
       end
 
       describe ".general_agency_profile" do
-        let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
-                                            sponsor_profile_id: nil,
-                                            owner_profile_id: "89769",
-                                            legal_name: "ABC Company",
-                                            sic_code: "0345" ) }
-        let!(:broker_agency) { double("sponsored_benefits_broker_agency_profile", id: "89769")}
-        let!(:employer_profile_with_ga) { double("::EmployerPorfile")}
-        let!(:employer_profile_with_out_ga) { build("sponsored_benefits_organizations_profile")}
-        let!(:organization) { double("Organization")}
-        let!(:active_general_agency_account) { double("::GeneralAgencyprofileAccount")}
+
+        let(:pdo_with_general_agency) { plan_design_organization_with_assigned_ga }
+        let(:pdo_without_general_agency) { prospect_plan_design_organization }
 
         context "pull active_general_agency_account for organization" do
           it "should return active_general_agency_account" do
-             allow(plan_design_organization).to receive(:broker_agency_profile).and_return(broker_agency)
-             allow(SponsoredBenefits::Organizations::Organization).to receive(:by_broker_agency_profile).with("89769").and_return([organization])
-             allow(organization).to receive(:employer_profile).and_return(employer_profile)
-             allow(employer_profile).to receive(:active_general_agency_account).and_return active_general_agency_account
-             expect(plan_design_organization.general_agency_profile).to eq active_general_agency_account
+             expect(pdo_with_general_agency.general_agency_profile).to eq general_agency_profile
           end
 
           it "should return nil if no active_general_agency_accounts" do
-            allow(plan_design_organization).to receive(:broker_agency_profile).and_return(broker_agency)
-            allow(SponsoredBenefits::Organizations::Organization).to receive(:by_broker_agency_profile).with("89769").and_return([organization])
-            allow(organization).to receive(:employer_profile).and_return(employer_profile_with_out_ga)
-            expect(plan_design_organization.general_agency_profile).to be_nil
+            expect(pdo_without_general_agency.general_agency_profile).to be_nil
           end
         end
       end
