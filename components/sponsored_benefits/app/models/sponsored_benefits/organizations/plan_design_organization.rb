@@ -87,6 +87,10 @@ module SponsoredBenefits
         general_agency_account.general_agency_profile if general_agency_account
       end
 
+      def active_general_agency_account
+        general_agency_accounts.active.first
+      end
+
       def active_employer_benefit_sponsorship
         bs = employer_profile.active_benefit_sponsorship
         bs if (bs && bs.is_eligible?)
