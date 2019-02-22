@@ -16,6 +16,8 @@ module Notifier
       "GeneralAgency" => "Notifier::MergeDataModels::GeneralAgency"
     }
 
+    MARKET_KINDS = [:aca_individual, :aca_shop]
+
     field :title, type: String
     field :description, type: String
     field :identifier, type: String
@@ -23,6 +25,7 @@ module Notifier
     field :recipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
     field :aasm_state, type: String, default: :draft
     field :event_name, type: String, default: nil
+    field :market_kind, type: Symbol, default: :aca_shop
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
@@ -31,14 +34,20 @@ module Notifier
     validates_presence_of :title, :notice_number, :recipient
     validates_uniqueness_of :notice_number
     validates_uniqueness_of :event_name, :allow_blank => true
+   
+    validates :market_kind,
+      inclusion:  { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+      allow_nil:  false
 
     before_save :set_data_elements
 
     scope :published,         ->{ any_in(aasm_state: ['published']) }
     scope :archived,          ->{ any_in(aasm_state: ['archived']) }
 
-    attr_accessor :resource, :payload
+    scope :shop,              ->{ where(market_kind: :aca_shop) }
+    scope :individual,        ->{ where(market_kind: :aca_individual) }
 
+    attr_accessor :resource, :payload
 
     def tokens
       template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
@@ -136,10 +145,10 @@ module Notifier
 
     def self.to_csv
       CSV.generate(headers: true) do |csv|
-        csv << ['Notice Number', 'Title', 'Description', 'Recipient', 'Event Name', 'Notice Template']
+        csv << ['Market Kind', 'Notice Number', 'Title', 'Description', 'Recipient', 'Event Name', 'Notice Template']
 
         all.each do |notice|
-          csv << [notice.notice_number, notice.title, notice.description, notice.recipient, notice.event_name, notice.template.try(:raw_body)]
+          csv << [notice.market_kind, notice.notice_number, notice.title, notice.description, notice.recipient, notice.event_name, notice.template.try(:raw_body)]
         end
       end
     end
