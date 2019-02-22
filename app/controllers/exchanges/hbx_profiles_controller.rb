@@ -438,14 +438,14 @@ def employer_poc
 
   def reinstate_enrollment
     enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
-    
+
     if enrollment.present?
       begin
         reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
         if reinstated_enrollment.present? && params['comments'].present?
           reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+          message = {notice: "Enrollment Reinstated successfully."}
         end
-        message = {notice: "Enrollment Reinstated successfully."}
       rescue Exception => e
         message = {error: e.to_s}
       end

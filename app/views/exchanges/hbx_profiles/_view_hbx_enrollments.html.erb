@@ -23,10 +23,14 @@
 
           <% @enrollments.each_with_index do |enrollment, index| %>
             <tr>
+              <% @terminated_enrollment = enrollment%>
               <td> <%= radio_button_tag("enrollment_id", enrollment.id, (index.zero? ? true : false)) %> </td>
               <td id="name"><%= enrollment.plan.name %> </td>
               <td><%= enrollment.kind.camelcase %></td>
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
+              <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
+              <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
+              <td id="enrollment_reinstated_before" class="hidden"><%= enrollment.reinstated_enrollment_exists? %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
@@ -34,7 +38,7 @@
               <td>
                 <input type="checkbox" name="edi_required" value="checked" checked />
               </td>
-              <td id="name1"><%= enrollment.hbx_id %></td>
+              <td id="hbx_id"><%= enrollment.hbx_id %></td>
             </tr>
           <%end%>
         </table>
@@ -57,36 +61,47 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="row" style="font-size: 15px;">
-          <p class="bg-warning"></p>
-          <div>
-            <h4 class="modal-title" style="display:inline;">
-              You are about to reinstate the following enrollment </br> on behalf of
-            </h4>
-            <p style="display:inline;font-size:15px;">
-              <%= @person.first_name %>
-            </p>
-          </div>
-          <br>
-          <div>
-            <label for="planName" class="col-sm-3 control-label">Plan Name</label>
-            <div class="col-sm-9"><div id="reinstate-plan-name"></div></div>
-          </div>
-          <div>
-            <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
-            <div class="col-sm-9"><div id="effective-date"></div></div>
-          </div>
-          <div>
-            <label for="comments" class="col-sm-3 control-label">Comments</label>
-            <div class="col-sm-9"><textarea class="form-control comments" rows="3"></textarea></div>
+      <% if @terminated_enrollment.can_be_reinstated? && !@terminated_enrollment.reinstated_enrollment_exists? %>
+        <div class="modal-body">
+          <div class="row" style="font-size: 15px;">
+            <p class="bg-warning"></p>
+            <div>
+              <h4 class="modal-title" style="display:inline;">
+                You are about to reinstate the following enrollment </br> on behalf of
+              </h4>
+              <p style="display:inline;font-size:15px;">
+                <%= @person.first_name %>
+              </p>
+            </div>
+            <br>
+            <div>
+              <label for="planName" class="col-sm-3 control-label">Plan Name</label>
+              <div class="col-sm-9"><div id="reinstate-plan-name"></div></div>
+            </div>
+            <div>
+              <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
+              <div class="col-sm-9"><div id="effective-date"></div></div>
+            </div>
+            <div>
+              <label for="comments" class="col-sm-3 control-label">Comments</label>
+              <div class="col-sm-9"><textarea class="form-control comments" rows="3"></textarea></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-        <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+          <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
+        </div>
+      <%else%>
+        <div class="modal-body">
+          <div class="row" style="font-size: 15px;">
+            <p class="bg-warning"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+        </div>
+      <%end%>
     </div>
   </div>
 </div>
@@ -105,8 +120,26 @@
     $('#terminated_enrollemnts :radio:checked').each(function (){
      $('#reinstate-plan-name').html($(this).closest('tr').find("td#name").text());
      $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
-     
+
      var employee_status = $(this).closest('tr').find("td#employee_status").text();
+     var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
+     var enrollment_market = $(this).closest('tr').find("td#enrollment_market").text();
+     var enrollment_reinstated_before = $(this).closest('tr').find("td#enrollment_reinstated_before").text();
+
+     if(enrollment_can_be_reinstated == "false") {
+       if (enrollment_market == "Employer Sponsored"){
+         $('.modal-dialog .bg-warning').html("<%= "Unable to reinstate SHOP enrollment for effective date #{@terminated_enrollment.terminated_on.next_day} : Employer not offering coverage for the effective date." %>");
+       }else{
+         $('.modal-dialog .bg-warning').html("<%= "Unable to reinstate IVL enrollment for effective date #{@terminated_enrollment.terminated_on.next_day} : Previous year terminated enrollment can't be reinstated, please try to reinstate for current year terminated enrollment." %>");
+       }
+     return;
+     }
+
+     if (enrollment_reinstated_before == "true") {
+       $('.modal-dialog .bg-warning').html("<%= "Enrollment with Effective date : #{@terminated_enrollment.terminated_on.next_day} Reinstated Already" %>");
+       return;
+     }
+
      if(employee_status) {
        if(employee_status == 'CobraTerminated') {
          $('.modal-dialog .bg-warning').html("This COBRA employee is no longer 'active' on the employers roster. If you proceed, the COBRA census record will also be reinstated to an 'active' state.")

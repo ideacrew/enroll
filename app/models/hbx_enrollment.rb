@@ -1127,6 +1127,19 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
+  def can_be_reinstated?
+    return false unless self.coverage_terminated?
+    if is_shop? && employer_profile.present?
+      employer_profile.plan_years.published_or_renewing_published.detect do |py|
+        !py.is_conversion && (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(terminated_on.next_day)
+      end.present?
+    elsif is_ivl_by_kind?
+      self.is_effective_in_current_year?
+    else
+      false
+    end
+  end
+
   def reinstated_enrollment_exists?
     family.active_household.hbx_enrollments.where({:kind => self.kind, 
       :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day, 
