@@ -457,6 +457,11 @@ function disableActionButtons() {
 }
 
 function fetch_data_title(min_employee_contribution, minimum_family_contribution) {
+  /* when it runs first time but did not load minimum_employee_contribution hidden_filed_tag page yet */
+  if (typeof min_employee_contribution === "undefined"){
+    return "";
+  }
+
   if (minimum_family_contribution === "0"){
     return "Employer premium contribution for Employee Only Health Plans must be at least " + min_employee_contribution + "%"
   } else {
