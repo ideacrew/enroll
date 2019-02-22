@@ -57,7 +57,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model do
     context 'when enrollment reinstated' do
 
       let(:reinstated_enrollment) {
-        Enrollments::Replicator::EmployerSponsored.new(enrollment, enrollment.terminated_on.next_day).build
+        Enrollments::Replicator::Reinstatement.new(enrollment, enrollment.terminated_on.next_day).build
       }
 
       it "should build reinstated enrollment" do
