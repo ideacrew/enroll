@@ -71,6 +71,34 @@ module SponsoredBenefits
         @highest_cost_plan ||= ::Plan.find(highest_cost_plan_id)
       end
 
+      def set_bounding_cost_health_plans
+        return if reference_plan_id.nil?
+
+        if plan_option_kind == "single_plan"
+          plans = [reference_plan]
+        else
+          if plan_option_kind == "single_carrier"
+            plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+          else
+            plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+          end
+        end
+
+        set_lowest_and_highest(plans)
+      end
+
+      def set_bounding_cost_dental_plans
+        return if reference_plan_id.nil?
+
+        if plan_option_kind == "single_plan"
+          plans = elected_dental_plans
+        elsif plan_option_kind == "single_carrier" || "custom"
+          plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+        end
+
+        set_lowest_and_highest(plans)
+      end
+
     end
   end
 end
