@@ -23,6 +23,11 @@ SponsoredBenefits::Engine.routes.draw do
         post :assign
         post :fire
       end
+
+      collection do
+        post :set_default
+        post :clear_default
+      end
     end
 
     resources :plan_design_organizations do
