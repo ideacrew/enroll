@@ -11,10 +11,10 @@ module Notifier
     attribute :incarcerated, String
     attribute :federal_tax_filing_status, String
     attribute :tax_household_size, Integer
-    attribute :expected_income_for_coverage_year, Float
+    attribute :expected_income_for_coverage_year, String
     attribute :aptc, Float
-    attribute :mec, String
-    attribute :actual_income, Float
+    attribute :other_coverage, String
+    attribute :aqhp_eligible, Boolean
     attribute :uqhp_eligible, Boolean
 
     def self.stubbed_object
@@ -23,15 +23,16 @@ module Notifier
         last_name: 'Parker',
         age: 28,
         federal_tax_filing_status: 'Married Filing Jointly',
-        expected_income_for_coverage_year: 35000.00,
+        expected_income_for_coverage_year: "$35,000",
         citizenship: 'US Citizen',
         dc_resident: 'Yes',
         tax_household_size: 2,
-        incarcerated: 'N',
-        mec: 'Yes',
-        actual_income: 25450.00,
+        coverage_year: 2020,
+        previous_coverage_year: 2019,
+        incarcerated: 'No',
+        other_coverage: 'No',
         aptc: 363.23,
-        uqhp_eligible: true
+        aqhp_eligible: true
       })
     end
 
