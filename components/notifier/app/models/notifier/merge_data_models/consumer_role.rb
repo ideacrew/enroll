@@ -20,13 +20,10 @@ module Notifier
     attribute :expected_income_for_coverage_year, Float
     attribute :previous_coverage_year, Integer
     attribute :aptc, Float
-    attribute :mec, String
-    attribute :actual_income, Float
     attribute :dependents, Array[MergeDataModels::Dependent]
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :aqhp_eligible, Boolean
     attribute :uqhp_eligible, Boolean
-    attribute :incarcerated, Boolean
     attribute :irs_consent, Boolean
     attribute :magi_medicaid, Boolean
     attribute :csr, Boolean
@@ -40,14 +37,15 @@ module Notifier
         age: 28,
         dc_resident: 'Yes',
         citizenship: 'US Citizen',
-        incarcerated: 'N',
-        other_coverage: 'Yes',
+        incarcerated: 'No',
+        other_coverage: 'No',
+        coverage_year: 2020,
+        previous_coverage_year: 2019,
         federal_tax_filing_status: 'Married Filing Jointly',
-        expected_income_for_coverage_year: 25000.00,
+        expected_income_for_coverage_year: "$25,000",
         tax_household_size: 2,
-        mec: 'Yes',
-        actual_income: 26455.00,
-        aptc: 363.23
+        aptc: 363.23,
+        aqhp_eligible: true
       })
       #notice.addresses = [ Notifier::MergeDataModels::IvlAddress.stubbed_object ]
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
@@ -86,7 +84,7 @@ module Notifier
     end
 
     def incarcerated?
-      incarcerated
+      incarcerated?
     end
 
     def irs_consent?

@@ -21,8 +21,11 @@ module Notifier
       builder.event_name = event_name if resource.is_a?(EmployeeRole)
       builder.payload = payload
       builder.append_contact_details
+      builder.dependents if resource.is_a?(ConsumerRole)
       template.data_elements.each do |element|
         elements = element.split('.')
+        next if resource.is_a?(ConsumerRole) && elements.first == 'dependent'
+
         date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
 
         if date_element.present?

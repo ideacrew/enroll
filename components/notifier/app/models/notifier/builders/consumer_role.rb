@@ -12,7 +12,6 @@ module Notifier
     def initialize
       data_object = Notifier::MergeDataModels::ConsumerRole.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
-      data_object.dependents = Notifier::MergeDataModels::Dependent.new
       @merge_model = data_object
     end
 
@@ -33,11 +32,15 @@ module Notifier
     end
 
     def aptc
-      merge_model.aptc = payload['notice_params']['primary_member']['aptc'] if payload['notice_params']['primary_member']['aptc'].present?
+      merge_model.aptc = Integer(payload['notice_params']['primary_member']['aptc']) if payload['notice_params']['primary_member']['aptc'].present?
+    end
+
+    def other_coverage
+      merge_model.other_coverage = payload['notice_params']['primary_member']['mec'].present? ? payload['notice_params']['primary_member']['mec'] : 'No'
     end
 
     def age
-      Date.current.year - Date.parse(payload['notice_params']['primary_member']['dob']).year
+      merge_model.age = Date.current.year - Date.parse(payload['notice_params']['primary_member']['dob']).year
     end
 
     def person
@@ -64,21 +67,17 @@ module Notifier
           last_name: member["last_name"],
           age: Date.current.year - Date.parse(member["dob"]).year,
           federal_tax_filing_status: member["federal_tax_filing_status"],
-          expected_income_for_coverage_year: member["expected_income_for_coverage_year"],
-          citizenship: member["citizenship"],
-          dc_resident: member["dc_resident"],
+          expected_income_for_coverage_year: member["actual_income"].present? ? ActionController::Base.helpers.number_to_currency(member['actual_income'], :precision => 0) : "",
+          citizenship: member["citizen_status"],
+          dc_resident: member["resident"],
           tax_household_size: member["tax_household_size"],
-          incarcerated: member["incarcerated"],
-          mec: member["mec"],
+          incarcerated: (member['incarcerated'] == "N") ? "No" : "Yes",
+          other_coverage: member["mec"].present? ? member["mec"] : "No",
           actual_income: member["actual_income"],
           aptc: member["aptc"],
-          uqhp_eligible: member["uqhp_eligible"].upcase == "YES"
+          aqhp_eligible: member["aqhp_eligible"].upcase == "YES"
         })
       end
-    end
-
-    def dependent_first_name
-      "sdsf"
     end
 
     def ivl_oe_start_date
@@ -94,31 +93,59 @@ module Notifier
     # end
 
     def coverage_year
-      TimeKeeper.date_of_record.next_year.year
+      merge_model.coverage_year = TimeKeeper.date_of_record.next_year.year
     end
 
     def previous_coverage_year
-      coverage_year.to_i - 1
+      merge_model.previous_coverage_year = coverage_year.to_i - 1
+    end
+
+    def depents
+      true
+    end
+
+    def dc_resident
+      merge_model.dc_resident = payload['notice_params']['primary_member']['resident'].capitalize
+    end
+
+    def expected_income_for_coverage_year
+      merge_model.expected_income_for_coverage_year = payload['notice_params']['primary_member']['actual_income'].present? ? ActionController::Base.helpers.number_to_currency(payload['notice_params']['primary_member']['actual_income'], :precision => 0) : ""
+    end
+
+    def federal_tax_filing_status
+     merge_model.federal_tax_filing_status = (payload['notice_params']['primary_member']['filer_type'])
+    end
+
+    def citizenship
+      merge_model.citizenship = payload['notice_params']['primary_member']['citizen_status'].capitalize
+    end
+
+    def tax_household_size
+      merge_model.tax_household_size = Integer(payload['notice_params']['primary_member']['tax_hh_count'])
+    end
+
+    def actual_income
+      merge_model.actual_income = Integer(payload['notice_params']['primary_member']['actual_income'])
     end
 
     def aqhp_eligible
-      payload['notice_params']['primary_member']['aqhp_eligible'].upcase == "YES"
+      merge_model.aqhp_eligible = payload['notice_params']['primary_member']['aqhp_eligible'].upcase == "YES"
     end
 
     def uqhp_eligible
-      payload['notice_params']['primary_member']['uqhp_eligible'].upcase == "YES"
+      merge_model.uqhp_eligible = payload['notice_params']['primary_member']['uqhp_eligible'].upcase == "YES"
     end
 
     def incarcerated
-      payload['notice_params']['primary_member']['incarcerated'].upcase == "N"
+      merge_model.incarcerated = (payload['notice_params']['primary_member']['incarcerated'] == "N") ? "No" : "Yes"
     end
 
     def irs_consent
-      payload['notice_params']['primary_member']['irs_consent'].upcase == "YES"
+      merge_model.irs_consent = payload['notice_params']['primary_member']['irs_consent'].upcase == "YES"
     end
 
     def magi_medicaid
-      payload['notice_params']['primary_member']['magi_medicaid'].upcase == "YES"
+      merge_model.magi_medicaid = payload['notice_params']['primary_member']['magi_medicaid'].upcase == "YES"
     end
 
     # def aptc_amount_available
@@ -126,11 +153,11 @@ module Notifier
     # end
 
     def csr
-      payload['notice_params']['primary_member']['csr'].upcase == "YES"
+      merge_model.csr = payload['notice_params']['primary_member']['csr'].upcase == "YES"
     end
 
     def csr_percent
-      Integer(payload['notice_params']['primary_member']['csr_percent'])
+      merge_model.csr_percent = Integer(payload['notice_params']['primary_member']['csr_percent'])
     end
 
      # Using same merge model for special enrollment period and qualifying life event kind
@@ -148,7 +175,7 @@ module Notifier
     end
 
     def incarcerated?
-      incarcerated
+      incarcerated.upcase == "No"
     end
 
     def irs_consent?
