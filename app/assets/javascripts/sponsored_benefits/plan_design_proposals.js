@@ -64,6 +64,10 @@ function attachEmployerHealthContributionShowHide() {
   }
 }
 
+function referencePlansFetch(element){
+   console.log(element.dataset);
+}
+
 function fetchCarriers() {
   var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
   var selected_carrier_level = $(this).siblings('input').val();
@@ -90,24 +94,6 @@ function fetchCarriers() {
   toggleSliders(selected_carrier_level);
   clearComparisons();
 }
-
-// function fetchDentalCarriers() {
-//   alert("Nisanth");
-//   var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
-//   var selected_carrier_level = $(this).siblings('input').val();
-//   var plan_design_organization_id = $('#plan_design_organization_id').val();
-//   $.ajax({
-//     type: "GET",
-//     data:{
-//       active_year: active_year,
-//       selected_carrier_level: selected_carrier_level,
-//       kind: "dental"
-//     },
-//     url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/carriers"
-//   });
-
-//   displayActiveDentalCarriers();
-// }
 
 function setSBC(element, plan) {
   var kind = fetchBenefitKind();
@@ -160,7 +146,7 @@ function sendPdf(event) {
   window.location.href = $(this).attr('href');
 }
 
-function checkIfSbcIncluded(event) {
+function checkIfSbcIncluded(event)  {
   var elem_id = $(this).attr('id');
   var obj = $('#'+elem_id);
   if(obj.hasClass('plan-not-saved')) {
@@ -240,24 +226,6 @@ function carrierSelected() {
   }
 }
 
-/*
-// Will Remove with refactor
-function planSelected() {
-  toggleSliders($("#elected_plan_kind").val());
-
-  var reference_plan_id = $(this).siblings('input').val();
-  $("#reference_plan_id").val(reference_plan_id);
-  $(this).closest('.benefit-group-fields').find('.health-plan-design .selected-plan').html("<br/><br/><div class=\'col-xs-12\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i><h4 style='text-align: center;'>Loading your reference plan preview...</h4></div>");
-
-  if (reference_plan_id != "" && reference_plan_id != undefined){
-    $('.health-plan-design .selected-plan').show();
-    calcPlanDesignContributions();
-    $(this).siblings('input').prop('checked', true);
-    console.log($(this).siblings('input'))
-  };
-
-  clearComparisons();
-}*/
 function setMyPlans(element) {
   // Need to remove jQuery Selectors
 

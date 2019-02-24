@@ -7,7 +7,8 @@ module SponsoredBenefits
         if benefit_group.sole_source?
           benefit_group.build_estimated_composite_rates
         end
-        benefit_group.set_bounding_cost_plans
+
+        benefit_group.send "set_bounding_cost_#{kind}_plans"
         @employer_contribution_amount = benefit_group.monthly_employer_contribution_amount(@plan)
         @min_employee_cost = benefit_group.monthly_min_employee_cost
         @max_employee_cost = benefit_group.monthly_max_employee_cost
@@ -16,7 +17,7 @@ module SponsoredBenefits
       end
 
       private
-        helper_method :plan_design_proposal, :benefit_group
+        helper_method :plan_design_proposal, :benefit_group, :kind
 
         def plan_design_proposal
           @plan_design_proposal ||= PlanDesignProposal.find(params[:plan_design_proposal_id])
@@ -24,6 +25,10 @@ module SponsoredBenefits
 
         def sponsorship
           @sponsorship ||= plan_design_proposal.profile.benefit_sponsorships.first
+        end
+
+        def kind
+          @kind ||= params[:benefit_group][:kind]
         end
 
         def benefit_group
