@@ -61,8 +61,7 @@ module Factories
           end
 
           @logger.debug "renewing: #{ce.full_name}"
-          person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
-
+          person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first || Person.where(first_name: ce.first_name, last_name: ce.last_name, dob: ce.dob).first
           if person.blank?
             employee_role, family = Factories::EnrollmentFactory.add_employee_role({
               first_name: ce.first_name,
