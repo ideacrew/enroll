@@ -69,7 +69,44 @@ describe Services::CheckbookServices::PlanComparision do
         allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:select).and_return("true")
         expect(subject.csr_value).to eq "-01"
       end
+
+      it "should return correct csr percentage" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        # allow(tax_household).to receive(:tax_households).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:select).and_return(nil)
+        allow(tax_household).to receive(:valid_csr_kind).and_return("csr_73")
+        expect(subject.csr_value).to eq "-04"
+      end
+
+      it "should return correct csr percentage" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        # allow(tax_household).to receive(:tax_households).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:select).and_return(nil)
+        allow(tax_household).to receive(:valid_csr_kind).and_return("csr_94")
+        expect(subject.csr_value).to eq "-06"
+      end
+
+      it "should return correct csr percentage" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        # allow(tax_household).to receive(:tax_households).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:select).and_return(nil)
+        allow(tax_household).to receive(:valid_csr_kind).and_return("csr_0")
+        expect(subject.csr_value).to eq "-02"
+      end
+
+      it "should return correct csr percentage" do
+        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(tax_household)
+        # allow(tax_household).to receive(:tax_households).and_return [eligibility_determination_1]
+        allow(hbx_enrollment).to receive_message_chain(:household,:tax_households,:tax_household_with_year,:active_tax_household, :first,:tax_household_members,:select).and_return(nil)
+        allow(tax_household).to receive(:valid_csr_kind).and_return("limited")
+        expect(subject.csr_value).to eq "-03"
+      end
     end
+
      context "when active household not present" do 
       it "should return -01" do
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
