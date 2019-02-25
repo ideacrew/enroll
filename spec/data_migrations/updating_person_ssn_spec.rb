@@ -14,7 +14,7 @@ describe ChangeFein do
 
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id_1").and_return(person1.hbx_id)
-      allow(ENV).to receive(:[]).with("person_ssn").and_return(person1.ssn)
+      allow(ENV).to receive(:[]).with("person_encrypted_ssn").and_return(person1.encrypted_ssn)
     end
     after(:each) do
       DatabaseCleaner.clean

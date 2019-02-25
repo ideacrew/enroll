@@ -8,7 +8,12 @@ class FixPlanYear < MongoidMigrationTask
     if employer_profile.present?
 
       plan_year_start_on = Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y")
-      plan_year = employer_profile.plan_years.where(start_on: plan_year_start_on).first
+      plan_year_status = ENV['plan_year_status'].to_s
+      if plan_year_status.empty?
+        plan_year = employer_profile.plan_years.where(start_on: plan_year_start_on).first
+      else 
+        plan_year = employer_profile.plan_years.where(start_on: plan_year_start_on, aasm_state: plan_year_status).first
+      end
       prev_state = plan_year.aasm_state
 
       prev_enrollments = if prev_state == "terminated"
@@ -30,31 +35,32 @@ class FixPlanYear < MongoidMigrationTask
         puts "plan year updated" unless Rails.env.test?
 
         return unless ENV['update_enrollments'].present? && ENV['update_enrollments'] == "true"
+        if !prev_enrollments.nil?
+          if plan_year.aasm_state == "active"
+            prev_enrollments.each do |enrollment|
+              enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_selected")
+              puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
+              enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
+            end
 
-        if plan_year.aasm_state == "active"
-          prev_enrollments.each do |enrollment|
-            enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_selected")
-            puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
-            enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
-          end
+          elsif ["canceled","renewing_canceled"].include?("#{plan_year.aasm_state}")
+            prev_enrollments.each do |enrollment|
+              enrollment.update_attributes(aasm_state: "coverage_canceled")
+              puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
+            end
 
-        elsif ["canceled","renewing_canceled"].include?("#{plan_year.aasm_state}")
-          prev_enrollments.each do |enrollment|
-            enrollment.update_attributes(aasm_state: "coverage_canceled")
-            puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
-          end
+          elsif plan_year.aasm_state == "terminated" 
+            prev_enrollments.each do |enrollment|
+              enrollment.update_attributes!(aasm_state: "coverage_terminated", terminated_on: plan_year.terminated_on)
+              puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
+              enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: plan_year.end_on)}
+            end
 
-        elsif plan_year.aasm_state == "terminated"
-          prev_enrollments.each do |enrollment|
-            enrollment.update_attributes!(aasm_state: "coverage_terminated", terminated_on: plan_year.terminated_on)
-            puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
-            enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: plan_year.end_on)}
-          end
-
-        elsif plan_year.aasm_state == "expired"
-          prev_enrollments.each do |enrollment|
-            enrollment.update_attributes(aasm_state: "coverage_expired")
-            puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
+          elsif plan_year.aasm_state == "expired"
+            prev_enrollments.each do |enrollment|
+              enrollment.update_attributes(aasm_state: "coverage_expired")
+              puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
+            end
           end
         end
       else
