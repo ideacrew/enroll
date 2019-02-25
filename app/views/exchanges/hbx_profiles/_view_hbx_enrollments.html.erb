@@ -23,7 +23,6 @@
 
           <% @enrollments.each_with_index do |enrollment, index| %>
             <tr>
-              <% @terminated_enrollment = enrollment%>
               <td> <%= radio_button_tag("enrollment_id", enrollment.id, (index.zero? ? true : false)) %> </td>
               <td id="name"><%= enrollment.plan.name %> </td>
               <td><%= enrollment.kind.camelcase %></td>
