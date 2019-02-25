@@ -4,7 +4,8 @@
       %id= broker_agency_account.broker_agency_profile.organization.hbx_id
     %name= broker_agency_account.broker_agency_profile.legal_name
     %display_name= ""  #field not available
-    %fein= broker_agency_account.broker_agency_profile.fein
+    - if broker_agency_account.broker_agency_profile.fein.present?
+      %fein= broker_agency_account.broker_agency_profile.fein
     %npn= broker_agency_account.broker_agency_profile.corporate_npn
   %writing_agent
     %id

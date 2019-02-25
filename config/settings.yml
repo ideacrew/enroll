@@ -47,6 +47,7 @@ site:
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "MA0"
+  tufts_premier_url: "https://tuftshealthplan.com/contact-us/members"
   mail_address: "noreply@healthconnector.org"
   privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
@@ -219,7 +220,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 21
+        day_of_month: 0
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
       application_submission_soft_deadline: 10

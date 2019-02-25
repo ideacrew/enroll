@@ -24,6 +24,12 @@ module BenefitSponsors
           date = application.start_on - 1.month
           expect(profile.billing_benefit_application(date)).to eq [nil, date]
         end
+
+        it "should return nil and given billing date if given date covers canceled benefit_application effective period " do
+          application.update_attributes!(aasm_state: :canceled)
+          date = application.start_on
+          expect(profile.billing_benefit_application(date)).to eq [nil, date]
+        end
       end
 
       context "when billing date is blank" do
@@ -45,6 +51,11 @@ module BenefitSponsors
 
           it "should return renewal published application effective date & renewal start on date" do
             expect(profile.billing_benefit_application).to eq [renewal_application, TimeKeeper.date_of_record.next_month]
+          end
+
+          it "should return renewal canceled application effective date & renewal start on date" do
+            renewal_application.update_attributes!(aasm_state: :canceled)
+            expect(profile.billing_benefit_application).to eq [nil, nil]
           end
         end
       end
