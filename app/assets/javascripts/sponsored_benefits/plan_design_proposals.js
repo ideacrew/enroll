@@ -66,6 +66,7 @@ function attachEmployerHealthContributionShowHide() {
 
 function fetchDentalCustom(){
     var plan_design_organization_id = $('#plan_design_organization_id').val();
+    var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
     var dental_plan_ids = [];
     $.each($("input[name='Dental Plan']:checked"), function(){
         dental_plan_ids.push($(this).val());
