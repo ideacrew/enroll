@@ -596,9 +596,6 @@ class HbxEnrollment
   def update_renewal_coverage
     
     if is_applicable_for_renewal?
-      if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
-        return
-      end
       employer = benefit_group.plan_year.employer_profile
       if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin

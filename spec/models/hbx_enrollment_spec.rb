@@ -2403,8 +2403,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
       end
 
       context 'when EE terminates current coverage' do
-
-        it 'should cancel passive renewal and generate a waiver' do
+        it 'should cancel passive renewal and should not generate a waiver' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
@@ -2413,7 +2412,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
 
           expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
-          expect(passive_waiver.present?).to be_truthy
+          expect(passive_waiver).to be_nil
         end
       end
     end
