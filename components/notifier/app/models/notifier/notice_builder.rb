@@ -13,7 +13,7 @@ module Notifier
 
     def notice_recipient
       return OpenStruct.new(hbx_id: "100009") if resource.blank?
-      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole)) ? resource.person : resource
+      sub_resource? ? resource.person : resource
     end
 
     def construct_notice_object
@@ -39,10 +39,10 @@ module Notifier
     end
 
     def render_envelope(params)
-      template_location = if self.event_name == 'generate_initial_employer_invoice'
+      template_location = if initial_invoice?
                             'notifier/notice_kinds/initial_invoice/invoice_template.html.erb'
                           else
-                            Settings.notices.shop.partials.template
+                            envelope
                           end
        Notifier::NoticeKindsController.new.render_to_string({
         :template => template_location,
@@ -94,22 +94,16 @@ module Notifier
         formats: :html,
         encoding: 'utf8',
         header: {
-          content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.header,
-            layout: false,
-            locals: {notice: self, recipient: notice_recipient}
-            }),
+          content: ApplicationController.new.render_to_string({ template: header,
+                                                                layout: false,
+                                                                locals: {notice: self, recipient: notice_recipient}})
           }
       }
       #TODO: Add footer partial
       if dc_exchange?
-        options.merge!({footer: {
-          content: ApplicationController.new.render_to_string({
-            template: Settings.notices.shop.partials.footer,
-            layout: false,
-            locals: {notice: self}
-          })
-        }})
+        options.merge!({footer: { content: ApplicationController.new.render_to_string({ template: footer,
+                                                                                        layout: false,
+                                                                                        locals: {notice: self}})}})
       end
       options
     end
@@ -151,7 +145,7 @@ module Notifier
     end
 
     def upload_to_amazonS3
-      if self.event_name == 'generate_initial_employer_invoice'
+      if initial_invoice?
         Aws::S3Storage.save(notice_path, 'invoices', file_name)
       else
         Aws::S3Storage.save(notice_path, 'notices')
@@ -161,9 +155,7 @@ module Notifier
     end
 
     def file_name
-      if self.event_name == 'generate_initial_employer_invoice'
-        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
-      end
+      "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime('%m%d%Y')}_INVOICE_R.pdf" if initial_invoice?
     end
 
     def invoice_date
@@ -222,7 +214,7 @@ module Notifier
 
     def create_recipient_document(doc_uri)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
       title = (self.event_name == 'generate_initial_employer_invoice') ? file_name : notice_filename
 
@@ -234,7 +226,7 @@ module Notifier
         format: "application/pdf"
       }
 
-      doc_params[:date] = invoice_date if self.event_name == 'generate_initial_employer_invoice'
+      doc_params[:date] = invoice_date if initial_invoice?
       notice = receiver.documents.build(doc_params)
 
       if notice.save
@@ -245,20 +237,20 @@ module Notifier
     end
 
     def document_subject
-      if self.event_name == 'generate_initial_employer_invoice'
-        'initial_invoice'
-      else
-        'notice'
-      end
+      initial_invoice? ? 'initial_invoice' : 'notice'
     end
 
     def create_secure_inbox_message(notice)
       receiver = resource
-      receiver = resource.person if (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+      receiver = resource.person if sub_resource?
 
-        body = "<br>You can download the notice by clicking this link " +
-               "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s,
-        receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+      body = if initial_invoice?
+               "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
+             else
+               "<br>You can download the notice by clicking this link " \
+               "<a href=#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s, receiver.id, 'documents', notice.id)}
+               ?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline target='_blank'>#{notice.title.gsub(/[^0-9a-z]/i,'')}</a>"
+             end
 
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
@@ -266,6 +258,26 @@ module Notifier
 
     def clear_tmp
       File.delete(notice_path)
+    end
+
+    def initial_invoice?
+      event_name == 'generate_initial_employer_invoice'
+    end
+
+    def sub_resource?
+      (resource.is_a?(EmployeeRole) || resource.is_a?(BrokerRole))
+    end
+
+    def envelope
+      shop_market? ? Settings.notices.shop.partials.template : Settings.notices.individual.partials.template
+    end
+
+    def header
+      shop_market? ? Settings.notices.shop.partials.header : Settings.notices.individual.partials.header
+    end
+
+    def footer
+      shop_market? ? Settings.notices.shop.partials.footer : Settings.notices.individual.partials.footer
     end
   end
 end
