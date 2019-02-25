@@ -26,6 +26,10 @@ module SponsoredBenefits
               }
       end
 
+      def dental_reference_plans
+
+      end
+
       private
         helper_method :selected_carrier_level, :plan_design_organization, :carrier_profile, :carriers_cache, :kind
 

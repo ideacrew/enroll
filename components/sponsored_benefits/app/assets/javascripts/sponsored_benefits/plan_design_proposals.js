@@ -64,8 +64,23 @@ function attachEmployerHealthContributionShowHide() {
   }
 }
 
-function referencePlansFetch(element){
-   console.log(element.dataset);
+function fetchDentalCustom(){
+    var plan_design_organization_id = $('#plan_design_organization_id').val();
+    var dental_plan_ids = [];
+    $.each($("input[name='Dental Plan']:checked"), function(){
+        dental_plan_ids.push($(this).val());
+    });
+    $.ajax({
+        type: "POST",
+        data:{
+          active_year: active_year,
+          plans_ids: dental_plan_ids,
+        },
+        success: function() {
+
+        },
+        url: "/sponsored_benefits/organizations/plan_design_organizations/" + plan_design_organization_id + "/dental_reference_plans"
+    });
 }
 
 function fetchCarriers() {

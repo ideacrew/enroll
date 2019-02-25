@@ -36,6 +36,7 @@ SponsoredBenefits::Engine.routes.draw do
       end
       resources :carriers, controller: 'plan_design_proposals/carriers', only: [:index]
       resources :plans, controller: 'plan_design_proposals/plans', only: [:index]
+      post :dental_reference_plans, to: :dental_reference_plans, controller: 'plan_design_proposals/plans'
     end
 
     resources :plan_design_proposals, only: [:destroy, :create, :show] do
