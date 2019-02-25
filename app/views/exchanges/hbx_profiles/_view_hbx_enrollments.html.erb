@@ -30,7 +30,7 @@
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
               <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
               <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
-              <td id="enrollment_reinstated_before" class="hidden"><%= enrollment.reinstated_enrollment_exists? %></td>
+              <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.reinstated_enrollment_exists? %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
@@ -44,8 +44,7 @@
         </table>
         <%= hidden_field_tag 'comments' %>
       <%end%>
-
-      <%= submit_tag "Submit", class: 'btn btn-primary', data: {toggle: "modal", target: "#reinstate_confirm"} %>
+      <%= submit_tag "Submit" , onclick: "ReinstateModal()", class: 'btn btn-primary' %>
     <%end%>
 
   </div>
@@ -61,10 +60,10 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <% if @terminated_enrollment.can_be_reinstated? && !@terminated_enrollment.reinstated_enrollment_exists? %>
-        <div class="modal-body">
-          <div class="row" style="font-size: 15px;">
-            <p class="bg-warning"></p>
+      <div class="modal-body">
+        <div class="row" style="font-size: 15px;">
+          <p class="bg-warning"></p>
+          <div id="show_reinstate">
             <div>
               <h4 class="modal-title" style="display:inline;">
                 You are about to reinstate the following enrollment </br> on behalf of
@@ -88,25 +87,32 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-          <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
-        </div>
-      <%else%>
-        <div class="modal-body">
-          <div class="row" style="font-size: 15px;">
-            <p class="bg-warning"></p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-        </div>
-      <%end%>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+        <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
+      </div>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
+
+  var ReinstateModal = function () {
+    $('#reinstate_confirm').modal('show');
+      $('#terminated_enrollemnts :radio:checked').each(function (){
+        var active_enroll_exists_with_reinstate_date = $(this).closest('tr').find("td#active_enroll_exists_with_reinstate_date").text();
+        var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
+          if (enrollment_can_be_reinstated == "true" && active_enroll_exists_with_reinstate_date == "false") {
+            $('#show_reinstate').show();
+            $("a.modal_confirm").show();
+          }else{
+            $('#show_reinstate').hide();
+            $("a.modal_confirm").hide();
+          }
+      });
+  }
+
   $("a.modal_confirm").click(function() {
     $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
     $("#reinstate-form").submit();
@@ -122,21 +128,22 @@
      $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
 
      var employee_status = $(this).closest('tr').find("td#employee_status").text();
+     var effective_date = $(this).closest('tr').find("td#reinstate").text();
      var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
      var enrollment_market = $(this).closest('tr').find("td#enrollment_market").text();
-     var enrollment_reinstated_before = $(this).closest('tr').find("td#enrollment_reinstated_before").text();
+     var active_enroll_exists_with_reinstate_date = $(this).closest('tr').find("td#active_enroll_exists_with_reinstate_date").text();
 
      if(enrollment_can_be_reinstated == "false") {
        if (enrollment_market == "Employer Sponsored"){
-         $('.modal-dialog .bg-warning').html("<%= "Unable to reinstate SHOP enrollment for effective date #{@terminated_enrollment.terminated_on.next_day} : Employer not offering coverage for the effective date." %>");
+         $('.modal-dialog .bg-warning').html("Unable to reinstate Employer Sponsored enrollment : Employer not offering coverage for the effective date " + effective_date);
        }else{
-         $('.modal-dialog .bg-warning').html("<%= "Unable to reinstate IVL enrollment for effective date #{@terminated_enrollment.terminated_on.next_day} : Previous year terminated enrollment can't be reinstated, please try to reinstate for current year terminated enrollment." %>");
+         $('.modal-dialog .bg-warning').html("Unable to reinstate Individual Market enrollment for effective date " + effective_date + " : Previous year terminated enrollment can't be reinstated, Please reinstate for current year terminated enrollment.");
        }
      return;
      }
 
-     if (enrollment_reinstated_before == "true") {
-       $('.modal-dialog .bg-warning').html("<%= "Enrollment with Effective date : #{@terminated_enrollment.terminated_on.next_day} Reinstated Already" %>");
+     if (active_enroll_exists_with_reinstate_date == "true") {
+       $('.modal-dialog .bg-warning').html("Unable to reinstate: Active Enrollment exists with Effective date " + effective_date);
        return;
      }
 

@@ -1128,7 +1128,7 @@ class HbxEnrollment
   end
 
   def can_be_reinstated?
-    return false unless self.coverage_terminated?
+    return false unless self.coverage_terminated? || self.coverage_termination_pending?
     if is_shop? && employer_profile.present?
       employer_profile.plan_years.published_or_renewing_published.detect do |py|
         !py.is_conversion && (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(terminated_on.next_day)

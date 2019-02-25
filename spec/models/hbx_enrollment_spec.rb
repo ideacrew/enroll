@@ -2789,25 +2789,51 @@ describe HbxEnrollment, dbclean: :after_all do
         )
       }
 
-      context 'reinstated effective date falls outside active plan year' do
-        before do
-          enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on)
-          enrollment.reload
+      context "reinstating coverage_terminated enrollment" do
+        context 'reinstated effective date falls outside active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on)
+            enrollment.reload
+          end
+
+          it "should return false" do
+            expect(enrollment.can_be_reinstated?).to be_falsey
+          end
         end
 
-        it "should return false" do
-          expect(enrollment.can_be_reinstated?).to be_falsey
+        context 'reinstated effective date falls with in range of active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
+            enrollment.reload
+          end
+
+          it "should return true" do
+            expect(enrollment.can_be_reinstated?).to be_truthy
+          end
         end
       end
 
-      context 'reinstated effective date falls with in range of active plan year' do
-        before do
-          enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
-          enrollment.reload
+      context "reinstating coverage_terminated pending enrollment" do
+        context 'reinstated effective date falls outside active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_termination_pending', terminated_on: benefit_group.plan_year.end_on)
+            enrollment.reload
+          end
+
+          it "should return false" do
+            expect(enrollment.can_be_reinstated?).to be_falsey
+          end
         end
 
-        it "should return true" do
-          expect(enrollment.can_be_reinstated?).to be_truthy
+        context 'reinstated effective date falls with in range of active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_termination_pending', terminated_on: benefit_group.plan_year.end_on - 1.month)
+            enrollment.reload
+          end
+
+          it "should return true" do
+            expect(enrollment.can_be_reinstated?).to be_truthy
+          end
         end
       end
 
