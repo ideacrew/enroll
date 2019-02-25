@@ -122,8 +122,8 @@ module BenefitSponsors
 
       private
 
-      def execute_sponsor_event(benefit_sponsorship, event)
-        BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorship, event)
+      def execute_sponsor_event(benefit_sponsorships, event)
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorships, event)
       end
 
       def process_events_for(&block)
