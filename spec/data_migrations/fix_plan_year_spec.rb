@@ -29,6 +29,7 @@ describe FixPlanYear, dbclean: :after_each do
       before :each do
         allow(ENV).to receive(:[]).with("fein").and_return organization.fein
         allow(ENV).to receive(:[]).with("start_on").and_return plan_year.start_on
+        allow(ENV).to receive(:[]).with("plan_year_status").and_return ""
         allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'active'
         allow(ENV).to receive(:[]).with("terminated_on").and_return ''
@@ -54,6 +55,7 @@ describe FixPlanYear, dbclean: :after_each do
       before :each do
         allow(ENV).to receive(:[]).with("fein").and_return organization.fein
         allow(ENV).to receive(:[]).with("start_on").and_return plan_year.start_on
+        allow(ENV).to receive(:[]).with("plan_year_status").and_return ""
         allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'terminated'
         allow(ENV).to receive(:[]).with("terminated_on").and_return (TimeKeeper.date_of_record - 1.days).to_s
@@ -80,6 +82,7 @@ describe FixPlanYear, dbclean: :after_each do
       before :each do
         allow(ENV).to receive(:[]).with("fein").and_return organization.fein
         allow(ENV).to receive(:[]).with("start_on").and_return plan_year.start_on
+        allow(ENV).to receive(:[]).with("plan_year_status").and_return ""
         allow(ENV).to receive(:[]).with("end_on").and_return (plan_year.start_on-1.day) + 1.year
         allow(ENV).to receive(:[]).with("aasm_state").and_return 'canceled'
         allow(ENV).to receive(:[]).with("terminated_on").and_return ''
