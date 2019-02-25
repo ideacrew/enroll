@@ -23,7 +23,7 @@ class LawfulPresenceDetermination
   field :vlp_document_id, type: String
   field :citizen_status, type: String
   field :citizenship_result, type: String
-  field :qualified_non_citizenship_result, type:  String
+  field :qualified_non_citizenship_result, type: String
   field :aasm_state, type: String
 
   track_history   :on => [:vlp_verified_at,
