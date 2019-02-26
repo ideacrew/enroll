@@ -21,7 +21,8 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
 
     embeds_many :product_packages, as: :packagable,
-                class_name: "::BenefitMarkets::Products::ProductPackage"
+                class_name: "::BenefitMarkets::Products::ProductPackage",
+                validate: false  # validation disabled to improve performance during catalog creation
 
 
     validates_presence_of :effective_date, :probation_period_kinds, :effective_period, :open_enrollment_period,
