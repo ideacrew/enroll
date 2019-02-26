@@ -556,7 +556,7 @@ module BenefitSponsors
       end
 
       event :revert_to_applicant do
-        transitions from: :applicant, to: :applicant
+        transitions from: [:terminated, :applicant], to: :applicant
       end
 
       event :terminate do
