@@ -160,20 +160,16 @@ class PlanYear
 
     if end_on >= TimeKeeper.date_of_record
       if self.may_schedule_termination?
-        self.terminated_on = terminated_on
-        self.termination_kind = termination_kind
         self.schedule_termination!(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on, transmit_xml: transmit_xml})
         notify_employer_py_terminate(transmit_xml)
       end
     else
      if self.may_terminate?
-        self.termination_kind = termination_kind
-        self.terminated_on = terminated_on
-        self.terminate!(end_on)
-        set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
-        notify_employer_py_terminate(transmit_xml)
-        self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
-        employer_profile.revert_application! if employer_profile.may_revert_application?
+       self.terminate!(end_on)
+       set_plan_year_termination_date(end_on, options = {termination_kind: termination_kind, terminated_on: terminated_on})
+       notify_employer_py_terminate(transmit_xml)
+       self.terminate_employee_enrollments(end_on, options = {transmit_xml: transmit_xml})
+       employer_profile.revert_application! if employer_profile.may_revert_application?
      end
     end
   end
