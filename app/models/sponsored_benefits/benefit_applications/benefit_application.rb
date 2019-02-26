@@ -152,6 +152,22 @@ module SponsoredBenefits
         new_benefit_application
       end
 
+      def to_plan_year(organization)
+        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
+        raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
+        copied_benefit_groups = []
+        benefit_groups.each do |benefit_group|
+          benefit_group.attributes.delete("_type")
+          new_benefit_group = ::BenefitGroup.new(benefit_group.attributes)
+          new_benefit_group.relationship_benefits = benefit_group.relationship_benefits
+          copied_benefit_groups << new_benefit_group
+        end
+        ::PlanYear.new(start_on: effective_period.begin, end_on: effective_period.end,
+                       open_enrollment_start_on: open_enrollment_period.begin,
+                       open_enrollment_end_on: open_enrollment_period.end,
+                       benefit_groups: copied_benefit_groups)
+      end
+
       def set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
         predecessor_applications = new_benefit_sponsorship.benefit_applications.where(:"effective_period.max" => new_benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
         if predecessor_applications.present?
