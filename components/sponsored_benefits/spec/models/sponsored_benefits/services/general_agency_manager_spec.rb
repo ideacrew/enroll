@@ -25,7 +25,7 @@ RSpec.describe SponsoredBenefits::Services::GeneralAgencyManager do
 
   describe "#fire_general_agency" do
     let(:form) { SponsoredBenefits::Forms::GeneralAgencyManager.new(
-      plan_design_organization_id: plan_design_organization_with_assigned_ga.id,
+      plan_design_organization_ids: [plan_design_organization_with_assigned_ga.id],
       broker_agency_profile_id: broker_agency_profile.id
     )}
 
