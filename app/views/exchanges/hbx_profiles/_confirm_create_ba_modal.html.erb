@@ -1,0 +1,33 @@
+<div class="modal" id="create_ba_mod" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Confirm Create Plan Year</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to create a new application?
+          <br/><br/>
+          <strong>
+            Warning:
+          </strong>
+          Creating a new application will cancel or terminate the existing application.
+        </p>
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Confirm", "#", class: "btn btn-primary mtz  btn-small", onclick: 'submitForm()'%>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function submitForm() {
+    $("#adminCreatePyButton").click()
+    $('#create_ba_mod').modal('hide')
+    // swal({title: "Please Hold!", text: "Creating plan year !", showCancelButton: true, icon:"success", buttons:false, closeOnClickOutside:true, timer: 4000});
+  }
+</script>

@@ -222,22 +222,36 @@ module BenefitSponsors
       end
 
       context 'for admin_datatable_action' do
-        let!(:ba)   { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :imported) }
-        let!(:ba2)  { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
 
         before :each do
           create_ba_params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
           @form = init_form_for_create
           set_bs_for_service(@form)
-          @result = subject.create_or_cancel_draft_ba(@form, "")
+          @model_attrs = subject.form_params_to_attributes(@form)
         end
 
-        it 'should return a combination of false and nil' do
-          expect(@result).to eq [false, nil]
+        [:pending, :enrollment_open, :enrollment_eligible, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+          let!(:ba) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :draft) }
+
+          context 'with dt in pending and enrollment states' do
+            let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
+
+            it 'should return true and instance as ba succesfully created' do
+              result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
+              benefit_sponsorship.reload
+              expect(result).to eq [true, benefit_sponsorship.benefit_applications.first]
+            end
+          end
         end
 
-        it 'should add errors to form' do
-          expect(@form.errors.full_messages).to eq ['Existing plan year with overlapping coverage exists']
+        context 'with dt active state' do
+          let!(:ba2) { FactoryGirl.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
+
+          it 'should return true and instance as ba succesfully created' do
+            result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
+            benefit_sponsorship.reload
+            expect(result).to eq [true, benefit_sponsorship.benefit_applications.first]
+          end
         end
       end
 

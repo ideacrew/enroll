@@ -20,6 +20,7 @@ module BenefitSponsors
       attribute :benefit_sponsorship_id, String
       attribute :start_on_options, Hash
       attribute :admin_datatable_action, Boolean, default: false
+      attribute :has_active_ba, Boolean, default: false
 
       validates :start_on, presence: true
       validates :end_on, presence: true
