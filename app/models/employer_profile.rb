@@ -792,17 +792,6 @@ class EmployerProfile
           effective_on = new_date.prev_day.next_month.beginning_of_month.strftime("%Y-%m-%d")
           notify("acapi.info.events.employer.initial_employer_quiet_period_ended", {:effective_on => effective_on})
         end
-
-       #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
-        start_on_for_missing_binder_payments = TimeKeeper.date_of_record.next_month.beginning_of_month
-        binder_next_day = PlanYear.calculate_open_enrollment_date(start_on_for_missing_binder_payments)[:binder_payment_due_date].next_day
-        if new_date == binder_next_day
-          initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
-            if !org.employer_profile.binder_paid?
-              notice_for_missing_binder_payment(org)
-            end
-          end
-        end
       end       
 
       # Employer activities that take place monthly - on first of month
@@ -1047,17 +1036,6 @@ class EmployerProfile
       end
     rescue Exception => e
       Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{org.legal_name} due to #{e.backtrace}"}
-    end
-  end
-
-  def self.notice_for_missing_binder_payment(org)
-    org.employer_profile.trigger_notices("initial_employer_no_binder_payment_received", "acapi_trigger" => true)
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
-      rescue Exception => e
-        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
-      end
     end
   end
 
