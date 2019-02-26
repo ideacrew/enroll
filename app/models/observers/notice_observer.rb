@@ -222,9 +222,9 @@ module Observers
           end
         end
 
-        if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
-             :renewal_plan_year_first_reminder_before_soft_dead_line,
-             :renewal_plan_year_publish_dead_line
+        if [ :renewal_employer_first_reminder_to_publish_plan_year,
+             :renewal_employer_second_reminder_to_publish_plan_year,
+             :renewal_employer_third_reminder_to_publish_plan_year
         ].include?(model_event.event_key)
           current_date = TimeKeeper.date_of_record
           EmployerProfile.organizations_for_force_publish(current_date).each do |organization|
