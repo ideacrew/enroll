@@ -1,5 +1,10 @@
 <div class="container" id="extendable_applications_table">
   <div class = "table-responsive table-override">
+    <div class="pull-right">
+      <a href="javascript:void(0);" onclick="$('tr.child-row:visible').remove();">
+        <span aria-hidden="true"> <i class="fa fa-times fa-lg"></i> </span>
+      </a>
+    </div>
   <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.extend_oe") %> </h4>
 
   <table class = "table" style="table-layout: fixed;">

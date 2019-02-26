@@ -131,6 +131,10 @@ Rails.application.routes.draw do
         get :edit_open_enrollment
         post :extend_open_enrollment
         post :close_extended_open_enrollment
+        get :new_benefit_application
+        post :create_benefit_application
+        get :edit_fein
+        post :update_fein
       end
 
       member do

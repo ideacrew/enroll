@@ -104,6 +104,35 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
       end
     end
 
+    context "fein element" do
+      before do
+        allow(employer_profile).to receive(:staff_roles).and_return([staff])
+        allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
+        allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+        allow(broker_agency_profile).to receive(:active_broker_roles).and_return([broker])
+        allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker)
+      end
+
+      subject do
+        render :template => "events/v2/employers/updated", :locals => { :employer => employer_profile, manual_gen: false }
+        Nokogiri::XML(rendered)
+      end
+
+      it "should display a tag for FEIN" do
+        expect(subject.xpath("//x:fein", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq(employer_profile.fein)
+      end
+
+      context "for an employer without an fein" do
+        before do
+          allow(employer_profile).to receive(:fein).and_return(nil)
+        end
+
+        it "should not display a tag for FEIN" do
+          expect(subject.xpath("//x:fein", "x"=>"http://openhbx.org/api/terms/1.0")).to be_empty
+        end
+      end
+    end
+
     context "with dental plans" do
       context "is_offering_dental? is true" do
 
