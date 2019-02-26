@@ -47,6 +47,26 @@ module BenefitMarkets
               inclusion: {in: BENEFIT_MARKET_KINDS, message: "%{value} is not a valid benefit market kind"}
 
     index({ hbx_id: 1 }, {name: "products_hbx_id_index"})
+    index({ service_area_id: 1}, {name: "products_service_area_index"})
+
+    index({ "application_period.min" => 1,
+            "application_period.max" => 1,
+            },
+            {name: "products_application_period_index"}
+          )
+
+    index({ "benefit_market_kind" => 1,
+            "kind" => 1,
+            "product_package_kinds" => 1
+            },
+            {name: "product_market_kind_product_package_kind_index"}
+          )
+
+    index({ "premium_tables.effective_period.min" => 1,
+            "premium_tables.effective_period.max" => 1 },
+            {name: "products_premium_tables_effective_period_index"}
+          )
+
     index({ "benefit_market_kind" => 1,
             "kind" => 1,
             "product_package_kinds" => 1,
@@ -74,7 +94,8 @@ module BenefitMarkets
     scope :by_issuer_profile,           ->(issuer_profile){ where(issuer_profile_id: issuer_profile.id) }
     scope :by_kind,                     ->(kind){ where(kind: kind) }
     scope :by_service_area,             ->(service_area){ where(service_area: service_area) }
-    scope :by_service_areas, ->(service_area_ids) { where("service_area_id" => {"$in" => service_area_ids }) }
+    scope :by_service_areas,            ->(service_area_ids) { where("service_area_id" => {"$in" => service_area_ids }) }
+
 =begin
     scope :by_coverage_date, ->(coverage_date) {
       where(
@@ -102,9 +123,9 @@ module BenefitMarkets
     scope :by_application_period,       ->(application_period){ 
       where(
         "$or" => [
-      {"application_period.min" => {"$lte" => application_period.max, "$gte" => application_period.min}},
-      {"application_period.max" => {"$lte" => application_period.max, "$gte" => application_period.min}},
-      {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
+          {"application_period.min" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+          {"application_period.max" => {"$lte" => application_period.max, "$gte" => application_period.min}},
+          {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
         ])
     }
 
@@ -288,9 +309,9 @@ module BenefitMarkets
     end
 
     def create_copy_for_embedding
-      new_product = self.class.new(self.attributes.except(:premium_tables))
-      new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
-      new_product
+      self.class.new(self.attributes.except(:premium_tables)).tap do |new_product|
+        new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
+      end
     end
 
     def health?
@@ -300,5 +321,22 @@ module BenefitMarkets
     def dental?
       kind == :dental
     end
+
+    # private
+    # self.class.new(attrs_without_tuples)
+    # def attrs_without_tuples
+    #   attributes.inject({}) do |attrs, (key, val)|
+    #     if key == "premium_tables"
+    #       attrs[key] = val.map do |pt| 
+    #         pt.tap {|t| t.delete("premium_tuples") }
+    #       end
+    #     elsif key == "sbc_document"
+    #       attrs
+    #     else
+    #       attrs[key] = val
+    #     end
+    #     attrs
+    #   end
+    # end
   end
 end
