@@ -75,6 +75,11 @@ module Notifier
       end
     end
 
+    def enrollment_enrollment_kind
+      return if enrollment.blank?
+      merge_model.enrollment.enrollment_kind = enrollment.enrollment_kind
+    end
+
     def enrollment_coverage_end_on
       return if enrollment.blank?
       if event_name == "employee_notice_for_employee_terminated_from_roster"
