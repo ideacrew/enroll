@@ -41,8 +41,8 @@ module SponsoredBenefits
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
-
-      if aca_state_abbreviation == "DC" ? redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits") : redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab=>'benefits')
+      
+      aca_state_abbreviation == "DC" ? (redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits")) : (redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab=>'benefits'))
     end
 
     def publish
