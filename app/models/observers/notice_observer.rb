@@ -30,41 +30,17 @@ module Observers
 
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
-          trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
-        if new_model_event.event_key == :zero_employees_on_roster
-          trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
-        if new_model_event.event_key == :renewal_employer_open_enrollment_completed
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+          # trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :renewal_application_submitted
-          trigger_zero_employees_on_roster_notice(plan_year)
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3a")
-        end
-
-        if new_model_event.event_key == :initial_employer_open_enrollment_completed
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
-        end
-
-        if new_model_event.event_key == :renewal_application_created
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_submitted")
+          # trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :renewal_application_autosubmitted
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "planyear_renewal_3b")
-          trigger_zero_employees_on_roster_notice(plan_year)
-        end
-
-        if new_model_event.event_key == :group_advance_termination_confirmation
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
-
-          plan_year.employer_profile.census_employees.active.each do |ce|
-            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
-          end
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_autosubmitted")
+          # trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :ineligible_initial_application_submitted
@@ -76,11 +52,35 @@ module Observers
         if new_model_event.event_key == :ineligible_renewal_application_submitted
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
-              end
-            end
+            # plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            #   if ce.employee_role.present?
+            #     deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
+            #   end
+            # end
+          end
+        end
+
+        if new_model_event.event_key == :zero_employees_on_roster
+          trigger_zero_employees_on_roster_notice(plan_year)
+        end
+
+        if new_model_event.event_key == :renewal_employer_open_enrollment_completed
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+        end
+
+        if new_model_event.event_key == :initial_employer_open_enrollment_completed
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
+        end
+
+        if new_model_event.event_key == :renewal_application_created
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
+        end
+
+        if new_model_event.event_key == :group_advance_termination_confirmation
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+
+          plan_year.employer_profile.census_employees.active.each do |ce|
+            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
           end
         end
 
