@@ -11,12 +11,14 @@ module BenefitSponsors
     def process(benefit_sponsorships, event)
       business_policy_name = policy_name(event)
 
-      benefit_sponsorships.each do |benefit_sponsorship|
+      benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
         begin
           business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
           sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
         rescue Exception => e
-          @logger.info "EXCEPTION: Event (#{event}) failed for Employer #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein}) due to #{e.to_s}"
+          @logger.info "EXCEPTION: Event (#{event}) failed for Employer #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
+          @logger.error e.message
+          @logger.error e.backtrace.join("\n")
         end
       end
     end
