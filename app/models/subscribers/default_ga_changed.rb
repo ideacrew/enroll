@@ -13,30 +13,32 @@ module Subscribers
       if broker_agency_profile.present?
         if broker_agency_profile.default_general_agency_profile.present?
           #change
-          orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
-          employer_profiles = orgs.map {|o| o.employer_profile}
-          employer_profiles.each do |employer_profile|
-            if employer_profile.active_general_agency_account.blank?
-              employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
-              employer_profile.save
-              send_general_agency_assign_msg(broker_agency_profile, broker_agency_profile.default_general_agency_profile, employer_profile, 'Hire')
+          plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id)
+          plan_design_organizations.each do |pdo|
+            if pdo.active_general_agency_account.blank?
+              service.create_general_agency_account(id: pdo.id, broker_role_id: person.broker_role.id, general_agency_profile_id: broker_agency_profile.default_general_agency_profile_id, broker_agency_profile_id: broker_agency_profile.id)
+              send_general_agency_assign_msg(broker_agency_profile, broker_agency_profile.default_general_agency_profile, pdo.employer_profile, 'Hire')
             end
           end
         else
           #clear
-          orgs = Organization.by_broker_agency_profile(broker_agency_profile.id).by_general_agency_profile(pre_default_ga_id) rescue []
-          employer_profiles = orgs.map {|o| o.employer_profile}
-          employer_profiles.each do |employer_profile|
-            general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
-            if general_agency && general_agency.id.to_s == pre_default_ga_id.to_s
-              send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, 'Terminate')
-              employer_profile.fire_general_agency!
+          plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id).find_by_general_agency(pre_default_ga_id)
+          plan_design_organizations.each do |pdo|
+            general_agency_profile = pdo.active_general_agency_account && pdo.active_general_agency_account.general_agency_profile
+            if general_agency_profile && general_agency_profile.id.to_s == pre_default_ga_id.to_s
+              send_general_agency_assign_msg(broker_agency_profile, general_agency_profile, pdo.employer_profile, 'Terminate')
+              service.fire_general_agency([pdo.id])
             end
           end
         end
       end
     rescue Exception => e
       log("GA_ERROR: Unable to set default ga for #{e.try(:message)}", {:severity => "error"})
+    end
+
+    def service
+      return @service if defined? @service
+      @service = SponsoredBenefits::Services::GeneralAgencyManager.new
     end
 
     def send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, status)
