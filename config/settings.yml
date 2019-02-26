@@ -81,7 +81,6 @@ contact_center:
     state: "DC"
     zip_code: "20090"
 
-<<<<<<< HEAD
   appeal_center:
     name: "DC Health Link"
     address_1: "PO Box 97022"
@@ -118,7 +117,7 @@ plan_option_descriptions:
 
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
-=======
+
   shop:
     attachments:
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
@@ -128,6 +127,7 @@ invoices:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notices/shared/shop_header.html.erb"
       footer: "notices/shared/shop_footer.html.erb"
+
   individual:
     attachments:
       non_discrimination_attachment: "shop_non_discrimination_attachment.pdf"
@@ -137,7 +137,6 @@ invoices:
       template: "notifier/notice_kinds/template.html.erb"
       header: "notices/shared/shop_header.html.erb"
       footer: "notices/shared/shop_footer.html.erb" 
->>>>>>> 75232d4191... Added IVL conditions for notice builders, added settings for IVL
 
 aca:
   state_key : "dc"
