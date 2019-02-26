@@ -27,7 +27,7 @@ module Subscribers
             general_agency_profile = pdo.active_general_agency_account && pdo.active_general_agency_account.general_agency_profile
             if general_agency_profile && general_agency_profile.id.to_s == pre_default_ga_id.to_s
               send_general_agency_assign_msg(broker_agency_profile, general_agency_profile, pdo.employer_profile, 'Terminate')
-              service.fire_general_agency(pdo.id)
+              service.fire_general_agency([pdo.id])
             end
           end
         end
