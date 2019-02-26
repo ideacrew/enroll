@@ -19,13 +19,15 @@ module SponsoredBenefits
         end
       end
 
-      def fire_general_agency(id=form.plan_design_organization_id)
-        plan_design_organization(id).general_agency_accounts.active.each do |account|
-          account.terminate!
+      def fire_general_agency(ids=form.plan_design_organization_ids)
+        ids.each do |id|
+          plan_design_organization(id).general_agency_accounts.active.each do |account|
+            account.terminate!
+            # toDo - check DC notice Engine refactor
+            # notify_general_agent_terminated
+            # self.trigger_notices("general_agency_terminated")
+          end
         end
-        # toDo - check DC notice Engine refactor
-        # notify_general_agent_terminated
-        # self.trigger_notices("general_agency_terminated")
       end
 
       def create_general_agency_account(id, broker_role_id, start_on=TimeKeeper.datetime_of_record, general_agency_profile_id=form.general_agency_profile_id, broker_agency_profile_id=form.broker_agency_profile_id)
@@ -60,7 +62,7 @@ module SponsoredBenefits
       end
 
       def fire_previous_general_agency(id)
-        fire_general_agency(id)
+        fire_general_agency([id])
       end
 
       def map_failed_assignment_on_form(id)

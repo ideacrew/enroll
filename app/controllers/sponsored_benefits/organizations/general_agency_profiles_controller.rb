@@ -31,7 +31,7 @@ module SponsoredBenefits
     def fire
       # Add pundit Authourization
       @form = SponsoredBenefits::Forms::GeneralAgencyManager.for_fire(
-        plan_design_organization_id: params[:id],
+        plan_design_organization_ids: params[:ids],
         broker_agency_profile_id: params[:broker_agency_profile_id]
       )
       if @form.fire!
