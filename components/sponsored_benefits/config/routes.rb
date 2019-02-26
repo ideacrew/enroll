@@ -19,12 +19,9 @@ SponsoredBenefits::Engine.routes.draw do
     end
 
     resources :general_agency_profiles, only: [:index] do
-      member do
+      collection do
         post :assign
         post :fire
-      end
-
-      collection do
         post :set_default
         post :clear_default
       end
