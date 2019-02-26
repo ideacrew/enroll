@@ -720,28 +720,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
-  {
-      hbx_id: 'SHOP_D052',
-      title: 'Confirmation - Broker Fired',
-      description: 'Broker gets terminated after employer selects change broker',
-      resource_name: 'employer',
-      event_name: 'employer_broker_fired',
-      notice_triggers: [
-          {
-              name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
-              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
-              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-              mpi_indicator: 'SHOP_D052',
-              notice_trigger_element_group: {
-                  market_places: ['shop'],
-                  primary_recipients: ["employer"],
-                  primary_recipient_delivery_method: ["secure_message"],
-                  secondary_recipients: []
-              }
-          }
-      ]
-  },
   {
     hbx_id: 'SHOP35',
     title: 'Special Enrollment Period Denial',
@@ -764,27 +742,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP51',
-    title: 'You have been removed as a broker',
-    description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
-    resource_name: 'broker_role',
-    event_name: 'broker_fired_confirmation_to_broker',
-    notice_triggers: [
-      {
-        name: 'Broker Fired',
-        notice_template: 'notices/shop_broker_notices/broker_fired_notice',
-        notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
-        mpi_indicator: 'SHOP_D051',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["broker"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP10047',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'Notification to employees regarding their Employer’s ineligibility.',
@@ -799,27 +756,6 @@ shop_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP_D049',
-    title: 'Confirmation - Broker Hired',
-    description: 'Confirmation of Broker Hired Sent to Employer',
-    resource_name: 'employer',
-    event_name: 'broker_hired_confirmation_notice',
-    notice_triggers: [
-      {
-        name: 'Boker Hired Confirmation',
-        notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
-        notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-        mpi_indicator: 'SHOP_D049',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -904,48 +840,6 @@ shop_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'D048',
-    title: 'You have been hired as a broker',
-    description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-    resource_name: 'broker_role',
-    event_name: 'broker_hired',
-    notice_triggers: [
-      {
-        name: 'Broker Hired',
-        notice_template: 'notices/shop_broker_notices/broker_hired_notice',
-        notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
-        mpi_indicator: 'SHOP_D048',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["broker"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'D047',
-    title: 'You have been Hired as their Broker Agency',
-    description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
-    resource_name: 'broker_role',
-    event_name: 'broker_agency_hired',
-    notice_triggers: [
-      {
-        name: 'Broker Agency Hired',
-        notice_template: 'notices/shop_broker_notices/broker_agency_hired_notice',
-        notice_builder: 'ShopBrokerNotices::BrokerAgencyHiredNotice',
-        mpi_indicator: 'SHOP_D047',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["broker"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
