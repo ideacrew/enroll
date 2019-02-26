@@ -133,7 +133,7 @@ module BenefitSponsors
         end
 
         def eligible_employee_criteria
-          ::CensusEmployee.where(
+          ::CensusEmployee.active_alone.where(
             :benefit_sponsorship_id => benefit_sponsorship.id,
             :hired_on => {"$lte" => coverage_start},
             "$or" => [

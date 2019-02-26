@@ -164,6 +164,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
         allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
         allow(ENV).to receive(:[]).with("notify_trading_partner").and_return("true")
+        allow(ENV).to receive(:[]).with('off_cycle_renewal').and_return('true')
         allow(ENV).to receive(:[]).with("action").and_return("terminate")
         allow(ENV).to receive(:[]).with("termination_date").and_return(termination_date.strftime("%m/%d/%Y"))
         allow(ENV).to receive(:[]).with("end_on").and_return(end_on.strftime("%m/%d/%Y"))
@@ -173,6 +174,11 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
 
       it "should terminate the benefit application" do
         expect(benefit_application.aasm_state).to eq :terminated
+      end
+
+      it "should transition benefit sponsorship to applicant" do
+        benefit_sponsorship.reload
+        expect(benefit_sponsorship.aasm_state).to eq :applicant
       end
 
       it "should update end on date on benefit application" do
@@ -369,6 +375,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:end_on)           { start_on.next_month.end_of_month }
 
       before do
+        allow(ENV).to receive(:[]).with('off_cycle_renewal').and_return('true')
         allow(ENV).to receive(:[]).with("termination_notice").and_return("true")
         allow(ENV).to receive(:[]).with("termination_kind").and_return("voluntary")
         allow(ENV).to receive(:[]).with("termination_reason").and_return("Company went out of business/bankrupt")
