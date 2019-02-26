@@ -21,6 +21,7 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
   }}
   let!(:notice) { catastrophic_plan_notice.notice }
   let!(:catastrophic_plan_notice) { IvlNotices::FinalCatastrophicPlanNotice.new(person.consumer_role, valid_params) }
+  let(:previous_year) { (TimeKeeper.date_of_record.year - 1) }
 
   before :each do
     catastrophic_plan_notice.append_hbe
@@ -30,10 +31,10 @@ RSpec.describe "notices/ivl/final_catastrophic_plan_letter.html.erb" do
 
   it "should display the text" do
     expect(rendered).to have_selector('h3', text: 'TAX INFORMATION FOR YOUR CATASTROPHIC HEALTH PLAN')
-    expect(rendered).to match /Federal law requires most Americans to have a minimum level of health coverage through 2018./
-    expect(rendered).to match /Dear #{person.full_name}:/
+    expect(rendered).to match /Federal law required most Americans to have a minimum level of health coverage or pay a tax penalty through #{previous_year}./
+    expect(rendered).to match /Dear #{person.first_name}:/
     expect(rendered).to match /You are receiving this letter because you were enrolled in a catastrophic health plan through #{Settings.site.short_name} in #{previous_year}./
-    expect(rendered).to match "For more information on these topics, consult a tax adviser or visit the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."
+    expect(rendered).to match /You may receive a tax form from your health insurance company./
     expect(rendered).to match /If you have questions or concerns, we’re here to help./
     expect(rendered).to match /The #{Settings.site.short_name} Team/
   end

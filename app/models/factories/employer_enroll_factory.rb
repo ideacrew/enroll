@@ -25,6 +25,7 @@ module Factories
 
       current_plan_year = published_plan_years.first
       if current_plan_year.may_activate?
+        current_plan_year.activate_employee_benefit_packages
         begin_coverage_for_employees(current_plan_year)
         current_plan_year.activate!
 
@@ -53,7 +54,6 @@ module Factories
 
     def begin_coverage_for_employees(current_plan_year)
       id_list = current_plan_year.benefit_groups.collect(&:_id).uniq
-
 
       families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => {
         :benefit_group_id.in => id_list,

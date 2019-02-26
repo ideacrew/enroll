@@ -111,10 +111,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
     end
 
-    it 'should display find your doctor link' do
-      expect(rendered).to_not have_selector('a', text: /estimate your costs/i)
-    end
-
     it "should display metal level filters if plan_option_kind is single_carrier" do
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
@@ -146,7 +142,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
 
   context "with consumer_role and tax_household" do
     let(:person) {double(is_consumer_role_active?: true)}
-
 
     before :each do
       assign(:hbx_enrollment, hbx_enrollment)

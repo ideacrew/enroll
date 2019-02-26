@@ -54,6 +54,10 @@ RSpec.describe IvlNotices::FinalCatastrophicPlanNotice, dbclean: :after_each do
       expect(@catastrophic_plan_notice.notice.primary_fullname).to eq person.full_name
     end
 
+    it "should receive a primary_firstname" do
+      expect(@catastrophic_plan_notice.notice.primary_firstname).to eq person.first_name
+    end
+
     it "should receive attach_taglines" do
       expect(@catastrophic_plan_notice).to receive :attach_taglines
       @catastrophic_plan_notice.attach_taglines
