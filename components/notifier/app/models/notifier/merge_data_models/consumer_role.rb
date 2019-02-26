@@ -19,19 +19,21 @@ module Notifier
     attribute :coverage_year, Integer
     attribute :expected_income_for_coverage_year, Float
     attribute :previous_coverage_year, Integer
-    attribute :aptc, Float
+    attribute :aptc, String
     attribute :dependents, Array[MergeDataModels::Dependent]
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :aqhp_eligible, Boolean
+    attribute :totally_ineligible, Boolean
     attribute :uqhp_eligible, Boolean
     attribute :irs_consent, Boolean
     attribute :magi_medicaid, Boolean
+    attribute :non_magi_medicaid, Boolean
     attribute :csr, Boolean
     attribute :csr_percent, Integer
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::ConsumerRole.new({
-        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        notice_date: TimeKeeper.date_of_record.strftime('%B %d, %Y'),
         first_name: 'Samules',
         last_name: 'Parker',
         age: 28,
@@ -44,8 +46,17 @@ module Notifier
         federal_tax_filing_status: 'Married Filing Jointly',
         expected_income_for_coverage_year: "$25,000",
         tax_household_size: 2,
-        aptc: 363.23,
-        aqhp_eligible: true
+        aptc: '363.23',
+        aqhp_eligible: true,
+        uqhp_eligible: false,
+        totally_ineligible: true,
+        non_magi_medicaid: false,
+        magi_medicaid: false,
+        irs_consent: true,
+        csr: true,
+        csr_percent: 73,
+        ivl_oe_start_date: 'November 01, 2019',
+        ivl_oe_end_date: 'January 31, 2020'
       })
       #notice.addresses = [ Notifier::MergeDataModels::IvlAddress.stubbed_object ]
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
@@ -71,12 +82,16 @@ module Notifier
         magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid?
         irs_consent_not_needed? aptc_amount_available? csr?
         aqhp_eligible_and_irs_consent_not_needed? csr_is_73? csr_is_87?
-        csr_is_94? csr_is_100? csr_is_nil?
+        csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid? aptc_is_zero? totally_ineligible?
       ]
     end
 
     def aqhp_eligible?
       aqhp_eligible
+    end
+
+    def totally_ineligible?
+      totally_ineligible
     end
 
     def uqhp_eligible?
@@ -95,12 +110,16 @@ module Notifier
       magi_medicaid
     end
 
+    def non_magi_medicaid?
+      non_magi_medicaid
+    end
+
     def aqhp_or_non_magi_medicaid?
-      aqhp_eligible? || !non_magi_medicaid?
+      aqhp_eligible? || non_magi_medicaid?
     end
 
     def uqhp_or_non_magi_medicaid?
-      uqhp_eligible? || !non_magi_medicaid?
+      uqhp_eligible? || non_magi_medicaid?
     end
 
     def irs_consent_not_needed?
@@ -108,7 +127,11 @@ module Notifier
     end
 
     def aptc_amount_available?
-      aptc.present?
+      aptc.present? && aptc.to_i > 0
+    end
+
+    def aptc_is_zero?
+      aptc.present? && aptc.to_i.zero?
     end
 
     def csr?
@@ -120,28 +143,32 @@ module Notifier
     end
 
     def csr_is_73?
-      false if csr?
+      false unless csr?
       csr_percent == 73
     end
 
     def csr_is_87?
-      false if csr?
+      false unless csr?
       csr_percent == 87
     end
 
     def csr_is_94?
-      false if csr?
+      false unless csr?
       csr_percent == 94
     end
 
     def csr_is_100?
-      false if csr?
+      false unless csr?
       csr_percent == 100
     end
 
-    def csr_is_nil?
-      false if csr?
+    def csr_is_zero?
+      false unless csr?
       csr_percent == 0
+    end
+
+    def csr_is_nil?
+      false unless csr?
     end
   end
 end

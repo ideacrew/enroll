@@ -20,7 +20,7 @@ module Notifier
     end
 
     def notice_date
-      merge_model.notice_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      merge_model.notice_date = TimeKeeper.date_of_record.strftime('%B %d, %Y')
     end
 
     def first_name
@@ -32,7 +32,7 @@ module Notifier
     end
 
     def aptc
-      merge_model.aptc = Integer(payload['notice_params']['primary_member']['aptc']) if payload['notice_params']['primary_member']['aptc'].present?
+      merge_model.aptc = (payload['notice_params']['primary_member']['aptc'])
     end
 
     def other_coverage
@@ -66,16 +66,17 @@ module Notifier
           first_name: member["first_name"],
           last_name: member["last_name"],
           age: Date.current.year - Date.parse(member["dob"]).year,
-          federal_tax_filing_status: member["federal_tax_filing_status"],
+          federal_tax_filing_status: filer_type(member["filer_type"]),
           expected_income_for_coverage_year: member["actual_income"].present? ? ActionController::Base.helpers.number_to_currency(member['actual_income'], :precision => 0) : "",
-          citizenship: member["citizen_status"],
+          citizenship: citizen_status(member["citizen_status"]),
           dc_resident: member["resident"],
-          tax_household_size: member["tax_household_size"],
+          tax_household_size: member["tax_hh_count"],
           incarcerated: (member['incarcerated'] == "N") ? "No" : "Yes",
           other_coverage: member["mec"].present? ? member["mec"] : "No",
-          actual_income: member["actual_income"],
           aptc: member["aptc"],
-          aqhp_eligible: member["aqhp_eligible"].upcase == "YES"
+          aqhp_eligible: member["aqhp_eligible"].upcase == "YES",
+          uqhp_eligible: member["uqhp_eligible"].upcase == "YES",
+          totally_ineligible: member["totally_inelig"].upcase == "YES"
         })
       end
     end
@@ -87,10 +88,6 @@ module Notifier
     def ivl_oe_end_date
       merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on
     end
-
-    # def email
-    #   merge_model.email = consumer_role.person.work_email_or_best if consumer_role.present?
-    # end
 
     def coverage_year
       merge_model.coverage_year = TimeKeeper.date_of_record.next_year.year
@@ -113,11 +110,11 @@ module Notifier
     end
 
     def federal_tax_filing_status
-     merge_model.federal_tax_filing_status = (payload['notice_params']['primary_member']['filer_type'])
+      merge_model.federal_tax_filing_status = filer_type(payload['notice_params']['primary_member']['filer_type'])
     end
 
     def citizenship
-      merge_model.citizenship = payload['notice_params']['primary_member']['citizen_status'].capitalize
+      merge_model.citizenship = citizen_status(payload['notice_params']['primary_member']['citizen_status'])
     end
 
     def tax_household_size
@@ -130,6 +127,10 @@ module Notifier
 
     def aqhp_eligible
       merge_model.aqhp_eligible = payload['notice_params']['primary_member']['aqhp_eligible'].upcase == "YES"
+    end
+
+    def totally_ineligible
+      merge_model.aqhp_eligible = payload['notice_params']['primary_member']['totally_inelig'].upcase == "YES"
     end
 
     def uqhp_eligible
@@ -148,9 +149,9 @@ module Notifier
       merge_model.magi_medicaid = payload['notice_params']['primary_member']['magi_medicaid'].upcase == "YES"
     end
 
-    # def aptc_amount_available
-    #   payload['notice_params']['primary_member']['aptc'].present?
-    # end
+    def non_magi_medicaid
+      merge_model.non_magi_medicaid = payload['notice_params']['primary_member']['non_magi_medicaid'].upcase == "YES"
+    end
 
     def csr
       merge_model.csr = payload['notice_params']['primary_member']['csr'].upcase == "YES"
@@ -163,11 +164,15 @@ module Notifier
      # Using same merge model for special enrollment period and qualifying life event kind
     def format_date(date)
       return '' if date.blank?
-      date.strftime('%m/%d/%Y')
+      date.strftime('%B %d, %Y')
     end
 
     def aqhp_eligible?
       aqhp_eligible
+    end
+
+    def totally_ineligible?
+      totally_ineligible
     end
 
     def uqhp_eligible?
@@ -184,6 +189,14 @@ module Notifier
 
     def magi_medicaid?
       magi_medicaid
+    end
+
+    def non_magi_medicaid?
+      non_magi_medicaid
+    end
+
+    def aptc_is_zero?
+      aptc.present? && aptc.to_i.zero?
     end
 
     def aqhp_or_non_magi_medicaid?
@@ -211,32 +224,62 @@ module Notifier
     end
 
     def csr_is_73?
-      false if csr?
+      false unless csr?
       csr_percent == 73
     end
 
     def csr_is_87?
-      false if csr?
+      false unless csr?
       csr_percent == 87
     end
 
     def csr_is_94?
-      false if csr?
+      false unless csr?
       csr_percent == 94
     end
 
     def csr_is_100?
-      false if csr?
+      false unless csr?
       csr_percent == 100
     end
 
-    def csr_is_nil?
-      false if csr?
+    def csr_is_zero?
+      false unless csr?
       csr_percent == 0
+    end
+
+    def csr_is_nil?
+      false unless csr?
     end
 
     def is_shop?
       false
+    end
+
+    def filer_type(type)
+      case type
+      when "Filers"
+        "Tax Filer"
+      when "Dependents"
+        "Tax Dependent"
+      when "Married Filing Jointly"
+        "Married Filing Jointly"
+      else
+        ""
+      end
+    end
+
+    def citizen_status(status)
+      case status
+      when "US"
+        "US Citizen"
+      when "LP"
+        "Lawfully Present"
+      when "NC"
+        "US Citizen"
+      else
+        ""
+      end
     end
   end
 end
