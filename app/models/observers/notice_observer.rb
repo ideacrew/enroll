@@ -60,7 +60,7 @@ module Observers
         end
 
         if new_model_event.event_key == :group_advance_termination_confirmation
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "notify_employer_of_group_advance_termination")
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
 
           plan_year.employer_profile.census_employees.active.each do |ce|
             deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
