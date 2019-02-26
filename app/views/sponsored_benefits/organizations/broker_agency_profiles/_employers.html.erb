@@ -16,19 +16,55 @@
         <%= render_datatable(@datatable) %>
       </div>
     </div>
-
-    <% if general_agency_enabled? and @general_agency_profiles %>
-      <div class="col-md-4">
-        <h3><%= "general_agencies" %></h3>
-        <%= select_tag "employers_general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
-        <%= hidden_field_tag :from_assign, false %>
-        <%= submit_tag "assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
-        <%= submit_tag "clear_assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
-      </div>
-    <% end %>
   <% end %>
 </div>
+
+<div class="modal fade" id="assign_ga" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><strong>Assign General Agency</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_tag sponsored_benefits.assign_organizations_general_agency_profiles_path, method: :post, id: "assign_modal_form" do %>
+          <%= hidden_field_tag "broker_agency_profile_id", @profile.id %>
+          <div class="row">
+            <div class="col col-sm-12">
+              <div class="col col-sm-4 mrg-top">
+                <strong><%= label_tag "Select A General Agency:" %></strong>
+              </div>
+              <div class="col col-sm-6">
+                <%= select_tag "general_agency_profile_id", options_for_select(@general_agency_profiles.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select a General Agency" %>
+              </div>
+              <%= submit_tag "Submit", class: "btn btn-default", id:"submit_ga_assignment" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   initializeDataTables();
+
+  $("#bulk_action_assign").on('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var ids = []
+    $(".individual_checkbox:checked").each(function(){
+      ids.push($(this).val());
+    })
+
+    $('form#assign_modal_form').prepend("<input type='hidden' id='ids' name='ids' />");
+    $("#ids").val(JSON.stringify(ids));
+
+    $("#assign_ga").modal("show");
+  });
 </script>
 

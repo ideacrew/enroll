@@ -15,7 +15,7 @@ module SponsoredBenefits
     def assign
       # Add pundit Authourization
       @form = SponsoredBenefits::Forms::GeneralAgencyManager.for_assign(
-        plan_design_organization_ids: [params[:id]] || params[:ids],
+        plan_design_organization_ids: JSON.parse(params[:ids].to_s),
         broker_agency_profile_id: params[:broker_agency_profile_id],
         general_agency_profile_id: params[:general_agency_profile_id]
       )
