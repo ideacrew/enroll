@@ -31,9 +31,9 @@ Feature: Super Admin & tier3 able to see & access "Create Plan Year" Feature.
     Then the Open Enrollment Start Date for the Create Plan Year form will be disabled
     Then the Open Enrollment End Date for the Create Plan Year form will be disabled
 
-  Scenario: Open Enrollment Start Date and Open Enrollment End Date will be disabled until user selects a Start Date
-    When the Hbx Admin clicks on Create Plan Year link
-    Then the Hbx Admin selects an Effective Start Date from the Create Plan Year form
-    Then the Effective End Date for the Create Plan Year form will be filled in
-    Then the Open Enrollment Start Date for the Create Plan Year form will be enabled
-    Then the Open Enrollment End Date for the Create Plan Year form will be enabled
+  #Scenario: Open Enrollment Start Date and Open Enrollment End Date will be disabled until user selects a Start Date
+  #  When the Hbx Admin clicks on Create Plan Year link
+  #  Then the Hbx Admin selects an Effective Start Date from the Create Plan Year form
+  #  Then the Effective End Date for the Create Plan Year form will be filled in
+  #  Then the Open Enrollment Start Date for the Create Plan Year form will be enabled
+  #  Then the Open Enrollment End Date for the Create Plan Year form will be enabled
