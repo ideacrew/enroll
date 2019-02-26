@@ -7,7 +7,8 @@ module Effective
 
         bulk_actions_column do
            bulk_action 'Assign General Agency', "#", id: "bulk_action_assign"
-           bulk_action 'Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(broker_agency_profile_id: attributes[:profile_id])
+           bulk_action 'Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(broker_agency_profile_id: attributes[:profile_id]),
+            data: { confirm: 'Are you sure to clear general agency to the selected Employers?' }
         end if general_agency_enabled? && !on_general_agency_portal?
 
         table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
