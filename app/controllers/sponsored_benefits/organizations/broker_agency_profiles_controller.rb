@@ -3,7 +3,7 @@ require_dependency "sponsored_benefits/application_controller"
 module SponsoredBenefits
   class Organizations::BrokerAgencyProfilesController < ApplicationController
     include DataTablesAdapter
-    before_action :find_profile, only: [:employers]
+    before_action :find_profile, :general_agency_profiles, only: [:employers]
 
     def employers
       # This should be index action in plan design organizations controller
@@ -19,6 +19,11 @@ module SponsoredBenefits
 
     def is_profile_general_agency?
       @profile.class.to_s == "GeneralAgencyProfile"
+    end
+
+    def general_agency_profiles
+      return @general_agency_profiles if defined? @general_agency_profiles
+      @general_agency_profiles = ::GeneralAgencyProfile.all
     end
   end
 end

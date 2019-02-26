@@ -1,4 +1,4 @@
-<%= form_tag sponsored_benefits.assign_organizations_general_agency_profile_path(id: @form.plan_design_organization_id), method: :post do %>
+<%= form_tag sponsored_benefits.assign_organizations_general_agency_profiles_path(ids: [@form.plan_design_organization_id]), method: :post do %>
   <%= hidden_field_tag "broker_agency_profile_id", @form.broker_agency_profile_id %>
   <div class="row">
     <div class="col col-sm-8">
