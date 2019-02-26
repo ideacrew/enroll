@@ -1,15 +1,9 @@
 module Effective
   module Datatables
-    class PlanDesignOrganizationDatatable < ::Effective::MongoidDatatable
+    class GeneralAgencyPlanDesignOrganizationDatatable < ::Effective::MongoidDatatable
       include Config::AcaModelConcern
 
       datatable do
-
-        bulk_actions_column do
-           bulk_action 'Assign General Agency', "#", id: "bulk_action_assign"
-           bulk_action 'Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(broker_agency_profile_id: attributes[:profile_id]),
-            data: { confirm: 'Are you sure to clear general agency to the selected Employers?' }
-        end if general_agency_enabled? && !on_general_agency_portal?
 
         table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
           if row.broker_relationship_inactive?
@@ -32,14 +26,6 @@ module Effective
         }, :sortable => false, :filter => false
 
         table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
-        
-        
-        table_column :general_agency, :label => "General Agency", :proc => Proc.new { |row|
-          general_agency_account = row.general_agency_accounts.active.first
-          if general_agency_account
-            general_agency_account.legal_name
-          end
-        }, :sortable => false, :filter => false if general_agency_enabled? && !on_general_agency_portal?
 
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
@@ -51,14 +37,6 @@ module Effective
                               remove_employer_link_type(row),
                               "Are you sure you want to remove this employer?"]
           ]
-
-          if general_agency_enabled? && !on_general_agency_portal?
-            dropdown << ['Assign General Agency', sponsored_benefits.organizations_general_agency_profiles_path(id: row.id, broker_agency_profile_id: attributes[:profile_id], action_id: "plan_design_#{row.id.to_s}"), 'ajax']
-            dropdown << ['Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(ids: [row.id], broker_agency_profile_id: attributes[:profile_id]),
-              'post ajax with confirm',
-              "Are you sure to clear General Agency for this Employer?"
-            ]
-          end
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
