@@ -30,7 +30,7 @@ module SponsoredBenefits
       end
 
       it "should set datatable instance variable" do
-        expect(assigns(:datatable).class).to eq Effective::Datatables::PlanDesignOrganizationDatatable
+        expect(assigns(:datatable).class).to eq Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable
       end
     end
   end
