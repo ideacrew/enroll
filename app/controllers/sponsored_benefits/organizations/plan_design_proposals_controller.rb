@@ -2,6 +2,7 @@ module SponsoredBenefits
   class Organizations::PlanDesignProposalsController < ApplicationController
     include SponsoredBenefits::ApplicationHelper
     include ApplicationHelper
+    include Config::AcaHelper
 
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
@@ -17,13 +18,14 @@ module SponsoredBenefits
     def claim
       # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
       employer_profile_id = params.fetch(:employer_profile_id, nil)
-      organization =  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
+      employer_profile = EmployerProfile.find(employer_profile_id)
+      employer_profile ||=  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
 
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
-      error_message = quote.present? ? check_if_county_zip_are_same(quote, organization.employer_profile) : ""
+      error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
 
       if error_message.present?
         flash[:error] = error_message
@@ -33,14 +35,14 @@ module SponsoredBenefits
         flash[:error] = "Quote claim code already claimed."
       else
         begin
-          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(organization, quote)
+          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         rescue Exception => e
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
 
-      redirect_to benefit_sponsors.profiles_employers_employer_profile_path(organization.employer_profile, :tab=>'benefits')
+      if aca_state_abbreviation == "DC" ? redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits") : redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab=>'benefits')
     end
 
     def publish

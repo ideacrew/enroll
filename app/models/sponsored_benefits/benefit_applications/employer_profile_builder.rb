@@ -2,11 +2,13 @@
 module SponsoredBenefits
   module BenefitApplications
     class EmployerProfileBuilder
+      include Config::AcaHelper
 
       attr_reader :plan_design_organization,
                   :plan_design_proposal,
                   :benefit_application,
-                  :employer_profile
+                  :employer_profile,
+                  :organization
 
       def initialize(plan_design_proposal, organization=nil)
 
@@ -24,16 +26,24 @@ module SponsoredBenefits
       end
 
       def quote_valid?
+        return true if aca_state_abbreviation == "DC"
         validate_effective_date
       end
 
       def validate_effective_date
-        if @organization.present?
+        if @organization.present? && aca_state_abbreviation == "MA"
           benefit_sponsorship = @organization.active_benefit_sponsorship
           if (benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?) || benefit_sponsorship.is_conversion?
             base_benefit_application = benefit_sponsorship.active_benefit_application || benefit_sponsorship.published_benefit_application
 
             if base_benefit_application.end_on.to_date.next_day != plan_design_proposal.effective_date
+              raise "Quote effective date is invalid"
+            end
+          end
+        else
+          if @organization.present? && @organization.active_plan_year.present? || @organization.is_converting?
+            base_plan_year = @organization.active_plan_year || @organization.published_plan_year
+            if base_plan_year.end_on.to_date.next_day != plan_design_proposal.effective_date
               raise "Quote effective date is invalid"
             end
           end
@@ -57,14 +67,37 @@ module SponsoredBenefits
       end
 
       def add_benefit_sponsors_benefit_application
-        quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
+        if aca_state_abbreviation == "DC"
+          quote_benefit_application = @benefit_application.to_plan_year(@organization)
+          if @organization.active_plan_year.present? || @organization.is_converting?
+            quote_benefit_application.renew_plan_year if quote_benefit_application.may_renew_plan_year?
+          end
 
-        if quote_benefit_application.valid? && quote_benefit_application.save!
-          cancel_any_previous_benefit_applications(@organization, quote_benefit_application)
-        end
+          if quote_benefit_application.valid? && @organization.valid?
+            @organization.plan_years.each do |plan_year|
+              next unless plan_year.start_on == quote_benefit_application.start_on
+              if plan_year.is_renewing?
+                plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
+              else
+                plan_year.cancel! if plan_year.may_cancel?
+              end
+            end
+          end
+          @organization.plan_years << quote_benefit_application
+          @organization.save!
+          @organization.census_employees.each do |census_employee|
+            census_employee.save
+          end
+        else
+          quote_benefit_application = @benefit_application.to_benefit_sponsors_benefit_application(@organization)
 
-        @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
-          census_employee.save
+          if quote_benefit_application.valid? && quote_benefit_application.save!
+            cancel_any_previous_benefit_applications(@organization, quote_benefit_application)
+          end
+
+          @organization.active_benefit_sponsorship.census_employees.each do |census_employee|
+            census_employee.save
+          end
         end
       end
 
