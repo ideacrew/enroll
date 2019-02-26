@@ -66,7 +66,7 @@ module Factories
             encrypted_ssn = Person.encrypt_ssn(ce.ssn)
             person = Person.where(encrypted_ssn: encrypted_ssn).first
           else
-            person = Person.where(first_name: /.*#{ce.first_name}.*/i, last_name: /.*#{ce.last_name}.*/i, dob: ce.dob).first
+            person = Person.where(first_name: /^#{ce.first_name}$/i, last_name: /^#{ce.last_name}$/i, dob: ce.dob).first
           end
 
           if person.blank?
