@@ -237,11 +237,19 @@ module Observers
         end
 
         if [ :initial_employer_first_reminder_to_publish_plan_year,
-             :initial_employer_second_reminder_to_publish_plan_year,
-             :initial_employer_final_reminder_to_publish_plan_year
+             :initial_employer_second_reminder_to_publish_plan_year
         ].include?(model_event.event_key)
-          start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
-          organizations = Queries::NoticeQueries.initial_employers_by_effective_on_and_state(start_on: start_on, aasm_state: :draft)
+          start_on = (current_date+2.months).beginning_of_month
+          organizations = EmployerProfile.initial_employers_reminder_to_publish(start_on)
+          organizations.each do|organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
+            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+          end
+        end
+
+        if model_event.event_key == :initial_employer_final_reminder_to_publish_plan_year
+          start_on = current_date.next_month.beginning_of_month
+          organizations = EmployerProfile.initial_employers_reminder_to_publish(start_on)
           organizations.each do|organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
             deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)

@@ -28,9 +28,9 @@ module ModelEvents
         :initial_employer_no_binder_payment_received,
         # :renewal_plan_year_publish_dead_line,
         # :low_enrollment_notice_for_employer,
-        # :initial_employer_first_reminder_to_publish_plan_year,
-        # :initial_employer_second_reminder_to_publish_plan_year,
-        # :initial_employer_final_reminder_to_publish_plan_year
+        :initial_employer_first_reminder_to_publish_plan_year,
+        :initial_employer_second_reminder_to_publish_plan_year,
+        :initial_employer_final_reminder_to_publish_plan_year
     ]
 
     def notify_on_save
@@ -146,14 +146,14 @@ module ModelEvents
         #   is_low_enrollment_notice_for_employer = true
         # end
 
-        # # reminder notices for initial application with unpublished plan year
-        # if (new_date+2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 2 days prior to advertised deadline of month i.e., 8th of the month
-        #   is_initial_employer_first_reminder_to_publish_plan_year = true
-        # elsif new_date.next_day.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 1 day prior to advertised deadline of month i.e., 9th of the month
-        #   is_initial_employer_second_reminder_to_publish_plan_year = true
-        # elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 13th of the month
-        #   is_initial_employer_final_reminder_to_publish_plan_year = true
-        # end
+        # reminder notices for initial application with unpublished plan year
+        if (new_date+2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 2 days prior to advertised deadline of month i.e., 30th of the month
+          is_initial_employer_first_reminder_to_publish_plan_year = true
+        elsif new_date.next_day.day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month # 1 day prior to advertised deadline of month i.e., 31st of the month
+          is_initial_employer_second_reminder_to_publish_plan_year = true
+        elsif new_date.day == Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2 # 2 days prior to publish deadline of month i.e., 3rd of the month
+          is_initial_employer_final_reminder_to_publish_plan_year = true
+        end
 
         DATA_CHANGE_EVENTS.each do |event|
           if event_fired = instance_eval("is_" + event.to_s)
