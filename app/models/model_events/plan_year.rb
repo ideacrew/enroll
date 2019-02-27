@@ -15,7 +15,7 @@ module ModelEvents
       :renewal_application_denied,
       :group_termination_confirmation_notice
       # :group_advance_termination_confirmation,
-      # :zero_employees_on_roster
+      :zero_employees_on_roster
     ]
 
     DATA_CHANGE_EVENTS = [
@@ -94,9 +94,9 @@ module ModelEvents
           is_group_termination_confirmation_notice = true
         end
 
-        # if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
-        #   is_zero_employees_on_roster = true
-        # end
+        if is_transition_matching?(to: :published, from: :draft, event: :force_publish)
+          is_zero_employees_on_roster = true
+        end
 
         # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
         REGISTERED_EVENTS.each do |event|
