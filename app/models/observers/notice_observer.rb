@@ -78,9 +78,24 @@ module Observers
 
         if new_model_event.event_key == :group_advance_termination_confirmation
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+        end
 
-          plan_year.employer_profile.census_employees.active.each do |ce|
-            deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
+        if new_model_event.event_key == :group_termination_confirmation_notice
+          if plan_year.termination_kind.to_s == "nonpayment"
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "notify_employer_of_group_non_payment_termination")
+            plan_year.employer_profile.census_employees.active.each do |ce|
+              begin
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_non_payment_termination")
+              end
+            end
+          else
+            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "group_advance_termination_confirmation")
+
+            plan_year.employer_profile.census_employees.active.each do |ce|
+              begin
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notify_employee_of_group_advance_termination")
+              end
+            end
           end
         end
 

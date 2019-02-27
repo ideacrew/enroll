@@ -736,8 +736,8 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
-  slim (= 3.0.8)
   simplecov (= 0.14.1)
+  slim (= 3.0.8)
   slim-rails
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
