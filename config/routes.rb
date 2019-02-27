@@ -91,6 +91,8 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :get_user_info
+        get :view_enrollment_to_update_end_date
+        post :update_enrollment_termianted_on_date
         get :identity_verification
         post :identity_verification_datatable
         get :user_account_index
