@@ -2793,3 +2793,11 @@ describe "#is_ivl_and_outstanding? and return true" do
       end
     end
 end
+
+describe "scope#can_update_enrollments_end_date" do
+  context "should inlcude terminated enrollment only", dbclean: :after_each do
+    it "should return enrollments can update enrollment end date" do
+      expect(HbxEnrollment.can_update_enrollments_end_date.selector).to eq ({"aasm_state"=>{"$in"=>["coverage_termination_pending", "coverage_terminated"]}})
+    end
+  end
+end
