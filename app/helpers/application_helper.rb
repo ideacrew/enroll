@@ -14,6 +14,23 @@ module ApplicationHelper
     end
   end
 
+  def display_carrier_pdf_logo(plan, options = {:width => 50})
+    carrier_name = carrier_logo(plan)
+    image_tag(wicked_pdf_asset_base64("logo/carrier/#{carrier_name.parameterize.underscore}.jpg"), width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
+  end
+
+  def carrier_logo(plan)
+    if plan.extract_value.class.to_s == "Plan"
+      return "" if !plan.carrier_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
+    else
+      return "" if !plan.issuer_profile.legal_name.extract_value.present?
+      issuer_hios_id = plan.hios_id[0..4].extract_value
+      Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.issuer_profile.legal_name.extract_value
+    end
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true

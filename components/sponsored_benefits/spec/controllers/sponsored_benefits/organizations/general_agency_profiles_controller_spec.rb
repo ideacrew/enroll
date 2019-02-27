@@ -28,7 +28,7 @@ module SponsoredBenefits
 
     describe "POST assign" do
       before do
-        post :assign, id: plan_design_organization.id, broker_agency_profile_id: plan_design_organization.owner_profile_id, general_agency_profile_id: general_agency_profile.id
+        post :assign, ids: [plan_design_organization.id], broker_agency_profile_id: plan_design_organization.owner_profile_id, general_agency_profile_id: general_agency_profile.id
       end
 
       it "should initialize form object" do

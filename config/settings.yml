@@ -56,6 +56,8 @@ aca:
   offerings_constrained_to_service_areas: false
   rating_areas:
     - nil
+  carrier_hios_logo_variant:
+    '': ""
 #
   qle:
     with_in_sixty_days: 60

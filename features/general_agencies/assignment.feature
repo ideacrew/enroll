@@ -45,6 +45,7 @@ Feature: Broker Assigns a General Agency to an Employer
     Then the ga should see the home of ga
 
   Scenario: A Broker have the ability to assign default GA for any future employers that come on board
+    Given PENDING: This needs to be fixed after finishing with General Agency Implementation
     When the broker login in
     Then the broker should see the home of broker
     When the broker visits their general agencies page

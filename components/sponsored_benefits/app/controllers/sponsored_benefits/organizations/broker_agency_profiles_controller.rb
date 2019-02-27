@@ -7,7 +7,7 @@ module SponsoredBenefits
 
     def employers
       # This should be index action in plan design organizations controller
-      @datatable = ::Effective::Datatables::PlanDesignOrganizationDatatable.new(profile_id: @profile._id, is_general_agency?: is_profile_general_agency?)
+      @datatable = klass.new(profile_id: @profile._id)
     end
 
   private
@@ -24,6 +24,14 @@ module SponsoredBenefits
     def general_agency_profiles
       return @general_agency_profiles if defined? @general_agency_profiles
       @general_agency_profiles = ::GeneralAgencyProfile.all
+    end
+
+    def klass
+      if is_profile_general_agency?
+        ::Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable
+      else
+        ::Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable
+      end
     end
   end
 end
