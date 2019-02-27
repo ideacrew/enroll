@@ -194,11 +194,31 @@ module Notifier
       UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
-    def send_generic_notice_alert_to_broker
-      if resource.is_a?(EmployerProfile) && resource.broker_agency_profile.present?
-        broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
-        broker_email = resource.broker_agency_profile.primary_broker_role.email_address
-        UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+    def send_generic_notice_alert_to_broker_and_ga
+      if resource.is_a?(EmployerProfile)
+        if resource.broker_agency_profile.present?
+          broker_name = resource.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.legal_name.titleize).deliver_now
+        end
+        if resource.general_agency_profile.present?
+          general_agent_name = resource.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.legal_name.titleize).deliver_now
+        end
+      end
+
+      if resource.is_a?(EmployeeRole)
+        if resource.employer_profile.broker_agency_profile.present?
+          broker_name = resource.employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+          broker_email = resource.employer_profile.broker_agency_profile.primary_broker_role.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, resource.person.full_name.titleize).deliver_now
+        end
+        if resource.employer_profile.general_agency_profile.present?
+          general_agent_name = resource.employer_profile.general_agency_profile.primary_staff.person.full_name
+          ga_email = resource.employer_profile.general_agency_profile.primary_staff.person.work_email_or_best
+          UserMailer.generic_notice_alert_to_ba_and_ga(general_agent_name, ga_email, resource.person.full_name.titleize).deliver_now
+        end
       end
     end
 
