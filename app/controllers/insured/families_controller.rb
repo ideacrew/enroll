@@ -31,7 +31,7 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
 
-    @employee_role = @person.active_employee_roles.first
+    @employee_role = @person.active_employee_roles.last
     @tab = params['tab']
     @family_members = @family.active_family_members
 
