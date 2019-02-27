@@ -30,17 +30,17 @@ module Observers
 
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :renewal_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_submitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :renewal_application_autosubmitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_autosubmitted")
-          # trigger_zero_employees_on_roster_notice(plan_year)
+          trigger_zero_employees_on_roster_notice(plan_year)
         end
 
         if new_model_event.event_key == :ineligible_initial_application_submitted
