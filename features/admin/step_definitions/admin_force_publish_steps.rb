@@ -50,5 +50,5 @@ Then(/^a warning message will appear$/) do
 end
 
 Then(/^the force publish successful message should be displayed$/) do
-  expect(page).to have_content('Force Published Application Under Review')
+  expect(page).to have_content('Force Publish Successful')
 end

@@ -21,7 +21,7 @@
         <tbody>
           <tr>
             <% @employer_profile = @organization.employer_profile %>
-            <td><%= "Initial" %></td>
+            <td><%= @employer_profile.is_renewing_employer? ? "Renewing" : "Initial" %></td>
             <td><%= @plan_year.start_on.strftime('%m/%d/%Y') %></td>
             <td><%= @plan_year.open_enrollment_end_on.strftime('%m/%d/%Y') %></td>
             <td><%= @plan_year.aasm_state %></td>

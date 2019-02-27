@@ -432,13 +432,14 @@ def employer_poc
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
     @plan_year = @organization.employer_profile.draft_plan_year.last
+
   end
 
   def force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split("_").last)
     @plan_year = @organization.employer_profile.draft_plan_year.last
-    if @plan_year.may_force_publish? && params[:publish_with_warnings] == 'true'
+    if @plan_year.may_force_publish? && (params[:publish_with_warnings] == 'true' || (@plan_year.application_eligibility_warnings.blank? && params[:publish_with_warnings] == 'false'))
       @plan_year.force_publish!
     end
 
