@@ -13,7 +13,7 @@ module ModelEvents
       # # :open_enrollment_began, #not being used
       # :application_denied,
       :renewal_application_denied,
-      :group_termination_confirmation_notice
+      :group_termination_confirmation_notice,
       # :group_advance_termination_confirmation,
       :zero_employees_on_roster
     ]
