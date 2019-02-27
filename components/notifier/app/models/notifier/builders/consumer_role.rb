@@ -5,9 +5,8 @@ module Notifier
     include Notifier::ApplicationHelper
     include Config::ContactCenterHelper
     include Config::SiteHelper
-    #include Notifier::Builders::Dependent
 
-    attr_accessor :consumer_role, :merge_model, :payload, :event_name, :sep_id
+    attr_accessor :consumer_role, :merge_model, :full_name, :payload, :event_name, :sep_id
 
     def initialize
       data_object = Notifier::MergeDataModels::ConsumerRole.new
@@ -29,6 +28,10 @@ module Notifier
 
     def last_name
       merge_model.last_name = consumer_role.person.last_name if consumer_role.present?
+    end
+
+    def primary_fullname
+      merge_model.primary_fullname = consumer_role.person.full_name.titleize if consumer_role.present?
     end
 
     def aptc
@@ -82,11 +85,11 @@ module Notifier
     end
 
     def ivl_oe_start_date
-      merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on
+      merge_model.ivl_oe_start_date = Settings.aca.individual_market.upcoming_open_enrollment.start_on.strftime('%B %d, %Y')
     end
 
     def ivl_oe_end_date
-      merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on
+      merge_model.ivl_oe_end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on.strftime('%B %d, %Y')
     end
 
     def coverage_year
@@ -95,10 +98,6 @@ module Notifier
 
     def previous_coverage_year
       merge_model.previous_coverage_year = coverage_year.to_i - 1
-    end
-
-    def depents
-      true
     end
 
     def dc_resident
@@ -161,10 +160,13 @@ module Notifier
       merge_model.csr_percent = Integer(payload['notice_params']['primary_member']['csr_percent'])
     end
 
-     # Using same merge model for special enrollment period and qualifying life event kind
     def format_date(date)
       return '' if date.blank?
       date.strftime('%B %d, %Y')
+    end
+
+    def depents
+      true
     end
 
     def aqhp_eligible?
@@ -252,7 +254,7 @@ module Notifier
       false unless csr?
     end
 
-    def is_shop?
+    def shop?
       false
     end
 

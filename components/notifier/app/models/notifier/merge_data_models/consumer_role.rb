@@ -6,10 +6,11 @@ module Notifier
     attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
+    attribute :primary_fullname, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :age, Integer
-    attribute :ivl_oe_start_date, Date
-    attribute :ivl_oe_end_date, Date
+    attribute :ivl_oe_start_date, String
+    attribute :ivl_oe_end_date, String
     attribute :dc_resident, String
     attribute :citizenship, String
     attribute :incarcerated, String
@@ -36,6 +37,7 @@ module Notifier
         notice_date: TimeKeeper.date_of_record.strftime('%B %d, %Y'),
         first_name: 'Samules',
         last_name: 'Parker',
+        primary_fullname: 'Samules Parker',
         age: 28,
         dc_resident: 'Yes',
         citizenship: 'US Citizen',
@@ -55,22 +57,14 @@ module Notifier
         irs_consent: true,
         csr: true,
         csr_percent: 73,
-        ivl_oe_start_date: 'November 01, 2019',
-        ivl_oe_end_date: 'January 31, 2020'
+        ivl_oe_start_date: Date.parse('November 01, 2019').strftime('%B %d, %Y'),
+        ivl_oe_end_date: Date.parse('January 31, 2020').strftime('%B %d, %Y')
       })
-      #notice.addresses = [ Notifier::MergeDataModels::IvlAddress.stubbed_object ]
+
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice.addresses = [notice.mailing_address]
       notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
       notice
-    end
-
-    def is_shop?
-      false
-    end
-
-    def primary_address
-      mailing_address
     end
 
     def collections
@@ -169,6 +163,22 @@ module Notifier
 
     def csr_is_nil?
       false unless csr?
+    end
+
+    def primary_address
+      mailing_address
+    end
+
+    def shop?
+      false
+    end
+
+    def individual?
+      true
+    end
+
+    def consumer_role?
+      true
     end
   end
 end
