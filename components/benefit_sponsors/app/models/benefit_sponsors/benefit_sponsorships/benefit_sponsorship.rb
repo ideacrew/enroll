@@ -273,7 +273,7 @@ module BenefitSponsors
 
     def service_areas_on(a_date = ::TimeKeeper.date_of_record)
       if has_primary_office_address?
-        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date)
+        ::BenefitMarkets::Locations::ServiceArea.service_areas_for(primary_office_location.address, during: a_date).to_a
       else
         []
       end

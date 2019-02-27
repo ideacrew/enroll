@@ -43,13 +43,14 @@ module BenefitMarkets
           :state => state_abbrev
         ).map(&:id).uniq
 
-        self.where(
+        service_areas = self.where(
           "active_year" => during.year,
           "$or" => [
             {"county_zip_ids" => { "$in" => county_zip_ids }},
             {"covered_states" =>  state_abbrev}
           ]
         )
+        service_areas
       end
     end
   end
