@@ -2,7 +2,9 @@
 namespace :recurring do
   desc "an automation task that sends out verification reminder notifications to IVL individuals"
   task ivl_reminder_notices: :environment do
-    families = Family.outstanding_verification
+    families = Family.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true, 
+      :"kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"], 
+      :"aasm_state".in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES}})
     puts "families #{families.count}" unless Rails.env.test?
     date = TimeKeeper.date_of_record
     families.each do |family|
