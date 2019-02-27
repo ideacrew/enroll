@@ -133,7 +133,7 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
-      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+      @employee_role = @person.active_employee_roles.last if @employee_role.blank? and @person.has_active_employee_role?
 
       if @hbx_enrollment.present?
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?
