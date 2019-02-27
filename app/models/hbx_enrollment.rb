@@ -51,6 +51,8 @@ class HbxEnrollment
   ]
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
 
+  ENROLLMENTS_TO_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
+
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
 
@@ -162,6 +164,7 @@ class HbxEnrollment
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
+  scope :can_update_enrollments_end_date,       ->{ where(:aasm_state.in =>  ENROLLMENTS_TO_UPDATE_END_DATE) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
@@ -1533,7 +1536,6 @@ class HbxEnrollment
 
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
 
-    return unless transmit_flag
     return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
 
     config = Rails.application.config.acapi
