@@ -52,7 +52,7 @@ module SponsoredBenefits
 
       let(:product)  { FactoryGirl.create :benefit_markets_products_health_products_health_product }
       let(:plan )    { FactoryGirl.create(:plan, hios_id: product.hios_id) }
-      let(:benefit_group)             { FactoryGirl.create(:benefit_group, reference_plan_id: plan.id) }
+      let(:benefit_group)             { FactoryGirl.create(:benefit_group, reference_plan_id: plan.id, title: 'benefit group') }
 
       before(:each) do
         sponsor_benefit_sponsorship.rating_area = rating_area

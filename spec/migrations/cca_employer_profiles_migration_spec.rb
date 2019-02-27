@@ -13,11 +13,6 @@ describe "CcaEmployerProfilesMigration" do
 
   describe ".up" do
 
-    let!(:site) {FactoryGirl.create(:benefit_sponsors_site, :with_owner_exempt_organization, site_key: :cca)}
-    let!(:benefit_market) {FactoryGirl.create(:benefit_markets_benefit_market)}
-    let!(:site_assign) {site.benefit_markets << benefit_market}
-    let!(:saved) {site.save!}
-
     before :all do
       organization = FactoryGirl.create(:organization, legal_name: "bk_one", dba: "bk_corp", home_page: "http://www.example.com")
       FactoryGirl.create(:broker_agency_profile, organization: organization)
@@ -35,12 +30,18 @@ describe "CcaEmployerProfilesMigration" do
       # employer_profile.organization.home_page = nil
       inbox = FactoryGirl.create(:inbox, :with_message, recipient: employer_profile)
       inbox.messages.first.update_attributes(body: "<br>Your invoice is now available in your employer profile under the Billing tab. For more information, please download your <a href=/document/authorized_download/EmployerProfile/#{employer_profile.id}/documents/#{document1.id}?content_type=application/pdf&filename=MonthlyInvoiceAvailableNotice.pdf&disposition=inline target='_blank'>MonthlyInvoiceAvailableNotice</a>")
-      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id, benefit_sponsor_employer_profile_id: "123456")
-      FactoryGirl.create(:employee_role, employer_profile: employer_profile)
-      FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)
+      FactoryGirl.create(:employer_staff_role, employer_profile_id: employer_profile.id)
 
+      FactoryGirl.create(:employee_role, employer_profile: employer_profile)
+      site = BenefitSponsors::Site.all.first
+      benefit_market = FactoryGirl.create(:benefit_markets_benefit_market)
+      site.benefit_markets << benefit_market
+      site.save!
+      BenefitSponsors::Organizations::Organization.employer_profiles.delete_all
       @migrated_organizations = BenefitSponsors::Organizations::Organization.employer_profiles
       @old_organizations = Organization.all_employer_profiles
+
+      CensusEmployee.create(first_name:"Eddie", last_name:"Vedder", gender:"male", dob: "1964-10-23".to_date, employer_profile_id: @old_organizations.first.employer_profile.id, hired_on: "2015-04-01".to_date, ssn: "112212221")
 
       @migrations_paths = Rails.root.join("db/migrate")
       @test_version = @path.split("/").last.split("_").first
@@ -106,7 +107,7 @@ describe "CcaEmployerProfilesMigration" do
       migrated_profile = @migrated_organizations.first.employer_profile
       old_profile = @old_organizations.first.employer_profile
       expect(migrated_profile).to have_attributes( created_at: old_profile.created_at,
-                                                  updated_at: old_profile.updated_at, aasm_state: old_profile.aasm_state)
+                                                  updated_at: old_profile.updated_at, sic_code: old_profile.sic_code)
     end
 
     it "should match all migrated attributes for employer profile" do

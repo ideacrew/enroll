@@ -2,6 +2,7 @@ site:
   key: :cca
   subdomain: "mhc"
   domain_name: "hbxshop.org"
+  site_title: "Massachusetts Health Connector for Business"
   home_url: "https://business.mahealthconnector.org/"
   home_business_url: "https://www.mahealthconnector.org/business/"
   help_url: "https://www.mahealthconnector.org/business/help-center"
@@ -12,6 +13,7 @@ site:
   policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
   invoice_bill_url: "https://ww2.e-billexpress.com/ebpp/maconnector/"
   payment_pdf_url: "https://www.mahealthconnector.org/help-center-answers/how-to-pay-your-premiums-online"
+  user_sign_in_url: "https://business.mahealthconnector.org/users/sign_in"
   website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   health_care_website: "www.healthcare.gov"
@@ -37,6 +39,7 @@ site:
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   terms_and_conditions_url: "https://www.mahealthconnector.org/business/brokers/certification/terms-and-conditions"
+  certification_url: "https://www.mahealthconnector.org/business/brokers/certification"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
@@ -46,7 +49,7 @@ site:
   exchange_hbx_id: "MA0"
   mail_address: "noreply@healthconnector.org"
   privacy_policy: "https://www.mahealthconnector.org/site-policies/privacy-policy"
-  late_rates_message: "Premiums for some coverage effective dates are not yet available. Premiums are typically ready for employers at least 30 days before your coverage starts, and often sooner than that. Please check back again soon to see if premium rates are available, or call customer service if you need more additional assistance."
+  late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
 
   exchange_name: "Massachusetts Health Connector"
   social_media:
@@ -98,6 +101,14 @@ plan_option_titles:
   single_carrier: 'One Carrier'
   single_plan: 'One Plan'
   plan_year_tooltip: "Employer premium contribution for Employee Only Health Plans must be at least"
+
+plan_option_descriptions:
+  sole_source: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  metal_level: "Choose a benefit level and your contribution amount. Your employees will be able to choose a plan offered by any insurance carrier at that benefit level."
+  single_carrier: "Choose an insurance carrier and your contribution amount. Your employees will be able to choose a plan from that carrier at any benefit level."
+  single_plan: "Choose one plan and your contribution amount. All employees can enroll in that plan."
+  dental:
+    single_plan: "For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in."
 
 notices:
   mailing_address:
@@ -208,7 +219,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -2
-        day_of_month: 0
+        day_of_month: 21
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
       application_submission_soft_deadline: 10

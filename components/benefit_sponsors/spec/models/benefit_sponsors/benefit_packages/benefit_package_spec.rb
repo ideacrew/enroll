@@ -74,12 +74,7 @@ module BenefitSponsors
 
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
-        let!(:product) {FactoryGirl.create(:benefit_markets_products_health_products_health_product)}
-        let!(:update_product){
-          reference_product = current_benefit_package.sponsored_benefits.first.reference_product
-          reference_product.renewal_product= product
-          reference_product.save!
-        }
+
         let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(renewal_effective_date), renewal_effective_date) }
         let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
         let!(:renewal_benefit_package)        { renewal_application.benefit_packages.build }

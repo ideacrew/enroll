@@ -70,7 +70,7 @@ module Importers
     end
 
     def benefit_begin_date=(val)
-      @benefit_begin_date = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
+      @benefit_begin_date = val.blank? ? nil : (Date.strptime(val.to_s, "%m/%d/%Y") rescue nil)
     end
 
     def subscriber_zip=(val)

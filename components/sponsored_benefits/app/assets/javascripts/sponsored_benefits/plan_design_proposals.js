@@ -111,8 +111,9 @@ function fetchCarriers() {
 
 function setSBC(element, plan) {
   var kind = fetchBenefitKind();
+  var sbc_link = element.parentElement.getElementsByClassName("sbc-download-checkbox")[0]
 
-  if (kind == "health" && element.parentElement.getElementsByClassName("sbc-download-checkbox")[0].checked == true) {
+  if (kind == "health" && sbc_link && sbc_link.checked == true) {
    $(element).attr('href',plan+"?sbc_included=true");
   } else {
    $(element).attr('href',plan);
@@ -143,7 +144,13 @@ function buildChiderenElements(form, prefix, data) {
 
 function downloadPdf(event, element) {
   event.preventDefault();
+  event.stopPropagation();
   var data = buildBenefitGroupParams();
+  if(!(data.benefit_group)) {
+    data.benefit_group = {
+      kind: element.dataset.kind
+    }
+  }
   url_redirect({url: element.href, method: "post", data: data});
 }
 
@@ -291,12 +298,17 @@ function toggleSliders(plan_kind) {
 }
 
 function calcPlanDesignContributions() {
+  effectiveDate = $("#forms_plan_design_proposal_effective_date").val()
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
-    disableActionButtons();
-  } else {
-    enableActionButtons();
-  }
+   if (effectiveDate !== undefined && effectiveDate.slice(5) =='01-01')
+       enableActionButtons();
+   else {
+       if (proposalIsInvalid(data)) {
+           disableActionButtons();
+       } else {
+           enableActionButtons();
+       }
+   }
 
   if (data == undefined || data == {} || !('benefit_group' in data)) {
     return;
@@ -511,8 +523,9 @@ function proposalIsInvalid(data) {
 }
 
 function saveProposal(event) {
-  var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
+  data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
     // handle error messaging
     return;
   } else {
@@ -533,8 +546,9 @@ function saveProposal(event) {
 }
 
 function saveProposalAndCopy(event) {
-  var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
+  data = buildBenefitGroupParams();
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     url = $("#benefit_groups_url").val();
@@ -560,8 +574,9 @@ function saveProposalAndCopy(event) {
 }
 
 function saveProposalAndPublish(event) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     var url = $("#benefit_groups_url").val();
@@ -593,8 +608,9 @@ function AddDentalToPlanDesignProposal(event) {
 }
 
 function saveProposalAndNavigateToReview(event) {
+  var effectiveDate = $("#forms_plan_design_proposal_effective_date").val();
   var data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
+  if (proposalIsInvalid(data) && (effectiveDate !== undefined && effectiveDate.slice(5) !='01-01')) {
 
   } else {
     var url = $("#benefit_groups_url").val();

@@ -3,15 +3,17 @@ require 'rails_helper'
 RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  do
   let(:user) { FactoryGirl.create(:user, oim_id: "test@enroll.com") }
 
-  describe "a signed in user" do
-    before :each do
-      sign_in user
-    end
-    it "should has current_user oim_id" do
-      render
-      expect(rendered).to match /#{user.oim_id}/
-      expect(rendered).not_to match /Broker Registration/
-      expect(rendered).not_to match /General Agency Registration/
+  unless Settings.site.key == :cca
+    describe "a signed in user" do
+      before :each do
+        sign_in user
+      end
+      it "should has current_user oim_id" do
+        render
+        expect(rendered).to match /#{user.oim_id}/
+        expect(rendered).not_to match /Broker Registration/
+        expect(rendered).not_to match /General Agency Registration/
+      end
     end
   end
 

@@ -10,7 +10,7 @@
 				= f.radio_button :product_package_kind, "single_product", checked: true, class: 'product_package_kind mr-1 hidden'
 		.tab-content
 			.tab-pane.active#plan role="tabpanel"
-				h4 For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in.
+				h4 = fetch_dental_product_option_choice_description_for_single_plan
 				br
 				- single_product_carriers.each do |issuer_name, issuer_id|
 					.col-xs-3.plans

@@ -161,6 +161,10 @@ class Person
     SymmetricEncryption.encrypt(ssn_val)
   end
 
+  def has_active_employer_staff_role?
+    employer_staff_roles.present? and employer_staff_roles.active.present?
+  end
+
   def self.decrypt_ssn(val)
     SymmetricEncryption.decrypt(val)
   end

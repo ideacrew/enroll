@@ -1,0 +1,15 @@
+<% if @service.errors.present? %>
+  <p><%= @service.errors.join(', ') %></p>
+<% else %>
+  <% if @service.messages['warnings'].present? %>
+    <p>
+      <% @service.messages['warnings'].each do |msg| %>
+      <li>* <%= msg.html_safe %></li>
+    </p>
+    <% end %>
+  <% elsif @service.messages['notice'].present? %>
+    <p><%= @service.messages['notice'] %></p>
+  <% end %>
+<% end %>
+
+

@@ -111,7 +111,35 @@ module BenefitSponsors
       benefit_sponsorships.each {|benefit_sponsorship| benefit_sponsorship.credit_binder! if benefit_sponsorship.may_credit_binder?}
     end
 
+    def update_fein(new_fein)
+      organization = benefit_sponsorship.organization
+      if (organization && new_fein)
+        begin
+          organization.assign_attributes(fein: new_fein)
+          organization.save!
+          return true, nil
+        rescue => e
+          org_errors = organization.errors.messages
+          errors_on_save = update_fein_errors(org_errors, new_fein)
+          return false, errors_on_save
+        end
+      end
+    end
+
     private
+
+    def update_fein_errors(error_messages, new_fein)
+      error_messages.to_a.inject([]) do |f_errors, error|
+        if error[1].first.include?("is not a valid")
+          f_errors << "FEIN must be at least 9 digits"
+        elsif error[1].first.include?("is already taken")
+          org = ::BenefitSponsors::Organizations::Organization.where(fein: (new_fein.gsub(/\D/, ''))).first
+          f_errors << "FEIN matches HBX ID #{org.hbx_id}, #{org.legal_name}"
+        else
+          f_errors << error[1].first
+        end
+      end
+    end
 
     def enrollment_policy
       return @enrollment_policy if defined?(@enrollment_policy)

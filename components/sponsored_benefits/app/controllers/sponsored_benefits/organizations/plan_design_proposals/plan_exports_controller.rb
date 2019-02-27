@@ -17,7 +17,7 @@ module SponsoredBenefits
           @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
         end
 
-        render pdf: 'plan_details_export',
+        render pdf: 'plan_details_export', dpi: 72,
                template: 'sponsored_benefits/organizations/plan_design_proposals/plan_exports/_plan_details.html.erb',
                disposition: 'attachment',
                locals: { benefit_group: @benefit_group, plan_design_proposal: plan_design_proposal, qhps: @qhps, plan: @plan, visit_types: visit_types, sbc_included: sbc_included }
