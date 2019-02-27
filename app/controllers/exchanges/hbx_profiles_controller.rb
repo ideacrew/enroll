@@ -334,6 +334,38 @@ def employer_poc
     end
   end
 
+  def view_enrollment_to_update_end_date
+    @person = Person.find(params[:person_id])
+    @row = params[:family_actions_id]
+    @enrollments = @person.primary_family.terminated_enrollments
+  end
+
+  def update_enrollment_termianted_on_date
+    begin
+      enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+      @row = params[:family_actions_id]
+      @result = {success: [], failure: []}
+      termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
+      if enrollment.present? && (enrollment.coverage_terminated? || enrollment.coverage_termination_pending?)
+        if enrollment.is_shop? && (termination_date > ::TimeKeeper.date_of_record && enrollment.may_schedule_coverage_termination?)
+          enrollment.schedule_coverage_termination!(termination_date)
+          enrollment.notify_enrollment_cancel_or_termination_event(params["edi_required"].present?)
+          @result[:success] << enrollment
+        elsif enrollment.may_terminate_coverage?
+          enrollment.terminated_on = termination_date
+          enrollment.terminate_coverage!(termination_date)
+          enrollment.notify_enrollment_cancel_or_termination_event(params["edi_required"].present?)
+          @result[:success] << enrollment
+        else
+          @result[:failure] << enrollment
+        end
+      end
+    rescue Exception => e
+      redirect_to exchanges_hbx_profiles_root_path, flash: {error: e.to_s}
+      return
+    end
+  end
+
   def broker_agency_index
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
