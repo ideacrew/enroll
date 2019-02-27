@@ -132,7 +132,7 @@ module BenefitMarkets
 
     # Intersection of BenefitMarket::Products that match both service area and effective date
     def benefit_market_products_available_for(service_areas, effective_date)
-      service_area_ids = service_areas.map(&:id)
+      service_area_ids = service_areas.pluck(:id)
       all_benefit_market_products.by_service_areas(service_area_ids).effective_with_premiums_on(effective_date)
     end
 
