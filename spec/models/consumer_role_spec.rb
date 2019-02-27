@@ -422,6 +422,23 @@ context "Verification process and notices" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
+
+        context "not_lawfully_present_in_us" do
+
+          before do
+            allow(person).to receive(:ssn).and_return nil
+            allow(consumer).to receive(:citizen_status).and_return "not_lawfully_present_in_us"
+            consumer.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+            consumer.coverage_purchased! verification_attr
+            consumer.reload
+            consumer.fail_dhs! verification_attr
+            consumer.reload
+          end
+
+          it "should store QNC result" do
+            expect(consumer.aasm_state).not_to be "unverified"
+          end
+        end
       end
 
       describe "indian tribe member with ssn" do
@@ -767,7 +784,7 @@ describe "it should check the residency status" do
   let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
   let!(:enrollment) {consumer.person.primary_family.active_household.hbx_enrollments.first}
   context "consumer role should check for eligibility" do
-    xit "should move the enrollment to unverified" do
+    it "should move the enrollment to unverified" do
       consumer.coverage_purchased!
       expect(consumer.aasm_state).to eq("ssa_pending")
       enrollment.reload
