@@ -302,7 +302,7 @@ context "Verification process and notices" do
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
-        person.update_attributes!(:tribal_id=>"444444444") if tribe
+        person.update_attributes!(:tribal_id=>"981278654") if tribe
         person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
         expect(person.consumer_role.native_validation).to eq(state)
       end
