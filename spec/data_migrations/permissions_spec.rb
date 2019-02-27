@@ -408,152 +408,8 @@ describe DefinePermissions, dbclean: :after_each do
         end
       end
     end
-  end
 
-  describe 'update permissions for hbx staff role' do
-    let(:given_task_name) { "hbx_admin_csr_view_personal_info_page" }
-
-    describe "given a task name" do
-      it "has the given task name" do
-        expect(subject.name).to eql given_task_name
-      end
-    end
-
-    before do
-      User.all.delete
-      Person.all.delete
-      @hbx_staff_person = FactoryGirl.create(:person)
-      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
-      @hbx_csr_tier1_person = FactoryGirl.create(:person)
-      @hbx_csr_tier2_person = FactoryGirl.create(:person)
-      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
-      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
-      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
-      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
-      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
-
-      subject.hbx_admin_csr_view_personal_info_page
-    end
-    it "updates hbx_admin_csr_view_personal_info_page to true" do
-      expect(Person.all.count).to eq(4)
-      expect(@hbx_staff_person.hbx_staff_role.permission.view_personal_info_page).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.view_personal_info_page).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.view_personal_info_page).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.view_personal_info_page).to be true
-    end
-  end
-
-  describe 'update permissions for hbx staff role' do
-    let(:given_task_name) { "hbx_admin_can_access_new_consumer_application_sub_tab" }
-    let(:given_task_name) { "hbx_admin_can_access_outstanding_verification_sub_tab" }
-    let(:given_task_name) { "hbx_admin_can_access_identity_verification_sub_tab" }
-    let(:given_task_name) { "hbx_admin_can_complete_resident_application" }
-    let(:given_task_name) { "hbx_admin_can_access_accept_reject_identity_documents" }
-    let(:given_task_name) { "hbx_admin_can_access_accept_reject_paper_application_documents" }
-    let(:given_task_name) { "hbx_admin_can_delete_identity_application_documents" }
-
-    describe "given a task name" do
-      it "has the given task name" do
-        expect(subject.name).to eql given_task_name
-      end
-    end
-
-    before do
-      User.all.delete
-      Person.all.delete
-      @hbx_staff_person = FactoryGirl.create(:person)
-      @hbx_read_only_person = FactoryGirl.create(:person)
-      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
-      @hbx_csr_tier1_person = FactoryGirl.create(:person)
-      @hbx_csr_tier2_person = FactoryGirl.create(:person)
-      @super_admin_person = FactoryGirl.create(:person)
-      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
-      permission_hbx_read_only = FactoryGirl.create(:permission, :hbx_read_only)
-      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
-      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
-      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
-      permission_super_admin = FactoryGirl.create(:permission, :super_admin)
-      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
-      hbx_read_only = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
-      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
-      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
-      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
-      super_admin = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: permission_hbx_staff.id)
-    end
-    it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
-      subject.hbx_admin_can_access_new_consumer_application_sub_tab
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
-    end
-    it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
-      subject.hbx_admin_can_access_identity_verification_sub_tab
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
-    end
-    it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
-      subject.hbx_admin_can_access_outstanding_verification_sub_tab
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
-    end
-    it "updates hbx_admin_can_complete_resident_application to true" do
-      subject.hbx_admin_can_complete_resident_application
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_complete_resident_application).to be true
-    end
-    it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
-      subject.hbx_admin_can_access_accept_reject_identity_documents
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
-    end
-    it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
-      subject.hbx_admin_can_access_accept_reject_paper_application_documents
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
-      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
-      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
-      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
-    end
-    it "updates hbx_admin_can_delete_identity_application_documents to true" do
-      subject.hbx_admin_can_delete_identity_application_documents
-      expect(Person.all.count).to eq(6)
-      expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
-    end
-  end
-
-  describe 'build test roles' do
-    let(:given_task_name) {':build_test_roles'}
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
-    before do
-      User.all.delete
-      Person.all.delete
-      hbx_profile = FactoryGirl.create(:hbx_profile)
-      allow(Permission).to receive_message_chain('hbx_staff.id'){FactoryGirl.create(:permission, :hbx_staff).id}
-      allow(Permission).to receive_message_chain('hbx_read_only.id'){FactoryGirl.create(:permission, :hbx_read_only).id}
-      allow(Permission).to receive_message_chain('hbx_csr_supervisor.id'){FactoryGirl.create(:permission, :hbx_csr_supervisor).id}
-      allow(Permission).to receive_message_chain('hbx_csr_tier2.id'){FactoryGirl.create(:permission,  :hbx_csr_tier2).id}
-      allow(Permission).to receive_message_chain('hbx_csr_tier1.id'){FactoryGirl.create(:permission,  :hbx_csr_tier1).id}
-      allow(Permission).to receive_message_chain('hbx_csr_tier1.id'){FactoryGirl.create(:permission,  :developer).id}
-      allow(Permission).to receive_message_chain('hbx_tier3.id'){FactoryGirl.create(:permission,  :hbx_tier3).id}
-      allow(Permission).to receive_message_chain('super_admin.id'){FactoryGirl.create(:permission, :super_admin).id}
-      subject.build_test_roles
-    end
-    it "creates permissions" do
-      expect(User.all.count).to eq(8)
-      expect(Person.all.count).to eq(8)
-      expect(Person.all.map{|p|p.hbx_staff_role.subrole}).to match_array roles
-    end
-  end
-  
-  describe 'update permissions for super admin role to be able to create plan year' do
+    describe 'update permissions for super admin role to be able to create plan year' do
       let(:given_task_name) {':hbx_admin_can_create_plan_year'}
 
       before do
@@ -761,6 +617,125 @@ describe DefinePermissions, dbclean: :after_each do
     end
   end
 
+  describe 'update permissions for hbx staff role' do
+    let(:given_task_name) { "hbx_admin_csr_view_personal_info_page" }
+
+    describe "given a task name" do
+      it "has the given task name" do
+        expect(subject.name).to eql given_task_name
+      end
+    end
+
+    before do
+      User.all.delete
+      Person.all.delete
+      @hbx_staff_person = FactoryGirl.create(:person)
+      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
+      @hbx_csr_tier1_person = FactoryGirl.create(:person)
+      @hbx_csr_tier2_person = FactoryGirl.create(:person)
+      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
+      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
+      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
+      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
+      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+
+      subject.hbx_admin_csr_view_personal_info_page
+    end
+    it "updates hbx_admin_csr_view_personal_info_page to true" do
+      expect(Person.all.count).to eq(4)
+      expect(@hbx_staff_person.hbx_staff_role.permission.view_personal_info_page).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.view_personal_info_page).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.view_personal_info_page).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.view_personal_info_page).to be true
+    end
+  end
+
+  describe 'update permissions for hbx staff role' do
+    let(:given_task_name) { "hbx_admin_can_access_new_consumer_application_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_access_outstanding_verification_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_access_identity_verification_sub_tab" }
+    let(:given_task_name) { "hbx_admin_can_complete_resident_application" }
+    let(:given_task_name) { "hbx_admin_can_access_accept_reject_identity_documents" }
+    let(:given_task_name) { "hbx_admin_can_access_accept_reject_paper_application_documents" }
+    let(:given_task_name) { "hbx_admin_can_delete_identity_application_documents" }
+
+    describe "given a task name" do
+      it "has the given task name" do
+        expect(subject.name).to eql given_task_name
+      end
+    end
+
+    before do
+      User.all.delete
+      Person.all.delete
+      @hbx_staff_person = FactoryGirl.create(:person)
+      @hbx_read_only_person = FactoryGirl.create(:person)
+      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
+      @hbx_csr_tier1_person = FactoryGirl.create(:person)
+      @hbx_csr_tier2_person = FactoryGirl.create(:person)
+      @super_admin_person = FactoryGirl.create(:person)
+      permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
+      permission_hbx_read_only = FactoryGirl.create(:permission, :hbx_read_only)
+      permission_hbx_csr_supervisor = FactoryGirl.create(:permission, :hbx_csr_supervisor)
+      permission_hbx_csr_tier2 = FactoryGirl.create(:permission, :hbx_csr_tier2)
+      permission_hbx_csr_tier1 = FactoryGirl.create(:permission, :hbx_csr_tier1)
+      permission_super_admin = FactoryGirl.create(:permission, :super_admin)
+      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: permission_hbx_staff.id)
+      hbx_read_only = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: permission_hbx_staff.id)
+      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: permission_hbx_csr_supervisor.id)
+      hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier1", permission_id: permission_hbx_csr_tier2.id)
+      hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier2", permission_id: permission_hbx_csr_tier1.id)
+      super_admin = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: permission_hbx_staff.id)
+    end
+    it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
+      subject.hbx_admin_can_access_new_consumer_application_sub_tab
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
+    end
+    it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_identity_verification_sub_tab
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
+    end
+    it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
+      subject.hbx_admin_can_access_outstanding_verification_sub_tab
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
+    end
+    it "updates hbx_admin_can_complete_resident_application to true" do
+      subject.hbx_admin_can_complete_resident_application
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_complete_resident_application).to be true
+    end
+    it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
+      subject.hbx_admin_can_access_accept_reject_identity_documents
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
+    end
+    it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
+      subject.hbx_admin_can_access_accept_reject_paper_application_documents
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+      expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
+    end
+    it "updates hbx_admin_can_delete_identity_application_documents to true" do
+      subject.hbx_admin_can_delete_identity_application_documents
+      expect(Person.all.count).to eq(6)
+      expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
+    end
+  end
+   
   describe 'update permissions for hbx staff role' do
     let(:given_task_name) { "hbx_admin_csr_view_personal_info_page" }
 
