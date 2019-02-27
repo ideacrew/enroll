@@ -22,7 +22,7 @@ def ridp_type_status(type, person)
   end
 end
 
-field_names  = %w(person_full_name person_hbx_id verification_type updated_from updated_to)
+field_names = %w[person_full_name person_hbx_id verification_type updated_from updated_to]
 file_name = "#{Rails.root}/consumers_with_updated_ridp_fields.csv"
 
 CSV.open(file_name, "w", force_quotes: true) do |csv|

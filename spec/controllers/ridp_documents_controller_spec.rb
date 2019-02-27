@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::RidpDocumentsController, :type => :controller, dbclean: :after_each do
+RSpec.describe Insured::RidpDocumentsController, type: :controller, dbclean: :after_each do
   let!(:user) { FactoryGirl.create(:user) }
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let!(:consumer_role) { person.consumer_role }
@@ -20,7 +20,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller, dbclean: 
       request.env["HTTP_REFERER"] = "/home"
       allow(user).to receive(:person).and_return person
       sign_in user
-      post :upload, {consumer_role: consumer_role}
+      post :upload, { consumer_role: consumer_role }
       expect(flash[:notice]).not_to be_present
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq "File not uploaded. Please select the file to upload."
@@ -32,7 +32,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller, dbclean: 
       let(:file) { double }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: person, file: [file], :ridp_verification_type => 'Identity'} }
+      let(:params) { { person: person, file: [file], ridp_verification_type: 'Identity' } }
       let(:bucket_name) { 'id-verification' }
       let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key}" }
       let(:file_path) { File.dirname(__FILE__) } # a sample file path
@@ -53,7 +53,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller, dbclean: 
         post :upload, params
       end
 
-      it "redirects" do
+      it 'should redirect' do
         expect(flash[:notice]).to be_present
       end
     end
