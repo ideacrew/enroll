@@ -979,7 +979,7 @@ class CensusEmployee < CensusMember
 
   def active_census_employee_is_unique
     potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
-    if potential_dups.detect { |dup| dup.id != self.id  }
+    if potential_dups.detect { |dup| dup.id != self.id }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)
