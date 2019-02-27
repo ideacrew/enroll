@@ -523,6 +523,7 @@ class ConsumerRole
 
     event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change, :five_year_bar_response] do
       transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :verification_outstanding
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
@@ -859,6 +860,22 @@ class ConsumerRole
 
   def verification_types
     person.verification_types.active.where(applied_roles: "consumer_role") if person
+  end
+
+  def mock_dummy_data
+    if person.ssn.present?
+      xml = File.read(Rails.root.join("spec", "test_data", "ssa_verification_payloads", "response.xml"))
+      payload = {:individual_id =>  self.person.hbx_id, :body => xml}
+      lawful_subscriber = ::Subscribers::SsaVerification.new
+      lawful_subscriber.call(nil, nil, nil, nil, payload )
+    elsif is_tribe_member_or_native_no_snn?
+      return
+    else
+      xml = [File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")), File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response3.xml")) ].sample
+      payload = {:individual_id =>  self.person.hbx_id, :body => xml}
+      lawful_subscriber = ::Subscribers::LawfulPresence.new
+      lawful_subscriber.call(nil, nil, nil, nil, payload )
+    end
   end
 
   private
