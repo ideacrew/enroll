@@ -20,7 +20,7 @@ module Notifier
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
-      builder.event_name = event_name if is_employee? || is_employer?
+      builder.event_name = event_name if is_employee? || is_employer? || is_consumer?
       builder.payload = payload
       builder.append_contact_details
       builder.dependents if resource.is_a?(ConsumerRole)
@@ -78,9 +78,16 @@ module Notifier
         file << self.to_pdf
       end
 
-      attach_envelope
-      non_discrimination_attachment
-      # clear_tmp
+      if shop_market?
+        attach_envelope
+        non_discrimination_attachment
+        # clear_tmp
+      else
+        ivl_blank_page
+        ivl_non_discrimination
+        ivl_attach_envelope
+        voter_application
+      end
     end
 
     def pdf_options
@@ -133,8 +140,24 @@ module Notifier
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_non_discrimination_attachment)]
     end
 
+    def ivl_non_discrimination
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_non_discrimination_attachment)]
+    end
+
+    def voter_application
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_voter_application)]
+    end
+
+    def ivl_blank_page
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_blank_page_attachment)]
+    end
+
     def attach_envelope
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
+    end
+
+    def ivl_attach_envelope
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', ivl_envelope_without_address)]
     end
 
     def employee_appeal_rights
@@ -177,13 +200,13 @@ module Notifier
     def recipient_name
       return resource.staff_roles.first.full_name.titleize if is_employer?
 
-      return resource.person.full_name.titleize if is_employee?
+      return resource.person.full_name.titleize if is_employee? || is_consumer?
     end
 
     def recipient_to
       return resource.staff_roles.first.work_email_or_best if is_employer?
 
-      return resource.person.work_email_or_best if is_employee?
+      return resource.person.work_email_or_best if is_employee? || is_consumer?
     end
 
     def is_employer?
@@ -192,6 +215,10 @@ module Notifier
 
     def is_employee?
       resource.is_a?(EmployeeRole)
+    end
+
+    def is_consumer?
+      resource.is_a?(ConsumerRole)
     end
 
     # @param recipient is a Person object
