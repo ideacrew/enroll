@@ -9,8 +9,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       bg = FactoryGirl.create(:benefit_group, plan_year: py)
       PlanYear.find(py.id)
     end
-    let(:employee_role) { FactoryGirl.create(:employee_role) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id) }
+    let(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
     let(:benefit_group_assignment) { double }
     let(:person) {double}
     let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -25,7 +25,8 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
     let(:health_enrollment)   { FactoryGirl.create( :hbx_enrollment,
                                               household: primary_family.latest_household,
                                               employee_role_id: employee_role.id,
-                                              plan: health_plan
+                                              plan: health_plan,
+                                              benefit_group_id: benefit_group.id
                                             )}
 
     before do
@@ -34,6 +35,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
       allow(census_employee).to receive(:employee_role).and_return(employee_role)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(employee_role).to receive(:person).and_return(person)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(person).to receive(:primary_family).and_return(primary_family)
     end
 
@@ -65,7 +67,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper do
 
       context "and the terminated employee is rehired" do
         let!(:census_employee) {
-          ce = FactoryGirl.create(:census_employee, employee_role_id: employee_role.id)
+          ce = FactoryGirl.create(:census_employee)
           ce.terminate_employment!(TimeKeeper.date_of_record - 45.days)
           ce
         }

@@ -14,6 +14,7 @@ module Notifier
     attribute :employee_last_name, String
     attribute :coverage_end_on, String
     attribute :enrolled_count, String
+    attribute :enrollment_kind, String
     # attribute :metal_level, String
     attribute :coverage_kind, String
     # attribute :plan_carrier, String
@@ -27,6 +28,7 @@ module Notifier
         employee_responsible_amount: '$90.0',
         premium_amount: '340.0',
         enrolled_count: '2',
+        enrollment_kind: "special_enrollment",
         employee_first_name: 'David',
         employee_last_name: 'Finch',
 
