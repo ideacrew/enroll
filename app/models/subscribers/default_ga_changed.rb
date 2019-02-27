@@ -16,12 +16,13 @@ module Subscribers
           plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id)
           plan_design_organizations.each do |pdo|
             if pdo.active_general_agency_account.blank?
-              service.create_general_agency_account(id: pdo.id, broker_role_id: person.broker_role.id, general_agency_profile_id: broker_agency_profile.default_general_agency_profile_id, broker_agency_profile_id: broker_agency_profile.id)
+              service.create_general_agency_account(pdo.id, person.broker_role.id, TimeKeeper.datetime_of_record, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id)
               send_general_agency_assign_msg(broker_agency_profile, broker_agency_profile.default_general_agency_profile, pdo.employer_profile, 'Hire')
             end
           end
         else
           #clear
+          return if pre_default_ga_id.blank?
           plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner(broker_agency_profile.id).find_by_general_agency(pre_default_ga_id)
           plan_design_organizations.each do |pdo|
             general_agency_profile = pdo.active_general_agency_account && pdo.active_general_agency_account.general_agency_profile
@@ -38,7 +39,7 @@ module Subscribers
 
     def service
       return @service if defined? @service
-      @service = SponsoredBenefits::Services::GeneralAgencyManager.new
+      @service = SponsoredBenefits::Services::GeneralAgencyManager.new(nil)
     end
 
     def send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, status)
