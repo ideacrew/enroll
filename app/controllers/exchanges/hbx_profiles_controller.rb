@@ -431,13 +431,13 @@ def employer_poc
   def edit_force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split('_').last)
-    @plan_year = @organization.get_renewing_or_draft_py
+    @plan_year = @organization.renewing_or_draft_py
   end
 
   def force_publish
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split('_').last)
-    @plan_year = @organization.get_renewing_or_draft_py
+    @plan_year = @organization.renewing_or_draft_py
     if @plan_year.may_force_publish? && (params[:publish_with_warnings] == 'true' || (@plan_year.application_eligibility_warnings.blank? && params[:publish_with_warnings] == 'false'))
       @plan_year.force_publish!
     end

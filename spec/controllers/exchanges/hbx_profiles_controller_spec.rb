@@ -298,8 +298,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   describe "POST force_publish" do
     context "of an hbx super admin clicks Submit in Force Publish window" do
-      let!(:organization){ FactoryGirl.create(:organization) }
-      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+      let!(:organization) { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
       let!(:draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
       let(:user) { FactoryGirl.create(:user, person: person) }
       let(:person) do
@@ -327,7 +327,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
         expect(response).to have_http_status(:success)
       end
 
-      it "should update plan year" do
+      it 'should update plan year' do
         expect(draft_plan_year.aasm_state).to eq 'enrolling'
       end
     end

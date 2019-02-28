@@ -370,7 +370,7 @@ class Organization
 
   end
 
-  def get_renewing_or_draft_py
+  def renewing_or_draft_py
     employer_profile.plan_years.renewing_draft_or_draft.last
   end
 
