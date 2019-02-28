@@ -4,6 +4,9 @@ Rails:
 Rails/ActiveRecordAliases:
   Enabled: false
 
+Rails/FindBy:
+  Enabled: false
+
 Layout/EmptyLines:
   Enabled: false
 
