@@ -48,7 +48,8 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
         "employer_profile.notice_date",
         "employer_profile.employer_name",
         "employer_profile.plan_year.current_py_start_date",
-        "employer_profile.plan_year.initial_py_publish_due_date", 
+        "employer_profile.plan_year.initial_py_publish_due_date",
+        "employer_profile.plan_year.current_py_oe_end_date",
         "employer_profile.broker.primary_fullname",
         "employer_profile.broker.organization",
         "employer_profile.broker.phone",
@@ -91,6 +92,10 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
       it "should return publish due date" do
         expect(merge_model.plan_year.initial_py_publish_due_date).to eq Date.new(model_instance.start_on.prev_month.year, model_instance.start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month).strftime('%m/%d/%Y')
+      end
+
+      it "should return plan year open enrollment date" do
+        expect(merge_model.plan_year.current_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
 
       it "should return false when there is no broker linked to employer" do
