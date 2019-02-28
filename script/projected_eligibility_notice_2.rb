@@ -49,19 +49,6 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
               primary_member: primary_member.to_hash
             }
           )
-        # else
-        #   builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
-        #       template: notice_trigger.notice_template,
-        #       subject: event_kind.title,
-        #       event_name: event_kind.event_name,
-        #       mpi_indicator: notice_trigger.mpi_indicator,
-        #       person: primary_person,
-        #       open_enrollment_start_on: bc_period.open_enrollment_start_on,
-        #       open_enrollment_end_on: bc_period.open_enrollment_end_on,
-        #       data: members
-        #       }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
-        #       )
-        #   builder.deliver
         end
         puts "***************** Notice delivered to #{primary_person.hbx_id} *****************" unless Rails.env.test?
         csv << [
