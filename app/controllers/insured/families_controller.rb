@@ -131,6 +131,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_qle_date
+    today = TimeKeeper.date_of_record
     @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = TimeKeeper.date_of_record - 30.days
     end_date = TimeKeeper.date_of_record + 30.days
@@ -153,10 +154,11 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
-      sep_request_denial_notice
-    elsif is_ee_sep_request_accepted?
-      ee_sep_request_accepted_notice
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && params[:qle_id].present? )
+      plan_year = @person.active_employee_roles.map(&:employer_profile).map(&:active_plan_year).compact.first
+      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+      event_name = @person.has_multiple_active_employers? ? 'sep_denail_notice_for_ee_active_on_multiple_rosters' : 'sep_denail_notice_for_ee_active_on_single_roster'
+      trigger_notice_observer(@person.active_employee_roles.first, plan_year, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -244,28 +246,28 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def sep_request_denial_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
-    end
-  end
+  # def sep_request_denial_notice
+  #   begin
+  #     ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
+  #   rescue Exception => e
+  #     log("#{e.message}; person_id: #{@person.id}")
+  #   end
+  # end
 
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
+  # def is_ee_sep_request_accepted?
+  #   !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
+  # end
 
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
-    end
-  end
+  # def ee_sep_request_accepted_notice
+  #   employee_role = @person.active_employee_roles.first
+  #   if employee_role.present? && employee_role.census_employee.present?
+  #     begin
+  #       ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
+  #     rescue Exception => e
+  #       Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
+  #     end
+  #   end
+  # end
 
   def transition_family_members
     @row_id = params[:family_actions_id]

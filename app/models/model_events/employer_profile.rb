@@ -2,6 +2,7 @@ module ModelEvents
   module EmployerProfile
 
     REGISTERED_EVENTS = [
+      :welcome_notice_to_employer,
       # :initial_employee_plan_selection_confirmation
     ]
 
@@ -10,12 +11,26 @@ module ModelEvents
     OTHER_EVENTS = [
       # :generate_initial_employer_invoice,
       # :broker_hired_confirmation_to_employer,
-      # :welcome_notice_to_employer
     ]
 
     def trigger_model_event(event_name, event_options = {})
       if OTHER_EVENTS.include?(event_name)
         notify_observers(ModelEvent.new(event_name, self, event_options))
+      end
+    end
+
+    def notify_on_create
+
+      if self.present?
+        is_welcome_notice_to_employer = true
+      end
+
+      REGISTERED_EVENTS.each do |event|
+        if event_fired = instance_eval("is_" + event.to_s)
+          # event_name = ("on_" + event.to_s).to_sym
+          event_options = {} # instance_eval(event.to_s + "_options") || {}
+          notify_observers(ModelEvent.new(event, self, event_options))
+        end
       end
     end
 

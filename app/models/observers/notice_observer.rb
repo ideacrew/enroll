@@ -130,6 +130,10 @@ module Observers
             end
           end
         end
+
+        if new_model_event.event_key == :welcome_notice_to_employer
+          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
+        end
       end
 
       if EmployerProfile::OTHER_EVENTS.include?(new_model_event.event_key)
@@ -141,10 +145,7 @@ module Observers
 
         if new_model_event.event_key == :broker_hired_confirmation_to_employer
           deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "broker_hired_confirmation_to_employer")
-        elsif new_model_event.event_key == :welcome_notice_to_employer
-          deliver(recipient: employer_profile, event_object: employer_profile, notice_event: "welcome_notice_to_employer")
         end
-
       end
     end
 
@@ -222,6 +223,37 @@ module Observers
           end
         end
 
+        if model_event.event_key == :initial_employee_oe_end_reminder_notice
+          initial_organizations_in_enrolling_state(current_date).each do |org|
+            begin
+              plan_year = org.employer_profile.plan_years.where(:aasm_state => "enrolling").first
+              next if (plan_year.benefit_groups.any?{|bg| bg.is_congress?})
+              org.employer_profile.census_employees.active.each do |ce|
+                begin
+                  deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "initial_employee_oe_end_reminder_notice")
+                end
+              end
+            end
+          end
+        end
+
+        if model_event.event_key == :renewal_employee_oe_end_reminder_notice
+          binding.pry
+          renewal_organizations_in_enrolling_state(current_date).each do |org|
+            begin
+              binding.pry
+              plan_year = org.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first
+              next if (plan_year.benefit_groups.any?{|bg| bg.is_congress?})
+              org.employer_profile.census_employees.active.each do |ce|
+                begin
+                  binding.pry
+                  deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_oe_end_reminder_notice")
+                end
+              end
+            end
+          end
+        end
+
         if [ :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
              :renewal_plan_year_first_reminder_before_soft_dead_line,
              :renewal_plan_year_publish_dead_line
@@ -263,12 +295,18 @@ module Observers
     end
 
     def special_enrollment_period_update(new_model_event)
-      special_enrollment_period = new_model_event.klass_instance
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      if SpecialEnrollmentPeriod::REGISTERED_EVENTS.include?(new_model_event.event_key)
+        special_enrollment_period = new_model_event.klass_instance
 
-      if special_enrollment_period.is_shop?
-        primary_applicant = special_enrollment_period.family.primary_applicant
-        if employee_role = primary_applicant.person.active_employee_roles[0]
-          deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: "employee_sep_request_accepted")
+        if new_model_event.event_key == :employee_sep_request_accepted
+          if special_enrollment_period.is_shop?
+            person = special_enrollment_period.family.primary_applicant.person
+            if employee_role = person.active_employee_roles[0]
+              event_name = person.has_multiple_active_employers? ? 'sep_accepted_notice_for_ee_active_on_multiple_rosters' : 'sep_accepted_notice_for_ee_active_on_single_roster'
+              deliver(recipient: employee_role, event_object: special_enrollment_period, notice_event: event_name)
+            end
+          end
         end
       end
     end
@@ -278,6 +316,7 @@ module Observers
     def census_employee_date_change; end
     def document_date_change; end
     def special_enrollment_period_date_change; end
+    def employee_role_date_change; end
 
     def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
@@ -290,6 +329,17 @@ module Observers
       if CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
        if new_model_event.event_key == :employee_notice_for_employee_terminated_from_roster
         deliver(recipient: census_employee.employee_role, event_object: census_employee, notice_event: "employee_notice_for_employee_terminated_from_roster")
+       end
+      end
+    end
+
+    def employee_role_update(new_model_event)
+      raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
+      employee_role = new_model_event.klass_instance
+
+      if EmployeeRole::REGISTERED_EVENTS.include?(new_model_event.event_key)
+       if new_model_event.event_key == :employee_matches_employer_roster
+        deliver(recipient: employee_role, event_object: employee_role.census_employee, notice_event: "employee_matches_employer_roster")
        end
       end
     end
@@ -308,6 +358,25 @@ module Observers
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"aasm_state".in => ["enrolling", "renewing_enrolling"],
+          :"open_enrollment_end_on" => current_date+2.days
+          }
+      })
+    end
+
+    def initial_organizations_in_enrolling_state(current_date)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state" => "enrolling",
+          :"open_enrollment_end_on" => current_date+2.days
+          }
+      })
+    end
+
+    def renewal_organizations_in_enrolling_state(current_date)
+      binding.pry
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state" => "renewing_enrolling",
           :"open_enrollment_end_on" => current_date+2.days
           }
       })

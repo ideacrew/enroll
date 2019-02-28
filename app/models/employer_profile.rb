@@ -5,6 +5,8 @@ class EmployerProfile
   include AASM
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include ModelEvents::EmployerProfile
+  include Concerns::Observable
   include StateTransitionPublisher
 
   embedded_in :organization
@@ -86,6 +88,7 @@ class EmployerProfile
 
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
+  after_create :notify_on_create
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
