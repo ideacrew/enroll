@@ -6,7 +6,7 @@ module Caches
         (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
       end
       age_record[:cost]
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.error { "Could not find rate for plan_id: #{plan_id}, rate_schedule_date: #{rate_schedule_date}, effective_age: #{effective_age} due to -- #{e}" }
       0
     end

@@ -19,7 +19,7 @@ module Events
         response_payload = render_to_string "events/census_employee/employer_response", :formats => ["xml"], :locals => {:census_employees => census_employees}
 
         reply_with(connection, reply_to, return_status, response_payload)
-      rescue Exception => e
+      rescue StandardError => e
         reply_with(connection, reply_to, "500", JSON.dump({exception: e.inspect, backtrace: e.backtrace.inspect}))
       end
     end
