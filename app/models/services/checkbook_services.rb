@@ -55,9 +55,7 @@ module Services
       def csr_value
         active_tax_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
 
-        return '-01' unless active_tax_house_hold
-
-        else
+        if active_tax_house_hold
           case active_tax_house_hold.valid_csr_kind(hbx_enrollment)
           when 'csr_100'
             '-01'
@@ -72,6 +70,8 @@ module Services
           when 'limited'
             '-03'
           end
+        else
+          return '-01'
         end
       end
 
