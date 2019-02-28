@@ -3003,3 +3003,43 @@ describe HbxEnrollment, dbclean: :after_all do
     end
   end
 end
+
+
+describe "#is_ivl_and_outstanding?" do
+    let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
+    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, kind: "employer_sponsored", aasm_state: "coverage_terminated") }
+
+    context "for checking kind for hbx_enrollment" do
+      it "should return false for kind" do
+        expect(hbx_enrollment.is_ivl_and_outstanding?).to eq false
+      end
+
+      it "should not eq to aasm_State" do
+        hbx_enrollment.is_ivl_and_outstanding?
+        expect(hbx_enrollment.aasm_state).not_to eq "employer_sponsored"
+      end
+    end
+end
+
+describe "#is_ivl_and_outstanding? and return true" do
+    let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:aasm_state)             {ivl_person.consumer_role.update_attributes(aasm_state: "verification_outstanding")}
+    let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
+    let(:ivl_enrollment)          { FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household,
+                                  kind: "individual", aasm_state: "renewing_coverage_selected") }
+    let!(:ivl_enrollment_member)  { FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true,
+                                  applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment,
+                                  eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record) }
+
+    context "for checking kind for hbx_enrollment", dbclean: :after_each do
+      it "should return true for kind" do
+        expect(ivl_enrollment.is_ivl_and_outstanding?).to eq true
+        expect(ivl_enrollment.kind).to eq "individual"
+      end
+
+      it "should eq to aasm_State" do
+        ivl_enrollment.is_ivl_and_outstanding?
+        expect(ivl_enrollment.aasm_state).to eq "renewing_coverage_selected"
+      end
+    end
+end
