@@ -477,7 +477,7 @@ $brand-primary: $mhc-dark-blue;
 }
 
 .pdp-titles-class {
-  color:$mhc-orange;
+  color:#000000;
 }
 .pdp-titles-class:hover {
   cursor:pointer;
@@ -524,6 +524,36 @@ $brand-primary: $mhc-dark-blue;
         border-bottom: none;
         display: none;
       }
+    }
+  }
+}
+
+.carrier-custom-plan-tab {
+  .carrier-custom-plans {
+    padding-left: 0px;
+    margin-bottom: 25px;
+  }
+  .cc-reference-plans {
+    font-size: 12px;
+    font-weight: 300;
+    margin-top: 5px;
+    margin-bottom: 0px;
+  }
+  .cc-reference-card {
+    .plan-label {
+      color: #b7b7b7;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+  }
+}
+.di {
+  font-size: 12px;
+}
+#pdp-bms {
+  .nav-tabs {
+    input[type="radio"] {
+      display: none;
     }
   }
 }
