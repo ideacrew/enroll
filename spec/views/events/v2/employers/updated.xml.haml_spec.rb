@@ -114,7 +114,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :after_each do
       end
 
       subject do
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer_profile, manual_gen: false }
+        render :template => "events/v2/employers/updated", :locals => { :employer => employer_profile, benefit_application_id:nil, manual_gen: false }
         Nokogiri::XML(rendered)
       end
 
