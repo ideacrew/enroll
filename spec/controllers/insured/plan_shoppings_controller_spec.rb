@@ -344,12 +344,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "POST terminate" do
-    let(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id}) }
-    let(:terminate_reason) { "terminate_reason" }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
-    let(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
-    let(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let!(:enrollment) { HbxEnrollment.new({:aasm_state => "coverage_selected", :benefit_group_id => benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, employee_role_id: employee_role.id}) }
+    let!(:terminate_reason) { "terminate_reason" }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let!(:plan_year) {FactoryGirl.create(:plan_year, employer_profile: employer_profile)}
+    let!(:benefit_group) {FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let!(:benefit_group_assignment) {FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:person) { family.person }
+    let!(:employee_role) { FactoryGirl.create(:employee_role, census_employee_id: census_employee.id, person: person)}
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment]) }
 
     before do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(enrollment)
@@ -407,11 +411,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(response).to be_redirect
     end
 
-    it "should redirect to family_account_path as terminate_reason exists" do
+    it "should get success flash mesage when terminate_reason exists" do
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_reason).and_return("terminate")
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
       post :waive, id: "hbx_id", waiver_reason: "waiver", terminate_reason: "terminate"
-      expect(response).to redirect_to(family_account_path)
+      expect(flash[:notice]).to eq "Waive Coverage Successful"
+      expect(response).to be_redirect
     end
 
     it "should get failure flash message" do
@@ -423,12 +429,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     context "waived_enrollment coverage kind" do
-        let(:person) { FactoryGirl.create(:person) }
-        let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
-        let(:coverage_household) {double}
-        let(:family) {Family.new}
-        let(:hbx_enrollment) {HbxEnrollment.create}
-        let(:wavied_enrollment) {HbxEnrollment.create}
+      let(:person) { FactoryGirl.create(:person) }
+      let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
+      let(:coverage_household) {double}
+      let(:family) {Family.new}
+      let(:hbx_enrollment) {HbxEnrollment.create}
+      let(:wavied_enrollment) {HbxEnrollment.create}
+      
       before :each do
         allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id).and_return(hbx_enrollment)
         allow(person).to receive(:primary_family).and_return(family)

@@ -509,7 +509,7 @@ class HbxEnrollment
       if enrollment.effective_on > TimeKeeper.date_of_record
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
       else
-        enrollment.schedule_coverage_termination! if enrollment.may_terminate_coverage? # terminate coverage if enrollment is already active
+        enrollment.schedule_coverage_termination! if enrollment.may_schedule_coverage_termination? # terminate coverage if enrollment is already active
       end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?

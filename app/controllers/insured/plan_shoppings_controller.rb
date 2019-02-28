@@ -7,7 +7,6 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
   before_action :create_or_update_waive_enrollment, only: [:waive, :terminate]
@@ -103,10 +102,10 @@ class Insured::PlanShoppingsController < ApplicationController
       unless hbx_enrollment.shopping? || hbx_enrollment.coverage_termination_pending?
         benefit_group = hbx_enrollment.benefit_group
         benefit_group_assignment = hbx_enrollment.benefit_group_assignment
-        employee_role =  hbx_enrollment.employee_role || @person.employee_roles.active.last
+        employee_role = hbx_enrollment.employee_role || @person.employee_roles.active.last
         coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
-        @waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
-        @waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
+        @waived_enrollment = coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: benefit_group, benefit_group_assignment: benefit_group_assignment, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        @waived_enrollment.coverage_kind = hbx_enrollment.coverage_kind
         @waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
         @waived_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
         @waived_enrollment.predecessor_enrollment_id = hbx_enrollment._id
