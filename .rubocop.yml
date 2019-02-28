@@ -46,6 +46,9 @@ Style/StringLiterals:
 Style/SymbolArray:
   Enabled: false
 
+require:
+  - ./cops/lint/empty_rescue_clause.rb
+
 # Deprecated
 # Style/TrailingBlankLines:
 #   Enabled: false
