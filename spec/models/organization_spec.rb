@@ -517,4 +517,21 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
+  describe "get_renewing_or_draft_py" do
+
+    context "get renewing draft or draft plan year " do
+      let!(:organization)     { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile, organization: organization) }
+      let!(:draft_plan_year)  { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let!(:non_draft_plan_year)  { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'enrolling', employer_profile: employer_profile) }
+
+      it 'should return draft plan year' do
+        expect(organization.get_renewing_or_draft_py).to eq(draft_plan_year)
+      end
+
+      it 'should not return enrolling plan year' do
+        expect(organization.get_renewing_or_draft_py).not_to eq(non_draft_plan_year)
+      end
+    end
+  end
 end
