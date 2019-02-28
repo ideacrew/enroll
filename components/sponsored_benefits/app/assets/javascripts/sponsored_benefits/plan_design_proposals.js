@@ -659,7 +659,7 @@ function viewComparisons() {
 function clearComparisons() {
   $('.reference-plan').each(function() {
     var checkboxes = $(this).find('input[type=checkbox]');
-    //checkboxes.attr('checked', false);
+    checkboxes.attr('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
     disableCompareButton();
   });
