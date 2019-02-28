@@ -219,7 +219,7 @@ module Insured
 
     def class_for_ineligible_row(family_member, is_ivl_coverage)
 
-      class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
+      class_names = @person.active_employee_roles_with_benefit_group.inject([]) do |class_names, employee_role|
         is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role)
 
         if !is_health_coverage && !is_health_coverage.nil?

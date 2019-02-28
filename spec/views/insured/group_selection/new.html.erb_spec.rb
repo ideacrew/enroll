@@ -31,7 +31,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member3).to receive(:is_primary_applicant?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(true)
 
-      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:active_employee_roles_with_benefit_group).and_return [employee_role]
       allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return(nil)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
@@ -111,7 +111,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:benefit, benefit_package)
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_family_relationships_satisfied?).and_return(true)
-      allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_active_individual_role_satisfied?).and_return(true)  
+      allow_any_instance_of(InsuredEligibleForBenefitRule).to receive(:is_active_individual_role_satisfied?).and_return(true)
       allow(benefit_package).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_year)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
@@ -242,7 +242,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
-      allow(person).to receive(:active_employee_roles).and_return []
+      allow(person).to receive(:active_employee_roles_with_benefit_group).and_return []
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.end_of_month + 1.day)
@@ -306,7 +306,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
-      allow(person).to receive(:active_employee_roles).and_return []
+      allow(person).to receive(:active_employee_roles_with_benefit_group).and_return []
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
@@ -590,7 +590,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_shop_shop?).with(person).and_return true
       allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
-      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:active_employee_roles_with_benefit_group).and_return [employee_role]
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:is_resident_role_active?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
