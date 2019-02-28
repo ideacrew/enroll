@@ -289,6 +289,7 @@ private
     begin
       klass.find(id)
     rescue
+      Rails.logger.error { "Could not find person with id #{id}" }
       nil
     end
   end

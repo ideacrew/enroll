@@ -19,6 +19,7 @@ module Aws
           nil
         end
       rescue Exception => e
+        Rails.logger.error { "Could not save #{file_name} to #{bucket_name} because of #{e}" }
       end
     end
 
@@ -40,6 +41,7 @@ module Aws
         object = get_object(env_bucket_name, key)
         read_object(object)
       rescue Exception => e
+        Rails.logger.error { "Could not find bucket with #{uri} because of #{e}" }
         nil
       end
     end

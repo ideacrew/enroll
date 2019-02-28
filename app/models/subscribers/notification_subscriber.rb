@@ -14,7 +14,7 @@ module Subscribers
         begin
           aek.execute_notices(event_name, payload)
         rescue Exception => e
-          # ADD LOGGING AND HANDLING
+          Rails.logger.error { "Could not execute noticces for #{event_name} with payload #{payload} because of #{e}" }
           puts "#{e.inspect} #{e.backtrace}"
         end
       end

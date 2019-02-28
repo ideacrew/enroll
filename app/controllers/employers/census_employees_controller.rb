@@ -35,7 +35,8 @@ class Employers::CensusEmployeesController < ApplicationController
       begin
         missing_kind = census_employee_params['email_attributes']['kind']==''
         @census_employee.errors['Email']='Kind must be selected' if missing_kind
-      rescue
+      rescue Exception => e
+        Rails.logger.error { "Could not create census_employee with #{census_employee_params} because of #{e}" }
       end
       @reload = true
       render action: "new"

@@ -528,6 +528,7 @@ class CensusEmployee < CensusMember
     self.elect_cobra(current_user)
     self.save
   rescue => e
+    Rails.logger.error { "Unable to update for cobra - defaulting to false - due to #{e}" }
     false
   end
 
@@ -922,7 +923,7 @@ class CensusEmployee < CensusMember
   #sort and display latest expired enrollments in desc order
   def past_enrollments
     if employee_role.blank?
-      []      
+      []
     else
       enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
       enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse

@@ -152,6 +152,7 @@ module Forms
       end
       true
     rescue => e
+      Rails.logger.error { "Could not add address to #{person.id} because of #{e}" }
       false
     end
 

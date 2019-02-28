@@ -6,15 +6,16 @@ module Caches
         (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
       end
       age_record[:cost]
-    rescue
+    rescue Exception => e
+      Rails.logger.error { "Could not find rate for plan_id: #{plan_id}, rate_schedule_date: #{rate_schedule_date}, effective_age: #{effective_age} due to -- #{e}" }
       0
-    end 
+    end
 
     def self.age_bounding(plan_id, given_age)
       plan_age = $plan_age_bounds[plan_id]
       return plan_age[:minimum] if given_age < plan_age[:minimum]
       return plan_age[:maximum] if given_age > plan_age[:maximum]
-      given_age 
+      given_age
     end
 
     def self.load_record_cache!
@@ -38,7 +39,7 @@ module Caches
               :cost => pt.cost
             }
           )
-        end 
+        end
       end
     end
 

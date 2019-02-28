@@ -169,7 +169,8 @@ module Forms
         person.update_attributes(extract_person_params)
         person.emails.find_by(kind: 'work').update(address: attr[:email])
       end
-    rescue
+    rescue Exception => e
+      Rails.logger.error { "Could not update broker agency profile: #{self.id} because of #{e}" }
       return false
     end
 
