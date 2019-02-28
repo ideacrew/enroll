@@ -873,7 +873,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       person.employee_roles.create!(ssn: census_employee.ssn,
                                     employer_profile_id: census_employee.employer_profile.id,
                                     hired_on: census_employee.hired_on)
-      expect(census_employee).to receive(:trigger_notices)
       census_employee.construct_employee_role_for_match_person
     end
   end

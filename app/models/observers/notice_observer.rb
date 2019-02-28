@@ -238,15 +238,12 @@ module Observers
         end
 
         if model_event.event_key == :renewal_employee_oe_end_reminder_notice
-          binding.pry
           renewal_organizations_in_enrolling_state(current_date).each do |org|
             begin
-              binding.pry
               plan_year = org.employer_profile.plan_years.where(:aasm_state => "renewing_enrolling").first
               next if (plan_year.benefit_groups.any?{|bg| bg.is_congress?})
               org.employer_profile.census_employees.active.each do |ce|
                 begin
-                  binding.pry
                   deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "renewal_employee_oe_end_reminder_notice")
                 end
               end
