@@ -606,7 +606,7 @@ module BenefitSponsors
     # application_ineligible -> initial_enrollment_ineligible
     # application_eligible   -> initial_enrollment_eligible
     # active                 -> active
-    def application_event_subscriber(aasm)
+    def application_event_subscriber(benefit_application, aasm)
       case aasm.to_state
       when :imported
         revert_to_applicant! if may_revert_to_applicant?
@@ -631,24 +631,18 @@ module BenefitSponsors
       when :draft
         revert_to_applicant! if may_revert_to_applicant?
       when :enrollment_extended
-        extend_open_enrollment(aasm)
+        extend_open_enrollment(benefit_application, aasm)
       end
     end
 
-    def extend_open_enrollment(aasm)
-      if aasm.from_state == :enrollment_ineligible || aasm.from_state == :enrollment_closed
-        # if initial_enrollment_ineligible? || initial_enrollment_closed?
-          update_state_without_event(:initial_enrollment_open)
-        # end
+    def extend_open_enrollment(benefit_application, aasm)
+      if benefit_application.is_renewing?
+        if !active?
+          update_state_without_event(:active)
+        end
       else
-        if transition = workflow_state_transitions[0]
-          if transition.from_state == 'initial_enrollment_ineligible' && transition.to_state == 'applicant'
-            update_state_without_event(:initial_enrollment_open)
-          end
-
-          if transition.from_state == 'active' && transition.to_state == 'applicant'
-            update_state_without_event(:active)
-          end
+        if !applicant?
+          update_state_without_event(:applicant)
         end
       end
     end
