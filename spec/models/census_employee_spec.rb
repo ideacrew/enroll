@@ -366,25 +366,23 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
                           end
 
                           context ".terminate_future_scheduled_census_employees" do
-                             it "should terminate the census employee when TimeKeeper.date_of_record is greater to employment_terminated_on" do
-                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 1.days, aasm_state: "employee_termination_pending")
+                            it "should terminate the census employee on the day of the termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
                               CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 2.days)
                               expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
                             end
 
-
-                             it "should not terminate the census employee when Today's date is equal to employment_terminated_on" do
-                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
-                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 2.days)
-                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
-                            end
-
-                            it "should not terminate the census employee when TimeKeeper.date_of_record is less than employment_terminated_on " do
+                            it "should not terminate the census employee if today's date < termination date" do
                               initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employee_termination_pending")
                               CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 1.days)
                               expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employee_termination_pending"
                             end
 
+                            it "should return the existing state of the census employee if today's date > termination date" do
+                              initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record + 2.days, aasm_state: "employment_terminated")
+                              CensusEmployee.terminate_future_scheduled_census_employees(TimeKeeper.date_of_record + 3.days)
+                              expect(CensusEmployee.find(initial_census_employee.id).aasm_state).to eq "employment_terminated"
+                            end
 
                             it "should also terminate the census employees if termination date is in the past" do
                               initial_census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record - 3.days, aasm_state: "employee_termination_pending")

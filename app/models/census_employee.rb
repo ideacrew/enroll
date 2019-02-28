@@ -649,7 +649,7 @@ class CensusEmployee < CensusMember
     end
 
     def terminate_future_scheduled_census_employees(as_of_date)
-      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on < as_of_date}
+      census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
         begin
           census_employee.terminate_employee_role!
