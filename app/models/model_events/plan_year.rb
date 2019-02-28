@@ -2,7 +2,7 @@ module ModelEvents
   module PlanYear
 
     REGISTERED_EVENTS = [
-      # :renewal_application_created,
+      :renewal_application_created,
       :initial_application_submitted,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
@@ -37,9 +37,9 @@ module ModelEvents
       return if self.is_conversion
       if aasm_state_changed?
 
-        # if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
-        #   is_renewal_application_created = true
-        # end
+        if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
+          is_renewal_application_created = true
+        end
 
         # if is_transition_matching?(to: :enrolled, from: :enrolling, event: :advance_date)
         #   is_initial_employer_open_enrollment_completed = true

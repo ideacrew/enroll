@@ -73,7 +73,8 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_application_created
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_created")
+          # event_name = plan_year.employer_profile.is_converting? ? 'renewal_application_created_for_conversion_group' : 'renewal_application_created'
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: 'renewal_application_created')
         end
 
         if new_model_event.event_key == :group_advance_termination_confirmation
