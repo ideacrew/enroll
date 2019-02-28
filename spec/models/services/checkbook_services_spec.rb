@@ -58,7 +58,7 @@ describe Services::CheckbookServices::PlanComparision do
     let!(:ivl_household)    { ivl_family.active_household }
     let!(:primary_fm_id)    { ivl_family.primary_applicant.id.to_s }
     let!(:dependent_fm_id)  { ivl_family.family_members[1].id.to_s }
-    let!(:ivl_tax_household){ FactoryGirl.create(:tax_household, household: ivl_household, effective_ending_on: nil)}
+    let!(:ivl_tax_household){ FactoryGirl.create(:tax_household, household: ivl_household, effective_ending_on: nil) }
     let!(:ivl_ed)           { FactoryGirl.create(:eligibility_determination, tax_household: ivl_tax_household) }
     let!(:thh_start_on)     { ivl_tax_household.effective_starting_on }
     let!(:ivl_enrollment)   { FactoryGirl.create(:hbx_enrollment, effective_on: thh_start_on, kind: 'individual', household: ivl_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
@@ -82,14 +82,14 @@ describe Services::CheckbookServices::PlanComparision do
       let!(:ivl_enr_member1)    { FactoryGirl.create(:hbx_enrollment_member, applicant_id: dependent_fm_id, hbx_enrollment: ivl_enrollment, is_subscriber: false) }
 
       it 'should return -01' do
-        expect(subject.csr_value).to eq "-01"
+        expect(subject.csr_value).to eq '-01'
       end
     end
 
     context 'when there is no active tax household' do
       it 'should return -01' do
         ivl_tax_household.update_attributes!(effective_ending_on: TimeKeeper.date_of_record.end_of_year)
-        expect(subject.csr_value).to eq "-01"
+        expect(subject.csr_value).to eq '-01'
       end
     end
   end
