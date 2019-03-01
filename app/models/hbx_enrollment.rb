@@ -10,6 +10,8 @@ class HbxEnrollment
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Mongoid::History::Trackable
+  include ModelEvents::HbxEnrollment
+  include Concerns::Observable
 
   embedded_in :household
 
@@ -219,6 +221,7 @@ class HbxEnrollment
 
   before_save :generate_hbx_id, :set_submitted_at, :check_for_subscriber, :set_is_any_enrollment_member_outstanding
   after_save :check_created_at
+  after_save :notify_on_save
 
   # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
   # If not, it assigns it to the oldest person.

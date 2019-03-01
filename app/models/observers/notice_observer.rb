@@ -177,7 +177,7 @@ module Observers
         end
 
         if new_model_event.event_key == :employee_waiver_confirmation
-          deliver(recipient: hbx_enrollment.census_employee.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
+          deliver(recipient: hbx_enrollment.employee_role, event_object: hbx_enrollment, notice_event: "employee_waiver_confirmation")
         end
 
         if new_model_event.event_key == :employee_coverage_termination
