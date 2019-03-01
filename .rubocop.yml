@@ -1,3 +1,7 @@
+AllCops:
+  Exclude:
+    - './project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec'
+
 Rails:
   Enabled: true
 
@@ -45,6 +49,9 @@ Style/StringLiterals:
 
 Style/SymbolArray:
   Enabled: false
+
+require:
+  - ./cops/lint/empty_rescue_clause.rb
 
 # Deprecated
 # Style/TrailingBlankLines:
