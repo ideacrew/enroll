@@ -8,7 +8,7 @@
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
           <%= f.fields_for :family do |f| %>
-              <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
+              <% if @person.primary_family.has_valid_e_case_id? %>
                   <%= f.select(:application_type, options_for_select(["Curam"], selected: @person.primary_family.application_type), required: true, id:'application_type_id' ) %>
               <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
                   <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"], selected: @person.primary_family.application_type), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
