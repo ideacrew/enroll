@@ -370,7 +370,6 @@ module Observers
     end
 
     def renewal_organizations_in_enrolling_state(current_date)
-      binding.pry
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"aasm_state" => "renewing_enrolling",
