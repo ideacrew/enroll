@@ -19,6 +19,15 @@ module SponsoredBenefits
         end
       end
 
+      def assign_default_general_agency(broker_agency_profile, ids=form.plan_design_organization_ids, start_on= TimeKeeper.datetime_of_record)
+        return true if broker_agency_profile.default_general_agency_profile_id.blank?
+        broker_role_id = broker_agency_profile.primary_broker_role.id
+        ids.each do |id|
+          next if plan_design_organization(id).active_general_agency_account.present?
+          create_general_agency_account(id, broker_role_id, start_on, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id)
+        end
+      end
+
       def fire_general_agency(ids=form.plan_design_organization_ids)
         ids.each do |id|
           plan_design_organization(id).general_agency_accounts.active.each do |account|
