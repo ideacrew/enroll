@@ -9,9 +9,10 @@ FactoryGirl.define do
     start_on { (TimeKeeper.date_of_record).beginning_of_month }
 
     end_on { start_on + 1.year - 1.day }
+
     open_enrollment_start_on { start_on.prev_month }
     open_enrollment_end_on { Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
-      
+
     fte_count { 5 }
   end
 
