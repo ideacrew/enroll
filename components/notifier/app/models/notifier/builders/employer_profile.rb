@@ -10,12 +10,13 @@ module Notifier
     include Config::ContactCenterHelper
     include Config::SiteHelper
 
-    attr_accessor :employer_profile, :merge_model, :payload
+    attr_accessor :employer_profile, :merge_model, :payload, :event_name
 
     def initialize
       data_object = Notifier::MergeDataModels::EmployerProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.plan_year.benefit_groups = Notifier::MergeDataModels::BenefitGroup.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.offered_products = Notifier::MergeDataModels::OfferedProduct.new
