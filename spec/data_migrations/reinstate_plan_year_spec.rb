@@ -47,7 +47,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
         ce_benefit_group_assignment.reload
 
         expect(plan_year.aasm_state).to eq 'active' # after update
-        expect(plan_year.end_on).to eq plan_year.start_on + 364.days
+        expect(plan_year.end_on).to eq plan_year.start_on.next_year - 1.day
         expect(plan_year.terminated_on).to eq nil
 
         expect(enrollment_terminated.aasm_state).to eq 'coverage_enrolled'
@@ -103,7 +103,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
         ce_benefit_group_assignment.reload
 
         expect(plan_year.aasm_state).to eq 'active' # after update
-        expect(plan_year.end_on).to eq plan_year.start_on + 364.days
+        expect(plan_year.end_on).to eq plan_year.start_on.next_year - 1.day
         expect(plan_year.terminated_on).to eq nil
 
         expect(enrollment_terminated.aasm_state).to eq 'coverage_enrolled'
