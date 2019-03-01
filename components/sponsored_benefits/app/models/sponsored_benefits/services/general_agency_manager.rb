@@ -23,9 +23,21 @@ module SponsoredBenefits
         ids.each do |id|
           plan_design_organization(id).general_agency_accounts.active.each do |account|
             account.terminate!
-            # toDo - check DC notice Engine refactor
-            # notify_general_agent_terminated
-            # self.trigger_notices("general_agency_terminated")
+            employer_profile = account.plan_design_organization.employer_profile
+            if employer_profile
+              send_notice({
+                modal_id: employer_profile.id,
+                event: "general_agency_terminated"
+              }) if dc? # In MA these were handled through Notice Engine
+
+              send_message({
+                employer_profile: employer_profile,
+                general_agency_profile: account.general_agency_profile,
+                broker_agency_profile: account.broker_agency_profile,
+                status: 'Terminate'
+              })
+              notify("acapi.info.events.employer.general_agent_terminated", {employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
+            end
           end
         end
       end
@@ -38,9 +50,21 @@ module SponsoredBenefits
           broker_role_id: broker_role_id
         ).tap do |account|
           if account.save
-            # toDo - check DC notice Engine refactor
-            # send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
-            # general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
+            employer_profile = account.plan_design_organization.employer_profile
+            if employer_profile
+              send_notice({
+                modal_id: general_agency_profile_id,
+                employer_profile_id: employer_profile.id,
+                event: "general_agency_hired_notice"
+              }) if dc? # In MA these were handled through Notice Engine
+
+              send_message({
+                employer_profile: employer_profile,
+                general_agency_profile: general_agency_profile(general_agency_profile_id),
+                broker_agency_profile: broker_agency_profile(broker_agency_profile_id),
+                status: 'Hire'
+              })
+            end
           else
             map_failed_assignment_on_form(id) if form.present?
           end
@@ -90,6 +114,47 @@ module SponsoredBenefits
 
       def current_default_ga
         broker_agency_profile.default_general_agency_profile
+      end
+
+      def send_notice(opts={})
+        begin
+          ShopNoticesNotifierJob.perform_later(opts[:modal_id].to_s, opts[:event], employer_profile_id: opts[:employer_profile_id].to_s)
+        rescue Exception => e
+          (Rails.logger.error {"Unable to deliver opts[:event] to General Agency ID: #{opts[:modal_id]} due to #{e}"}) unless Rails.env.test?
+        end
+      end
+
+      def send_message(opts={})
+        subject = "You are associated to #{opts[:employer_profile].legal_name}- #{opts[:general_agency_profile].legal_name} (#{opts[:status]})"
+        body = "<br><p>Associated details<br>General Agency : #{opts[:general_agency_profile].legal_name}<br>Employer : #{opts[:employer_profile].legal_name}<br>Status : #{opts[:status]}</p>"
+        secure_message(opts[:broker_agency_profile], opts[:general_agency_profile], subject, body)
+        secure_message(opts[:broker_agency_profile], opts[:employer_profile], subject, body)
+      end
+
+      def secure_message(from_provider, to_provider, subject, body)
+        message_params = {
+          sender_id: from_provider.id,
+          parent_message_id: to_provider.id,
+          from: from_provider.legal_name,
+          to: to_provider.legal_name,
+          subject: subject,
+          body: body
+        }
+
+        create_secure_message(message_params, to_provider, :inbox)
+        create_secure_message(message_params, from_provider, :sent)
+      end
+
+      def create_secure_message(message_params, inbox_provider, folder)
+        message = Message.new(message_params)
+        message.folder =  Message::FOLDER_TYPES[folder]
+        msg_box = inbox_provider.inbox
+        msg_box.post_message(message)
+        msg_box.save
+      end
+
+      def dc?
+        Settings.aca.state_abbreviation = "DC"
       end
     end
   end

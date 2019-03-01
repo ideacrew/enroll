@@ -17,7 +17,6 @@ module Subscribers
           plan_design_organizations.each do |pdo|
             if pdo.active_general_agency_account.blank?
               service.create_general_agency_account(pdo.id, person.broker_role.id, TimeKeeper.datetime_of_record, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id)
-              send_general_agency_assign_msg(broker_agency_profile, broker_agency_profile.default_general_agency_profile, pdo.employer_profile, 'Hire')
             end
           end
         else
@@ -27,7 +26,6 @@ module Subscribers
           plan_design_organizations.each do |pdo|
             general_agency_profile = pdo.active_general_agency_account && pdo.active_general_agency_account.general_agency_profile
             if general_agency_profile && general_agency_profile.id.to_s == pre_default_ga_id.to_s
-              send_general_agency_assign_msg(broker_agency_profile, general_agency_profile, pdo.employer_profile, 'Terminate')
               service.fire_general_agency([pdo.id])
             end
           end
@@ -40,35 +38,6 @@ module Subscribers
     def service
       return @service if defined? @service
       @service = SponsoredBenefits::Services::GeneralAgencyManager.new(nil)
-    end
-
-    def send_general_agency_assign_msg(broker_agency_profile, general_agency, employer_profile, status)
-      subject = "You are associated to #{employer_profile.legal_name}- #{general_agency.legal_name} (#{status})"
-      body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
-      secure_message(broker_agency_profile, general_agency, subject, body)
-      secure_message(broker_agency_profile, employer_profile, subject, body)
-    end
-
-    def secure_message(from_provider, to_provider, subject, body)
-      message_params = {
-        sender_id: from_provider.id,
-        parent_message_id: to_provider.id,
-        from: from_provider.legal_name,
-        to: to_provider.legal_name,
-        subject: subject,
-        body: body
-      }
-
-      create_secure_message(message_params, to_provider, :inbox)
-      create_secure_message(message_params, from_provider, :sent)
-    end
-
-    def create_secure_message(message_params, inbox_provider, folder)
-      message = Message.new(message_params)
-      message.folder =  Message::FOLDER_TYPES[folder]
-      msg_box = inbox_provider.inbox
-      msg_box.post_message(message)
-      msg_box.save
     end
   end
 end
