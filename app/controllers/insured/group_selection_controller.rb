@@ -11,7 +11,7 @@ class Insured::GroupSelectionController < ApplicationController
     set_admin_bookmark_url
     hbx_enrollment = build_hbx_enrollment
     @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
-    @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
+    @employee_role = @person.active_employee_roles.last if @employee_role.blank? && @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || @market_kind == 'coverall' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
@@ -78,7 +78,7 @@ class Insured::GroupSelectionController < ApplicationController
     # it assumes the primary and dependent are in either IVL or coverall
     # TODO will need to account for shop market as well with coverall phase 3 when
     # people will be able to receive a transition from shop to coverall, etc.
-    
+
     if ((hbx_enrollment.kind != @market_kind) && (@market_kind != "shop"))
       hbx_enrollment.kind = @market_kind
     end
@@ -136,7 +136,7 @@ class Insured::GroupSelectionController < ApplicationController
   def build_hbx_enrollment
     case @market_kind
     when 'shop'
-      @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
+      @employee_role = @person.active_employee_roles.last if @employee_role.blank? and @person.has_active_employee_role?
 
       if @hbx_enrollment.present?
         @change_plan = 'change_by_qle' if @hbx_enrollment.is_special_enrollment?

@@ -341,6 +341,21 @@ describe Person do
         end
       end
 
+      context "active_employee_roles_with_benefit_group" do
+        let(:person) {FactoryGirl.build(:person)}
+        let(:benefit_group) { FactoryGirl.build(:benefit_group)}
+        let(:employee_role1) { FactoryGirl.build(:employee_role, :with_census_employee) }
+        let(:employee_role2) { FactoryGirl.build(:employee_role, :with_census_employee) }
+
+        it "should return true when person has multiple employee_roles and one employee_role has benefit_group" do
+          allow(person).to receive(:employee_roles).and_return([employee_role1, employee_role2])
+          allow(employee_role1).to receive(:benefit_group).and_return(nil)
+          allow(employee_role2).to receive(:benefit_group).and_return(benefit_group)
+          expect(person.active_employee_roles_with_benefit_group.count).to eq 1
+        end
+
+      end
+
       context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}

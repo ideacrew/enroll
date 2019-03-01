@@ -799,7 +799,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
     before do
       assign(:"person", person)
-      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      allow(person).to receive(:active_employee_roles_with_benefit_group).and_return [employee_role]
       @member = person.primary_family.primary_applicant
     end
 
