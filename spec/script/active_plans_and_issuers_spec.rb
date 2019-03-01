@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(Rails.root, "script", "active_plans_and_issuers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
@@ -29,7 +30,7 @@ describe 'active_plans_and_issuers', :dbclean => :after_each, type: :helper do
     subject { ActivePlans.retrieve }
 
     it 'finds initial benefit applications' do
-      expect(subject).to include(published_plan_year)
+      expect(subject).to include(benefit_sponsorship.benefit_applications.first)
     end
 
     it 'finds renewing benefit applications' do
