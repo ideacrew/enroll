@@ -1,4 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
+  include Acapi::Notifiers
+
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
@@ -35,8 +37,8 @@ class Employers::CensusEmployeesController < ApplicationController
       begin
         missing_kind = census_employee_params['email_attributes']['kind']==''
         @census_employee.errors['Email']='Kind must be selected' if missing_kind
-      rescue Exception => e
-        Rails.logger.error { "Could not create census_employee with #{census_employee_params} because of #{e}" }
+      rescue StandardError => e
+        log("ERROR: Could not create census_employee with #{census_employee_params} because of #{e}", {:severity => "critical"})
       end
       @reload = true
       render action: "new"
@@ -237,7 +239,7 @@ class Employers::CensusEmployeesController < ApplicationController
   def notify_employee_of_termination
     begin
       ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
-    rescue Exception => e
+    rescue StandardError => e
       (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
     end
   end

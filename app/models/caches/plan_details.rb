@@ -1,5 +1,7 @@
 module Caches
   class PlanDetails
+    include Acapi::Notifiers
+
     def self.lookup_rate(plan_id, rate_schedule_date, effective_age)
       calc_age = age_bounding(plan_id, effective_age)
       age_record = $plan_age_lookup[plan_id][calc_age].detect do |pt|
@@ -7,7 +9,7 @@ module Caches
       end
       age_record[:cost]
     rescue StandardError => e
-      Rails.logger.error { "Could not find rate for plan_id: #{plan_id}, rate_schedule_date: #{rate_schedule_date}, effective_age: #{effective_age} due to -- #{e}" }
+      log("ERROR: Could not find rate for plan_id: #{plan_id}, rate_schedule_date: #{rate_schedule_date}, effective_age: #{effective_age} due to -- #{e}", {:severity => "critical"})
       0
     end
 

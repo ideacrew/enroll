@@ -1,6 +1,7 @@
 require 'date'
 module Forms
   class BrokerAgencyProfile < ::Forms::OrganizationSignup
+    include Acapi::Notifiers
 
     include ActiveModel::Validations
     include Validations::Email
@@ -169,8 +170,8 @@ module Forms
         person.update_attributes(extract_person_params)
         person.emails.find_by(kind: 'work').update(address: attr[:email])
       end
-    rescue Exception => e
-      Rails.logger.error { "Could not update broker agency profile: #{self.id} because of #{e}" }
+    rescue StandardError => e
+      log("ERROR: Could not update broker agency profile: #{self.id} because of #{e}", {:severity => "critical"})
       return false
     end
 

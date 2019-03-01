@@ -1,5 +1,6 @@
 module Forms
   class FamilyMember
+    include Acapi::Notifiers
     include ActiveModel::Model
     include ActiveModel::Validations
 
@@ -152,7 +153,7 @@ module Forms
       end
       true
     rescue => e
-      Rails.logger.error { "Could not add address to #{person.id} because of #{e}" }
+      log("ERROR: Could not add address to #{person.id} because of #{e}", {:severity => "critical"})
       false
     end
 

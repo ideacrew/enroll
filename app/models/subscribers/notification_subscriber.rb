@@ -13,8 +13,8 @@ module Subscribers
       application_event_kinds.each do |aek|
         begin
           aek.execute_notices(event_name, payload)
-        rescue Exception => e
-          Rails.logger.error { "Could not execute notices for #{event_name} with payload #{payload} because of #{e}" }
+        rescue StandardError => e
+          log("ERROR: Could not execute notices for #{event_name} with payload #{payload} because of #{e}", {:severity => "critical"})
           puts "#{e.inspect} #{e.backtrace}"
         end
       end

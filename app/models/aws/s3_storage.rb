@@ -1,5 +1,7 @@
 module Aws
   class S3Storage
+    include Acapi::Notifiers
+
     ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat']
 
     def initialize
@@ -18,8 +20,8 @@ module Aws
         else
           nil
         end
-      rescue StandardError => e
-        Rails.logger.error { "Could not save #{file_path} to #{bucket_name} because of #{e}" }
+      rescue Exception => e
+        log("ERROR: Could not save #{file_path} to #{bucket_name} because of #{e}", {:severity => "critical"})
       end
     end
 
@@ -40,8 +42,8 @@ module Aws
         env_bucket_name = set_correct_env_bucket_name(bucket_name)
         object = get_object(env_bucket_name, key)
         read_object(object)
-      rescue StandardError => e
-        Rails.logger.error { "Could not find bucket with #{uri} because of #{e}" }
+      rescue Exception => e
+        log("ERROR: Could not find bucket with #{uri} because of #{e}", {:severity => "critical"})
         nil
       end
     end

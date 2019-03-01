@@ -528,7 +528,7 @@ class CensusEmployee < CensusMember
     self.elect_cobra(current_user)
     self.save
   rescue => e
-    Rails.logger.error { "Unable to update for cobra - defaulting to false - due to #{e}" }
+    log("ERROR: Unable to update for cobra - defaulting to false - due to #{e}", {:severity => "critical"})
     false
   end
 

@@ -2,6 +2,7 @@ class PeopleController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
   include VlpDoc
+  include Acapi::Notifiers
 
   def new
     @person = Person.new
@@ -289,7 +290,7 @@ private
     begin
       klass.find(id)
     rescue
-      Rails.logger.error { "Could not find person with id #{id}" }
+      log("ERROR: Could not find person with id #{id}", {:severity => "critical"})
       nil
     end
   end
