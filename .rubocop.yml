@@ -10,6 +10,7 @@ AllCops:
     - './lib/tasks/**/*'
     - './components/benefit_markets/db/seedfiles/**/*'
     - './components/benefit_sponsors/db/seedfiles/**/*'
+    - './components/old_benefit_sponsors/**/*'
     - './eyes/enroll.eye.rb'
 
 Rails:
