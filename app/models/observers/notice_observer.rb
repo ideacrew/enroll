@@ -85,8 +85,8 @@ module Observers
           errors = plan_year.enrollment_errors
           return if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
 
-          if plan_year.is_renewing?
-            if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
+          if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count)) || errors.include?(:enrollment_ratio)
+            if plan_year.is_renewing?
               deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
 
               plan_year.employer_profile.census_employees.non_terminated.each do |ce|
@@ -98,11 +98,8 @@ module Observers
                   (Rails.logger.error { "Unable to deliver notice  due to #{e.inspect}" }) unless Rails.env.test?
                 end
               end
-            end
-          else
-            if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
+            else
               deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
-
               plan_year.employer_profile.census_employees.non_terminated.each do |ce|
                 begin
                   if ce.employee_role.present?
