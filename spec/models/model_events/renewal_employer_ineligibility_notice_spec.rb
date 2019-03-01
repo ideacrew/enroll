@@ -43,7 +43,7 @@ describe 'ModelEvents::RenewalEmployerIneligibiltyNotice', dbclean: :around_each
         model_instance.observer_peers.keys.each do |observer|
           expect(observer).to receive(:plan_year_update) do |model_event|
             expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :renewal_application_denied, :klass_instance => model_instance, :options => {})
+            expect(model_event).to have_attributes(:event_key => :application_denied, :klass_instance => model_instance, :options => {})
           end
         end
         model_instance.close_open_enrollment!
@@ -55,7 +55,7 @@ describe 'ModelEvents::RenewalEmployerIneligibiltyNotice', dbclean: :around_each
     context "when renewal application denied" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:renewal_application_denied, model_instance, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:application_denied, model_instance, {}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|

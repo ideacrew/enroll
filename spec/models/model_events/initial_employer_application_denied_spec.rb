@@ -23,8 +23,6 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
   }
 
   before :each do
-    # allow(person).to receive(:employee_roles).and_return([employee_role])
-    # allow(employee_role).to receive(:employee_roles).and_return([employee_role])
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     person.employee_roles[0].update_attributes(census_employee_id: census_employee.id)
     census_employee.update_attributes(employee_role_id: person.employee_roles[0].id)
@@ -52,15 +50,15 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
 
        it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.group_ineligibility_notice_to_employee"
-          expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
+          expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
+          expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
         
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.initial_employer_application_denied"
-          expect(payload[:employer_id]).to eq employer.hbx_id.to_s
+          expect(event_name).to eq "acapi.info.events.employee.group_ineligibility_notice_to_employee"
+          expect(payload[:employee_role_id]).to eq census_employee.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end

@@ -14,20 +14,6 @@ module Observers
       if PlanYear::REGISTERED_EVENTS.include?(new_model_event.event_key)
         plan_year = new_model_event.klass_instance
 
-        if new_model_event.event_key == :renewal_application_denied
-          errors = plan_year.enrollment_errors
-
-          if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
-            deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
-
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
-              end
-            end
-          end
-        end
-
         if new_model_event.event_key == :initial_application_submitted
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_application_submitted")
           trigger_zero_employees_on_roster_notice(plan_year)
@@ -97,17 +83,37 @@ module Observers
 
         if new_model_event.event_key == :application_denied
           errors = plan_year.enrollment_errors
-          
-          if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
-            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-              if ce.employee_role.present?
-                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
+          return if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
+
+          if plan_year.is_renewing?
+            if (errors.include?(:eligible_to_enroll_count) || errors.include?(:non_business_owner_enrollment_count))
+              deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
+
+              plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+                begin
+                  if ce.employee_role.present?
+                    deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
+                  end
+                rescue Exception => e
+                  (Rails.logger.error { "Unable to deliver notice  due to #{e.inspect}" }) unless Rails.env.test?
+                end
+              end
+            end
+          else
+            if(errors.include?(:enrollment_ratio) || errors.include?(:non_business_owner_enrollment_count))
+              deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
+
+              plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+                begin
+                  if ce.employee_role.present?
+                    deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "group_ineligibility_notice_to_employee")
+                  end
+                rescue Exception => e
+                  (Rails.logger.error { "Unable to deliver notice  due to #{e.inspect}" }) unless Rails.env.test?
+                end
               end
             end
           end
-
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_application_denied")
-
         end
 
         if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
