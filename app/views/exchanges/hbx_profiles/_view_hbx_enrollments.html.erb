@@ -27,6 +27,9 @@
               <td id="name"><%= enrollment.plan.name %> </td>
               <td><%= enrollment.kind.camelcase %></td>
               <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
+              <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
+              <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
+              <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.reinstated_enrollment_exists? %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
@@ -34,14 +37,13 @@
               <td>
                 <input type="checkbox" name="edi_required" value="checked" checked />
               </td>
-              <td id="name1"><%= enrollment.hbx_id %></td>
+              <td id="hbx_id"><%= enrollment.hbx_id %></td>
             </tr>
           <%end%>
         </table>
         <%= hidden_field_tag 'comments' %>
       <%end%>
-
-      <%= submit_tag "Submit", class: 'btn btn-primary', data: {toggle: "modal", target: "#reinstate_confirm"} %>
+      <%= submit_tag "Submit" , onclick: "ReinstateModal()", class: 'btn btn-primary' %>
     <%end%>
 
   </div>
@@ -60,26 +62,28 @@
       <div class="modal-body">
         <div class="row" style="font-size: 15px;">
           <p class="bg-warning"></p>
-          <div>
-            <h4 class="modal-title" style="display:inline;">
-              You are about to reinstate the following enrollment </br> on behalf of
-            </h4>
-            <p style="display:inline;font-size:15px;">
-              <%= @person.first_name %>
-            </p>
-          </div>
-          <br>
-          <div>
-            <label for="planName" class="col-sm-3 control-label">Plan Name</label>
-            <div class="col-sm-9"><div id="reinstate-plan-name"></div></div>
-          </div>
-          <div>
-            <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
-            <div class="col-sm-9"><div id="effective-date"></div></div>
-          </div>
-          <div>
-            <label for="comments" class="col-sm-3 control-label">Comments</label>
-            <div class="col-sm-9"><textarea class="form-control comments" rows="3"></textarea></div>
+          <div id="show_reinstate">
+            <div>
+              <h4 class="modal-title" style="display:inline;">
+                You are about to reinstate the following enrollment </br> on behalf of
+              </h4>
+              <p style="display:inline;font-size:15px;">
+                <%= @person.first_name %>
+              </p>
+            </div>
+            <br>
+            <div>
+              <label for="planName" class="col-sm-3 control-label">Plan Name</label>
+              <div class="col-sm-9"><div id="reinstate-plan-name"></div></div>
+            </div>
+            <div>
+              <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
+              <div class="col-sm-9"><div id="effective-date"></div></div>
+            </div>
+            <div>
+              <label for="comments" class="col-sm-3 control-label">Comments</label>
+              <div class="col-sm-9"><textarea class="form-control comments" rows="3"></textarea></div>
+            </div>
           </div>
         </div>
       </div>
@@ -92,6 +96,22 @@
 </div>
 
 <script type="text/javascript">
+
+  var ReinstateModal = function () {
+    $('#reinstate_confirm').modal('show');
+      $('#terminated_enrollemnts :radio:checked').each(function (){
+        var active_enroll_exists_with_reinstate_date = $(this).closest('tr').find("td#active_enroll_exists_with_reinstate_date").text();
+        var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
+          if (enrollment_can_be_reinstated == "true" && active_enroll_exists_with_reinstate_date == "false") {
+            $('#show_reinstate').show();
+            $("a.modal_confirm").show();
+          }else{
+            $('#show_reinstate').hide();
+            $("a.modal_confirm").hide();
+          }
+      });
+  }
+
   $("a.modal_confirm").click(function() {
     $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
     $("#reinstate-form").submit();
@@ -105,8 +125,27 @@
     $('#terminated_enrollemnts :radio:checked').each(function (){
      $('#reinstate-plan-name').html($(this).closest('tr').find("td#name").text());
      $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
-     
+
      var employee_status = $(this).closest('tr').find("td#employee_status").text();
+     var effective_date = $(this).closest('tr').find("td#reinstate").text();
+     var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
+     var enrollment_market = $(this).closest('tr').find("td#enrollment_market").text();
+     var active_enroll_exists_with_reinstate_date = $(this).closest('tr').find("td#active_enroll_exists_with_reinstate_date").text();
+
+     if(enrollment_can_be_reinstated == "false") {
+       if (enrollment_market == "Employer Sponsored"){
+         $('.modal-dialog .bg-warning').html("Unable to reinstate Employer Sponsored enrollment : Employer not offering coverage for the effective date " + effective_date);
+       }else{
+         $('.modal-dialog .bg-warning').html("Unable to reinstate Individual Market enrollment for effective date " + effective_date + " : Previous year terminated enrollment can't be reinstated, Please reinstate for current year terminated enrollment.");
+       }
+     return;
+     }
+
+     if (active_enroll_exists_with_reinstate_date == "true") {
+       $('.modal-dialog .bg-warning').html("Unable to reinstate: Active Enrollment exists with Effective date " + effective_date);
+       return;
+     }
+
      if(employee_status) {
        if(employee_status == 'CobraTerminated') {
          $('.modal-dialog .bg-warning').html("This COBRA employee is no longer 'active' on the employers roster. If you proceed, the COBRA census record will also be reinstated to an 'active' state.")

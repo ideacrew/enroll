@@ -25,8 +25,8 @@ class HbxEnrollment
   COVERAGE_KINDS      = %w(health dental)
 
   ENROLLED_STATUSES   = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending
-                               unverified coverage_reinstated
-                            )
+                           unverified coverage_reinstated
+                          )
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
   CANCELED_STATUSES   = %w(coverage_canceled)
@@ -50,6 +50,8 @@ class HbxEnrollment
   ]
 
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
+
+  CAN_REINSTATE_ENROLLMENTS = %w(coverage_termination_pending coverage_terminated)
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
@@ -161,6 +163,7 @@ class HbxEnrollment
   scope :without_aptc,        ->{lte("applied_aptc_amount.cents": 0) }
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
+  scope :can_reinstate,       ->{ where(:aasm_state.in =>  CAN_REINSTATE_ENROLLMENTS) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
@@ -596,9 +599,6 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_applicable_for_renewal?
-      if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
-        return
-      end
       employer = benefit_group.plan_year.employer_profile
       if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin
@@ -1136,6 +1136,19 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
+  def can_be_reinstated?
+    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    if is_shop? && employer_profile.present?
+      employer_profile.plan_years.published_or_renewing_published.detect do |py|
+        !py.is_conversion && (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(terminated_on.next_day)
+      end.present?
+    elsif is_ivl_by_kind?
+      self.is_effective_in_current_year?
+    else
+      false
+    end
+  end
+
   def reinstated_enrollment_exists?
     family.active_household.hbx_enrollments.where({:kind => self.kind,
       :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day,
@@ -1345,6 +1358,7 @@ class HbxEnrollment
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive],
                   to: :coverage_canceled
+
     end
 
     event :terminate_coverage, :after => :record_transition do
@@ -1581,16 +1595,6 @@ class HbxEnrollment
     if self.census_employee.present?
       begin
         self.census_employee.update_attributes!(employee_role_id: self.employee_role.id.to_s ) if !census_employee.employee_role.present?
-        if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
-          ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s)
-        end
-      end
-    end
-  end
-
-  def ee_select_plan_during_oe
-    if self.census_employee.present?
-      begin
         if self.is_open_enrollment? && self.benefit_group.plan_year.open_enrollment_contains?(TimeKeeper.datetime_of_record)
           ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe", hbx_enrollment_hbx_id: self.hbx_id.to_s, :acapi_trigger =>  true)
         end

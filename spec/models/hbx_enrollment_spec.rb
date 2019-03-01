@@ -2645,8 +2645,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
       end
 
       context 'when EE terminates current coverage' do
-
-        it 'should cancel passive renewal and generate a waiver' do
+        it 'should cancel passive renewal and should not generate a waiver' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
@@ -2655,7 +2654,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
 
           expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
-          expect(passive_waiver.present?).to be_truthy
+          expect(passive_waiver).to be_nil
         end
       end
     end
@@ -3023,6 +3022,136 @@ describe HbxEnrollment, dbclean: :after_all do
       it "should have reinstated enrollmentt" do
         allow(hbx_enrollment).to receive(:workflow_state_transitions).and_return([])
         expect(hbx_enrollment.is_reinstated_enrollment?).to be_falsey
+      end
+    end
+  end
+
+  describe "#can_be_reinstated?" do
+
+    context "for Individual market" do
+      let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
+
+      let(:ivl_enrollment)    {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: ivl_family.latest_household,
+                           coverage_kind: "health",
+                           effective_on: TimeKeeper.date_of_record.last_year.beginning_of_year,
+                           enrollment_kind: "open_enrollment",
+                           kind: "individual",
+                           aasm_state: "coverage_terminated",
+                           terminated_on: TimeKeeper.date_of_record.last_year.end_of_year)
+      }
+
+      it "enrollment termianted previous year can't be reinstated?" do
+        expect(ivl_enrollment.can_be_reinstated?).to be_falsey
+      end
+
+      it "enrollment termianted during current year can be reinstated?" do
+        ivl_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_year, terminated_on: TimeKeeper.date_of_record.end_of_month)
+        ivl_enrollment.reload
+        expect(ivl_enrollment.can_be_reinstated?).to be_truthy
+      end
+
+    end
+
+    context "for SHOP market" do
+      let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.beginning_of_year)}
+      let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+      let!(:census_employees){
+        FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+        employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+        employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+      }
+
+      let!(:plan) {
+        FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+      }
+
+      let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+      let!(:family) {
+        person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+        employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+        ce.update_attributes({employee_role: employee_role})
+        Family.find_or_build_from_employee_role(employee_role)
+      }
+
+      let(:person) { family.primary_applicant.person }
+
+      let!(:enrollment) {
+        FactoryGirl.create(:hbx_enrollment,
+                           household: family.active_household,
+                           coverage_kind: "health",
+                           effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                           enrollment_kind: "open_enrollment",
+                           kind: "employer_sponsored",
+                           benefit_group_id: benefit_group.id,
+                           employee_role_id: person.active_employee_roles.first.id,
+                           benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                           plan_id: plan.id
+        )
+      }
+
+      context "reinstating coverage_terminated enrollment" do
+        context 'reinstated effective date falls outside active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on)
+            enrollment.reload
+          end
+
+          it "should return false" do
+            expect(enrollment.can_be_reinstated?).to be_falsey
+          end
+        end
+
+        context 'reinstated effective date falls with in range of active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
+            enrollment.reload
+          end
+
+          it "should return true" do
+            expect(enrollment.can_be_reinstated?).to be_truthy
+          end
+        end
+      end
+
+      context "reinstating coverage_terminated pending enrollment" do
+        context 'reinstated effective date falls outside active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_termination_pending', terminated_on: benefit_group.plan_year.end_on)
+            enrollment.reload
+          end
+
+          it "should return false" do
+            expect(enrollment.can_be_reinstated?).to be_falsey
+          end
+        end
+
+        context 'reinstated effective date falls with in range of active plan year' do
+          before do
+            enrollment.update_attributes(aasm_state: 'coverage_termination_pending', terminated_on: benefit_group.plan_year.end_on - 1.month)
+            enrollment.reload
+          end
+
+          it "should return true" do
+            expect(enrollment.can_be_reinstated?).to be_truthy
+          end
+        end
+      end
+
+      context 'for reinstated enrollment no active coverage offering by employer' do
+
+        before do
+          benefit_group.plan_year.update_attributes(aasm_state: "terminated")
+          enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: benefit_group.plan_year.end_on - 1.month)
+          enrollment.reload
+        end
+
+        it "should return true" do
+          expect(enrollment.can_be_reinstated?).to be_falsey
+        end
       end
     end
   end

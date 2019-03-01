@@ -483,10 +483,12 @@ def employer_poc
     if enrollment.present?
       begin
         reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
-        if reinstated_enrollment.present? && params['comments'].present?
-          reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+        if reinstated_enrollment.present?
+          if params['comments'].present?
+            reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
+          end
+          message = {notice: "Enrollment Reinstated successfully."}
         end
-        message = {notice: "Enrollment Reinstated successfully."}
       rescue Exception => e
         message = {error: e.to_s}
       end

@@ -46,6 +46,14 @@ module Enrollments
         end
       end
 
+      def reinstatement_benefit_group_assignment
+        if reinstate_under_renewal_py?
+          renewal_benefit_group_assignment.id
+        else
+          base_enrollment.benefit_group_assignment_id
+        end
+      end
+
       def reinstatement_benefit_group
         if reinstate_under_renewal_py?
           renewal_benefit_group_assignment.benefit_group
@@ -81,7 +89,7 @@ module Enrollments
         if base_enrollment.is_shop?
           if can_be_reinstated?
             reinstated_enrollment.employee_role_id = base_enrollment.employee_role_id
-            reinstated_enrollment.benefit_group_assignment_id = base_enrollment.benefit_group_assignment_id
+            reinstated_enrollment.benefit_group_assignment_id = reinstatement_benefit_group_assignment
             reinstated_enrollment.benefit_group_id = reinstatement_benefit_group.id
             reinstated_enrollment.plan_id = reinstatement_plan.id
           end
