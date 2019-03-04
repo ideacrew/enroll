@@ -1,5 +1,8 @@
 require 'rails_helper'
 
+ currency = ActionView::Base.new
+ currency.extend ActionView::Helpers::NumberHelper
+
  describe 'ModelEvents::InitialEmployeePlanSelectionConfirmation', dbclean: :around_each do
 
   let(:model_event)  { "initial_employee_plan_selection_confirmation" }
@@ -94,6 +97,18 @@ require 'rails_helper'
 
     it "should return notice_date" do
       expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    end
+
+    it "should return employee plan name" do
+      expect(merge_model.enrollment.plan_name).to eq hbx_enrollment.plan.name
+    end
+
+    it "should return employee coverage start date" do
+      expect(merge_model.enrollment.coverage_start_on).to eq hbx_enrollment.effective_on.strftime('%m/%d/%Y')
+    end
+
+    it "should return employer responsible amount" do
+      expect(merge_model.enrollment.employer_responsible_amount).to eq currency.number_to_currency(hbx_enrollment.total_employer_contribution)
     end
 
     it "should return employee first name" do
