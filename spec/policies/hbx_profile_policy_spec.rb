@@ -68,14 +68,14 @@ describe HbxProfilePolicy do
 end
 
 describe HbxProfilePolicy do
-  let(:person){FactoryGirl.create(:person, user: user)}
-  let(:user){FactoryGirl.create(:user)}
-  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
-  let(:policy){HbxProfilePolicy.new(user,hbx_profile)}
-  let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
-  Permission.all.delete
 
-  context 'hbx_staff_role subroles' do
+  describe "given an HbxStaffRole with permissions" do
+    let(:person){FactoryGirl.create(:person, user: user)}
+    let(:user){FactoryGirl.create(:user)}
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:policy){HbxProfilePolicy.new(user,hbx_profile)}
+    let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+
     it 'hbx_staff' do
       allow(hbx_staff_role).to receive(:permission).and_return(FactoryGirl.create(:permission, :hbx_staff))
       expect(policy.modify_admin_tabs?).to be true
@@ -119,6 +119,53 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be false
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
+    end
+  end
+
+  describe "given no staff role" do
+    let(:person) { FactoryGirl.create(:person, user: user) }
+    let(:user) { FactoryGirl.create(:user) }
+    let(:policy) { HbxProfilePolicy.new(user,hbx_profile) }
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+
+    before :each do
+      person
+    end
+
+    it "is prohibited from modifying admin tabs" do
+      expect(policy.modify_admin_tabs?).to be false
+    end
+
+    it "is prohibited from viewing admin tabs" do
+      expect(policy.view_admin_tabs?).to be false
+    end
+
+    it "is prohibited from sending broker agency messages" do
+      expect(policy.send_broker_agency_message?).to be false
+    end
+
+    it "is prohibited from approving brokers" do
+      expect(policy.approve_broker?).to be false
+    end
+
+    it "is prohibited from approving GAs" do
+      expect(policy.approve_ga?).to be false
+    end
+
+    it "is prohibited from extending open enrollment" do
+      expect(policy.can_extend_open_enrollment?).to be false
+    end
+
+    it "is prohibited from extending creating benefit applications" do
+      expect(policy.can_create_benefit_application?).to be false
+    end
+
+    it "is prohibited from changing feins" do
+      expect(policy.can_change_fein?).to be false
+    end
+
+    it "is prohibited from force publishing" do
+      expect(policy.can_force_publish?).to be false
     end
   end
 end
