@@ -666,7 +666,6 @@ function clearComparisons() {
 }
 
 function hideDetailComparisons() {
-  selected_rpids = [];
   $('.plan-comparison-container').hide();
 }
 
