@@ -78,6 +78,7 @@ module SponsoredBenefits
               has_active_broker_relationship: true,
               office_locations: office_locations(employer).map(&:attributes),
             })
+            plan_design_organization
           else
             init_plan_design_organization(broker_agency, employer)
           end.tap do |pdo|
