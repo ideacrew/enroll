@@ -50,7 +50,7 @@ module Notifier
                                                             aptc: '363.23',
                                                             aqhp_eligible: true,
                                                             uqhp_eligible: false,
-                                                            totally_ineligible: true,
+                                                            totally_ineligible: false,
                                                             non_magi_medicaid: false,
                                                             magi_medicaid: false,
                                                             irs_consent: true,
@@ -77,8 +77,6 @@ module Notifier
          csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid? aptc_is_zero? totally_ineligible?]
     end
 
-
-
     def aqhp_eligible?
       aqhp_eligible
     end
@@ -92,7 +90,7 @@ module Notifier
     end
 
     def incarcerated?
-      incarcerated?
+      incarcerated.upcase == 'No'
     end
 
     def irs_consent?
@@ -161,7 +159,7 @@ module Notifier
     end
 
     def csr_is_nil?
-      false unless csr?
+      csr_percent.nil?
     end
 
     def primary_address
