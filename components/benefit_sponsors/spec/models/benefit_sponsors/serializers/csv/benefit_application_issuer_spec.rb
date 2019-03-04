@@ -30,7 +30,7 @@ module BenefitSponsors
       subject { BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first) }
 
       it 'returns a csv line for each carrier' do
-        expect(subject).to eql("#{abc_organization.hbx_id},#{abc_organization.fein},#{effective_period_start_on},#{effective_period_end_on},#{product_package.products.first.issuer_profile.hbx_id},#{product_package.products.first.issuer_profile.fein}")
+        expect(subject).to include("#{abc_organization.hbx_id},#{abc_organization.fein},#{effective_period_start_on},#{effective_period_end_on},#{product_package.products.first.issuer_profile.hbx_id},#{product_package.products.first.issuer_profile.fein}")
       end
     end
   end

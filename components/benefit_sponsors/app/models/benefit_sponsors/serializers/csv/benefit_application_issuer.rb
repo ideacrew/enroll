@@ -8,14 +8,14 @@ module BenefitSponsors
             sponsored_benefit.products(Date.today + 1.month).each do |product|
               list.push [benefit_application.benefit_sponsorship.organization.hbx_id,
                          benefit_application.benefit_sponsorship.organization.fein,
-                         benefit_application.effective_period.min,
-                         benefit_application.effective_period.max,
+                         benefit_application.effective_period.min.to_date,
+                         benefit_application.effective_period.max.to_date,
                          product.issuer_profile.hbx_id,
                          product.issuer_profile.fein].join(',')
             end
           end
           list
-        end.join("\n")
+        end.flatten
       end
     end
   end

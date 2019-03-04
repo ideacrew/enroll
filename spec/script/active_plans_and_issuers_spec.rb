@@ -19,21 +19,18 @@ describe 'active_plans_and_issuers', :dbclean => :after_each, type: :helper do
             metal_level_kind: :gold) }
 
     let(:current_effective_date)    { effective_period_start_on }
-    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day - 2.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
 
-    let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
+    let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
-    subject { ActivePlans.retrieve }
+    subject { ActivePlans.new }
 
-    it 'finds initial benefit applications' do
-      expect(subject).to include(benefit_sponsorship.benefit_applications.first)
-    end
-
-    it 'finds renewing benefit applications' do
+    it 'finds active benefit applications' do
+      expect(subject.lines).to include(BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first))
     end
   end
 end
