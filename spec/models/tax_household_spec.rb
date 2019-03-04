@@ -241,7 +241,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member1) { double(applicant_id: 'member1') }
     let(:hbx_member2) { double(applicant_id: 'member2') }
     let(:hbx_enrollment) { double(hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_on: TimeKeeper.date_of_record)}
+    let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_100', determined_on: TimeKeeper.date_of_record)}
     let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
     let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
     let(:tax_household) {TaxHousehold.new}
