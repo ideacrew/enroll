@@ -102,7 +102,7 @@ class IvlNotices::ReminderNotice < IvlNotice
     end
 
     hbx_enrollments = []
-    en = enrollments.select{ |en| en.is_ivl_actively_outstanding? }
+    en = enrollments.select{ |en| en.is_ivl_and_outstanding? }
     health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at)
     dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at)
     hbx_enrollments << health_enrollments
