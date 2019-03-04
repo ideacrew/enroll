@@ -8,8 +8,8 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
   let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
-  let(:notice_event1) {"sep_denail_notice_for_ee_active_on_single_roster"}
-  let(:notice_event2) {"sep_denail_notice_for_ee_active_on_multiple_rosters"}
+  let(:notice_event1) {"sep_denial_notice_for_ee_active_on_single_roster"}
+  let(:notice_event2) {"sep_denial_notice_for_ee_active_on_multiple_rosters"}
 
   before do
     today = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
@@ -24,7 +24,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload| 
-          expect(event_name).to eq "acapi.info.events.employee.sep_denail_notice_for_ee_active_on_single_roster"
+          expect(event_name).to eq "acapi.info.events.employee.sep_denial_notice_for_ee_active_on_single_roster"
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end
@@ -39,7 +39,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestDeniedNotice', :dbclean => :after
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload| 
-          expect(event_name).to eq "acapi.info.events.employee.sep_denail_notice_for_ee_active_on_multiple_rosters"
+          expect(event_name).to eq "acapi.info.events.employee.sep_denial_notice_for_ee_active_on_multiple_rosters"
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end

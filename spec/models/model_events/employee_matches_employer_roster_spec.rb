@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'ModelEvents::EmployeeMatchesEmployerRoster', :dbclean => :after_each  do
-  let(:notice_event) { "employee_matches_employer_roster" }
   let(:organization) { FactoryGirl.create(:organization, :with_active_plan_year) }
   let(:employer_profile) { organization.employer_profile }
   let(:plan_year) { employer_profile.plan_years.first }

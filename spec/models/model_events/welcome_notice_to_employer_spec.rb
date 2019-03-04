@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
-  let(:notice_event)  { "welcome_notice_to_employer" }
   let(:organization) { FactoryGirl.create(:organization) }
   let(:model_instance) { FactoryGirl.build(:employer_profile, organization: organization) }
 

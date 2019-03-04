@@ -638,8 +638,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "qle event when person has dual roles" do
       let(:organization) { FactoryGirl.create(:organization, :with_active_plan_year) }
       let(:employer_profile) { organization.employer_profile }
-      let(:notice_event1) {"sep_denail_notice_for_ee_active_on_single_roster"}
-      let(:notice_event2) {"sep_denail_notice_for_ee_active_on_multiple_rosters"}
+      let(:notice_event1) {"sep_denial_notice_for_ee_active_on_single_roster"}
+      let(:notice_event2) {"sep_denial_notice_for_ee_active_on_multiple_rosters"}
 
       before :each do
         allow(person).to receive(:user).and_return(user)

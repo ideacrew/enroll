@@ -30,20 +30,20 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestAccepted', :dbclean => :after_eac
       subject { Observers::NoticeObserver.new }
       let(:model_event) { ModelEvents::ModelEvent.new(:employee_sep_request_accepted, model_instance, {}) }
 
-    before do
-      fm = family.family_members.first
-      allow(model_instance).to receive(:family).and_return(family)
-      allow(family).to receive(:primary_applicant).and_return(fm)
-      allow(fm).to receive(:person).and_return(person)
-      census_employee.update_attributes(employee_role_id: employee_role.id)
-    end
-
-    it "should trigger notice event" do
-      expect(subject.notifier).to receive(:notify) do |event_name, payload| 
-        expect(event_name).to eq "acapi.info.events.employee.sep_accepted_notice_for_ee_active_on_single_roster"
-        expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
-        expect(payload[:event_object_id]).to eq model_instance.id.to_s
+      before do
+        fm = family.family_members.first
+        allow(model_instance).to receive(:family).and_return(family)
+        allow(family).to receive(:primary_applicant).and_return(fm)
+        allow(fm).to receive(:person).and_return(person)
+        census_employee.update_attributes(employee_role_id: employee_role.id)
       end
+
+      it "should trigger notice event" do
+        expect(subject.notifier).to receive(:notify) do |event_name, payload| 
+          expect(event_name).to eq "acapi.info.events.employee.sep_accepted_notice_for_ee_active_on_single_roster"
+          expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.special_enrollment_period_update(model_event)
       end
     end
@@ -58,20 +58,20 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestAccepted', :dbclean => :after_eac
       let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile2) }
       let!(:employee_role2) { FactoryGirl.create(:employee_role, employer_profile: employer_profile2, person: person, census_employee_id: census_employee.id) }
 
-    before do
-      fm = family.family_members.first
-      allow(model_instance).to receive(:family).and_return(family)
-      allow(family).to receive(:primary_applicant).and_return(fm)
-      allow(fm).to receive(:person).and_return(person)
-      census_employee.update_attributes(employee_role_id: employee_role.id)
-    end
-
-    it "should trigger notice event" do
-      expect(subject.notifier).to receive(:notify) do |event_name, payload| 
-        expect(event_name).to eq "acapi.info.events.employee.sep_accepted_notice_for_ee_active_on_multiple_rosters"
-        expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
-        expect(payload[:event_object_id]).to eq model_instance.id.to_s
+      before do
+        fm = family.family_members.first
+        allow(model_instance).to receive(:family).and_return(family)
+        allow(family).to receive(:primary_applicant).and_return(fm)
+        allow(fm).to receive(:person).and_return(person)
+        census_employee.update_attributes(employee_role_id: employee_role.id)
       end
+
+      it "should trigger notice event" do
+        expect(subject.notifier).to receive(:notify) do |event_name, payload| 
+          expect(event_name).to eq "acapi.info.events.employee.sep_accepted_notice_for_ee_active_on_multiple_rosters"
+          expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
+          expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
         subject.special_enrollment_period_update( model_event)
       end
     end
