@@ -9,11 +9,14 @@ module ModelEvents
       :ineligible_initial_application_submitted,
       :ineligible_renewal_application_submitted,
       # :renewal_enrollment_confirmation,
-      # :initial_employer_open_enrollment_completed,
+      # :ineligible_initial_application_submitted,
+      # :ineligible_renewal_application_submitted,
+      :initial_employer_open_enrollment_completed,
       # # :open_enrollment_began, #not being used
-      # :application_denied,
+      :application_denied,
       :renewal_application_denied,
       :group_termination_confirmation_notice,
+      :renewal_employer_open_enrollment_completed
       # :group_advance_termination_confirmation,
       :zero_employees_on_roster
     ]
@@ -24,6 +27,7 @@ module ModelEvents
         :renewal_employer_third_reminder_to_publish_plan_year,
         :initial_employer_no_binder_payment_received,
         # :renewal_employer_open_enrollment_completed,
+        # :renewal_employer_open_enrollment_completed
         # :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
         # :renewal_plan_year_first_reminder_before_soft_dead_line,
         # :renewal_plan_year_publish_dead_line,
@@ -41,9 +45,13 @@ module ModelEvents
           is_renewal_application_created = true
         end
 
-        # if is_transition_matching?(to: :enrolled, from: :enrolling, event: :advance_date)
-        #   is_initial_employer_open_enrollment_completed = true
-        # end
+        if is_transition_matching?(to: :enrolled, from: :enrolling, event: :advance_date)
+          is_initial_employer_open_enrollment_completed = true
+        end
+
+        if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :close_open_enrollment)
+          is_renewal_employer_open_enrollment_completed = true
+        end
 
         if is_transition_matching?(to: [:published, :enrolling], from: :draft, event: :publish)
           is_initial_application_submitted = true
@@ -74,18 +82,18 @@ module ModelEvents
         # #   is_open_enrollment_began = true
         # # end
 
-        # if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :advance_date)
-        #   is_application_denied = true
-        # end
+        if is_transition_matching?(to: :application_ineligible, from: :enrolling, event: :close_open_enrollment)
+          is_application_denied = true
+        end
 
-        if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :advance_date)
+        if is_transition_matching?(to: :renewing_application_ineligible, from: :renewing_enrolling, event: :close_open_enrollment)
           is_renewal_application_denied = true
         end
 
-        # if is_transition_matching?(to: :termination_pending, from: :active, event: :schedule_termination)
+        # if is_transition_matc1hing?(to: :termination_pending, from: :active, event: :schedule_termination)
         #   is_group_advance_termination_confirmation = true
         # end
-        
+
         # if is_transition_matching?(to: :terminated, from: [:active, :suspended], event: :terminate)
         #   is_group_advance_termination_confirmation = true
         # end
