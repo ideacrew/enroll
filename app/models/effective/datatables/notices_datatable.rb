@@ -48,7 +48,7 @@ module Effective
         market_kind:
          [
            {scope:'all', label: 'All'},
-           {scope:'individual', label: 'Individul'},
+           {scope:'individual', label: 'Individual'},
            {scope:'shop', label: 'Shop'}
          ],
         top_scope: :market_kind
