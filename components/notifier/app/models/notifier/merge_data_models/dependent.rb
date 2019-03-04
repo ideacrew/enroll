@@ -35,7 +35,7 @@ module Notifier
         other_coverage: 'No',
         aptc: '363.23',
         aqhp_eligible: true,
-        totally_ineligible: true,
+        totally_ineligible: false,
         uqhp_eligible: false,
         non_magi_medicaid: false,
         magi_medicaid: false
@@ -47,7 +47,7 @@ module Notifier
     end
 
     def conditions
-      %w[uqhp_eligible? uqhp_ineligible? aqhp_eligible? aqhp_eligible_and_irs_consent_not_needed? magi_medicaid? non_magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid? totally_ineligible? ]
+      %w[ uqhp_eligible? aqhp_eligible? aqhp_eligible_and_irs_consent_not_needed? magi_medicaid? non_magi_medicaid? aqhp_or_non_magi_medicaid? uqhp_or_non_magi_medicaid? totally_ineligible? ]
     end
 
     def uqhp_eligible?
@@ -56,10 +56,6 @@ module Notifier
 
     def totally_ineligible?
       totally_ineligible
-    end
-
-    def uqhp_ineligible?
-      !uqhp_eligible
     end
 
     def aqhp_eligible_and_irs_consent_not_needed?
