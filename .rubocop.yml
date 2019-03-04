@@ -1,0 +1,61 @@
+AllCops:
+  Exclude:
+    - './project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec'
+    - './node_modules/**/*'
+
+Rails:
+  Enabled: true
+
+Rails/ActiveRecordAliases:
+  Enabled: false
+
+Rails/FindBy:
+  Enabled: false
+
+Layout/EmptyLines:
+  Enabled: false
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+Layout/ExtraSpacing:
+  Enabled: false
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 200
+
+Style/BracesAroundHashParameters:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+require:
+  - ./cops/lint/empty_rescue_clause.rb
+
+# Deprecated
+# Style/TrailingBlankLines:
+#   Enabled: false
+# AllCops:
+#   RunRailsCops: true
