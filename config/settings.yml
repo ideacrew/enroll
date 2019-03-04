@@ -138,10 +138,6 @@ checkbook_services:
     current_year: 2019
     previous_year: 2018
     plan_match: "DC"
-    #Note Settings for PVT Enrionment This needs be in chef
-    checkbook_services_congress_url: "https://staging.checkbookhealth.org/congress/dc/api?environment=pvt&from=dchbx"
-    checkbook_services_ee_url: "https://staging.checkbookhealth.org/shop/dc/api?environment=pvt&from=dchbx" 
-    ivl_path: "https://staging.checkbookhealth.org/hie/dc/api?environment=pvt"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

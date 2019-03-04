@@ -6,9 +6,9 @@ module Services
 
       attr_accessor :hbx_enrollment, :is_congress, :elected_aptc
 
-      BASE_URL = Settings.checkbook_services.checkbook_services_ee_url
-      CONGRESS_URL = Settings.checkbook_services.checkbook_services_congress_url
-      IVL_PATH = Settings.checkbook_services.ivl_path
+      BASE_URL = Rails.application.config.checkbook_services_shop_path
+      CONGRESS_URL = Rails.application.config.checkbook_services_congress_url
+      IVL_PATH = Rails.application.config.checkbook_services_ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
       def initialize(hbx_enrollment, is_congress=false)
