@@ -37,7 +37,7 @@ describe 'ModelEvents::InitialEmployerApplicationDenied', dbclean: :around_each 
             expect(model_event).to have_attributes(:event_key => :application_denied, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.close_open_enrollment!
+        model_instance.advance_date!
       end
     end
   end
