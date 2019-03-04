@@ -3,8 +3,8 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
   def migrate
     trigger_single_table_inheritance_auto_load_of_child = Document
-    hbx_id_1=ENV['hbx_id_1']
-    hbx_id_2=ENV['hbx_id_2']
+    hbx_id_1 = ENV['hbx_id_1']
+    hbx_id_2 = ENV['hbx_id_2']
     person1 = Person.where(hbx_id:hbx_id_1).first
     person2 = Person.where(hbx_id:hbx_id_2).first
 
