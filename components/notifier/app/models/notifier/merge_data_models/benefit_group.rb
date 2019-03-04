@@ -7,6 +7,7 @@ module Notifier
     attribute :plan_option_kind, String
     attribute :reference_plan_name, String
     attribute :reference_plan_carrier_name, String
+    attribute :plan_offerings_text, String
     attribute :relationship_benefits, Array[MergeDataModels::RelationshipBenefit]
 
     def self.stubbed_object

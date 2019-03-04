@@ -11,20 +11,32 @@ module Notifier
       benefit_groups.collect do |b_group|
         benefit_group = Notifier::MergeDataModels::BenefitGroup.new
         benefit_group.start_on = b_group.start_on
-        benefit_group.title = b_group.title
+        benefit_group.title = b_group.title.titleize
         benefit_group.plan_option_kind = b_group.plan_option_kind
-        benefit_group.reference_plan_name = b_group.reference_plan.name
-        benefit_group.reference_plan_carrier_name = b_group.reference_plan.carrier_profile.legal_name
+        benefit_group.reference_plan_name = b_group.reference_plan.name.titleize
+        benefit_group.reference_plan_carrier_name = b_group.reference_plan.carrier_profile.legal_name.titleize
         benefit_group.relationship_benefits = build_relationship_benefits(b_group.relationship_benefits.compact)
+        benefit_group.plan_offerings_text = plan_offerings_text(b_group)
         benefit_group
+      end
+    end
+
+    def plan_offerings_text(benefit_group)
+      case benefit_group.plan_option_kind
+      when "single_carrier"
+        "All plans from #{benefit_group.reference_plan.carrier_profile.legal_name}"
+      when "metal_level"
+        "#{benefit_group.reference_plan.metal_level.titleize} metal level"
+      when "single_plan"
+        "#{benefit_group.reference_plan.carrier_profile.legal_name.titleize} - #{benefit_group.reference_plan.name.titleize}"
       end
     end
 
     def build_relationship_benefits(relationship_benefits)
       relationship_benefits.reject{ |rel_ben| rel_ben.relationship == 'child_26_and_over' }.collect do |relationship_benefit|
         rel_benefit = Notifier::MergeDataModels::RelationshipBenefit.new
-        rel_benefit.relationship = relationship_benefit.relationship
-        rel_benefit.premium_pct = relationship_benefit.premium_pct
+        rel_benefit.relationship = relationship_benefit.relationship.titleize
+        rel_benefit.premium_pct = number_to_percentage(relationship_benefit.premium_pct, precision: 0)
         rel_benefit
       end
     end
