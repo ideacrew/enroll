@@ -141,7 +141,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
 
   context '.renew for leap year' do 
 
-    let(:effective_on) { Date.new(2019,3,1) }
+    let(:effective_on) { Date.new(2019,(TimeKeeper.date_of_record + 1.month).month,1) }
     let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
     let!(:plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'gold', active_year: effective_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
 
