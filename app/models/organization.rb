@@ -370,6 +370,10 @@ class Organization
 
   end
 
+  def renewing_or_draft_py
+    employer_profile.plan_years.renewing_draft_or_draft.last
+  end
+
   class << self
     def employer_profile_renewing_starting_on(date_filter)
       employer_profile_renewing_coverage.employer_profile_plan_year_start_on(date_filter)
@@ -442,6 +446,5 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-
   end
 end
