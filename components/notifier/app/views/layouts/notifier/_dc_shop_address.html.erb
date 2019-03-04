@@ -5,7 +5,7 @@
       <td><br></br></td>
     </tr>
     <tr>
-      <td><%= notice_recipient.full_name %></td>
+      <td><%= recipient.first_name %> <%= recipient.last_name %></td>
     </tr>
 
     <% if (recipient.shop? && !recipient.employee_notice? && !recipient.general_agency? && !recipient.broker?) %>
