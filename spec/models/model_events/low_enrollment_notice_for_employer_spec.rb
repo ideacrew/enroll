@@ -9,16 +9,20 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
   let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'enrolling') }
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:date_mock_object) { double("Date", day: (model_instance.open_enrollment_end_on - 2.days).day)}
-  
+
   before do
-    allow(TimeKeeper).to receive(:date_of_record).and_return model_instance.open_enrollment_end_on - 2.days
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(start_on.year, start_on.prev_month.month, date_mock_object.day))
+  end
+
+   after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 
   describe "ModelEvent" do
     context "when initial employer 2 days prior to dead line" do
       it "should trigger model event" do
         expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer, event_object: model_instance, notice_event: notice_event).and_return(true)
-        PlanYear.date_change_event(date_mock_object)
+        PlanYear.date_change_event(TimeKeeper.date_of_record)
       end
     end
   end
