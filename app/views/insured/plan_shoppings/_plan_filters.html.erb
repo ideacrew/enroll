@@ -39,7 +39,7 @@
             <%#TODO uncomment this before merging to master %>
             <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
             <% elsif @hbx_enrollment.effective_on.year == 2018%>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary", target: '_blank' %>
+            <%=link_to l10n("confirm") , @dc_individual_checkbook_previous_year , class: "btn btn-primary" %>
             <% end %>
           </center>
           </div>
@@ -62,7 +62,7 @@
           <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button> 
-            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary", target: '_blank'  %>
+            <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary" %>
           </div>
         </center>
        </div>
@@ -88,6 +88,49 @@
         </center>
        </div>
     </div>
+  </div>
+
+  <div class="modal fade" id="plan_match_shop" tabindex="-1" role="dialog" role="document"> 
+    <div class="modal-dialog">  
+       <div class="modal-content">  
+          <div class="modal-header" style="height:50px">  
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+          </div>  
+           <div style="margin-left:20px;">  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p> 
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p> 
+           </div> 
+          <div class="modal-footer" style="padding:10px"> 
+            <center>  
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>  
+            
+            <%=link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary" %>  
+          </div>  
+        </center> 
+       </div> 
+    </div>  
+  </div>  
+
+   <div class="modal fade" id="plan_match_doctor_shop" tabindex="-1" role="dialog" role="document"> 
+    <div class="modal-dialog">  
+       <div class="modal-content">  
+          <div class="modal-header" style="height:50px">  
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+          </div>  
+           <div style="margin-left:20px;">  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>  
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p> 
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p> 
+           </div> 
+          <div class="modal-footer" style="padding:10px"> 
+            <center>  
+            <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>  
+            <%=link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'%>  
+          </div>  
+        </center> 
+       </div> 
+    </div>  
   </div>
 
 
