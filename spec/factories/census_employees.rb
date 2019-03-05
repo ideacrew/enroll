@@ -32,6 +32,10 @@ FactoryGirl.define do
       end
     end
 
+    trait :old_case do
+      benefit_sponsorship_id nil
+      benefit_sponsors_employer_profile_id nil
+    end
 
     trait :owner do
       is_business_owner  true
@@ -83,7 +87,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_and_renewal_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:census_employee_with_active_assignment)
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee, is_active: true)
         create(:benefit_group_assignment, benefit_group: evaluator.renewal_benefit_group, census_employee: census_employee, is_active: false)
       end
     end

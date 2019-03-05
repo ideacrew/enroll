@@ -1,6 +1,6 @@
 module Queries
   class UserDatatableQuery
-  	attr_reader :search_string, :custom_attributes
+    attr_reader :search_string, :custom_attributes
 
     def datatable_search(string)
       @search_string = string

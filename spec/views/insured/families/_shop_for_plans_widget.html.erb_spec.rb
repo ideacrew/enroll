@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
+RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :after_each do
   let(:person) { FactoryGirl.build(:person) }
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member) }
   let(:employee_role) { FactoryGirl.build(:employee_role) }

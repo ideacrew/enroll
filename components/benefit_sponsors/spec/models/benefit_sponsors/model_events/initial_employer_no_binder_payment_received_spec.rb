@@ -1,21 +1,23 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentReceived', :dbclean => :after_each do
+
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
 
   let(:model_event) { "initial_employer_no_binder_payment_received" }
   let(:notice_event1) { "initial_employer_no_binder_payment_received" }
   let(:notice_event2) { "notice_to_ee_that_er_plan_year_will_not_be_written" }
+
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
-  let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:organization)     { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-  let!(:employer_profile)    { organization.employer_profile }
-  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryGirl.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_ineligible',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let(:current_effective_date) { start_on }
+  let(:aasm_state) { :enrollment_ineligible }
+  let(:benefit_sponsorship_state) { :initial_enrollment_ineligible }
+  let(:employer_profile) { abc_profile }
+  let(:benefit_application) { initial_application }
+
   let!(:date_mock_object) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day }
   let!(:person) { FactoryGirl.create(:person, :with_family) }
   let!(:census_employee)  { FactoryGirl.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
@@ -23,13 +25,12 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerNoBinderPaymentRece
 
   before do
     census_employee.update_attributes(employee_role_id: employee_role.id)
-    benefit_sponsorship.update_attributes(aasm_state: :initial_enrollment_ineligible)
-   end
+  end
 
   describe "ModelEvent" do
     it "should trigger model event" do
       benefit_application.class.observer_peers.keys.each do |observer|
-        expect(observer).to receive(:notifications_send).exactly(3).times do |instance, model_event|
+        expect(observer).to receive(:notifications_send) do |instance, model_event|
           expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
           expect(model_event).to have_attributes(:event_key => :initial_employer_no_binder_payment_received, :klass_instance => benefit_application, :options => {})
         end

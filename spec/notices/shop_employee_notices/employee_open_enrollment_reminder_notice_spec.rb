@@ -1,11 +1,28 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice, :dbclean => :after_each do
-  let!(:employer_profile){ create :employer_profile, :aasm_state => "active"}
-  let!(:person){ create :person}
-  let(:employee_role) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
-  let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:person) {FactoryGirl.create(:person, :with_family)}
+  let(:family){ person.primary_family }
+  let(:household){ family.active_household }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package ) }
+  let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile) }
+  let!(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
+  let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
+  let(:hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                            household: household,
+                                            hbx_enrollment_members: [hbx_enrollment_member],
+                                            coverage_kind: "health",
+                                            external_enrollment: false,
+                                            sponsored_benefit_id: sponsored_benefit.id,
+                                            rating_area_id: rating_area.id )
+  }
+
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Open Enrollment available for Employee',
                             :notice_template => 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
@@ -49,7 +66,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice, :dbcle
 
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
-      expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+      expect(@employee_notice.notice.employer_name).to eq abc_profile.organization.legal_name.titleize
     end
   end
 
@@ -58,44 +75,44 @@ RSpec.describe ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice, :dbcle
       @employee_notice = ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice.new(census_employee, valid_parmas)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
+
     context "initial employer" do
-      let!(:employer_profile){ create :employer_profile, :aasm_state => "enrolling"}
-      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-      let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: active_benefit_group.id, census_employee: census_employee, start_on: active_benefit_group.start_on) }
-      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year, plan: plan)}
-      let(:plan) { FactoryGirl.create(:plan, :with_premium_tables)}
       it "it should return open enrollment end date" do
         hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
-        plan_year = census_employee.active_benefit_group_assignment.benefit_group.plan_year
         @employee_notice.append_data
-        expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
+        expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq initial_application.open_enrollment_end_on
       end
     end
 
     context "renewing employer" do
-      let!(:employer_profile){ create :employer_profile, :aasm_state => "renewing_enrolling"}
-      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-      let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
-      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-      let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: renewal_benefit_group.id, census_employee: census_employee, start_on: renewal_benefit_group.start_on) }
-      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year, plan: plan)}
-      let(:renewal_plan) { FactoryGirl.create(:plan)}
-      let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      let(:person) {FactoryGirl.create(:person, :with_family)}
+      let(:family){ person.primary_family }
+      let(:household){ family.active_household }
+      let!(:census_employee) { FactoryGirl.create(:census_employee, :with_active_assignment, employee_role_id: employee_role.id, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: benefit_package ) }
+      let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: abc_profile) }
+      let!(:sponsored_benefit) { renewal_application.benefit_packages.first.sponsored_benefits.first }
+      let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
+      let(:hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+      let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                                household: household,
+                                                hbx_enrollment_members: [hbx_enrollment_member],
+                                                coverage_kind: "health",
+                                                external_enrollment: false,
+                                                sponsored_benefit_id: sponsored_benefit.id,
+                                                rating_area_id: rating_area.id )
+      }
+
       before do
         @employee_notice = ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice.new(census_employee, valid_parmas)
-        allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       end
+
       it "it should return open enrollment end date" do
         hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
-        plan_year = census_employee.renewal_benefit_group_assignment.benefit_group.plan_year
         @employee_notice.append_data
-        expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
+        expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewal_application.open_enrollment_end_on
       end
     end
   end
-
 end

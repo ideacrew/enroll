@@ -371,8 +371,8 @@ class CensusEmployee < CensusMember
 
   def active_benefit_package
     if active_benefit_group_assignment.present?
-      if active_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
-        active_benefit_group_assignment.benefit_group
+      if active_benefit_group_assignment.benefit_package.plan_year.employees_are_matchable?
+        active_benefit_group_assignment.benefit_package
       end
     end
   end
@@ -611,9 +611,11 @@ class CensusEmployee < CensusMember
     @construct_role = true
 
     if active_benefit_group_assignment.present?
-       send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion? && !Rails.env.test?
+      if !Rails.env.test?
+        send_invite! if _id_changed? && !self.benefit_sponsorship.is_conversion?
+      end
       # we do not want to create employer role durig census employee saving for conversion
-      return if self.employer_profile.is_a_conversion_employer?
+      # return if self.employer_profile.is_a_conversion_employer? ### this check needs to be re-done when loading mid_PY conversion and needs to have more specific check.
 
       if employee_role.present?
         self.link_employee_role! if may_link_employee_role? && employee_record_claimed?
@@ -1116,7 +1118,6 @@ def self.to_csv
   end
 
   def enrollments_for_display
-
     enrollments = []
 
     coverages_selected = lambda do |enrollments|
@@ -1230,8 +1231,16 @@ def self.to_csv
   end
 
   def benefit_package_for_date(coverage_date)
-    benefit_package = active_benefit_group_assignment.benefit_package.package_for_date(coverage_date)
+    benefit_assignment = benefit_group_assignment_for_date(coverage_date)
+    benefit_package = benefit_assignment.benefit_package  if benefit_assignment.present?
     (benefit_package.present? && benefit_package.is_conversion?) ? nil : benefit_package
+  end
+
+  def benefit_group_assignment_for_date(coverage_date)
+    assignments = benefit_group_assignments.select do |assignment|
+      (assignment.start_on..assignment.benefit_end_date).cover?(coverage_date) && assignment.benefit_package.is_active
+    end
+    assignments.detect{|assignment| assignment.is_active} || assignments.first
   end
 
   def earliest_benefit_package_after(coverage_date)

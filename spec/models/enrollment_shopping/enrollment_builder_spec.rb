@@ -12,7 +12,7 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
   let(:product_kinds)  { [:health, :dental] }
   let(:roster_size) { 2 }
   let(:start_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
-  let(:effective_period) { start_on..start_on.next_year.prev_day }
+  let(:effective_period) {start_on..start_on.next_year.prev_day}
 
   let(:ce) { benefit_sponsorship.census_employees.non_business_owner.first }
 
@@ -32,37 +32,50 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
 
   let(:enrollment_builder) { EnrollmentShopping::EnrollmentBuilder.new(coverage_household, employee_role, coverage_kind) }
 
-  describe ".build_new_enrollment" do
+  shared_examples_for "build new enrollment of state" do |state|
 
-    context "when employee shopping dental" do
+    context "when employee shopping" do
 
-      let(:coverage_kind) { 'dental' }
-
-      context "under open enrollment period" do
-
+      shared_examples_for "under open enrollment period" do |coverage_kind|
+        let(:coverage_kind) { coverage_kind }
         let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+        let(:current_effective_date) { start_on }
         let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+        let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+        let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
         let(:aasm_state) { :enrollment_open }
+        let(:waiver_subject) { enrollment_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: effective_on, waiver_reason: "this is waiver reason") }
+        let(:enrolled_subject) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: effective_on) }
 
-        subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: effective_on) }
+        subject(:enrollment) {
+          state == "waiver" ? waiver_subject : enrolled_subject
+        }
 
-        it "should build a new dental enrollment" do
-          expect(dental_enrollment.valid?).to be_truthy
-          expect(dental_enrollment.coverage_kind).to eq 'dental'
-          expect(dental_enrollment.effective_on).to eq effective_on
-          expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-          expect(dental_enrollment.hbx_enrollment_members).to be_present
-          expect(dental_enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
-          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+        it "should build a new #{coverage_kind} enrollment" do
+          expect(enrollment.valid?).to be_truthy
+          expect(enrollment.coverage_kind).to eq coverage_kind
+          expect(enrollment.effective_on).to eq effective_on
+          expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+          expect(enrollment.hbx_enrollment_members).to be_present
+          expect(enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
+          expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+          expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+          expect(enrollment.coverage_kind).to eq coverage_kind
+          expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
         end
       end
+
+      it_behaves_like "under open enrollment period", "health"
+      it_behaves_like "under open enrollment period", "dental"
 
       context "under new hire enrollment period" do
 
-        context "with past hired on date" do
-
+        shared_examples_for "with past hired on date" do |coverage_kind|
+          let(:current_effective_date) { start_on }
+          let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+          let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+          let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
+          let(:coverage_kind) { coverage_kind }
           let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
           let(:aasm_state) { :active }
 
@@ -70,23 +83,33 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
             census_employee = benefit_sponsorship.census_employees.non_business_owner.first
             census_employee.update(hired_on: TimeKeeper.date_of_record - 2.years)
             census_employee
-          } 
+          }
 
-          subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
+          let(:waiver_subject) { enrollment_builder.build_new_waiver_enrollment(is_qle: false, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+          let(:enrolled_subject) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
 
-          it "should build a new dental enrollment with effective date same as plan year start date" do
-            expect(dental_enrollment.valid?).to be_truthy
-            expect(dental_enrollment.coverage_kind).to eq 'dental'
-            expect(dental_enrollment.effective_on).to eq start_on
-            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-            expect(dental_enrollment.hbx_enrollment_members).to be_present
-            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          subject(:enrollment) {
+            state == "waiver" ? waiver_subject : enrolled_subject
+          }
+
+          it "should build a new #{coverage_kind} enrollment with effective date same as plan year start date" do
+            expect(enrollment.valid?).to be_truthy
+            expect(enrollment.coverage_kind).to eq coverage_kind
+            expect(enrollment.effective_on).to eq start_on
+            expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+            expect(enrollment.hbx_enrollment_members).to be_present
+            expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+            expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
           end
         end
 
-        context "with current hired on date" do 
+        it_behaves_like "with past hired on date", "health"
+        it_behaves_like "with past hired on date", "dental"
+
+        shared_examples_for "with current hired on date" do |coverage_kind|
+          let(:coverage_kind) { coverage_kind }
           let(:hired_on) { TimeKeeper.date_of_record - 2.days }
 
           let(:earliest_effective_on) { 
@@ -97,26 +120,39 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
             census_employee = benefit_sponsorship.census_employees.non_business_owner.first
             census_employee.update(hired_on: hired_on)
             census_employee
-          } 
+          }
 
-          subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
+          let(:waiver_subject) { enrollment_builder.build_new_waiver_enrollment(is_qle: false, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+          let(:enrolled_subject) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: false, optional_effective_on: nil) }
 
-          it "should build a new dental enrollment with effective date beginning of next month" do
-            expect(dental_enrollment.valid?).to be_truthy
-            expect(dental_enrollment.coverage_kind).to eq 'dental'
-            expect(dental_enrollment.effective_on).to eq earliest_effective_on
-            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-            expect(dental_enrollment.hbx_enrollment_members).to be_present
-            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          subject(:enrollment) {
+            state == "waiver" ? waiver_subject : enrolled_subject
+          }
+
+          it "should build a new #{coverage_kind} enrollment with effective date beginning of next month" do
+            expect(enrollment.valid?).to be_truthy
+            expect(enrollment.coverage_kind).to eq coverage_kind
+            expect(enrollment.effective_on).to eq earliest_effective_on
+            expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+            expect(enrollment.hbx_enrollment_members).to be_present
+            expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+            expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
           end
         end
+
+        it_behaves_like "with current hired on date", "health"
+        it_behaves_like "with current hired on date", "dental"
       end
 
-      context "under special enrollment period" do
-
+      shared_examples_for "under special enrollment period" do |coverage_kind|
+        let(:coverage_kind) { coverage_kind }
         let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+        let(:current_effective_date) { start_on }
+        let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+        let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
+        let(:open_enrollment_period) { open_enrollment_start_on..open_enrollment_end_on }
         let(:aasm_state) { :active }
         let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
         let(:qle_on) { TimeKeeper.date_of_record - 2.days }
@@ -132,155 +168,202 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :after_each do
           special_enrollment
         }
 
-        subject(:dental_enrollment) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: true, optional_effective_on: nil) }
+        let(:waiver_subject) { enrollment_builder.build_new_waiver_enrollment(is_qle: true, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+        let(:enrolled_subject) { enrollment_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: true, optional_effective_on: nil) }
 
-        it "should build a new SEP dental enrollment with effective date matching QLE on date" do
-          expect(dental_enrollment.valid?).to be_truthy
-          expect(dental_enrollment.coverage_kind).to eq 'dental'
-          expect(dental_enrollment.effective_on).to eq qle_on
-          expect(dental_enrollment.enrollment_kind).to eq 'special_enrollment'
-          expect(dental_enrollment.hbx_enrollment_members).to be_present
-          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+        subject(:enrollment) {
+          state == "waiver" ? waiver_subject : enrolled_subject
+        }
+
+        it "should build a new SEP #{coverage_kind} enrollment with effective date matching QLE on date" do
+          expect(enrollment.valid?).to be_truthy
+          expect(enrollment.coverage_kind).to eq coverage_kind
+          expect(enrollment.effective_on).to eq qle_on
+          expect(enrollment.enrollment_kind).to eq 'special_enrollment'
+          expect(enrollment.hbx_enrollment_members).to be_present
+          expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+          expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+          expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
         end
       end
+
+      it_behaves_like "under special enrollment period", "health"
+      it_behaves_like "under special enrollment period", "dental"
     end
   end
 
-  describe ".build_change_enrollment" do
-    context "when employee making changes to dental coverage" do
-      let(:coverage_kind) { 'dental' }
+  it_behaves_like "build new enrollment of state", "enrolled"
+  it_behaves_like "build new enrollment of state", "waiver"
 
-      let!(:previous_enrollment) {
-        FactoryGirl.create(:hbx_enrollment,
-          household: family.active_household,
-          coverage_kind: "dental",
-          effective_on: enrollment_effective_date,
-          enrollment_kind: "open_enrollment",
-          kind: "employer_sponsored",
-          employee_role_id: person.active_employee_roles.first.id,
-          benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
-          benefit_sponsorship: benefit_sponsorship,
-          sponsored_benefit_package: current_benefit_package,
-          sponsored_benefit: current_benefit_package.sponsored_benefit_for(coverage_kind),
-          product: dental_product_package.products[0]
-        )
-      }
+  shared_examples_for "build_change_enrollment of state" do |state|
+    shared_examples_for "when employee making changes for coverage of kind" do |coverage_kind|
+      let(:coverage_kind) { coverage_kind }
+      context "when employee making changes to dental coverage" do
 
-      let(:enrollment_effective_date) { start_on }
+        let(:build_product_package) { coverage_kind == "health" ? product_package : dental_product_package }
 
-      context "during open enrollment period" do
+        let!(:previous_enrollment) {
+          FactoryGirl.create(:hbx_enrollment,
+            household: family.active_household,
+            coverage_kind: coverage_kind,
+            effective_on: enrollment_effective_date,
+            enrollment_kind: "open_enrollment",
+            kind: "employer_sponsored",
+            employee_role_id: person.active_employee_roles.first.id,
+            benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+            benefit_sponsorship: benefit_sponsorship,
+            sponsored_benefit_package: current_benefit_package,
+            sponsored_benefit: current_benefit_package.sponsored_benefit_for(coverage_kind),
+            product: build_product_package.products[0]
+          )
+        }
 
-        let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
-        let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
-        let(:aasm_state) { :enrollment_open }
+        let(:enrollment_effective_date) { start_on }
 
-        subject(:dental_enrollment) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
+        context "during open enrollment period" do
 
-        it "should build an enrollment from previous dental enrollment" do
-          expect(dental_enrollment.valid?).to be_truthy
-          expect(dental_enrollment.coverage_kind).to eq 'dental'
-          expect(dental_enrollment.effective_on).to eq previous_enrollment.effective_on
-          expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-          expect(dental_enrollment.hbx_enrollment_members).to be_present
-          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+          let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+          let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+          let(:aasm_state) { :enrollment_open }
+
+          let(:waiver_subject) { enrollment_builder.build_change_waiver_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+          let(:enrolled_subject) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
+
+          subject(:enrollment) {
+            state == "waiver" ? waiver_subject : enrolled_subject
+          }
+
+          it "should build an enrollment from previous #{coverage_kind} enrollment" do
+            expect(enrollment.valid?).to be_truthy
+            expect(enrollment.coverage_kind).to eq coverage_kind
+            expect(enrollment.effective_on).to eq previous_enrollment.effective_on
+            expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+            expect(enrollment.hbx_enrollment_members).to be_present
+            expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+            expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+          end
         end
-      end
 
-      context "during new hire enrollment period" do
+        context "during new hire enrollment period" do
 
-        context "with past hired on date" do
+          context "with past hired on date" do
+
+            let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
+            let(:aasm_state) { :active }
+
+            let!(:ce) { 
+              census_employee = benefit_sponsorship.census_employees.non_business_owner.first
+              census_employee.update(hired_on: TimeKeeper.date_of_record - 2.years)
+              census_employee
+            }
+
+            let(:waiver_subject) { enrollment_builder.build_change_waiver_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+            let(:enrolled_subject) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
+
+            subject(:enrollment) {
+              state == "waiver" ? waiver_subject : enrolled_subject
+            }
+
+            it "should build an enrollment from previous #{coverage_kind} enrollment" do
+              expect(enrollment.valid?).to be_truthy
+              expect(enrollment.coverage_kind).to eq coverage_kind
+              expect(enrollment.effective_on).to eq previous_enrollment.effective_on
+              expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+              expect(enrollment.hbx_enrollment_members).to be_present
+              expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+              expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+              expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+              expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+            end
+          end
+
+          context "with current hired on date" do
+
+            let(:hired_on) { TimeKeeper.date_of_record - 2.days }
+
+            let(:earliest_effective_on) { 
+              hired_on.mday == 1 ? hired_on : hired_on.next_month.beginning_of_month
+            }
+
+            let(:enrollment_effective_date) { earliest_effective_on }
+
+            let!(:ce) { 
+              census_employee = benefit_sponsorship.census_employees.non_business_owner.first
+              census_employee.update(hired_on: hired_on)
+              census_employee
+            }
+
+            let(:waiver_subject) { enrollment_builder.build_change_waiver_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+            let(:enrolled_subject) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
+
+            subject(:enrollment) {
+              state == "waiver" ? waiver_subject : enrolled_subject
+            }
+
+            it "should build an enrollment from previous #{coverage_kind} enrollment" do
+              expect(enrollment.valid?).to be_truthy
+              expect(enrollment.coverage_kind).to eq coverage_kind
+              expect(enrollment.effective_on).to eq previous_enrollment.effective_on
+              expect(enrollment.enrollment_kind).to eq 'open_enrollment'
+              expect(enrollment.hbx_enrollment_members).to be_present
+              expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+              expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+              expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+              expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+            end
+          end
+        end
+
+        context "during special enrollment period" do
 
           let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
           let(:aasm_state) { :active }
+          let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+          let(:qle_on) { TimeKeeper.date_of_record - 2.days }
 
-          let!(:ce) { 
-            census_employee = benefit_sponsorship.census_employees.non_business_owner.first
-            census_employee.update(hired_on: TimeKeeper.date_of_record - 2.years)
-            census_employee
-          } 
+          let!(:special_enrollment_period) {
+            special_enrollment = family.special_enrollment_periods.build({
+              qle_on: qle_on,
+              effective_on_kind: "date_of_event",
+              })
 
-          subject(:dental_enrollment) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
-
-          it "should build an enrollment from previous dental enrollment" do
-            expect(dental_enrollment.valid?).to be_truthy
-            expect(dental_enrollment.coverage_kind).to eq 'dental'
-            expect(dental_enrollment.effective_on).to eq previous_enrollment.effective_on
-            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-            expect(dental_enrollment.hbx_enrollment_members).to be_present
-            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
-          end
-        end
-
-        context "with current hired on date" do
-
-          let(:hired_on) { TimeKeeper.date_of_record - 2.days }
-
-          let(:earliest_effective_on) { 
-            hired_on.mday == 1 ? hired_on : hired_on.next_month.beginning_of_month
+            special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
+            special_enrollment.save!
+            special_enrollment
           }
 
-          let(:enrollment_effective_date) { earliest_effective_on }
+          let(:enrollment_effective_date) { qle_on }
 
-          let!(:ce) { 
-            census_employee = benefit_sponsorship.census_employees.non_business_owner.first
-            census_employee.update(hired_on: hired_on)
-            census_employee
-          } 
+          let(:waiver_subject) { enrollment_builder.build_change_waiver_enrollment(previous_enrollment: previous_enrollment, is_qle: true, optional_effective_on: nil, waiver_reason: "this is waiver reason") }
+          let(:enrolled_subject) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: true, optional_effective_on: nil, family_member_ids: family_member_ids) }
 
-          subject(:dental_enrollment) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: is_qle?, optional_effective_on: nil, family_member_ids: family_member_ids) }
+          subject(:enrollment) {
+            state == "waiver" ? waiver_subject : enrolled_subject
+          }
 
-          it "should build an enrollment from previous dental enrollment" do
-            expect(dental_enrollment.valid?).to be_truthy
-            expect(dental_enrollment.coverage_kind).to eq 'dental'
-            expect(dental_enrollment.effective_on).to eq previous_enrollment.effective_on
-            expect(dental_enrollment.enrollment_kind).to eq 'open_enrollment'
-            expect(dental_enrollment.hbx_enrollment_members).to be_present
-            expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-            expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-            expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
-          end
+          it "should build an enrollment from previous #{coverage_kind} enrollment" do
+            expect(enrollment.valid?).to be_truthy
+            expect(enrollment.coverage_kind).to eq coverage_kind
+            expect(enrollment.effective_on).to eq previous_enrollment.effective_on
+            expect(enrollment.enrollment_kind).to eq 'special_enrollment'
+            expect(enrollment.hbx_enrollment_members).to be_present
+            expect(enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
+            expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+            expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
+            expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
+            expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+          end      
         end
       end
+    end
 
-      context "during special enrollment period" do
-
-        let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
-        let(:aasm_state) { :active }
-        let(:qualifying_life_event_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
-        let(:qle_on) { TimeKeeper.date_of_record - 2.days }
-
-        let!(:special_enrollment_period) {
-          special_enrollment = family.special_enrollment_periods.build({
-            qle_on: qle_on,
-            effective_on_kind: "date_of_event",
-            })
-
-          special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
-          special_enrollment.save!
-          special_enrollment
-        }
-
-        let(:enrollment_effective_date) { qle_on }
-        subject(:dental_enrollment) { enrollment_builder.build_change_enrollment(previous_enrollment: previous_enrollment, is_qle: true, optional_effective_on: nil, family_member_ids: family_member_ids) }
-
-        it "should build an enrollment from previous dental enrollment" do
-          expect(dental_enrollment.valid?).to be_truthy
-          expect(dental_enrollment.coverage_kind).to eq 'dental'
-          expect(dental_enrollment.effective_on).to eq previous_enrollment.effective_on
-          expect(dental_enrollment.enrollment_kind).to eq 'special_enrollment'
-          expect(dental_enrollment.hbx_enrollment_members).to be_present
-          expect(dental_enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
-          expect(dental_enrollment.benefit_sponsorship).to eq benefit_sponsorship
-          expect(dental_enrollment.sponsored_benefit_package).to eq current_benefit_package
-          expect(dental_enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
-        end      
-      end
-    end 
+    it_behaves_like "when employee making changes for coverage of kind", "health"
+    it_behaves_like "when employee making changes for coverage of kind", "dental"
   end
+
+  it_behaves_like "build_change_enrollment of state", "enrolled"
+  it_behaves_like "build_change_enrollment of state", "waived"
 end

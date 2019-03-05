@@ -3,6 +3,7 @@ module Eligibility
     # Deprecated
     def assign_default_benefit_package
       return true unless is_case_old?
+
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
         if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
@@ -18,7 +19,6 @@ module Eligibility
     end
 
     # Deprecated
-
     def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
       bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
@@ -32,6 +32,7 @@ module Eligibility
 
     def find_or_create_benefit_group_assignment(benefit_packages)
       return find_or_create_benefit_group_assignment_deprecated(benefit_packages) if is_case_old?
+
       if benefit_packages.present?
         bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
 
@@ -134,7 +135,11 @@ module Eligibility
     def reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
         end_on = benefit_group_assignment.end_on || (new_benefit_group.start_on - 1.day)
-        end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        if is_case_old?
+          end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
+        else
+          end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
+        end
         benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end

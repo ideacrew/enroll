@@ -7,7 +7,7 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  include ApplicationHelper
+
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 

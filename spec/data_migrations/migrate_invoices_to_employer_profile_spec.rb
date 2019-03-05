@@ -14,10 +14,11 @@ describe MigrateInvoicesToEmployerProfile do
 
   describe "migrate invoices from organization to employer_profile", dbclean: :after_each do
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
-    let(:organization) { org = FactoryGirl.create(:organization, employer_profile:employer_profile)
-                         org.documents << Document.new(subject: "invoice")
-                         org
-                       }
+    let(:organization)     { employer_profile.organization }
+
+    before do
+      organization.documents << Document.new(subject: "invoice")
+    end
 
     context "should find documents on organization with subject as invoice" do
       it "move invoices to employer_profile" do

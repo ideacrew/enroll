@@ -1,13 +1,13 @@
 require 'rails_helper'
 require Rails.root.join("lib", "sbc", "sbc_processor2015")
 
-describe SbcProcessor2015 do
+describe SbcProcessor2015, dbclean: :after_each do
   let(:csv_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/*.csv')).first }
   let(:pdf_path) { Dir.glob(File.join(Rails.root, 'spec/test_data/plan_data/sbc/pdf/')).first }
   let!(:product) { FactoryGirl.create(
       :benefit_markets_products_health_products_health_product,
       hios_id: "59763MA0030014-01",
-      application_period: Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31),
+      application_period: Date.new(2018, 1, 1)..Date.new(2018, 12, 31),
       sbc_document: nil
   )}
   let!(:plan){ FactoryGirl.create(

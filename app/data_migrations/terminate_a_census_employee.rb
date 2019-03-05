@@ -9,6 +9,6 @@ class TerminateACensusEmployee < MongoidMigrationTask
     else
       census_employee.terminate_employment(termination_date || 5.days.ago)
       puts "Terminated the census employee" unless Rails.env.test?
-  	end
+    end
   end
 end

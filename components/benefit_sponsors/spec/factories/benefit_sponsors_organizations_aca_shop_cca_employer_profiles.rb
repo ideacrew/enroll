@@ -3,6 +3,8 @@ FactoryGirl.define do
 
     employer_attestation  { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
     sic_code              "001"
+    referred_by           "Other"
+    referred_reason       "Other Reason"
 
     transient do
       site nil

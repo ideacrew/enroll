@@ -38,6 +38,7 @@
 
 - if show_benefit_application_tile == "true"
   javascript:
+    var appStartOn = #{@benefit_package_form.service.benefit_application.effective_period.min.strftime("%m-%d").to_json.html_safe};
     var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
     var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
 
@@ -178,12 +179,16 @@
         }
       })
 
-      if (eeContribution < erCL || employeeOnly < erCL) {
-        disablePlanYearButton()
-      } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
-        disablePlanYearButton()
+      if (appStartOn === "01-01") {
+          enablePlanYearButton()
       } else {
-        enablePlanYearButton()
+        if (eeContribution < erCL || employeeOnly < erCL) {
+            disablePlanYearButton()
+        } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
+            disablePlanYearButton()
+        } else {
+            enablePlanYearButton()
+        }
       }
       submitContributionDetailsForSelectedReferencePlan()
     }

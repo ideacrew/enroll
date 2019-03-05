@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "employers/employer_profiles/_show_profile" do
+RSpec.describe "employers/employer_profiles/_show_profile", dbclean: :after_each do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }

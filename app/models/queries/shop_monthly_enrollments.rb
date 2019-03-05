@@ -19,11 +19,21 @@ module Queries
     end
 
     def query_families_with_quiet_period_enrollments
+      # include new hire enrollment that purchased in open enrollment with effective_on date greater benefit application start date,
+      # and quiet period enrollments.
       add({
         "$match" => {
-          "$and" => [
-            "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
-            "households.hbx_enrollments.workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
+          "$or" => [
+            {"$and" =>[
+              "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+              "households.hbx_enrollments.workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
+            ]},
+            {"$and" =>[
+              "households.hbx_enrollments.aasm_state" => {"$in" => @enrollment_statuses},
+              "households.hbx_enrollments.effective_on" => {"$gt" => @effective_on},
+              "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+              "households.hbx_enrollments.submitted_at" => {"$lt" => quiet_period.begin}
+            ]}
           ]
         }
       })
@@ -59,7 +69,8 @@ module Queries
       add({
         "$match" => {
           "$or" => [
-            quiet_period_coverage_expression
+            quiet_period_coverage_expression,
+            new_hire_enrollment_expression
           ]
         }
       })
@@ -94,14 +105,18 @@ module Queries
     end
 
     def quiet_period
-      PlanYear.enrollment_quiet_period(start_on: @effective_on)
+      # quiet period check not needed for renewal application(quiet period: OE close to 26th of month) just for initial(quiet period: OE close to 8th of next month)
+      # transmission date 26th of month
+      quiet_period_start = Date.new( @effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+      quiet_period_end =  @effective_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+      TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
     end
 
     def quiet_period_expression
       {
         "to_state" => {"$in" => @enrollment_statuses},
-        "transition_at" => { 
-          "$gte" => quiet_period.begin, 
+        "transition_at" => {
+          "$gte" => quiet_period.begin,
           "$lt" => quiet_period.end
         }
       }
@@ -109,11 +124,20 @@ module Queries
 
     def quiet_period_coverage_expression
       {
-        "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
+        "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
         "households.hbx_enrollments.kind" => "employer_sponsored",
         "households.hbx_enrollments.workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
         }
+      }
+    end
+
+    def new_hire_enrollment_expression
+      {
+          "households.hbx_enrollments.effective_on" => {"$gt" => @effective_on},
+          "households.hbx_enrollments.sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+          "households.hbx_enrollments.kind" => "employer_sponsored",
+          "households.hbx_enrollments.submitted_at" => {"$lt" => quiet_period.begin}
       }
     end
 
@@ -199,16 +223,16 @@ module Queries
 
     def collect_benefit_group_ids(effective_on = nil)
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
-        employer = EmployerProfile.find_by_fein(fein)
-        if employer.present?
-          plan_years = employer.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE + ['expired'])
-          plan_year = plan_years.where(:start_on => effective_on || @effective_on).first
+        benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein:  fein).first.active_benefit_sponsorship
+
+        if benefit_sponsorship.present?
+          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on , :aasm_state => :active).first
         end
 
-        if plan_year.blank? || plan_year.external_plan_year?
+        if benefit_application.blank?
           id_list
         else
-          id_list += plan_year.benefit_groups.map(&:id)
+          id_list += benefit_application.benefit_packages.map(&:sponsored_benefits).flatten.map(&:id)
         end
       end
     end

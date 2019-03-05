@@ -1,12 +1,3 @@
-<% if can_employee_shop?(f.object.effective_date.try(:to_date)) %>
- <div class="alert alert-info" role="alert">
-   <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-      <%= Settings.site.late_rates_message %>
-   </strong>
- </div>
-<% end %>
-
-
 <div class="row no-buffer row-form-wrapper">
   <div class="col-md-4 col-md-4 col-xs-12 form-group form-group-lg no-pd">
     <%= f.text_field :title, class: "floatlabel form-control", disabled: read_only, required: true, placeholder: 'Quote Name' %>
