@@ -1,5 +1,5 @@
 <div class="container bottom-pd">
-  <% if @plan_year.publish_pending? %>
+  <% if @plan_year.publish_pending? || @plan_year.renewing_publish_pending? %>
     <h4 class="title"> <%= l10n("hbx_profiles.force_published_application_review") %> </h4>
   <% else %>
     <h4 class="title"> <%= l10n("hbx_profiles.force_publish_success") %> </h4>
