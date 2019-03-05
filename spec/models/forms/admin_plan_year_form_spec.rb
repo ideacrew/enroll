@@ -37,7 +37,7 @@ require 'rails_helper'
 
     describe "model attributes" do
       it {
-        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on].each do |key|
+        [:start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :admin_dt_action].each do |key|
           expect(subject.attributes.has_key?(key)).to be_truthy
         end
       }
@@ -81,6 +81,7 @@ require 'rails_helper'
           "open_enrollment_end_on" => (TimeKeeper.date_of_record.beginning_of_month + 1.month + Settings.aca.shop_market.open_enrollment.monthly_end_on.days).strftime("%m/%d/%Y"),
           "employer_actions_id" => "family_actions_5c5b3afd83d00d6b750001e9",
           "organization_id" => organization.id.to_s
+
         }
       }
 
