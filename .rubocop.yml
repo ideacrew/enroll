@@ -49,17 +49,10 @@ Rails/Validation:
 Rails:
   Enabled: false
 
-# TODO: RWC
-Layout:
-  Enabled: false
-
 Layout/EmptyLines:
   Enabled: false
 
 Layout/EmptyLinesAroundBlockBody:
-  Enabled: false
-
-Layout/IndentationWidth:
   Enabled: false
 
 Layout/LeadingCommentSpace:
@@ -90,8 +83,14 @@ Layout/SpaceInsideBlockBraces:
 Layout/TrailingBlankLines:
   Enabled: false
 
+Layout/IndentationWidth:
+  Enabled: true
+
+Layout/Tab:
+  Enabled: true
+
 Layout/TrailingWhitespace:
-  Enabled: false
+  Enabled: true
 
 Metrics/AbcSize:
   Max: 50
@@ -114,9 +113,8 @@ Naming/PredicateName:
 Naming/VariableNumber:
   Enabled: false
 
-# TODO: RWC
-Style:
-  Enabled: false
+Style/AndOr:
+  Enabled: true
 
 Style/BracesAroundHashParameters:
   Enabled: false
@@ -125,7 +123,16 @@ Style/BracesAroundHashParameters:
 Style/Documentation:
   Enabled: false
 
+Style/EachWithObject:
+  Enabled: false
+
+Style/ExpandPathArguments:
+  Enabled: false
+
 Style/HashSyntax:
+  Enabled: false
+
+Style/NumericPredicate:
   Enabled: false
 
 Style/StringLiterals:
