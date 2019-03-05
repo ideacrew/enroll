@@ -34,8 +34,8 @@ Given (/a matched Employee exists with multiple employee roles/) do
   ce2.link_employee_role!
   ce2.save!
 
-  employee_role1.update_attributes(census_employee_id: ce1.id, employer_profile_id: org1.employer_profile.id)
-  employee_role2.update_attributes(census_employee_id: ce2.id, employer_profile_id: org2.employer_profile.id)
+  employee_role2.update_attributes(census_employee_id: ce1.id, employer_profile_id: org1.employer_profile.id)
+  employee_role1.update_attributes(census_employee_id: ce2.id, employer_profile_id: org2.employer_profile.id)
 end
 
 Given (/a matched Employee exists with consumer role/) do
@@ -114,7 +114,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   coverage_kind: coverage_kind,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
-                                  employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),
+                                  employee_role_id: (var == "first" ? @person.active_employee_roles[1].id : @person.active_employee_roles[0].id),
                                   benefit_group_id: benefit_group.id
                                 )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @person.primary_family.primary_applicant.id,
@@ -158,7 +158,11 @@ And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, 
   if type == "ineligible"
     expect(find("#family_member_ids_1")).to be_disabled
     expect(find("#family_member_ids_1")).not_to be_checked
+    # expect(find("#family_member_ids_0")).not_to be_disabled
+    # expect(find("#family_member_ids_0")).to be_checked
   else
+    # expect(find("#family_member_ids_1")).to be_disabled
+    # expect(find("#family_member_ids_1")).not_to be_checked
     expect(find("#family_member_ids_0")).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
@@ -285,7 +289,8 @@ And(/employee should not see the reason for ineligibility/) do
 end
 
 When(/employee switched to (.*) employer/) do |employer|
-  if employer == "first"
+  puts "employer... #{employer}"
+  if employer == "second"
     find(:xpath, '//*[@id="employer-selection"]/div/div[1]/label').click
   else
     find(:xpath, '//*[@id="employer-selection"]/div/div[2]/label').click
