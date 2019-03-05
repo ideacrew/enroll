@@ -2,13 +2,17 @@ require 'rails_helper'
 
 describe 'ModelEvents::InitialApplicationSubmitted', dbclean: :around_each do
 
-  let(:open_enrollment_end_on) { TimeKeeper.date_of_record + 10.days}
-  let!(:employer_profile)       { FactoryGirl.create(:employer_profile) }
-  let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, 
-    start_on: open_enrollment_end_on.next_month.beginning_of_month,
-    open_enrollment_start_on: open_enrollment_end_on - 10.days,
-    open_enrollment_end_on: open_enrollment_end_on,
-    aasm_state: 'draft') }
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month}
+  let(:oe_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
+  let(:oe_end_on) { oe_start_on + 10.days }
+
+  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer_profile,
+                                            aasm_state: "draft",
+                                            start_on: start_on,
+                                            open_enrollment_start_on: oe_start_on ,
+                                            # open_enrollment_end_on:oe_end_on,
+  )}
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
 
   describe "ModelEvent" do
