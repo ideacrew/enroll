@@ -42,9 +42,11 @@ module Services
             return uri
           else
             raise "Unable to generate url"
+            return false
           end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
+          return false
         end
       end
 
@@ -79,7 +81,7 @@ module Services
         active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         if active_house_hold.nil?
           return "NULL"
-        else 
+        else
           active_house_hold.latest_eligibility_determination.max_aptc.to_i
         end
       end

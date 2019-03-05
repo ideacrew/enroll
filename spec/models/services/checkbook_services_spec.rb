@@ -52,6 +52,23 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
+  describe "when checkbook response is irregular or an exception is raised" do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
+    let(:checkbook_url) {"http://checkbook_url"}
+    let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => ""})}
+    before { Rails.env.stub(:test? => false) }
+    it "should generate consumer link" do
+        if ApplicationHelperModStubber.plan_match_dc
+          allow(subject).to receive(:construct_body_ivl).and_return({})
+          allow(HTTParty).to receive(:post).with(Rails.application.config.checkbook_services_base_url,
+            {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
+            and_raise(Exception)
+          expect(subject.generate_url).to eq false
+        end
+      end
+  end
+
+
   describe "#csr_value" do
     let!(:ivl_person)       { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:ivl_family)       { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: ivl_person) }
@@ -96,7 +113,7 @@ describe Services::CheckbookServices::PlanComparision do
 
   describe "#aptc_value  " do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
-    context "when active household is present" do 
+    context "when active household is present" do
       let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
       let(:sample_max_aptc_1) {511.78}
       let(:sample_csr_percent_1) {87}
@@ -108,7 +125,7 @@ describe Services::CheckbookServices::PlanComparision do
         expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc.to_i
       end
     end
-     context "when active household  not present" do 
+     context "when active household  not present" do
       it "should return max NULL" do
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
         expect(subject.aptc_value).to eq "NULL"
