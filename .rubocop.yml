@@ -1,3 +1,6 @@
+# This yaml describes our current checks.
+#   Any checks marked "# TODO: RWC" are "re-enable when corrected.RWC" are "re-enable when corrected.
+
 # We will add the following back in later, but they cause
 #   a completely outsized amount of cop failures for the number of files:
 # - db/seedfiles
@@ -19,13 +22,44 @@ Rails:
 Rails/ActiveRecordAliases:
   Enabled: false
 
+Rails/FilePath:
+  Enabled: false
+
 Rails/FindBy:
+  Enabled: false
+
+Rails/DynamicFindBy:
+  Enabled: false
+
+# Re-enable for upgrade of rails
+Rails/ActionFilter:
+  Enabled: false
+
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+Rails/Output:
+  Enabled: false
+
+# Re-enable for upgrade of rails
+Rails/Validation:
+  Enabled: false
+
+# TODO: RWC
+Rails:
+  Enabled: false
+
+# TODO: RWC
+Layout:
   Enabled: false
 
 Layout/EmptyLines:
   Enabled: false
 
 Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Layout/IndentationWidth:
   Enabled: false
 
 Layout/LeadingCommentSpace:
@@ -35,6 +69,9 @@ Layout/ExtraSpacing:
   Enabled: false
 
 Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/IndentArray:
   Enabled: false
 
 # Re-enable once other problems are solved
@@ -50,8 +87,36 @@ Layout/SpaceInsideHashLiteralBraces:
 Layout/SpaceInsideBlockBraces:
   Enabled: false
 
+Layout/TrailingBlankLines:
+  Enabled: false
+
+Layout/TrailingWhitespace:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 50
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/LineLength:
-  Max: 200
+  Max: 250
+
+Metrics/MethodLength:
+  Max: 50
+
+Naming/PredicateName:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+# TODO: RWC
+Style:
+  Enabled: false
 
 Style/BracesAroundHashParameters:
   Enabled: false
