@@ -1062,7 +1062,6 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
-        self.initial_employee_plan_selection_confirmation(org)
       end
     end
   end
