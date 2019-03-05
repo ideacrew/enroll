@@ -10,6 +10,7 @@
       attribute :open_enrollment_start_on, String
       attribute :open_enrollment_end_on, String
       attribute :fte_count, Integer, default: 0
+      attribute :admin_dt_action, Boolean, default: true
 
       attribute :start_on_options, Hash
       attribute :organization_id, String
@@ -32,12 +33,12 @@
       end
 
       def set_start_on_dates
-        start_on_dates = PlanYear.calculate_start_on_options.inject([]) do |dates, date_arr|
+        start_on_dates = PlanYear.calculate_start_on_options(admin_dt_action).inject([]) do |dates, date_arr|
           dates << date_arr.second.to_date
         end
 
         start_on_dates.each do |date|
-          oe_dates_hash = PlanYear.calculate_open_enrollment_date(date)
+          oe_dates_hash = PlanYear.calculate_open_enrollment_date(date, admin_dt_action)
           oe_dates_hash.keys.each { |key| oe_dates_hash[key] = oe_dates_hash[key].to_s }
           self.start_on_options[date] = {
             :start_on => date.to_s, :end_on => get_end_on(date)
