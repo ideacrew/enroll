@@ -2,7 +2,7 @@
   <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
 
     <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
-      <% if((phone.index == 0) || (phone.index == 2)) && ::Phone::KINDS.include?(kind) %>
+      <% if((phone.index == 0) || (phone.index == 2)) %>
         <div class="row row-form-wrapper no-buffer">
       <% end %>
     <div class="col-md-6 col-sm-6 no-pd">
