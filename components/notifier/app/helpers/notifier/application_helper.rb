@@ -58,8 +58,20 @@ module Notifier
       Settings.notices.shop.attachments.envelope_without_address
     end
 
-    def employee_appeal_rights
-      Settings.notices.shop.attachments.employee_appeal_rights
+    def ivl_non_discrimination_attachment
+      Settings.notices.individual.attachments.non_discrimination_attachment
+    end
+
+    def ivl_envelope_without_address
+      Settings.notices.individual.attachments.envelope_without_address
+    end
+
+    def ivl_blank_page_attachment
+      Settings.notices.individual.attachments.blank_page_attachment
+    end
+
+    def ivl_voter_application
+      Settings.notices.individual.attachments.voter_application
     end
   end
 end

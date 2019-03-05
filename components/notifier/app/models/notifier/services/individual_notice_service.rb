@@ -25,7 +25,6 @@ module Notifier
         :contact_center => %w(name alt_name phone_number fax tty_number alt_phone_number email_address small_business_email appeals),
         :'contact_center.mailing_address' => %w(name address_1 address_2 city state zip_code),
         :aca => %w(state_name state_abbreviation),
-        :'aca.shop_market' => %w(valid_employer_attestation_documents_url binder_payment_due_on),
       }
     end
   end

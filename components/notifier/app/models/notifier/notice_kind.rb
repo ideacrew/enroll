@@ -8,6 +8,7 @@ module Notifier
     include Notifier::NoticeBuilder
 
     RECIPIENTS = {
+      "Consumer" => "Notifier::MergeDataModels::ConsumerRole",
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
       "Broker" => "Notifier::MergeDataModels::BrokerProfile",
@@ -99,6 +100,14 @@ module Notifier
       send_generic_notice_alert
       send_generic_notice_alert_to_broker_and_ga
     end
+
+    def shop?
+      [:employer_profile,
+        :employee_profile,
+        :broker_profile,
+        :broker_agency_profile,
+        :general_agency].include?(recipient_klass_name)
+      end
 
     def recipient_klass_name
       recipient.to_s.split('::').last.underscore.to_sym

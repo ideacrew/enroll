@@ -107,6 +107,7 @@ GEM
       rails
     arel (6.0.4)
     awesome_print (1.8.0)
+    ast (2.4.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
     aws-sdk-core (2.2.4)
