@@ -11,7 +11,6 @@ describe 'ModelEvents::InitialApplicationSubmitted', dbclean: :around_each do
                                             aasm_state: "draft",
                                             start_on: start_on,
                                             open_enrollment_start_on: oe_start_on ,
-                                            # open_enrollment_end_on:oe_end_on,
   )}
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
 
