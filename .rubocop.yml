@@ -95,6 +95,9 @@ Layout/TrailingWhitespace:
 Metrics/AbcSize:
   Max: 50
 
+Metrics/ClassLength:
+  Max: 300
+
 Metrics/CyclomaticComplexity:
   Max: 8
 
@@ -106,6 +109,9 @@ Metrics/LineLength:
 
 Metrics/MethodLength:
   Max: 50
+
+Metrics/PerceivedComplexity:
+  Max: 15
 
 Naming/PredicateName:
   Enabled: false
