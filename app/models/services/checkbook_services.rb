@@ -19,15 +19,20 @@ module Services
         else
           @census_employee = @hbx_enrollment.employee_role.census_employee
           @is_congress = is_congress
-          is_congress ? @url = CONGRESS_URL+"#{@hbx_enrollment.coverage_year}/" : @url = BASE_URL+SHOP_PATH
+          is_congress ? @url = CONGRESS_URL : @url = BASE_URL+SHOP_PATH
         end
       end
 
       def generate_url
-        return @url if is_congress
+        #return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
         begin
-          construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
+          construct_body = {}
+          if is_congress
+            construct_body = construct_body_congress
+          else
+            construct_body = @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop 
+          end
 
           @result = HTTParty.post(@url,
                 :body => construct_body.to_json,
@@ -86,9 +91,6 @@ module Services
         end
       end
 
-
-      private
-
       def construct_body_shop
         {
           "remote_access_key":  Rails.application.config.checkbook_services_remote_access_key,
@@ -103,7 +105,8 @@ module Services
           "contribution": employer_contributions,
           "reference_plan": reference_plan.hios_id,
           "filterOption": filter_option,
-          "filterValue": filter_value
+          "filterValue": filter_value,
+          "enrollmentId": @hbx_enrollment.id.to_s,
         }
       end
 
@@ -115,6 +118,16 @@ module Services
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,
+          "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+         }
+      end
+
+      def construct_body_congress
+        {
+          "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
+          "reference_id": Rails.application.config.checkbook_services_reference_id,
+          "employee_coverage_date": @hbx_enrollment.effective_on.strftime("%Y-%m-%d"),
+          "family": build_congress_employee_age,
           "enrollmentId": @hbx_enrollment.id.to_s, #Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
          }
       end
@@ -172,6 +185,14 @@ module Services
           family << {"age": age, "pregnant": false, "AIAN": tribal_id}
         end
         family
+      end
+
+      def build_congress_employee_age
+        family = []
+        @hbx_enrollment.hbx_enrollment_members.each do |dependent|
+          family << {"dob": dependent.family_member.person.dob.strftime("%Y-%m-%d")}
+          end
+          family
       end
 
       def build_family
