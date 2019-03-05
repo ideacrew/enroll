@@ -123,6 +123,13 @@ class PlanYear
     end
   end
 
+  def activate_employee_benefit_packages
+    census_employees_within_play_year.each do |census_employee|
+      assignment = census_employee.benefit_group_assignments_for(self).first
+      assignment.make_active if assignment.present?
+    end
+  end
+
   #Updating end_on with start_on for XML purposes only.
   def update_end_date
     self.update_attributes!(:end_on => self.start_on)

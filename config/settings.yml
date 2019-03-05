@@ -40,7 +40,7 @@ aca:
 #
 
   individual_market:
-    monthly_enrollment_due_on: 16
+    monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
     verification_due:
@@ -48,7 +48,7 @@ aca:
 
     open_enrollment:
       start_on: <%= Date.new(2018,11,1) %>
-      end_on: <%= Date.new(2019,01,31) %>
+      end_on: <%= Date.new(2019,02,8) %>
     dc_resident_application: true
     transition_family_members_link: true
 
