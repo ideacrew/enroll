@@ -57,6 +57,18 @@ module SponsoredBenefits
           }) if Settings.aca.state_abbreviation == "MA" # Bring in aca helper
 
           broker_profile.save!
+          plan_design_organization
+        end
+
+        def init_prospect_organization(broker_agency, attrs={})
+          broker_profile = find_or_initialize_broker_profile(broker_agency).broker_agency_profile
+          plan_design_organization = broker_profile.plan_design_organizations.new(attrs).tap do |pdo|
+            if pdo.save && broker_profile.save
+              general_agency_service.assign_default_general_agency(broker_agency, [pdo.id])
+            else
+              return false
+            end
+          end
         end
 
         def assign_employer(broker_agency:, employer:)
@@ -66,8 +78,11 @@ module SponsoredBenefits
               has_active_broker_relationship: true,
               office_locations: office_locations(employer).map(&:attributes),
             })
+            plan_design_organization
           else
             init_plan_design_organization(broker_agency, employer)
+          end.tap do |pdo|
+            general_agency_service.assign_default_general_agency(broker_agency, [pdo.id])
           end
         end
 
@@ -79,9 +94,14 @@ module SponsoredBenefits
           plan_design_organization.sic_code ||= employer.sic_code
           plan_design_organization.save!
           plan_design_organization.expire_proposals
+          general_agency_service.fire_general_agency([plan_design_organization.id])
+        end
+
+        def general_agency_service
+          return @service if defined? @service
+          @service = SponsoredBenefits::Services::GeneralAgencyManager.new(nil)
         end
       end
-
     end
   end
 end
