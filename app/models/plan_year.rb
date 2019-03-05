@@ -891,20 +891,23 @@ class PlanYear
       {result: (result || "ok"), msg: (msg || "")}
     end
 
-    def calculate_start_on_dates
+    def calculate_start_on_dates(admin_dt_action = false)
       # Today - 5 + 2.months).beginning_of_month
       # July 6 => Sept 1
       # July 1 => Aug 1
-      start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
-      end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month
+      due_date_of_month = HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth
+      date_now = TimeKeeper.date_of_record
+      start_on = (date_now - due_date_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
+      start_on = start_on.prev_month if admin_dt_action && (date_now.day > due_date_of_month)
+      end_on = (date_now - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month
       dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
     end
 
-    def calculate_start_on_options
-      calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+    def calculate_start_on_options(admin_dt_action = false)
+      calculate_start_on_dates(admin_dt_action).map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
-    def calculate_open_enrollment_date(start_on)
+    def calculate_open_enrollment_date(start_on, admin_dt_action = false)
       start_on = start_on.to_date
 
       # open_enrollment_start_on = [start_on - 1.month, TimeKeeper.date_of_record].max
@@ -927,6 +930,11 @@ class PlanYear
       #end
 
       open_enrollment_end_on = shop_enrollment_timetable(start_on)[:open_enrollment_latest_end_on]
+
+      oe_min_days = Settings.aca.shop_market.open_enrollment.minimum_length.days
+      if admin_dt_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
+        open_enrollment_end_on = (open_enrollment_start_on + oe_min_days)
+      end
 
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 

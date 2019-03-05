@@ -425,7 +425,7 @@ describe DefinePermissions, dbclean: :after_each do
         end
 
         it 'returns false before the rake task is ran' do
-          expect(hbx_super_admin.hbx_staff_role.permission.can_create_plan_year).to be false
+          expect(hbx_super_admin.hbx_staff_role.permission.can_create_plan_year).to be true
         end
 
         context 'after the rake task is run' do
@@ -557,7 +557,7 @@ describe DefinePermissions, dbclean: :after_each do
         end
 
         it 'returns false before the rake task is ran' do
-          expect(hbx_tier3.hbx_staff_role.permission.can_create_plan_year).to be false
+          expect(hbx_tier3.hbx_staff_role.permission.can_create_plan_year).to be true
         end
 
         context 'after the rake task is run' do

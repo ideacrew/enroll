@@ -17,6 +17,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   let(:valid_params) do
     {
+
       employer_profile: employer_profile,
       start_on: valid_plan_year_start_on,
       end_on: valid_plan_year_end_on,
@@ -1496,6 +1497,32 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:coverage_effective_date) { PlanYear.calculate_start_on_dates.first }
     let(:calculate_open_enrollment_date) { PlanYear.calculate_open_enrollment_date(coverage_effective_date) }
 
+    context "on the first of the month with data table action as true" do
+      let(:first_effective_start_on) { PlanYear.calculate_start_on_dates(true).first }
+      let(:open_enrollment_date) { PlanYear.calculate_open_enrollment_date(first_effective_start_on, true) }
+      let(:date_of_record_to_use) { Date.new(2015, 7, HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + 2) }
+      let(:expected_open_enrollment_start_on) { Date.new(2015,7,7) }
+      let(:oe_min_days) { Settings.aca.shop_market.open_enrollment.minimum_length.days }
+      let(:expected_open_enrollment_end_on) { expected_open_enrollment_start_on + oe_min_days.days }
+      let(:expected_start_on) { Date.new(2015,8,1) }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
+      end
+
+      it "should suggest correct open enrollment start" do
+        expect(open_enrollment_date[:open_enrollment_start_on]).to eq expected_open_enrollment_start_on
+      end
+
+      it "should suggest correct open enrollment end" do
+        expect(open_enrollment_date[:open_enrollment_end_on]).to eq expected_open_enrollment_end_on
+      end
+
+      it "should have the right start on" do
+        expect(first_effective_start_on).to eq expected_start_on
+      end
+    end
+
     context "on the first of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
@@ -1676,7 +1703,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
       date2 = date1.next_month
       dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
-
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end

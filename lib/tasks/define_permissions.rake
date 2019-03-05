@@ -102,6 +102,12 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_force_publish => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_create_plan_year
+namespace :permissions do
+  desc 'hbx admin can create plan year'
+  DefinePermissions.define_task :hbx_admin_can_create_plan_year => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do
   desc 'grant super admin access for given users'
