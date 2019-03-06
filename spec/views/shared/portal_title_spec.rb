@@ -16,7 +16,7 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :after_each do
     Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
   end
   before(:each) do
-  	sign_in current_user
+    sign_in current_user
   end
   it 'identifies HBX Staff' do
     current_user.roles=['hbx_staff']

@@ -7,7 +7,8 @@
     %dba= employer.dba.strip
   -#%display_name= " " filed doesn't exists
   -#%abbreviation= " " filed doesn't exists
-  %fein= employer.fein.strip
+  - if employer.fein.present?
+    %fein= employer.fein.strip
   %office_locations
     = render :partial => "events/v2/organizations/office_location", :collection => employer.office_locations
   - if !employer.organization.home_page.blank?

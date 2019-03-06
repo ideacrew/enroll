@@ -103,7 +103,7 @@ end
 group :development do
   gem "certified"
   gem 'overcommit'
-  gem 'rubocop', require: false
+  gem 'rubocop', "0.54.0", require: false
   gem 'web-console', '2.3.0'
 end
 
@@ -134,7 +134,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'poltergeist'
   gem 'rspec-instafail'
-  gem 'ruby-progressbar', '1.6.0'
+  gem 'ruby-progressbar', '~> 1.7'
   gem 'shoulda-matchers', '3.1.1'
   gem 'simplecov', '0.14.1', :require => false
   gem 'test-prof', '0.5.0'

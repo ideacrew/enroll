@@ -6,17 +6,25 @@ module BenefitSponsors
 
     subject { BenefitSponsors::Services::NewProfileRegistrationService }
     let!(:security_question)  { FactoryGirl.create_default :security_question }
-
     let!(:site) { ::BenefitSponsors::SiteSpecHelpers.create_cca_site_with_hbx_profile_and_benefit_market }
     let!(:general_org) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
     let!(:employer_profile) {general_org.employer_profile}
     let(:user) { FactoryGirl.create(:user)}
-    let(:person) { FactoryGirl.create(:person, emails:[FactoryGirl.build(:email, kind:'work')], user: user) }
+    let!(:person) { FactoryGirl.create(:person, emails:[ FactoryGirl.build(:email, kind:'work') ], user: user) }
     let!(:active_employer_staff_role) {FactoryGirl.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
     let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
     let!(:broker_agency_staff_role) { FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person )}
+# =======
+#     let!(:employer_profile) { general_org.employer_profile }
+#     let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
+#     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
+#     let!(:user) { FactoryGirl.create(:user)}
+#     let!(:person) { FactoryGirl.create(:person, emails:[ FactoryGirl.build(:email, kind:'work') ], user_id: user.id) }
+#     let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
+#     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+# >>>>>>> master
 
     shared_examples_for "should return profile type" do |profile_type|
 
@@ -71,6 +79,20 @@ module BenefitSponsors
     describe ".find" do
       it_behaves_like "should find profile and return form for profile", "benefit_sponsor"
       it_behaves_like "should find profile and return form for profile", "broker_agency"
+    end
+
+    describe ".is_benefit_sponsor_already_registered?" do
+      context "Should return when person found" do
+        before :each do
+          allow(user).to receive(:person).and_return(person)
+          @form = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.new(profile_type: "benefit_sponsor")
+          @result = subject.new(@form).is_benefit_sponsor_already_registered?(user, @form)
+        end
+
+        it 'should return false for when found employer profile id' do
+          expect(@result).to eq false
+        end
+      end
     end
 
     describe ".has_broker_agency_staff_role_for_profile" do

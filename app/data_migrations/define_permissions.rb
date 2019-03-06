@@ -25,9 +25,10 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
       modify_admin_tabs: false, view_admin_tabs: true)
-    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+    Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
+      can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
+      view_admin_tabs: true)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
@@ -36,7 +37,7 @@ class DefinePermissions < MigrationTask
     permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
-  
+
   def build_test_roles
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all
@@ -49,7 +50,7 @@ class DefinePermissions < MigrationTask
     u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u7 = User.create( email: 'themanda.csr_tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
     u8 = User.create( email: 'themanda.super_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    
+
     hbx_profile_id = FactoryGirl.create(:hbx_profile).id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
     p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
@@ -59,7 +60,7 @@ class DefinePermissions < MigrationTask
     p6 = Person.create( first_name: 'developer', last_name: "developer#{rand(1000000)}", user: u6)
     p7 = Person.create( first_name: 'tier3', last_name: "amanda#{rand(1000000)}", user: u7)
     p8 = Person.create( first_name: 'super_admin', last_name: "amanda#{rand(1000000)}", user: u8)
-    
+
     HbxStaffRole.create!( person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
@@ -72,21 +73,31 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes!(can_update_ssn: true)
+    Permission.super_admin.update_attributes!(can_update_ssn: true)
+    Permission.hbx_tier3.update_attributes!(can_update_ssn: true)
   end
 
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+    Permission.super_admin.update_attributes!(can_complete_resident_application: true)
+    Permission.hbx_tier3.update_attributes!(can_complete_resident_application: true)
   end
   def hbx_admin_can_add_sep
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
+    Permission.super_admin.update_attributes!(can_add_sep: true)
+    Permission.hbx_tier3.update_attributes!(can_add_sep: true)
   end
 
   def hbx_admin_can_lock_unlock
     Permission.hbx_staff.update_attributes(can_lock_unlock: true)
+    Permission.super_admin.update_attributes(can_lock_unlock: true)
+    Permission.hbx_tier3.update_attributes(can_lock_unlock: true)
   end
 
   def hbx_admin_can_view_username_and_email
     Permission.hbx_staff.update_attributes!(can_view_username_and_email: true)
+    Permission.super_admin.update_attributes!(can_view_username_and_email: true)
+    Permission.hbx_tier3.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_read_only.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_supervisor.update_attributes!(can_view_username_and_email: true)
     Permission.hbx_csr_tier2.update_attributes!(can_view_username_and_email: true)
@@ -95,10 +106,27 @@ class DefinePermissions < MigrationTask
 
   def hbx_admin_can_reset_password
     Permission.hbx_staff.update_attributes(can_reset_password: true)
+    Permission.super_admin.update_attributes(can_reset_password: true)
+    Permission.hbx_tier3.update_attributes(can_reset_password: true)
+  end
+
+  def hbx_admin_can_change_fein
+    Permission.super_admin.update_attributes(can_change_fein: true)
+    Permission.hbx_tier3.update_attributes(can_change_fein: true)
+  end
+
+  def hbx_admin_can_force_publish
+    Permission.super_admin.update_attributes(can_force_publish: true)
+    Permission.hbx_tier3.update_attributes(can_force_publish: true)
   end
 
   def hbx_admin_can_extend_open_enrollment
     Permission.hbx_tier3.update_attributes(can_extend_open_enrollment: true)
+  end
+
+  def hbx_admin_can_create_benefit_application
+    Permission.super_admin.update_attributes(can_create_benefit_application: true)
+    Permission.hbx_tier3.update_attributes(can_create_benefit_application: true)
   end
 
   def grant_super_admin_access

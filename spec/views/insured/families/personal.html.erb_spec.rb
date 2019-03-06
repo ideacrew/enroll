@@ -24,7 +24,7 @@ RSpec.describe "insured/families/personal.html.erb" do
     end
   end
 
-  context "for employee role" do
+  context "for employee role", dbclean: :after_each do
    let(:person) {FactoryGirl.create(:person, :with_family)}
    let(:employee_role) {FactoryGirl.create(:employee_role, census_employee_id: census_employee.id)}
    let(:census_employee) {FactoryGirl.create(:census_employee)}

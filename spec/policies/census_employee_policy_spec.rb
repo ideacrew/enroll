@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe CensusEmployeePolicy do
+describe CensusEmployeePolicy, dbclean: :after_each do
   subject { described_class }
   let(:employer_profile){ FactoryGirl.create(:employer_profile)}
   let(:person) { FactoryGirl.create(:person) }

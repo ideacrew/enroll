@@ -12,7 +12,7 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop do
     end
   end
 
-  describe "#trigger notify_renewal_employees_dental_carriers_exiting_shop", type: :model, dbclean: :after_all do
+  describe "#trigger notify_renewal_employees_dental_carriers_exiting_shop", type: :model, dbclean: :after_each do
     let!(:person) { FactoryGirl.create(:person, hbx_id: "19877154") }
     let!(:employer_profile) { create(:employer_with_planyear)}
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }

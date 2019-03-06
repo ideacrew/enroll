@@ -2,7 +2,7 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencyNotices::GeneralAgencyTerminatedNotice, dbclean: :after_each do
-	let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ FactoryGirl.create :employer_profile}
   let!(:general_agency_profile) { FactoryGirl.create :general_agency_profile }
   let!(:general_agency_account) { FactoryGirl.create :general_agency_account ,aasm_state: 'inactive',employer_profile: employer_profile, general_agency_profile_id: general_agency_profile.id, end_on: TimeKeeper.date_of_record}

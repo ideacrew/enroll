@@ -1,8 +1,7 @@
 require 'rails_helper'
 
-describe "load_benefit_market_catalogs" do
+describe "load_benefit_market_catalogs", dbclean: :after_each do
   before do
-    DatabaseCleaner.clean
 
     Rake.application.rake_require 'tasks/migrations/plans/load_benefit_market_catalogs'
     Rake::Task.define_task(:environment)
@@ -86,10 +85,6 @@ describe "load_benefit_market_catalogs" do
       bm.reload
       expect(bm.benefit_market_catalogs.map(&:product_packages).flatten.map(&:products).flatten.count).to eq 11
     end
-  end
-
-  after :all do
-    DatabaseCleaner.clean
   end
 end
 

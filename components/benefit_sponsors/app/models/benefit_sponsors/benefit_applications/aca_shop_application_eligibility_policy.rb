@@ -18,7 +18,7 @@ module BenefitSponsors
   class BenefitApplications::AcaShopApplicationEligibilityPolicy
     include BenefitMarkets::BusinessRulesEngine
 
-    OPEN_ENROLLMENT_DAYS_MIN = 15
+    OPEN_ENROLLMENT_DAYS_MIN = 5
     MIN_BENEFIT_GROUPS = 1
     EMPLOYEE_MINIMUM_COUNT = 1
     EMPLOYEE_MAXIMUM_COUNT = 50
@@ -35,10 +35,14 @@ module BenefitSponsors
 
     rule  :benefit_application_fte_count,
             validate: -> (benefit_application){
+              if benefit_application.is_renewing?
+                true
+              else
                 benefit_application.fte_count >= EMPLOYEE_MINIMUM_COUNT && benefit_application.fte_count < EMPLOYEE_MAXIMUM_COUNT
-              },
+              end
+                },
             success:  -> (benfit_application)  { "validated successfully" },
-            fail:     -> (benefit_application) { "Has #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
+            fail:     -> (benefit_application) { "Small business should have #{EMPLOYEE_MINIMUM_COUNT} - #{EMPLOYEE_MAXIMUM_COUNT} full time equivalent employees" }
 
     #TODO: Do not use Settings.
     rule  :employer_primary_office_location,
@@ -46,7 +50,7 @@ module BenefitSponsors
               benefit_application.sponsor_profile.is_primary_office_local?
               },
             success:  -> (benfit_application)  { "validated successfully" },
-            fail:     -> (benefit_application) { "Is a small business located in #{Settings.aca.state_name}" }
+            fail:     -> (benefit_application) { "Small business NOT located in #{Settings.aca.state_name}" }
 
     rule  :benefit_application_contains_benefit_packages,
             validate: -> (benefit_application){
@@ -67,7 +71,7 @@ module BenefitSponsors
               benefit_application.benefit_sponsorship.census_employees.active.all?{|e| benefit_application.benefit_packages.map(&:id).include?(e.try(:renewal_benefit_group_assignment).try(:benefit_package_id) || e.try(:active_benefit_group_assignment).try(:benefit_package_id))}
             },
             success:  -> (benfit_application) { "validated successfully" },
-            fail:     -> (benefit_application) { "all employees must have an assigned benefit package" }
+            fail:     -> (benefit_application) { "All employees must have an assigned benefit package" }
 
 
     rule :employer_profile_eligible,
@@ -122,11 +126,22 @@ module BenefitSponsors
     business_policy  :stubbed_policy,
             rules: [:stubbed_rule_one, :stubbed_rule_two ]
 
+    business_policy :force_submit_benefit_application,
+            rules: [:open_enrollment_period_minimum,
+                    :benefit_application_contains_benefit_packages,
+                    :benefit_packages_contains_reference_plans,
+                    :all_employees_are_assigned_benefit_package,
+                    :employer_profile_eligible,
+                    :employer_primary_office_location,
+                    :all_contribution_levels_min_met,
+                    :benefit_application_fte_count]
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
 
         case event_name
+        when :force_submit_benefit_application
+          business_policies[:force_submit_benefit_application]
         when :submit_benefit_application
           business_policies[:submit_benefit_application]
         else

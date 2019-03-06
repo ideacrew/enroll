@@ -11,6 +11,7 @@ module ApplicationHelper
   end
 
   def product_rates_available?(benefit_sponsorship, date=nil)
+    date = Date.strptime(date.to_s, '%m/%d/%Y') if date.present?
     return false if benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?
     date = date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
     benefit_sponsorship.applicant? && BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
