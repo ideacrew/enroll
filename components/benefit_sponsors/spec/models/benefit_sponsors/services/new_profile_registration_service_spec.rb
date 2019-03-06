@@ -16,15 +16,6 @@ module BenefitSponsors
     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
     let!(:broker_agency_staff_role) { FactoryGirl.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person )}
-# =======
-#     let!(:employer_profile) { general_org.employer_profile }
-#     let(:broker_agency) {FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
-#     let!(:broker_agency_profile) {broker_agency.broker_agency_profile}
-#     let!(:user) { FactoryGirl.create(:user)}
-#     let!(:person) { FactoryGirl.create(:person, emails:[ FactoryGirl.build(:email, kind:'work') ], user_id: user.id) }
-#     let!(:active_employer_staff_role) {FactoryGirl.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
-#     let!(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
-# >>>>>>> master
 
     shared_examples_for "should return profile type" do |profile_type|
 
