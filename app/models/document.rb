@@ -9,8 +9,6 @@ class Document
 
   ACCESS_RIGHTS = %w(public pii_restricted)
 
-  after_save :notify_on_save
-
   # Enable polymorphic associations
   embedded_in :documentable, polymorphic: true
 
