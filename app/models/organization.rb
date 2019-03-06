@@ -184,11 +184,14 @@ class Organization
   end
 
   def invoices
-    documents.select{ |document| document.subject == 'invoice' }
+    invoices = []
+    invoices = documents.select{ |document| document.subject == 'invoice' }
+    invoices += employer_profile.documents.select{ |document| document.subject == 'initial_invoice' }
+    invoices
   end
 
   def current_month_invoice
-    documents.select{ |document| document.subject == 'invoice' && document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
+    invoices.select{ |document| document.date.strftime("%Y%m") == TimeKeeper.date_of_record.strftime("%Y%m")}
   end
 
   # Strip non-numeric characters
