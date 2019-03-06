@@ -50,6 +50,22 @@ describe Services::CheckbookServices::PlanComparision do
       end
     end
   end
+
+  describe "when checkbook response is irregular or an exception is raised" do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
+    let(:checkbook_url) {"http://checkbook_url"}
+    let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => ""})}
+    before { Rails.env.stub(:test? => false) }
+    it "should generate consumer link" do
+        if ApplicationHelperModStubber.plan_match_dc
+          allow(subject).to receive(:construct_body_ivl).and_return({})
+          allow(HTTParty).to receive(:post).with(Rails.application.config.checkbook_services_base_url,
+            {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
+            and_raise(Exception)
+          expect(subject.generate_url).to eq false
+        end
+      end
+  end
   
   describe "#build_congress_employee_age" do 
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
@@ -68,25 +84,8 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "when checkbook response is irregular or an exception is raised" do
-    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
-    let(:checkbook_url) {"http://checkbook_url"}
-    let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => ""})}
-    before { Rails.env.stub(:test? => false) }
-    it "should generate consumer link" do
-        if ApplicationHelperModStubber.plan_match_dc
-          allow(subject).to receive(:construct_body_ivl).and_return({})
-          allow(HTTParty).to receive(:post).with(Rails.application.config.checkbook_services_base_url,
-            {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
-            and_raise(Exception)
-          expect(subject.generate_url).to eq false
-        end
-      end
-  end
-
 
   describe "#csr_value" do
-
     let!(:ivl_person)       { FactoryGirl.create(:person, :with_consumer_role) }
     let!(:ivl_family)       { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: ivl_person) }
     let!(:ivl_household)    { ivl_family.active_household }

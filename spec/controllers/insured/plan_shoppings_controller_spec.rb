@@ -254,11 +254,44 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(response).to have_http_status(:success)
     end
 
+     it "when enrollment has change plan" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id", change_plan: "rspec"
+      expect(assigns(:change_plan)).to eq "rspec"
+    end
+
+    it "when enrollment does not have change plan" do
+      sign_in(user)
+      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:change_plan)).to eq "change_plan"
+    end
+
     it "should be enrollable" do
       sign_in(user)
       get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:enrollable)).to be_truthy
     end
+
+    it "When enrollment kind receives" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id", enrollment_kind: "shop"
+      expect(assigns(:enrollment_kind)).to eq "shop"
+    end
+
+    it "when is_special_enrollment " do
+      sign_in(user)
+      allow(enrollment).to receive(:is_special_enrollment?).and_return true
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:enrollment_kind)).to eq "sep"
+    end
+
+    it "when no special_enrollment" do
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:enrollment_kind)).to eq ""
+    end
+
 
     it "should be waivable" do
       sign_in(user)

@@ -85,8 +85,18 @@ class Insured::PlanShoppingsController < ApplicationController
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    if params[:change_plan].present? 
+     @change_plan =  params[:change_plan] 
+    elsif @enrollment.is_special_enrollment?
+      @change_plan = "change_plan"
+    end
+    if params[:enrollment_kind].present? 
+      @enrollment_kind = params[:enrollment_kind] 
+    elsif @enrollment.is_special_enrollment?
+      @enrollment_kind = "sep"
+    else
+       @enrollment_kind = ""
+    end
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
@@ -186,7 +196,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def plan_selection_callback
     selected_plan= Plan.where(:hios_id=> params[:hios_id], active_year: Settings.checkbook_services.current_year).first
     if selected_plan.present?
-      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id], market_kind: params[:market_kind]})
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
     else
       redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
     end

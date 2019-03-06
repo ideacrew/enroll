@@ -326,7 +326,11 @@ And(/I click on purchase button on confirmation page/) do
 end
 
 And(/I click on continue button to go to the individual home page/) do
-  click_link "GO TO MY ACCOUNT"
+  if page.has_link?('CONTINUE')
+   click_link "CONTINUE"
+  else
+   click_link "GO TO MY ACCOUNT"
+  end
 end
 
 And(/I should see the individual home page/) do
