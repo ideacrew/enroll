@@ -49,6 +49,9 @@ Rails/Validation:
 Rails:
   Enabled: false
 
+Layout/CommentIndentation:
+  Enabled: false
+
 Layout/EmptyLines:
   Enabled: false
 
@@ -121,6 +124,9 @@ Naming/VariableNumber:
 
 Style/AndOr:
   Enabled: true
+
+Style/BlockComments:
+  Enabled: false
 
 Style/BracesAroundHashParameters:
   Enabled: false
