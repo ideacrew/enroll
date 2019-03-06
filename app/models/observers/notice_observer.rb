@@ -204,6 +204,7 @@ module Observers
     def vlp_document_update; end
     def paper_application_update; end
     def employer_attestation_document_update; end
+    def ridp_document_update; end
 
     def plan_year_date_change(model_event)
       current_date = TimeKeeper.date_of_record

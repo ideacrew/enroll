@@ -310,7 +310,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:invoices)
-    sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @invoices
+    if @invoices
+      sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
+    end
   end
 
   def check_and_download_invoice
