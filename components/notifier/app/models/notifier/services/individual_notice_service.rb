@@ -1,23 +1,24 @@
 module Notifier
-  class Services::IndividualNoticeService
+  module Services
+    class IndividualNoticeService
 
-    def recipients
-      {
-        "Consumer" => "Notifier::MergeDataModels::ConsumerRole"
-      }
-    end
-
-    def setting_placeholders
-      system_settings.inject([]) do |placeholders, (category, attribute_set)|
-        attribute_set.each do |attribute|
-          placeholders << {
-            title: "#{category.to_s.humanize}: #{attribute.humanize}",
-            target: ["Settings", category, attribute].join('.')
-          }
-        end
-        placeholders
+      def recipients
+        {
+          "Consumer" => "Notifier::MergeDataModels::ConsumerRole"
+        }
       end
-    end
+
+      def setting_placeholders
+        system_settings.inject([]) do |placeholders, (category, attribute_set)|
+          attribute_set.each do |attribute|
+            placeholders << {
+              title: "#{category.to_s.humanize}: #{attribute.humanize}",
+              target: ["Settings", category, attribute].join('.')
+            }
+          end
+          placeholders
+        end
+      end
 
     def system_settings
       {
