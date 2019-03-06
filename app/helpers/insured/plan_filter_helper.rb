@@ -5,13 +5,14 @@ module Insured::PlanFilterHelper
     if @market_kind == "individual" && @coverage_kind == "health"
       link_to('Find Your Doctor','',data: {toggle: "modal", target: "#plan_match_family"})
     elsif @market_kind == "shop" && @coverage_kind == "health"
-      link_to('Find Your Doctor', Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/', target: '_blank')
+      # link_to('Find Your Doctor', Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/', target: '_blank')
+      link_to('Find Your Doctor','',data: {toggle: "modal", target: "#plan_match_doctor_shop"})
     end
   end
 
   def estimate_your_costs
-    if @market_kind == "shop" && @coverage_kind == "health"
-      link_to(l10n("estimate_your_costs"), @dc_checkbook_url , target: '_blank')
+    if @market_kind == "shop" && @coverage_kind == "health" && @dc_checkbook_url != false
+      link_to(l10n("estimate_your_costs"),'',data: {toggle: "modal", target: "#plan_match_shop"})
     end
   end
 
