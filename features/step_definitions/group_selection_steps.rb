@@ -114,7 +114,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   coverage_kind: coverage_kind,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
-                                  employee_role_id: (var == "first" ? @person.active_employee_roles[1].id : @person.active_employee_roles[0].id),
+                                  employee_role_id: (var == "first" ? @person.active_employee_roles.last.id : @person.active_employee_roles.first.id),
                                   benefit_group_id: benefit_group.id
                                 )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @person.primary_family.primary_applicant.id,
@@ -158,11 +158,7 @@ And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, 
   if type == "ineligible"
     expect(find("#family_member_ids_1")).to be_disabled
     expect(find("#family_member_ids_1")).not_to be_checked
-    # expect(find("#family_member_ids_0")).not_to be_disabled
-    # expect(find("#family_member_ids_0")).to be_checked
   else
-    # expect(find("#family_member_ids_1")).to be_disabled
-    # expect(find("#family_member_ids_1")).not_to be_checked
     expect(find("#family_member_ids_0")).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
@@ -289,7 +285,6 @@ And(/employee should not see the reason for ineligibility/) do
 end
 
 When(/employee switched to (.*) employer/) do |employer|
-  puts "employer... #{employer}"
   if employer == "second"
     find(:xpath, '//*[@id="employer-selection"]/div/div[1]/label').click
   else
