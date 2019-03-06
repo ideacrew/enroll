@@ -114,7 +114,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                                   coverage_kind: coverage_kind,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
-                                  employee_role_id: (var == "first" ? @person.active_employee_roles[1].id : @person.active_employee_roles[0].id),
+                                  employee_role_id: (var == "first" ? @person.active_employee_roles.last.id : @person.active_employee_roles.first.id),
                                   benefit_group_id: benefit_group.id
                                 )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @person.primary_family.primary_applicant.id,
