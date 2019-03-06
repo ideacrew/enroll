@@ -29,9 +29,8 @@ describe Services::CheckbookServices::PlanComparision do
     it "should generate non-congressional link" do
       if ApplicationHelperModStubber.plan_match_dc
         allow(subject).to receive(:construct_body_shop).and_return({})
-        allow(HTTParty).to receive(:post).with("https://checkbook_url/shop/",
-          {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
-          and_return(result)
+        allow(HTTParty).to receive(:post).and_return(result)
+        # expect(subject.generate_url).to eq Rails.application.config.checkbook_services_congress_url+"#{hbx_enrollment.effective_on.year}/"
         expect(subject.generate_url).to eq checkbook_url
       end
     end
@@ -51,6 +50,40 @@ describe Services::CheckbookServices::PlanComparision do
       end
     end
   end
+
+  describe "when checkbook response is irregular or an exception is raised" do
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
+    let(:checkbook_url) {"http://checkbook_url"}
+    let(:result) {double("HttpResponse" ,:parsed_response =>{"URL" => ""})}
+    before { Rails.env.stub(:test? => false) }
+    it "should generate consumer link" do
+        if ApplicationHelperModStubber.plan_match_dc
+          allow(subject).to receive(:construct_body_ivl).and_return({})
+          allow(HTTParty).to receive(:post).with(Rails.application.config.checkbook_services_base_url,
+            {:body=>"{}", :headers=>{"Content-Type"=>"application/json"}}).
+            and_raise(Exception)
+          expect(subject.generate_url).to eq false
+        end
+      end
+  end
+  
+  describe "#build_congress_employee_age" do 
+    subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    context "when active household is present" do 
+      let(:person_congress) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role , dob: "1980-01-01") }
+      let(:person_congress_spouse) { FactoryGirl.create(:person, dob: "1984-01-01" ) }
+      let(:enrollment_memeber_congress){ double }
+      let(:enrollment_memeber_spouse){ double }
+      it "should return correct age" do
+        allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([enrollment_memeber_congress,enrollment_memeber_spouse])
+        allow(enrollment_memeber_congress).to receive_message_chain(:family_member,:person).and_return(person_congress)
+        allow(enrollment_memeber_spouse).to receive_message_chain(:family_member,:person).and_return(person_congress_spouse)
+        expect(subject.build_congress_employee_age).to include({:dob => "1984-01-01"})
+        expect(subject.build_congress_employee_age).to include({:dob => "1980-01-01"})
+      end
+    end
+  end
+
 
   describe "#csr_value" do
     let!(:ivl_person)       { FactoryGirl.create(:person, :with_consumer_role) }
@@ -96,7 +129,7 @@ describe Services::CheckbookServices::PlanComparision do
 
   describe "#aptc_value  " do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
-    context "when active household is present" do 
+    context "when active household is present" do
       let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
       let(:sample_max_aptc_1) {511.78}
       let(:sample_csr_percent_1) {87}
@@ -108,7 +141,7 @@ describe Services::CheckbookServices::PlanComparision do
         expect(subject.aptc_value).to eq tax_household.latest_eligibility_determination.max_aptc.to_i
       end
     end
-     context "when active household  not present" do 
+     context "when active household  not present" do
       it "should return max NULL" do
         allow(hbx_enrollment).to receive_message_chain(:household,:latest_active_tax_household_with_year).and_return(nil)
         expect(subject.aptc_value).to eq "NULL"
@@ -118,11 +151,12 @@ describe Services::CheckbookServices::PlanComparision do
 
   describe "when employee is congress member" do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
+    let(:checkbook_url) {"http://checkbook_url"}
 
     it "should generate congressional url" do
      if ApplicationHelperModStubber.plan_match_dc
        allow(subject).to receive(:construct_body_shop).and_return({})
-       expect(subject.generate_url).to eq("https://checkbook_url/congress/2019/")
+       expect(subject.generate_url).to eq checkbook_url
       end
     end
   end
