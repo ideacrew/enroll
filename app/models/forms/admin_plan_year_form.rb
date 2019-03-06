@@ -23,7 +23,7 @@ module Forms
     validates_presence_of :fte_count
 
     def self.for_new(params)
-      form = self.new(params)
+      form = new(params)
       form.set_start_on_dates
       form
     end
@@ -40,21 +40,21 @@ module Forms
       start_on_dates.each do |date|
         oe_dates_hash = PlanYear.calculate_open_enrollment_date(date, admin_dt_action)
         oe_dates_hash.keys.each { |key| oe_dates_hash[key] = oe_dates_hash[key].to_s }
-        self.start_on_options[date] = {
+        start_on_options[date] = {
           :start_on => date.to_s, :end_on => get_end_on(date)
         }
-        self.start_on_options[date].merge!(oe_dates_hash)
+        start_on_options[date].merge!(oe_dates_hash)
       end
     end
 
     def self.for_create(params)
-      form = self.new(params)
+      form = new(params)
       form.organization_id = params["employer_actions_id"].split('_').last
       form
     end
 
     def save
-      return false unless self.valid?
+      return false unless valid?
       create_plan_year
     end
 
@@ -67,7 +67,7 @@ module Forms
     end
 
     def cancel_draft_applications(new_plan_year)
-      new_plan_year.employer_profile.plan_years.draft.select{|py| py != new_plan_year}.each do |pl_year|
+      new_plan_year.employer_profile.plan_years.draft.reject{|py| py == new_plan_year}.each do |pl_year|
         pl_year.cancel! if pl_year.may_cancel?
       end
     end
@@ -85,16 +85,14 @@ module Forms
     end
 
     def validate_oe_dates
-      if open_enrollment_end_on <= open_enrollment_start_on
-        errors.add(:base, "Open Enrollment Start Date can't be later than the Open Enrollment End Date")
-      end
+      message = "Open Enrollment Start Date can't be later than the Open Enrollment End Date"
+      errors.add(:base, message) if open_enrollment_end_on <= open_enrollment_start_on
     end
 
     def validate_minimum_oe_range
       oe_min_days = Settings.aca.shop_market.open_enrollment.minimum_length.days
-      if (get_date(open_enrollment_end_on) - get_date(open_enrollment_start_on)) < oe_min_days
-        errors.add(:base, "Open Enrollment period is shorter than minimum (#{oe_min_days} days)")
-      end
+      message = "Open Enrollment period is shorter than minimum (#{oe_min_days} days)"
+      errors.add(:base, message) if (get_date(open_enrollment_end_on) - get_date(open_enrollment_start_on)) < oe_min_days
     end
   end
 end
