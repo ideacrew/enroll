@@ -158,11 +158,7 @@ And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, 
   if type == "ineligible"
     expect(find("#family_member_ids_1")).to be_disabled
     expect(find("#family_member_ids_1")).not_to be_checked
-    # expect(find("#family_member_ids_0")).not_to be_disabled
-    # expect(find("#family_member_ids_0")).to be_checked
   else
-    # expect(find("#family_member_ids_1")).to be_disabled
-    # expect(find("#family_member_ids_1")).not_to be_checked
     expect(find("#family_member_ids_0")).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
@@ -289,7 +285,6 @@ And(/employee should not see the reason for ineligibility/) do
 end
 
 When(/employee switched to (.*) employer/) do |employer|
-  puts "employer... #{employer}"
   if employer == "second"
     find(:xpath, '//*[@id="employer-selection"]/div/div[1]/label').click
   else
