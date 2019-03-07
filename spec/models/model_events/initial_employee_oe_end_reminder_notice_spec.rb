@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'ModelEvents::InitialEmployeeOeEndRemainderNotice', :dbclean => :after_each  do
+RSpec.describe 'ModelEvents::InitialEmployeeOeEndReminderNotice', :dbclean => :after_each  do
   let(:notice_event) { "initial_employee_oe_end_reminder_notice" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:organization) { FactoryGirl.create(:organization) }
@@ -18,9 +18,10 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndRemainderNotice', :dbclean => :
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
-    
+
   describe "ModelEvent" do
     it "should trigger model event" do
+      expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employer_profile, event_object: plan_year, notice_event: 'low_enrollment_notice_for_employer').and_return(true)
       expect_any_instance_of(Observers::NoticeObserver).to receive(:deliver).with(recipient: employee_role, event_object: plan_year, notice_event: notice_event).and_return(true)
       PlanYear.date_change_event(date_mock_object)
     end
@@ -32,6 +33,12 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndRemainderNotice', :dbclean => :
       let(:model_event) { ModelEvents::ModelEvent.new(:initial_employee_oe_end_reminder_notice, plan_year, {}) }
 
       it "should trigger notice event" do
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.low_enrollment_notice_for_employer"
+          expect(payload[:event_object_kind]).to eq 'PlanYear'
+          expect(payload[:event_object_id]).to eq plan_year.id.to_s
+        end
+
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.initial_employee_oe_end_reminder_notice"
           expect(payload[:event_object_kind]).to eq 'PlanYear'
