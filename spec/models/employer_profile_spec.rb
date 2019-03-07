@@ -836,25 +836,6 @@ describe EmployerProfile, "roster size" do
   end
 end
 
-describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Binder Paid' for group", dbclean: :after_each do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:organization) { employer_profile.organization }
-  let!(:census_employee){
-    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
-    employee
-  }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
-
-  it "should trigger notice" do
-    expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
-    EmployerProfile.update_status_to_binder_paid([organization.id])
-  end
-end
-
 describe EmployerProfile, "when a binder premium is credited" do
   let(:hbx_id) { "some hbx id string value" }
   let(:employer) { EmployerProfile.new(:aasm_state => :eligible, :organization => Organization.new(:hbx_id => hbx_id)) }
