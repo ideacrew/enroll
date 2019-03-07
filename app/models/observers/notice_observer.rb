@@ -49,11 +49,11 @@ module Observers
         if new_model_event.event_key == :ineligible_renewal_application_submitted
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
-            # plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-            #   if ce.employee_role.present?
-            #     deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
-            #   end
-            # end
+            plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+              if ce.employee_role.present?
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "termination_of_employers_health_coverage")
+              end
+            end
           end
         end
 
