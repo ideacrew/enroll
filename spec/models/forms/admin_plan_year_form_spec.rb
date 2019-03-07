@@ -47,7 +47,7 @@ require 'rails_helper'
     describe 'model attributes' do
       it {
         %i[start_on end_on open_enrollment_start_on open_enrollment_end_on admin_dt_action].each do |key|
-          expect(subject.attributes.has_key?(key)).to be_truthy
+          expect(subject.attributes.key?(key)).to be_truthy
         end
       }
     end
@@ -71,7 +71,6 @@ require 'rails_helper'
     end
 
     describe 'validate_minimum_oe_range' do
-
       context 'with invalid params' do
         let(:build_admin_plan_year_form) { Forms::AdminPlanYearForm.new(invalid_params1) }
 
@@ -100,7 +99,7 @@ require 'rails_helper'
     end
 
     describe '#for_create' do
-      let(:params) {
+      let(:params) do
         {
           'start_on' => (TimeKeeper.date_of_record.beginning_of_month + 2.months).strftime("%m/%d/%Y"),
           'end_on' => (TimeKeeper.date_of_record.beginning_of_month + 1.year + 2.months - 1.day).strftime("%m/%d/%Y"),
@@ -109,7 +108,7 @@ require 'rails_helper'
           'employer_actions_id' => "family_actions_5c5b3afd83d00d6b750001e9",
           'organization_id' => organization.id.to_s
         }
-      }
+      end
 
       it 'should create the form assign the params for forms' do
         form = Forms::AdminPlanYearForm.for_create(params)
