@@ -41,7 +41,7 @@ module ModelEvents
           is_initial_employer_open_enrollment_completed = true
         end
 
-        if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :close_open_enrollment)
+        if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
           is_renewal_employer_open_enrollment_completed = true
         end
 
