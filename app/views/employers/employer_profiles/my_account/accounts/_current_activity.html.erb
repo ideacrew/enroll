@@ -4,23 +4,12 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Date</th>
       <th>Description</th>
       <th>Amount</th>
     </tr>
   </thead>
   <% if @employer_profile_account %>
   <tbody>
-    <!-- Starting Balance -->
-    <tr>
-      <td><%= @employer_profile_account.current_statement_date %></td>
-      <td>Remaining amount due from <%= @employer_profile_account.current_statement_date %> invoice
-        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="This amount is the remaining amount due from the last invoice balance due minus any advanced credits for enrollment changes, or payments made since the last invoice date. Invoices must be paid in full or else the group is at risk of going into arrears. Any payment or enrollment activity that occurs after the last invoice date will be reflected on the next invoice."></i>
-      </td>
-      <td>
-        <%= number_to_currency(@employer_profile_account.total_due) || "Data not available" %>
-      </td>
-    </tr>
     <!-- Payments -->
     <tr>
       <td class="payments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
@@ -52,7 +41,7 @@
     <tr>
       <td class="adjustments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
       <td>Enrollment changes since <%= @employer_profile_account.current_statement_date %> invoice
-        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Enrollment Changes are any type of enrollment change, including new enrollments, changes to existing enrollments, or terminations of coverage. Enrollment changes may occur due to a variety of reasons, including newly-eligible for coverage, special enrollment periods, or terminations of eligibility."></i>
+        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Includes new enrollments, changes to existing enrollments, and terminations. Enrollment changes happen when you make a new employee eligible for coverage, when someone qualifies for a special enrollment period, or when someone is no longer eligible for coverage."></i>
       </td>
       <td></td>
     </tr>
