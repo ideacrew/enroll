@@ -29,6 +29,17 @@ module Observers
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
+        if new_model_event.event_key == :renewal_employer_open_enrollment_completed
+          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+          plan_year.employer_profile.census_employees.non_terminated.each do |ce|
+            enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+            enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
+            if enrollment.present?
+              deliver(recipient: ce.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+            end
+          end
+        end
+
         if new_model_event.event_key == :ineligible_initial_application_submitted
           if (plan_year.application_eligibility_warnings.include?(:primary_office_location) || plan_year.application_eligibility_warnings.include?(:fte_count))
             deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_initial_eligibility_denial_notice")
@@ -87,7 +98,6 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_enrollment_confirmation
-          deliver(recipient: plan_year.employer_profile,  event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed" )
           plan_year.employer_profile.census_employees.non_terminated.each do |ce|
             enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
             enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.sort_by(&:updated_at).last
