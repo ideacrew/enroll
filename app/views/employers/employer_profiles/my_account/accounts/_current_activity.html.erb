@@ -4,7 +4,6 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Date</th>
       <th>Description</th>
       <th>Amount</th>
     </tr>
@@ -13,7 +12,6 @@
   <tbody>
     <!-- Payments -->
     <tr>
-      <td><%= @employer_profile_account.current_statement_date %></td>
       <td class="payments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
       <td>Payments since <%= @employer_profile_account.try(:current_statement_date) %> invoice</td>
       <!-- <td><%= (@employer_profile.try(:employer_profile_account).try(:payments)) || "Data not available" %></td> -->
