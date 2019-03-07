@@ -49,7 +49,9 @@ class HbxEnrollment
     "I do not have other coverage"
   ]
 
-  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled coverage_terminated)
+  CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
+
+  CAN_REINSTATE_ENROLLMENTS = %w(coverage_termination_pending coverage_terminated)
 
   ENROLLMENTS_TO_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
 
