@@ -9,10 +9,10 @@ RSpec.describe 'ModelEvents::InitialEmployeeOeEndRemainderNotice', :dbclean => :
   let(:person){ FactoryGirl.create(:person, :with_family)}
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
-  let(:date_mock_object) { double("Date", day: (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
+  let(:date_mock_object) { Date.new(start_on.year, start_on.prev_month.month, (Settings.aca.shop_market.open_enrollment.monthly_end_on - 2))}
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(start_on.year, start_on.prev_month.month, date_mock_object.day))
+    TimeKeeper.set_date_of_record_unprotected!(date_mock_object)
   end
 
   after :all do
