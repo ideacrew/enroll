@@ -184,34 +184,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "get employers" do
-    let(:user) { FactoryGirl.create(:user, :roles => ['broker_agency_staff'], :person => person)}
-    let(:user1) {FactoryGirl.create(:user,:roles=> [], person: broker_role.person)}
-    let(:person) {broker_agency_staff_role.person}
-    let(:person1) {broker_role.person}
-    let(:organization) {FactoryGirl.create(:organization)}
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
-    let(:broker_agency_staff_role) {FactoryGirl.build(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
-    let(:broker_role) { FactoryGirl.create(:broker_role,  broker_agency_profile: broker_agency_profile, aasm_state: 'active')}
-    it "should get organizations for employers where broker_agency_account is active" do
-      allow(person).to receive(:broker_role).and_return(nil)
-      allow(person).to receive(:hbx_staff_role).and_return(nil)
-      sign_in user
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
-      expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
-      expect(assigns(:orgs)).to eq orgs
-    end
-
-    it "should get organizations for employers where writing_agent is active" do
-      sign_in user1
-      xhr :get, :employers, id: broker_agency_profile.id, format: :js
-      expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :writing_agent_id=> broker_role.id }}})
-      expect(assigns(:orgs)).to eq orgs
-    end
-  end
-
   describe "family_index" do
     before :all do
       org = FactoryGirl.create(:organization)
