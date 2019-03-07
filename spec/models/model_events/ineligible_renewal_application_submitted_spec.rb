@@ -106,7 +106,7 @@ describe 'ModelEvents::IneligibleRenewalApplicationSubmitted', dbclean: :around_
           "employee_profile.employer_name",
           "employee_profile.plan_year.warnings",
           "employee_profile.plan_year.renewal_py_end_on",
-          "employee_profile.plan_year.py_plus_60_days",
+          "employee_profile.plan_year.py_end_on_plus_60_days",
           "employee_profile.ivl_oe_start_date",
           "employee_profile.ivl_oe_end_date"
         ]
@@ -148,7 +148,7 @@ describe 'ModelEvents::IneligibleRenewalApplicationSubmitted', dbclean: :around_
       end
 
       it "should return renewal group termination date + 60 days" do
-        expect(merge_model.plan_year.py_plus_60_days).to eq (model_instance.end_on + 60.days).strftime('%m/%d/%Y')
+        expect(merge_model.plan_year.py_end_on_plus_60_days).to eq (model_instance.end_on + 60.days).strftime('%m/%d/%Y')
       end
 
       it "should return IVL OE start date" do
