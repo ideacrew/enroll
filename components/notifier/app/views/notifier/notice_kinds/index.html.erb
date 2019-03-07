@@ -73,6 +73,8 @@
   initializeDataTables();
 
   $(document).ajaxComplete(function() {
-    CKEDITOR.replace('notice_kind_template_raw_body');
+    if ($.isEmptyObject(CKEDITOR.instances)) {
+      CKEDITOR.replace('notice_kind_template_raw_body', {});
+    }
   })
 </script>
