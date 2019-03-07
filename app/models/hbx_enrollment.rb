@@ -1550,6 +1550,25 @@ class HbxEnrollment
     )
   end
 
+  def reterm_enrollment_with_earlier_date(termination_date, edi_required)
+
+    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false if termination_date > self.terminated_on
+
+    if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
+      self.schedule_coverage_termination!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    elsif self.may_terminate_coverage?
+      self.terminated_on = termination_date
+      self.terminate_coverage!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    else
+      false
+    end
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding

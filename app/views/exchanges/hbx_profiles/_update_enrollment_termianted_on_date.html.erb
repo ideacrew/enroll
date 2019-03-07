@@ -1,16 +1,16 @@
 <table class="table table-striped">
-  <%if @result[:success].present?%>
+  <%if @retrem_success.present?%>
       <h4>Enrollment End Date Updated Sucessfully</h4>
   <%else%>
       <h4>Enrollment Failed to Update End Date</h4>
   <%end%>
-  <% hbx = @result[:success].present? ? @result[:success].first : @result[:failure].first%>
+  <% hbx = @retrem_success.present? ? @retrem_success : @retrem_failure%>
   <tr>
     <th>HBX ID</th>
     <th>Plan</th>
     <th>Effective Date</th>
     <th>Terminated Date</th>
-    <% if @result[:success].present?%>
+    <% if @retrem_success.present?%>
         <th>Terminated ?</th>
     <%end%>
   </tr>
@@ -19,7 +19,7 @@
     <td><%= hbx.plan.name %></td>
     <td><%= hbx.effective_on %></td>
     <td><%= hbx.terminated_on %></td>
-    <% if @result[:success].present?%>
+    <% if @retrem_success.present?%>
         <td><i class="fa fa-check" aria-hidden="true"></i></td>
     <%end%>
   </tr>
