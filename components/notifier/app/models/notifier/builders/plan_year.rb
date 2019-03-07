@@ -47,9 +47,15 @@ module Notifier
       end
     end
 
-    def plan_year_py_plus_60_days
+    def plan_year_current_py_plus_60_days
+      if current_plan_year.present?
+        merge_model.plan_year.current_py_plus_60_days = format_date(current_plan_year.end_on + 60.days)
+      end
+    end
+
+    def plan_year_py_end_on_plus_60_days
       if current_or_renewal_py.present?
-        merge_model.plan_year.py_plus_60_days = format_date(current_or_renewal_py.end_on + 60.days)
+        merge_model.plan_year.py_end_on_plus_60_days = format_date(current_or_renewal_py.end_on + 60.days)
       end
     end
 
