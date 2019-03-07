@@ -20,8 +20,7 @@ module BenefitSponsors
         # because gluedb will have already been notified about them and need issuer_ids backfilled
         if (compare_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
           { "$or" => [{:"effective_period.max".gt => compare_date, :aasm_state => :active},
-                    {:"effective_period.min" => compare_date.next_month.beginning_of_month, :aasm_state => :enrollment_eligible}]
-              }
+                      {:"effective_period.min" => compare_date.next_month.beginning_of_month, :aasm_state => :enrollment_eligible}] }
         # if compare_date is before the transmission day then we ened to only need active because gluedb
         # has not yet been notified
         else

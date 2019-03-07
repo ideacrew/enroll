@@ -1,10 +1,10 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-include Config::AcaModelConcern
 
 module BenefitSponsors
   module Exporters
+    include Config::AcaModelConcern
     describe BenefitApplicationIssuers, :dbclean => :after_each do
       describe '##retrive' do
         include_context 'setup benefit market with market catalogs and product packages'
