@@ -61,10 +61,6 @@ module Observers
           trigger_zero_employees_on_roster_notice(plan_year)
         end
 
-        if new_model_event.event_key == :renewal_employer_open_enrollment_completed
-          deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
-        end
-
         if new_model_event.event_key == :initial_employer_open_enrollment_completed
           deliver(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_open_enrollment_completed")
         end
