@@ -9,15 +9,16 @@ module BenefitSponsors
         include_context "setup benefit market with market catalogs and product packages"
         include_context "setup initial benefit application"
 
-        let!(:health_products) { create_list(:benefit_markets_products_health_products_health_product,
-                5,
-                :with_renewal_product, :with_issuer_profile,
-                application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-                product_package_kinds: [:single_issuer, :metal_level, :single_product],
-                assigned_site: site,
-                service_area: service_area,
-                renewal_service_area: renewal_service_area,
-                metal_level_kind: :gold) }
+        let!(:health_products) do
+          create_list(:benefit_markets_products_health_products_health_product,
+                      5, :with_renewal_product, :with_issuer_profile,
+                      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                      product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                      assigned_site: site,
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area,
+                      metal_level_kind: :gold)
+        end
 
         let(:current_effective_date)    { effective_period_start_on }
         let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day - 2.month }
@@ -31,7 +32,8 @@ module BenefitSponsors
         subject { BenefitSponsors::Exporters::BenefitApplicationIssuers.new }
 
         it 'finds active benefit applications' do
-          expect(subject.lines).to include(BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first)
+          csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first
+          expect(subject.lines).to include(csv_export)
         end
       end
     end

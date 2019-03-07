@@ -1,12 +1,14 @@
 module BenefitSponsors
   module Exporters
-    class BenefitApplicationIssuers #Exporter
+    class BenefitApplicationIssuers
       attr_reader :lines
 
       def retrieve(compare_date = TimeKeeper.date_of_record)
-        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {
-          :$elemMatch => {:"effective_period.max".gt => compare_date, :aasm_state => :active }
-        }).each do |benefit_sponsorship|
+        BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
+          :benefit_applications => {
+            :$elemMatch => { :"effective_period.max".gt => compare_date, :aasm_state => :active }
+          }
+        ).each do |benefit_sponsorship|
           benefit_sponsorship.benefit_applications.each do |benefit_application|
             @lines += BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_application)
           end
@@ -20,10 +22,10 @@ module BenefitSponsors
         end
       end
 
-      def initialize(file_name="active_plans_and_issuers.csv")
+      def initialize(file_name = "active_plans_and_issuers.csv")
         @file_name = file_name
         @lines = []
-        self.retrieve
+        retrieve
       end
     end
   end
