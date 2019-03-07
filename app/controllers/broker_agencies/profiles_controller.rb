@@ -5,7 +5,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_broker_agency_staff_role, only: [:new, :create]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
-  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
+  before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
@@ -168,18 +168,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     respond_to do |format|
       format.js {}
     end
-  end
-
-  def employers
-    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
-    else
-      broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id)
-    end
-    @memo = {}
-    @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
   def general_agency_index

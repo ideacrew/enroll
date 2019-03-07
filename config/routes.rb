@@ -351,7 +351,6 @@ Rails.application.routes.draw do
 
       collection do
         get :family_index
-        get :employers
         get :messages
         get :staff_index
         get :agency_messages
