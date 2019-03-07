@@ -108,6 +108,8 @@ Rails.application.routes.draw do
         post :update_fein
         get :edit_force_publish
         post :force_publish
+        get :view_enrollment_to_update_end_date
+        post :update_enrollment_termianted_on_date
         get :identity_verification
         post :identity_verification_datatable
         get :view_terminated_hbx_enrollments
