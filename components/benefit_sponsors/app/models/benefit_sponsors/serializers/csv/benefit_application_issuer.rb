@@ -5,11 +5,11 @@ module BenefitSponsors
       def self.to_csv(benefit_application)
         benefit_application.benefit_packages.inject([]) do |list, benefit_package|
           benefit_package.sponsored_benefits.each do |sponsored_benefit|
-            sponsored_benefit.products(Date.today + 1.month).each do |product|
+            sponsored_benefit.products(benefit_application.start_on).each do |product|
               list.push [benefit_application.benefit_sponsorship.organization.hbx_id,
                          benefit_application.benefit_sponsorship.organization.fein,
-                         benefit_application.effective_period.min.to_date,
-                         benefit_application.effective_period.max.to_date,
+                         benefit_application.effective_period.min.to_date.strftime('%m/%d/%Y'),
+                         benefit_application.effective_period.max.to_date.strftime('%m/%d/%Y'),
                          product.issuer_profile.hbx_id,
                          product.issuer_profile.fein].join(',')
             end

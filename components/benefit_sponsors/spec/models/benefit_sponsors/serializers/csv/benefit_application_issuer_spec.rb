@@ -34,6 +34,11 @@ module BenefitSponsors
         serialization = "#{abc_organization.hbx_id},#{abc_organization.fein},#{effective_period_start_on},#{effective_period_end_on},#{product_package.products.first.issuer_profile.hbx_id},#{product_package.products.first.issuer_profile.fein}"
         expect(subject).to include(serialization)
       end
+
+      it 'serializes the date to ISO 8601' do
+        date_field = subject.first.split(',').third
+        expect(Date.strptime(date_field, '%m/%d/%Y')).to eq(effective_period_start_on)
+      end
     end
   end
 end

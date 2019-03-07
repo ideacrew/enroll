@@ -1,13 +1,14 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+include Config::AcaModelConcern
 
 module BenefitSponsors
   module Exporters
     describe BenefitApplicationIssuers, :dbclean => :after_each do
-      describe "##retrive" do
-        include_context "setup benefit market with market catalogs and product packages"
-        include_context "setup initial benefit application"
+      describe '##retrive' do
+        include_context 'setup benefit market with market catalogs and product packages'
+        include_context 'setup initial benefit application'
 
         let!(:health_products) do
           create_list(:benefit_markets_products_health_products_health_product,
@@ -20,20 +21,61 @@ module BenefitSponsors
                       metal_level_kind: :gold)
         end
 
-        let(:current_effective_date)    { effective_period_start_on }
-        let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day - 2.month }
-        let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
-        let(:effective_period)          { effective_period_start_on..effective_period_end_on }
-
-        let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month.prev_month }
-        let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
-        let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
+        let(:current_effective_date)  { effective_period_start_on }
+        let(:effective_period_end_on) { effective_period_start_on + 1.year - 1.day }
+        let(:effective_period)        { effective_period_start_on..effective_period_end_on }
 
         subject { BenefitSponsors::Exporters::BenefitApplicationIssuers.new }
 
-        it 'finds active benefit applications' do
-          csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first
-          expect(subject.lines).to include(csv_export)
+        context 'of an active employer already transmitted' do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day - 2.month }
+
+          it 'finds the benefit applications' do
+            csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first
+            expect(subject.lines).to include(csv_export)
+          end
+        end
+
+        context 'of an renewing employer already transmitted' do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+          let(:renewal_state)             { :enrollment_eligible }
+
+          before do
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month + 1))
+          end
+
+          it 'finds benefit applications' do
+            csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first
+            expect(subject.lines).to include(csv_export)
+          end
+        end
+
+        context 'of an renewing employer not yet transmitted' do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+          let(:renewal_state)             { :enrollment_eligible }
+
+          before do
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month - 1))
+          end
+
+          it 'finds benefit applications' do
+            csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first).first
+            expect(subject.lines).to include(csv_export)
+          end
+        end
+
+        context 'of an ineligible application' do
+          let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+          let(:renewal_state)             { :enrollment_closed }
+
+          before do
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month + 1))
+          end
+
+          it 'finds benefit applications' do
+            csv_export = BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.effective_date_begin_on(effective_period_start_on).first)
+            expect(subject.lines).to_not include(csv_export)
+          end
         end
       end
     end
