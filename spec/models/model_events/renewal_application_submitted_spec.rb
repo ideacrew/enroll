@@ -2,16 +2,15 @@ require 'rails_helper'
 
 describe 'ModelEvents::RenewalApplicationSubmitted', dbclean: :around_each do
 
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month}
-  let(:oe_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months}
+  let(:oe_start_on) { start_on.prev_month.beginning_of_month }
   let(:oe_end_on) { oe_start_on + 10.days }
-
-  let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:employer_profile)       { FactoryGirl.create(:employer_profile) }
   let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer_profile,
-                                            aasm_state: "renewing_draft",
-                                            start_on: start_on,
-                                            open_enrollment_start_on: oe_start_on ,
-  )}
+    start_on: start_on,
+    open_enrollment_start_on: oe_start_on,
+    open_enrollment_end_on: oe_end_on,
+    aasm_state: 'renewing_draft') }
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
 
   describe "ModelEvent" do
