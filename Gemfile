@@ -96,6 +96,7 @@ gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 group :development do
   gem 'web-console', '2.3.0'
   gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
 end
 
 group :development, :test do
