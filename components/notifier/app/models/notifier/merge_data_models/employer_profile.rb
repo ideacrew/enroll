@@ -59,7 +59,7 @@ module Notifier
     end
 
     def collections
-      %w{addresses offered_products}
+      %w{addresses offered_products plan_year.benefit_groups}
     end
 
     def conditions

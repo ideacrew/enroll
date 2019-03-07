@@ -1071,10 +1071,6 @@ class EmployerProfile
     end
   end
 
-  def generate_checkbook_notices
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
-  end
-
   def trigger_notices(event, options = {})
     begin
       ShopNoticesNotifierJob.perform_later(self.id.to_s, event, options)
