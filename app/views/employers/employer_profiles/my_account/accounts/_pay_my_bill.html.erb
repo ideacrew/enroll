@@ -1,8 +1,6 @@
 <h3 class="darkblue no-buffer">Billing</h3>
 <h4 class="starter">
-  <%= Settings.site.short_name %>
-  will mail you a monthly invoice at the beginning of each month. The invoice will include charges for the next month's premium payments, as well as any adjustments from previous months. You will make one premium payment each month, regardless of
-  whether you offer your employees health coverage from more than one health insurance company or you offer dental coverage to your employees.
+  <%= Settings.site.short_name %> issues one monthly invoice at the beginning of each month. The invoice includes next month’s premium payments, and any adjustments from previous months. The total amount due reflects all premiums due (health and dental if applicable), even when you offer coverage from more than one insurer.
 </h4>
 <h4>Your
   <%= Settings.site.short_name %>
@@ -14,10 +12,10 @@
   <ol>
     <li>
       <% if @wf_url.present? %>
-        <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="FASTEST payment option- up to 2-3 business days processing"></i>
+        <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Fastest payment option - processed in 2-3 business days."></i>
       <% else %>
       <div>
-        <button class="btn btn-default disabled">Pay Online unavailable</button> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="FASTEST payment option- up to 2-3 business days processing"></i>
+        <button class="btn btn-default disabled">Pay Online unavailable</button> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Fastest payment option - processed in 2-3 business days."></i>
 
       </div>
       <% end %>
@@ -30,7 +28,7 @@
         <%=  Settings.contact_center.alt_phone_number %>, select "Small Business Employer" then "Make a Payment"
       </div>
     </li>
-    <li>Pay by Mail <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="SLOWEST payment option- up to 2 weeks processing"></i>
+    <li>Pay by Mail <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Slowest payment option – takes up to 2 weeks to process."></i>
       <div class="row col-md-offset-1">
         <%= Settings.site.short_name %>
       </div>

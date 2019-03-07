@@ -1,15 +1,13 @@
 <div id="payments-table">
-  <h4><strong>Payment History</strong> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="All previous payments are displayed below."></i>
+  <h4><strong>Payment History</strong> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="View all previous payments."></i>
   </h4>
   <% if @wf_url %>
     <p>
-      Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
-      <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, target: :_blank %> to make an online payment now.
+      Online and phone payments will appear 2-3 business days after you submit them. Mailed payments will appear within 2 weeks after you mail them. <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, target: :_blank %> online is the fastest way to pay.
     </p>
   <% else %>
     <p>
-      Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
-      <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> to make an online payment now.
+      Online and phone payments will appear 2-3 business days after you submit them. Mailed payments will appear within 2 weeks after you mail them. <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> online is the fastest way to pay.
     </p>
   <% end %>
 
