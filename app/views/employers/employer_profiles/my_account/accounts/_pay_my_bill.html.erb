@@ -12,7 +12,7 @@
   <ol>
     <li>
       <% if @wf_url.present? %>
-        <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Fastest payment option - processed in 2-3 business days."></i>
+        <span class="btn btn-default" data-target="#payOnlineConfirmation_<%= @employer_profile.id %>" data-toggle="modal">Pay Online</span> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Fastest payment option - processed in 2-3 business days."></i>
       <% else %>
       <div>
         <button class="btn btn-default disabled">Pay Online unavailable</button> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Fastest payment option - processed in 2-3 business days."></i>
@@ -41,6 +41,7 @@
     </li>
   </ol>
 </h4>
+<%= render "employers/employer_profiles/my_account/accounts/pay_online_confirmation_modal" %>
 <h4>**Please include your account number on your check.</h4>
 <h4>Check that your mailing address is up to date - click on
   <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>.
