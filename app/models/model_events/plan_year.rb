@@ -111,6 +111,7 @@ module ModelEvents
       def date_change_event(new_date)
 
         #it goes to all initial employees 2 days before their open enrollment end i.e., 8th of the month
+        # low enrollment notice for initial employers will be triggerd through this event
         if new_date.day == Settings.aca.shop_market.open_enrollment.monthly_end_on - 2
           is_initial_employee_oe_end_reminder_notice = true
         end
@@ -147,10 +148,6 @@ module ModelEvents
         # end
 
         if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
-          is_low_enrollment_notice_for_employer = true
-        end
-
-        if new_date.day == Settings.aca.shop_market.open_enrollment.monthly_end_on - 2
           is_low_enrollment_notice_for_employer = true
         end
 
