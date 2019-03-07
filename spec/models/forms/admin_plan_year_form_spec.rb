@@ -128,9 +128,12 @@ require 'rails_helper'
           expect(admin_plan_year_form.create_plan_year).to be_truthy
         end
 
-        it 'should return false if application has errors' do
-          plan_year.update_attribute(:aasm_state, 'enrolling')
-          expect(admin_plan_year_form.create_plan_year).to be_falsy
+        it 'should return false if applicat2ion has errors' do
+          states = PlanYear::ACTIVE_STATES_PER_DT + PlanYear::RENEWING
+          states.each do |state|
+            plan_year.update_attribute(:aasm_state, state)
+            expect(admin_plan_year_form.create_plan_year).to be_falsey
+          end
         end
       end
     end
