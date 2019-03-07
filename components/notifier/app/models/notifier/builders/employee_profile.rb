@@ -100,6 +100,12 @@ module Notifier
       end
     end
 
+    def enrollment_coverage_kind
+      if enrollment.present?
+        merge_model.enrollment.coverage_kind = enrollment.coverage_kind
+      end
+    end
+
     def enrollment_employee_responsible_amount
       return if enrollment.blank?
       merge_model.enrollment.employee_responsible_amount = number_to_currency(enrollment.total_employee_cost, precision: 2)
@@ -185,7 +191,7 @@ module Notifier
     def dependent_termination_date
       merge_model.dependent_termination_date = format_date(TimeKeeper.date_of_record.end_of_month)
     end
-    
+
     # Using same merge model for special enrollment period and qualifying life event kind.
     def special_enrollment_period
       return @special_enrollment_period if defined? @special_enrollment_period

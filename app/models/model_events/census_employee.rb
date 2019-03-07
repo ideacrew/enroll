@@ -1,8 +1,7 @@
 module ModelEvents
   module CensusEmployee
-
     REGISTERED_EVENTS = [
-      # :employee_notice_for_employee_terminated_from_roster
+      :employee_notice_for_employee_terminated_from_roster
     ]
 
     OTHER_EVENTS = [
@@ -12,9 +11,9 @@ module ModelEvents
     ]
 
     def notify_on_save
-      # if is_transition_matching?(to: [:employment_terminated, :employee_termination_pending], from: [:eligible, :employee_role_linked, :newly_designated_eligible, :newly_designated_linked], event: [:terminate_employee_role, :schedule_employee_termination])
-      #   is_employee_notice_for_employee_terminated_from_roster = true
-      # end
+      if is_transition_matching?(to: [:employment_terminated, :employee_termination_pending], from: [:eligible, :employee_role_linked, :newly_designated_eligible, :newly_designated_linked], event: [:terminate_employee_role, :schedule_employee_termination])
+        is_employee_notice_for_employee_terminated_from_roster = true
+      end
 
       REGISTERED_EVENTS.each do |event|
         if event_fired = instance_eval("is_" + event.to_s)

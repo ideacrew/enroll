@@ -6,7 +6,7 @@ module Notifier
     attribute :current_py_oe_end_date, String
     attribute :current_py_start_date, String
     attribute :current_py_end_date, String
-    attribute :current_py_plus_60_days, String
+    attribute :py_plus_60_days, String
 
     attribute :renewal_py_oe_start_date, String
     attribute :renewal_py_oe_end_date, String

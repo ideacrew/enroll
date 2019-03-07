@@ -10,8 +10,8 @@ module ModelEvents
       :ineligible_renewal_application_submitted,
       # :renewal_enrollment_confirmation,
       # :ineligible_initial_application_submitted,
-      # :ineligible_renewal_application_submitted,
       :initial_employer_open_enrollment_completed,
+      :ineligible_renewal_application_submitted,
       # # :open_enrollment_began, #not being used
       :application_denied,
       :group_termination_confirmation_notice,
@@ -50,6 +50,10 @@ module ModelEvents
 
         if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
           is_renewal_employer_open_enrollment_completed = true
+        end
+
+        if is_transition_matching?(to: :renewing_publish_pending, from: :renewing_draft, event: :force_publish)
+          is_ineligible_renewal_application_submitted = true
         end
 
         if is_transition_matching?(to: [:published, :enrolling], from: :draft, event: :publish)
