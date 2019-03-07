@@ -25,6 +25,8 @@ module ModelEvents
         :renewal_employer_second_reminder_to_publish_plan_year,
         :renewal_employer_third_reminder_to_publish_plan_year,
         :initial_employer_no_binder_payment_received,
+        :initial_employee_oe_end_reminder_notice,
+        :renewal_employee_oe_end_reminder_notice,
         # :renewal_employer_open_enrollment_completed,
         # :renewal_employer_open_enrollment_completed
         # :renewal_employer_publish_plan_year_reminder_after_soft_dead_line,
@@ -126,6 +128,21 @@ module ModelEvents
         if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1
           is_renewal_employer_second_reminder_to_publish_plan_year = true
         end
+
+        #it goes to all initial employees 2 days before their open enrollment end i.e., 8th of the month
+        if new_date.day == Settings.aca.shop_market.open_enrollment.monthly_end_on - 2
+          is_initial_employee_oe_end_reminder_notice = true
+        end
+
+        #it goes to all renewal employees 2 days before their open enrollment end i.e., 8th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 2
+          is_renewal_employee_oe_end_reminder_notice = true
+        end
+
+        # # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
+        # if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1
+        #   is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
+        # end
 
         # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 3th of the month
         if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2

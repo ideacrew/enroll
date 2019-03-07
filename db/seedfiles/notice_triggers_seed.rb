@@ -340,48 +340,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP13',
-    title: 'Open Enrollment Reminder',
-    description: 'This notices goes to all the employees in the open enrollment period',
-    resource_name: 'employee_role',
-    event_name: 'employee_open_enrollment_reminder',
-    notice_triggers: [
-      {
-        name: 'Employee Open Enrollment Reminder Notice',
-        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
-        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-        mpi_indicator: 'MPI_SHOP13',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'DAE053',
-    title: 'Eligible to Apply for Employer-sponsored Health Insurance',
-    description: 'This notices goes to all the employees who have successfully matched their employer.',
-    resource_name: 'employee_role',
-    event_name: 'employee_eligibility_notice',
-    notice_triggers: [
-      {
-        name: 'Employee Eligibility Notice',
-        notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
-        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
-        mpi_indicator: 'SHOP_D053',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
@@ -721,20 +679,20 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP35',
-    title: 'Special Enrollment Period Denial',
-    description: 'EE SEP Requested by Employee outside of allowable time frame',
-    resource_name: 'employee_role',
-    event_name: 'sep_request_denial_notice',
+    hbx_id: 'SHOP51',
+    title: 'You have been removed as a broker',
+    description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
+    resource_name: 'broker_role',
+    event_name: 'broker_fired_confirmation_to_broker',
     notice_triggers: [
       {
-        name: 'Denial of SEP Requested by EE outside of allowable time frame',
-        notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
-        notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'SHOP_D035',
-                notice_trigger_element_group: {
+        name: 'Broker Fired',
+        notice_template: 'notices/shop_broker_notices/broker_fired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
+        mpi_indicator: 'SHOP_D051',
+        notice_trigger_element_group: {
           market_places: ['shop'],
-          primary_recipients: ["employee"],
+          primary_recipients: ["broker"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -805,27 +763,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP_D001',
-    title: 'Welcome to DC Health Link',
-    description: 'ER creates an account in DC Health',
-    resource_name: 'employer',
-    event_name: 'employer_account_creation_notice',
-    notice_triggers: [
-      {
-        name: 'Welcome Notice sent to Employer',
-        notice_template: 'notices/shop_employer_notices/employer_account_creation_notice',
-        notice_builder: 'ShopEmployerNotices::EmployerAccountCreationNotice',
-        mpi_indicator: 'SHOP_D001',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP10066',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
@@ -867,29 +804,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
-  {
-    hbx_id: 'SHOP_D034',
-    title: 'Special Enrollment Period Approval',
-    description: 'SEP request by Employee accepted when an eligiblity determination is reached',
-    resource_name: 'employee_role',
-    event_name: 'ee_sep_request_accepted_notice',
-    notice_triggers: [
-      {
-        name: 'EE SEP Requested Accepted',
-        notice_template: 'notices/shop_employee_notices/ee_sep_request_accepted_notice',
-        notice_builder: 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
-        mpi_indicator: 'SHOP_D034',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  
   {
     hbx_id: 'SHOP_DAG043',
     title: 'Confirmation of Termination of Employer-Sponsored Health Coverage',
@@ -1034,27 +948,6 @@ shop_notice_triggers = [
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
-      }
-    ]
-  },
-  {
-    hbx_id: 'DIE075',
-    title: 'Employee Enrollment Confirmation',
-    description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
-    resource_name: 'employee_role',
-    event_name: 'initial_employee_plan_selection_confirmation',
-    notice_triggers: [
-      {
-          name: 'Notice to employee after they select a plan Annual Open Enrollment',
-          notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
-          notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
-          mpi_indicator: 'SHOP_D075',
-          notice_trigger_element_group: {
-              market_places: ['shop'],
-              primary_recipients: ["employee"],
-              primary_recipient_delivery_method: ["secure_message"],
-              secondary_recipients: []
-          }
       }
     ]
   },
