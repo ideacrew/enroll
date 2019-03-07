@@ -6,10 +6,12 @@ require File.join(Rails.root, "app", "data_migrations", "change_census_employee_
 # RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="change_ssn" encrypted_ssn="ZCVGGZG+_DUD+==JKLS" new_encrypted_ssn="CVGGZG+_DUD+==JKLSHH"
 
 # To delink employee role
-# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="delink_employee_role" encrypted_ssn="ZCVGGZG+_DUD+==JKLS"
+# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="delink_employee_role" encrypted_ssn="QEVuQwIAgEiv5WEl217EsGIZBqdaLg=="
+# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="delink_employee_role" census_employee_id="5bd09f7f43d4ad0416000001"
 
 # To link or construct employee role
 # RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="link_or_construct_employee_role" employer_fein=123456789 ssn="000111001"
+# RAILS_ENV=production bundle exec rake migrations:change_census_employee_details action="link_or_construct_employee_role" census_employee_id="5bd09f7f43d4ad0416000001"
 
 namespace :migrations do
   desc "changing attributes on census_employee"

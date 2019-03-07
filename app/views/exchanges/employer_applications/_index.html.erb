@@ -1,0 +1,101 @@
+<style>
+/*  .custom_filter{
+    margin-left: 15em;
+    margin-top: -15px;
+    position: absolute;
+    z-index: 999;
+  }
+  #upload{
+    position: absolute;
+    margin-left: 75em;
+  }
+
+  .attestation_form{
+    text-align: left !important;
+  }*/
+</style>
+
+
+<div class="container" id="attestation_documents_table">
+  <div class = "table-responsive table-override"> 
+  <h4> Applications </h4>
+  <% plan_years = @employer_profile.plan_years.where(:is_conversion => false) %>
+  <% if plan_years.present? %>
+    <table class="table">
+      <thead>
+        <tr>
+         <th></th>
+         <th>Start Date</th>
+         <th>End Date</th>
+         <th>Open Enrollment Start</th>
+         <th>Open Enrollment end</th>
+         <th>Created On</th>
+         <th>Terminated On</th>
+         <th>Status</th>
+         <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% plan_years.order('start_on DESC').each do |application| %>
+          <tr>
+            <td class="py-status"><%= radio_button_tag 'plan_year_radio', application.id, false, status: application.aasm_state  %></td>
+            <td><%= TimeKeeper.format_date(application.start_on) %></td>
+            <td><%= TimeKeeper.format_date(application.end_on) %></td>
+            <td><%= TimeKeeper.format_date(application.open_enrollment_start_on) %></td>
+            <td><%= TimeKeeper.format_date(application.open_enrollment_end_on) %></td>
+            <td><%= TimeKeeper.format_date_time(application.created_at) %></td>
+            <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
+            <td><%= application.aasm_state.humanize %></td>
+            <td colspan="1">
+              <div class="btn-group" id="plan-year-btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle disabled py-btn-grp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Actions <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="padding:10px">
+                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @employer_profile.id %>', '0', '<%= application.start_on.to_s %>')" class="cancel-py">CANCEL</li>
+                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @employer_profile.id %>', '0', '<%= application.start_on.to_s %>')" class="terminate-py">TERMINATE</li>
+                    <!-- <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @employer_profile.id %>', '<%= application.terminated_on %>', '')" class="reinstate-py">REINSTATE</li> -->
+                </ul>
+              </div>
+              
+            </td>
+          </tr>
+          <tr id="<%= application.id %>" class="plan-year-actions hidden">
+            <td colspan="2">
+              <div class="term_action_radios hidden">
+                <%= radio_button_tag 'term_actions', 'voluntary', true  %> VOLUNTARY TERMINATION <br />
+                <%= radio_button_tag 'term_actions', 'nonpayment'  %> NON-PAY TERMINATION
+              </div>
+            </td>
+            <td colspan="2">
+              <input type="text" class="form-control date py-end-date" style="width:120px" id="date_picker_<%= application.id %>" onchange="validateFormat(this,'<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
+            </td>
+            <td colspan="2">
+              <%= check_box_tag 'trasmit_to_carrier', 'trasmit_to_carrier', true, disabled: true  %> TRANSMIT TO CARRIER
+            </td>
+            <td colspan="1">
+              <button class="btn btn-primary btn-sm plan-year-submit disabled" onclick="submitPlanActions()">Submit</button>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <h2>No valid plan years present for <%= @employer_profile.legal_name.titleize %></h2>
+  <% end %>
+</div>
+
+<div class="attestation_form"></div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  function printDoc(id){
+    var window_obj=window.open();
+    window_obj.document.write($('#print_'+id).html());
+    window_obj.print();
+    window_obj.close();
+  }
+</script>

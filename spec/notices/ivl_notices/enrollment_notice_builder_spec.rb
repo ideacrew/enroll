@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent")}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual", is_any_enrollment_member_outstanding: true)}
   let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
@@ -23,11 +23,11 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let (:citizenship_type) { FactoryGirl.build(:verification_type, type_name: 'Citizenship')}
   let (:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number')}
 
+  before do
+    allow(person.consumer_role).to receive_message_chain("person").and_return(person)
+  end
 
   describe "New" do
-    before do
-      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
-    end
     context "valid params" do
       it "should initialze" do
         expect{IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)}.not_to raise_error
@@ -219,4 +219,27 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
   end
 
+  describe "for recipient, recipient_document_store", dbclean: :after_each do
+    let!(:person100)          { FactoryGirl.create(:person, :with_consumer_role, :with_work_email) }
+    let!(:dep_family1)        { FactoryGirl.create(:family, :with_primary_family_member, person: FactoryGirl.create(:person, :with_consumer_role, :with_work_email)) }
+    let!(:dep_family_member)  { FactoryGirl.create(:family_member, family: dep_family1, person: person100) }
+    let!(:family100)          { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+    let(:dep_fam_primary)     { dep_family1.primary_applicant.person }
+
+    before :each do
+      @notice = IvlNotices::EnrollmentNoticeBuilder.new(person100.consumer_role, valid_params)
+    end
+
+    it "should have person100 as the recipient for the enrollment notice as this person is the primary" do
+      expect(@notice.recipient).to eq person100
+      expect(@notice.recipient_document_store).to eq person100
+      expect(@notice.to).to eq person100.work_email_or_best
+    end
+
+    it "should not pick the dep_family1's primary person" do
+      expect(@notice.recipient).not_to eq dep_fam_primary
+      expect(@notice.recipient_document_store).not_to eq dep_fam_primary
+      expect(@notice.to).not_to eq dep_fam_primary.work_email_or_best
+    end
+  end
 end

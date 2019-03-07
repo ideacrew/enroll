@@ -51,6 +51,7 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  has_many :payment_transactions
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -86,6 +87,20 @@ class Family
          "households.hbx_enrollments.terminated_on" => 1
          },
          {name: "kind_and_state_and_created_and_terminated"})
+
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1})
+  index({"households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.terminated_on" => 1
+       },
+       {name: "is_any_enrollment_member_outstanding_and_aasm_state_and_terminated_on"})
+
+  index({"households.hbx_enrollments.kind" => 1,
+       "households.hbx_enrollments.aasm_state" => 1,
+       "households.hbx_enrollments.is_any_enrollment_member_outstanding" => 1,
+       "households.hbx_enrollments.effective_on" => 1
+       },
+       {name: "kind_and_aasm_state_and_is_any_enrollment_member_outstanding_and_effective_on"})
 
   index({"households.hbx_enrollments._id" => 1})
   index({"households.hbx_enrollments.kind" => 1,
@@ -181,6 +196,7 @@ class Family
   scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :all_enrolled_and_enrolling_enrollments,->{  where(:"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES))}
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
@@ -192,15 +208,12 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
-  scope :having_unverified_enrollment,          ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
-  scope :with_all_verifications,                ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "ready"}})}
-  scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
-  scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
-  scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :having_unverified_enrollment,          ->{ by_enrollment_individual_market.all_enrollments.where(:"households.hbx_enrollments.is_any_enrollment_member_outstanding" => true)}
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
-  scope :outstanding_verification,              ->{ by_enrollment_individual_market.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:aasm_state => "enrolled_contingent", :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+  scope :outstanding_verification,              ->{ by_enrollment_individual_market.all_enrollments.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true, :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+  scope :outstanding_verification_datatable,    ->{ by_enrollment_individual_market.all_enrolled_and_enrolling_enrollments.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true}})}
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -261,6 +274,10 @@ class Family
   # @return [ FamilyMember ] the designated head of this family
   def primary_applicant
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
+  end
+
+  def primary_person
+    primary_applicant.person if primary_applicant
   end
 
   def primary_family_member=(new_primary_family_member)
@@ -752,15 +769,23 @@ class Family
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending', 'enrolled_contingent', 'unverified']
       }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
-      families.each do |family|
+      @logger = Logger.new("#{Rails.root}/log/expire_individual_market_enrollments_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") if families.present?
+      @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}" if @logger
+      families.no_timeout.each do |family|
         begin
+          @logger.info "--------------- Processing family_id: #{family.id} ---------------"
           family.active_household.hbx_enrollments.where(query).each do |enrollment|
-            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+            if enrollment.may_expire_coverage?
+              enrollment.expire_coverage!
+              @logger.info "Processed enrollment: #{enrollment.hbx_id}"
+            end
           end
         rescue Exception => e
-          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+          Rails.logger.error "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
+          @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         end
       end
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}" if @logger
     end
 
     def begin_coverage_for_ivl_enrollments
@@ -771,12 +796,23 @@ class Family
           :aasm_state => 'auto_renewing'
         }
       families = Family.where("households.hbx_enrollments" => {:$elemMatch => query})
-
-      families.each do |family|
-        family.active_household.hbx_enrollments.where(query).each do |enrollment|
-          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+      @logger = Logger.new("#{Rails.root}/log/begin_coverage_for_ivl_enrollments_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") if families.present?
+      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}" if @logger
+      families.no_timeout.each do |family|
+        begin
+          @logger.info "--------------- Processing family_id: #{family.id} ---------------"
+          family.active_household.hbx_enrollments.where(query).each do |enrollment|
+            if enrollment.may_begin_coverage?
+              enrollment.begin_coverage!
+              @logger.info "Processed enrollment: #{enrollment.hbx_id}"
+            end
+          end
+        rescue Exception => e
+          Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+          @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
         end
       end
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}" if @logger
     end
 
     # Manage: SEPs, FamilyMemberAgeOff
@@ -1042,6 +1078,10 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
+  def has_curam_or_mobile_application_type?
+    ['Curam', 'Mobile'].include? application_type
+  end
+  
   def self.min_verification_due_date_range(start_date,end_date)
     timekeeper_date = TimeKeeper.date_of_record + 95.days
     if timekeeper_date >= start_date.to_date && timekeeper_date <= end_date.to_date
@@ -1082,6 +1122,26 @@ class Family
   def has_valid_e_case_id?
     return false if !e_case_id
     e_case_id.split('#').last.scan(/\D/).empty?
+  end
+  def set_due_date_on_verification_types(date=nil)
+    family_members.each do |family_member|
+      begin
+        person = family_member.person
+        person.consumer_role.verification_types.each do |v_type|
+          next if !(v_type.type_unverified?)
+          v_type.update_attributes(due_date: date.present? ? date : (TimeKeeper.date_of_record + 95.days),
+                                   updated_by: nil,
+                                   due_date_type:  "notice" )
+          person.save!
+        end
+      rescue Exception => e
+        puts "Exception in family ID #{family.id}: #{e}" unless Rails.env.test?
+      end
+    end
+  end
+
+  def has_primary_active_employee?
+    primary_applicant.person.has_active_employee_role?
   end
 
 private

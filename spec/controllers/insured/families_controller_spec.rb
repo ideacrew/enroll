@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryGirl.create(:user, person: person) }
-    let(:person) { FactoryGirl.create(:person) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, person: person) }
 
@@ -35,7 +35,7 @@ RSpec.describe Insured::FamiliesController do
   end
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
@@ -103,6 +103,8 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(user).to receive(:identity_verified?).and_return(false)
+        allow(consumer_role).to receive(:identity_verified?).and_return(false)
+        allow(consumer_role).to receive(:application_verified?).and_return(false)
         allow(person).to receive(:has_active_employee_role?).and_return(false)
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([])
@@ -246,6 +248,8 @@ RSpec.describe Insured::FamiliesController do
         before do
           allow(user).to receive(:idp_verified?).and_return false
           allow(user).to receive(:identity_verified?).and_return false
+          allow(consumer_role).to receive(:identity_verified?).and_return false
+          allow(consumer_role).to receive(:application_verified?).and_return false
           allow(user).to receive(:last_portal_visited).and_return ''
           allow(person).to receive(:user).and_return(user)
           allow(person).to receive(:has_active_employee_role?).and_return(false)
@@ -636,6 +640,8 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:user).and_return(user)
         allow(person).to receive(:has_active_employee_role?).and_return(true)
+        allow(person).to receive(:has_multiple_active_employers?).and_return(false)
+        allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
         @qle = FactoryGirl.create(:qualifying_life_event_kind)
         @family = FactoryGirl.build(:family, :with_primary_family_member)
@@ -736,7 +742,7 @@ RSpec.describe Insured::FamiliesController do
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         family.broker_agency_accounts = [
-          FactoryGirl.build(:broker_agency_account, family: family)
+            FactoryGirl.build(:broker_agency_account, family: family)
         ]
         allow(Family).to receive(:find).and_return family
         delete :delete_consumer_broker , :id => family.id
@@ -920,7 +926,7 @@ RSpec.describe Insured::FamiliesController do
     end
 
     context "should transition resident to consumer" do
-      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role)}
+      let(:resident_person) {FactoryGirl.create(:person, :with_resident_role, :with_consumer_role)}
       let(:resident_family) { FactoryGirl.create(:family, :with_primary_family_member, person: resident_person) }
       let(:user){ FactoryGirl.create(:user, person: resident_person) }
       let!(:individual_market_transition) { FactoryGirl.create(:individual_market_transition, :resident, person: resident_person) }
@@ -966,7 +972,7 @@ RSpec.describe Insured::FamiliesController do
 
 end
 
-RSpec.describe Insured::FamiliesController do
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET purchase" do
     let(:hbx_enrollment) { HbxEnrollment.new }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }

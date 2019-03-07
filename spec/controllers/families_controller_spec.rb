@@ -12,6 +12,7 @@ RSpec.describe FamiliesController do
     let!(:family_member2) {FactoryGirl.create(:family_member, family: person.primary_family, person: person2) }
 
     let(:params) { {family:  person.primary_family.id.to_s } }
+    let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
 
     it "return when @person is nil" do
       sign_in(user_with_out_person)
@@ -35,6 +36,10 @@ RSpec.describe FamiliesController do
       sign_in(user)
       subject.instance_eval{set_family}
       expect(person2.families.first).to eq(Family.find(params[:family]))
+    end
+
+    it "qle market kind should be shop" do
+      expect(qle.market_kind).to eq "shop"
     end
 
   end

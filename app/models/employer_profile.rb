@@ -32,6 +32,10 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+  field :no_ssn, type: Boolean, default: false
+  field :enable_ssn_date, type: DateTime
+  field :disable_ssn_date, type: DateTime
+
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
@@ -168,6 +172,10 @@ class EmployerProfile
     @broker_agency_profile = active_broker_agency_account.broker_agency_profile if active_broker_agency_account.present?
   end
 
+  # def is_ssn_disabled?
+  #   no_ssn
+  # end
+
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
     @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
@@ -288,7 +296,7 @@ class EmployerProfile
   end
 
   def dt_display_plan_year
-    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
+    plan_years.where(:aasm_state.nin => ['canceled','renewing_canceled']).order_by(:"start_on".desc).first || latest_plan_year
   end
 
   def plan_year_drafts
@@ -304,7 +312,7 @@ class EmployerProfile
   end
 
   def find_plan_year_by_effective_date(target_date)
-    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(:aasm_state.in => ["expired", "termination_pending"])).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
@@ -634,8 +642,28 @@ class EmployerProfile
       })
     end
 
+    def terminate_scheduled_plan_years
+
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
+      organizations.each do |org|
+        begin
+          plan_years = org.employer_profile.plan_years.where(:aasm_state => "termination_pending", :end_on.lt => TimeKeeper.date_of_record)
+          plan_years.each do |py|
+            py.terminate!(py.end_on)
+            org.employer_profile.revert_application! if py.terminated? && org.employer_profile.may_revert_application?
+          end
+        rescue Exception => e
+          Rails.logger.error { "Unable to terminate plan year for #{org.legal_name} due to #{e.inspect}" }
+        end
+      end
+    end
+
     def advance_day(new_date)
       if !Rails.env.test?
+
+        # Terminates scheduled plan years
+        EmployerProfile.terminate_scheduled_plan_years
+
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         organizations_eligible_for_renewal(new_date).each do |organization|
           begin
@@ -799,7 +827,7 @@ class EmployerProfile
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
             if !org.employer_profile.binder_paid?
-              notice_to_ee_that_er_plan_year_will_not_be_written(org)
+              notice_for_missing_binder_payment(org)
             end
           end
         end
@@ -891,7 +919,7 @@ class EmployerProfile
   end
 
   def default_benefit_group
-    plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
+    plan_year_with_default = plan_years.where("benefit_groups.default" => true).order_by([:start_on]).last
     return unless plan_year_with_default
     plan_year_with_default.benefit_groups.detect{|bg| bg.default }
   end
@@ -1030,6 +1058,33 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+        self.initial_employee_plan_selection_confirmation(org)
+      end
+    end
+  end
+
+  def self.initial_employee_plan_selection_confirmation(org)
+    begin
+      if org.employer_profile.is_new_employer?
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == org.employer_profile.plan_years.where(:aasm_state.in => ["enrolled", "enrolling"]).first.start_on
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation", "acapi_trigger" => true )
+          end
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation to employees of #{org.legal_name} due to #{e.backtrace}"}
+    end
+  end
+
+  def self.notice_for_missing_binder_payment(org)
+    org.employer_profile.trigger_notices("initial_employer_no_binder_payment_received", "acapi_trigger" => true)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
       end
     end
   end
@@ -1145,16 +1200,6 @@ private
     )
   end
    
-  def self.notice_to_ee_that_er_plan_year_will_not_be_written(org)
-    org.employer_profile.census_employees.active.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_ee_that_er_plan_year_will_not_be_written", "acapi_trigger" =>  true )
-      rescue Exception => e
-        (Rails.logger.error {"Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
-      end
-    end
-  end
-
   # TODO - fix premium amount
   def initialize_account
     if employer_profile_account.blank?

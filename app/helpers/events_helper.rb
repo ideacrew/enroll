@@ -70,8 +70,8 @@ module EventsHelper
                         end
   end
 
-  def employer_plan_years(employer)
-    employer.plan_years.select(&:eligible_for_export?)
+  def employer_plan_years(employer, plan_year_id)
+    employer.plan_years.select{|py| (py.eligible_for_export? || py.id.to_s == plan_year_id) }
   end
 
   def is_initial_or_conversion_employer?(employer)

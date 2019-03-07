@@ -77,4 +77,39 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       end
     end
   end
+
+  describe "UnassistedPlanCostDecorator" do
+    let!(:family10) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent) }
+    let!(:hbx_enrollment10) { FactoryGirl.create(:hbx_enrollment, household: family10.active_household, aasm_state: "shopping") }
+    let!(:hbx_enrollment_member1) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
+    let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
+    let!(:plan) { FactoryGirl.create(:plan) }
+    let!(:tax_household10) { FactoryGirl.create(:tax_household, household: family10.active_household) }
+    let!(:eligibility_determination) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household10) }
+    let!(:tax_household_member1) { tax_household10.tax_household_members.create(applicant_id: family10.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
+    let!(:tax_household_member2) { tax_household10.tax_household_members.create(applicant_id: family10.family_members[1].id, is_ia_eligible: true ) }
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01") }
+
+    before do
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+    end
+
+    context "for aptc_amount" do
+      let(:unassisted_plan_cost_decorator1) { UnassistedPlanCostDecorator.new(plan, hbx_enrollment10, 100.00, tax_household10) }
+      let(:unassisted_plan_cost_decorator2) { UnassistedPlanCostDecorator.new(plan, hbx_enrollment10) }
+
+      before :each do
+        allow(unassisted_plan_cost_decorator1).to receive(:premium_for).and_return(200.00)
+      end
+
+      it "should return some valid amount when valid information is given" do
+        expect(unassisted_plan_cost_decorator1.aptc_amount(hbx_enrollment_member1)).to eq 50.00
+      end
+
+      it "should return 0.00 when invalid information is given" do
+        expect(unassisted_plan_cost_decorator2.aptc_amount(hbx_enrollment_member1)).to eq 0.00
+      end
+    end
+  end
 end

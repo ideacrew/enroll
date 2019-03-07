@@ -6,8 +6,8 @@
 
 namespace :import do
   task :common_data_from_master_xml => :environment do
-    NATIONWIDE_NETWORK = ["Nationwide In-Network"]
-    DC_IN_NETWORK = ["DC Metro In-Network"]
+    NATIONWIDE_NETWORK = ["Nationwide In-Network", "Nationwide"]
+    DC_IN_NETWORK = ["DC Metro In-Network", "DC Metro", "DC-Metro", "DC, MD (not available in VA)"]
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
     files.each do |file|
       year = file.split("/")[-2].to_i
@@ -37,7 +37,7 @@ namespace :import do
                 rx_formulary_url = row_info[@headers["rx formulary url"]]
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
                 if sheet_name == "IVL" && year > 2017
-                  plan.is_standard_plan = row_info[@headers["standard plan?"]]
+                  plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
                 end
               end
               plan.save

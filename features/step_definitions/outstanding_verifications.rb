@@ -1,14 +1,17 @@
 Given(/^oustanding verfications users exists$/) do
-  person = FactoryGirl.create(:person, :with_consumer_role)
+  person = FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)
   @person_name = person.full_name
+  person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
   family = FactoryGirl.create(:family, :with_primary_family_member, person: person)
-  enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent", kind: "individual", effective_on: TimeKeeper.date_of_record.beginning_of_year)
-  families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+  enrollment = FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "coverage_selected", kind: "individual", effective_on: TimeKeeper.date_of_record.beginning_of_year)
+  enrollment_member = FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment)
+  enrollment.save!
+  families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.is_any_enrollment_member_outstanding' => true)
 end
 
 When(/^Admin clicks Outstanding Verifications$/) do
   page.find('.families.dropdown-toggle.interaction-click-control-families').click
-  page.find('.interaction-click-control-outstanding-verifications').click
+  page.find('.interaction-click-control-outstanding-verifications').trigger('click')
 end
 
 When(/^Admin clicks Families tab$/) do

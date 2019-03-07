@@ -7,24 +7,55 @@
             <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
           <% end %>
         </li>
-
-  <li class="brokers-dropdown dropdown">
-        <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
-            <ul class="dropdown-menu">
+        <li class="brokers-dropdown dropdown">
+          <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
+          <ul class="dropdown-menu">
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                            tab_name: 'families',
-                                                                            link_path: family_index_dt_exchanges_hbx_profiles_path,
-                                                                            display_name: 'Families',
-                                                                            active_tab: active_tab
-                                                                          } %>
+              tab_name: 'families',
+              link_path: family_index_dt_exchanges_hbx_profiles_path,
+              display_name: 'Families',
+              active_tab: active_tab,
+              remote: true,
+              pundit_object: nil,
+              pundit_method: nil
+            } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+              tab_name: 'outstanding-verifications',
+              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
+              display_name: 'Outstanding Verifications',
+              active_tab: active_tab,
+              remote: true,
+              pundit_object: HbxProfile,
+              pundit_method: :can_access_outstanding_verification_sub_tab?
+            } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+              tab_name: 'new-consumer-application',
+              link_path: begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone'),
+              display_name: 'New Consumer Application',
+              active_tab: active_tab,
+              remote: false,
+              pundit_object: ConsumerRole,
+              pundit_method: :can_access_new_consumer_application_sub_tab?
+            } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+              tab_name: 'identity_verification',
+              link_path: identity_verification_exchanges_hbx_profiles_path,
+              display_name: 'Identity Verification',
+              active_tab: active_tab,
+              remote: true,
+              pundit_object: HbxProfile,
+              pundit_method: :can_access_identity_verification_sub_tab?
+            } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                              tab_name: 'outstanding-verifications',
-                                                                              link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
-                                                                              display_name: 'Outstanding Verifications',
-                                                                              active_tab: active_tab
-                                                                            } %>
-             
-            </ul>
+                tab_name: 'dc-resident-application',
+                link_path: begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'),
+                display_name: 'DC Resident Application',
+                active_tab: active_tab,
+                remote: false,
+                pundit_object: ResidentRole,
+                pundit_method: :begin_resident_enrollment?
+              } %>
+          </ul>
         </li>
 
 
@@ -41,6 +72,14 @@
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
+
+	        <li role="presentation"<%= menu_tab_class(active_tab, "user-accounts") %> class="<%=pundit_class HbxProfile, :can_access_user_account_tab?%>">
+	          <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "user-accounts", "role" => "tab" ) do  %>
+	              <span class="hidden-xs">User Accounts</span>
+	              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Account"></span>
+	          <% end %>
+	        </li>
+
         <li role="presentation"<%= menu_tab_class(active_tab, "broker-agencies-tab") %>>
          <%= link_to(broker_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "broker_agencies", "role" => "tab" ) do  %>
             <span class="hidden-xs">Broker Agencies</span>

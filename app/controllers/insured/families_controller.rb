@@ -15,6 +15,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
+    set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
@@ -41,6 +42,7 @@ class Insured::FamiliesController < FamiliesController
 
   def manage_family
     set_bookmark_url
+    set_admin_bookmark_url
     @family_members = @family.active_family_members
     @resident = @person.is_resident_role_active?
     # @employee_role = @person.employee_roles.first
@@ -87,6 +89,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.market_kind = qle.market_kind == "shop" ? "shop" : "ivl"
       special_enrollment_period.save
     end
 
@@ -150,7 +153,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+    if ((@qle.present? && @qle.shop?) && !@qualified_date && !@person.has_multiple_active_employers? )
       sep_request_denial_notice
     elsif is_ee_sep_request_accepted?
       ee_sep_request_accepted_notice
@@ -243,7 +246,7 @@ class Insured::FamiliesController < FamiliesController
 
   def sep_request_denial_notice
     begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice",qle_reported_date: "#{@qle_date}", qle_title: @qle.title)
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.id}")
     end
@@ -389,10 +392,17 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    return false if current_user.has_hbx_staff_role?
+    consumer = @person.consumer_role
+    not_verified = ((@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified?) ? false : true
+    @person.user && not_verified
   end
 
   def update_changing_hbxs(hbxs)

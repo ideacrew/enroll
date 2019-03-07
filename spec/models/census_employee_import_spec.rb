@@ -184,4 +184,33 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       it_behaves_like "is_business_owner", "false", false
     end
   end
+
+  context "#assign_census_employee_attributes with no-ssn" do
+    let(:member) { CensusEmployee.new}
+    let(:record) {
+      {
+        employer_assigned_family_id: nil,
+        first_name: "Mike",
+        last_name: "Scofield",
+        ssn: nil,
+        dob: TimeKeeper.date_of_record - 30.years,
+        hire_date: TimeKeeper.date_of_record - 1.year,
+        is_business_owner: "no",
+        gender: "male",
+        employee_relationship: "Employee",
+        email: nil
+      }
+    }
+
+    context "it should assign the census employee attributes on the object" do
+
+      before do
+        @result = subject.assign_census_employee_attributes(member, record)
+      end
+
+      it "should return census employee" do
+        expect(@result.class).to eq CensusEmployee
+      end
+    end
+  end
 end

@@ -165,6 +165,8 @@ module Insured::FamiliesHelper
   def display_aasm_state?(enrollment)
     if enrollment.is_shop?
       true
+    elsif enrollment.is_ivl_actively_outstanding?
+      false
     else
       ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'renewing_coverage_selected', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
     end
@@ -185,7 +187,11 @@ module Insured::FamiliesHelper
         hbx_enrollment.benefit_group_assignment.benefit_group.end_on
       else
         benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.by_date(hbx_enrollment.effective_on).first
-        benefit_coverage_period.end_on
+        if benefit_coverage_period
+          benefit_coverage_period.end_on
+        else
+          hbx_enrollment.effective_on.end_of_year
+        end
       end
     end
   end

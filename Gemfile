@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'aasm', '~> 4.8.0'
-gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.0.0'
+gem 'acapi', git: 'https://github.com/dchbx/acapi.git', branch: '1.3.1'
 gem 'addressable', '2.3.8'
 gem 'animate-rails', '~> 1.0.7'
 gem 'aws-sdk', '2.2.4'
@@ -82,11 +82,13 @@ group :doc do
 end
 
 group :development do
-  gem 'parallel_tests'
   gem 'web-console', '2.3.0'
+  gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
 end
 
 group :development, :test do
+  gem 'parallel_tests', "2.21.3"
   gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
@@ -101,7 +103,7 @@ group :development, :test do
   gem 'railroady', '~> 1.5.2'
   gem 'rspec-rails', '~> 3.4.2'
   gem 'rspec_junit_formatter', '0.2.3'
-  gem 'ruby-progressbar', '1.6.0'
+  gem 'ruby-progressbar', '~> 1.7'
   gem 'spring', '1.6.3'
   gem 'yard', '~> 0.9.5'
   gem 'yard-mongoid', '~> 0.1.0'
@@ -118,6 +120,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'poltergeist'
   gem 'shoulda-matchers', '3.1.1'
+  gem 'simplecov', '0.14.1', :require => false
   gem 'warden'
   gem 'watir'
 end

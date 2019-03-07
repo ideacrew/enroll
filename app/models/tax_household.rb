@@ -46,7 +46,8 @@ class TaxHousehold
   def valid_csr_kind(hbx_enrollment)
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
-    tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind
+    return 'csr_100' if tax_household_members.blank?
+    tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_100' : csr_kind
   end
 
   def current_csr_percent
@@ -106,12 +107,66 @@ class TaxHousehold
     {}
   end
 
+  def aptc_family_members_by_tax_household
+    members = household.hbx_enrollments.enrolled.by_submitted_after_datetime(self.created_at).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).uniq
+    members.select{ |family_member| family_member if is_member_aptc_eligible?(family_member)}
+  end
+
+  def unwanted_family_members(hbx_enrollment)
+    ((family.active_family_members - find_enrolling_fms(hbx_enrollment)) - aptc_family_members_by_tax_household)
+  end
+
+  # to get aptc family members from given family members
+  def find_aptc_family_members(family_members)
+    family_members.inject([]) do |array, family_member|
+      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true).present?
+      array.flatten
+    end
+  end
+
+  # to get non aptc fms from given family members
+  def find_non_aptc_fms(family_members)
+    family_members.inject([]) do |array, family_member|
+      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
+      array.flatten
+    end
+  end
+
+  # to get family members from given enrollment
+  def find_enrolling_fms hbx_enrollment
+    hbx_enrollment.hbx_enrollment_members.map(&:family_member)
+  end
+
+  # to check if all the enrolling family members are not aptc
+  def is_all_non_aptc?(hbx_enrollment)
+    enrolling_family_members = find_enrolling_fms(hbx_enrollment)
+    find_non_aptc_fms(enrolling_family_members).count == enrolling_family_members.count
+  end
+
+  def is_member_aptc_eligible?(family_member)
+    aptc_members.map(&:family_member).include?(family_member)
+  end
+
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
-    hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
+    return 0 if is_all_non_aptc?(hbx_enrollment)
+    total = family.active_family_members.reduce(0) do |sum, member|
+      sum + (aptc_available_amount_by_member[member.id.to_s] || 0)
     end
+    family_members = unwanted_family_members(hbx_enrollment)
+    unchecked_aptc_fms = find_aptc_family_members(family_members)
+    deduction_amount = total_benchmark_amount(unchecked_aptc_fms) if unchecked_aptc_fms
+    total = total - deduction_amount
+    (total < 0.00) ? 0.00 : total
+  end
+
+  def total_benchmark_amount(family_members)
+    total_sum = 0
+    family_members.each do |family_member|
+      total_sum += family_member.aptc_benchmark_amount
+    end
+    total_sum
   end
 
   def aptc_available_amount_by_member
@@ -121,16 +176,13 @@ class TaxHousehold
     aptc_ratio_by_member.each do |member_id, ratio|
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
-
     # FIXME should get hbx_enrollments by effective_starting_on
     household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
-        aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
-
     aptc_available_amount_hash
   end
 
@@ -183,6 +235,11 @@ class TaxHousehold
   def family
     return nil unless household
     household.family
+  end
+
+  #usage: filtering through group_by criteria
+  def group_by_year
+    effective_starting_on.year
   end
 
   def is_eligibility_determined?

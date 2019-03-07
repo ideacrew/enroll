@@ -7,9 +7,20 @@ module IvlAssistanceWorld
     Plan.all.each { |plan| plan.update_attributes!(csr_variant_id: "01") }
   end
 
+  def thh_starting_date
+    open_enrollment_start = Settings.aca.individual_market.open_enrollment.start_on
+    open_enrollment_end = Settings.aca.individual_market.open_enrollment.end_on
+    open_enrollment = open_enrollment_start .. open_enrollment_end
+    if open_enrollment.cover? TimeKeeper.date_of_record
+      open_enrollment_end
+    else
+      TimeKeeper.date_of_record
+    end
+  end
+
   def create_tax_household_and_eligibility_determination(family)
     tax_household = TaxHousehold.new(
-        effective_starting_on: (TimeKeeper.date_of_record - 30.days),
+        effective_starting_on: thh_starting_date,
         is_eligibility_determined: true,
         submitted_at: TimeKeeper.date_of_record
     )

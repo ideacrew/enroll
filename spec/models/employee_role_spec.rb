@@ -5,7 +5,7 @@ describe EmployeeRole do
     subject.valid?
   end
 
-  [:hired_on, :dob, :gender, :ssn, :employer_profile_id].each do |property|
+  [:hired_on, :dob, :gender, :employer_profile_id].each do |property|
     it "should require #{property}" do
       expect(subject).to have_errors_on(property)
     end
@@ -47,7 +47,7 @@ end
 
 describe ".coverage_effective_on" do
 
-  context 'when both active and renewal benefit groups present' do 
+  context 'when both active and renewal benefit groups present' do
 
     let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
 
@@ -56,7 +56,7 @@ describe ".coverage_effective_on" do
       employer = FactoryGirl.create :employer_profile, organization: org
       plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
       FactoryGirl.create :benefit_group, plan_year: plan_year
-      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
+      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: (end_on + 1.year).end_of_month, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
       FactoryGirl.create :benefit_group, plan_year: renewal_plan_year
       employer
     }
@@ -91,7 +91,7 @@ describe ".coverage_effective_on" do
 
       it 'should calculate effective date based on active benefit group' do
         expect(employee_role.coverage_effective_on).to eq hired_on
-      end 
+      end
     end
   end
 end
@@ -665,7 +665,7 @@ describe "#benefit_group", dbclean: :after_each do
 
     before do
       census_employee.benefit_group_assignments.each do |bga|
-        bga.delete 
+        bga.delete
       end
       active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
       expired_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
@@ -753,7 +753,7 @@ describe EmployeeRole do
       let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
 
       let!(:renewing_plan_year) {
-        FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
+        FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: (end_on + 1.year).end_of_month, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
       }
 
       let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }

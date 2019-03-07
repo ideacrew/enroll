@@ -5,7 +5,7 @@ class MakeBenefitGroupAssignmentActive < MongoidMigrationTask
   def migrate
     census_employee = CensusEmployee.where(id:ENV['ce_id']).first
     if census_employee.present?
-      bga = census_employee.benefit_group_assignments.last
+      bga = census_employee.benefit_group_assignments.where(id:ENV['bga_id']).first
       if bga.present?
         bga.make_active
       else

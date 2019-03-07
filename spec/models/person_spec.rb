@@ -407,21 +407,38 @@ describe Person do
       end
 
       context "is_consumer_role_active?" do
-        let(:person) {FactoryGirl.build(:person)}
-        let(:consumer_role) {double(is_active?: true)}
+        let(:person) {FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
 
         it "should return true" do
-          allow(person).to receive(:consumer_role).and_return(consumer_role)
-          allow(person).to receive(:is_consumer_role_active?).and_return(true)
-
           expect(person.is_consumer_role_active?).to eq true
         end
 
-        it "should return false" do
-          allow(person).to receive(:consumer_role).and_return(nil)
+        it "should return false as person doesn't have consumer_role imt" do
           allow(person).to receive(:is_consumer_role_active?).and_return(false)
-
           expect(person.is_consumer_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have consumer_role" do
+          allow(person).to receive(:consumer_role).and_return(nil)
+          expect(person.is_consumer_role_active?).to eq false
+        end
+      end
+
+      context "is_resident_role_active?" do
+        let(:person) {FactoryGirl.create(:person, :with_resident_role, :with_active_resident_role)}
+
+        it "should return true" do
+          expect(person.is_resident_role_active?).to eq true
+        end
+
+        it "should return false as person doesn't have resident_role imt" do
+          allow(person).to receive(:is_resident_role_active?).and_return(false)
+          expect(person.is_resident_role_active?).to eq false
+        end
+
+        it "should return false as person doesn't have resident_role" do
+          allow(person).to receive(:resident_role).and_return(nil)
+          expect(person.is_resident_role_active?).to eq false
         end
       end
 
@@ -573,11 +590,11 @@ describe Person do
     end
   end
 
-  describe '#find_all_staff_roles_by_employer_profile' do
-    employer_profile = FactoryGirl.build(:employer_profile)
-    person = FactoryGirl.build(:person)
-    FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
+  describe '#find_all_staff_roles_by_employer_profile', dbclean: :after_each do
     it "should have the same search criteria" do
+      employer_profile = FactoryGirl.build(:employer_profile)
+      person = FactoryGirl.build(:person)
+      FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
       allow(Person).to receive(:where).and_return([person])
       expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq [person]
     end
@@ -978,6 +995,34 @@ describe Person do
       end
     end
   end
+
+  describe 'ridp_verification_types' do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role, user: user) }
+
+    shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
+      before do
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
+        person.consumer_role.update_attributes!(is_applicant: is_applicant)
+      end
+      it 'returns array of verification types' do
+        expect(person.ridp_verification_types).to be_a Array
+      end
+
+      it "returns #{types_count} verification types" do
+        expect(person.ridp_verification_types.count).to eq types_count
+      end
+
+      it "contains #{ridp_types} verification types" do
+        expect(person.ridp_verification_types).to eq ridp_types
+      end
+    end
+    context 'ridp verification types for person' do
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, false
+    end
+  end
+
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}

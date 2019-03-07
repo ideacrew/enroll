@@ -175,7 +175,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  click_link "Continue Application"
 end
 
 Then(/\w+ should see the dependents form/) do
@@ -229,6 +229,11 @@ And(/I click on continue button on household info form/) do
   click_link "Continue"
 end
 
+And(/I click Special Enrollment Period Link on Coverage Household page/) do
+  find('.interaction-click-control-special-enrollment-period').click
+  expect(page).to have_content 'None of the situations listed above apply'
+end
+
 Then(/Individual creates a new HBX account$/) do
   click_button 'Create account', :wait => 10
   fill_in "user[oim_id]", :with => "testflow@test.com"
@@ -242,6 +247,15 @@ When(/I click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
   find('#no_qle_checkbox').click
   expect(page).to have_content 'To enroll before open enrollment'
+end
+
+When(/I click on none of the situations listed above apply checkbox during open enrollment$/) do
+  expect(page).to have_content 'None of the situations listed above apply'
+  find('#no_qle_checkbox').click
+end
+
+Then(/^I should see pop up with message It is currently open enrollment$/) do
+  expect(page).to have_content 'It is currently open enrollment. You can enroll even if you do not qualify for a special enrollment period'
 end
 
 And(/I click on back to my account button$/) do
@@ -307,7 +321,11 @@ And(/I click on purchase button on confirmation page/) do
 end
 
 And(/I click on continue button to go to the individual home page/) do
-  click_link "GO TO MY ACCOUNT"
+  if page.has_link?('CONTINUE')
+   click_link "CONTINUE"
+  else
+   click_link "GO TO MY ACCOUNT"
+  end
 end
 
 And(/I should see the individual home page/) do

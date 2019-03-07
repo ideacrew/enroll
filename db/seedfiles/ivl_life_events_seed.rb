@@ -448,7 +448,7 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: false,
-    date_options_available: false,
+    date_options_available: true,
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")
   )
@@ -465,7 +465,7 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: false,
-    date_options_available: false,
+    date_options_available: true,
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")
   )

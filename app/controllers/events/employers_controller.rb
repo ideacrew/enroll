@@ -6,11 +6,12 @@ module Events
       reply_to = properties.reply_to
       headers = (properties.headers || {}).stringify_keys
       employer_id = headers["employer_id"]
+      plan_year_id = headers["plan_year_id"].present? ? headers["plan_year_id"] : nil
       employer_org = Organization.employer_by_hbx_id(employer_id).first
       manual_gen = headers["manual_gen"].present? && (headers["manual_gen"] == "true" || headers["manual_gen"] == true) ? true : false
       if !employer_org.nil?
         employer = employer_org.employer_profile
-        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { employer: employer, manual_gen: manual_gen }
+        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { employer: employer, manual_gen: manual_gen, plan_year_id: plan_year_id.to_s}
         with_response_exchange(connection) do |ex|
           ex.publish(
             event_payload,

@@ -1,5 +1,5 @@
 require 'csv'
-@pdc = 0
+
 @slcsp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.slcsp_id
 @wrong_ssn_counter = 0
 
@@ -9,8 +9,8 @@ def check_duplicated
   not_found = []
   stranges = []
 
-  CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
-    ssn, hbx_id, aptc, csr = row_with_ssn
+  CSV.foreach("pids/2019_THHEligibility.csv") do |row_with_ssn|
+    ssn, hbx_id, aptc, csr, date = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
@@ -54,95 +54,61 @@ end
 def check_and_run
   ran = []
   not_run = []
-  running = []
+  created_eligibility = []
 
-  CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
-    ssn, hbx_id, aptc, csr = row_with_ssn
+  CSV.foreach("pids/2019_THHEligibility.csv") do |row_with_ssn|
+    ssn, hbx_id, aptc, csr, date = row_with_ssn
+    date = "1/1/2019" unless date
+    effective_date = date.to_date
+
+    if aptc.blank? || csr.blank?
+      not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data(csr/aptc)"}
+      puts "Either aptc or csr are not valid"
+      next
+    end
+
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
       person = Person.by_ssn(ssn).first rescue nil
     end
 
-    unless person
-      person = Person.by_hbx_id(hbx_id).first rescue nil
+    person_by_hbx = Person.by_hbx_id(hbx_id).first rescue nil
+
+    if ssn && hbx_id && person && person_by_hbx && person.id != person_by_hbx.id
+      not_run << {ssn: ssn, hbx_id: hbx_id, error: "Bad CSV data(ssn/hbx_id)"}
+      puts "Person with ssn: #{ssn} and person with hbx_id: #{hbx_id} are not same"
+      next
     end
+
+    person = person_by_hbx unless person
 
     if person
       unless person.primary_family
-        not_run << {no_family: ssn}
-        puts "Person with ssn: #{ssn} has no family."
+        not_run << {no_family: ssn, hbx_id: hbx_id}
+        puts "Person with ssn: #{ssn} has no family"
         next
       end
-      deter = person.primary_family.active_household.latest_active_tax_household_with_year(2018).try(:latest_eligibility_determination)
-      if deter && deter.e_pdc_id =~ /MANUALLY_10_06_2017LOADING/
-        deter.update_attributes(max_aptc: aptc)
-        deter.csr_percent_as_integer = csr
-        deter.save
-        ran << person.hbx_id
-        print 'r'
+
+      active_household = person.primary_family.active_household
+      active_thh = active_household.latest_active_thh_with_year(effective_date.year)
+      deter = active_thh.try(:latest_eligibility_determination)
+
+      if active_thh && deter.present? && deter.csr_percent_as_integer.to_s == csr && active_thh.effective_starting_on.to_date == effective_date && deter.max_aptc.to_f == aptc.to_f
+        not_run << [hbx_id: person.hbx_id, error: 'active THH with eligibility having same aptc, csr & thh_effective_date is already present']
+        puts "Skipped Creation of Eligibility for person with person_hbx_id: #{person.hbx_id} as this household already has one"
       else
-        row=[person.hbx_id, aptc, csr]
-        update_aptc(row)
-        running << person.hbx_id
-        print '#'
+        active_household.build_thh_and_eligibility(aptc, csr, effective_date, @slcsp)
+        created_eligibility << [hbx_id: person.hbx_id]
+        puts "Created Eligibility for person with person_hbx_id: #{person.hbx_id}"
       end
+
     else
       not_run << {not_found: ssn}
       puts "Person with ssn: #{ssn} can't be found."
     end
-  end
 
+  end
   [ran: {count: ran.count, rs: ran},
    not_run: {count: not_run.count, rs: not_run},
-   running: {count: running.count, rs: running}]
-end
-
-def update_aptc(row)
-  person = Person.by_hbx_id(row[0]).first
-  return unless person.primary_family
-  @household = person.primary_family.active_household
-
-  if @household.tax_households.present?
-    active_tax_households = @household.tax_households.active_tax_household
-    active_tax_households.update_all(effective_ending_on: Date.new(2017,12,31)) if active_tax_households
-  end
-
-  th = @household.tax_households.build(
-    allocated_aptc: 0.0,
-    effective_starting_on: Date.new(2018,1,1),
-    is_eligibility_determined: true,
-    submitted_at: Date.today
-  )
-
-  th.tax_household_members.build(
-    family_member: @household.family.primary_family_member,
-    is_subscriber: true,
-    is_ia_eligible: true,
-  )
-
-  @pdc+=1
-
-  deter = th.eligibility_determinations.build(
-    e_pdc_id: "MANUALLY_10_06_2017LOADING" + @pdc.to_s,
-    benchmark_plan_id: @slcsp,
-    max_aptc: row[1],
-    csr_percent_as_integer: row[2],
-    determined_on: Date.today
-  )
-  deter.csr_percent_as_integer = row[2]
-  deter.save
-
-  th.save!
-
-  person.primary_family.dependents.each do |fm|
-    th = @household.latest_active_tax_household
-    th.tax_household_members.build(
-      family_member: fm,
-      is_subscriber: false,
-      is_ia_eligible: true
-      )
-    th.save!
-  end
-
-  #puts person.primary_family.active_household.tax_households.last.eligibility_determinations.inspect
+   created_eligibility: {count: created_eligibility.count, rs: created_eligibility}]
 end

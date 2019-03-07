@@ -85,7 +85,10 @@ class QhpRateBuilder
   end
 
   def find_plan_and_create_premium_tables
+    counter = 0
+    total_premium_tables = @results.count
     @results.each do |key, premium_tables|
+      counter = counter + 1
       hios_id, year = key.split(",")
       unless INVALID_PLAN_IDS.include?(hios_id)
         @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
@@ -94,13 +97,18 @@ class QhpRateBuilder
           plan.premium_tables.create!(premium_tables)
           plan.minimum_age, plan.maximum_age = plan.premium_tables.map(&:age).minmax
           plan.save
+          print "\r#{(counter.to_f/total_premium_tables).round(1)*100}% complete" unless Rails.env.test?
         end
       end
     end
+    puts "" unless Rails.env.test?
   end
 
   def find_plan_and_update_premium_tables
+    counter = 0
+    total_premium_tables = @results.count
     @results.each do |key, premium_tables|
+      counter = counter + 1
       hios_id, year = key.split(",")
       unless INVALID_PLAN_IDS.include?(hios_id)
         @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
@@ -110,10 +118,11 @@ class QhpRateBuilder
             pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on]).first
             pt.cost = value[:cost]
             pt.save
+            print "\r#{(counter.to_f/total_premium_tables).round(1)*100}% complete" unless Rails.env.test?
           end
         end
       end
     end
+    puts "" unless Rails.env.test?
   end
-
 end

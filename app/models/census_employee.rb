@@ -9,6 +9,7 @@ class CensusEmployee < CensusMember
   include Acapi::Notifiers
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Insured::FamiliesHelper
 
   require 'roo'
 
@@ -28,6 +29,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
+  field :no_ssn_allowed, type: Boolean, default: false
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -49,7 +51,7 @@ class CensusEmployee < CensusMember
 
   accepts_nested_attributes_for :census_dependents, :benefit_group_assignments
 
-  validates_presence_of :employer_profile_id, :ssn, :dob, :hired_on, :is_business_owner
+  validates_presence_of :employer_profile_id, :dob, :hired_on, :is_business_owner
   validate :check_employment_terminated_on
   validate :active_census_employee_is_unique
   validate :allow_id_info_changes_only_in_eligible_state
@@ -57,6 +59,13 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
+  validate :validate_unique_identifier
+
+  # validates :ssn,
+  #   length: { minimum: 3, maximum: 9, message: "Length not met" },
+  #   allow_blank: true,
+  #   numericality: true
+
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
 
@@ -115,7 +124,9 @@ class CensusEmployee < CensusMember
   scope :non_business_owner,              ->{ where(is_business_owner: false) }
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
-  scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
+  scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)).and(:encrypted_ssn.nin => ["", nil]) }
+  scope :search_with_ssn_dob,              ->(ssn, dob) { unscoped.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob) }
+  scope :search_dependent_with_ssn_dob,    ->(ssn, dob) { unscoped.where(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob) }
 
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
@@ -129,6 +140,14 @@ class CensusEmployee < CensusMember
    linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
+  }
+
+  scope :matchable_by_dob_lname_fname, ->(dob, first_name, last_name) {
+    matched = unscoped.and(dob: dob, first_name: first_name, last_name: last_name, aasm_state: {"$in": ELIGIBLE_STATES })
+    benefit_group_assignment_ids = matched.flat_map() do |ee|
+      ee.published_benefit_group_assignment ? ee.published_benefit_group_assignment.id : []
+    end
+    matched.by_benefit_group_assignment_ids(benefit_group_assignment_ids)
   }
 
   def initialize(*args)
@@ -179,6 +198,10 @@ class CensusEmployee < CensusMember
   def employer_profile
     return @employer_profile if defined? @employer_profile
     @employer_profile = EmployerProfile.find(self.employer_profile_id) unless self.employer_profile_id.blank?
+  end
+
+  def is_no_ssn_allowed?
+    employer_profile.try(:no_ssn) == true ? true : false
   end
 
   # This performs employee summary count for waived and enrolled in the latest plan year
@@ -236,7 +259,7 @@ class CensusEmployee < CensusMember
 
   def active_and_renewing_benefit_group_assignments
     result = []
-    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
   end
@@ -307,7 +330,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_save_to_temp_folder
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -325,7 +348,7 @@ class CensusEmployee < CensusMember
 
   def generate_and_deliver_checkbook_url
     begin
-      url = Settings.checkbook_services.url
+      url = Rails.application.config.checkbook_services_base_url
       event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
       notice_trigger = event_kind.notice_triggers.first
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
@@ -413,7 +436,7 @@ class CensusEmployee < CensusMember
   def assign_benefit_packages(benefit_group_id: nil, renewal_benefit_group_id: nil)
     if benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(benefit_group_id))
-      
+
       if active_benefit_group_assignment.blank? || (active_benefit_group_assignment.benefit_group_id != benefit_group.id)
         find_or_create_benefit_group_assignment([benefit_group])
       end
@@ -577,7 +600,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -884,6 +907,28 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
+  def ssn=(new_ssn)
+    if !new_ssn.blank?
+      write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+    else
+      if new_ssn.blank? && is_no_ssn_allowed?
+        write_attribute(:encrypted_ssn, CensusMember.encrypt_ssn(new_ssn))
+      else
+        unset_sparse("encrypted_ssn")
+      end
+    end
+  end
+
+  #sort and display latest expired enrollments in desc order
+  def past_enrollments
+    if employee_role.blank?
+      []      
+    else
+      enrollments = employee_role.person.primary_family.all_enrollments.terminated.shop_market
+      enrollments.select{|e| e.benefit_group_assignment.present? && e.benefit_group_assignment.census_employee == self && !enrollments_for_display.include?(e)}.sort_by { |enr| enrollment_coverage_end(enr)}.reverse
+    end
+  end
+
   private
 
   def record_transition
@@ -934,7 +979,7 @@ class CensusEmployee < CensusMember
 
   def active_census_employee_is_unique
     potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
-    if potential_dups.detect { |dup| dup.id != self.id  }
+    if potential_dups.detect { |dup| dup.id != self.id }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)
@@ -970,6 +1015,14 @@ class CensusEmployee < CensusMember
     unset("employee_role_id")
     self.benefit_group_assignments = []
     @employee_role = nil
+  end
+
+  def validate_unique_identifier
+    if ssn && ssn.size != 9 && no_ssn_allowed == false
+      errors.add(:ssn, "must be 9 digits.")
+    elsif ssn.blank? && no_ssn_allowed == false
+      errors.add(:ssn, "Can't be blank")
+    end
   end
 
   def notify_terminated

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Admin::Aptc, :type => :model do
+RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
   # Household

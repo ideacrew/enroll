@@ -4,7 +4,7 @@ require 'rake'
 describe 'recurring:ivl_reminder_notices', :dbclean => :after_each do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: nil)}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent", applied_aptc_amount: 0.0)}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", is_any_enrollment_member_outstanding: true, aasm_state: "coverage_selected", applied_aptc_amount: 0.0, effective_on: TimeKeeper.date_of_record)}
   let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
 
   before do

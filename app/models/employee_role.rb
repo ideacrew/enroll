@@ -22,7 +22,7 @@ class EmployeeRole
   delegate :dob, :dob=, to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :employer_profile_id, :hired_on
+  validates_presence_of :dob, :gender, :employer_profile_id, :hired_on
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   accepts_nested_attributes_for :person

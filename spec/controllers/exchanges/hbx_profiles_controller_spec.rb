@@ -292,6 +292,27 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "#disable_ssn_requirement" do
+    subject   {xhr :post, :disable_ssn_requirement, {ids: [organization.id]} ,  format: :js}
+    let(:user) { double("user", :has_hbx_staff_role? => true)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:hbx_enrollment) { FactoryGirl.build_stubbed :hbx_enrollment }
+    let(:date) { TimeKeeper.datetime_of_record }
+
+    before :each do
+      sign_in(user)
+    end
+
+    it "renders the 'employer index' template with updated attributes" do
+      expect(employer_profile.no_ssn).to be_falsy
+      expect(employer_profile.disable_ssn_date).to be_nil
+      expect(subject).to redirect_to employer_invoice_exchanges_hbx_profiles_path
+      expect(employer_profile.reload.no_ssn).to be_truthy
+      expect(employer_profile.disable_ssn_date.to_time).to be_within(5.seconds).of(date)
+    end
+  end
+
   describe "GET employer index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person")}
@@ -382,7 +403,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "GET verifications_index_datatable" do
 
     let(:user) { double("User", :has_hbx_staff_role? => true)}
-    
+
     before :each do
       sign_in(user)
     end
@@ -546,7 +567,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   describe "POST update_dob_ssn" do
 
     let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
-    let(:person1) { FactoryGirl.create(:person) }
+    let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
     let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
@@ -559,7 +580,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should render back to edit_enrollment if there is a validation error on save" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
-      @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
+      @params = {:person=>{:pid => person1.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
     end

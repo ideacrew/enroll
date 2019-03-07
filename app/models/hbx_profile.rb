@@ -129,7 +129,7 @@ class HbxProfile
   CallCenterPhoneNumber = "1-855-532-5465"
   ShortName = "DC Health Link"
 
-  IndividualEnrollmentDueDayOfMonth = 15
+  IndividualEnrollmentDueDayOfMonth = Settings.aca.individual_market.monthly_enrollment_due_on
 
   #New Rule There is no 14 days rule for termination
   # IndividualEnrollmentTerminationMinimum = 14.days

@@ -140,6 +140,58 @@ describe "#find_vlp_document_by_key" do
   end
 end
 
+describe "#move_identity_documents_to_outstanding" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+
+  context "move to outstanding if initial state is unverified" do
+
+    it "successfully updates identity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'outstanding'
+      expect(consumer.application_validation). to eq 'outstanding'
+    end
+
+    it "should not update dentity and application to outstanding" do
+      consumer = person.consumer_role
+      consumer.identity_validation = 'valid'
+      consumer.application_validation = 'valid'
+      consumer.move_identity_documents_to_outstanding
+      expect(consumer.identity_validation). to eq 'valid'
+      expect(consumer.application_validation). to eq 'valid'
+    end
+  end
+end
+
+describe "#find_ridp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:ridp_document) {RidpDocument.new({subject: "Driver License", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a ridp_document without a file uploaded" do
+    before do
+      consumer_role.ridp_documents.build({subject: "Driver License"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a ridp_document with a file uploaded" do
+    before do
+      consumer_role.ridp_documents << ridp_document
+    end
+
+    it "returns ridp_document document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to eql(ridp_document)
+    end
+  end
+end
+
 describe "#build_nested_models_for_person" do
   let(:person) {FactoryGirl.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
@@ -183,7 +235,15 @@ describe "#latest_active_tax_household_with_year" do
   it "should rerturn nil when can not found taxhousehold" do
     expect(consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, family)).to eq nil
   end
-end
+  context "vlp exist but document is NOT uploaded" do
+      let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+        it "returns false for vlp doc without uploaded copy" do
+          unverified_types= person.verification_types.active.where(applied_roles: "consumer_role")
+          unverify_count= unverified_types.reject{|a| a.type_verified? == true}.size
+          expect(person.consumer_role.types_include_to_notices.count).to eq(unverify_count)
+        end   
+      end
+  end
 
 context "Verification process and notices" do
   let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
@@ -213,6 +273,32 @@ context "Verification process and notices" do
     end
   end
 
+  describe "#has_ridp_docs_for_type?" do
+    before do
+      person.consumer_role.ridp_documents=[]
+    end
+    context "ridp exist but document is NOT uploaded" do
+      it "returns false for ridp doc without uploaded copy" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil )
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+      it "returns false for Identity type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+    end
+    context "ridp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+    end
+  end
+
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
@@ -231,6 +317,42 @@ context "Verification process and notices" do
       it_behaves_like "ensures native american field value", "doesn't change", "outstanding", "outstanding native american consumer", "tribe", "outstanding"
       it_behaves_like "ensures native american field value", "assigns", "outstanding", "na native american consumer", "tribe", "na"
     end
+  end
+
+  describe "update_ridp_verification_type private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "update ridp verification type for consumer" do |verification_type, reason|
+      before do
+        consumer.update_ridp_verification_type(verification_type, reason)
+      end
+      it "updates #{verification_type}" do
+        expect(consumer.identity_verified?).to eq true
+      end
+    end
+
+    it_behaves_like "update ridp verification type for consumer", "Identity", "documents in Enroll"
+  end
+
+  describe "#admin_ridp_verification_action private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "admin ridp verification actions" do |admin_action, v_type, update_reason, upd_attr, result, rejected_field|
+      before do
+        consumer.admin_ridp_verification_action(admin_action, v_type, update_reason)
+      end
+      it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
+        expect(consumer.send(upd_attr)).to eq result
+      end
+
+      if admin_action == "return_for_deficiency"
+        it "marks #{v_type} type as rejected" do
+          expect(consumer.send(rejected_field)).to be_truthy
+        end
+      end
+    end
+
+    it_behaves_like "admin ridp verification actions", "verify", "Identity", "Document in EnrollApp", "identity_validation", "valid"
+    it_behaves_like "admin ridp verification actions", "return_for_deficiency", "Identity", "Document in EnrollApp", "identity_validation", "outstanding", "identity_rejected"
+
   end
 
   describe "state machine" do
@@ -296,7 +418,7 @@ context "Verification process and notices" do
       describe "immigrant with NO ssn" do
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", true,  "valid", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
-      it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, "outstanding", :unverified, :dhs_pending, "coverage_purchased!"
         it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, "valid", :unverified, :dhs_pending, "coverage_purchased!"
       end
 
@@ -319,7 +441,7 @@ context "Verification process and notices" do
         it "updates indian tribe validition status to outstanding and to pending for the rest" do
           consumer.tribal_id = "345543345"
           consumer.coverage_purchased!
-          consumer.verification_types.each { |verif| 
+          consumer.verification_types.each { |verif|
             if verif.type_name == "American Indian Status"
               expect(verif.validation_status). to eq("outstanding")
             else
@@ -626,7 +748,7 @@ describe "#revert_lawful_presence" do
 end
 
 describe "it should check the residency status" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:consumer) { person.consumer_role }
   let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
@@ -646,16 +768,17 @@ describe "it should check the residency status" do
       consumer.ssn_valid_citizenship_valid!(verification_attr)
       expect(consumer.aasm_state).to eq("sci_verified")
       enrollment.reload
-      expect(enrollment.aasm_state).to eq("coverage_selected")
+      expect(enrollment.aasm_state).to eq("unverified")
     end
 
-    it "should move the enrollment status to contingent when received negative response from residency hub" do
+    it "should set is_any_enrollment_member_outstanding to true when received negative response from residency hub" do
       consumer.coverage_purchased!
       consumer.ssn_valid_citizenship_valid!(verification_attr)
       consumer.fail_residency!
       expect(consumer.aasm_state).to eq("verification_outstanding")
       enrollment.reload
-      expect(enrollment.aasm_state).to eq("enrolled_contingent")
+      expect(enrollment.aasm_state).to eq("coverage_selected")
+      expect(enrollment.is_any_enrollment_member_outstanding).to eq(true)
     end
 
     it "should move the enrollment status to contingent when received negative response from residency hub" do

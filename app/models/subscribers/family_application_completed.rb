@@ -163,11 +163,7 @@ module Subscribers
       if broker.present?
         if broker.broker_agency_profile_id.present?
           family.hire_broker_agency(broker.id)
-        else
-          throw(:processing_issue, "ERROR: Broker with npn: #{npn} has no broker agency profile id")
         end
-      else
-        throw(:processing_issue, "ERROR: Failed to match broker with npn: #{npn}")
       end
     end
 

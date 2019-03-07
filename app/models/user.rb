@@ -6,6 +6,9 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
+  include AuthorizationConcern
+  include Mongoid::History::Trackable
+  include PermissionsConcern
 
   attr_accessor :login
 
@@ -23,6 +26,12 @@ class User
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+  
+  scope :datatable_search, ->(query) {
+      search_regex = ::Regexp.compile(/.*#{query}.*/i)
+      person_user_ids = Person.any_of({hbx_id: search_regex}, {first_name: search_regex}, {last_name: search_regex}).pluck(:user_id)
+      User.any_of({oim_id: search_regex}, {email: search_regex}, {id: {"$in" => person_user_ids} } )
+    }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -153,6 +162,15 @@ class User
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
+
+  track_history   :on => [:oim_id,
+                        :email],
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,
+                  :track_update  => true,
+                  :track_destroy => true
+
 
 
   before_save :strip_empty_fields
@@ -296,11 +314,20 @@ class User
   def has_agent_role?
     has_role?(:csr) || has_role?(:assister)
   end
-
+  
   def can_change_broker?
     if has_employer_staff_role? || has_hbx_staff_role?
       true
     elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
+      false
+    end
+  end
+  
+  def has_tier3_subrole?
+    hbx_staff_role = self.try(:person).try(:hbx_staff_role)
+    if hbx_staff_role.present? && hbx_staff_role.subrole == "hbx_tier3"
+      true
+    else
       false
     end
   end

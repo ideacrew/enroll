@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent",  dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -22,6 +22,16 @@ describe Family, "given a primary applicant and a dependent" do
     subject.remove_family_member(dependent)
   end
 
+  context "payment_transactions" do
+    it "should match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).to eq :has_many
+    end
+
+    it "should not match with has_many association" do
+      expect(Family.reflect_on_association(:payment_transactions).macro).not_to eq :embeds_many
+    end
+  end
+
   context "with enrolled hbx enrollments" do
     let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
     before do
@@ -39,12 +49,12 @@ describe Family, "given a primary applicant and a dependent" do
 
   context "enrollments_for_display" do
     let(:expired_enrollment) {
-    FactoryGirl.create(:hbx_enrollment,
-                       household: household,
-                       coverage_kind: "health",
-                       enrollment_kind: "open_enrollment",
-                       aasm_state: 'coverage_expired'
-    )}
+      FactoryGirl.create(:hbx_enrollment,
+                         household: household,
+                         coverage_kind: "health",
+                         enrollment_kind: "open_enrollment",
+                         aasm_state: 'coverage_expired'
+      )}
 
     it "should not return expired enrollment" do
       expect(subject.enrollments_for_display.to_a).to eq []
@@ -77,10 +87,10 @@ describe Family, type: :model, dbclean: :after_each do
 
       let(:valid_params) do
         {
-          e_case_id: e_case_id,
-          renewal_consent_through_year: renewal_consent_through_year,
-          submitted_at: submitted_at,
-          updated_by: updated_by
+            e_case_id: e_case_id,
+            renewal_consent_through_year: renewal_consent_through_year,
+            submitted_at: submitted_at,
+            updated_by: updated_by
         }
       end
 
@@ -319,7 +329,7 @@ describe Family, type: :model, dbclean: :after_each do
 
 end
 
-describe Family do
+describe Family, dbclean: :after_each do
   let(:family) { Family.new }
 
   describe "with no special enrollment periods" do
@@ -370,7 +380,7 @@ describe Family do
       expect(family.current_special_enrollment_periods.size).to eq 1
       expect(family.current_special_enrollment_periods.first).to eq @current_sep
     end
-   end
+  end
 
   context "and the family is under more than one SEP" do
     before do
@@ -426,9 +436,9 @@ describe Family do
     end
   end
 
-  context "best_verification_due_date" do 
+  context "best_verification_due_date" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    
+
     it "should earliest duedate when family had two or more due dates" do
       family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
       allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
@@ -495,7 +505,7 @@ describe Family do
   end
 end
 
-describe "special enrollment periods" do
+describe "special enrollment periods",  dbclean: :after_each do
 =begin
   include_context "BradyBunchAfterAll"
 
@@ -527,7 +537,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
                                  PersonRelationship.new(relative: child, kind: "child")] }
   let(:family_relationships)  {  married_relationships <<
-                                 PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+      PersonRelationship.new(relative: grandpa, kind: "grandparent") }
 
   let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
   let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
@@ -611,7 +621,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
 
 end
 
-describe Family, "given an inactive member" do
+describe Family, "given an inactive member" ,:dbclean => :after_all do
   let(:ssn) { double }
   let(:dependent) {
     double(:id => "123456", :ssn => ssn, :last_name => last_name, :first_name => first_name, :dob => dob)
@@ -648,7 +658,7 @@ describe Family, "given an inactive member" do
   end
 end
 
-describe Family, "with a primary applicant" do
+describe Family, "with a primary applicant", :dbclean => :after_all do
   describe "given a new person and relationship to make to the primary applicant" do
     let(:primary_person_id) { double }
     let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
@@ -799,15 +809,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -860,15 +870,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -890,15 +900,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
     let!(:census_employee2) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile2
       )
       employee_role2.census_employee = ce
       employee_role2.save
@@ -976,15 +986,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -1034,15 +1044,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
     let!(:census_employee) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile
       )
       employee_role.census_employee = ce
       employee_role.save
@@ -1064,15 +1074,15 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:employee_role2) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile2) }
     let!(:census_employee2) do
       ce = FactoryGirl.create(:census_employee,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob,
-        gender: person.gender,
-        hired_on: TimeKeeper.date_of_record - 5.years,
-        ssn: person.ssn,
-        address: person.addresses.first,
-        email: person.emails.first,
-        employer_profile: employer_profile2
+                              first_name: person.first_name,
+                              last_name: person.last_name,
+                              dob: person.dob,
+                              gender: person.gender,
+                              hired_on: TimeKeeper.date_of_record - 5.years,
+                              ssn: person.ssn,
+                              address: person.addresses.first,
+                              email: person.emails.first,
+                              employer_profile: employer_profile2
       )
       employee_role2.census_employee = ce
       employee_role2.save
@@ -1106,7 +1116,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, 'coverage_waived?' do
+describe Family, 'coverage_waived?', dbclean: :after_each do
   let(:family) {Family.new}
   let(:household) {double}
   let(:hbx_enrollment) {HbxEnrollment.new}
@@ -1214,7 +1224,6 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
   end
 end
 
-
 describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
   let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
@@ -1263,8 +1272,12 @@ describe Family, ".expire_individual_market_enrollments", dbclean: :after_each d
                        plan_id: two_years_old_plan.id
     )
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with current & previous year coverages' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.expire_individual_market_enrollments
       family.reload
     end
@@ -1318,8 +1331,12 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
     )
 
   }
+
+  let(:logger) { Logger.new("#{Rails.root}/log/test_family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
   context 'when family exists with passive renewals ' do
     before do
+      Family.instance_variable_set(:@logger, logger)
       Family.begin_coverage_for_ivl_enrollments
       family.reload
     end
@@ -1360,7 +1377,54 @@ describe "min_verification_due_date", dbclean: :after_each do
   end
 end
 
-describe "has_valid_e_case_id" do
+describe "#all_persons_vlp_documents_status", dbclean: :after_each do
+
+  context "vlp documents status for single family member" do
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:family_person) {family.primary_applicant.person}
+    let(:ssn_type ) { person.consumer_role.verification_types.by_name("Social Security Number").first }
+    let(:dc_residency_type) { person.consumer_role.verification_types.by_name("DC Residency").first }
+
+    it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
+      family_person.consumer_role.verification_types.each{|type| type.vlp_documents.delete_all} # Deletes all vlp documents if there is any
+      expect(family.all_persons_vlp_documents_status).to eq("None")
+    end
+
+    it "returns all_persons_vlp_documents_status is partially uploaded when single document is uploaded" do
+      family_person.consumer_role.verification_types.first.vlp_documents << FactoryGirl.build(:vlp_document)
+      family_person.consumer_role.verification_types.each{|type| type.validation_status = "outstanding" }
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Partially Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is fully uploaded when all documents are uploaded" do
+      ssn_type.vlp_documents << FactoryGirl.build(:vlp_document)
+      ssn_type.validation_status = "outstanding"
+      dc_residency_type.vlp_documents << FactoryGirl.build(:vlp_document)
+      dc_residency_type.validation_status = "outstanding"
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
+    end
+
+    it "returns all_persons_vlp_documents_status is None when documents status is verified" do
+      dc_residency_type.vlp_documents << FactoryGirl.build(:vlp_document)
+      dc_residency_type.validation_status = "valid"
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("None")
+    end
+
+    it "returns all_persons_vlp_documents_status is None when document is rejected" do
+      ssn_type.vlp_documents << FactoryGirl.build(:vlp_document)
+      ssn_type.validation_status = "outstanding"
+      ssn_type.rejected = true
+      family_person.save!
+      expect(family.all_persons_vlp_documents_status).to eq("None")
+    end
+  end
+end
+
+describe "has_valid_e_case_id" ,dbclean: :after_each do
   let!(:family1000) { FactoryGirl.create(:family, :with_primary_family_member, e_case_id: nil) }
 
   it "returns false as e_case_id is nil" do
@@ -1378,7 +1442,7 @@ describe "has_valid_e_case_id" do
   end
 end
 
-describe "currently_enrolled_plans_ids" do
+describe "currently_enrolled_plans_ids",  dbclean: :after_each do
   let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member) }
   let!(:enrollment100) { FactoryGirl.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
 
@@ -1387,7 +1451,31 @@ describe "currently_enrolled_plans_ids" do
   end
 end
 
-describe "active dependents" do
+describe "set_due_date_on_verification_types",  dbclean: :after_each do
+  let!(:person)           { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:consumer_role)     { person.consumer_role }
+  let!(:family)           { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+
+  it 'should set the due date on verfification type' do
+    person.consumer_role.update_attribute('aasm_state','verification_outstanding')
+    expect(family.set_due_date_on_verification_types).to be_truthy
+  end
+end
+
+context "verifying employee_role is active?",  dbclean: :after_each do
+  let!(:person100) { FactoryGirl.create(:person, :with_employee_role) }
+  let!(:family100) { FactoryGirl.create(:family, :with_primary_family_member, person: person100) }
+
+  before :each do
+    allow(person100).to receive(:has_active_employee_role?).and_return(true)
+  end
+
+  it "should return true" do
+    expect(family100.has_primary_active_employee?).to eq true
+  end
+end
+
+describe "active dependents",  dbclean: :after_each do
   let!(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryGirl.create(:person, :with_consumer_role)}
   let!(:person3) { FactoryGirl.create(:person, :with_consumer_role)}
@@ -1406,3 +1494,93 @@ describe "active dependents" do
     expect(family.active_dependents.count).to eq 1
   end
 end
+
+describe "#outstanding_verification scope", dbclean: :after_each do
+  let(:person)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:family)                    { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual", effective_on: TimeKeeper.date_of_record) }
+  let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+  let(:active_year)               {TimeKeeper.date_of_record.year}
+  before :each do
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+  it "should not include family with no outstanding family member " do  
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with no enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with renewal enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"auto_renewing")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification.size).to be(0)
+  end 
+  it "should include family with outstanding family member with enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"coverage_selected")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification.size).to be(1)
+  end 
+end
+
+describe "#outstanding_verification_datatable scope", dbclean: :after_each do
+  let(:person)                    { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let(:family)                    { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:hbx_profile)               {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_sponsorship)       { FactoryGirl.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let(:benefit_coverage_period)   { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:benefit_package)           { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+  let!(:hbx_enrollment)           { FactoryGirl.create(:hbx_enrollment, aasm_state: "coverage_terminated", household: family.active_household, kind: "individual") }
+  let!(:hbx_enrollment_member)     { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: hbx_enrollment) }
+  let(:active_year)               {TimeKeeper.date_of_record.year}
+  before :each do
+    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
+    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+  end
+  it "should not include family with no outstanding family member " do  
+    expect(Family.outstanding_verification_datatable.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with no enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    expect(Family.outstanding_verification_datatable.size).to be(0)
+  end 
+  it "should not include family with outstanding family member with renewal enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"auto_renewing")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification_datatable.size).to be(1)
+  end 
+  it "should include family with outstanding family member with enrollend or enrolling enrollments" do  
+    person.consumer_role.update_attribute("aasm_state","verification_outstanding")
+    person.consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
+    enrollment= family.all_enrollments.first
+    enrollment.update_attributes(aasm_state:"coverage_selected")
+    person.reload
+    enrollment.reload
+    family.reload
+    expect(Family.outstanding_verification_datatable.size).to be(1)
+  end 
+end
+
+

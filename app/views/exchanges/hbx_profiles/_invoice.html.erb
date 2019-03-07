@@ -1,7 +1,12 @@
+<% flash.each do |key, value| %>
+  <div class="alert alert-success"> <%= value %>
+  <a href="#" data-dismiss="alert" class="close interaction-click-control-×">×</a>
+  </div>
+<% end %>
+
 <h1>Employers</h1>
 
 <%= render_datatable(@datatable) %>
-
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();
 </script>

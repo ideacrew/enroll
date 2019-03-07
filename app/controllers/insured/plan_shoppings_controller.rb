@@ -7,8 +7,8 @@ class Insured::PlanShoppingsController < ApplicationController
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include Aptc
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate,:plan_selection_callback]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt,:set_elected_aptc,:plan_selection_callback]
 
   def checkout
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
@@ -67,6 +67,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
@@ -84,8 +85,18 @@ class Insured::PlanShoppingsController < ApplicationController
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    if params[:change_plan].present? 
+     @change_plan =  params[:change_plan] 
+    elsif @enrollment.is_special_enrollment?
+      @change_plan = "change_plan"
+    end
+    if params[:enrollment_kind].present? 
+      @enrollment_kind = params[:enrollment_kind] 
+    elsif @enrollment.is_special_enrollment?
+      @enrollment_kind = "sep"
+    else
+       @enrollment_kind = ""
+    end
     flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
@@ -147,6 +158,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
+    set_admin_bookmark_url if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
@@ -166,21 +178,43 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if params[:market_kind] == 'shop' && plan_match_dc
       is_congress_employee = @hbx_enrollment.benefit_group.is_congress
-      @dc_checkbook_url = is_congress_employee  ? Settings.checkbook_services.congress_url : ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment).generate_url
-    end
+      @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment,is_congress_employee).generate_url
+    elsif @hbx_enrollment.kind == "individual"
+      if @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year
+        plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+        plan_comparision_obj.elected_aptc = session[:elected_aptc]
+        @dc_individual_checkbook_url = plan_comparision_obj.generate_url
+      elsif @hbx_enrollment.effective_on.year == Settings.checkbook_services.previous_year 
+        @dc_individual_checkbook_previous_year = Rails.application.config.checkbook_services_base_url + "/hie/dc/"+ Settings.checkbook_services.previous_year.to_s + "/"
+      end
+   end
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
 
+  def plan_selection_callback
+    selected_plan= Plan.where(:hios_id=> params[:hios_id], active_year: Settings.checkbook_services.current_year).first
+    if selected_plan.present?
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
+    else
+      redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
+    end
+  end
+
   def set_elected_aptc
     session[:elected_aptc] = params[:elected_aptc].to_f
-    render json: 'ok'
+    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc =  session[:elected_aptc]
+    checkbook_url = plan_comparision_obj.generate_url
+    render json: {message: 'ok',checkbook_url: "#{checkbook_url}" }
   end
 
   def plans
     set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
     if @tax_household.present?

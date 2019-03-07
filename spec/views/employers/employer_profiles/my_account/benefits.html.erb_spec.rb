@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
+RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb", :dbclean => :after_each do
 
   context "Plan year display" do
 
@@ -189,6 +189,28 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       it "should not display add plan year button" do
         render "employers/employer_profiles/my_account/benefits"
         expect(rendered).to have_selector("a", text: "Claim Quote")
+      end
+    end
+
+    context "when renewing employer has canceled the renewal applicatoin"do
+      let!(:employer_profile)  { FactoryGirl.create(:employer_profile) }
+      let!(:benefit_group) { FactoryGirl.create(:benefit_group)}
+      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state:'active', benefit_groups:[benefit_group]) }
+      let!(:renew_benefit_group) { FactoryGirl.create(:benefit_group)}
+      let!(:renewing_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state:'renewing_canceled',benefit_groups:[renew_benefit_group], start_on: plan_year.start_on.next_year, end_on: plan_year.end_on.next_year) }
+
+      before do
+        allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true, list_enrollments?: true))
+        sign_in(user)
+        allow(benefit_group).to receive(:reference_plan).and_return(plan)
+        assign(:plan_years, employer_profile.plan_years)
+        assign(:employer_profile, employer_profile)
+        plan_years = []
+      end
+
+      it "should display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Add Plan Year")
       end
     end
 

@@ -240,7 +240,7 @@ describe EmployerProfile, dbclean: :after_each do
 
    context "binder paid methods" do
      let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
-     let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'enrolling') }
+     let(:new_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month , end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'enrolling') }
      let(:new_employer)     { EmployerProfile.new(**valid_params, plan_years: [new_plan_year]) }
      let(:renewing_employer)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year]) }
 
@@ -285,7 +285,7 @@ describe EmployerProfile, dbclean: :after_each do
         open_enrollment_start_on: TimeKeeper.date_of_record + 1.day,
         open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
         start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day,
-        end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year,
+        end_on: (TimeKeeper.date_of_record.next_month + 1.year).end_of_month,
         aasm_state: 'renewing_published')
     }
 
@@ -301,8 +301,7 @@ describe EmployerProfile, dbclean: :after_each do
 
     context 'when upcoming month plan year present' do
 
-      let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.end_of_month + 1.year, aasm_state: 'renewing_published') }
-
+    let(:renewing_plan_year)   { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: (TimeKeeper.date_of_record + 1.year).end_of_month, aasm_state: 'renewing_published') }
       it 'should return upcoming month plan year' do
         plan_year, billing_date = employer_profile.billing_plan_year
 
@@ -317,7 +316,7 @@ describe EmployerProfile, dbclean: :after_each do
           open_enrollment_start_on: TimeKeeper.date_of_record - 1.day,
           open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
           start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day,
-          end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year,
+          end_on: (TimeKeeper.date_of_record.next_month + 1.year).end_of_month,
           aasm_state: 'renewing_published')
       }
 
@@ -779,6 +778,46 @@ describe EmployerProfile, "instance methods" do
       end
     end
   end
+  describe "#default_benefit_group" do 
+    let!(:organization1) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
+      employer = FactoryGirl.create :employer_profile, organization: org
+      2.times{ FactoryGirl.create :plan_year, employer_profile: employer, aasm_state: :draft }
+      org
+    }
+    let!(:calender_year) { TimeKeeper.date_of_record.year }
+    let!(:benefit_group)            { FactoryGirl.build(:benefit_group) }
+    let!(:benefit_group1) { FactoryGirl.create(:benefit_group, title: "silver offerings 1", plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier', default:true)}
+    let!(:benefit_group2) { FactoryGirl.create(:benefit_group, title: "silver offerings 2", plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier',default:true)}
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today+1.month) if TimeKeeper.date_of_record.month == 1
+      plan_years = organization1.employer_profile.plan_years.to_a
+      plan_years.first.update_attributes({ aasm_state: :renewing_published,:start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),benefit_groups: [benefit_group1],
+        :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 13)
+        })
+      plan_years.last.update_attributes({ aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),benefit_groups: [benefit_group2],
+        :open_enrollment_start_on => Date.new(calender_year-1, 4, 1), :open_enrollment_end_on => Date.new(calender_year-1, 4, 10)
+        })
+    end
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
+    end
+    context 'default benefit group', dbclean: :after_each do
+      it 'should return latest plan year default benefit group' do
+        expect(organization1.employer_profile.default_benefit_group).to eq benefit_group1
+      end
+      it 'should return only default benefit group' do
+        benefit_group1.update_attributes(default:false)
+        expect(organization1.employer_profile.default_benefit_group).to eq benefit_group2
+      end
+      it 'should return nil if no default benefit group exists' do
+        benefit_group1.update_attributes(default:false)
+        benefit_group2.update_attributes(default:false)
+        expect(organization1.employer_profile.default_benefit_group).to eq nil
+      end
+    end
+    
+  end
 end
 
 describe EmployerProfile, "roster size" do
@@ -794,6 +833,25 @@ describe EmployerProfile, "roster size" do
     census_employee3
     census_employee4
     expect(employer_profile.roster_size).to eq 2
+  end
+end
+
+describe EmployerProfile, "ER made binder payment, Admin user selected 'Mark Binder Paid' for group", dbclean: :after_each do
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'enrolled', start_on: start_on)}
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:organization) { employer_profile.organization }
+  let!(:census_employee){
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+    employee
+  }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
+
+  it "should trigger notice" do
+    expect(EmployerProfile).to receive(:initial_employee_plan_selection_confirmation)
+    EmployerProfile.update_status_to_binder_paid([organization.id])
   end
 end
 
@@ -1064,6 +1122,7 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
     let(:organization) { FactoryGirl.create(:organization, :with_draft_and_canceled_plan_years)}
     let(:invalid_employer_profile) { FactoryGirl.create(:employer_profile)}
     let!(:canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "canceled", employer_profile: invalid_employer_profile)}
+    let!(:renewing_canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "renewing_canceled", employer_profile: invalid_employer_profile)}
     let(:ineligible_employer_profile) { EmployerProfile.new }
 
     it "should return draft plan year when employer profile has canceled and draft plan years with same py start on date" do
@@ -1071,8 +1130,8 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(organization.employer_profile.dt_display_plan_year).to eq draft_plan_year
     end
 
-    it "should return canceled plan year when there is no other plan year associated with employer" do
-      expect(invalid_employer_profile.dt_display_plan_year).to eq canceled_plan_year
+    it "should return canceled or renewing canceled plan year when there is no other plan year associated with employer" do
+      expect(invalid_employer_profile.dt_display_plan_year).to eq (canceled_plan_year || renewing_canceled_plan_year)
     end
 
     it "should return nil when there is no plan year associated with employer" do
@@ -1235,6 +1294,26 @@ describe EmployerProfile, "initial employers enrolled plan year state", dbclean:
   end
 end
 
+describe EmployerProfile, "terminate_scheduled_plan_years", dbclean: :after_each do
+  let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, aasm_state: "termination_pending", end_on: TimeKeeper.date_of_record-1.day)}
+  let!(:organization) { employer_profile.organization }
+
+  before do
+    EmployerProfile.terminate_scheduled_plan_years
+  end
+
+  it "should move the plan year to terminated state" do
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "terminated"
+  end
+
+  it "should do nothing when there is no termination_pending plan year" do
+    plan_year.update_attributes!(:aasm_state => "active", :end_on => plan_year.start_on.next_year-1.days)
+    plan_year.reload
+    expect(plan_year.aasm_state).to eq "active"
+  end
+end
 
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }

@@ -68,7 +68,7 @@ class IvlNotices::ReminderNotice < IvlNotice
 
   def append_unverified_family_members
     family = recipient.primary_family
-    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+    enrollments = family.active_household.hbx_enrollments.select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -102,7 +102,7 @@ class IvlNotices::ReminderNotice < IvlNotice
     end
 
     hbx_enrollments = []
-    en = enrollments.select{ |en| en.enrolled_contingent?}
+    en = enrollments.select{ |en| en.is_ivl_and_outstanding? }
     health_enrollments = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at)
     dental_enrollments = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at)
     hbx_enrollments << health_enrollments

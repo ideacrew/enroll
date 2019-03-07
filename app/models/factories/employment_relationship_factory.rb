@@ -7,7 +7,6 @@ module Factories
     def build(employee_candidate, census_employee)
       hired_on = census_employee.hired_on
       employer = census_employee.employer_profile
-
       ::Forms::EmploymentRelationship.new({
         :employer_name => employer.legal_name,
         :first_name => employee_candidate.first_name,
@@ -18,6 +17,7 @@ module Factories
         :gender => employee_candidate.gender,
         :census_employee_id => census_employee.id,
         :hired_on => hired_on,
+        :no_ssn => employee_candidate.no_ssn,
         :eligible_for_coverage_on => census_employee.coverage_effective_on
       })
     end

@@ -753,7 +753,7 @@ shop_notice_triggers = [
         name: 'Denial of SEP Requested by EE outside of allowable time frame',
         notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
         notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'MPI_SHOP35',
+        mpi_indicator: 'SHOP_D035',
                 notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -1119,6 +1119,48 @@ shop_notice_triggers = [
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DIG063',
+    title: "NO PAYMENT FOR GROUP HEALTH COVERAGE ON DC HEALTH LINK",
+    description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_no_binder_payment_received',
+    notice_triggers: [
+      {
+        name: 'Initial Employer No Binder Payment Received',
+        notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
+        notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
+        mpi_indicator: 'SHOP_D063',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DIE075',
+    title: 'Employee Enrollment Confirmation',
+    description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
+    resource_name: 'employee_role',
+    event_name: 'initial_employee_plan_selection_confirmation',
+    notice_triggers: [
+      {
+          name: 'Notice to employee after they select a plan Annual Open Enrollment',
+          notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
+          notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
+          mpi_indicator: 'SHOP_D075',
+          notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employee"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+          }
       }
     ]
   },
@@ -1598,71 +1640,92 @@ ivl_notice_triggers = [
   },
 
   {
-      hbx_id: 'IVL_BV',
-      title: 'You Must Submit Documents by the Deadline to Keep Your Insurance',
-      description: 'This is an Backlog Notice and is sent for people need to submit their documents',
-      resource_name: 'consumer_role',
-      event_name: 'ivl_backlog_verification_notice_uqhp',
-      notice_triggers: [
-          {
-              name: 'Backlog Notice',
-              notice_template: 'notices/ivl/ivl_backlog_verification_notice_uqhp',
-              notice_builder: 'IvlNotices::IvlBacklogVerificationNoticeUqhp',
-              mpi_indicator: 'IVL_BV',
-              notice_trigger_element_group: {
-                  market_places: ['individual'],
-                  primary_recipients: ["consumer"],
-                  primary_recipient_delivery_method: ["secure_message", "paper"],
-                  secondary_recipients: []
-              }
-          }
-      ]
+    hbx_id: 'IVL_TAX',
+    title: 'Your 1095-A Health Coverage Tax Form',
+    description: 'Notice to be sent out to all the people who got 1095a form for the year 2017',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_tax_cover_letter_notice',
+    notice_triggers: [
+      {
+        name: '1095A Tax Cover Letter Notice',
+        notice_template: 'notices/ivl/ivl_tax_notice',
+        notice_builder: 'IvlNotices::IvlTaxNotice',
+        mpi_indicator: 'IVL_TAX',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
 
   {
-      hbx_id: 'IVL_CDC',
-      title: 'Your Insurance through DC Health Link Has Changed to Cover All DC',
-      description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
-      resource_name: 'consumer_role',
-      event_name: 'ivl_to_coverall_transition_notice',
-      notice_triggers: [
-          {
-              name: 'Ivl to Coverall Transition Notice',
-              notice_template: 'notices/ivl/ivl_to_coverall_notice',
-              notice_builder: 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
-              mpi_indicator: 'IVL_CDC',
-              notice_trigger_element_group: {
-                  market_places: ['individual'],
-                  primary_recipients: ["consumer"],
-                  primary_recipient_delivery_method: ["secure_message", "paper"],
-                  secondary_recipients: []
-              }
-          }
-      ]
+    hbx_id: 'IVL_BV',
+    title: 'You Must Submit Documents by the Deadline to Keep Your Insurance',
+    description: 'This is an Backlog Notice and is sent for people need to submit their documents',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_backlog_verification_notice_uqhp',
+    notice_triggers: [
+      {
+        name: 'Backlog Notice',
+        notice_template: 'notices/ivl/ivl_backlog_verification_notice_uqhp',
+        notice_builder: 'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+        mpi_indicator: 'IVL_BV',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
 
   {
-      hbx_id: 'IVL_DCH',
-      title: 'Your Insurance through Cover All DC Has Changed to DC Health Link',
-      description: 'This is an Transition Notice and is sent for people who are moved to DC HEALTH LINK',
-      resource_name: 'consumer_role',
-      event_name: 'coverall_to_ivl_transition_notice',
-      notice_triggers: [
-          {
-              name: 'Coverall to IVL Transition Notice',
-              notice_template: 'notices/ivl/coverall_to_ivl_notice',
-              notice_builder: 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
-              mpi_indicator: 'IVL_DCH',
-              notice_trigger_element_group: {
-                  market_places: ['individual'],
-                  primary_recipients: ["consumer"],
-                  primary_recipient_delivery_method: ["secure_message", "paper"],
-                  secondary_recipients: []
-              }
-          }
-      ]
+    hbx_id: 'IVL_CDC',
+    title: 'Your Insurance through DC Health Link Has Changed to Cover All DC',
+    description: 'This is an Transition Notice and is sent for people who are moved to Coverall DC',
+    resource_name: 'consumer_role',
+    event_name: 'ivl_to_coverall_transition_notice',
+    notice_triggers: [
+      {
+        name: 'Ivl to Coverall Transition Notice',
+        notice_template: 'notices/ivl/ivl_to_coverall_notice',
+        notice_builder: 'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+        mpi_indicator: 'IVL_CDC',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
 
+  {
+    hbx_id: 'IVL_DCH',
+    title: 'Your Insurance through Cover All DC Has Changed to DC Health Link',
+    description: 'This is an Transition Notice and is sent for people who are moved to DC HEALTH LINK',
+    resource_name: 'consumer_role',
+    event_name: 'coverall_to_ivl_transition_notice',
+    notice_triggers: [
+      {
+        name: 'Coverall to IVL Transition Notice',
+        notice_template: 'notices/ivl/coverall_to_ivl_notice',
+        notice_builder: 'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+        mpi_indicator: 'IVL_DCH',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  }
 ]
 
 shop_notice_triggers.each do |trigger_params|

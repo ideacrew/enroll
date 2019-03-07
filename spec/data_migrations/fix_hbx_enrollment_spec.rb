@@ -9,7 +9,7 @@ describe FixHbxEnrollments, dbclean: :after_each do
   verification_states.each do |state|
     obj=(state+"_person").to_sym
     let(obj) {
-      person = FactoryGirl.create(:person, :with_consumer_role)
+      person = FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role)
       person.consumer_role.aasm_state = state
       person
     }
@@ -19,10 +19,11 @@ describe FixHbxEnrollments, dbclean: :after_each do
     hbx_enrollment_member = (state+"_enrollment_member").to_sym
     let(hbx_enrollment_member) { FactoryGirl.build(:hbx_enrollment_member, applicant_id: eval(family_member.to_s) ) }
   end
-
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: verification_outstanding_person) }
+  let(:hbx_enrollment_member){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
   let(:enrollment) {
     FactoryGirl.create(:hbx_enrollment,
+                       hbx_enrollment_members: [ hbx_enrollment_member ],
                        household: family.active_household,
                        coverage_kind: "health",
                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
@@ -46,26 +47,26 @@ describe FixHbxEnrollments, dbclean: :after_each do
       allow(subject).to receive(:get_enrollments).and_return([enrollment])
     end
     context "enrollment with outstanding member" do
-      it "moves hbx_enrollment to enrolled_contingent state" do
+      it "set is_any_enrollment_member_outstanding to true" do
         allow(subject).to receive(:get_members).and_return([verification_outstanding_person.consumer_role])
         subject.migrate
-        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(enrollment.is_any_enrollment_member_outstanding).to eq true
       end
     end
 
     context "enrollment with verification_period_ended member" do
-      it "moves hbx_enrollment to enrolled_contingent state" do
+      it "set is_any_enrollment_member_outstanding to true" do
         allow(subject).to receive(:get_members).and_return([verification_period_ended_person.consumer_role])
         subject.migrate
-        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(enrollment.is_any_enrollment_member_outstanding).to eq true
       end
     end
 
     context "enrollment with outstanding members" do
-      it "moves hbx_enrollment to enrolled_contingent state" do
+      it "set is_any_enrollment_member_outstanding to true" do
         allow(subject).to receive(:get_members).and_return([verification_outstanding_person.consumer_role, fully_verified_person.consumer_role, ssa_pending_person.consumer_role])
         subject.migrate
-        expect(enrollment.aasm_state).to eq "enrolled_contingent"
+        expect(enrollment.is_any_enrollment_member_outstanding).to eq true
       end
     end
   end
