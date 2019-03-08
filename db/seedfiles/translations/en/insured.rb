@@ -121,6 +121,7 @@ INSURED_TRANSLATIONS = {
   "en.insured.your_broker" => "Your Broker",
   "en.insured.delete_broker" => "Delete Broker",
   "en.confirm_delete_msg" => "Are you sure you want to delete?",
+  "en.confirm" => "Are you sure?",
   "en.insured.broker_name" => "Broker Name",
   "en.phone_number" => "Phone Number",
   "en.email_address" => "Email Address",

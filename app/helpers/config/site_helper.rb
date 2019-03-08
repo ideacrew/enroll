@@ -199,4 +199,13 @@ module Config::SiteHelper
   def fte_max_count
     Settings.aca.shop_market.small_market_employee_count_maximum
   end
+
+  def site_tufts_url
+     Settings.site.tufts_premier_url
+  end
+
+  def site_tufts_premier_link
+    link_to site_tufts_url, site_tufts_url
+  end
+
 end

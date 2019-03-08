@@ -21,7 +21,7 @@ class ShopEmployerNotices::EeMidYearPlanChangeNotice < ShopEmployerNotice
   def append_data
     effective_on = self.hbx_enrollment.effective_on
     employee_fullname = self.hbx_enrollment.employee_role.person.full_name.titleize
-  	notice.enrollment = PdfTemplates::Enrollment.new({
+    notice.enrollment = PdfTemplates::Enrollment.new({
       :effective_on => effective_on
       })
     notice.employee = PdfTemplates::EmployeeNotice.new({
