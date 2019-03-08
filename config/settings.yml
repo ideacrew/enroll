@@ -17,6 +17,7 @@ site:
   irs_url: "https://www.irs.gov/"
   exchange_hbx_id: "DC0"
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
+  invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
 
   social_media:
     facebook_url: ""
@@ -29,6 +30,10 @@ contact_center:
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
+  po_box: "PO Box 97022"
+  city: "Washington"
+  state: "DC"
+  zip_code: "20090"
 
 notices:
 

@@ -2,8 +2,9 @@ module Notifier
   module Builders::OfferedProduct
 
     def offered_products
-      plan_year = load_plan_year      
-      enrollments = plan_year.hbx_enrollments_by_month(TimeKeeper.date_of_record.next_month.beginning_of_month)
+      plan_year = load_plan_year
+      date = TimeKeeper.date_of_record.next_month.beginning_of_month
+      enrollments = plan_year.hbx_enrollments_by_month(date)
       merge_model.offered_products = build_offered_products(enrollments)
     end
 
@@ -26,8 +27,8 @@ module Notifier
         enrollment = Notifier::MergeDataModels::Enrollment.new
 
         enrollment.plan_name = enr.plan.name
-        enrollment.employee_responsible_amount = enr.total_employer_contribution
-        enrollment.employer_responsible_amount = enr.total_employee_cost
+        enrollment.employer_responsible_amount = enr.total_employer_contribution
+        enrollment.employee_responsible_amount = enr.total_employee_cost
         enrollment.premium_amount = enr.total_premium
 
         employee = enr.subscriber.person
