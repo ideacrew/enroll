@@ -1,59 +1,37 @@
 require 'rails_helper'
 
-RSpec.describe 'ModelEvents::InitialEmployerInvoiceAvailable', dbclean: :after_each do
+RSpec.describe 'ModelEvents::EmployerInvoiceAvailableNotice', dbclean: :after_each do
 
-  let(:model_event) { "employer_invoice_available" }
-  let(:notice_event) { "employer_invoice_available" }
+  let(:notice_event) { "employer_invoice_available_notice" }
   let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
   let(:organization) { FactoryGirl.create(:organization, :with_active_plan_year) }
   let(:employer_profile) { organization.employer_profile }
   let(:plan_year) { employer_profile.plan_years.first }
 
-  let(:model_instance) {Document.new({ title: "file_name_1", 
-    date: TimeKeeper.date_of_record, 
-    creator: "hbx_staff", 
-    subject: "invoice", 
+  let(:model_instance) {Document.new({ title: "file_name_1",
+    date: TimeKeeper.date_of_record,
+    creator: "hbx_staff",
+    subject: "invoice",
     identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
-    format: "file_content_type" 
+    format: "file_content_type"
   })}
-  let(:initial_invoice) { Document.new(subject: "invoice") }
-
-  before do
-    organization.documents << initial_invoice
-    organization.save
-  end
-
-  describe "ModelEvent" do
-    context "when monthly invoice is generated" do
-      it "should trigger model event" do
-        model_instance.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:document_update) do | model_event|
-            expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :employer_invoice_available, :klass_instance => model_instance, :options => {})
-          end
-        end
-        organization.documents << model_instance
-      end
-    end
-  end
 
   describe "NoticeTrigger" do
-    context "when initial invoice is generated" do
-      subject { Observers::NoticeObserver.new}
-      let(:model_event) { ModelEvents::ModelEvent.new(:employer_invoice_available, model_instance, {}) }
+    context "when non-first month invoice is generated" do
+      subject { Services::NoticeService.new }
 
       before do
-        allow(model_instance).to receive(:documentable).and_return(organization)
+        allow(model_instance).to receive(:documentable).and_return(organization.employer_profile)
       end
 
       it "should trigger notice event" do
-        expect(subject.notifier).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employer.employer_invoice_available"
+        expect(subject).to receive(:notify) do |event_name, payload|
+          expect(event_name).to eq "acapi.info.events.employer.employer_invoice_available_notice"
           expect(payload[:employer_id]).to eq employer_profile.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq plan_year.id.to_s
         end
-        subject.document_update(model_event)
+        subject.deliver(recipient: employer_profile, event_object: plan_year, notice_event: notice_event)
       end
     end
   end
