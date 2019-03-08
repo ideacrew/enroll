@@ -3,14 +3,13 @@
   </h4>
   <% if @wf_url %>
     <p>
-      Online and phone payments will appear 2-3 business days after you submit them. Mailed payments will appear within 2 weeks after you mail them. <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, target: :_blank %> online is the fastest way to pay.
+      Online and phone payments will appear 2-3 business days after you submit them. Mailed payments will appear within 2 weeks after you mail them. <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, "data-target" => "#payOnlineConfirmation_#{@employer_profile.id}", "data-toggle" => "modal" %> online is the fastest way to pay.
     </p>
   <% else %>
     <p>
       Online and phone payments will appear 2-3 business days after you submit them. Mailed payments will appear within 2 weeks after you mail them. <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> online is the fastest way to pay.
     </p>
   <% end %>
-
 <% if @employer_profile.has_premium_payments? %>
 
   <table class="table" id="payments-table">
