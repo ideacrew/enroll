@@ -38,4 +38,4 @@ Feature: Passive renewal should be updated when EE updates his current coverage
       Then Soren White selects active enrollment for termination
       When Soren White enters termination reason
       Then Soren White should see termination confirmation
-      Then Soren White should see a waiver instead of passive renewal
+      Then Soren White should not see a passive waiver
