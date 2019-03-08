@@ -188,8 +188,7 @@ describe EventsHelper, "transforming a qualifying event kind for external xml" d
     "new_eligibility_member" => "drop_family_member_due_to_new_eligibility",
     "new_eligibility_family" => "drop_family_member_due_to_new_eligibility",
     "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
-    "divorce" => "divorce",
-    "unknown_sep" => "exceptional_circumstances"
+    "divorce" => "divorce"
   }
 
   subject { EventsHelperSlug.new }

@@ -15,7 +15,6 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
   let!(:employer_profile) {
     create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id)
   }
-  let!(:update_renewing_plan) {employer_profile.renewing_plan_year.benefit_groups.map{ |benefit| benefit.update_attributes(elected_plan_ids:[renewal_plan.id], reference_plan_id: renewal_plan.id)}}
   let(:active_plan_year) { employer_profile.active_plan_year }
   let(:benefit_group) { active_plan_year.benefit_groups.first }
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }

@@ -293,11 +293,6 @@ class Family
     primary_family_member
   end
 
-  def terminated_enrollments
-    return [] if  latest_household.blank?
-    enrollments.order_by(:created_at => "DESC").select{|hbx| ["coverage_terminated", "coverage_termination_pending"].include?(hbx.aasm_state)}
-  end
-
   # @deprecated Use {primary_applicant}
   alias_method :primary_family_member, :primary_applicant
 

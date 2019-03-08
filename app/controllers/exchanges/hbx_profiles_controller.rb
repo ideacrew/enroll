@@ -1,5 +1,4 @@
 class Exchanges::HbxProfilesController < ApplicationController
-  include Exchanges::HbxProfilesHelper
   include DataTablesAdapter
   include DataTablesSearch
   include Pundit
@@ -13,7 +12,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
-
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -428,34 +426,6 @@ def employer_poc
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, person_has_active_enrollment: @person_has_active_enrollment}
     end
-  end
-
-   def view_terminated_hbx_enrollments
-    @person = Person.find(params[:person_id])
-    @element_to_replace_id = params[:family_actions_id]
-    @enrollments = @person.primary_family.terminated_enrollments
-  end
-
-  def reinstate_enrollment
-    enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
-
-    if enrollment.present?
-      begin
-        reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
-        if reinstated_enrollment.present?
-          if params['comments'].present?
-            reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
-          end
-          message = {notice: "Enrollment Reinstated successfully."}
-        end
-      rescue Exception => e
-        message = {error: e.to_s}
-      end
-    else
-      message = {notice: "Unable to find Enrollment."}
-    end
-
-    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def verify_dob_change
