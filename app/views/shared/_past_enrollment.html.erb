@@ -1,0 +1,30 @@
+<% plan = past_enrollment.product %>
+<tr>
+  <td>
+    <%= past_enrollment.terminated_on %>
+  </td>
+  <td>
+    <%= plan.name %>
+  </td>
+  <td>
+    <%= past_enrollment.kind.humanize.titleize %>
+  </td>
+  <td>
+    <%= past_enrollment.coverage_kind.titleize %>
+  </td>
+  <td>
+    <%= number_to_currency(current_premium(past_enrollment), precision: 2) %>/month
+  </td>
+  <td>
+    <%= past_enrollment.effective_on %>
+  </td>
+  <td>
+    <% names = past_enrollment.covered_members_first_names %>
+    <% if names.present? %>
+    <%= names.map do |name| name.capitalize end.to_sentence %>
+    <% end %>
+  </td>
+  <td>
+    <%= past_enrollment.aasm_state.humanize.titleize %>
+  </td>
+</tr>
