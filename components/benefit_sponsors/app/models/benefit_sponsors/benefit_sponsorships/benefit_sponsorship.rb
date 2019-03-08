@@ -637,13 +637,9 @@ module BenefitSponsors
 
     def extend_open_enrollment(benefit_application)
       if benefit_application.is_renewing?
-        unless active?
-          update_state_without_event(:active)
-        end
+        update_state_without_event(:active) unless active?
       else
-        unless applicant?
-          update_state_without_event(:applicant)
-        end
+        update_state_without_event(:applicant) unless applicant?
       end
     end
 
