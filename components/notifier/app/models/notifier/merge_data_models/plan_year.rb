@@ -7,11 +7,13 @@ module Notifier
     attribute :current_py_start_date, String
     attribute :current_py_end_date, String
     attribute :current_py_plus_60_days, String
+    attribute :current_year, String
 
     attribute :renewal_py_oe_start_date, String
     attribute :renewal_py_oe_end_date, String
     attribute :renewal_py_start_date, String
     attribute :renewal_py_end_date, String
+    attribute :renewal_year, String
 
     attribute :initial_py_publish_advertise_deadline, String
     attribute :initial_py_publish_due_date, String

@@ -59,6 +59,8 @@ describe 'ModelEvents::RenewalEmployerRemindersToPublishPlanYear', dbclean: :aft
           "employer_profile.plan_year.renewal_py_submit_soft_due_date",
           "employer_profile.plan_year.renewal_py_submit_due_date",
           "employer_profile.plan_year.renewal_py_oe_end_date",
+          "employer_profile.plan_year.current_year",
+          "employer_profile.plan_year.renewal_year",
           "employer_profile.broker.primary_fullname",
           "employer_profile.broker.organization",
           "employer_profile.broker.phone",
@@ -103,6 +105,14 @@ describe 'ModelEvents::RenewalEmployerRemindersToPublishPlanYear', dbclean: :aft
 
         it "should return renewal application advertised soft deadline of month" do
           expect(merge_model.plan_year.renewal_py_submit_soft_due_date).to eq Date.new(model_instance.start_on.year, model_instance.start_on.prev_month.month, Settings.aca.shop_market.renewal_application.application_submission_soft_deadline).strftime('%m/%d/%Y')
+        end
+
+        it "should return current year" do
+          expect(merge_model.plan_year.current_year).to eq plan_year.start_on.year.to_s
+        end
+
+        it "should return renewal year" do
+          expect(merge_model.plan_year.renewal_year).to eq model_instance.start_on.year.to_s
         end
 
         it "should return renewal application deadline of month" do
