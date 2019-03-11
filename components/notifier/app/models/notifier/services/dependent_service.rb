@@ -59,7 +59,7 @@ module Notifier
           if is_uqhp_notice
             false
           else
-            payload_member['aqhp_eligible'].upcase == 'YES'
+            payload_member['aqhp_eligible'].casecmp('YES').zero?
           end
       end
 
@@ -68,7 +68,7 @@ module Notifier
           if is_uqhp_notice
             false
           else
-            payload_member['totally_inelig'].upcase == 'YES'
+            payload_member['totally_inelig'].casecmp('YES').zero?
           end
       end
 
@@ -77,7 +77,7 @@ module Notifier
           if is_uqhp_notice
             true
           else
-            payload_member['uqhp_eligible'].upcase == 'YES'
+            payload_member['uqhp_eligible'].casecmp('YES').zero?
           end
       end
     end
