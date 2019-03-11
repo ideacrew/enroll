@@ -481,6 +481,20 @@ class EmployerProfile
     renewing_plan_year.present? && renewing_plan_year.renewing_enrolled?
   end
 
+  def is_transmission_eligible_for_renewal_effectuated?(start_on) # checked's for renewal plan year that started.
+    active_py = plan_years.where(start_on: start_on, :aasm_state.in => ['renewing_enrolled', 'active'])
+    expired_py = plan_years.where(start_on: start_on.prev_year, :aasm_state.in => ['active', 'expired'])
+    expired_py.present? && active_py.present?
+  end
+
+  def renewal_effectuated_carrier_drop?(start_on) # checked's carrier drop for renewal plan year that started.
+    if is_transmission_eligible_for_renewal_effectuated?(start_on)
+      active_py = plan_years.where(start_on: start_on, :aasm_state.in => ['renewing_enrolled', 'active']).first
+      expired_py = plan_years.where(start_on: start_on.prev_year, :aasm_state.in => ['active', 'expired']).first
+      (expired_py.carriers_offered - active_py.carriers_offered).any? || (expired_py.dental_carriers_offered - active_py.dental_carriers_offered).any?
+    end
+  end
+
   def is_renewal_carrier_drop?
     # commenting: it will send carrier drop for employer whose renewal application is in ineligble state.But later employer may come and fix application want to renew.
     if is_renewal_transmission_eligible?
@@ -897,44 +911,54 @@ class EmployerProfile
   end
 
   def self.transmit_scheduled_employers(start_on, transition_at = nil, feins=[])
+    org_collection =  feins.any? ? Organization.where(:fein.in => feins) : Organization
 
-    organization_collection =  feins.any? ? Organization.where(:fein.in => feins) : Organization
-
-    employer_collection = if transition_at.present?
-                            # late renewal employer after transmission day.
-                            organization_collection.where(:"employer_profile.plan_years" => {
-                                                              :$elemMatch => {
-                                                                  :start_on => start_on,
-                                                                  :aasm_state.in => ['active', 'renewing_enrolled'],
-                                                                  "workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'renewing_enrolled', "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}
-                                                              }})
-                          else
-                            # monthly renewal on transmission day.
-                            organization_collection.where(:"employer_profile.plan_years" => {
-                                                              :$elemMatch => {:start_on => start_on.prev_year, :aasm_state => 'active'}})
-                          end
-
-    employer_collection.each do |org|
+    renewal_employer_collection(org_collection, start_on, transition_at).each do |org|
       employer_profile = org.employer_profile
-      employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
-      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
+      employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible? || employer_profile.is_transmission_eligible_for_renewal_effectuated?(start_on)
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? || employer_profile.renewal_effectuated_carrier_drop?(start_on)
     end
 
-    employer_collection = if transition_at.present?
-                            # late initial employer after transmission day.
-                            organization_collection.where(:"employer_profile.plan_years" => {
-                                                          :$elemMatch => {:start_on => start_on, :aasm_state.in => ['enrolled', 'active']}},
-                                                          :"employer_profile.workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'binder_paid', "transition_at" => { "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}},
-                                                          :"employer_profile.aasm_state".in => ['binder_paid'])
-                          else
-                            # monthly initial employer on transmission day.
-                            organization_collection.where(:"employer_profile.plan_years" => {
-                                                              :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}},
-                                                              :"employer_profile.aasm_state".in => ['binder_paid'])
-                          end
-
-    employer_collection.each do |org|
+    initial_employer_collection(org_collection, start_on, transition_at).each do |org|
       org.employer_profile.transmit_initial_eligible_event
+    end
+  end
+
+
+  def self.renewal_employer_collection(org_collection, start_on, transition_at)
+
+    if transition_at.present? # late renewal employer after transmission day.
+
+      org_collection.where(:"employer_profile.plan_years" => {
+                           :$elemMatch => {:start_on => start_on, :aasm_state.in => ['active', 'renewing_enrolled'],
+                              :"workflow_state_transitions" => {"$elemMatch" => {"to_state" => 'renewing_enrolled',
+                                                                           "transition_at" => {"$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at), "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}}}})
+    else # monthly renewal on transmission day.
+
+      org_collection.where(:"employer_profile.plan_years" => {
+                           :$elemMatch => {:start_on => start_on.prev_year, :aasm_state => 'active'}})
+
+    end
+  end
+
+
+  def self.initial_employer_collection(org_collection, start_on, transition_at)
+    if transition_at.present? # late initial employer after transmission day.
+
+      org_collection.where(:"employer_profile.plan_years" => {
+                           :$elemMatch => {:start_on => start_on, :aasm_state.in => ['enrolled', 'active']}},
+                           :"employer_profile.aasm_state".in => ['binder_paid', 'active'],
+                           :"employer_profile.workflow_state_transitions" =>
+                              {:$elemMatch => {"to_state" => 'binder_paid', "transition_at" => {
+                                  "$gte" => TimeKeeper.start_of_exchange_day_from_utc(transition_at),
+                                  "$lt" => TimeKeeper.end_of_exchange_day_from_utc(transition_at)}}})
+
+    else # monthly initial employer on transmission day.
+
+      org_collection.where(:"employer_profile.plan_years" => {
+                           :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}},
+                           :"employer_profile.aasm_state".in => ['binder_paid'])
+
     end
   end
 
