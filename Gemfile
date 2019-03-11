@@ -95,6 +95,8 @@ gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 
 group :development do
   gem 'web-console', '2.3.0'
+  gem 'rubocop', "0.54.0", require: false
+  gem 'rubocop-git'
 end
 
 group :development, :test do
@@ -113,7 +115,7 @@ group :development, :test do
   gem 'railroady', '~> 1.5.2'
   gem 'rspec-rails', '~> 3.4.2'
   gem 'rspec_junit_formatter', '0.2.3'
-  gem 'ruby-progressbar', '1.6.0'
+  gem 'ruby-progressbar', '~> 1.7'
   gem 'spring', '1.6.3'
   gem 'yard', '~> 0.9.5'
   gem 'yard-mongoid', '~> 0.1.0'
