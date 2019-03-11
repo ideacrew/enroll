@@ -1,6 +1,6 @@
 require 'singleton'
 
-class CuramFinancialApplicationLookup
+class CuramApplicationLookup
   include Singleton
 
   attr_accessor :provider
@@ -25,17 +25,17 @@ class CuramFinancialApplicationLookup
         request_result = Acapi::Requestor.request("account_management.check_existing_account", person_demographics, 2)
         retry_attempt = retry_attempt + 1
       end
-      request_result.stringify_keys["body"]
+      request_result.stringify_keys["return_status"]
     end
   end
 
   class SlugSource
     def self.search_curam_financial_app(person_demographics)
-      "NO_DATA_FOUND"
+      "NO_CURAM_DATA_FOUND"
     end
   end
 end
 
 unless Rails.env.production?
-  CuramFinancialApplicationLookup.slug!
+  CuramApplicationLookup.slug!
 end
