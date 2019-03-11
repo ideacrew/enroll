@@ -14,9 +14,6 @@ class PlanYear
 
   INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
-  OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
-  INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
-  INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
   #This is being used only for datatable action
   ACTIVE_STATES_PER_DT    = %w(publish_pending enrolling enrollment_closed enrolled application_ineligible active)
   OPEN_ENROLLMENT_STATE   = %w(enrolling enrollment_extended renewing_enrolling renewing_enrollment_extended)
