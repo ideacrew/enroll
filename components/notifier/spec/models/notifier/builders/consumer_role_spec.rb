@@ -61,8 +61,24 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
     end
 
     context "Conditional attributes" do
-      it "should have aqhp_eligible?" do
-        expect(subject.aqhp_eligible?).to eq(true)
+      it "should be aqhp_eligible?" do
+        expect(subject.aqhp_eligible).to eq(true)
+      end
+
+      it "should be totally_ineligible?" do
+        expect(subject.totally_ineligible).to eq(false)
+      end
+
+      it "should be uqhp_eligible?" do
+        expect(subject.uqhp_eligible).to eq(false)
+      end
+
+      it "should have incarcerated?" do
+        expect(subject.incarcerated).to eq('No')
+      end
+
+      it "should have irs_consent?" do
+        expect(subject.irs_consent).to eq(false)
       end
     end
 
@@ -83,16 +99,16 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
 
       context "Model address attributes" do
         it "should have address " do
-          expect(address.address_1).to eq('1129 Awesome Street')
+          address.save
+          expect(address.address_1).to eq('1137 Awesome Street')
         end
       end
 
-      context "Initializing consumer role and address mergemodels" do
-        it "should have mergemodel with consumerrole and address" do
-          expect(address.mailing_address.state).to eq('DC')
+      context "CSR attributes" do
+        it "should be CSR present" do
+          expect(subject.csr_percent). to eq(73)
         end
       end
     end
-
   end
 end
