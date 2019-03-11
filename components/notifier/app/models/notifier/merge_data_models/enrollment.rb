@@ -29,7 +29,7 @@ module Notifier
         enrolled_count: '2',
         employee_first_name: 'David',
         employee_last_name: 'Finch',
-
+        coverage_kind: 'health'
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
