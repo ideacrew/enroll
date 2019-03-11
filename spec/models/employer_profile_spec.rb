@@ -1302,7 +1302,11 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
 
       before do
         if transition_at.present?
-          employer_profile.workflow_state_transitions << WorkflowStateTransition.new( to_state: emp_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+          employer_profile.workflow_state_transitions << WorkflowStateTransition.new( from_state:"applicant", to_state: emp_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+          if transition_at == 31
+            employer_profile.update_attributes(aasm_state: "active")
+            plan_year.update_attributes(aasm_state: 'active')
+          end
         end
       end
       it "shoud notify intial employer event" do
@@ -1333,16 +1337,29 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
       before do
         if transition_at.present?
           renewing_employer.renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new( to_state: py_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+          if transition_at == 31
+            renewing_employer.active_plan_year.update_attributes(aasm_state: 'expired')
+            renewing_employer.renewing_plan_year.update_attributes(aasm_state: 'active')
+          end
         end
       end
+
       it "shoud notify renewal employer event" do
         allow_any_instance_of(EmployerProfile).to receive(:is_renewal_carrier_drop?).and_return(false)
+        allow_any_instance_of(EmployerProfile).to receive(:renewal_effectuated_carrier_drop?).and_return(false)
         expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
+        if transition_at == 31
+          expect(renewing_employer.is_renewal_transmission_eligible?).to eq false
+          expect(renewing_employer.is_transmission_eligible_for_renewal_effectuated?(start_date)).to eq true
+        else
+          expect(renewing_employer.is_renewal_transmission_eligible?).to eq true
+        end
         transition_day =  transition_at.present? ? Date.new(start_date.year, start_date.prev_month.month, transition_at) : nil
         EmployerProfile.transmit_scheduled_employers(start_date, transition_day)
       end
     end
 
+    # on transmission day 16th
     it_behaves_like "eligible renewal employer", "renewing_enrolled", nil
 
     # late renewal employer 16 to 31 of the month
@@ -1364,12 +1381,25 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
       before do
         if transition_at.present?
           renewing_employer.renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new( to_state: py_state, transition_at: Date.new(start_date.year,start_date.prev_month.month, transition_at).to_time.utc)
+          if transition_at == 31
+            renewing_employer.active_plan_year.update_attributes(aasm_state: 'expired')
+            renewing_employer.renewing_plan_year.update_attributes(aasm_state: 'active')
+          end
         end
       end
       it "shoud notify renewal employer event" do
         expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_application_eligible", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_application_eligible'})
         expect_any_instance_of(EmployerProfile).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewing_employer.hbx_id, event_name: 'benefit_coverage_renewal_carrier_dropped'})
         transition_day =  transition_at.present? ? Date.new(start_date.year, start_date.prev_month.month, transition_at) : nil
+        if transition_at == 31
+          expect(renewing_employer.is_renewal_transmission_eligible?).to eq false
+          expect(renewing_employer.is_renewal_carrier_drop?).to eq nil
+          expect(renewing_employer.is_transmission_eligible_for_renewal_effectuated?(start_date)).to eq true
+          expect(renewing_employer.renewal_effectuated_carrier_drop?(start_date)).to eq true
+        else
+          expect(renewing_employer.is_renewal_transmission_eligible?).to eq true
+          expect(renewing_employer.is_renewal_carrier_drop?).to eq true
+        end
         EmployerProfile.transmit_scheduled_employers(start_date, transition_day)
       end
     end
