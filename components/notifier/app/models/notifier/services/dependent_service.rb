@@ -15,7 +15,7 @@ module Notifier
       aqhp_eligible?
     end
 
-  private
+    private
 
     def extract_person_details
       @person = Person.by_hbx_id(payload_member['person_hbx_id']).first
@@ -27,7 +27,7 @@ module Notifier
     def f_name
       @first_name =
         if is_uqhp_notice
-           person.first_name
+          person.first_name
         else
           payload_member['first_name']
         end
@@ -45,19 +45,18 @@ module Notifier
     def calculate_age
       @age =
       if is_uqhp_notice
-        person.age_on(TimeKeeper.date_of_record).present? ? person.age_on(TimeKeeper.date_of_record) : nil
+        person.age_on(TimeKeeper.date_of_record).presence || nil
       else
         Date.current.year - Date.parse(payload_member['dob']).year
       end
     end
-
 
     def aqhp_eligible?
       @is_aqhp_eligible =
         if is_uqhp_notice
           false
         else
-          payload_member['aqhp_eligible'].upcase == 'YES'
+          payload_member['aqhp_eligible'].casecmp('YES').zero?
         end
     end
 
@@ -66,7 +65,7 @@ module Notifier
         if is_uqhp_notice
           false
         else
-          payload_member['totally_inelig'].upcase == 'YES'
+          payload_member['totally_inelig'].casecmp('YES').zero?
         end
     end
 
@@ -75,7 +74,7 @@ module Notifier
         if is_uqhp_notice
           true
         else
-          payload_member['uqhp_eligible'].upcase == 'YES'
+          payload_member['uqhp_eligible'].casecmp('YES').zero?
         end
     end
 
