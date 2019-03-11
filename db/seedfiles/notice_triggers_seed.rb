@@ -214,27 +214,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP6',
-    title: 'Action Needed – Add all Eligible Employees to your Roster',
-    description: 'This notice goes to all the employers with zero employees on roster when published',
-    resource_name: 'employer',
-    event_name: 'zero_employees_on_roster',
-    notice_triggers: [
-      {
-        name: 'Zero Employees on Rotser',
-        notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
-        notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-        mpi_indicator: 'MPI_SHOP6',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP8A',
     title: 'Your Health Plan Open Enrollment Period has Begun',
     description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
