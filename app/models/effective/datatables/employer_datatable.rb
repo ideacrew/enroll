@@ -72,12 +72,8 @@ module Effective
         TimeKeeper.date_of_record > draft_plan_year.due_date_for_publish && TimeKeeper.date_of_record < draft_plan_year.start_on
       end
 
-      def get_latest_draft_plan_year(row)
-        row.employer_profile.is_renewing_employer? ? row.employer_profile.renewing_plan_year_drafts.last : row.employer_profile.plan_year_drafts.last
-      end
-
       def force_publish_link_type(row, allow)
-        draft_plan_year = get_latest_draft_plan_year(row)
+        draft_plan_year = row.renewing_or_draft_py
         draft_plan_year_and_allow = draft_plan_year.present? && business_policy_accepted?(draft_plan_year) && allow
         draft_plan_year_and_allow ? 'ajax' : 'hide'
       end
