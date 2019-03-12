@@ -17,6 +17,10 @@ module Notifier
     def self.stubbed_object
       Notifier::MergeDataModels::Broker.new({
         primary_fullname: 'Count Olaf',
+        primary_first_name: 'Count',
+        primary_last_name: 'Olaf',
+        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         organization: 'Best Brokers LLC',
         phone: '703-303-1007',
         email: 'count.olaf@bestbrokers.llc',
