@@ -140,7 +140,6 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
       [
         "employer_profile.notice_date",
         "employer_profile.employer_name",
-        "employer_profile.plan_year.current_py_start_date",
         "employer_profile.plan_year.current_py_oe_end_date",
         "employer_profile.broker.primary_fullname",
         "employer_profile.broker.organization",
@@ -149,6 +148,13 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
         "employer_profile.broker_present?"
       ]
     }
+
+    let(:start_on) { (TimeKeeper.date_of_record.beginning_of_month + 2.months).prev_year }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on, :aasm_state => 'active' ) }
+    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+    let!(:model_instance) { FactoryGirl.create(:plan_year, employer_profile: employer, start_on: start_on + 1.year, :aasm_state => 'renewing_draft', open_enrollment_start_on: TimeKeeper.date_of_record.next_day) }
+    let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: model_instance, title: "Benefits #{model_instance.start_on.year}") }
+
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
@@ -159,7 +165,7 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
 
     context "when notice event received" do
 
-      subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      subject { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: notice_event) }
 
       before do
         allow(subject).to receive(:resource).and_return(employer)
@@ -179,8 +185,8 @@ describe 'ModelEvents::ZeroEmployeesOnRosterNotice', dbclean: :around_each  do
         expect(merge_model.employer_name).to eq employer.legal_name
       end
 
-      it "should return plan year start date" do
-        expect(merge_model.plan_year.current_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
+      it "should return plan year open enrollment end date" do
+        expect(merge_model.plan_year.current_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
 
       it "should return false when there is no broker linked to employer" do
