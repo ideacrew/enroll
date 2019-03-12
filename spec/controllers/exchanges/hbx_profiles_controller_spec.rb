@@ -132,7 +132,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
   end
-
+=begin
   describe "#create" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
@@ -213,6 +213,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
 
   end
+=end
 
   describe "#check_hbx_staff_role" do
     let(:user) { double("user")}

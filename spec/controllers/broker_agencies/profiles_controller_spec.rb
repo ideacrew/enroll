@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
+RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
   let(:broker_agency_profile_id) { "abecreded" }
   let!(:broker_agency) { FactoryGirl.create(:broker_agency) }
   let(:broker_agency_profile) { broker_agency.broker_agency_profile }
 
-  describe "GET new",dbclean: :after_each do
+  describe "GET new", dbclean: :after_each do
     let(:user) { FactoryGirl.create(:user) }
     let(:person) { double("person")}
 
@@ -64,7 +64,7 @@ RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
     end
   end
 
-  describe "patch update",dbclean: :after_each do
+  describe "patch update", dbclean: :after_each do
     let(:user) { double(has_broker_role?: true)}
     #let(:org) { double }
     let(:org) { FactoryGirl.create(:organization)}
@@ -80,6 +80,7 @@ RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
         }
       }
     end
+
     before :each do
       sign_in user
       #allow(Forms::BrokerAgencyProfile).to receive(:find).and_return(org)
@@ -415,7 +416,11 @@ RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
     let(:favorite_general_agency) { FactoryGirl.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    let(:employer_profile) do
+      FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile, general_agency_accounts: [
+        GeneralAgencyAccount.new(general_agency_profile_id: general_agency_profile.id, broker_role_id: broker_role.id, start_on: (Date.today - 1.month))
+      ])
+    end
 
     before :each do
       sign_in user
@@ -555,7 +560,7 @@ RSpec.describe BrokerAgencies::ProfilesController,dbclean: :after_each do
     end
   end
 
-  describe "POST set_default_ga",dbclean: :after_each do
+  describe "POST set_default_ga", dbclean: :after_each do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, default_general_agency_profile_id: general_agency_profile.id) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
