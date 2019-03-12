@@ -9,6 +9,7 @@ module Notifier
     attribute :current_py_plus_60_days, String
     attribute :py_end_on_plus_60_days, String
     attribute :current_year, String
+    attribute :group_termination_plus_31_days, String
 
     attribute :renewal_py_oe_start_date, String
     attribute :renewal_py_oe_end_date, String
@@ -58,6 +59,7 @@ module Notifier
         current_py_plus_60_days: (renewal_py_start.prev_day + 60.days).strftime('%m/%d/%Y'),
         py_end_on_plus_60_days: (renewal_py_start.prev_day + 60.days).strftime('%m/%d/%Y'),
         current_year: current_py_start.year,
+        group_termination_plus_31_days: (renewal_py_start.prev_day + 31.days).strftime('%m/%d/%Y'),
         renewal_py_oe_start_date: renewal_py_start.prev_month.strftime('%m/%d/%Y'),
         renewal_py_oe_end_date: (renewal_py_start.prev_month + 19.days).strftime('%m/%d/%Y'),
         renewal_py_start_date: renewal_py_start.strftime('%m/%d/%Y'),
