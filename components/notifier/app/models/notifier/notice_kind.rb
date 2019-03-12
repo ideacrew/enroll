@@ -100,15 +100,8 @@ module Notifier
       send_generic_notice_alert
       send_generic_notice_alert_to_broker
       store_paper_notice if @resource.can_receive_paper_communication?
+      send_generic_notice_alert_to_broker_and_ga
     end
-
-    def shop?
-      [:employer_profile,
-        :employee_profile,
-        :broker_profile,
-        :broker_agency_profile,
-        :general_agency].include?(recipient_klass_name)
-      end
 
     def recipient_klass_name
       recipient.to_s.split('::').last.underscore.to_sym
@@ -141,6 +134,16 @@ module Notifier
 
     # Check if notice with same MPI indictor exists
     def can_be_published?
+    end
+
+    def is_shop?
+      [
+        :employer_profile,
+        :employee_profile,
+        :broker_profile,
+        :broker_agency_profile,
+        :general_agency
+      ].include? recipient_klass_name
     end
 
     def record_transition
