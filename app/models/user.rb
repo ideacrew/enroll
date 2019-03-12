@@ -110,10 +110,6 @@ class User
     end
   end
 
-  def super_admin?
-    true if self.try(:person).try(:hbx_staff_role).permission.name == "super_admin"
-  end
-
   def idp_verified?
     idp_verified
   end
@@ -224,7 +220,6 @@ class User
     def current_user=(user)
       Thread.current[:current_user] = user
     end
-
 
     def get_saml_settings
       settings = OneLogin::RubySaml::Settings.new

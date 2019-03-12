@@ -83,6 +83,8 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be true
       expect(policy.approve_broker?).to be true
       expect(policy.approve_ga?).to be true
+      expect(policy.view_the_configuration_tab?).to be false
+      expect(policy.can_submit_time_travel_request?).to be false
     end
 
     it 'hbx_read_only' do
@@ -92,6 +94,8 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be false
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
+      expect(policy.view_the_configuration_tab?).to be false
+      expect(policy.can_submit_time_travel_request?).to be false
     end
 
     it 'hbx_csr_supervisor' do
@@ -101,6 +105,8 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be false
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
+      expect(policy.view_the_configuration_tab?).to be false
+      expect(policy.can_submit_time_travel_request?).to be false
     end
 
     it 'hbx_csr_tier2' do
@@ -110,6 +116,8 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be false
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
+      expect(policy.view_the_configuration_tab?).to be false
+      expect(policy.can_submit_time_travel_request?).to be false
     end
 
     it 'csr_tier1' do
@@ -119,6 +127,8 @@ describe HbxProfilePolicy do
       expect(policy.send_broker_agency_message?).to be false
       expect(policy.approve_broker?).to be false
       expect(policy.approve_ga?).to be false
+      expect(policy.view_the_configuration_tab?).to be false
+      expect(policy.can_submit_time_travel_request?).to be false
     end
   end
 
@@ -167,6 +177,14 @@ describe HbxProfilePolicy do
     it "is prohibited from force publishing" do
       expect(policy.can_force_publish?).to be false
     end
+
+    it "is prohibited from viewing config tab" do
+      expect(policy.view_the_configuration_tab?).to be false
+    end
+
+    it "is prohibited from time traveling" do
+      expect(policy.can_submit_time_travel_request?).to be false
+    end
   end
 end
 
@@ -196,8 +214,31 @@ describe HbxProfilePolicy do
         it 'should return true' do
           person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
           expect(subject.can_create_benefit_application?).to eq true
+          expect(subject.can_submit_time_travel_request?).to eq false
         end
       end
     end
   end
+    describe HbxProfilePolicy do
+      context 'super admin can view config tab?' do
+        let!(:user10)                  { FactoryGirl.create(:user) }
+        let!(:person)                  { FactoryGirl.create(:person, :with_hbx_staff_role, user: user10) }
+
+        subject                        { HbxProfilePolicy.new(user10, nil) }
+
+      ['super_admin'].each do |kind|
+        context "for permissions which doesn't allow the user" do
+          let(:good_permission) { FactoryGirl.create(:permission, kind.to_sym) }
+
+          it 'should return true' do
+            person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+            expect(subject.can_create_benefit_application?).to eq true
+            expect(subject.can_submit_time_travel_request?).to eq false
+            expect(subject.view_the_configuration_tab?).to eq true
+          end
+        end
+      end
+    end
+  end
+
 end
