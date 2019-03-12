@@ -1,4 +1,5 @@
 require 'rails_helper'
+require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
@@ -742,6 +743,150 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      end
+    end
+  end
+
+  describe "benefit application creation" do
+    let!(:user)                { FactoryGirl.create(:user) }
+    let!(:person)              { FactoryGirl.create(:person, user: user) }
+    let!(:permission)          { FactoryGirl.create(:permission, :super_admin) }
+    let!(:hbx_staff_role)      { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id) }
+    let!(:rating_area)         { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+    let!(:service_area)        { FactoryGirl.create_default :benefit_markets_locations_service_area }
+    let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:benefit_market)      { site.benefit_markets.first }
+    let!(:organization)        { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let!(:employer_profile)    { organization.employer_profile }
+    let!(:benefit_sponsorship) { bs = employer_profile.add_benefit_sponsorship
+                                bs.save!
+                                bs
+                               }
+    let(:effective_period)     { (TimeKeeper.date_of_record + 3.months)..(TimeKeeper.date_of_record + 1.year + 3.months - 1.day) }
+    let!(:current_benefit_market_catalog) do
+      BenefitSponsors::ProductSpecHelpers.construct_cca_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      benefit_market.benefit_market_catalogs.where(
+        "application_period.min" => effective_period.min.to_s
+      ).first
+    end
+
+    let!(:valid_params)   {
+      { admin_datatable_action: true,
+        benefit_sponsorship_id: benefit_sponsorship.id.to_s,
+        start_on: effective_period.min,
+        end_on: effective_period.max,
+        open_enrollment_start_on: TimeKeeper.date_of_record + 2.months,
+        open_enrollment_end_on: TimeKeeper.date_of_record + 2.months + 20.day
+      }
+    }
+
+    before :each do
+      sign_in(user)
+    end
+
+    context '.new_benefit_application' do
+      before :each do
+        xhr :get, :new_benefit_application
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render new_benefit_application' do
+        expect(response).to render_template("exchanges/hbx_profiles/new_benefit_application")
+      end
+    end
+
+    context '.create_benefit_application' do
+      before :each do
+        xhr :post, :create_benefit_application, valid_params
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render new_benefit_application' do
+        expect(response).to render_template("exchanges/hbx_profiles/create_benefit_application")
+      end
+    end
+  end
+
+  describe "GET edit_fein" do
+
+    context "of an hbx super admin clicks Change FEIN" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
+      end
+
+      it "renders edit_fein" do
+        sign_in(user)
+        @params = {id: benefit_sponsorship.id.to_s, employer_actions_id: "employer_actions_#{employer_organization.employer_profile.id.to_s}", :format => 'js'}
+        xhr :get, :edit_fein, @params
+        expect(response).to render_template('edit_fein')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST update_fein" do
+
+    context "of an hbx super admin clicks Submit in Change FEIN window" do
+      let(:site) do
+        FactoryGirl.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      end
+      let(:employer_organization) do
+        FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site).tap do |org|
+          benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
+          benefit_sponsorship.save
+          org
+        end
+      end
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:user) do
+        FactoryGirl.create(:user, person: person)
+      end
+      let(:benefit_sponsorship) do
+        employer_organization.benefit_sponsorships.first
+      end
+
+      let(:new_valid_fein) { "23-4508390" }
+
+      it "renders update_fein" do
+        sign_in(user)
+        @params = {:organizations_general_organization => {:new_fein => new_valid_fein}, :id => benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{employer_organization.employer_profile.id.to_s}"}
+        xhr :post, :update_fein, @params
+        expect(response).to render_template('update_fein')
+        expect(response).to have_http_status(:success)
       end
     end
   end

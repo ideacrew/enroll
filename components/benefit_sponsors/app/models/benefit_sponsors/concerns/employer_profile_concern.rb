@@ -182,7 +182,7 @@ module BenefitSponsors
 
       def billing_benefit_application(billing_date=nil)
         billing_report_date = billing_date.is_a?(Date) ? billing_date : TimeKeeper.date_of_record.next_month
-        valid_applications = benefit_applications.non_draft.non_imported
+        valid_applications = benefit_applications.non_draft.non_canceled
 
         if billing_date.present?
           application = valid_applications.effective_period_cover(billing_date).first

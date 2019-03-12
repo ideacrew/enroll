@@ -204,7 +204,7 @@ module BenefitSponsors
 
       def is_benefit_sponsor_already_registered?(user, form)
         if user.person.present? && user.person.has_active_employer_staff_role?
-          form.profile_id = user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id.to_s
+          form.profile_id = user.person.active_employer_staff_roles.where(:benefit_sponsor_employer_profile_id.exists => true).first.benefit_sponsor_employer_profile_id.to_s
           return false
         end
         true

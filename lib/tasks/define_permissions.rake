@@ -39,6 +39,12 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
 
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_change_fein
+namespace :permissions do
+  desc 'hbx system admin can change fein'
+  DefinePermissions.define_task :hbx_admin_can_change_fein => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_force_publish
 namespace :permissions do
   desc 'hbx admin can force publish'
@@ -49,6 +55,12 @@ end
 namespace :permissions do
   desc 'hbx admin can extend open enrollment'
   DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_create_benefit_application
+namespace :permissions do
+  desc 'hbx admin can extend open enrollment'
+  DefinePermissions.define_task :hbx_admin_can_create_benefit_application => :environment
 end
 
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"

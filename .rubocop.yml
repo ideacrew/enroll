@@ -1,7 +1,55 @@
+# This yaml describes our current checks.
+#   Any checks marked "# TODO: RWC" are "re-enable when corrected.RWC" are "re-enable when corrected.
+
+# We will add the following back in later, but they cause
+#   a completely outsized amount of cop failures for the number of files:
+# - db/seedfiles
+# - lib/tasks
+AllCops:
+  Exclude:
+    - './project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec'
+    - './node_modules/**/*'
+    - './db/seedfiles/**/*'
+    - './lib/tasks/**/*'
+    - './components/benefit_markets/db/seedfiles/**/*'
+    - './components/benefit_sponsors/db/seedfiles/**/*'
+    - './components/old_sponsored_benefits/**/*'
+    - './eyes/enroll.eye.rb'
+
 Rails:
   Enabled: true
 
 Rails/ActiveRecordAliases:
+  Enabled: false
+
+Rails/FilePath:
+  Enabled: false
+
+Rails/FindBy:
+  Enabled: false
+
+Rails/DynamicFindBy:
+  Enabled: false
+
+# Re-enable for upgrade of rails
+Rails/ActionFilter:
+  Enabled: false
+
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+Rails/Output:
+  Enabled: false
+
+# Re-enable for upgrade of rails
+Rails/Validation:
+  Enabled: false
+
+# TODO: RWC
+Rails:
+  Enabled: false
+
+Layout/CommentIndentation:
   Enabled: false
 
 Layout/EmptyLines:
@@ -19,6 +67,13 @@ Layout/ExtraSpacing:
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
+Layout/IndentArray:
+  Enabled: false
+
+# Re-enable once other problems are solved
+Layout/SpaceAfterComma:
+  Enabled: false
+
 Layout/SpaceBeforeBlockBraces:
   Enabled: false
 
@@ -28,13 +83,68 @@ Layout/SpaceInsideHashLiteralBraces:
 Layout/SpaceInsideBlockBraces:
   Enabled: false
 
+Layout/TrailingBlankLines:
+  Enabled: false
+
+Layout/IndentationWidth:
+  Enabled: true
+
+Layout/Tab:
+  Enabled: true
+
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Metrics/AbcSize:
+  Max: 50
+
+Metrics/ClassLength:
+  Max: 300
+
+Metrics/CyclomaticComplexity:
+  Max: 8
+
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/LineLength:
-  Max: 200
+  Max: 250
+
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Naming/PredicateName:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/AndOr:
+  Enabled: true
+
+Style/BlockComments:
+  Enabled: false
 
 Style/BracesAroundHashParameters:
   Enabled: false
 
+# We will want to turn this back on or customize it more fully
+Style/Documentation:
+  Enabled: false
+
+Style/EachWithObject:
+  Enabled: false
+
+Style/ExpandPathArguments:
+  Enabled: false
+
 Style/HashSyntax:
+  Enabled: false
+
+Style/NumericPredicate:
   Enabled: false
 
 Style/StringLiterals:
@@ -42,6 +152,12 @@ Style/StringLiterals:
 
 Style/SymbolArray:
   Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+require:
+  - ./cops/lint/empty_rescue_clause.rb
 
 # Deprecated
 # Style/TrailingBlankLines:

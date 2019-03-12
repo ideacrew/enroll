@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
+RSpec.describe ShopEmployerNotices::LowEnrollmentNotice, dbclean: :after_each do
   let!(:employer_profile){ create :employer_profile}
   let!(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{

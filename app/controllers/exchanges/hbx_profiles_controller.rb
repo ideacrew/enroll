@@ -12,7 +12,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
-  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
+  before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -49,6 +49,39 @@ class Exchanges::HbxProfilesController < ApplicationController
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
     ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application).end_open_enrollment(TimeKeeper.date_of_record)
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
+  end
+
+  def new_benefit_application
+    authorize HbxProfile, :can_create_benefit_application?
+    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_ba_params)
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def create_benefit_application
+    @ba_form = BenefitSponsors::Forms::BenefitApplicationForm.for_create(create_ba_params)
+    authorize @ba_form, :updateable?
+    @save_errors = benefit_application_error_messages(@ba_form) unless @ba_form.save
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def edit_fein
+    @organization = @benefit_sponsorship.organization
+    @element_to_replace_id = params[:employer_actions_id]
+
+    respond_to do |format|
+      format.js { render "edit_fein" }
+    end
+  end
+
+  def update_fein
+    @organization = @benefit_sponsorship.organization
+    @element_to_replace_id = params[:employer_actions_id]
+    service_obj = ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: @benefit_sponsorship)
+    @result,  @errors_on_save = service_obj.update_fein(params['organizations_general_organization']['new_fein'])
+    respond_to do |format|
+      format.js { render "edit_fein" } if @errors_on_save
+      format.js { render "update_fein" }
+    end
   end
 
   def binder_paid
@@ -574,7 +607,6 @@ def employer_poc
     redirect_to exchanges_hbx_profiles_root_path
   end
 
-
   # Enrollments for APTC / CSR
   def aptc_csr_family_index
     raise NotAuthorizedError if !current_user.has_hbx_staff_role?
@@ -612,13 +644,27 @@ def employer_poc
 
 private
 
-   def modify_admin_tabs?
-     authorize HbxProfile, :modify_admin_tabs?
-   end
+  def benefit_application_error_messages(obj)
+    obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }
+  end
 
-   def view_admin_tabs?
-     authorize HbxProfile, :view_admin_tabs?
-   end
+  def new_ba_params
+    params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def create_ba_params
+    params.merge!({ pte_count: '0', msp_count: '0', admin_datatable_action: true })
+    params.permit(:start_on, :end_on, :fte_count, :pte_count, :msp_count,
+                  :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id, :admin_datatable_action)
+  end
+
+  def modify_admin_tabs?
+    authorize HbxProfile, :modify_admin_tabs?
+  end
+
+  def view_admin_tabs?
+    authorize HbxProfile, :view_admin_tabs?
+  end
 
   def setting_params
     params.require(:setting).permit(:name, :value)
