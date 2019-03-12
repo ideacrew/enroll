@@ -99,7 +99,7 @@ module SponsoredBenefits
       end
 
       def map_failed_assignment_on_form(id)
-        form.errors.add("Assignment Failed for #{plan_design_organization(id).legal_name}")
+        form.errors.add(:general_agency, "Assignment Failed for #{plan_design_organization(id).legal_name}")
       end
 
       def agencies
