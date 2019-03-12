@@ -54,7 +54,7 @@
   <% carrier_names.each do |plan| %>
     <div class="col-xs-6 carrier-custom-plans">
       <div class="col-xs-2">
-        <%= check_box_tag "Dental Plan", plan.id, false %>
+        <%= check_box_tag "Dental Plan", plan.id, true, :onclick => "handleReferencePlanSelection(this)" %>
       </div>
       <div class="col-xs-10 cc-reference-card">
         <h3 class="cc-reference-plans"><%= plan.name %></h3>
