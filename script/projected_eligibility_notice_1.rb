@@ -28,7 +28,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     begin
       subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
       dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
-      primary_person = HbxEnrollment.by_hbx_id(members.first["applid"]).first.family.primary_person rescue nil
+      primary_person = HbxEnrollment.by_hbx_id(members.first["applid"]).first.family.primary_person
       next if primary_person.nil?
       next if subscriber.present? && subscriber["resident"] && subscriber["resident"].casecmp('NO').zero?
       next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES').zero? }.present?
