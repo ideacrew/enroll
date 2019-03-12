@@ -98,7 +98,7 @@ module Notifier
       upload_and_send_secure_message
       send_generic_notice_alert
       send_generic_notice_alert_to_broker
-      store_paper_notice if @resource.can_receive_paper_communication?
+      store_paper_notice if @resource.is_a(ConsumerRole) && @resource.can_receive_paper_communication?
     end
 
     def recipient_klass_name
