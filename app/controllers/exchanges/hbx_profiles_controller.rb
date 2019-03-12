@@ -8,7 +8,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
+  before_action :check_super_admin, only: [:configuration]
+  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
@@ -472,7 +473,6 @@ def employer_poc
 
   def configuration
     @time_keeper = Forms::TimeKeeper.new
-
     respond_to do |format|
       format.html { render partial: "configuration_index" }
       format.js {}
@@ -727,6 +727,12 @@ private
   def check_hbx_staff_role
     unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+    end
+  end
+
+  def check_super_admin
+    unless current_user.try(:person).try(:hbx_staff_role).permission.name == "super_admin"
+      redirect_to root_path, :flash => { :error => "You must be an HBX super admin" }
     end
   end
 

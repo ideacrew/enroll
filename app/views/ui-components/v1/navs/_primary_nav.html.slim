@@ -47,6 +47,7 @@
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'calendar', link_path: main_app.exchanges_scheduled_events_path, display_name: 'Calendar', active_tab: 'calendar' }
               li
+              - if current_user.super_admin?
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'configuration', link_path: main_app.configuration_exchanges_hbx_profiles_path, display_name: 'Config', active_tab: 'config' }
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'staff', link_path: main_app.staff_index_exchanges_hbx_profiles_path, display_name: 'Staff', active_tab: 'staff' }

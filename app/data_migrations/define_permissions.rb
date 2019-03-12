@@ -9,30 +9,30 @@ class DefinePermissions < MigrationTask
     Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true)
+      view_admin_tabs: true,  view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true, 
+       view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,  
+      view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false, 
+       view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: false)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false, 
+       view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
-      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-      modify_admin_tabs: false, view_admin_tabs: true)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: true,  
+      view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true)
+      view_admin_tabs: true,  view_the_configuration_tab: false, can_submit_time_travel_request: false)
     Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
       can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-      view_admin_tabs: true, can_extend_open_enrollment: true)
+      view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false)
 
     permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
