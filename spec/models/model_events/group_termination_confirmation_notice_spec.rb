@@ -8,8 +8,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group, plan_year: model_instance) }
   let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id) }
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
-  let(:end_on) {TimeKeeper.date_of_record.end_of_month}
-  let(:terminated_on) {TimeKeeper.date_of_record}
+  let!(:end_on) {TimeKeeper.date_of_record.end_of_month}
   let(:termination_kind) {"nonpayment"}
    
   describe "ModelEvent" do
@@ -85,6 +84,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
           "employer_profile.notice_date",
           "employer_profile.employer_name",
           "employer_profile.plan_year.current_py_end_date",
+          "employer_profile.plan_year.group_termination_plus_31_days",
           "employer_profile.broker.primary_fullname",
           "employer_profile.broker.organization",
           "employer_profile.broker.phone",
@@ -104,6 +104,8 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
       before do
         allow(subject).to receive(:resource).and_return(employer_profile)
         allow(subject).to receive(:payload).and_return(payload)
+        model_instance.terminate!
+        allow(model_instance).to receive(:end_on).and_return(end_on)
       end
 
       it "should return merge model" do
@@ -122,6 +124,11 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
         expect(merge_model.plan_year.current_py_end_date).to eq model_instance.end_on.strftime('%m/%d/%Y')
       end
 
+      it 'should return plan year group termination date plus 31 calender days' do
+        expect(merge_model.plan_year.group_termination_plus_31_days).to eq (model_instance.end_on + 31.days).strftime('%m/%d/%Y')
+      end
+
+
       it "should return false when there is no broker linked to employer" do
         expect(merge_model.broker_present?).to be_falsey
       end
@@ -134,6 +141,7 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
           "employee_profile.employer_name",
           "employee_profile.plan_year.current_py_end_date",
           "employee_profile.plan_year.current_py_plus_60_days",
+          "employee_profile.plan_year.group_termination_plus_31_days",
           "employee_profile.broker.primary_fullname",
           "employee_profile.broker.organization",
           "employee_profile.broker.phone",
@@ -153,6 +161,8 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
       before do
         allow(subject).to receive(:resource).and_return(employee_role)
         allow(subject).to receive(:payload).and_return(payload)
+        model_instance.terminate!
+        allow(model_instance).to receive(:end_on).and_return(end_on)
       end
 
       it "should return merge model" do
@@ -173,6 +183,10 @@ describe 'ModelEvents::GroupTerminationConfirmationNotice', dbclean: :around_eac
 
       it 'should return plan year end date plus 60 days' do
         expect(merge_model.plan_year.current_py_plus_60_days).to eq (model_instance.end_on + 60.days).strftime('%m/%d/%Y')
+      end
+
+      it 'should return plan year group termination date plus 31 calender days' do
+        expect(merge_model.plan_year.group_termination_plus_31_days).to eq (model_instance.end_on + 31.days).strftime('%m/%d/%Y')
       end
 
       it "should return false when there is no broker linked to employer" do
