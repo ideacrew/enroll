@@ -52,6 +52,8 @@ module ShopPolicyCalculations
       else
         benefit_relationship(member.primary_relationship)
       end
+    when SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee
+      member.relationship_string
     else
       member.employee_relationship
     end
