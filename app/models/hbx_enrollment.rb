@@ -510,9 +510,9 @@ class HbxEnrollment
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
       if enrollment.effective_on > TimeKeeper.date_of_record
-        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
       else
-        enrollment.schedule_coverage_termination! if enrollment.may_schedule_coverage_termination? # terminate coverage if enrollment is already active
+        enrollment.schedule_coverage_termination!(TimeKeeper.date_of_record.end_of_month) if enrollment.may_schedule_coverage_termination? # terminate coverage if enrollment is past effective
       end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
