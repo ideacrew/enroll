@@ -734,3 +734,19 @@ function sortPlans() {
 function setCarrierRadio(element) {
   element.checked = true;
 }
+
+function handleReferencePlanSelection(element) {
+  if($(".reference-plans").children().length) {
+    target = $("input#reference_plan_" + element.value)
+    if(element.checked) {
+      target.parents('div.reference-plan').show();
+    } else {
+      if(target.prop('checked')) {
+        target.prop('checked', false);
+        $("#dental_reference_plan_id").val('')
+      }
+      target.parents('div.reference-plan').hide();
+      disableActionButtons();
+    }
+  }
+}
