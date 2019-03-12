@@ -13,5 +13,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.close_open_enrollment" => "Close Open Enrollment",
 	"en.hbx_profiles.publish_application" => "Publish Application",
 	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
-	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review"
+	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review",
+	"en.hbx_profiles.force_publish_fail" => "Application Force Publish Failed"
 }

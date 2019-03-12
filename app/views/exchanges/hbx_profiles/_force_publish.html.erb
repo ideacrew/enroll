@@ -1,4 +1,4 @@
-<%if @warning_on_save %>
+<% if @warning_on_save && @plan_year.application_errors.blank? %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
     <li><%= @warning_on_save %></li>
   </div>
@@ -7,6 +7,8 @@
 <div class="container bottom-pd">
   <% if @plan_year.publish_pending? || @plan_year.renewing_publish_pending? %>
     <h4 class="title"> <%= l10n("hbx_profiles.force_published_application_review") %> </h4>
+  <% elsif @plan_year.application_errors.present? %>
+    <h4 class="title"> <%= l10n("hbx_profiles.force_publish_fail") %> </h4>
   <% else %>
     <h4 class="title"> <%= l10n("hbx_profiles.force_publish_success") %> </h4>
   <% end %>
