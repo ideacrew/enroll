@@ -1,4 +1,3 @@
 - id = (resource.public_send(resource_method) rescue resource.object_id)
 - options = {autocomplete: 'off', id: "bulk_actions_resource_#{id}", class:"individual_checkbox", data: { role: 'bulk-actions-resource' }, onClick: 'event.stopPropagation();'}
-- options.merge!(disabled: true) if resource.employer_profile.blank?
 = check_box_tag 'bulk_actions_resources[]', id, false, options
