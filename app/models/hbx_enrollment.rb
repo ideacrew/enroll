@@ -1514,6 +1514,10 @@ class HbxEnrollment
     ENROLLED_STATUSES.include?(aasm_state)
   end
 
+  def is_ivl_and_outstanding?
+    is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
+  end
+
   def is_effective_in_current_year?
     (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).include?(effective_on)
   end

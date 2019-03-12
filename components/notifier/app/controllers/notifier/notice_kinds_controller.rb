@@ -48,7 +48,6 @@ module Notifier
     def update
       notice_kind = Notifier::NoticeKind.find(params['id'])
       notice_kind.update_attributes(notice_params)
-
       flash[:notice] = 'Notice content updated successfully'
       redirect_to notice_kinds_path
     end
@@ -109,23 +108,31 @@ module Notifier
     end
 
     def get_tokens
-      builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
-      token_builder = builder.constantize.new
-      tokens = token_builder.editor_tokens
-      # placeholders = token_builder.place_holders
-
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: {tokens: tokens} }
+        format.json { render json: {tokens: service.editor_tokens} }
       end
     end
 
     def get_placeholders
-      placeholders = Notifier::MergeDataModels::EmployerProfile.new.place_holders
+      service = Notifier::Services::NoticeKindService.new(params['market_kind'])
+      service.builder = builder_param
+      respond_to do |format|
+        format.html
+        format.json { render json: { 
+          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
+        } }
+      end
+    end
+
+    def get_recipients
+      recipients = Notifier::Services::NoticeKindService.new(params['market_kind']).recipients
 
       respond_to do |format|
         format.html
-        format.json {render json: placeholders}
+        format.json { render json: {recipients: recipients} }
       end
     end
 
@@ -138,7 +145,11 @@ module Notifier
     end
 
     def notice_params
-      params.require(:notice_kind).permit(:title, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+      params.require(:notice_kind).permit(:title, :market_kind, :description, :notice_number, :recipient, :event_name, {:template => [:raw_body]})
+    end
+
+    def builder_param
+      params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
     end
   end
 end
