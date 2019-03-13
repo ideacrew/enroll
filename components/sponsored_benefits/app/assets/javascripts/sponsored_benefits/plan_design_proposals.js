@@ -76,6 +76,7 @@ function fetchDentalCustom(){
         data:{
           active_year: active_year,
           plans_ids: dental_plan_ids,
+          kind: "dental"
         },
         success: function() {
 
