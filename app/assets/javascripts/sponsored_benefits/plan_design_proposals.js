@@ -71,6 +71,10 @@ function fetchDentalCustom(){
     $.each($("input[name='Dental Plan']:checked"), function(){
         dental_plan_ids.push($(this).val());
     });
+
+    if(!dental_plan_ids.length){
+        return alert("Please Select One of Plan Under Custom Carrier Filter");
+    }
     $.ajax({
         type: "POST",
         data:{
