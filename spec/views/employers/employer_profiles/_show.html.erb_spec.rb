@@ -94,7 +94,6 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
     it "should render the correct date" do
       @tab = 'home'
       render template: "employers/employer_profiles/show"
-      expect(rendered).not_to have_content((open_enrollment_end_date - Time.now.to_date).to_i)
       expect(rendered).to have_content((open_enrollment_end_date - TimeKeeper.date_of_record).to_i)
     end
   end
