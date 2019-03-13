@@ -250,7 +250,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
       end
 
       it "should return broker assignment date" do
-        expect(merge_model.broker.assignment_date).to eq model_instance.start_on
+        expect(merge_model.broker.assignment_date).to eq model_instance.start_on.strftime("%m/%d/%Y")
       end
 
       it "should return broker agency name " do
