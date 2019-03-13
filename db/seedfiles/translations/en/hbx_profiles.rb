@@ -22,5 +22,9 @@ HBX_PROFILES_TRANSLATIONS = {
 	'en.hbx_profiles.provide_oe_end_date' => 'Please provide Open Enrollment End On date.',
 	"en.hbx_profiles.change_fein" => "Change FEIN",
 	"en.hbx_profiles.new_fein" => "New FEIN",
-	"en.hbx_profiles.update_fein_success" => "FEIN Update Successful"
+	"en.hbx_profiles.update_fein_success" => "FEIN Update Successful",
+	"en.hbx_profiles.confirm_create_ba" => "Confirm Create Plan Year",
+  "en.hbx_profiles.confirm_create_ba_message" => "Are you sure you want to create a new application?",
+  "en.hbx_profiles.confirm_create_ba_warning" => "Creating a new application will cancel or terminate the existing application."
+
 }
