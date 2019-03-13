@@ -10,7 +10,7 @@ module BenefitSponsors
                          benefit_application.benefit_sponsorship.organization.fein,
                          benefit_application.effective_period.min.to_date.strftime('%m/%d/%Y'),
                          benefit_application.effective_period.max.to_date.strftime('%m/%d/%Y'),
-                         product.issuer_profile.hbx_id,
+                         product.issuer_profile.hbx_carrier_id,
                          product.issuer_profile.fein].join(',')
             end
           end
