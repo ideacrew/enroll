@@ -81,5 +81,13 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_draft"
     end
+
+    it "should update aasm_state of plan year to renewing_enrolling when ENV['py_state_to'] is set to renewing_draft" do
+      plan_year.update_attributes!(aasm_state:'renewing_canceled')
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrolling"
+    end
   end
 end

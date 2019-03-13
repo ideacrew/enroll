@@ -25,6 +25,7 @@ module Insured
     end
 
     def service_unavailable
+      session[:person_id] = params["person_id"] if params.keys.include?("person_id")
       set_consumer_bookmark_url
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"

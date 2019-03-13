@@ -119,6 +119,13 @@ class PlanYear
     end
   end
 
+  def activate_employee_benefit_packages
+    census_employees_within_play_year.each do |census_employee|
+      assignment = census_employee.benefit_group_assignments_for(self).first
+      assignment.make_active if assignment.present?
+    end
+  end
+
   #Updating end_on with start_on for XML purposes only.
   def update_end_date
     self.update_attributes!(:end_on => self.start_on)
@@ -189,7 +196,7 @@ class PlanYear
   def enrollments_for_plan_year
     id_list = self.benefit_groups.map(&:id)
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector]
+    enrollment_selector = [HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector, HbxEnrollment::terminated.selector]
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of(enrollment_selector).to_a
     end
@@ -212,11 +219,15 @@ class PlanYear
         hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
         hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
       else
-        if py_end_on < TimeKeeper.date_of_record
+        if hbx_enrollment.coverage_termination_pending? && hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on < py_end_on)
+          #do nothing
+        elsif py_end_on < TimeKeeper.date_of_record
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.terminate_coverage!(py_end_on)
-            hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
-            hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            if hbx_enrollment.terminated_on.nil? || (hbx_enrollment.terminated_on.present? && (hbx_enrollment.terminated_on > py_end_on))
+              hbx_enrollment.terminate_coverage!(py_end_on)
+              hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
+              hbx_enrollment.notify_enrollment_cancel_or_termination_event(options[:transmit_xml])
+            end
           end
         else
           if hbx_enrollment.may_schedule_coverage_termination?

@@ -273,7 +273,7 @@ class ConsumerRole
   #use this method to check what verification types needs to be included to the notices
   def types_include_to_notices
     verification_types.find_all do |type|
-      type.unverified_no_docs?
+      type.type_unverified?
     end
   end
 

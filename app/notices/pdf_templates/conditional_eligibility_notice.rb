@@ -40,9 +40,9 @@ module PdfTemplates
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
     attribute :current_year, String
+    attribute :is_an_aqhp_cover_letter, Boolean
     attribute :same_plan_health_enrollment, Boolean
     attribute :same_plan_dental_enrollment, Boolean
-
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }

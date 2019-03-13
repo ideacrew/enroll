@@ -2,11 +2,11 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   include ApplicationHelper
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
+    args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
-    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person
+    args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end

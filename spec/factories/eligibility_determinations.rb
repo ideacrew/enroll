@@ -10,5 +10,4 @@ FactoryGirl.define do
     e_pdc_id "3110344"
     source "Curam"
   end
-
 end

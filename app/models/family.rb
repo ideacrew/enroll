@@ -201,6 +201,7 @@ class Family
   scope :all_with_hbx_enrollments,              -> { exists(:"households.hbx_enrollments" => true) }
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
+  scope :all_enrolled_and_enrolling_enrollments,->{  where(:"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES))}
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
@@ -217,6 +218,7 @@ class Family
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
   scope :outstanding_verification,              ->{ by_enrollment_individual_market.all_enrollments.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true, :effective_on => { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }}}) }
+  scope :outstanding_verification_datatable,    ->{ by_enrollment_individual_market.all_enrolled_and_enrolling_enrollments.where(:"households.hbx_enrollments"=>{"$elemMatch"=>{:is_any_enrollment_member_outstanding => true}})}
 
   def self.approved_applications
     where :_id.in => FinancialAssistance::Application.where('aasm_state' => 'determined').map(&:family_id)
