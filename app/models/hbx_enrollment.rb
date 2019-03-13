@@ -509,13 +509,13 @@ class HbxEnrollment
 
   def propogate_waiver
     return false unless is_shop? # there is no concept of waiver in ivl case
-    id_list = self.employer_profile.active_and_renewing_published.collect{|py| py.benefit_groups.pluck(:id)}.flatten
+    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
       if enrollment.effective_on > TimeKeeper.date_of_record
-        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
+        enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future active
       else
-        enrollment.schedule_coverage_termination!(TimeKeeper.date_of_record.end_of_month) if enrollment.may_schedule_coverage_termination? # terminate coverage if enrollment is past effective
+        enrollment.schedule_coverage_termination!(self.effective_on.prev_day) if enrollment.may_schedule_coverage_termination?
       end
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
