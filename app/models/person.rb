@@ -698,14 +698,19 @@ class Person
     def search_hash(s_str)
       clean_str = s_str.strip
       s_rex = Regexp.new(Regexp.escape(clean_str), true)
-      {
-        "$or" => ([
-          {"first_name" => s_rex},
-          {"last_name" => s_rex},
-          {"hbx_id" => s_rex},
-          {"encrypted_ssn" => encrypt_ssn(s_rex)}
-        ] + additional_exprs(clean_str))
-      }
+      if clean_str =~ /[a-z]/i
+          { "$or" => ([
+            {"first_name" => s_rex},
+            {"last_name" => s_rex}
+          ] + additional_exprs(clean_str)) }
+      else
+        {
+          "$or" => [
+            {"hbx_id" => s_rex},
+            {"encrypted_ssn" => encrypt_ssn(clean_str)}
+          ]
+        }
+      end
     end
 
     def additional_exprs(clean_str)
