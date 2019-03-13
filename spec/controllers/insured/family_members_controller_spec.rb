@@ -365,7 +365,7 @@ RSpec.describe Insured::FamilyMembersController do
         expect(assigns(:dependent).family_member).to eq family_member
         expect(assigns(:dependent).family_member.person.consumer_role.is_applying_coverage).to eq true
       end
-      it "should not update the is_applying_coverage attribute when it is changed" dol
+      it "should not update the is_applying_coverage attribute when it is changed" do
         dependent_properties['is_applying_coverage']= "false" 
         put :update, :id => dependent_id, :dependent => dependent_properties
         expect(assigns(:dependent).family_member).to eq family_member
