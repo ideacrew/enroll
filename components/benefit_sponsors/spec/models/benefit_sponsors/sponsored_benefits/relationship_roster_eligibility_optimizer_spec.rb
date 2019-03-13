@@ -1,17 +1,17 @@
 require "rails_helper"
 
 module BenefitSponsors
-	RSpec.describe BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer, :dbclean => :after_each do
-		subject { ::BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer.new }
+  RSpec.describe BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer, :dbclean => :after_each do
+    subject { ::BenefitSponsors::SponsoredBenefits::RelationshipRosterEligibilityOptimizer.new }
 
-		let(:employee_dob) { Date.new(1990, 6, 1) }
-	  let(:employee_member_id) { "some_employee_id" }
-		let(:roster_entry) do
-			::BenefitSponsors::Members::MemberGroup.new(
+    let(:employee_dob) { Date.new(1990, 6, 1) }
+    let(:employee_member_id) { "some_employee_id" }
+    let(:roster_entry) do
+      ::BenefitSponsors::Members::MemberGroup.new(
         roster_members,
         group_enrollment: group_enrollment,
-			)
-		end
+      )
+    end
 
     let(:employee) do
       instance_double(

@@ -15,7 +15,11 @@ class AddHbxEnrollmentMember < MongoidMigrationTask
         return
       end
       primary_hem = enrollment.hbx_enrollment_members.where(is_subscriber: true).first
-      enrollment_member = HbxEnrollmentMember.new(applicant_id: family_member.id, is_subscriber: false, eligibility_date: primary_hem.eligibility_date, coverage_start_on: primary_hem.coverage_start_on)
+      enrollment_member = if !primary_hem
+        HbxEnrollmentMember.new(applicant_id: family_member.id, is_subscriber: true, eligibility_date: ENV['coverage_start_on'], coverage_start_on: ENV['coverage_start_on'])
+      else
+        HbxEnrollmentMember.new(applicant_id: family_member.id, is_subscriber: false, eligibility_date: primary_hem.eligibility_date, coverage_start_on: primary_hem.coverage_start_on)
+      end
       enrollment.hbx_enrollment_members << enrollment_member
       enrollment.save!
       puts "Added coverage to the family member" unless Rails.env.test?

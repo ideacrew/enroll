@@ -80,6 +80,7 @@ module BenefitSponsors
     delegate :sic_code,     :sic_code=,     to: :profile, allow_nil: true
     delegate :primary_office_location,      to: :profile, allow_nil: true
     delegate :enforce_employer_attestation, to: :benefit_market
+    delegate :legal_name,   :fein,          to: :organization
 
     belongs_to  :organization,
       inverse_of: :benefit_sponsorships,

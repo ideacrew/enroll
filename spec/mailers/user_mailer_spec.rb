@@ -7,11 +7,11 @@ RSpec.describe UserMailer do
     let(:email){UserMailer.generic_notice_alert('john', hbx_id, 'john@dc.gov' , {"file_name" => file})}
 
     it 'should not allow a reply' do
-    	expect(email.from).to match(["no-reply@individual.#{site_domain_name}"])
+      expect(email.from).to match(["no-reply@individual.#{site_domain_name}"])
     end
 
     it 'should deliver to john' do
-    	expect(email.to).to match(['john@dc.gov'])
+      expect(email.to).to match(['john@dc.gov'])
       expect(email.html_part.body).to match(/Dear john/)
     end
 
