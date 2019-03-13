@@ -335,7 +335,7 @@ class BenefitGroup
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 199
     targeted_census_employees.active.collect do |ce|
-      if plan.coverage_kind == 'dental'
+      if plan.coverage_kind == 'dental' && self.persisted?
         pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
       else
         pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
