@@ -136,7 +136,7 @@ class Insured::FamilyMembersController < ApplicationController
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
-      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
+      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?&& params[:dependent][:is_applying_coverage].present?
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

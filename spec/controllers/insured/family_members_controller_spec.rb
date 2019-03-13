@@ -338,4 +338,39 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
   end
+
+  describe "update ivl dependent " do
+    let(:address) { double }
+    let(:person2) {FactoryGirl.create(:person,:with_consumer_role)}
+    let(:consumer_role) {person2.consumer_role}
+    let(:family_member) { FactoryGirl.create(:family_member, person:person2, family:test_family) }
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
+    let(:dependent_id) { "234dlfjadsklfj" }
+    let(:dependent_properties) { { "first_name" => "lkjdfkajdf", "is_applying_coverage" => nil } }
+    let(:update_result) { true }
+
+    before(:each) do
+      sign_in(user)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
+      allow(dependent).to receive(:family_id).and_return(test_family.id)
+      allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
+      allow(dependent).to receive(:same_with_primary=)
+      allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
+    end
+
+    describe "with an ivl dependent" do    
+      it "should not update the is_applying_coverage attribute when it is nil" do
+        put :update, :id => dependent_id, :dependent => dependent_properties
+        expect(assigns(:dependent).family_member).to eq family_member
+        expect(assigns(:dependent).family_member.person.consumer_role.is_applying_coverage).to eq true
+      end
+      it "should not update the is_applying_coverage attribute when it is changed" dol
+        dependent_properties['is_applying_coverage']= "false" 
+        put :update, :id => dependent_id, :dependent => dependent_properties
+        expect(assigns(:dependent).family_member).to eq family_member
+        expect(assigns(:dependent).family_member.person.consumer_role.is_applying_coverage).to eq false
+      end
+    end    
+  end
 end
