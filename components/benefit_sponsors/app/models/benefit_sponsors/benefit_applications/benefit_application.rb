@@ -898,7 +898,7 @@ module BenefitSponsors
     # Notify BenefitSponsorship upon state change
     def publish_state_transition
       return unless benefit_sponsorship.present?
-      benefit_sponsorship.application_event_subscriber(aasm)
+      benefit_sponsorship.application_event_subscriber(self, aasm)
     end
 
     def coverage_renewable?

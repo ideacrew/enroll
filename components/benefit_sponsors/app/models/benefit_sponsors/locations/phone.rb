@@ -1,7 +1,7 @@
 module BenefitSponsors
   module Locations
     class Phone
-    	include Mongoid::Document
+      include Mongoid::Document
       include Mongoid::Timestamps
 
       KINDS = ["home", "work", "mobile", "main", "fax"]

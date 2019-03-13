@@ -335,7 +335,7 @@ module BenefitSponsors
 
         include_context "setup initial benefit application" do
           let(:aasm_state) { :enrollment_open }
-          let(:benefit_sponsorship_state) { :initial_enrollment_open }
+          let(:benefit_sponsorship_state) { :applicant }
         end
 
         before(:each) do
@@ -406,7 +406,7 @@ module BenefitSponsors
 
         let(:open_enrollment_close) { TimeKeeper.date_of_record + 2.days }
         let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }        
-        let(:benefit_sponsorship_state) { :initial_enrollment_open }
+        let(:benefit_sponsorship_state) { :applicant }
 
         include_context "setup initial benefit application" do
           let(:aasm_state) { :enrollment_extended }
@@ -637,17 +637,17 @@ module BenefitSponsors
 
       context 'when application is ineligible' do 
         let(:aasm_state) { :enrollment_ineligible }
-        let(:benefit_sponsorship_state) { :initial_enrollment_ineligible }
+        let(:benefit_sponsorship_state) { :applicant }
         let(:today) { current_effective_date - 7.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
         it 'should extend open enrollment' do 
           expect(initial_application.aasm_state).to eq :enrollment_ineligible
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
           initial_application.reload
           expect(initial_application.aasm_state).to eq :enrollment_extended
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           expect(initial_application.open_enrollment_period.max).to eq oe_end_date
         end
       end
@@ -658,51 +658,47 @@ module BenefitSponsors
         let(:today) { current_effective_date + 2.days }
         let(:oe_end_date) { current_effective_date + 5.days }
 
-        before do
-          benefit_sponsorship.workflow_state_transitions.create(from_state: 'initial_enrollment_ineligible', to_state: 'applicant') 
-        end
-
         it 'should extend open enrollment' do 
           expect(initial_application.aasm_state).to eq :canceled
           expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
           initial_application.reload
           expect(initial_application.aasm_state).to eq :enrollment_extended
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           expect(initial_application.open_enrollment_period.max).to eq oe_end_date
         end
       end
 
       context 'when application open enrollment closed' do
         let(:aasm_state) { :enrollment_closed }
-        let(:benefit_sponsorship_state) { :initial_enrollment_closed }
+        let(:benefit_sponsorship_state) { :applicant }
         let(:today) { current_effective_date - 8.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
         it 'should extend open enrollment' do 
           expect(initial_application.aasm_state).to eq :enrollment_closed
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_closed
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
           initial_application.reload
           expect(initial_application.aasm_state).to eq :enrollment_extended
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           expect(initial_application.open_enrollment_period.max).to eq oe_end_date
         end
       end
 
       context 'when application open enrollment open' do
         let(:aasm_state) { :enrollment_open }
-        let(:benefit_sponsorship_state) { :initial_enrollment_open }
+        let(:benefit_sponsorship_state) { :applicant }
         let(:today) { current_effective_date - 13.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
         it 'should extend open enrollment' do 
           expect(initial_application.aasm_state).to eq :enrollment_open
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
           initial_application.reload
           expect(initial_application.aasm_state).to eq :enrollment_extended
-          expect(initial_application.benefit_sponsorship.aasm_state).to eq :initial_enrollment_open
+          expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           expect(initial_application.open_enrollment_period.max).to eq oe_end_date
         end
       end
