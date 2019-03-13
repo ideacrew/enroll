@@ -2,6 +2,7 @@ class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  embedded_in :person
   embedded_in :office_location
 
   field :kind, type: String

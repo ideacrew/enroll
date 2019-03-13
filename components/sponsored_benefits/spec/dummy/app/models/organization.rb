@@ -10,7 +10,12 @@ class Organization
   field :fein, type: String
   field :home_page, type: String
 
-  embeds_one :employer_profile, cascade_callbacks: true, validate: true
   embeds_many :office_locations, cascade_callbacks: true, validate: true
+
+  embeds_one :employer_profile, cascade_callbacks: true, validate: true
+  embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
+  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
+  embeds_one :carrier_profile, cascade_callbacks: true, validate: true
+  embeds_one :hbx_profile, cascade_callbacks: true, validate: true
       
 end
