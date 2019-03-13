@@ -107,11 +107,15 @@ module BenefitSponsors
     end
 
     def transmit_renewal_eligible_event
-      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+      if benefit_sponsorship.is_renewal_transmission_eligible?
+        notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
+      end
     end
 
     def transmit_renewal_carrier_drop_event
-      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
+      if benefit_sponsorship.is_renewal_carrier_drop?
+        notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
+      end
     end
 
     # TODO: Need to verify is_renewing? logic for off-cycle renewals

@@ -18,10 +18,10 @@ class HbxEnrollmentExemption
   accepts_nested_attributes_for :comments, reject_if: proc { |attribs| attribs['content'].blank? }, allow_destroy: true
 
   validates :kind,
-  					presence: true,
-  					allow_blank: false,
-  					allow_nil:   false,
-  					inclusion: {in: KINDS}
+            presence: true,
+            allow_blank: false,
+            allow_nil:   false,
+            inclusion: {in: KINDS}
 
 
   def parent

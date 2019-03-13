@@ -2,7 +2,7 @@ class Exchanges::ScheduledEventsController < ApplicationController
   layout "two_column"
 
   def new
-  	@scheduled_event = ScheduledEvent.new
+    @scheduled_event = ScheduledEvent.new
   end
 
   def list

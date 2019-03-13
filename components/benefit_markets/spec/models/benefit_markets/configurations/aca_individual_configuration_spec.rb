@@ -7,7 +7,7 @@ module BenefitMarkets
       let(:aca_individual_configuration) { AcaIndividualConfiguration.new }
 
       let(:mm_enr_due_on)       { 15 }
-      let(:vr_os_window)    	  { 0 }
+      let(:vr_os_window)        { 0 }
       let(:vr_due)              { 95 }
       let(:open_enrl_start_on)  { Date.new(2017,11,1) }
       let(:open_enrl_end_on)    { Date.new(2017,01,31) }
