@@ -919,7 +919,7 @@ class EmployerProfile
   end
 
   def default_benefit_group
-    plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
+    plan_year_with_default = plan_years.where("benefit_groups.default" => true).order_by([:start_on]).last
     return unless plan_year_with_default
     plan_year_with_default.benefit_groups.detect{|bg| bg.default }
   end

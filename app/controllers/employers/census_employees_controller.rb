@@ -192,15 +192,8 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show
-    @family = @census_employee.employee_role.person.primary_family if @census_employee.employee_role.present?
     @no_ssn = @census_employee.no_ssn_allowed || false
 
-    past_enrollment_statuses = HbxEnrollment::TERMINATED_STATUSES
-    @past_enrollments = @census_employee.employee_role.person.primary_family.all_enrollments.select {
-        |hbx_enrollment| (past_enrollment_statuses.include? hbx_enrollment.aasm_state) && (@census_employee.benefit_group_assignments.map(&:id).include? hbx_enrollment.benefit_group_assignment_id)
-    } if @census_employee.employee_role.present?
-
-    @past_enrollments = @past_enrollments.reject { |r| r.coverage_expired?} if @census_employee.employee_role.present?
     @status = params[:status] || ''
 
     if @no_ssn && !@employer_profile.no_ssn && @census_employee.encrypted_ssn.nil?

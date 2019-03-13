@@ -1296,7 +1296,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
-                          :unverified, :coverage_expired],
+                          :unverified, :coverage_expired, :coverage_terminated],
                   to: :coverage_terminated, after: :propogate_terminate
     end
 
@@ -1512,6 +1512,10 @@ class HbxEnrollment
 
   def is_enrolled_by_aasm_state?
     ENROLLED_STATUSES.include?(aasm_state)
+  end
+
+  def is_ivl_and_outstanding?
+    is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
   end
 
   def is_effective_in_current_year?

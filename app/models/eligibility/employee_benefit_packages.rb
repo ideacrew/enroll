@@ -85,9 +85,9 @@ module Eligibility
 
     def reset_active_benefit_group_assignments(new_benefit_group)
       benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
-        end_on = benefit_group_assignment.end_on || (benefit_group_assignment.start_on - 1.day)
-        py = benefit_group_assignment.plan_year
-        end_on = benefit_group_assignment.plan_year.end_on unless (py.start_on..py.end_on).cover?(end_on)
+        end_on    = benefit_group_assignment.end_on
+        plan_year = benefit_group_assignment.plan_year
+        end_on    = plan_year.end_on if end_on.blank? || !(plan_year.start_on..plan_year.end_on).cover?(end_on)
         benefit_group_assignment.update_attributes(is_active: false, end_on: end_on)
       end
     end
@@ -95,6 +95,12 @@ module Eligibility
     def has_benefit_group_assignment?
       (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED + ['termination_pending']).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
       (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
+    end
+
+    def benefit_group_assignments_for(plan_year)
+      benefit_group_assignments.where({
+        :benefit_group_id.in => plan_year.benefit_groups.pluck(:id)
+        })
     end
   end
 end
