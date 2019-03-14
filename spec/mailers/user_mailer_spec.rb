@@ -27,8 +27,9 @@ RSpec.describe UserMailer do
 
   describe 'broker_staff_invitation_email' do
     let(:hbx_id) { rand(10000 )}
+    let(:person_id) { double("465") }
     let(:invitation) {double("123")}
-    let(:email){UserMailer.broker_staff_invitation_email('john@dc.gov', 'john', invitation )}
+    let(:email){UserMailer.broker_staff_invitation_email('john@dc.gov', 'john', invitation, person_id)}
 
     it 'should not allow a reply' do
       expect(email.from).to match(['no-reply@shop.dchealthlink.com'])
