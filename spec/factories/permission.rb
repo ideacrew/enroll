@@ -51,8 +51,9 @@ FactoryGirl.define do
       can_access_new_consumer_application_sub_tab true
       name 'hbx_csr_supervisor'
     end
-    
+
     trait :hbx_tier3 do
+      can_create_plan_year true
       can_view_username_and_email true
       can_lock_unlock true
       can_reset_password true
@@ -98,6 +99,17 @@ FactoryGirl.define do
       modify_admin_tabs false
       view_admin_tabs  false
       name 'developer'
+    end
+
+    trait :super_admin do
+      can_create_plan_year true
+      can_complete_resident_application true
+      can_add_sep true
+      can_access_new_consumer_application_sub_tab true
+      can_access_identity_verification_sub_tab true
+      can_access_outstanding_verification_sub_tab true
+      can_view_username_and_email true
+      name 'super_admin'
     end
   end
 end

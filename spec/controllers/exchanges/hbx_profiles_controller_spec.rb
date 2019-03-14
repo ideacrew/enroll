@@ -714,4 +714,62 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "plan year creation" do
+    let!(:user)                { FactoryGirl.create(:user) }
+    let!(:person)              { FactoryGirl.create(:person, user: user) }
+    let!(:permission)          { FactoryGirl.create(:permission, :super_admin) }
+    let!(:hbx_staff_role)      { FactoryGirl.create(:hbx_staff_role, person: person, permission_id: permission.id) }
+    let!(:organization)        { FactoryGirl.create(:organization)}
+    let!(:employer_profile)    { FactoryGirl.create(:employer_profile, organization: organization) }
+    let!(:plan_year)           { FactoryGirl.create(:plan_year, fte_count: valid_fte_count, employer_profile: employer_profile) }
+    let!(:benefit_group)       { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:start_on)             { TimeKeeper.date_of_record.beginning_of_month.next_month }
+    let(:end_on)               { start_on + 1.year - 1.day }
+    let(:valid_fte_count)      { 5 }
+
+    let!(:valid_params)   {
+      { benefit_group_id: benefit_group.id.to_s,
+        start_on: start_on,
+        end_on: end_on,
+        fte_count: valid_fte_count,
+        open_enrollment_start_on: start_on - 1.month,
+        open_enrollment_end_on: TimeKeeper.date_of_record - 1.month + 10.days,
+        employer_actions_id: "family_actions_#{organization.id.to_s}",
+        id: organization.id.to_s
+      }
+    }
+
+    before :each do
+      sign_in(user)
+    end
+
+    context '.new_plan_year' do
+      before :each do
+        xhr :get, :new_plan_year
+      end
+
+       it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+       it 'should render new_plan_year' do
+        expect(response).to render_template("exchanges/hbx_profiles/new_plan_year")
+      end
+    end
+
+    context '.create_plan_year' do
+      before :each do
+        xhr :post, :create_plan_year, valid_params
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render create_plan_year' do
+        expect(response).to render_template("exchanges/hbx_profiles/create_plan_year")
+      end
+    end
+  end
 end

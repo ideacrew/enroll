@@ -230,7 +230,7 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
-  
+
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
@@ -646,7 +646,23 @@ def employer_poc
 
   end
 
+  def new_plan_year
+    authorize HbxProfile, :can_create_plan_year?
+    @ba_form = ::Forms::AdminPlanYearForm.for_new(params)
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
+  def create_plan_year
+    @ba_form = ::Forms::AdminPlanYearForm.for_create(params)
+    @save_errors = plan_year_error_messages(@ba_form) unless @ba_form.save
+    @element_to_replace_id = params[:employer_actions_id]
+  end
+
 private
+
+  def plan_year_error_messages(obj)
+    obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }
+  end
 
    def modify_admin_tabs?
      authorize HbxProfile, :modify_admin_tabs?

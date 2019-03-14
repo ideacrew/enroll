@@ -1,9 +1,9 @@
 module HbxAdminWorld
   def hbx_admin(*traits)
     p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, 
-      can_complete_resident_application: true,can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true, view_personal_info_page: true, 
-      can_access_new_consumer_application_sub_tab: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true, 
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true,
+      can_complete_resident_application: true,can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true, view_personal_info_page: true,
+      can_access_new_consumer_application_sub_tab: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true,
       can_access_accept_reject_paper_application_documents: true, can_delete_identity_application_documents: true, can_access_accept_reject_identity_documents: true)
     attributes = traits.extract_options!
     @hbx_admin ||= FactoryGirl.create :user, *traits, attributes
@@ -16,7 +16,7 @@ module HbxAdminWorld
     @u1 = User.create( email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', roles: ["hbx_staff"])
     hbx_profile_id = FactoryGirl.create(:hbx_profile).id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: @u1)
-    permission_hbx_staff = FactoryGirl.create(:permission, :hbx_staff)
+    permission_hbx_staff = FactoryGirl.create(:permission, subrole.to_sym)
     HbxStaffRole.create!( person: p1, permission_id: permission_hbx_staff.id, subrole: subrole, hbx_profile_id: hbx_profile_id)
   end
 end
@@ -28,6 +28,14 @@ end
 
 Given(/^the HBX admin is logged in$/) do
   login_as hbx_admin, scope: :user
+end
+
+Given(/^a Hbx admin with super_admin role exists$/) do
+  hbx_admin_with_subrole 'super_admin'
+end
+
+Given(/^a Hbx admin with hbx_tier3 role exists$/) do
+  hbx_admin_with_subrole 'hbx_tier3'
 end
 
 Given(/^a Hbx admin with hbx_staff role exists$/) do

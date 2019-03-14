@@ -16,6 +16,8 @@ class PlanYear
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
   INITIAL_ELIGIBLE_STATE  = %w(published enrolling enrolled)
+  #This is being used only for datatable action
+  ACTIVE_STATES_PER_DT    = %w(publish_pending enrolling enrollment_closed enrolled application_ineligible active)
 
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary"
   VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_terminated_voluntary"
@@ -71,6 +73,9 @@ class PlanYear
   scope :published,         ->{ any_in(aasm_state: PUBLISHED) }
   scope :renewing_published_state, ->{ any_in(aasm_state: RENEWING_PUBLISHED_STATE) }
   scope :renewing,          ->{ any_in(aasm_state: RENEWING) }
+
+  scope :draft, -> { where(aasm_state: 'draft') }
+  scope :active_states_per_dt, -> { any_in(aasm_state: ACTIVE_STATES_PER_DT + RENEWING)}
 
   scope :published_or_renewing_published, -> { any_of([published.selector, renewing_published_state.selector]) }
 
@@ -829,20 +834,23 @@ class PlanYear
       {result: (result || "ok"), msg: (msg || "")}
     end
 
-    def calculate_start_on_dates
+    def calculate_start_on_dates(admin_dt_action = false)
       # Today - 5 + 2.months).beginning_of_month
       # July 6 => Sept 1
       # July 1 => Aug 1
-      start_on = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
-      end_on = (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month
+      due_date_of_month = HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth
+      date_now = TimeKeeper.date_of_record
+      start_on = (date_now - due_date_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month
+      start_on = start_on.prev_month if admin_dt_action && (date_now.day > due_date_of_month)
+      end_on = (date_now - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month
       dates = (start_on..end_on).select {|t| t == t.beginning_of_month}
     end
 
-    def calculate_start_on_options
-      calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+    def calculate_start_on_options(admin_dt_action = false)
+      calculate_start_on_dates(admin_dt_action).map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
-    def calculate_open_enrollment_date(start_on)
+    def calculate_open_enrollment_date(start_on, admin_dt_action = false)
       start_on = start_on.to_date
 
       # open_enrollment_start_on = [start_on - 1.month, TimeKeeper.date_of_record].max
@@ -865,6 +873,11 @@ class PlanYear
       #end
 
       open_enrollment_end_on = shop_enrollment_timetable(start_on)[:open_enrollment_latest_end_on]
+
+      oe_min_days = Settings.aca.shop_market.open_enrollment.minimum_length.days
+      if admin_dt_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
+        open_enrollment_end_on = (open_enrollment_start_on + oe_min_days)
+      end
 
       binder_payment_due_date = map_binder_payment_due_date_by_start_on(start_on)
 
@@ -1107,7 +1120,7 @@ class PlanYear
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
     end
 
-    event :close_open_enrollment, :after => :record_transition do 
+    event :close_open_enrollment, :after => :record_transition do
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_enrollment_valid?]
       transitions from: :enrolling, to: :application_ineligible,  :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
 
