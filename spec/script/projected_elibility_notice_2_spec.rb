@@ -10,6 +10,8 @@ describe "ProjectedEligibilityNotice_2" do
     data = file_reader
     expect(data[0].present?).to eq true
     expect(data[1].present?).to eq true
+    expect(data[1][1]).to eq(person.hbx_id.to_s)
+    expect(data[1][2]).to eq(person.full_name)
   end
 
   after :all do
