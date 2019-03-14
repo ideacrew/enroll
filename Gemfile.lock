@@ -262,6 +262,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
     ice_nine (0.11.2)
+    iniparse (1.4.4)
     interactor (3.1.0)
     interactor-rails (2.0.2)
       interactor (~> 3.0)
@@ -367,6 +368,9 @@ GEM
       nokogiri (~> 1.5)
     origin (2.3.1)
     orm_adapter (0.5.0)
+    overcommit (0.44.0)
+      childprocess (~> 0.6, >= 0.6.3)
+      iniparse (~> 1.4)
     parallel (1.12.1)
     parallel_tests (2.21.3)
       parallel
@@ -688,6 +692,7 @@ DEPENDENCIES
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
   openhbx_cv2!
+  overcommit
   parallel_tests (= 2.21.3)
   poltergeist
   prawn!

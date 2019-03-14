@@ -52,7 +52,7 @@ gem 'roo', '~> 2.1.0'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'sass-rails', '~> 5.0'
 gem 'slim-rails'
-gem 'sprockets' , '~> 2.12.3'
+gem 'sprockets', '~> 2.12.3'
 gem 'symmetric-encryption', '~> 3.6.0'
 gem 'therubyracer', platforms: :ruby
 gem 'turbolinks','2.5.3'
@@ -82,19 +82,20 @@ group :doc do
 end
 
 group :development do
-  gem 'web-console', '2.3.0'
+  gem 'overcommit'
   gem 'rubocop', "0.54.0", require: false
   gem 'rubocop-git'
+  gem 'web-console', '2.3.0'
 end
 
 group :development, :test do
-  gem 'parallel_tests', "2.21.3"
   gem 'byebug', '8.2.2'
   gem 'capistrano', '3.3.5'
   gem 'capistrano-rails', '1.1.6'
   gem 'email_spec', '2.0.0'
   gem 'factory_girl_rails', '4.6.0'
   gem 'forgery'
+  gem 'parallel_tests', "2.21.3"
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-rails'
