@@ -11,7 +11,8 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment
     @effective_on_date = hbx_enrollment.effective_on if hbx_enrollment.present? #building hbx enrollment before hand to display correct effective date on CCH page
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? && @person.has_active_employee_role?
-    @market_kind = select_market(@person, params)
+    effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : @new_effective_on
+    @market_kind = select_market(@person, effective_on, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
     if @market_kind == 'individual' || @market_kind == 'coverall' || (@person.try(:has_active_employee_role?) && @person.try(:is_consumer_role_active?)) || @person.try(:is_resident_role_active?) || @resident
       if params[:hbx_enrollment_id].present?
@@ -200,7 +201,7 @@ class Insured::GroupSelectionController < ApplicationController
   def set_vars_for_market
     if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
       @disable_market_kind = "shop"
-      @disable_market_kind = "individual" if select_market(@person, params) == "shop"
+      @disable_market_kind = "individual" if select_market(@person, @optional_effective_on, params) == "shop"
     end
 
     if @hbx_enrollment.present? && @change_plan == "change_plan"

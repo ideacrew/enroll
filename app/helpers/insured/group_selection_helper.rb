@@ -56,13 +56,13 @@ module Insured
       end
     end
 
-    def select_market(person, params)
+    def select_market(person, effective_on, params)
       return params[:market_kind] if params[:market_kind].present?
       if params[:qle_id].present? && (!person.is_resident_role_active?)
         qle = QualifyingLifeEventKind.find(params[:qle_id])
         return qle.market_kind
       end
-      if (person.has_active_employee_role? && person.has_employer_benefits?)
+      if person.has_active_employee_role? && person.has_employer_benefits?(effective_on)
         'shop'
       elsif person.is_consumer_role_active?
         'individual'

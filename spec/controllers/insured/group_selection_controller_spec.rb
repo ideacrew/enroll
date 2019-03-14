@@ -37,6 +37,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(family).to receive(:active_household).and_return(household)
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
+    allow(person).to receive(:has_employer_benefits?).and_return(true)
     allow(user).to receive(:last_portal_visited).and_return('/')
     allow(user).to receive(:has_hbx_staff_role?).and_return false
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
