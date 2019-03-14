@@ -58,6 +58,14 @@ Given(/^a Hbx admin with hbx_csr_tier2 role exists$/) do
   hbx_admin_with_subrole 'hbx_csr_tier2'
 end
 
+Given(/^a Hbx admin with hbx_tier3 role exists$/) do
+  hbx_admin_with_subrole 'hbx_tier3'
+end
+
+Given(/^a Hbx admin with super_admin role exists$/) do
+  hbx_admin_with_subrole 'super_admin'
+end
+
 Given(/^a Hbx admin logs on to Portal$/) do
   visit "/users/sign_in"
   fill_in "user[login]", :with => @u1.oim_id

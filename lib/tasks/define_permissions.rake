@@ -98,6 +98,13 @@ namespace :permissions do
 end
 
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
+#RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_extend_open_enrollment
+namespace :permissions do
+  desc 'hbx admin can access user account tab'
+  DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
+end
+
+#RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do
   desc 'grant super admin access for given users'
   DefinePermissions.define_task :grant_super_admin_access => :environment

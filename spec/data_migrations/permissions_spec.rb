@@ -150,6 +150,26 @@ describe DefinePermissions, dbclean: :after_each do
       end
     end
 
+    describe 'update permissions for super admin and hbx_tire3 to extend open enrollment' do
+      before do
+        User.all.delete
+        Person.all.delete
+        @hbx_staff_person = FactoryGirl.create(:person)
+        @hbx_tier3_person = FactoryGirl.create(:person)
+        @super_admin_person = FactoryGirl.create(:person)
+        hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        hbx_tier3_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_tier3_person, subrole: "hbx_tier3", permission_id: Permission.hbx_tier3.id)
+        super_admin_role = FactoryGirl.create(:hbx_staff_role, person: @super_admin_person, subrole: "super_admin", permission_id: Permission.super_admin.id)
+      end
+
+      it "check can_extend_open_enrollment permission " do
+        expect(Person.all.count).to eq(3)
+        expect(@hbx_tier3_person.hbx_staff_role.permission.can_extend_open_enrollment).to be true
+        expect(@super_admin_person.hbx_staff_role.permission.can_extend_open_enrollment).to be true
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_extend_open_enrollment).to be false
+      end
+    end
+
     describe 'update permissions for hbx staff role to be able transition family members' do
       let(:given_task_name) {':hbx_admin_can_transition_family_members'}
 

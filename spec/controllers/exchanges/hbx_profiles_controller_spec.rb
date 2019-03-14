@@ -816,4 +816,123 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "extend open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:employer_profile) { double(plan_years: plan_years) }
+    let(:plan_years) { [ double ]}
+
+     before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      sign_in(user)
+    end
+
+    context '.oe_extendable_applications' do
+      let(:plan_years) { [ double(may_extend_open_enrollment?: true) ]}
+
+      before do
+        allow(employer_profile).to receive(:oe_extendable_plan_years).and_return(plan_years)
+      end
+
+      it "renders open enrollment extendable plan years" do
+        xhr :get, :oe_extendable_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extendable_applications")
+      end
+    end
+
+    context '.oe_extended_applications' do
+      let(:plan_years) { [ double(enrollment_extended?: true) ]}
+
+      before do
+        allow(employer_profile).to receive(:oe_extended_plan_years).and_return(plan_years)
+      end
+
+      it "renders open enrollment extended plan years" do
+        xhr :get, :oe_extended_applications
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/oe_extended_applications")
+      end
+    end
+
+    context '.edit_open_enrollment' do
+      let(:plan_year) { double }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+      end
+
+      it "renders edit open enrollment" do
+        xhr :get, :edit_open_enrollment
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("exchanges/hbx_profiles/edit_open_enrollment")
+      end
+    end
+
+    context '.extend_open_enrollment' do
+      let(:plan_year) { double }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+        allow(plan_year).to receive(:extend_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :extend_open_enrollment, open_enrollment_end_date: "02/18/2019"
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        expect(flash[:success]).to match("Successfully extended employer(s) open enrollment.")
+      end
+    end
+  end
+
+  describe "close open enrollment" do
+
+    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:permission) { double(can_extend_open_enrollment: true) }
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+    let(:hbx_profile) { double("HbxProfile")}
+    let(:employer_profile) { double(plan_years: plan_years) }
+    let(:plan_years) { [ double ]}
+
+    before :each do
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      sign_in(user)
+    end
+
+    context '.close_extended_open_enrollment' do
+      let(:plan_year) { plan_years.first }
+
+      before do
+        allow(plan_years).to receive(:find).and_return(plan_year)
+        allow(plan_year).to receive(:end_open_enrollment).and_return(true)
+      end
+
+      it "renders index" do
+        post :close_extended_open_enrollment
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+        expect(flash[:success]).to match("Successfully closed employer(s) open enrollment.")
+      end
+    end
+  end
 end

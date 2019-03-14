@@ -102,6 +102,11 @@ Rails.application.routes.draw do
         get :new_eligibility
         get :new_plan_year
         post :create_plan_year
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
       end
 
       member do
