@@ -30,14 +30,6 @@ Given(/^the HBX admin is logged in$/) do
   login_as hbx_admin, scope: :user
 end
 
-Given(/^a Hbx admin with super_admin role exists$/) do
-  hbx_admin_with_subrole 'super_admin'
-end
-
-Given(/^a Hbx admin with hbx_tier3 role exists$/) do
-  hbx_admin_with_subrole 'hbx_tier3'
-end
-
 Given(/^a Hbx admin with hbx_staff role exists$/) do
   hbx_admin_with_subrole 'hbx_staff'
 end
