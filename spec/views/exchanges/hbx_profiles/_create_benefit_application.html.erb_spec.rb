@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "_create_benefit_application.html.erb", :type => :view, dbclean: :after_each  do
 
-  context "when show success alert" do
+  context "it should successfully create draft application" do
     before do
       render template: 'exchanges/hbx_profiles/_create_benefit_application.html.erb'
     end
