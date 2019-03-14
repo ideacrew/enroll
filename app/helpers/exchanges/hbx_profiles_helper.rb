@@ -6,20 +6,21 @@ module Exchanges::HbxProfilesHelper
         enrollment.benefit_group_assignment.census_employee.aasm_state.camelcase
       end
     end
+  end
 
-    def update_fein_errors(error_messages, new_fein)
-      error_messages.to_a.inject([]) do |f_errors, error|
-        if error[1].first.include?("is not a valid")
-          f_errors << "FEIN must be at least 9 digits"
-        elsif error[1].first.include?("is already taken")
-          org = Organization.where(fein: (new_fein.gsub(/\D/, ''))).first
-          f_errors << "FEIN matches HBX ID #{org.hbx_id}, #{org.legal_name}"
-        else
-          f_errors << error[1].first
-        end
+  def update_fein_errors(error_messages, new_fein)
+    error_messages.to_a.inject([]) do |f_errors, error|
+      if error[1].first.include?("is not a valid")
+        f_errors << "FEIN must be at least 9 digits"
+      elsif error[1].first.include?("is already taken")
+        org = Organization.where(fein: (new_fein.gsub(/\D/, ''))).first
+        f_errors << "FEIN matches HBX ID #{org.hbx_id}, #{org.legal_name}"
+      else
+        f_errors << error[1].first
       end
     end
   end
+  
 
   def get_person_roles(person, person_roles = [])
     person_roles << "Employee Role" if person.active_employee_roles.present?

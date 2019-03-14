@@ -20,7 +20,6 @@ RSpec.describe Exchanges::HbxProfilesHelper, :type => :helper do
     }
 
     it "should show error message: FEIN must be at least 9 digits" do
-      debugger
       expect(helper.update_fein_errors(error_message1, new_invalid_fein)).to eq ["FEIN must be at least 9 digits"]
     end
 
