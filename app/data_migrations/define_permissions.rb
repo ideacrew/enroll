@@ -162,4 +162,8 @@ class DefinePermissions < MigrationTask
       HbxStaffRole.create!(person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile.id)
     end
   end
+
+  def hbx_admin_can_change_fein
+    Permission.super_admin.update_attributes!(can_change_fein: true)
+  end
 end
