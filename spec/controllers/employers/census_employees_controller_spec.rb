@@ -262,7 +262,7 @@ RSpec.describe Employers::CensusEmployeesController do
         expect(controller).to receive(:notify_employee_of_termination)
         xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
         expect(response).to have_http_status(:success)
-        expect(assigns[:fa]).to eq true
+        expect(assigns[:fa]).to eq census_employee
       end
     end
 
