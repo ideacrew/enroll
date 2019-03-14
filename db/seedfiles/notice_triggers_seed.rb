@@ -85,7 +85,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP2B',
+    hbx_id: 'DIG003',
     title: 'Employer Denial Notice',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
@@ -95,7 +95,7 @@ shop_notice_triggers = [
         name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
         notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
-        mpi_indicator: 'MPI_SHOP2B',
+        mpi_indicator: 'SHOP_D003',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -372,6 +372,27 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
         notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
         mpi_indicator: 'SHOP_D053',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP_D039',
+    title: 'Termination of Employer’s Health Coverage Offered Through DC Health Link',
+    description: 'This notices goes to all the renewal EEs that ER is terminated from SHOP.',
+    resource_name: 'employee_role',
+    event_name: 'renewal_employer_ineligibility_notice_to_employee',
+    notice_triggers: [
+      {
+        name: 'Renewal Employee Ineligibilty Notice',
+        notice_template: 'notices/shop_employee_notices/renewal_employee_ineligibility_notice',
+        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeIneligibilityNotice',
+        mpi_indicator: 'SHOP_D039',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -785,7 +806,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP10047',
+    hbx_id: 'DIE040',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'Notification to employees regarding their Employer’s ineligibility.',
     resource_name: 'employee_role',
@@ -795,7 +816,7 @@ shop_notice_triggers = [
         name: 'Notification to employees regarding their Employer’s ineligibility.',
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
         notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
-        mpi_indicator: 'MPI_SHOP10047',
+        mpi_indicator: 'SHOP_D040',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
