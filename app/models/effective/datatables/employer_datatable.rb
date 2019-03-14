@@ -54,7 +54,8 @@ module Effective
            [text_to_display(row.employer_profile), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.employer_profile.no_ssn), 'post_ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(people_id: Person.where({"employer_staff_roles.employer_profile_id" => row.employer_profile._id}).map(&:id), employers_action_id: "family_actions_#{row.id.to_s}"), pundit_allow(Family, :can_view_username_and_email?) ? 'ajax' : 'disabled'],
            ['Plan Years', exchanges_employer_applications_path(employer_id: row.employer_profile._id, employers_action_id: "family_actions_#{row.id}"), 'ajax'],
-            ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide']
+           ['Create Plan Year', new_plan_year_exchanges_hbx_profiles_path(id: row, employer_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_create_plan_year?) ? 'ajax' : 'hide'],
+           ['Change FEIN',  edit_fein_exchanges_hbx_profiles_path(id: row, row_actions_id: "family_actions_#{row.id.to_s}"), pundit_allow(HbxProfile, :can_change_fein?) ? 'ajax' : 'hide']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false

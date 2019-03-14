@@ -630,6 +630,50 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
   end
 
+  describe "POST edit_fein" do
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_change_fein => true)}
+    let(:new_invalid_fein) { "234-839" }
+    let(:new_valid_fein) { "23-4508390" }
+
+    it "should render edit_fein sucessful, when cahnge fein is clicked under Actions dropdown" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = {:id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :get, :edit_fein, @params
+      expect(response).to render_template('edit_fein')
+    end
+  end
+
+  describe "POST update_fein" do
+    let(:organization){  FactoryGirl.create(:organization) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
+    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission_yes) { FactoryGirl.create(:permission, :can_change_fein => true)}
+    let(:new_invalid_fein) { "234-839" }
+    let(:new_valid_fein) { "23-4508390" }
+
+    it "should render update_fein if fein is updated successful" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = { :organization => {:new_fein => new_valid_fein}, :id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :post, :update_fein, @params
+      expect(response).to render_template('update_fein')
+    end
+
+    it "should render back to edit_fein if there is a validation error on save" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      @params = { :organization => {:new_fein => new_invalid_fein}, :id => organization.id, :row_actions_id => "family_actions_#{organization.id.to_s}"}
+      xhr :post, :update_fein, @params
+      expect(response).to render_template('edit_fein')
+    end
+  end
+
   describe "GET general_agency_index" do
     let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
     before :each do
