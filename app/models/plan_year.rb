@@ -186,7 +186,7 @@ class PlanYear
     renewing_plan_year = parent.plan_years.where(:aasm_state.in => RENEWING + ['renewing_application_ineligible']).first
 
     if renewing_plan_year
-      renewing_plan_year.cancel_renewal!(transmit_xml) if renewing_plan_year.may_cancel_renewal?
+      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
     end
 
     if end_on >= TimeKeeper.date_of_record
@@ -239,11 +239,13 @@ class PlanYear
 
   def cancel_employee_enrollments(transmit_xml = false)
     enrollments_for_plan_year.each do |hbx_enrollment|
-      if hbx_enrollment.may_cancel_coverage? && hbx_enrollment.inactive?
-        hbx_enrollment.cancel_coverage!
-      else
-        hbx_enrollment.cancel_coverage!
-        hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
+      if hbx_enrollment.may_cancel_coverage?
+        if hbx_enrollment.inactive?
+          hbx_enrollment.cancel_coverage!
+        else
+          hbx_enrollment.cancel_coverage!
+          hbx_enrollment.notify_enrollment_cancel_or_termination_event(transmit_xml) if eligible_for_export?
+        end
       end
     end
   end
@@ -1272,17 +1274,16 @@ class PlanYear
   end
   
   def notify_cancel_event(transmit_xml = false)
-    return unless transmit_xml
     transition = self.latest_workflow_state_transition
     if TimeKeeper.date_of_record < start_on
       if transition.from_state == "enrolled" && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
-        notify_employer_py_cancellation
+        notify_employer_py_cancellation(transmit_xml)
       elsif transition.from_state == "renewing_enrolled" && open_enrollment_completed? && past_transmission_threshold?
-        notify_employer_py_cancellation
+        notify_employer_py_cancellation(transmit_xml)
       end
     else
       if transition.from_state == "active"
-        notify_employer_py_cancellation
+        notify_employer_py_cancellation(transmit_xml)
       end
     end
   end
@@ -1291,21 +1292,20 @@ class PlanYear
 
   private
 
-  def notify_employer_py_cancellation
-    notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id.to_s, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG})
+  def notify_employer_py_cancellation(transmit_xml)
+    notify(INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT, {employer_id: self.employer_profile.hbx_id, plan_year_id: self.id.to_s, event_name: INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG, is_trading_partner_publishable: transmit_xml})
   end
 
   def notify_employer_py_terminate(transmit_xml)
 
-    return unless transmit_xml
     return unless self.termination_pending? || self.terminated?
 
     if self.termination_kind == "voluntary"
-      notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG})
+      notify(VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG, is_trading_partner_publishable: transmit_xml})
     end
 
     if self.termination_kind == "nonpayment"
-      notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG})
+      notify(NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT, {employer_id: self.employer_profile.hbx_id, event_name: NON_PAYMENT_TERMINATED_PLAN_YEAR_EVENT_TAG, is_trading_partner_publishable: transmit_xml})
     end
   end
 

@@ -1620,7 +1620,6 @@ class HbxEnrollment
 
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
 
-    return unless transmit_flag
     return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
 
     config = Rails.application.config.acapi

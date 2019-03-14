@@ -2799,13 +2799,13 @@ describe "notify_employer_py_voluntary_terminate" do
     let!(:plan_year) {FactoryGirl.build(:plan_year, termination_kind: 'voluntary', aasm_state:'terminated')}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
 
-    it "should notify event" do
-      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_voluntary"})
+    it "should notify event" do # loud transaction
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_voluntary", is_trading_partner_publishable: true})
       plan_year.send(:notify_employer_py_terminate, true)
     end
 
-    it "should not notify event" do
-      expect(plan_year).to receive(:notify).exactly(0).times
+    it "should notify event, with trading_partner_publishable flag false" do # silent transaction
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_voluntary", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_voluntary", is_trading_partner_publishable: false})
       plan_year.send(:notify_employer_py_terminate, false)
     end
   end
@@ -2816,13 +2816,13 @@ describe "notify_employer_py_nonpayment_terminate" do
     let!(:plan_year) {FactoryGirl.build(:plan_year, termination_kind: "nonpayment", aasm_state:'terminated')}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year]) }
 
-    it "should notify event" do
-      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_nonpayment"})
+    it "should notify event" do # loud transaction
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_nonpayment", is_trading_partner_publishable: true})
       plan_year.send(:notify_employer_py_terminate, true)
     end
 
-    it "should not notify event" do
-      expect(plan_year).to receive(:notify).exactly(0).times
+    it "should notify event with trading_partner_publishable flag false" do   # silent transaction
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_period_terminated_nonpayment", {employer_id: plan_year.employer_profile.hbx_id, event_name: "benefit_coverage_period_terminated_nonpayment", is_trading_partner_publishable: false})
       plan_year.send(:notify_employer_py_terminate, false)
     end
   end
@@ -2835,19 +2835,21 @@ describe "notify_employer_py_cancellation" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile,plan_years:[plan_year, renewal_plan_year]) }
 
     it "should notify event" do
-      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: plan_year.employer_profile.hbx_id, plan_year_id:plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      expect(plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: plan_year.employer_profile.hbx_id, plan_year_id:plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped", is_trading_partner_publishable: true})
       plan_year.cancel!(true)
     end
 
-    it "should not notify event, when renewal plan year canceled and open enrollment not compeleted" do
-      expect(renewal_plan_year).to receive(:notify).exactly(0).times
+    it "should notify event with trading_partner_publishable flag false, for silent transaction" do   # silent transaction
+      allow(renewal_plan_year).to receive(:open_enrollment_completed?).and_return true
+      allow(renewal_plan_year).to receive(:past_transmission_threshold?).and_return true
+      expect(renewal_plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewal_plan_year.employer_profile.hbx_id, plan_year_id:renewal_plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped", is_trading_partner_publishable: false})
       renewal_plan_year.cancel_renewal!(false)
     end
 
-    it "should notify event, when renewal plan year canceled" do
+    it "should notify event, when renewal plan year canceled, for loud transaction" do # loud transaction
       allow(renewal_plan_year).to receive(:open_enrollment_completed?).and_return true
       allow(renewal_plan_year).to receive(:past_transmission_threshold?).and_return true
-      expect(renewal_plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewal_plan_year.employer_profile.hbx_id, plan_year_id:renewal_plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped"})
+      expect(renewal_plan_year).to receive(:notify).with("acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped", {employer_id: renewal_plan_year.employer_profile.hbx_id, plan_year_id:renewal_plan_year.id, event_name: "benefit_coverage_renewal_carrier_dropped", is_trading_partner_publishable: true})
       renewal_plan_year.cancel_renewal!(true)
     end
 
