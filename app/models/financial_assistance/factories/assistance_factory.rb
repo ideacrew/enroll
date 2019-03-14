@@ -1,17 +1,19 @@
 module FinancialAssistance
   module Factories
-    # test
-    class AssistancesFactory
+    # To call service, encode message, object to attr
+    class AssistanceFactory
       attr_accessor :person
 
       def initialize(person)
         @person = person
       end
 
-      def search_existing_assistances
-        status, @message = service.new(hashed_person).eligible_for_assistances?
+      def search_existing_assistance
+        status, @message = service.new(hashed_person).eligible_for_assistance?
         [status, encode_msg]
       end
+
+      private
 
       def hashed_person
         {
@@ -23,7 +25,7 @@ module FinancialAssistance
       end
 
       def service
-        FinancialAssistance::Services::AssistancesLookup
+        FinancialAssistance::Services::AssistanceLookup
       end
 
       def encode_msg
