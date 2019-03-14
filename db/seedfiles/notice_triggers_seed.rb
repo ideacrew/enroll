@@ -214,7 +214,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP6',
+    hbx_id: 'DAG008',
     title: 'Action Needed – Add all Eligible Employees to your Roster',
     description: 'This notice goes to all the employers with zero employees on roster when published',
     resource_name: 'employer',
@@ -224,7 +224,7 @@ shop_notice_triggers = [
         name: 'Zero Employees on Rotser',
         notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
         notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
-        mpi_indicator: 'MPI_SHOP6',
+        mpi_indicator: 'SHOP_D008',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -340,7 +340,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP13',
+    hbx_id: 'DAE014',
     title: 'Open Enrollment Reminder',
     description: 'This notices goes to all the employees in the open enrollment period',
     resource_name: 'employee_role',
@@ -350,7 +350,7 @@ shop_notice_triggers = [
         name: 'Employee Open Enrollment Reminder Notice',
         notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
         notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-        mpi_indicator: 'MPI_SHOP13',
+        mpi_indicator: 'SHOP_D014',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
@@ -827,6 +827,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'DAE073',
+    title: 'Employee Plan Selection Confirmation',
+    description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
+    resource_name: 'employee_role',
+    event_name: 'ee_select_plan_during_oe',
+    notice_triggers: [
+      {
+        name: 'Notice to employee after they select a plan during Annual Open Enrollment',
+        notice_template: 'notices/shop_employee_notices/employee_select_plan_during_open_enrollment',
+        notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
+        mpi_indicator: 'SHOP_D073',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP_D049',
     title: 'Confirmation - Broker Hired',
     description: 'Confirmation of Broker Hired Sent to Employer',
@@ -1080,12 +1101,12 @@ shop_notice_triggers = [
       }
     ]
   },
-  {                
+  {         
     hbx_id: 'SHOP_D064',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
     resource_name: 'employee_role',
-    event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written', 
+    event_name: 'notice_to_ee_that_er_plan_year_will_not_be_written',
     notice_triggers: [
       {
         name: "Notice to EEs that ER’s plan year will not be written",

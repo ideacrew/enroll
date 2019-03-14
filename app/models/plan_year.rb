@@ -1311,7 +1311,7 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
       begin
-        self.employer_profile.trigger_notices("zero_employees_on_roster")
+        self.employer_profile.trigger_notices("zero_employees_on_roster", "acapi_trigger" =>  true)
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer zero employees on roster notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
       end
