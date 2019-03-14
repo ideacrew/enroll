@@ -63,7 +63,7 @@ module Notifier
 
     def parent_data_model
       return @class_name if defined? @class_name
-      @class_name = self.class.to_s.split('::').last.underscore.to_sym #self.class.class_name.underscore.to_sym
+      @class_name = self.model_builder.class.to_s.split('::').last.underscore.to_sym #self.class.class_name.underscore.to_sym
     end
   end
 end
