@@ -330,10 +330,6 @@ module Notifier
         csr_percent.nil?
       end
 
-      def shop?
-        false
-      end
-
       def filer_type(type)
         case type
         when "Filers"
