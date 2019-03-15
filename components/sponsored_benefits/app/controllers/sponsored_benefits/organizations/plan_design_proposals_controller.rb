@@ -78,6 +78,7 @@ module SponsoredBenefits
       @benefit_group = @plan_design_proposal.active_benefit_group
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships.first
       @census_employees = sponsorship.census_employees
+      @broker_agency_profile = broker_agency_profile
 
       if @benefit_group
         @plan = @benefit_group.reference_plan
