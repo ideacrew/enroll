@@ -104,13 +104,7 @@ class Employers::CensusEmployeesController < ApplicationController
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
-        # @fa = false
-        # if @census_employee.terminate_employment(termination_date)
-        #   @fa = true 
-        # end
-
         @fa = @census_employee.terminate_employment(termination_date) ? true : false
-
         notify_employee_of_termination
       end
     end
