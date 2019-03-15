@@ -211,16 +211,16 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : special_enrollment_period.event_on
+      event_on = (payload['notice_params'] && payload['notice_params']['qle_event_on']) ? payload['notice_params']['qle_event_on'] : format_date(special_enrollment_period.qle_on)
       merge_model.special_enrollment_period.event_on = event_on
     end
 
     def special_enrollment_period_title
-      merge_model.special_enrollment_period.title = special_enrollment_period.nil? ? payload['notice_params']['qle_title'] : special_enrollment_period.title
+      merge_model.special_enrollment_period.title = (payload['notice_params'] && payload['notice_params']['qle_title']) ? payload['notice_params']['qle_title'] : special_enrollment_period.title
     end
 
     def special_enrollment_period_qle_reported_on
-      merge_model.special_enrollment_period.qle_reported_on = (special_enrollment_period.present? && special_enrollment_period.qle_on.present?) ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
+      merge_model.special_enrollment_period.qle_reported_on = format_date(TimeKeeper.date_of_record)
     end
 
     def special_enrollment_period_start_on
@@ -230,7 +230,9 @@ module Notifier
     end
 
     def special_enrollment_period_end_on
-      merge_model.special_enrollment_period.end_on = format_date(special_enrollment_period.end_on)
+      if special_enrollment_period.present? && special_enrollment_period.start_on.present?
+        merge_model.special_enrollment_period.end_on = format_date(special_enrollment_period.end_on)
+      end
     end
 
     def special_enrollment_period_submitted_at
@@ -238,7 +240,7 @@ module Notifier
     end
 
     def special_enrollment_period_reporting_deadline
-      deadline = payload['notice_params']['qle_reporting_deadline']
+      deadline = payload['notice_params'] && payload['notice_params']['qle_reporting_deadline']
       merge_model.special_enrollment_period.reporting_deadline = deadline
     end
 
