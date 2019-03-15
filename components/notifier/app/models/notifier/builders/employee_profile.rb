@@ -38,7 +38,13 @@ module Notifier
     end
 
     def append_contact_details
-      mailing_address = employee_role.person.mailing_address
+      mailing_address =
+        if employee_role.person.mailing_address
+          employee_role.person.mailing_address
+        elsif employee_role.census_employee
+          employee_role.census_employee.address
+        end
+
       if mailing_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
           street_1: mailing_address.address_1,
