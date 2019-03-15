@@ -84,7 +84,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
         allow(current_user).to receive(:has_consumer_role?).and_return(true)
         allow(controller).to receive(:controller_path).and_return("broker_agencies")
         allow(helper).to receive(:params).and_return(params)
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/broker_agencies/profiles/#{profile_id.to_s}\"><img src=\"/images/icons/icon-expert.png\" alt=\"Icon expert\" /> &nbsp; I'm a Broker</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/broker_agencies/profiles/#{profile_id}\"><img src=\"/images/icons/icon-expert.png\" alt=\"Icon expert\" /> &nbsp; I'm a Broker</a>"
       end
 
       it ' should have Individual and Family link when user completes RIDP and Consent form' do
