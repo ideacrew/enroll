@@ -1,5 +1,5 @@
 Feature: As a Super Admin I will be the only user
-  that is able to see & access the "Create Plan Year" Feature.
+  that is able to see & access the Config tab
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
@@ -13,7 +13,6 @@ Feature: As a Super Admin I will be the only user
     And the user is on the Main Page
     Then the user will <action> the Config tab
 
-
     Examples:
       | subrole       | action  |
       | Super Admin   | see     |
@@ -21,5 +20,19 @@ Feature: As a Super Admin I will be the only user
       | HBX Staff     | not see |
       | HBX Read Only | not see |
       | Developer     | not see |
+
+Scenario: HBX Staff with Super Admin subroles should not have the option to time travel
+  Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
+  And the user is on the Main Page
+  And the user goes to the Config Page
+  Then the user will not see the Time Tavel option
+
+Scenario: HBX Staff with Super Admin subroles and a time travel ability enabled should have the option to time travel
+  Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
+  And the user with a HBX staff role with Super Admin subrole updates permisssions to time travel
+  And the user is on the Main Page
+  And the user goes to the Config Page
+  Then the user will see the Time Tavel option
+
 
 

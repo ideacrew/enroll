@@ -21,6 +21,7 @@ class HbxProfilePolicy < ApplicationPolicy
   def can_submit_time_travel_request?
     role = user_hbx_staff_role
     return false unless role
+    return false unless  role.permission.name == "super_admin"
     role.permission.can_submit_time_travel_request
   end
 
