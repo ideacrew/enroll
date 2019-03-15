@@ -62,7 +62,6 @@ module SponsoredBenefits
     def new
       if @plan_design_organization.employer_profile.present?
         begin
-          load_broker_agency_profile
           plan_design_proposal = @plan_design_organization.build_proposal_from_existing_employer_profile
           flash[:success] = "Imported quote and employee information from your client #{@plan_design_organization.employer_profile.legal_name}."
           redirect_to action: :edit, id: plan_design_proposal.id
