@@ -67,7 +67,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
     context "when notice event received" do
 
-      subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      subject { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: notice_event) }
 
       before do
         allow(subject).to receive(:resource).and_return(employer)
@@ -94,7 +94,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
         expect(merge_model.plan_year.initial_py_publish_due_date).to eq Date.new(model_instance.start_on.prev_month.year, model_instance.start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month).strftime('%m/%d/%Y')
       end
 
-      it "should return plan year open enrollment date" do
+      it "should return plan year open enrollment end date" do
         expect(merge_model.plan_year.current_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
 
