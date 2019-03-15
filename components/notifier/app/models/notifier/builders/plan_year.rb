@@ -117,11 +117,13 @@ module Notifier
     end
 
     def plan_year_current_py_oe_end_date
-      plan_year = if event_name == 'zero_employees_on_roster_notice'
-        load_plan_year
+      plan_year =
+        if event_name == 'zero_employees_on_roster_notice' || event_name == 'low_enrollment_notice_for_employer'
+          load_plan_year
         else
           current_plan_year
         end
+
       if plan_year.present?
         merge_model.plan_year.current_py_oe_end_date = format_date(plan_year.open_enrollment_end_on)
       end
