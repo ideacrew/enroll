@@ -440,12 +440,9 @@ def employer_poc
     @element_to_replace_id = params[:row_actions_id]
     @organization = Organization.find(@element_to_replace_id.split('_').last)
     @plan_year = @organization.renewing_or_draft_py
-    @warning_on_save = zero_employee_warning
-
     if @plan_year.may_force_publish? && (params[:publish_with_warnings] == 'true' || (@plan_year.application_eligibility_warnings.blank? && params[:publish_with_warnings] == 'false'))
       @plan_year.force_publish!
     end
-
     respond_to do |format|
       format.js
     end
@@ -725,10 +722,5 @@ private
 
   def call_customer_service(first_name, last_name)
     "No match found for #{first_name} #{last_name}.  Please call Customer Service at: (855)532-5465 for assistance.<br/>"
-  end
-
-  def zero_employee_warning
-    message = "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
-    message if @plan_year.assigned_census_employees_without_owner.blank?
   end
 end
