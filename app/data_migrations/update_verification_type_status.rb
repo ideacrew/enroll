@@ -2,8 +2,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class UpdateVerificationTypeStatus < MongoidMigrationTask
   def migrate
     begin
-      census_employee = Person.where(id: ENV['hbx_id']).first
-      if census_employee.nil?
+      person = Person.where(id: ENV['hbx_id']).first
+      if person.nil?
         puts "No person record found for given HBX ID" unless Rails.env.test?
       else
         verification_type = person.verification_types.where(type_name: ENV['verification_type_name'] )
