@@ -19,7 +19,7 @@ RSpec.describe 'Notifier::Builders::ConsumerRole', :dbclean => :after_each do
       }
     }
 
-    let!(:person) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Samules", last_name: "Park") }
+    let!(:person) { FactoryGirl.create(:person, :with_consumer_role, hbx_id: "a16f4029916445fcab3dbc44bb7aadd0", first_name: "Test", last_name: "Data") }
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
 
     subject do
