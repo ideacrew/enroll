@@ -20,7 +20,7 @@ RSpec.describe 'Notifier::Builders::DependentService', :dbclean => :after_each d
     }
 
     let!(:person) {
-      FactoryGirl.create(:person, :with_consumer_role, hbx_id: "3117597607a14ef085f9220f4d189356", first_name: "Samules", last_name: "Park")
+      FactoryGirl.create(:person, :with_consumer_role, hbx_id: "3117597607a14ef085f9220f4d189356", first_name: "Test", last_name: "Data")
     }
 
     let!(:family){ FactoryGirl.create(:family, :with_primary_family_member, person: person) }

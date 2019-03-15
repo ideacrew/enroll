@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe "ProjectedEligibilityNotice_1" do
-  let!(:person) {FactoryGirl.create(:person, :with_consumer_role, first_name: "Sam", last_name: "Parker", hbx_id: "91091f87b17d4f91af5fd1646d8acf66") }
+  let!(:person) {FactoryGirl.create(:person, :with_consumer_role, first_name: "Test", last_name: "Data", hbx_id: "91091f87b17d4f91af5fd1646d8acf66") }
   let!(:user) {FactoryGirl.create(:user, person: person) }
   let!(:family100) {FactoryGirl.create(:family, :with_primary_family_member, person: person, id: "5c6594605f326d004f000060")}
   let!(:enrollment) do
