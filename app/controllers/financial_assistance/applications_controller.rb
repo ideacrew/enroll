@@ -109,17 +109,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
   end
 
-  def aqhp_flow
-    if @family.applications.where(aasm_state: "draft").blank?
-      application = @family.applications.build(aasm_state: "draft")
-      @family.active_family_members.each do |family_member|
-        application.applicants.build(family_member_id: family_member.id)
-      end
-      application.save!
-    end
-    redirect_to application_checklist_financial_assistance_applications_path
-  end
-
   def uqhp_flow
     @family.applications.where(aasm_state: "draft").destroy_all
     redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
@@ -193,7 +182,16 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @family = @person.primary_family
   end
 
-
+  def aqhp_flow
+    if @family.applications.where(aasm_state: "draft").blank?
+      application = @family.applications.build(aasm_state: "draft")
+      @family.active_family_members.each do |family_member|
+        application.applicants.build(family_member_id: family_member.id)
+      end
+      application.save!
+    end
+    redirect_to application_checklist_financial_assistance_applications_path
+  end
 
   def dummy_data_for_demo(params)
     #Dummy_ED
