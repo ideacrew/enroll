@@ -253,7 +253,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(census_employee).to receive(:terminate_employment).and_return(false)
       xhr :get, :terminate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, termination_date: Date.today.to_s, :format => :js
       expect(response).to have_http_status(:success)
-      expect(assigns[:fa]).to eq false
+      expect(assigns[:fa]).to eq census_employee
       expect(flash[:error]).to eq "Census Employee could not be terminated: Termination date must be within the past 60 days."
     end
 
