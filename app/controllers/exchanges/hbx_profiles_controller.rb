@@ -8,7 +8,9 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
+  before_action :check_super_admin, only: [:configuration, :set_date]
+  before_action :can_submit_time_travel_request?, only: [:set_date]
+  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
@@ -237,6 +239,18 @@ def employer_poc
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
+  def check_super_admin
+    unless current_user.permission.name == "super_admin"
+      redirect_to root_path, :flash => { :error => "Access not allowed" }
+    end
+  end
+
+  def can_submit_time_travel_request?
+    unless current_user.permission.can_submit_time_travel_request?
+      redirect_to root_path, :flash => { :error => "Access not allowed" }
+    end
+  end
+  
   def outstanding_verification_dt
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])

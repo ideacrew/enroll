@@ -13,9 +13,9 @@
           <%= datepicker_control f, :date_of_record, {:class => "floatlabel form-control", :placeholder => "DATE OF RECORD",
                                            :'data-date-min' => "0d", required: true } %>
 
-          <button type="submit" class="btn btn-primary pull-right display-on-mobile">Set Current Date</button>
+          <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%= current_user.permission.can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
         </td>
-        <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Set Current Date</button></td>
+        <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right" <%= current_user.permission.can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button></td>
       </table>
     <% end %>
 

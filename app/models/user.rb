@@ -62,6 +62,10 @@ class User
     false
   end
 
+  def permission
+    person.hbx_staff_role.permission
+  end
+
   def password_required?
     !persisted? || !password.nil? || !password_confirmation.nil?
   end
