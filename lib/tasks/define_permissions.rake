@@ -57,9 +57,15 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_extend_open_enrollment => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_modify_plan_year
+namespace :permissions do
+  desc 'hbx admin can update plan years'
+  DefinePermissions.define_task :hbx_admin_can_modify_plan_year => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_create_benefit_application
 namespace :permissions do
-  desc 'hbx admin can extend open enrollment'
+  desc 'hbx admin can create benefit application'
   DefinePermissions.define_task :hbx_admin_can_create_benefit_application => :environment
 end
 
@@ -81,3 +87,4 @@ end
 #rake permissions:hbx_admin_can_complete_resident_application
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_reset_password
+#rake permissions:hbx_admin_can_modify_plan_year
