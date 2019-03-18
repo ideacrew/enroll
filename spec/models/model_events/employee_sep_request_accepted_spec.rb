@@ -151,7 +151,7 @@ RSpec.describe 'ModelEvents::EmployeeSepRequestAccepted', :dbclean => :after_eac
       end
 
       it "should return qle_event_on" do
-        expect(merge_model.special_enrollment_period.qle_reported_on).to eq model_instance.qle_on.strftime('%m/%d/%Y')
+        expect(merge_model.special_enrollment_period.qle_reported_on).to eq TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       end
 
       it "should return submitted_at" do
