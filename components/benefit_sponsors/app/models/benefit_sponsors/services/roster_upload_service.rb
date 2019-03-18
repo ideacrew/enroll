@@ -215,7 +215,7 @@ module BenefitSponsors
       end
 
       def init_census_record(member, form)
-        params = sanitize_params(form).merge!({  hired_on: Date.strptime(form.hired_on, "%m/%d/%Y"),
+        params = sanitize_params(form).merge!({  hired_on: parse_date(form.hired_on),
           is_business_owner: is_business_owner?(form),
           email: build_email(form),
           employee_relationship: form.employee_relationship,
