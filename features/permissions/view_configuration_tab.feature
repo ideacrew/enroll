@@ -16,10 +16,10 @@ Feature: As a Super Admin I will be the only user
     Examples:
       | subrole       | action  |
       | Super Admin   | see     |
-      | HBX Tier3     | not see |
-      | HBX Staff     | not see |
-      | HBX Read Only | not see |
-      | Developer     | not see |
+      | HBX Tier3     | see     |
+      | HBX Staff     | see     |
+      | HBX Read Only | see     |
+      | Developer     | see     |
 
 Scenario: HBX Staff with Super Admin subroles should not have the option to time travel
   Given that a user with a HBX staff role with Super Admin subrole exists and is logged in

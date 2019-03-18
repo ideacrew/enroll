@@ -6,11 +6,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::Config::AcaHelper
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
+  before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
-  before_action :check_super_admin, only: [:configuration, :set_date]
+  before_action :view_the_configuration_tab?, only: [:configuration, :set_date]
   before_action :can_submit_time_travel_request?, only: [:set_date]
-  before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :show, :binder_index]
+  before_action :find_hbx_profile, only: [:employer_index, :configuration, :broker_agency_index, :inbox, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
@@ -668,7 +668,7 @@ private
   end
 
   def can_submit_time_travel_request?
-    unless current_user.permission.can_submit_time_travel_request?
+    unless authorize HbxProfile, :can_submit_time_travel_request?
       redirect_to root_path, :flash => { :error => "Access not allowed" }
     end
   end
@@ -741,8 +741,8 @@ private
     end
   end
 
-  def check_super_admin
-    unless current_user.permission.name == "super_admin"
+  def view_the_configuration_tab?
+    unless authorize HbxProfile, :view_the_configuration_tab?
       redirect_to root_path, :flash => { :error => "Access not allowed" }
     end
   end
