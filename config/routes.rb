@@ -95,6 +95,12 @@ Rails.application.routes.draw do
         post :identity_verification_datatable
         get :user_account_index
         get :new_eligibility
+        get :oe_extendable_applications
+        get :oe_extended_applications
+        get :edit_open_enrollment
+        post :extend_open_enrollment
+        post :close_extended_open_enrollment
+
       end
 
       member do

@@ -33,6 +33,7 @@ class Permission
   field :can_view_username_and_email, type: Boolean, default: false
   field :can_reset_password, type: Boolean, default: false
   field :can_access_user_account_tab, type: Boolean, default: false
+  field :can_extend_open_enrollment, type: Boolean, default: false
   
   class << self
     def hbx_staff
@@ -55,6 +56,9 @@ class Permission
     end
     def developer
       Permission.where(name: 'developer').first
+    end
+    def super_admin
+      Permission.where(name: 'super_admin').first
     end
   end
 end

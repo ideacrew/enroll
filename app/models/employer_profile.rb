@@ -387,6 +387,24 @@ class EmployerProfile
     end
   end
 
+  def oe_extendable_plan_years
+     plan_years.where(:"start_on".gte => TimeKeeper.date_of_record.beginning_of_month).select do |plan_year|
+      plan_year.may_extend_open_enrollment? && !overlapping_coverage_exists?(plan_year)
+    end
+  end
+
+  def overlapping_coverage_exists?(plan_year)
+    plan_years.published_or_renewing_published_or_terminated
+     .by_overlapping_coverage_period(plan_year.start_on, plan_year.end_on)
+     .reject{|result| result == plan_year}.present?
+  end
+
+  def oe_extended_plan_years
+    plan_years.select do |plan_year|
+      (plan_year.enrollment_extended? || plan_year.renewing_enrollment_extended?) && TimeKeeper.date_of_record > PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:open_enrollment_end_on]
+    end
+  end
+
   def binder_criteria_satisfied?
     show_plan_year.present? &&
     participation_count == 0 &&
