@@ -321,6 +321,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
   allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
   allow(employer_profile).to receive(:default_benefit_group).and_return(nil)
+  allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
   allow(benefit_group).to receive(:elected_plans=).and_return("test")
   allow(benefit_group).to receive(:elected_dental_plans=).and_return("test")
   allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")

@@ -205,8 +205,8 @@ class Invitation
     UserMailer.broker_invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
-  def send_broker_staff_invitation!(invitee_name)
-    UserMailer.broker_staff_invitation_email(invitation_email, invitee_name, self).deliver_now
+  def send_broker_staff_invitation!(invitee_name, person_id)
+    UserMailer.broker_staff_invitation_email(invitation_email, invitee_name, self, person_id).deliver_now
   end
 
   def send_initial_employee_invitation!(census_employee)
@@ -299,7 +299,7 @@ class Invitation
         :source_id => broker_role.id,
         :invitation_email => broker_role.email_address
       )
-      invitation.send_broker_staff_invitation!(broker_role.parent.full_name)
+      invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
       invitation
     end
   end
