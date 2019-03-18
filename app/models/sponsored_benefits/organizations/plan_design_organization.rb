@@ -61,6 +61,7 @@ module SponsoredBenefits
       scope :find_by_proposal,    -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
 
       scope :find_by_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts.general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id))}
+      scope :find_by_active_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts" => {:"$elemMatch" => { general_agency_profile_id: BSON::ObjectId.from_string(general_agency_profile_id), aasm_state: :active}} )}
 
       scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
       scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }

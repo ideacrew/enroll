@@ -62,7 +62,7 @@ module Queries
     end
 
     def general_agency_plan_design_organizations
-      SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_general_agency(custom_attributes[:profile_id])
+      SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_active_general_agency(custom_attributes[:profile_id])
     end
   end
 end
