@@ -11,4 +11,9 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.last_updated_at" => "Last Updated At",
 	"en.hbx_profiles.edit_open_enrollment" => "Edit Open Enrollment",
 	"en.hbx_profiles.close_open_enrollment" => "Close Open Enrollment",
+	"en.hbx_profiles.publish_application" => "Publish Application",
+	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
+	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review",
+	"en.hbx_profiles.force_publish_fail" => "Application Force Publish Failed",
+	"en.hbx_profiles.zero_employee_warning" => "Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?"
 }
