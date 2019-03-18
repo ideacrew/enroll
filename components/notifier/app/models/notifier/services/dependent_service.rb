@@ -3,7 +3,7 @@ module Notifier
   class Services::DependentService
 
     attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible
-    attr_accessor :person, :is_toatally_ineligible, :is_uqhp_eligible
+    attr_accessor :person, :is_totally_ineligible, :is_uqhp_eligible
     attr_accessor :first_name, :last_name
 
     def initialize(is_uqhp_notice, member)
@@ -13,7 +13,7 @@ module Notifier
       @first_name = f_name
       @last_name = l_name
       @age = calculate_age
-      @is_toatally_ineligible = toatally_ineligible?
+      @is_totally_ineligible = totally_ineligible?
       @is_uqhp_eligible = uqhp_eligible?
       @is_aqhp_eligible = aqhp_eligible?
     end
@@ -44,7 +44,7 @@ module Notifier
       is_uqhp_notice ? false : payload_member['aqhp_eligible'].casecmp('YES').zero?
     end
 
-    def toatally_ineligible?
+    def totally_ineligible?
       is_uqhp_notice ? false : payload_member['totally_inelig'].casecmp('YES').zero?
     end
 

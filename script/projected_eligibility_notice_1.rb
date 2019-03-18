@@ -1,7 +1,14 @@
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 begin
   @data_hash = {}
-  CSV.foreach('uqhp_projected_eligibility_notice_report.csv', :headers => true).each do |d|
+
+  csv_path = if Rails.env.production?
+               "proj_elig_report_uqhp_2019.csv"
+             else
+               "#{Rails.root}/spec/test_data/notices/proj_elig_report_uqhp_2019_test_data.csv"
+             end
+
+  CSV.foreach(csv_path, :headers => true).each do |d|
     if @data_hash[d["family.id"]].present?
       hbx_ids = @data_hash[d["family.id"]].collect{|r| r['person_hbx_id']}
       next if hbx_ids.include?(d["person_hbx_id"])
@@ -15,15 +22,15 @@ rescue StandardError => error
 end
 
 field_names = %w[family.id hbx_id full_name]
-file_name = Rails.root.join(
-  "projected_eligibility_notice_1_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
-)
+
+file_name = if Rails.env.production?
+              Rails.root.join("projected_eligibility_notice_uqhp_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
+            else
+              "#{Rails.root}/spec/test_data/notices/projected_eligibility_notice_uqhp_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+            end
 
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
-
-  event_kind = ApplicationEventKind.where(:event_name => 'projected_eligibility_notice_1').first
-  notice_trigger = event_kind.notice_triggers.first
   @data_hash.each do |family_id, members|
     begin
       subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
@@ -36,18 +43,16 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
         begin
-          if ARGV.include?("send_via_notice_eng")
-            @notifier = Services::NoticeService.new
-            @notifier.deliver(
-              recipient: consumer_role,
-              event_object: consumer_role,
-              notice_event: 'projected_eligibility_notice_1',
-              notice_params: {
-                dependents: dependents.map(&:to_hash),
-                primary_member: subscriber.to_hash
-              }
-            )
-          end
+          @notifier = Services::NoticeService.new
+          @notifier.deliver(
+            recipient: consumer_role,
+            event_object: consumer_role,
+            notice_event: 'projected_eligibility_notice_1',
+            notice_params: {
+              dependents: dependents.map(&:to_hash),
+              primary_member: subscriber.to_hash
+            }
+          )
           csv << [
             family_id,
             primary_person.hbx_id,
@@ -64,6 +69,6 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       puts "Unable to process family_id: #{family_id} due to the following error #{e}" unless Rails.env.test?
     end
   end
-  puts "End of #{notice_trigger.mpi_indicator} notice generation" unless Rails.env.test?
+  puts "End of IVL_PRE UQHP notice generation" unless Rails.env.test?
 end
-  puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
+puts "-------------------------------------- End of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?

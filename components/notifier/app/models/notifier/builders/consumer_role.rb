@@ -105,7 +105,7 @@ module Notifier
               aptc: member['aptc'],
               aqhp_eligible: dependent.is_aqhp_eligible,
               uqhp_eligible: dependent.is_uqhp_eligible,
-              totally_ineligible: dependent.is_toatally_ineligible
+              totally_ineligible: dependent.is_totally_ineligible
             }
           )
         end
