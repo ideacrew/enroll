@@ -162,9 +162,6 @@ Bundler/OrderedGems:
 Gemspec/OrderedDependencies:
   Enabled: false
 
-require:
-  - ./cops/lint/empty_rescue_clause.rb
-
 # Deprecated
 # Style/TrailingBlankLines:
 #   Enabled: false
