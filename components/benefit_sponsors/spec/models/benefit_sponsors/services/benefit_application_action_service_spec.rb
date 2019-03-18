@@ -15,8 +15,8 @@ module BenefitSponsors
 
     describe '.terminate_application' do
 
-      let(:past_end_on)  { TimeKeeper.date_of_record.prev_month }
-      let(:future_end_on)  { TimeKeeper.date_of_record.next_month }
+      let(:past_end_on)  { TimeKeeper.date_of_record.prev_month.end_of_month }
+      let(:future_end_on)  { TimeKeeper.date_of_record.next_month.end_of_month }
       let(:termination_kind) { "voluntary" }
       let(:termination_reason) { "Company went out of business/bankrupt" }
 

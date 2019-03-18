@@ -195,6 +195,7 @@ function pyAction(action, id, employer_id, term_date, start_on) {
     showTerminationRadios();
     clearDatePickerValue();
     disableSubmitButton();
+    updateDatePickerBasedOnTermReason('voluntary', id)
   }
   
   if (action == 'cancel') {
@@ -210,11 +211,47 @@ function pyAction(action, id, employer_id, term_date, start_on) {
   }
 }
 
+function showOnlyLastDate(id) {
+  $("#date_picker_" + id ).datepicker({
+    beforeShowDay: function(date){
+      if (date.getDate() == getLastDayOfYearAndMonth(date.getFullYear(), date.getMonth())){
+        return [true, ''];
+      }
+      return [false, ''];
+    }
+  });
+}
+
+function showAllDates(id) {
+  $("#date_picker_" + id ).datepicker({
+    changeMonth: true,
+    changeYear: true,
+    yearRange: (new Date).getFullYear()-5 + ":" + (new Date).getFullYear()+1
+  });
+  $("#date_picker_" + id ).datepicker( "option", "dateFormat", "mm/dd/yy" );
+}
+
+function getLastDayOfYearAndMonth(year, month){
+  return(new Date((new Date(year, month + 1, 1)) - 1)).getDate();
+}
+
+function updateDatePickerBasedOnTermReason(reason, id) {
+  var terminationReason = reason
+  if (terminationReason == 'nonpayment' && '<%= Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment.to_s %>' == 'true') {
+    showAllDates(id);
+  } else if ((terminationReason == 'voluntary') && '<%= Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary.to_s %>' == 'true') {
+    showAllDates(id);
+  } else {
+    showOnlyLastDate(id);
+  }
+}
+
 function addTermReasons(reason, id) {
   applicationId = id
   document.getElementById('term_reason_'+ applicationId).value = "";
   document.getElementById('date_picker_'+ applicationId).value = "";
   validateFormat(applicationId)
+  updateDatePickerBasedOnTermReason(reason.value, id)
   $.ajax({
     type: 'get',
     datatype: 'js',
@@ -231,6 +268,7 @@ function addTermReasons(reason, id) {
       }
     }
   });
+
   return true
 }
 

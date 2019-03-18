@@ -567,7 +567,7 @@ module BenefitSponsors
     describe '.schedule_termination' do
       context "when an employer is scheduled for termination" do
         include_context "setup initial benefit application"
-        let(:end_date) { TimeKeeper.date_of_record.next_month }
+        let(:end_date) { TimeKeeper.date_of_record.next_month.end_of_month }
 
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
@@ -597,21 +597,52 @@ module BenefitSponsors
     describe '.terminate' do
       context "when an employer is terminated" do
         include_context "setup initial benefit application"
-        let(:end_date) { TimeKeeper.date_of_record.prev_day }
-
+        let(:date)  { TimeKeeper.date_of_record }
         subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
 
-        before do
-          subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
-          initial_application.reload
+        context 'with other than end of the month date' do
+          let(:end_date) { Date.new(date.year, date.month, 12) }
+
+          before do
+            subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
+            initial_application.reload
+          end
+
+          it "should NOT terminate benefit application" do
+            expect(initial_application.aasm_state).to eq :active
+          end
+
+          it "should NOT update benefit application end date" do
+            expect(initial_application.end_on).not_to eq end_date
+          end
         end
 
-        it "should terminate benefit application" do
-          expect(initial_application.aasm_state).to eq :terminated
+        context 'with other than end of the month date' do
+          let(:end_date) { Date.new(date.year, date.month, 12) }
+
+          it "should return errors" do
+            result, benefit_application, errors = subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
+            expect(errors.keys.include?(:mid_month_voluntary_term)).to be_truthy
+            expect(result).to be_falsey
+            expect(benefit_application.aasm_state).to eq :active
+          end
         end
 
-        it "should update benefit application end date" do
-          expect(initial_application.end_on).to eq end_date
+        context 'with end of the month date' do
+          let(:end_date) { date.end_of_month }
+
+          before do
+            subject.terminate(end_date, TimeKeeper.date_of_record, "voluntary", "Company went out of business/bankrupt", false)
+            initial_application.reload
+          end
+
+          it "should terminate benefit application" do
+            expect(initial_application.aasm_state).to eq :terminated
+          end
+
+          it "should update benefit application end date" do
+            expect(initial_application.end_on).to eq end_date
+          end
         end
       end
 

@@ -22,7 +22,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GroupTerminationNotice', :dbclean 
   }
   let(:model_instance) { initial_application }
   let(:end_date) { TimeKeeper.date_of_record.prev_day }
-  let(:termination_date) {(TimeKeeper.date_of_record)}
+  let(:termination_date) {(TimeKeeper.date_of_record.end_of_month)}
   let(:service) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(model_instance) }
   
   before do

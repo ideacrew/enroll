@@ -1,5 +1,6 @@
 class Exchanges::EmployerApplicationsController < ApplicationController
   include Pundit
+  include Config::AcaHelper
 
   before_action :can_modify_plan_year?, only: [:terminate, :cancel]
   before_action :check_hbx_staff_role, except: :get_term_reasons
