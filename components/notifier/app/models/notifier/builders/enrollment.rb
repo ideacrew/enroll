@@ -25,11 +25,6 @@ module Notifier
       merge_model.enrollment.coverage_end_on = format_date(enrollment.terminated_on)
     end
 
-    def enrollment_waiver_effective_date
-      return if enrollment.blank?
-      merge_model.enrollment.waiver_effective_date = format_date(enrollment.created_at)
-    end
-
     def enrollment_plan_name
       return if enrollment.blank?
       merge_model.enrollment.plan_name = enrollment.plan.name

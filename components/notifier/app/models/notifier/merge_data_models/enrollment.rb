@@ -13,7 +13,6 @@ module Notifier
     attribute :employee_first_name, String
     attribute :employee_last_name, String
     attribute :coverage_end_on, String
-    attribute :waiver_effective_date, String
     attribute :enrolled_count, String
     # attribute :metal_level, String
     attribute :coverage_kind, String
@@ -30,7 +29,6 @@ module Notifier
         enrolled_count: '2',
         employee_first_name: 'David',
         employee_last_name: 'Finch',
-        waiver_effective_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
 
       })
 
