@@ -1,4 +1,4 @@
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
 require "sponsored_benefits/version"
@@ -32,11 +32,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'capybara'
   s.add_development_dependency 'factory_girl_rails'
-  s.add_development_dependency 'pry'
-  s.add_development_dependency 'pry-rails'
-  s.add_development_dependency 'pry-stack_explorer'
-  s.add_development_dependency 'pry-byebug'
-  s.add_development_dependency 'pry-remote'
-  s.add_development_dependency 'forgery'
   s.add_development_dependency 'devise'
 end
