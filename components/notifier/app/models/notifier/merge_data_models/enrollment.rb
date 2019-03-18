@@ -30,6 +30,7 @@ module Notifier
         enrolled_count: '2',
         employee_first_name: 'David',
         employee_last_name: 'Finch',
+        waiver_effective_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
 
       })
 

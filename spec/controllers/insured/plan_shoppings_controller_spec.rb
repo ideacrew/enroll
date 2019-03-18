@@ -78,10 +78,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           expect(response).to have_http_status(:success)
         end
       end
-
     end
-
-
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
@@ -362,17 +359,28 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "GET print_waiver" do
-    let(:enrollment){ double(:HbxEnrollment) }
+    let(:notice_event) {"employee_waiver_confirmation"}
+    let(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:parent_enrollment){ FactoryGirl.create(:hbx_enrollment, household: family.active_household, employee_role_id: employee_role.id) }
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, predecessor_enrollment_id: parent_enrollment.id, employee_role_id: employee_role.id, aasm_state: 'inactive') }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+    let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
 
-    it "should return hbx_enrollment to print waiver" do
-      allow(user).to receive(:person).and_return(person)
-      allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
-      sign_in(user)
-      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
-      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
-      allow(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
-      get :print_waiver, id: "id"
+    before do
+      sign_in user
+      get :print_waiver, id: enrollment.id
+    end
+
+    it "should be success" do
       expect(response).to have_http_status(:success)
+    end
+
+    it "should set hbx enrollment instance variable" do
+      expect(assigns(:hbx_enrollment)).to eq enrollment
+    end
+
+    it "should trigger notice with predecessor_enrollment_id" do
+      allow(controller).to receive(:trigger_notice_observer).with(parent_enrollment.employee_role, parent_enrollment, notice_event)
     end
   end
 
