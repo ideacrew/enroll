@@ -38,6 +38,27 @@ describe PlanYear, "that is:
     end
 
   end
+
+  describe "late initial employer after monthly transmission i.e after 16th" do
+    (17..30).each do |date|
+      let(:current_date) { Date.new(2017, 6, date) }
+      context "late initial employer on #{date} day of the month " do
+        it "is eligible for export" do
+          expect(subject.eligible_for_export?).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe "late initial employer on effective date of month" do
+    let(:current_date) { Date.new(2017, 7, 1) }
+    context "late initial employer on effective date of plan year " do
+      it "is eligible for export" do
+        subject.aasm_state = "active"
+        expect(subject.eligible_for_export?).to be_truthy
+      end
+    end
+  end
 end
 
 describe PlanYear, "that is:
@@ -77,5 +98,26 @@ describe PlanYear, "that is:
       expect(subject.eligible_for_export?).to be_truthy
     end
 
+  end
+
+  describe "late renewal employer after monthly transmission i.e after 16th" do
+    (17..30).each do |date|
+      let(:current_date) { Date.new(2017, 6, date) }
+      context "late renewal employer on #{date} day of the month " do
+        it "is eligible for export" do
+          expect(subject.eligible_for_export?).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe "late renewal employer on effective date of month" do
+    let(:current_date) { Date.new(2017, 7, 1) }
+    context "late renewal employer on effective date of plan year " do
+      it "is eligible for export" do
+        subject.aasm_state = "active"
+        expect(subject.eligible_for_export?).to be_truthy
+      end
+    end
   end
 end
