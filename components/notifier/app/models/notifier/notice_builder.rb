@@ -249,8 +249,8 @@ module Notifier
     end
 
     def store_paper_notice
-      bucket_name= Settings.paper_notice
-      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
+      bucket_name = Settings.paper_notice
+      notice_filename_for_paper_notice = "#{@resource.person.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
       notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
       begin
         FileUtils.cp(notice_path, notice_path_for_paper_notice)

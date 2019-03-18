@@ -34,7 +34,7 @@ module Notifier
     validates_presence_of :title, :notice_number, :recipient
     validates_uniqueness_of :notice_number
     validates_uniqueness_of :event_name, :allow_blank => true
-   
+
     validates :market_kind,
       inclusion:  { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
       allow_nil:  false
@@ -87,10 +87,10 @@ module Notifier
       if finder_mapping.nil?
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
       end
-      
+
       @payload = payload
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
-      
+
       if @resource.blank?
         raise ArgumentError.new("Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}.")
       end
@@ -98,16 +98,10 @@ module Notifier
       generate_pdf_notice
       upload_and_send_secure_message
       send_generic_notice_alert
+      send_generic_notice_alert_to_broker
+      store_paper_notice if @resource.is_a(ConsumerRole) && @resource.can_receive_paper_communication?
       send_generic_notice_alert_to_broker_and_ga
     end
-
-    def shop?
-      [:employer_profile,
-        :employee_profile,
-        :broker_profile,
-        :broker_agency_profile,
-        :general_agency].include?(recipient_klass_name)
-      end
 
     def recipient_klass_name
       recipient.to_s.split('::').last.underscore.to_sym
@@ -135,7 +129,7 @@ module Notifier
 
       event :archive, :after => :record_transition do
         transitions from: [:published],  to: :archived
-      end  
+      end
     end
 
     # Check if notice with same MPI indictor exists
@@ -172,7 +166,7 @@ module Notifier
     #       no_links: true,
     #       hard_wrap: true,
     #       disable_indented_code_blocks: true,
-    #       fenced_code_blocks: false,        
+    #       fenced_code_blocks: false,
     #     )
     # end
 
