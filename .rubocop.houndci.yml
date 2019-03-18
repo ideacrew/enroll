@@ -156,6 +156,12 @@ Style/SymbolArray:
 Style/WordArray:
   Enabled: false
 
+Bundler/OrderedGems:
+  Enabled: false
+
+Gemspec/OrderedDependencies:
+  Enabled: false
+
 # Deprecated
 # Style/TrailingBlankLines:
 #   Enabled: false
