@@ -9,7 +9,7 @@ module Factories
       clone_enrollment = clone_cobra_enrollment
       clone_enrollment.decorated_hbx_enrollment
       save_clone_enrollment(clone_enrollment)
-    rescue Exception => e
+    rescue StandardError => e
       Rails.logger.error { "Unable to create cobra enrollment, Errors: #{e}" }
       raise FamilyEnrollmentCloneFactoryError, "Unable to create cobra enrollment Errors : #{e}"
     end
@@ -38,33 +38,23 @@ module Factories
 
     def find_renewal_py_for_cobra_enrollment
       employer = plan_year.employer_profile
-      employer.plan_years.where("$and" => [ {:aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)},
-                                            {:start_on.lte => new_effective_date, :end_on.gte => new_effective_date}]).first
+      employer.plan_years.where("$and" => [{:aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)},
+                                           {:start_on.lte => new_effective_date, :end_on.gte => new_effective_date}]).first
     end
 
     def can_create_cobra_under_renewal_py?
-      if find_renewal_py_for_cobra_enrollment.present?
-        benefit_groups = find_renewal_py_for_cobra_enrollment.benefit_groups
-        elected_plan_ids = enrollment.coverage_kind == 'health' ? benefit_groups.map(&:elected_plan_ids).flatten : benefit_groups.map(&:elected_dental_plan_ids).flatten
-        if elected_plan_ids.include?(enrollment.plan.renewal_plan.id)
-          true
-        else
-          raise FamilyEnrollmentCloneFactoryError, "your Employer Sponsored Benefits no longer offerring the plan #{enrollment.plan.renewal_plan.name}."
-        end
-      else
-        raise FamilyEnrollmentCloneFactoryError, 'valid plan year not found for new effective date'
-      end
+      raise FamilyEnrollmentCloneFactoryError, 'valid plan year not found for new effective date' if find_renewal_py_for_cobra_enrollment.blank?
+      benefit_groups = find_renewal_py_for_cobra_enrollment.benefit_groups
+      elected_plan_ids = enrollment.coverage_kind == 'health' ? benefit_groups.map(&:elected_plan_ids).flatten : benefit_groups.map(&:elected_dental_plan_ids).flatten
+      raise FamilyEnrollmentCloneFactoryError, "your Employer Sponsored Benefits no longer offerring the plan #{enrollment.plan.renewal_plan.name}." unless elected_plan_ids.include?(enrollment.plan.renewal_plan.id)
+      true
     end
 
     def find_benefit_group_assignment
       assignment = census_employee.renewal_benefit_group_assignment
       if assignment.blank?
-        if census_employee.active_benefit_group_assignment.blank?
-          census_employee.save
-        end
-        if find_renewal_py_cobra_enrollment == census_employee.published_benefit_group_assignment.benefit_group.plan_year
-          assignment = census_employee.published_benefit_group_assignment
-        end
+        census_employee.save if census_employee.active_benefit_group_assignment.blank?
+        assignment = census_employee.published_benefit_group_assignment if find_renewal_py_cobra_enrollment == census_employee.published_benefit_group_assignment.benefit_group.plan_year
       end
       assignment
     end

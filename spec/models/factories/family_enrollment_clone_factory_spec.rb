@@ -127,14 +127,14 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
         ce.coverage_terminated_on = active_plan_year.end_on
         ce.save
         benefit_group = renewing_plan_year.benefit_groups.first
-        benefit_group.reference_plan_id   = renewal_plan.id
+        benefit_group.reference_plan_id = renewal_plan.id
         benefit_group.elected_plan_ids = [renewal_plan.id]
         renewing_plan_year.save
       end
 
       it 'should generate external cobra enrollment under renewal plan year' do
         generate_cobra_enrollment
-        cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+        cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
         expect(cobra_enrollment.external_enrollment).to be_truthy
         expect(cobra_enrollment.auto_renewing?).to be_truthy
         expect(cobra_enrollment.effective_on).to eq employer_profile.renewing_plan_year.start_on
@@ -142,7 +142,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
 
       it 'cobra enrollment member coverage_start_on should cloned enrollment effective_on' do
         generate_cobra_enrollment
-        cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+        cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
         expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq family.enrollments.first.effective_on
       end
     end
