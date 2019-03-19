@@ -649,10 +649,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    context '.oe_extendable_applications' do 
+    context '.oe_extendable_applications' do
       let(:benefit_applications) { [ double(may_extend_open_enrollment?: true) ]}
 
-      before do 
+      before do
         allow(benefit_sponsorship).to receive(:oe_extendable_benefit_applications).and_return(benefit_applications)
       end
 
@@ -667,7 +667,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     context '.oe_extended_applications' do
       let(:benefit_applications) { [ double(enrollment_extended?: true) ]}
 
-      before do 
+      before do
         allow(benefit_sponsorship).to receive(:oe_extended_applications).and_return(benefit_applications)
       end
 
@@ -693,8 +693,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
         expect(response).to render_template("exchanges/hbx_profiles/edit_open_enrollment")
       end
     end
-    
-    context '.extend_open_enrollment' do  
+
+    context '.extend_open_enrollment' do
       let(:benefit_application) { double }
 
       before do
@@ -730,7 +730,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    context '.close_extended_open_enrollment' do 
+    context '.close_extended_open_enrollment' do
       let(:benefit_application) { double }
 
       before do
@@ -786,7 +786,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
 
     context '.new_benefit_application' do
       before :each do
-        xhr :get, :new_benefit_application
+        xhr :get, :new_benefit_application, benefit_sponsorship_id: benefit_sponsorship.id.to_s
       end
 
       it 'should respond with success status' do
@@ -798,9 +798,23 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       end
     end
 
-    context '.create_benefit_application' do
+    context '.create_benefit_application when existing draft application' do
       before :each do
-        xhr :post, :create_benefit_application, valid_params
+        xhr :post, :create_benefit_application, valid_params, has_active_ba: false
+      end
+
+      it 'should respond with success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render new_benefit_application' do
+        expect(response).to render_template("exchanges/hbx_profiles/create_benefit_application")
+      end
+    end
+
+    context '.create_benefit_application when existing application is in active states' do
+      before :each do
+        xhr :post, :create_benefit_application, valid_params, has_active_ba: true
       end
 
       it 'should respond with success status' do
