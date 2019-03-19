@@ -35,7 +35,7 @@ module Notifier
         enrollment_kind: "special_enrollment",
         employee_first_name: 'David',
         employee_last_name: 'Finch',
-        coverage_kind: 'health'
+        coverage_kind: 'health',
         coverage_end_on_minus_60_days: ((end_on - 60.days).strftime('%m/%d/%Y')),
         coverage_end_on_plus_60_days: ((end_on + 60.days).strftime('%m/%d/%Y'))
       })
