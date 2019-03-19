@@ -272,7 +272,6 @@ function setMyPlans(element) {
     $('.plan-design .selected-plan').show();
     calcPlanDesignContributions();
   };
-  clearComparisons();
 }
 
 function setSliderDisplayVal(slideEvt) {
