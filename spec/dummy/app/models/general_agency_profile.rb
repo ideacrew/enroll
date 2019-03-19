@@ -35,10 +35,10 @@ class GeneralAgencyProfile
   accepts_nested_attributes_for :general_agency_contacts, reject_if: :all_blank, allow_destroy: true
 
 
-  embeds_many :documents, as: :documentable
-  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
-  accepts_nested_attributes_for :inbox
-  after_initialize :build_nested_models
+  # embeds_many :documents, as: :documentable
+  # embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  # accepts_nested_attributes_for :inbox
+  # after_initialize :build_nested_models
 
   def market_kind=(new_market_kind)
     write_attribute(:market_kind, new_market_kind.to_s.downcase)
