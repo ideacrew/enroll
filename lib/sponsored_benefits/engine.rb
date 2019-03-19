@@ -1,3 +1,5 @@
+require 'virtus'
+
 module SponsoredBenefits
   class Engine < ::Rails::Engine
     isolate_namespace SponsoredBenefits

@@ -191,6 +191,26 @@ class BenefitGroup
     plan_option_kind == "single_plan"
   end
 
+  def build_relationship_benefits
+    self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.relationship_benefits.build(relationship: relationship, offered: true)
+    end
+  end
+
+  def build_dental_relationship_benefits
+    self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
+       self.dental_relationship_benefits.build(relationship: relationship, offered: true)
+    end
+  end
+
+  def elected_dental_plans_by_option_kind
+    if dental_plan_option_kind == "single_carrier"
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+    else
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
+    end
+  end
+
   def monthly_employer_contribution_amount(plan = reference_plan)
   end
 
