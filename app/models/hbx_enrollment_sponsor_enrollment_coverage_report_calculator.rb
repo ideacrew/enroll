@@ -1,5 +1,5 @@
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
-	EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
+  EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year)
   
   MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn) do
     def ssn
@@ -8,81 +8,81 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     end
   end
 
-	EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :member_info, :sponsored_benefit) do
-		def is_disabled?
-			is_disabled
-		end
+  EnrollmentMemberAdapter = Struct.new(:member_id, :dob, :relationship, :is_primary_member, :is_disabled, :employee_role, :member_info, :sponsored_benefit) do
+    def is_disabled?
+      is_disabled
+    end
 
-		def is_primary_member?
-			is_primary_member
-		end
-	end
+    def is_primary_member?
+      is_primary_member
+    end
+  end
 
-	class HbxEnrollmentRosterMapper
-		include Enumerable
+  class HbxEnrollmentRosterMapper
+    include Enumerable
 
-		def initialize(he_id_list, s_benefit)
-			@hbx_enrollment_id_list = he_id_list
-			@sponsored_benefit = s_benefit
-			@issuer_profile_id_map = {}
-			@active_year_map = {}
-			::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
-				@issuer_profile_id_map[rec.first] = rec[1]
-				@active_year_map[rec.first] = rec.last["min"].year
-			end
-		end
+    def initialize(he_id_list, s_benefit)
+      @hbx_enrollment_id_list = he_id_list
+      @sponsored_benefit = s_benefit
+      @issuer_profile_id_map = {}
+      @active_year_map = {}
+      ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+        @issuer_profile_id_map[rec.first] = rec[1]
+        @active_year_map[rec.first] = rec.last["min"].year
+      end
+    end
 
-		def each
-			@hbx_enrollment_id_list.each_slice(200) do |heidl|
+    def each
+      @hbx_enrollment_id_list.each_slice(200) do |heidl|
         search_criteria(heidl).each do |agg_result|
           yield rosterize_hbx_enrollment(agg_result)
         end
-			end
-		end
+      end
+    end
 
-		def search_criteria(enrollment_ids)
-			Family.collection.aggregate([
-				{"$match" => {
-					"households.hbx_enrollments" => { "$elemMatch" => {
-						"_id" => {"$in" => enrollment_ids}
-					}}}},
-					{"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
-					{"$unwind" => "$households"},
-					{"$unwind" => "$households.hbx_enrollments"},
-					{"$match" => {
-						"households.hbx_enrollments._id" => {"$in" => enrollment_ids}
-					}},
-					{"$project" => {
-						"hbx_enrollment" => {
-							"effective_on" => "$households.hbx_enrollments.effective_on",
-							"hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
-							"_id" => "$households.hbx_enrollments._id",
+    def search_criteria(enrollment_ids)
+      Family.collection.aggregate([
+        {"$match" => {
+          "households.hbx_enrollments" => { "$elemMatch" => {
+            "_id" => {"$in" => enrollment_ids}
+          }}}},
+          {"$project" => {"households" => {"hbx_enrollments": 1}, "family_members" => {"_id": 1, "person_id": 1}}},
+          {"$unwind" => "$households"},
+          {"$unwind" => "$households.hbx_enrollments"},
+          {"$match" => {
+            "households.hbx_enrollments._id" => {"$in" => enrollment_ids}
+          }},
+          {"$project" => {
+            "hbx_enrollment" => {
+              "effective_on" => "$households.hbx_enrollments.effective_on",
+              "hbx_enrollment_members" => "$households.hbx_enrollments.hbx_enrollment_members",
+              "_id" => "$households.hbx_enrollments._id",
               "product_id" => "$households.hbx_enrollments.product_id",
               "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
               "kind" => "$households.hbx_enrollments.kind"
-						},
-						"family_members" => 1,
-						"people_ids" => {
-							"$map" => {
-								"input" => "$family_members",
-								"as" => "fm",
-								"in" => "$$fm.person_id"
-							}
-						}
-					}},
-					{"$lookup" => {
-						"from" => "people",
-						"localField" => "people_ids",
-						"foreignField" => "_id",
-						"as" => "people"
-					}},
-					{"$project" => {
-						"hbx_enrollment" => 1,
-						"family_members" => 1,
-						"people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
-					}}
-			])
-		end
+            },
+            "family_members" => 1,
+            "people_ids" => {
+              "$map" => {
+                "input" => "$family_members",
+                "as" => "fm",
+                "in" => "$$fm.person_id"
+              }
+            }
+          }},
+          {"$lookup" => {
+            "from" => "people",
+            "localField" => "people_ids",
+            "foreignField" => "_id",
+            "as" => "people"
+          }},
+          {"$project" => {
+            "hbx_enrollment" => 1,
+            "family_members" => 1,
+            "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
+          }}
+      ])
+    end
 
     def person_info_fields
       {
@@ -95,24 +95,24 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       }
     end
 
-		def rosterize_hbx_enrollment(enrollment_record)
-			person_id_map = {}
-			enrollment_record["people"].each do |pers|
-				person_id_map[pers["_id"]] = pers
-			end
-			subject_arr, dep_members = enrollment_record["hbx_enrollment"]["hbx_enrollment_members"].partition do |entry|
-				entry["is_subscriber"]
-			end
-			sub_member = subject_arr.first
+    def rosterize_hbx_enrollment(enrollment_record)
+      person_id_map = {}
+      enrollment_record["people"].each do |pers|
+        person_id_map[pers["_id"]] = pers
+      end
+      subject_arr, dep_members = enrollment_record["hbx_enrollment"]["hbx_enrollment_members"].partition do |entry|
+        entry["is_subscriber"]
+      end
+      sub_member = subject_arr.first
       sub_person = nil
-			family_people_ids = {}
-			family_dobs = {}
-			family_disables = {}
-		  family_names = {}
-			enrollment_record["family_members"].each do |fm|
-				family_people_ids[fm["_id"]] = fm["person_id"]
-				family_dobs[fm["_id"]] = person_id_map[fm["person_id"]]["dob"]
-				family_disables[fm["_id"]] = person_id_map[fm["person_id"]]["is_disabled"]
+      family_people_ids = {}
+      family_dobs = {}
+      family_disables = {}
+      family_names = {}
+      enrollment_record["family_members"].each do |fm|
+        family_people_ids[fm["_id"]] = fm["person_id"]
+        family_dobs[fm["_id"]] = person_id_map[fm["person_id"]]["dob"]
+        family_disables[fm["_id"]] = person_id_map[fm["person_id"]]["is_disabled"]
         family_names[fm["_id"]] = MemberInfoAdapter.new(
           person_id_map[fm["person_id"]]["name_pfx"],
           person_id_map[fm["person_id"]]["first_name"],

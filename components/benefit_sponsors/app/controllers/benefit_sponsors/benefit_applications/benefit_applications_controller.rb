@@ -5,7 +5,7 @@ module BenefitSponsors
       include Pundit
 
       def new
-        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.require(:benefit_sponsorship_id))
+        @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
       end
 

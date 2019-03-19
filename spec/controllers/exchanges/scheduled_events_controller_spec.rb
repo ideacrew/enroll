@@ -19,8 +19,8 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "GET new" do
-	  it "should render the new template" do
-  	  xhr :get, :new
+    it "should render the new template" do
+      xhr :get, :new
         expect(response).to have_http_status(:success)
       end
   end
@@ -34,7 +34,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
       allow(scheduled_event).to receive(:save!).and_return success
       xhr :post, :create, scheduled_event: event_params
     end
-  	it "returns http status" do
+    it "returns http status" do
       expect(response).to have_http_status(:success)
       expect(response).to render_template('exchanges/scheduled_events/create')
     end

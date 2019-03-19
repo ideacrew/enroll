@@ -7,16 +7,16 @@ class DirtyDbRoom
 
   def self.db_was_cleaned!(example)
     @db_room_mutex.synchronize do
-      @room_status_list.delete(example.full_description)
+      @room_status_list.delete(example.location)
     end
   end
 
   def self.room_made_dirty!(factory_name)
-    @db_room_mutex.synchronize do
-      if RSpec.current_example
-        @room_status_list[RSpec.current_example.full_description] = 
-          @room_status_list[RSpec.current_example.full_description] + 
-          [[factory_name, RSpec.current_example.location]]
+    if RSpec.current_example
+      @db_room_mutex.synchronize do
+        @room_status_list[RSpec.current_example.location] = 
+          @room_status_list[RSpec.current_example.location] + 
+          [[factory_name, RSpec.current_example.full_description]]
       end
     end
   end
@@ -44,6 +44,13 @@ module FactoryGirl::Syntax::Methods
   end
 
   alias_method_chain :create, :log
+
+  def build_with_log(name, *traits_and_overrides, &block)
+    DirtyDbRoom.room_made_dirty!(name)
+    build_without_log(name, *traits_and_overrides, &block)
+  end
+
+  alias_method_chain :build, :log
 end
 
 DirtyDbRoom.initialize_stern_mom!

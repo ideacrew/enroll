@@ -3,9 +3,9 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_ra
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_list_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
 
-describe "QhpRateBuilder" do
+describe "QhpRateBuilder", dbclean: :after_each do
 
-  before :all do
+  before :each do
     glob_pattern = File.join(Rails.root, "db/seedfiles/cca/issuer_profiles_seed.rb")
     load glob_pattern
     load_cca_issuer_profiles_seed

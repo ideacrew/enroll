@@ -72,5 +72,32 @@ module BenefitSponsors
       expect(disabled_child.relationship).to eq "child"
       expect(disabled_child.is_disabled?).to be_truthy
     end
+
+    describe 'eligible_employee_criteria' do
+      let!(:rating_area)                  { FactoryGirl.create_default :benefit_markets_locations_rating_area }
+      let!(:service_area)                 { FactoryGirl.create_default :benefit_markets_locations_service_area }
+      let!(:site)                         { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:organization)                 { FactoryGirl.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:employer_profile)             { organization.employer_profile }
+      let!(:benefit_sponsorship)          { employer_profile.add_benefit_sponsorship }
+      let!(:ce1)                          { FactoryGirl.create(:census_employee, :with_enrolled_census_employee, benefit_sponsorship_id: benefit_sponsorship.id) }
+      let!(:ce2)                          { FactoryGirl.create(:census_employee, benefit_sponsorship_id: benefit_sponsorship.id) }
+
+      before :each do
+        ce2.update_attribute(:aasm_state, 'employment_terminated')
+        ce_cost_instance = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_sponsorship, TimeKeeper.date_of_record)
+        @census_employees = ce_cost_instance.send(:eligible_employee_criteria)
+      end
+
+      context 'cases based on aasm_states' do
+        it 'should return array with ce1 id as it is active' do
+          expect(@census_employees.pluck(:id)).to include(ce1.id)
+        end
+
+        it 'should return array without ce2 id as it is not active' do
+          expect(@census_employees.pluck(:id)).not_to include(ce2.id)
+        end
+      end
+    end
   end
 end
