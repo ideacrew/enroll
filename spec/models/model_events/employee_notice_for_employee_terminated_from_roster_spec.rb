@@ -12,6 +12,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
   let!(:model_instance) {census_employee}
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id) }
+  let!(:dental_enrollment) {FactoryGirl.create(:hbx_enrollment, :with_dental_coverage_kind, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id)}
 
   describe "when an employer successfully terminates employee from roster" do
 
@@ -58,10 +59,12 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
             "employee_profile.last_name",
             "employee_profile.employer_name",
             "employee_profile.enrollment.plan_name",
+            "employee_profile.dental_enrollment.plan_name",
             "employee_profile.enrollment.coverage_end_on",
             "employee_profile.enrollment.coverage_kind",
             "employee_profile.termination_of_employment",
-            "employee_profile.coverage_terminated_on"
+            "employee_profile.coverage_terminated_on",
+            "employee_profile.coverage_terminated_on_plus_30_days"
         ]
       }
 
@@ -103,12 +106,20 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
         expect(merge_model.enrollment.plan_name).to eq hbx_enrollment.plan.name
       end
 
+      it 'should return dental enrollment plan name' do
+        expect(merge_model.dental_enrollment.plan_name).to eq dental_enrollment.plan.name
+      end
+
       it "should return employee termination_of_employment" do
         expect(merge_model.termination_of_employment).to eq model_instance.employment_terminated_on.strftime('%m/%d/%Y')
       end
 
       it "should return employee coverage_terminated_on" do
         expect(merge_model.coverage_terminated_on).to eq census_employee.coverage_terminated_on.strftime('%m/%d/%Y')
+      end
+
+      it "should return employee coverage_terminated_on plus 30 days" do
+        expect(merge_model.coverage_terminated_on_plus_30_days).to eq(census_employee.coverage_terminated_on + 30.days).strftime('%m/%d/%Y')
       end
     end
   end
