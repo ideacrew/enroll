@@ -1035,33 +1035,6 @@ describe Person do
       it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
       it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, false
     end
-
-    describe "financial assistance" do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 21, true
-      end
-
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 21, true
-      end
-
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, 30, "native", true
-      end
-
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20, true
-      end
-
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 25, true
-      end
-
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 30, true
-      end
-    end
-
   end
 
 
