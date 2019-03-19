@@ -8,7 +8,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
   let!(:organization) { FactoryGirl.create(:organization) }
   let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
-  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name, employee_role_id: employee_role.id) }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name, employee_role_id: employee_role.id, employment_terminated_on: TimeKeeper.date_of_record.prev_day, coverage_terminated_on: TimeKeeper.date_of_record.end_of_month) }
   let!(:model_instance) {census_employee}
   let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person) }
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, employee_role_id: employee_role.id, aasm_state: "coverage_enrolled", benefit_group_id: benefit_group.id) }
@@ -57,9 +57,11 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
             "employee_profile.first_name",
             "employee_profile.last_name",
             "employee_profile.employer_name",
+            "employee_profile.enrollment.plan_name",
             "employee_profile.enrollment.coverage_end_on",
             "employee_profile.enrollment.coverage_kind",
-            # "employee_profile.termination_of_employment"
+            "employee_profile.termination_of_employment",
+            "employee_profile.coverage_terminated_on"
         ]
       }
 
@@ -69,7 +71,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
           "event_object_kind" => "CensusEmployee",
           "event_object_id" => model_instance.id
       } }
-      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+      let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient, event_name: 'employee_notice_for_employee_terminated_from_roster') }
       let(:merge_model) { subject.construct_notice_object }
 
       before do
@@ -95,6 +97,18 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
 
       it "should return employee last_name" do
         expect(merge_model.last_name).to eq model_instance.last_name
+      end
+
+      it 'should return health enrollment plan name' do
+        expect(merge_model.enrollment.plan_name).to eq hbx_enrollment.plan.name
+      end
+
+      it "should return employee termination_of_employment" do
+        expect(merge_model.termination_of_employment).to eq model_instance.employment_terminated_on.strftime('%m/%d/%Y')
+      end
+
+      it "should return employee coverage_terminated_on" do
+        expect(merge_model.coverage_terminated_on).to eq census_employee.coverage_terminated_on.strftime('%m/%d/%Y')
       end
     end
   end
