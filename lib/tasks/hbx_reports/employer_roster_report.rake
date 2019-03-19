@@ -50,9 +50,11 @@ def build_employee_row(employee, employer_data)
     employment_status(employee.aasm_state)
   ]
 
-  if employment_status(employee.aasm_state) == 'terminated'
+ status = ['terminated', 'termination_pending'].include? employment_status(employee.aasm_state)
+
+  if status
     data << format_date(employee.employment_terminated_on)
-    transition = employee.workflow_state_transitions.where(:to_state => 'employment_terminated').first
+    transition = employee.workflow_state_transitions.order_by(:'transition_at'.desc).where(:"to_state".in => ['employment_terminated', 'termination_pending']).first
     data << (transition.present? ? format_date(transition.transition_at) : format_date(employee.updated_at))
   else
     data += ['', '']
