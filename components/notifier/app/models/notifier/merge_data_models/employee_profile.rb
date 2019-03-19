@@ -55,6 +55,7 @@ module Notifier
         new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
         termination_of_employment: TimeKeeper.date_of_record.prev_day.strftime('%m/%d/%Y'),
         coverage_terminated_on: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        coverage_terminated_on_plus_30_days: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
         new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       })
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
