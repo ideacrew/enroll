@@ -59,6 +59,158 @@ class Plan
   # for dental plans only, metal level -> high/low values
   field :dental_level, type: String
 
+  default_scope -> {order("name ASC")}
+
+  # Metal level
+  scope :platinum_level,      ->{ where(metal_level: "platinum") }
+  scope :gold_level,          ->{ where(metal_level: "gold") }
+  scope :silver_level,        ->{ where(metal_level: "silver") }
+  scope :bronze_level,        ->{ where(metal_level: "bronze") }
+  scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
+
+
+  scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
+
+  # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
+  scope :silver_level_by_csr_kind, ->(csr_kind = "csr_100"){ where(
+                                          metal_level: "silver").and(
+                                          csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
+                                        )
+                                      }
+
+  # Plan Type
+  scope :ppo_plan, ->{ where(plan_type: "ppo") }
+  scope :pos_plan, ->{ where(plan_type: "pos") }
+  scope :hmo_plan, ->{ where(plan_type: "hmo") }
+  scope :epo_plan, ->{ where(plan_type: "epo") }
+
+  # Plan offers local or national in-network benefits
+  # scope :national_network,  ->{ where(nationwide: "true") }
+  # scope :local_network,     ->{ where(nationwide: "false") }
+
+  scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
+  scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
+  scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
+
+
+  # Marketplace
+  scope :shop_market,           ->{ where(market: "shop") }
+  scope :individual_market,     ->{ where(market: "individual") }
+
+  scope :health_coverage,       ->{ where(coverage_kind: "health") }
+  scope :dental_coverage,       ->{ where(coverage_kind: "dental") }
+
+  # DEPRECATED - 2015-09-23 - By Sean Carley
+    # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
+    # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
+    scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
+    scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+
+  ## DEPRECATED - 2015-10-26 - By Dan Thomas - Use: individual_health_by_active_year_and_csr_kind
+    scope :individual_health_by_active_year, ->(active_year) {where(active_year: active_year, market: "individual", coverage_kind: "health", hios_id: /-01$/ ) }
+  # END DEPRECATED
+
+  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {
+    where(
+        carrier_profile_id: carrier_profile_id,
+        active_year: year,
+        market: "shop",
+        hios_id: { "$not" => /-00$/ },
+        metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
+      )
+  }
+  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {
+    where(
+        active_year: year,
+        market: "shop",
+        hios_id: /-01$/,
+        metal_level: metal_level
+      )
+  }
+
+  scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
+
+
+  scope :shop_health_by_active_year, ->(active_year) {
+      where(
+          active_year: active_year,
+          market: "shop",
+          coverage_kind: "health"
+        )
+    }
+
+  scope :shop_dental_by_active_year, ->(active_year) {
+      where(
+          active_year: active_year,
+          market: "shop",
+          coverage_kind: "dental"
+        )
+    }
+
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+      )
+    }
+
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+      )
+    }
+
+  scope :individual_dental_by_active_year, ->(active_year) {
+      where(
+          active_year: active_year,
+          market: "individual",
+          coverage_kind: "dental"
+        )
+    }
+
+  scope :individual_health_by_active_year_carrier_profile_csr_kind, ->(active_year, carrier_profile_id, csr_kind) {
+    where(
+      "$and" => [
+          {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
+          {"$or" => [
+                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
+                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                    ]
+            }
+        ]
+    )
+  }
+
+  scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
+  scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_carrier_profile_for_bqt,            ->(carrier_profile_id) { where(:carrier_profile_id.in => carrier_profile_id) }
+
+  scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
+  scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
+  scope :health_metal_nin_catastropic,          ->{ not_in(metal_level: "catastrophic") }
+
+
+  scope :by_plan_ids, ->(plan_ids) { where(:id => {"$in" => plan_ids}) }
+
+  scope :by_nationwide, ->(types) { where(:nationwide => {"$in" => types})}
+  scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
+
 
   def carrier_profile=(new_carrier_profile)
     if new_carrier_profile.nil?

@@ -18,7 +18,18 @@ class BrokerAgencyProfile
   field :aasm_state, type: String
   field :aasm_state_set_on, type: Date
 
+  delegate :hbx_id, to: :organization, allow_nil: true
+  delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
+  delegate :dba, :dba=, to: :organization, allow_nil: true
+  delegate :home_page, :home_page=, to: :organization, allow_nil: true
+  delegate :fein, :fein=, to: :organization, allow_nil: false
+  delegate :is_fake_fein, :is_fake_fein=, to: :organization, allow_nil: false
+  delegate :is_active, :is_active=, to: :organization, allow_nil: false
+  delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
+
   def self.find(id)
+    organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
+    organizations.size > 0 ? organizations.first.broker_agency_profile : nil
   end
 
   def primary_broker_role=(new_primary_broker_role = nil)
