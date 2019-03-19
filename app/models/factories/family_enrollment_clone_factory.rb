@@ -4,16 +4,14 @@ module Factories
     attr_accessor :family, :census_employee, :enrollment, :new_effective_date
 
     def clone_for_cobra
-      begin
-        raise ArgumentError if !defined?(family) || !defined?(census_employee)
-        @new_effective_date = effective_on_for_cobra(enrollment)
-        clone_enrollment = clone_cobra_enrollment
-        clone_enrollment.decorated_hbx_enrollment
-        save_clone_enrollment(clone_enrollment)
-      rescue Exception => e
-        Rails.logger.error { "Unable to create cobra enrollment, Errors: #{e}" }
-        raise FamilyEnrollmentCloneFactoryError.new("Unable to create cobra enrollment Errors : #{e}")
-      end
+      raise ArgumentError if !defined?(family) || !defined?(census_employee)
+      @new_effective_date = effective_on_for_cobra(enrollment)
+      clone_enrollment = clone_cobra_enrollment
+      clone_enrollment.decorated_hbx_enrollment
+      save_clone_enrollment(clone_enrollment)
+    rescue Exception => e
+      Rails.logger.error { "Unable to create cobra enrollment, Errors: #{e}" }
+      raise FamilyEnrollmentCloneFactoryError.new("Unable to create cobra enrollment Errors : #{e}")
     end
 
     def save_clone_enrollment(clone_enrollment)
@@ -22,7 +20,7 @@ module Factories
       else
         message = "Enrollment: #{enrollment.id}, \n" \
         "Unable to save clone enrollment: #{clone_enrollment.inspect}, \n" \
-          "Error(s): \n #{clone_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
+          "Error(s): \n #{clone_enrollment.errors.map { |k, v| "#{k} = #{v}" }.join(" & \n")} \n"
         raise FamilyEnrollmentCloneFactoryError.new(message)
       end
     end
@@ -114,14 +112,15 @@ module Factories
       effective_on = effective_on_for_cobra(enrollment)
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
-          applicant_id: hbx_enrollment_member.applicant_id,
-          eligibility_date: effective_on,
-          coverage_start_on: enrollment.effective_on,
-          is_subscriber: hbx_enrollment_member.is_subscriber
-        })
+                                               applicant_id: hbx_enrollment_member.applicant_id,
+                                               eligibility_date: effective_on,
+                                               coverage_start_on: enrollment.effective_on,
+                                               is_subscriber: hbx_enrollment_member.is_subscriber
+                                           })
       end
     end
   end
 
-  class FamilyEnrollmentCloneFactoryError < StandardError; end
+  class FamilyEnrollmentCloneFactoryError < StandardError;
+  end
 end
