@@ -27,4 +27,11 @@ class CarrierProfile
   delegate :fein, :fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
+
+  class << self
+    def find(id)
+      organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
+      organizations.size > 0 ? organizations.first.carrier_profile : nil
+    end
+  end
 end
