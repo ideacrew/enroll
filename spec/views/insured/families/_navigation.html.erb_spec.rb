@@ -69,7 +69,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     end
     describe "no unverified enrollments" do
       before :each do
-        allow(view).to receive(:enrollment_group_unverified?).and_return true
+        allow(view).to receive(:enrollment_group_unverified?).and_return false
         allow(view).to receive(:verification_needed?).and_return false
         render partial: "insured/families/navigation.html.erb"
       end
