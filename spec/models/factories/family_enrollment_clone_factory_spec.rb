@@ -120,7 +120,31 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       it 'should raise error' do
         expect{generate_cobra_enrollment}.to raise_error("Unable to create cobra enrollment Errors : your Employer Sponsored Benefits no longer offerring the plan #{renewal_plan.name}.")
       end
+    end
 
+    context "when employer offering plan in renewal plan year" do
+      before do
+        ce.coverage_terminated_on = active_plan_year.end_on
+        ce.save
+        benefit_group = renewing_plan_year.benefit_groups.first
+        benefit_group.reference_plan_id   = renewal_plan.id
+        benefit_group.elected_plan_ids = [renewal_plan.id]
+        renewing_plan_year.save
+      end
+
+      it 'should generate external cobra enrollment under renewal plan year' do
+        generate_cobra_enrollment
+        cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+        expect(cobra_enrollment.external_enrollment).to be_truthy
+        expect(cobra_enrollment.auto_renewing?).to be_truthy
+        expect(cobra_enrollment.effective_on).to eq employer_profile.renewing_plan_year.start_on
+      end
+
+      it 'cobra enrollment member coverage_start_on should cloned enrollment effective_on' do
+        generate_cobra_enrollment
+        cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+        expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq family.enrollments.first.effective_on
+      end
     end
   end
 end
