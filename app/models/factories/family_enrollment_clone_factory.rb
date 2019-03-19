@@ -1,13 +1,19 @@
 module Factories
   class FamilyEnrollmentCloneFactory
     include Mongoid::Document
-    attr_accessor :family, :census_employee, :enrollment
+    attr_accessor :family, :census_employee, :enrollment, :new_effective_date
 
     def clone_for_cobra
-      raise ArgumentError if !defined?(family) || !defined?(census_employee)
-      clone_enrollment = clone_cobra_enrollment
-      clone_enrollment.decorated_hbx_enrollment
-      save_clone_enrollment(clone_enrollment)
+      begin
+        raise ArgumentError if !defined?(family) || !defined?(census_employee)
+        @new_effective_date = effective_on_for_cobra(enrollment)
+        clone_enrollment = clone_cobra_enrollment
+        clone_enrollment.decorated_hbx_enrollment
+        save_clone_enrollment(clone_enrollment)
+      rescue Exception => e
+        Rails.logger.error { "Unable to create cobra enrollment, Errors: #{e}" }
+        raise FamilyEnrollmentCloneFactoryError.new("Unable to create cobra enrollment Errors : #{e}")
+      end
     end
 
     def save_clone_enrollment(clone_enrollment)
@@ -17,9 +23,7 @@ module Factories
         message = "Enrollment: #{enrollment.id}, \n" \
         "Unable to save clone enrollment: #{clone_enrollment.inspect}, \n" \
           "Error(s): \n #{clone_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
-
-        Rails.logger.error { message }
-        raise FamilyEnrollmentCloneFactory, message
+        raise FamilyEnrollmentCloneFactoryError.new(message)
       end
     end
 
@@ -29,13 +33,61 @@ module Factories
       [effective_on_by_terminated, effective_on_by_benefit_group].max
     end
 
+    def plan_year
+      raise FamilyEnrollmentCloneFactoryError.new("benefit group not found for enrollment") if enrollment.benefit_group.blank?
+      enrollment.benefit_group.plan_year
+    end
+
+    def find_renewal_py_for_cobra_enrollment
+      employer = plan_year.employer_profile
+      employer.plan_years.where("$and" => [
+                                    {:aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)},
+                                    {:"start_on".lte => new_effective_date, :"end_on".gte => new_effective_date}]).first
+    end
+
+    def can_create_cobra_under_renewal_py?
+      if find_renewal_py_for_cobra_enrollment.present?
+        benefit_groups = find_renewal_py_for_cobra_enrollment.benefit_groups
+        elected_plan_ids = enrollment.coverage_kind == 'health' ? benefit_groups.map(&:elected_plan_ids).flatten : benefit_groups.map(&:elected_dental_plan_ids).flatten
+        if elected_plan_ids.include?(enrollment.plan.renewal_plan.id)
+          true
+        else
+          raise FamilyEnrollmentCloneFactoryError.new("your Employer Sponsored Benefits no longer offerring the plan #{enrollment.plan.renewal_plan.name}.")
+        end
+      else
+        raise FamilyEnrollmentCloneFactoryError.new("valid plan year not found for new effective date")
+      end
+    end
+
+    def find_benefit_group_assignment
+      assignment = census_employee.renewal_benefit_group_assignment
+      if assignment.blank?
+        if census_employee.active_benefit_group_assignment.blank?
+          census_employee.save
+        end
+        if find_renewal_py_cobra_enrollment == census_employee.published_benefit_group_assignment.benefit_group.plan_year
+          assignment = census_employee.published_benefit_group_assignment
+        end
+      end
+      assignment
+    end
+
     def clone_cobra_enrollment
       clone_enrollment = family.active_household.hbx_enrollments.new
 
-      clone_enrollment.benefit_group_assignment_id = enrollment.benefit_group_assignment_id
-      clone_enrollment.benefit_group_id = enrollment.benefit_group_id
+      if new_effective_date > plan_year.end_on
+        if can_create_cobra_under_renewal_py?
+          clone_enrollment.benefit_group_assignment_id = find_benefit_group_assignment.id
+          clone_enrollment.benefit_group_id = find_benefit_group_assignment.benefit_group.id
+          clone_enrollment.plan_id = enrollment.plan.renewal_plan.id
+        end
+      else
+        clone_enrollment.benefit_group_assignment_id = enrollment.benefit_group_assignment_id
+        clone_enrollment.benefit_group_id = enrollment.benefit_group_id
+        clone_enrollment.plan_id = enrollment.plan_id
+      end
+
       clone_enrollment.employee_role_id = enrollment.employee_role_id
-      clone_enrollment.plan_id = enrollment.plan_id
       clone_enrollment.coverage_kind = enrollment.coverage_kind
 
       clone_enrollment.kind = 'employer_sponsored_cobra'
@@ -43,7 +95,7 @@ module Factories
       clone_enrollment.effective_on = effective_on
       clone_enrollment.external_enrollment = enrollment.external_enrollment
 
-      if enrollment.benefit_group.plan_year.is_renewing?
+      if clone_enrollment.benefit_group.plan_year.is_renewing?
         clone_enrollment.aasm_state = 'auto_renewing'
       else
         clone_enrollment.select_coverage
