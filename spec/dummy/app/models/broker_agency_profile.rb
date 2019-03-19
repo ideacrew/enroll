@@ -27,6 +27,12 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  # embeds_many :documents, as: :documentable
+  accepts_nested_attributes_for :inbox
+
+  after_initialize :build_nested_models
+
   def self.find(id)
     organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
     organizations.size > 0 ? organizations.first.broker_agency_profile : nil
@@ -52,5 +58,11 @@ class BrokerAgencyProfile
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
       organizations.size > 0 ? organizations.first.broker_agency_profile : nil
     end
+  end
+
+  private
+
+  def build_nested_models
+    build_inbox if inbox.nil?
   end
 end

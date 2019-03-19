@@ -37,4 +37,12 @@ class BrokerRole
   field :license, type: Boolean
   field :training, type: Boolean
   field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
+
+  class << self
+    def find(id)
+      return nil if id.blank?
+      people = Person.where("broker_role._id" => BSON::ObjectId.from_string(id))
+      people.any? ? people[0].broker_role : nil
+    end
+  end
 end
