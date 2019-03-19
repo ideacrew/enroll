@@ -113,7 +113,7 @@ class BenefitGroup
       self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
     end
 
-    # set_bounding_cost_plans # toDO
+    set_bounding_cost_plans
     @elected_plans = new_plans
   end
 
@@ -133,5 +133,76 @@ class BenefitGroup
   def elected_dental_plans
     return @elected_dental_plans if defined? @elected_dental_plans
     @elected_dental_plans ||= Plan.where(:id => {"$in" => elected_dental_plan_ids}).to_a
+  end
+
+  def set_bounding_cost_plans
+    return if reference_plan_id.nil?
+
+    if plan_option_kind == "single_plan"
+      plans = [reference_plan]
+    else
+      if plan_option_kind == "single_carrier"
+        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+      else
+        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+      end
+    end
+
+    set_lowest_and_highest(plans)
+  end
+
+  def set_bounding_cost_dental_plans
+    return if reference_plan_id.nil?
+
+    if dental_plan_option_kind == "single_plan"
+      plans = elected_dental_plans
+    elsif dental_plan_option_kind == "single_carrier"
+      plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+    end
+
+    set_lowest_and_highest(plans)
+  end
+
+  def set_lowest_and_highest(plans)
+    if plans.size > 0
+      plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
+
+      self.lowest_cost_plan_id  = plans_by_cost.first.id
+      @lowest_cost_plan = plans_by_cost.first
+
+      self.highest_cost_plan_id = plans_by_cost.last.id
+      @highest_cost_plan = plans_by_cost.last
+    end
+  end
+
+  def lowest_cost_plan
+    return @lowest_cost_plan if defined? @lowest_cost_plan
+  end
+
+  def highest_cost_plan
+    return @highest_cost_plan if defined? @highest_cost_plan
+  end
+
+  def sole_source?
+    plan_option_kind == "sole_source"
+  end
+
+  def single_plan_type?
+    plan_option_kind == "single_plan"
+  end
+
+  def monthly_employer_contribution_amount(plan = reference_plan)
+  end
+
+  def employee_cost_for_plan(ce, plan = reference_plan)
+  end
+
+  def monthly_min_employee_cost(coverage_kind = nil)
+  end
+
+  def monthly_max_employee_cost(coverage_kind = nil)
+  end
+
+  def elected_plans_by_option_kind
   end
 end
