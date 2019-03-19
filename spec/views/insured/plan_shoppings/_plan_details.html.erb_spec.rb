@@ -54,7 +54,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
     tax_household = FactoryGirl.create(:tax_household, household: family.active_household )
+    thhm = tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: family.primary_applicant.id, is_ia_eligible: true)
     eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+    tax_household.save!
     assign(:tax_household, tax_household)
   end
 

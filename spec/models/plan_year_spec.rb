@@ -2061,6 +2061,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         expect(plan_year.aasm_state).to eq('renewing_enrolling')
       end
 
+      it 'should fire an event' do
+        expect(plan_year).to receive(:notify).with("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:plan_year_id=> plan_year.id.to_s})
+        plan_year.send(:send_employee_invites)
+      end
+
+      it 'should send invitations to renewal census employees' do
+        expect(Invitation).to receive(:invite_renewal_employee!).with(census_employee)
+        plan_year.send_employee_renewal_invites
+      end
+
+
       it 'should send invitations to benefit group census employees'
       # Find a way to test this that relies on the event being fired, as well as write companion specs
       # to determine if the content is correct.  Right now this doesn't really check much
@@ -2078,6 +2089,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it 'the plan should be in enrolling' do
           expect(plan_year.enrolling?).to be_truthy
           expect(plan_year.aasm_state).to eq('enrolling')
+        end
+
+        it 'should fire an event' do
+          expect(plan_year).to receive(:notify).with("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:plan_year_id=> plan_year.id.to_s})
+          plan_year.send(:send_employee_invites)
+        end
+
+        it 'should send invitations to initial census employees' do
+          expect(Invitation).to receive(:invite_initial_employee!).with(census_employee)
+          plan_year.send_employee_initial_enrollment_invites
         end
 
         it 'should send invitations to benefit group census employees'
@@ -2472,6 +2493,21 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
+  end
+end
+
+describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
+  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
+  let!(:census_employee){ FactoryGirl.create :census_employee, employer_profile: employer_profile }
+  let!(:plan_year1) { employer_profile.plan_years.first }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
+
+   it "should trigger renewal_employee_enrollment_confirmation" do
+    expect(ShopNoticesNotifierJob).to receive(:perform_later).with(census_employee.id.to_s, "renewal_employee_enrollment_confirmation", {"acapi_trigger" => true})
+    plan_year1.send(:renewal_employee_enrollment_confirmation)
   end
 end
 
