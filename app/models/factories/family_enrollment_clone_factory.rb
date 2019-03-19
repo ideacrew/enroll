@@ -11,7 +11,7 @@ module Factories
       save_clone_enrollment(clone_enrollment)
     rescue Exception => e
       Rails.logger.error { "Unable to create cobra enrollment, Errors: #{e}" }
-      raise FamilyEnrollmentCloneFactoryError.new("Unable to create cobra enrollment Errors : #{e}")
+      raise FamilyEnrollmentCloneFactoryError, "Unable to create cobra enrollment Errors : #{e}"
     end
 
     def save_clone_enrollment(clone_enrollment)
@@ -21,7 +21,7 @@ module Factories
         message = "Enrollment: #{enrollment.id}, \n" \
         "Unable to save clone enrollment: #{clone_enrollment.inspect}, \n" \
           "Error(s): \n #{clone_enrollment.errors.map { |k, v| "#{k} = #{v}" }.join(" & \n")} \n"
-        raise FamilyEnrollmentCloneFactoryError.new(message)
+        raise FamilyEnrollmentCloneFactoryError, message
       end
     end
 
@@ -32,15 +32,14 @@ module Factories
     end
 
     def plan_year
-      raise FamilyEnrollmentCloneFactoryError.new("benefit group not found for enrollment") if enrollment.benefit_group.blank?
+      raise FamilyEnrollmentCloneFactoryError, 'benefit group not found for enrollment' if enrollment.benefit_group.blank?
       enrollment.benefit_group.plan_year
     end
 
     def find_renewal_py_for_cobra_enrollment
       employer = plan_year.employer_profile
-      employer.plan_years.where("$and" => [
-                                    {:aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)},
-                                    {:"start_on".lte => new_effective_date, :"end_on".gte => new_effective_date}]).first
+      employer.plan_years.where("$and" => [ {:aasm_state.in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE)},
+                                            {:start_on.lte => new_effective_date, :end_on.gte => new_effective_date}]).first
     end
 
     def can_create_cobra_under_renewal_py?
@@ -50,10 +49,10 @@ module Factories
         if elected_plan_ids.include?(enrollment.plan.renewal_plan.id)
           true
         else
-          raise FamilyEnrollmentCloneFactoryError.new("your Employer Sponsored Benefits no longer offerring the plan #{enrollment.plan.renewal_plan.name}.")
+          raise FamilyEnrollmentCloneFactoryError, "your Employer Sponsored Benefits no longer offerring the plan #{enrollment.plan.renewal_plan.name}."
         end
       else
-        raise FamilyEnrollmentCloneFactoryError.new("valid plan year not found for new effective date")
+        raise FamilyEnrollmentCloneFactoryError, 'valid plan year not found for new effective date'
       end
     end
 
@@ -112,15 +111,14 @@ module Factories
       effective_on = effective_on_for_cobra(enrollment)
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
-                                               applicant_id: hbx_enrollment_member.applicant_id,
-                                               eligibility_date: effective_on,
-                                               coverage_start_on: enrollment.effective_on,
-                                               is_subscriber: hbx_enrollment_member.is_subscriber
-                                           })
+          applicant_id: hbx_enrollment_member.applicant_id,
+          eligibility_date: effective_on,
+          coverage_start_on: enrollment.effective_on,
+          is_subscriber: hbx_enrollment_member.is_subscriber
+        })
       end
     end
   end
 
-  class FamilyEnrollmentCloneFactoryError < StandardError;
-  end
+  class FamilyEnrollmentCloneFactoryError < StandardError; end
 end
