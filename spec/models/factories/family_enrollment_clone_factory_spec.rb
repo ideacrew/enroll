@@ -30,6 +30,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
   let(:ce) {
     employer_profile.census_employees.non_business_owner.first
   }
+  let(:renewing_plan_year) { employer_profile.renewing_plan_year }
 
   let!(:family) {
     person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
@@ -105,5 +106,21 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq family.enrollments.first.effective_on
     end
 
+  end
+
+  context "when cobra enrollment effective date falls under renewal plan year" do
+    let(:external_enrollment) { true }
+
+    before :each do
+      ce.coverage_terminated_on = active_plan_year.end_on
+      ce.save
+    end
+
+    context "when employer not offering plan in renewal plan year" do
+      it 'should raise error' do
+        expect{generate_cobra_enrollment}.to raise_error("Unable to create cobra enrollment Errors : your Employer Sponsored Benefits no longer offerring the plan #{renewal_plan.name}.")
+      end
+
+    end
   end
 end
