@@ -155,8 +155,8 @@ module SponsoredBenefits
       end
 
       def create_secure_message(message_params, inbox_provider, folder)
-        message = Message.new(message_params)
-        message.folder =  Message::FOLDER_TYPES[folder]
+        message = ::Message.new(message_params)
+        message.folder = ::Message::FOLDER_TYPES[folder]
         msg_box = inbox_provider.inbox
         msg_box.post_message(message)
         msg_box.save
