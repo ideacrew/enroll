@@ -18,6 +18,7 @@ module Notifier
     attribute :date_of_hire, String
     attribute :termination_of_employment, String
     attribute :coverage_terminated_on, String
+    attribute :coverage_terminated_on_plus_30_days, String
     attribute :earliest_coverage_begin_date, String
     attribute :ivl_oe_start_date, Date
     attribute :ivl_oe_end_date, Date

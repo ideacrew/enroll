@@ -139,6 +139,10 @@ module Notifier
       merge_model.coverage_terminated_on = format_date(census_employee_record.coverage_terminated_on)
     end
 
+    def coverage_terminated_on_plus_30_days
+      merge_model.coverage_terminated_on_plus_30_days = format_date(census_employee_record.coverage_terminated_on + 30.days)
+    end
+
     def earliest_coverage_begin_date
       merge_model.earliest_coverage_begin_date = format_date census_employee_record.coverage_effective_on
     end
