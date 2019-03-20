@@ -1335,22 +1335,6 @@ class PlanYear
       end
     end
   end
-  
-  def notify_cancel_event(transmit_xml = false)
-    return unless transmit_xml
-    transition = self.latest_workflow_state_transition
-    if TimeKeeper.date_of_record < start_on
-      if transition.from_state == "enrolled" && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
-        notify_employer_py_cancellation
-      elsif transition.from_state == "renewing_enrolled" && open_enrollment_completed? && past_transmission_threshold?
-        notify_employer_py_cancellation
-      end
-    else
-      if transition.from_state == "active"
-        notify_employer_py_cancellation
-      end
-    end
-  end
 
   alias_method :external_plan_year?, :can_be_migrated?
 

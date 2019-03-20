@@ -2815,27 +2815,6 @@ describe PlanYear, '.terminate_employee_enrollments', type: :model, dbclean: :af
   end
 end
 
-describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
-  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
-  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
-  let!(:census_employee){
-    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
-    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
-    employee
-  }
-  let!(:plan_year1) { employer_profile.plan_years.first }
-  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
-
-   it "should trigger renewal_employee_enrollment_confirmation" do
-    census_employee.renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
-    hbx_enrollment.save!
-    expect(ShopNoticesNotifierJob).to receive(:perform_later).with(census_employee.id.to_s, "renewal_employee_enrollment_confirmation", {"acapi_trigger" => true})
-    plan_year1.send(:renewal_employee_enrollment_confirmation)
-  end
-end
-
 describe PlanYear, '.enrollment_quiet_period', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
 

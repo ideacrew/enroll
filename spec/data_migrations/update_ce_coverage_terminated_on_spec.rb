@@ -1,4 +1,3 @@
-require "pry"
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_ce_coverage_terminated_on")
 
