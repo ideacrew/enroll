@@ -63,12 +63,13 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
 
     before do
       broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id)
+      employer_profile.fire_broker_agency(start_on)
     end
 
     let(:broker_role) { broker_agency_profile.primary_broker_role }
     let!(:employer_staff_role) { FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id) }
 
-    context "when broker_hired_notice_to_broker is triggered" do
+    context "when broker_fired_notice_to_broker is triggered" do
       let(:data_elements) {
         [
             "broker_profile.notice_date",
@@ -77,6 +78,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
             "broker_profile.last_name",
             "broker_profile.assignment_date",
             "broker_profile.broker_agency_name",
+            "broker_profile.termination_date",
             "broker_profile.employer_poc_firstname",
             "broker_profile.employer_poc_lastname"
         ]
@@ -116,8 +118,8 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
         expect(merge_model.last_name).to eq broker_role.person.last_name
       end
 
-      it "should return broker assignment date" do
-        expect(merge_model.assignment_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
+      it "should return broker termination date" do
+        expect(merge_model.termination_date).to eq model_instance.end_on.strftime('%m/%d/%Y')
       end
 
       it "should return employer poc first name" do
@@ -134,14 +136,13 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
     end
 
 
-    context "when broker_agency_hired_confirmation is triggered" do
+    context "when broker_agency_fired_confirmation is triggered" do
       let(:data_elements) {
         [
           "broker_agency_profile.notice_date",
           "broker_agency_profile.employer_name",
           "broker_agency_profile.first_name",
           "broker_agency_profile.last_name",
-          "broker_agency_profile.assignment_date",
           "broker_agency_profile.broker_agency_name",
           "broker_agency_profile.employer_poc_firstname",
           "broker_agency_profile.employer_poc_lastname",
@@ -181,10 +182,6 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
         expect(merge_model.last_name).to eq broker_agency_profile.primary_broker_role.person.last_name
       end
 
-      it "should return broker assignment date" do
-        expect(merge_model.assignment_date).to eq model_instance.start_on.strftime('%m/%d/%Y')
-      end
-
       it "should return employer poc name" do
         expect(merge_model.employer_poc_firstname).to eq employer_profile.staff_roles.first.first_name
         expect(merge_model.employer_poc_lastname).to eq employer_profile.staff_roles.first.last_name
@@ -203,7 +200,7 @@ RSpec.describe 'ModelEvents::BrokerFired', dbclean: :around_each  do
       end
     end
 
-    context "when broker_agency_hired_confirmation is triggered" do
+    context "when broker_agency_fired_confirmation is triggered" do
       let(:data_elements) {
         [
           "employer_profile.notice_date",
