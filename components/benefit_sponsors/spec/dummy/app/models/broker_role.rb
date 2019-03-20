@@ -1,6 +1,7 @@
 class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
 
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
@@ -76,6 +77,16 @@ class BrokerRole
 
   def email
     parent.emails.detect { |email| email.kind == "work" }
+  end
+
+  aasm do
+    state :applicant, initial: true
+    state :active
+    state :denied
+    state :decertified
+    state :broker_agency_pending
+    state :broker_agency_declined
+    state :broker_agency_terminated
   end
   
   class << self
