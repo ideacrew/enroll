@@ -467,7 +467,7 @@ class Plan
     end
 
     def individual_plans(coverage_kind:, active_year:, tax_households:, hbx_enrollment:)
-      family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:application_id)
+      family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
