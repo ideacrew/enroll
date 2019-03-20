@@ -71,11 +71,16 @@ function fetchDentalCustom(){
     $.each($("input[name='Dental Plan']:checked"), function(){
         dental_plan_ids.push($(this).val());
     });
+
+    if(!dental_plan_ids.length){
+        return alert("Please Select One of Plan Under Custom Carrier Filter");
+    }
     $.ajax({
         type: "POST",
         data:{
           active_year: active_year,
           plans_ids: dental_plan_ids,
+          kind: "dental"
         },
         success: function() {
 
@@ -267,7 +272,6 @@ function setMyPlans(element) {
     $('.plan-design .selected-plan').show();
     calcPlanDesignContributions();
   };
-  clearComparisons();
 }
 
 function setSliderDisplayVal(slideEvt) {
@@ -733,4 +737,20 @@ function sortPlans() {
 
 function setCarrierRadio(element) {
   element.checked = true;
+}
+
+function handleReferencePlanSelection(element) {
+  if($(".reference-plans").children().length) {
+    target = $("input#reference_plan_" + element.value)
+    if(element.checked) {
+      target.parents('div.reference-plan').show();
+    } else {
+      if(target.prop('checked')) {
+        target.prop('checked', false);
+        $("#dental_reference_plan_id").val('')
+      }
+      target.parents('div.reference-plan').hide();
+      disableActionButtons();
+    }
+  }
 }

@@ -1,13 +1,12 @@
 class MigrateGeneralAgencyAccounts < Mongoid::Migration
   def self.up
     say_with_time("Create General Agency Accounts for existing records") do
-
       Organization.collection.aggregate([
         {"$unwind" => "$employer_profile"},
         {"$unwind" => "$employer_profile.general_agency_accounts"},
         {"$sort" => {"employer_profile.general_agency_accounts.created_at" => 1 }},
         {"$group" => {'_id' => {
-          broker_role_id: "$employer_profile.general_agency_accounts.writing_agent_id",
+          broker_role_id: "$employer_profile.general_agency_accounts.broker_role_id",
           aasm_state: "$employer_profile.general_agency_accounts.aasm_state",
           employer_profile_id: "$employer_profile._id",
           general_agency_profile_id: "$employer_profile.general_agency_accounts.general_agency_profile_id",
@@ -62,7 +61,7 @@ class MigrateGeneralAgencyAccounts < Mongoid::Migration
 
   def self.plan_design_organization(owner_id, sponsor_id)
     Rails.cache.fetch("plan_design_organization-#{owner_id}-#{sponsor_id}", expires_in: 2.hour) do
-      SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency.id, record[:employer_profile_id])
+      SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(owner_id, sponsor_id)
     end
   end
 end

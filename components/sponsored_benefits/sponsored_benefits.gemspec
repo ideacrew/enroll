@@ -38,4 +38,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry-byebug'
   s.add_development_dependency 'pry-remote'
   s.add_development_dependency 'forgery'
+  s.add_development_dependency 'devise'
 end

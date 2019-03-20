@@ -6,7 +6,7 @@
         <strong><%= label_tag "Select A General Agency:" %></strong>
       </div>
       <div class="col col-sm-4">
-        <%= select_tag "general_agency_profile_id", options_for_select(@form.service.agencies.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select a General Agency" %>
+        <%= select_tag "general_agency_profile_id", options_for_select(@form.service.agencies.collect {|agency| [agency.legal_name, agency.id]}), prompt: "Select a General Agency", required: true %>
       </div>
       <%= submit_tag "Submit", class: "btn btn-default" %>
     </div>

@@ -92,7 +92,7 @@ module SponsoredBenefits
 
         if plan_option_kind == "single_plan"
           plans = elected_dental_plans
-        elsif plan_option_kind == "single_carrier" || "custom"
+        elsif plan_option_kind == "single_carrier" || plan_option_kind == "custom"
           plans = Plan.shop_dental_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
         end
 
