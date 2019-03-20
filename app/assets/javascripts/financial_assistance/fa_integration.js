@@ -36,3 +36,16 @@ $(document).ready(function() {
     }, interval_time);
   }
 });
+// Provides functionality to display modal then navigate to household income on confirming
+var toLocation = '';
+
+function notifyUserPrompt(element) {
+  toLocation = element.dataset.path;
+  $('#backModal').modal('show');
+}
+
+function backToHouseHolds() {
+  $('#backModal').modal('hide');
+  window.location = toLocation;
+  toLocation = '';
+}
