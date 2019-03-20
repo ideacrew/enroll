@@ -23,7 +23,7 @@ class FinancialAssistance::Application
 
   SUBMITTED_STATUS  = %w(submitted verifying_income)
 
-  REVIEWABLE_STATUSES = %w(submitted determination_response_error determined)
+  REVIEWABLE_STATUSES = %w[submitted determination_response_error determined]
 
   FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
@@ -451,7 +451,7 @@ class FinancialAssistance::Application
   end
 
   def is_reviewable?
-    REVIEWABLE_STATUSES.include?(self.aasm_state)
+    REVIEWABLE_STATUSES.include?(aasm_state)
   end
 
   def incomplete_applicants?
