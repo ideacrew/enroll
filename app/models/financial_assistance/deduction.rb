@@ -13,7 +13,6 @@ class FinancialAssistance::Deduction
       domestic_production_activities
       penalty_on_early_withdrawel_of_savings
       educator_expenses
-      rent_or_royalties
       self_employment_sep_simple_and_qualified_plans
       self_employed_health_insurance
       student_loan_interest
@@ -33,8 +32,8 @@ class FinancialAssistance::Deduction
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
-  validates_length_of :title, 
-                      in: TITLE_SIZE_RANGE, 
+  validates_length_of :title,
+                      in: TITLE_SIZE_RANGE,
                       allow_nil: true,
                       message: "pick a name length between #{TITLE_SIZE_RANGE}",
                       on: [:step_1, :submission]
