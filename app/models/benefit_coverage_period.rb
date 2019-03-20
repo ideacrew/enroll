@@ -144,7 +144,7 @@ class BenefitCoveragePeriod
   # @param tax_household [ TaxHousehold ] the tax household members belong to if eligible for financial assistance
   #
   # @return [ Array<Plan> ] the list of eligible products
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households=nil, market=nil, family_member_ids=nil)
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households=nil, market=nil)
     ivl_bgs = []
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     benefit_packages.each do |bg|

@@ -48,7 +48,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def aptc_amount(member)
-    return (0.00) if @tax_households.blank?
+    return 0.00 if @tax_households.blank?
 
     if !@tax_households.map(&:application_id).include?(nil)
       @tax_household = @tax_households.select{|thh|  thh if thh.applicants.map(&:family_member_id).include?(member.applicant_id)}.first
