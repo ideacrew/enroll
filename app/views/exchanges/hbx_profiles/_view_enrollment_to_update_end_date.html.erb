@@ -1,0 +1,61 @@
+<script type="text/javascript">
+  jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
+  jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=text]").prop('disabled', false);
+
+  jQuery('[id^="terminate_hbx_"]').click(function($) {
+    jQuery('[id^="terminate_hbx_"]').each(function($) {
+      if (this.checked) {
+        jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', false);
+        jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', false);
+      }else{
+        jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', true);
+        jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('checked', false);
+        jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', true);
+      }
+    });
+  });
+
+</script>
+
+<td colspan="90%">
+  <%if @enrollments.present?%>
+      <%= form_tag update_enrollment_termianted_on_date_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
+          <h3 class='title'>Terminated Enrollment To Update End Date</h3>
+          <br />
+          <table  class="table table-striped">
+            <tr>
+              <th></th>
+              <th>HBX ID</th>
+              <th>Plan</th>
+              <th>Effective Date</th>
+              <th>Previous Termianted Date</th>
+              <th>Termination Date</th>
+              <th>Transmit to Carrier ?</th>
+            </tr>
+            <% @enrollments.each_with_index do |hbx, index| %>
+                <tr>
+                  <td> <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %> </td>
+                  <td><%= hbx.hbx_id %></td>
+                  <td><%= hbx.plan.name %></td>
+                  <td><%= hbx.effective_on %></td>
+                  <td><%= hbx.terminated_on %></td>
+                  <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>
+                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
+                </tr>
+            <% end %>
+            <tr><td colspan = "7"><br /></td></tr>
+            <tr>
+              <td colspan = "6">
+                <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+                <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+                <%= submit_tag "Submit", class: 'btn btn-primary' %>
+              </td>
+            </tr>
+          </table>
+      <% end %>
+  <%else%>
+      <h4 class='title'>No Enrollments to terminate</h4>
+  <%end%>
+</td>
+
+<style>.date-picker { width:90px !important;font-size: 12px;} </style>

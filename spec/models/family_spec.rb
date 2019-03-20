@@ -1611,6 +1611,3 @@ describe "terminated_enrollments", dbclean: :after_each do
     expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_terminated", "coverage_termination_pending"]
   end
 end
-
-
-

@@ -53,6 +53,7 @@ class HbxEnrollment
   CAN_TERMINATE_ENROLLMENTS = %w(coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled)
 
   CAN_REINSTATE_ENROLLMENTS = %w(coverage_termination_pending coverage_terminated)
+  ENROLLMENTS_TO_UPDATE_END_DATE = %w(coverage_termination_pending coverage_terminated)
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
@@ -166,6 +167,7 @@ class HbxEnrollment
   scope :enrolled,            ->{ where(:aasm_state.in => ENROLLED_STATUSES ) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :can_reinstate,       ->{ where(:aasm_state.in =>  CAN_REINSTATE_ENROLLMENTS) }
+  scope :can_update_enrollments_end_date,       ->{ where(:aasm_state.in =>  ENROLLMENTS_TO_UPDATE_END_DATE) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
@@ -1620,7 +1622,6 @@ class HbxEnrollment
 
   def notify_enrollment_cancel_or_termination_event(transmit_flag)
 
-    return unless transmit_flag
     return unless self.coverage_terminated? || self.coverage_canceled? || self.coverage_termination_pending?
 
     config = Rails.application.config.acapi
@@ -1633,6 +1634,25 @@ class HbxEnrollment
             "is_trading_partner_publishable" => transmit_flag
         }
     )
+  end
+
+  def reterm_enrollment_with_earlier_date(termination_date, edi_required)
+
+    return false unless self.coverage_terminated? || self.coverage_termination_pending?
+    return false if termination_date > self.terminated_on
+
+    if self.is_shop? && (termination_date > ::TimeKeeper.date_of_record && self.may_schedule_coverage_termination?)
+      self.schedule_coverage_termination!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    elsif self.may_terminate_coverage?
+      self.terminated_on = termination_date
+      self.terminate_coverage!(termination_date)
+      self.notify_enrollment_cancel_or_termination_event(edi_required)
+      return true
+    else
+      false
+    end
   end
 
   private

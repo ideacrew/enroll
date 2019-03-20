@@ -1,0 +1,28 @@
+<table class="table table-striped">
+  <%if @retrem_success.present?%>
+      <h4>Enrollment End Date Updated Sucessfully</h4>
+  <%else%>
+      <h4>Enrollment Failed to Update End Date</h4>
+  <%end%>
+  <% hbx = @retrem_success.present? ? @retrem_success : @retrem_failure%>
+  <tr>
+    <th>HBX ID</th>
+    <th>Plan</th>
+    <th>Effective Date</th>
+    <th>Terminated Date</th>
+    <% if @retrem_success.present?%>
+        <th>Terminated ?</th>
+    <%end%>
+  </tr>
+  <tr>
+    <td><%= hbx.hbx_id %></td>
+    <td><%= hbx.plan.name %></td>
+    <td><%= hbx.effective_on %></td>
+    <td><%= hbx.terminated_on %></td>
+    <% if @retrem_success.present?%>
+        <td><i class="fa fa-check" aria-hidden="true"></i></td>
+    <%end%>
+  </tr>
+</table>
+
+<%= link_to "Close", hide_form_exchanges_hbx_profiles_path(family_id: @family_id, family_actions_id: "family_actions_#{@family_id.to_s}"), class: "btn btn-info", remote: true %>
