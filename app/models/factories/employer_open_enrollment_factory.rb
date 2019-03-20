@@ -55,21 +55,18 @@ module Factories
 
       @employer_profile.census_employees.non_terminated.no_timeout.each do |ce|
 
-        @logger.debug " #{@employer_profile.legal_name} has #{@employer_profile.census_employees.non_terminated.count} ees"
-
         begin
           if CensusEmployee::PENDING_STATES.include?(ce.aasm_state)
             next if ce.coverage_terminated_on.blank? || ce.coverage_terminated_on < @renewing_plan_year.start_on
           end
 
           @logger.debug "renewing: #{ce.full_name}"
+
           if ce.ssn.present?
-            @logger.debug " #{ce.full_name} does have an ssn "
-            encrypted_ssn =  Person.encrypt_ssn(ce.ssn)
+            encrypted_ssn = Person.encrypt_ssn(ce.ssn)
             person = Person.where(encrypted_ssn: encrypted_ssn).first
           else
-            @logger.debug " #{ce.full_name} does not have an ssn "
-            person = Person.where(first_name: ce.first_name, last_name: ce.last_name, dob: ce.dob).first
+            person = Person.where(first_name: /^#{ce.first_name}$/i, last_name: /^#{ce.last_name}$/i, dob: ce.dob).first
           end
 
           if person.blank?
