@@ -816,6 +816,7 @@ DEPENDENCIES
   forgery
   haml
   httparty
+  i18n (= 0.7.0)
   interactor (= 3.1.0)
   interactor-rails (= 2.0.2)
   jbuilder (~> 2.0)
