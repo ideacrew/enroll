@@ -3,7 +3,8 @@ module Eligibility
 
     def coverage_effective_on(benefit_group = nil)
       benefit_group = (active_benefit_group_assignment || renewal_benefit_group_assignment).benefit_group if benefit_group.blank?
-      if benefit_group.present? && !benefit_group.plan_year.expired?
+
+      if non_expired_benefit_group(benefit_group)
 
         effective_on_date = benefit_group.effective_on_for(hired_on)
         if newly_designated_eligible? || newly_designated_linked?
@@ -12,6 +13,10 @@ module Eligibility
 
         effective_on_date
       end
+    end
+
+    def non_expired_benefit_group(bg)
+      bg.present? && !bg.plan_year.expired?
     end
 
     def new_hire_enrollment_period
