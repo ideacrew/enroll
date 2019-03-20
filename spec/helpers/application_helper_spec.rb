@@ -533,12 +533,4 @@ end
       expect(user3.person.hbx_staff_role).to eq nil
     end
   end
-
-  describe "decode_msg" do
-    let(:encoded_msg){"101"}
-
-    it "should return decoded msg" do
-      expect(helper.decode_msg(encoded_msg)).to eq "faa.acdes_lookup"
-    end
-  end
 end

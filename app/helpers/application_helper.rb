@@ -711,13 +711,5 @@ module ApplicationHelper
     return true unless hbx_staff_role.present?
     hbx_staff_role.permission.can_access_pay_now
   end
-
-  def decode_msg(encoded_msg)
-    if encoded_msg == "101"
-      "faa.acdes_lookup"
-    elsif encoded_msg == "010"
-      "faa.curam_lookup"
-    end
-  end
 end
 
