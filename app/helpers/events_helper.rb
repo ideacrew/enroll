@@ -36,6 +36,8 @@ module EventsHelper
                   "eligibility_change_employer_ineligible"
                 when "employer_sponsored_cobra"
                   "cobra"
+                when "unknown_sep"
+                  "exceptional_circumstances"
                 else
                   eligibility_kind
                 end
