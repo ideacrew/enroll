@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EmployerRenewalNotice do
+RSpec.describe ShopEmployerNotices::EmployerRenewalNotice, :dbclean => :after_each  do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:person){ create :person}
@@ -8,20 +8,36 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalNotice do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
-  let(:application_event){ double("ApplicationEventKind",{
+  let(:conversion_application_event){ double("ApplicationEventKind",{
                             :name =>'Conversion, Group Renewal Available',
                             :notice_template => 'notices/shop_employer_notices/6_conversion_group_renewal_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerRenewalNotice',
-                            :event_name => 'group_renewal_5',
-                            :mpi_indicator => 'SHOP_D077',
+                            :event_name => 'conversion_group_renewal',
+                            :mpi_indicator => 'MPI_SHOP6',
                             :title => "Welcome to DC Health Link, Group Renewal Available"})
                           }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
+    let(:conversion_valid_parmas) {{
+        :subject => conversion_application_event.title,
+        :mpi_indicator => conversion_application_event.mpi_indicator,
+        :event_name => conversion_application_event.event_name,
+        :template => conversion_application_event.notice_template
     }}
+
+  let(:application_event){ double("ApplicationEventKind",{
+                          :name =>'Group Renewal Available',
+                          :notice_template => 'notices/shop_employer_notices/5_employer_renewal_notice',
+                          :notice_builder => 'ShopEmployerNotices::EmployerRenewalNotice',
+                          :event_name => 'group_renewal_5',
+                          :mpi_indicator => 'SHOP_D004',
+                          :title => "Group Renewal Available"})
+                        }
+
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
 
   describe "New" do
     before do
@@ -70,4 +86,41 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalNotice do
     end
   end
 
+  describe "render template and generate pdf for group_renewal_5 notice" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::EmployerRenewalNotice.new(employer_profile, valid_parmas)
+      @employer_notice.build
+      @employer_notice.append_data
+      @employer_notice.generate_pdf_notice
+    end
+
+    it "should render 5_employer_renewal_notice template" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/5_employer_renewal_notice"
+    end
+
+    it "should generate pdf" do
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
+
+  describe "render template and generate pdf for conversion_group_renewal notice" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::EmployerRenewalNotice.new(employer_profile, conversion_valid_parmas)
+      @employer_notice.build
+      @employer_notice.append_data
+      @employer_notice.generate_pdf_notice
+    end
+
+    it "should render 6_conversion_group_renewal_notice template" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/6_conversion_group_renewal_notice"
+    end
+
+    it "should generate pdf" do
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end

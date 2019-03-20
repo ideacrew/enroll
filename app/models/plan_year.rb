@@ -1335,6 +1335,22 @@ class PlanYear
       end
     end
   end
+  
+  def notify_cancel_event(transmit_xml = false)
+    return unless transmit_xml
+    transition = self.latest_workflow_state_transition
+    if TimeKeeper.date_of_record < start_on
+      if transition.from_state == "enrolled" && open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      elsif transition.from_state == "renewing_enrolled" && open_enrollment_completed? && past_transmission_threshold?
+        notify_employer_py_cancellation
+      end
+    else
+      if transition.from_state == "active"
+        notify_employer_py_cancellation
+      end
+    end
+  end
 
   alias_method :external_plan_year?, :can_be_migrated?
 
@@ -1541,8 +1557,8 @@ class PlanYear
   def renewal_employee_enrollment_confirmation
     self.employer_profile.census_employees.non_terminated.each do |ce|
       begin
-        enrollment = ce.renewal_benefit_group_assignment.hbx_enrollment
-        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && (enrollment.effective_on == self.start_on)
+        enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
+        if enrollments.present? && enrollments.select { |enr| enr.effective_on == start_on}.present?
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation", "acapi_trigger" => true)
         end
       rescue Exception => e
