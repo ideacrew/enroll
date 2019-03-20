@@ -235,10 +235,8 @@ class ForcePublishPlanYears < MongoidMigrationTask
         "#{start_on_date.year} enrollment kind",
         "#{start_on_date.year} status"
       ]
-      orgs.each do |organization|
-
+    orgs.each do |organization|
         puts "Processing #{organization.legal_name}"
-
         employer_profile = organization.employer_profile
         next if employer_profile.active_plan_year.blank?
         active_bg_ids = employer_profile.active_plan_year.benefit_groups.pluck(:id)
@@ -291,20 +289,17 @@ class ForcePublishPlanYears < MongoidMigrationTask
                 employer_employee_data += [nil, nil, nil, nil]
               end
 
-
               %w(health dental).each do |coverage_kind|
                 next if enrollments.where(:coverage_kind => coverage_kind).blank?
-
                 data = employer_employee_data
                 data += enrollment_details_by_coverage_kind(enrollments, coverage_kind)
                 if renewal_bg_ids.present?
                   data += enrollment_details_by_coverage_kind(renewal_enrollments, coverage_kind)
                 end
-
                 csv << data
               end
-            rescue Exception => e 
-              puts "Failed: #{family.id} #{e.to_s}"
+            rescue Exception => e
+              puts "Failed: #{family.id}#{e.to_s}"
               next
             end
           end

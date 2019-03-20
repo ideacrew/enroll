@@ -26,8 +26,8 @@ qs.evaluate.each do |r|
   enroll_pol_ids << r['hbx_id']
 end
 
-glue_list = File.read("policies_to_pull_renewals.txt").split("\n").map(&:strip)
-enroll_pol_ids = enroll_pol_ids - (glue_list + excluded_ids)
+# glue_list = File.read("policies_to_pull_renewals.txt").split("\n").map(&:strip)
+# enroll_pol_ids = enroll_pol_ids - (glue_list + excluded_ids)
 clean_pol_ids = enroll_pol_ids
 
 plan_cache = {}
