@@ -15,8 +15,8 @@ module Eligibility
       end
     end
 
-    def non_expired_benefit_group(bg)
-      bg.present? && !bg.plan_year.expired?
+    def non_expired_benefit_group(benefit_group)
+      benefit_group.present? && !benefit_group.plan_year.expired?
     end
 
     def new_hire_enrollment_period
