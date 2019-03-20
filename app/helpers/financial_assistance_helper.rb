@@ -239,10 +239,10 @@ module FinancialAssistanceHelper
   end
 
   def decode_msg(encoded_msg)
-    if encoded_msg == "101"
-      "faa.acdes_lookup"
-    elsif encoded_msg == "010"
-      "faa.curam_lookup"
+    if encoded_msg == '101'
+      'faa.acdes_lookup'
+    elsif encoded_msg == '010'
+      'faa.curam_lookup'
     end
   end
 end
