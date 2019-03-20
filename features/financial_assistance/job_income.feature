@@ -58,3 +58,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the save button should be enabled
     And the user saves the self employment information
     Then the self employment information should be saved on the page
+
+  Scenario: Confirmation pop-up functionality
+    When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
+    Then a modal should show asking the user are you sure you want to leave this page

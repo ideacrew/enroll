@@ -19,7 +19,7 @@ Then(/^the other income choices should show$/) do
 end
 
 Given(/^the user checks a other income checkbox$/) do
-  find(:css, "#other_income_kind[value='alimony_and_maintenance']").set(true)   
+  find(:css, "#other_income_kind[value='alimony_and_maintenance']").set(true)
 end
 
 Then(/^the other income form should show$/) do
@@ -52,10 +52,18 @@ end
 
 Then(/^the other income checkbox should be unchecked$/) do
   expect(find(:css, "#other_income_kind[value='alimony_and_maintenance']")).not_to be_checked
-  
+
 end
 
 Then(/^the other income form should not show$/) do
   expect(page).to_not have_content "AMOUNT *"
   expect(page).to_not have_content "HOW OFTEN *"
+end
+
+When(/^the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link$/) do
+  click_link('BACK TO ALL HOUSEHOLD MEMBERS')
+end
+
+Then(/^a modal should show asking the user are you sure you want to leave this page$/) do
+  expect(page).to have_content "Are you sure you want to leave this page?"
 end

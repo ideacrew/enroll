@@ -1,5 +1,5 @@
 Feature: Other income page
-  
+
   Background: Other income page
     Given a consumer, with a family, exists
     And is logged in
@@ -35,6 +35,9 @@ Feature: Other income page
     Given the user answers yes to having other income
     And the user checks a other income checkbox
     When the user cancels the form
-    Then the other income checkbox should be unchecked 
+    Then the other income checkbox should be unchecked
     And the other income form should not show
-    
+
+  Scenario: Confirmation pop-up functionality
+    When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
+    Then a modal should show asking the user are you sure you want to leave this page

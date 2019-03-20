@@ -64,3 +64,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     When the user cancels the form
     Then the health coverage checkbox should be unchecked
     And the health coverage form should not show
+
+  Scenario: Confirmation pop-up functionality
+    When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
+    Then a modal should show asking the user are you sure you want to leave this page
