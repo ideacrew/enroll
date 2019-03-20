@@ -22,5 +22,6 @@ class HbxStaffRole
   field :permission_id, type: BSON::ObjectId
 
   def permission
+    Permission.find(permission_id)
   end
 end
