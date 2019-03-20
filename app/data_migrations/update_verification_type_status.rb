@@ -8,6 +8,7 @@ class UpdateVerificationTypeStatus < MongoidMigrationTask
       else
         verification_type = person.verification_types.where(type_name: ENV['verification_type_name']).first
         verification_type.pass_type if verification_type && verification_type.validation_status == 'pending'
+        person.consumer_role.update_attributes(is_state_resident: true)
         puts "Changed verification type validation status" unless Rails.env.test?
       end
     rescue StandardError => e

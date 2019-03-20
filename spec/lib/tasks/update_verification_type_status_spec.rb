@@ -14,8 +14,8 @@ RSpec.describe 'update_verification_type_status' do
   context "Update verification type status" do
  
     it "Should move to verified when status is pending" do
-      ENV['hbx_id']=person.hbx_id
-      ENV['verification_type_name']="DC Residency"
+      ENV['hbx_id'] = person.hbx_id
+      ENV['verification_type_name'] = "DC Residency"
       person.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "pending")
       Rake::Task["migrations:update_verification_type_status"].invoke()
       person.reload
@@ -23,8 +23,8 @@ RSpec.describe 'update_verification_type_status' do
     end
 
     it "Should not move to verified when status is not pending" do
-      ENV['hbx_id']=person.hbx_id
-      ENV['verification_type_name']="DC Residency"
+      ENV['hbx_id'] = person.hbx_id
+      ENV['verification_type_name'] = "DC Residency"
       person.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "unverified")
       Rake::Task["migrations:update_verification_type_status"].invoke()
       person.reload
