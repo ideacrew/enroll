@@ -10,6 +10,7 @@ module SponsoredBenefits
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
     before_action :claimed_quotes_are_view_only, only: [:edit]
+    before_action :load_broker_agency_profile, only: [:new, :edit]
 
     def index
       @datatable = effective_datatable
@@ -41,7 +42,7 @@ module SponsoredBenefits
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end
       end
-      
+
       aca_state_abbreviation == "DC" ? (redirect_to main_app.employers_employer_profile_path(employer_profile, tab: "benefits")) : (redirect_to benefit_sponsors.profiles_employers_employer_profile_path(employer_profile, :tab=>'benefits'))
     end
 
@@ -199,6 +200,11 @@ module SponsoredBenefits
       if @plan_design_proposal.claimed?
         redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
       end
+    end
+
+    def load_broker_agency_profile
+      @broker_agency_profile = @plan_design_organization.broker_agency_profile
+      @provider = @broker_agency_profile.primary_broker_role.person
     end
   end
 end

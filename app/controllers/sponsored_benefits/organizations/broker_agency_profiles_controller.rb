@@ -13,6 +13,8 @@ module SponsoredBenefits
   private
 
     def find_profile
+      @broker_agency_profile = ::BrokerAgencyProfile.find(params[:id]) || BenefitSponsors::Organizations::Profile.find(params[:id])
+      @provider = @broker_agency_profile.primary_broker_role.person
       @profile = ::BrokerAgencyProfile.find(params[:id]) || ::GeneralAgencyProfile.find(params[:id])
       @profile ||= BenefitSponsors::Organizations::Profile.find(params[:id])
     end
