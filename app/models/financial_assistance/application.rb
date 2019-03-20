@@ -451,7 +451,7 @@ class FinancialAssistance::Application
   end
 
   def is_reviewable?
-    REVIEWABLE_STATUSES.include?(self.aasm_state) ? true : false
+    REVIEWABLE_STATUSES.include?(self.aasm_state)
   end
 
   def incomplete_applicants?
