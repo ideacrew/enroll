@@ -57,7 +57,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::LocalResidency")
       config.acapi.add_async_subscription("Subscribers::FamilyApplicationCompleted")
       config.acapi.add_async_subscription("Subscribers::IamAccountCreation")
-      config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
+      # config.acapi.add_async_subscription("Subscribers::NotificationSubscriber")
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
       config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
       config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
@@ -68,7 +68,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::EmployeeInitialEnrollmentInvitationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeRenewalInvitationsSubscriber")
       config.acapi.add_async_subscription("Notifier::NotificationSubscriber")
-      config.acapi.add_amqp_worker("Subscribers::LegacyNotificationSubscriber")
+      # config.acapi.add_amqp_worker("Subscribers::LegacyNotificationSubscriber")
     end
   end
 end
