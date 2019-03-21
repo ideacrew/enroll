@@ -87,14 +87,14 @@ module BenefitSponsors
             raise 'Employer(s) Plan Year date has not matched.'
           end
         else
-          @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+          @messages['notice'] = 'Employer(s) Plan Year could not be processed.'
         end
       elsif benefit_application.may_submit_for_review?
         benefit_application.submit_for_review!
         @messages['notice'] = 'Employer(s) Plan Year was successfully submitted for review.'
         @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       else
-        @messages['notice'] = 'Employer(s) Plan Year could not be processed'
+        @messages['notice'] = 'Employer(s) Plan Year could not be processed.'
         @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       end
     rescue => e
