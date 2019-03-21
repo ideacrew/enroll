@@ -17,7 +17,8 @@ class Insured::FamiliesController < FamiliesController
     set_bookmark_url
     set_admin_bookmark_url
     @active_sep = @family.latest_active_sep
-
+    @employer_profile = EmployerProfile.find(params[:employer_profile_id]) if params[:employer_profile_id].present?
+    @broker_agency_profile_id = @employer_profile.active_broker_agency_account.broker_agency_profile_id if @employer_profile.present?
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
     @hbx_enrollments = @family.enrollments.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
@@ -120,10 +121,12 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
     @provider = @person
     @family_members = @family.active_family_members
+    @broker_agency_profile_id = @person.broker_role.broker_agency_profile_id if @person.broker_role.present?
   end
 
   def verification
     @family_members = @person.primary_family.has_active_consumer_family_members
+    @broker_agency_profile_id = @person.broker_role.broker_agency_profile_id if @person.broker_role.present?
   end
 
   def upload_application

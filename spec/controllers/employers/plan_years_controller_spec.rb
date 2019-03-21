@@ -4,6 +4,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
+  let(:broker_agency_account) { double(BrokerAgencyAccount, broker_agency_profile_id: '1234')}
 
   let(:user) { FactoryGirl.create(:user) } 
   let(:person) { FactoryGirl.create(:person, user: user) }
@@ -29,6 +30,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
       allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       get :new, :employer_profile_id => employer_profile_id
     end
@@ -319,6 +321,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(::Forms::PlanYearForm).to receive(:build).with(employer_profile, plan_year_params).and_return(plan_year)
   allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
   allow(employer_profile).to receive(:default_benefit_group).and_return(nil)
+  allow(employer_profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
   allow(benefit_group).to receive(:elected_plans=).and_return("test")
   allow(benefit_group).to receive(:elected_dental_plans=).and_return("test")
   allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
