@@ -17,8 +17,11 @@ module SponsoredBenefits
 
     let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
     let(:broker_agency_profile) do
-      double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
-                                                        legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization, office_locations: [])
+      double(
+        :sponsored_benefits_broker_agency_profile,
+        id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312", legal_name: "ba-name",
+        dba: "alternate", is_active: true, organization: plan_design_organization, office_locations: []
+      )
     end
 
     let(:broker_role) { double(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
