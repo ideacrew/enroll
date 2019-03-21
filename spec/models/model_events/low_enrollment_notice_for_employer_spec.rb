@@ -127,7 +127,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
       [
         'employer_profile.notice_date',
         'employer_profile.employer_name',
-        'employer_profile.plan_year.renewal_py_oe_end_date',
+        'employer_profile.plan_year.current_py_oe_end_date',
         'employer_profile.broker.primary_fullname',
         'employer_profile.broker.organization',
         'employer_profile.broker.phone',
@@ -171,7 +171,7 @@ describe 'ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
       end
 
       it 'should return plan year open enrollment end date' do
-        expect(merge_model.plan_year.renewal_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
+        expect(merge_model.plan_year.current_py_oe_end_date).to eq model_instance.open_enrollment_end_on.strftime('%m/%d/%Y')
       end
 
       it 'should return false when there is no broker linked to employer' do
