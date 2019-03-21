@@ -56,7 +56,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like 'ridp type status', 'outstanding', 'Application', true, 'in review'
     end
 
-    #TODO specs refactor is needed when assisted verifications is refactored
+    #TODO: Specs refactor is needed when assisted verifications is refactored
     # describe "assisted verification for consumer" do
     #
     #   before :each do

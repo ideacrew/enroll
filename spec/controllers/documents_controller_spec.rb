@@ -168,7 +168,7 @@ RSpec.describe DocumentsController, :type => :controller do
       end
     end
 
-    #TODO needs refactor after assisted_verification structure is refactored
+    #TODO: Needs refactor after assisted_verification structure is refactored
     # context "assisted verification reason inputs" do
     #
     #   before :each do
