@@ -28,6 +28,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def edit
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find params[:id]
     matrix = @family.build_relationship_matrix
@@ -37,6 +38,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def step
     save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+    set_admin_bookmark_url
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
@@ -86,6 +88,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def help_paying_coverage
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @transaction_id = params[:id]
   end
 
@@ -115,11 +118,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_checklist
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.active_applicants if @application.present?
@@ -132,12 +137,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def wait_for_eligibility_response
     save_faa_bookmark(@person, financial_assistance_applications_path)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
   end
 
   def eligibility_results
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -146,6 +153,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_publish_error
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -154,6 +162,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def eligibility_response_error
     save_faa_bookmark(@person, request.original_url)
+    set_admin_bookmark_url
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
     @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
