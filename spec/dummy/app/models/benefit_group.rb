@@ -239,7 +239,6 @@ class BenefitGroup
   def monthly_max_employee_cost(coverage_kind = nil)
   end
 
-
   def build_composite_tier_contributions
     composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
       composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
