@@ -1,5 +1,4 @@
 require "rails_helper"
-require 'byebug'
 require File.join(Rails.root, "app", "data_migrations", "reactivate_tax_household_with_assistance_year")
 
 describe ReactivateTaxHouseholdWithAssistanceYear, dbclean: :after_each do

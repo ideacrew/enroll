@@ -34,10 +34,12 @@ describe "shared/_edit_reference_plans_list.html.erb" do
   end
 
   it "should not have a selection option for dental" do
-    expect(rendered).to have_selector("option[value='dental']")
+    # Plan::REFERENCE_PLAN_METAL_LEVELS does not have "dental"
+    expect(rendered).not_to have_selector("option[value='dental']")
   end
 
   it "should not have a selection option for catastrophic" do
+    # Plan::REFERENCE_PLAN_METAL_LEVELS does not have "catastrophic"
     expect(rendered).not_to have_selector("option[value='catastrophic']")
   end
 
