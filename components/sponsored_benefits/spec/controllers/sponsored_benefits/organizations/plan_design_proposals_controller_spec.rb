@@ -7,7 +7,6 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     let(:broker_double) { double(id: '12345') }
     let(:current_person) { double(:current_person) }
-    let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
     let(:datatable) { double(:datatable) }
     let(:sponsor) { double(:sponsor, id: '5ac4cb58be0a6c3ef400009a', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
@@ -16,8 +15,13 @@ module SponsoredBenefits
         create(:sponsored_benefits_plan_design_organization, sponsor_profile_id: sponsor.id, owner_profile_id: '5ac4cb58be0a6c3ef400009b', plan_design_proposals: [ plan_design_proposal ], sic_code: sponsor.sic_code )
     }
 
-    let!(:broker_organization) { create(:sponsored_benefits_organization, broker_agency_profile: broker_agency_profile) }
-    let(:broker_agency_profile) { build(:sponsored_benefits_broker_agency_profile) }
+    let(:broker_agency_profile_id) { "5ac4cb58be0a6c3ef400009b" }
+    let(:broker_agency_profile) do
+      double(:sponsored_benefits_broker_agency_profile, id: broker_agency_profile_id, persisted: true, fein: "5555", hbx_id: "123312",
+                                                        legal_name: "ba-name", dba: "alternate", is_active: true, organization: plan_design_organization, office_locations: [])
+    end
+
+    let(:broker_role) { double(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
 
     let(:sponsorship) { build(:plan_design_benefit_sponsorship,
                         benefit_market: :aca_shop_cca,
@@ -86,6 +90,8 @@ module SponsoredBenefits
       allow(subject).to receive(:employee_datatable).and_return(datatable)
       allow(broker_role).to receive(:benefit_sponsors_broker_agency_profile_id).and_return(broker_agency_profile.id)
       allow(controller).to receive(:set_broker_agency_profile_from_user).and_return(broker_agency_profile)
+      allow(BenefitSponsors::Organizations::Profile).to receive(:find).with(BSON::ObjectId.from_string(broker_agency_profile.id)).and_return(broker_agency_profile)
+      allow(BenefitSponsors::Organizations::Profile).to receive(:find).with(BSON::ObjectId.from_string(sponsor.id)).and_return(sponsor)
     end
 
     describe "GET #index" do
