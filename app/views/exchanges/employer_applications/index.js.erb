@@ -237,9 +237,9 @@ function getLastDayOfYearAndMonth(year, month){
 
 function updateDatePickerBasedOnTermReason(reason, id) {
   var terminationReason = reason
-  if (terminationReason == 'nonpayment' && '<%= Settings.aca.shop_market.mid_month_benefit_application_terminations.non_payment.to_s %>' == 'true') {
+  if (terminationReason == 'nonpayment' && '<%= @allow_mid_month_non_payment_terms.to_s %>' == 'true') {
     showAllDates(id);
-  } else if ((terminationReason == 'voluntary') && '<%= Settings.aca.shop_market.mid_month_benefit_application_terminations.voluntary.to_s %>' == 'true') {
+  } else if ((terminationReason == 'voluntary') && '<%= @allow_mid_month_voluntary_terms.to_s %>' == 'true') {
     showAllDates(id);
   } else {
     showOnlyLastDate(id);

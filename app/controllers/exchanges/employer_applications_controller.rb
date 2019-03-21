@@ -7,6 +7,8 @@ class Exchanges::EmployerApplicationsController < ApplicationController
   before_action :find_benefit_sponsorship, except: :get_term_reasons
 
   def index
+    @allow_mid_month_voluntary_terms = allow_mid_month_voluntary_terms?
+    @allow_mid_month_non_payment_terms = allow_mid_month_non_payment_terms?
     @element_to_replace_id = params[:employers_action_id]
   end
 
