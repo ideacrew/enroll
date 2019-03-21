@@ -274,6 +274,10 @@
             <%= f.radio_button("is_physically_disabled", false, class: "radio-yml", id: 'radio_physically_disabled_no', required: true) %>
             <label class="radio-yml" for="radio_physically_disabled_no">No</label>
           </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_pregnant" data-toggle="modal" data-target="#is_physically_disabled">Not Sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
+          </div>
         </div>
         <% if @person.eligible_immigration_status.present? %>
         <div class="row row-form-wrapper no-buffer row-height">
