@@ -8,14 +8,17 @@ FactoryGirl.define do
     published_lowest_cost_plan {self.published_reference_plan}
     published_highest_cost_plan {self.published_reference_plan}
 
-    quote_relationship_benefits {[
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :employee, premium_pct: 80, employer_max_amt: 1000.00),
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :spouse, premium_pct: 40, employer_max_amt: 200.00),
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :domestic_partner, premium_pct: 40, employer_max_amt: 200.00),
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :child_under_26, premium_pct: 40, employer_max_amt: 200.00),
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :disabled_child_26_and_over, premium_pct: 40, employer_max_amt: 200.00),
-        FactoryGirl.build_stubbed(:relationship_benefit, benefit_group: self, relationship: :child_26_and_over, premium_pct: 0, employer_max_amt: 0.00, offered: false),
-    ]}
+
+    after(:create) do |benfit_group|
+      benfit_group.quote_relationship_benefits {[
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :employee, premium_pct: 80, employer_max_amt: 1000.00),
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :spouse, premium_pct: 40, employer_max_amt: 200.00),
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :domestic_partner, premium_pct: 40, employer_max_amt: 200.00),
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :child_under_26, premium_pct: 40, employer_max_amt: 200.00),
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :disabled_child_26_and_over, premium_pct: 40, employer_max_amt: 200.00),
+          FactoryGirl.create(:relationship_benefit, benefit_group: benfit_group, relationship: :child_26_and_over, premium_pct: 0, employer_max_amt: 0.00, offered: false),
+      ]}
+    end
 
     trait :with_valid_dental do
       quote_dental_relationship_benefits {[

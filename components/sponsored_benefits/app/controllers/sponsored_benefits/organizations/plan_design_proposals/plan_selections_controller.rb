@@ -2,6 +2,7 @@ module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::PlanSelectionsController < ApplicationController
       before_action :published_plans_are_view_only
+      before_action :load_broker_agency_profile, only: [:new]
 
       def new
         plan_design_form.for_new
@@ -22,6 +23,11 @@ module SponsoredBenefits
 
       def plan_design_organization
         @plan_design_organization ||= plan_design_proposal.plan_design_organization
+      end
+
+      def load_broker_agency_profile
+        @broker_agency_profile = plan_design_proposal.plan_design_organization.broker_agency_profile
+        @provider = @broker_agency_profile.primary_broker_role.person
       end
 
       def plan_design_form
