@@ -272,6 +272,67 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "GET edit_force_publish" do
+    context "of an hbx super admin clicks Force Publish" do
+      let!(:organization){ FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization)}
+      let!(:draft_plan_year) { FactoryGirl.create(:future_plan_year, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+
+      it "renders edit_force_publish" do
+        sign_in(user)
+        xhr :get, :edit_force_publish, row_actions_id: "family_actions_#{organization.id.to_s}"
+        expect(response).to render_template('edit_force_publish')
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
+  describe "POST force_publish" do
+    context "of an hbx super admin clicks Submit in Force Publish window" do
+      let!(:organization) { FactoryGirl.create(:organization) }
+      let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+      let!(:draft_plan_year) { FactoryGirl.create(:next_month_plan_year, :with_benefit_group, aasm_state: 'draft', employer_profile: employer_profile) }
+      let(:user) { FactoryGirl.create(:user, person: person) }
+      let(:person) do
+        FactoryGirl.create(:person, :with_hbx_staff_role).tap do |person|
+          FactoryGirl.create(:permission, :super_admin).tap do |permission|
+            person.hbx_staff_role.update_attributes(permission_id: permission.id)
+            person
+          end
+        end
+      end
+      let(:params) { { row_actions_id: "family_actions_#{organization.id.to_s}", publish_with_warnings: 'true' } }
+
+      before :each do
+        sign_in(user)
+        allow(draft_plan_year).to receive(:is_application_invalid?).and_return(false)
+        xhr :post, :force_publish, params
+        draft_plan_year.reload
+      end
+
+      it 'should render template' do
+        expect(response).to render_template('force_publish')
+      end
+
+      it 'should return success' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should update plan year' do
+        expect(draft_plan_year.aasm_state).to eq 'enrolling'
+      end
+    end
+  end
+
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true)}
     let(:person) { double("person")}

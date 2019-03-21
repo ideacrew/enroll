@@ -1,5 +1,6 @@
 module Exchanges
   module HbxProfilesHelper
+    include L10nHelper
     def get_person_roles(person, person_roles = [])
       person_roles << "Employee Role" if person.active_employee_roles.present?
       person_roles << "Consumer Role" if person.is_consumer_role_active?
@@ -11,6 +12,10 @@ module Exchanges
       person_roles << "Broker Agency Staff Role" if person.broker_agency_staff_roles.present?
       person_roles << "General Agency Staff Role" if person.general_agency_staff_roles.present?
       person_roles
+    end
+
+    def zero_employee_warning
+      l10n("hbx_profiles.zero_employee_warning")
     end
   end
 end
