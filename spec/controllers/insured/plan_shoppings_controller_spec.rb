@@ -65,6 +65,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     describe "Eligibility determined and not_csr_100 user" do
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person )}
+      let(:family_member_ids) {family.family_members.map(&:id)}
+      let!(:person) { FactoryGirl.create(:person,  :with_consumer_role) }
       let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
       let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household)}
 
@@ -76,14 +79,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(family).to receive(:active_household).and_return(household)
           allow(family).to receive(:currently_enrolled_plans).and_return([])
           allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
-          allow(household).to receive(:latest_active_tax_household).and_return tax_household
           sign_in user
         end
 
         it "returns http success" do
           tax_household.eligibility_determinations = [eligibility_determination]
           person.primary_family.latest_household.tax_households << tax_household
-          xhr :get, :plans, id: "hbx_id", format: :js
+          xhr :get, :plans, id: "hbx_id", family_member_ids: family_member_ids, format: :js
           expect(response).to have_http_status(:success)
         end
       end
@@ -589,8 +591,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
       let(:family) { FactoryGirl.build(:individual_market_family) }
-      let(:person) {double("Person",primary_family: family, is_consumer_role_active?: true)}
-      let(:user) {double("user",person: person)}
+      let!(:person) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
+      let!(:user)  { FactoryGirl.create(:user, person: person) }
 
       before do
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')

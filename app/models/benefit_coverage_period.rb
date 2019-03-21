@@ -145,7 +145,6 @@ class BenefitCoveragePeriod
   #
   # @return [ Array<Plan> ] the list of eligible products
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households=nil, market=nil)
-    family_member_ids = hbx_enrollment_members.map(&:applicant_id)
     ivl_bgs = []
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     benefit_packages.each do |bg|
