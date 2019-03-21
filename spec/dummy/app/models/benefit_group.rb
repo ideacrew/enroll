@@ -4,7 +4,7 @@ class BenefitGroup
   include Mongoid::Timestamps
   include Config::AcaModelConcern
 
-    embedded_in :plan_year
+  embedded_in :plan_year
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
@@ -12,13 +12,14 @@ class BenefitGroup
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 1, 30, 60]
   TERMINATE_ON_KINDS = %w(end_of_month)
+
   PERSONAL_RELATIONSHIP_KINDS = [
     :employee,
     :spouse,
     :domestic_partner,
     :child_under_26,
     :child_26_and_over
-  ]
+  ].freeze
 
   field :title, type: String, default: ""
   field :description, type: String, default: ""
@@ -49,8 +50,6 @@ class BenefitGroup
   field :dental_relationship_benefits_attributes_time, type: BSON::ObjectId, default: 0
   field :dental_reference_plan_id, type: BSON::ObjectId
   field :elected_dental_plan_ids, type: Array, default: []
-
-  # Array of plan_ids
   field :elected_plan_ids, type: Array, default: []
   field :is_congress, type: Boolean, default: false
   field :_type, type: String, default: self.name
@@ -71,6 +70,9 @@ class BenefitGroup
   accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
+  embeds_many :composite_tier_contributions, cascade_callbacks: true
+  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
+
 
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
@@ -184,6 +186,19 @@ class BenefitGroup
     return @highest_cost_plan if defined? @highest_cost_plan
   end
 
+  def elected_plans_by_option_kind
+    case plan_option_kind
+    when "sole_source"
+      Plan.where(id: reference_plan_id).first
+    when "single_plan"
+      Plan.where(id: reference_plan_id).first
+    when "single_carrier"
+      Plan.where(id: reference_plan_id).to_a
+    when "metal_level"
+      Plan.where(id: reference_plan_id).to_a
+    end
+  end
+
   def sole_source?
     plan_option_kind == "sole_source"
   end
@@ -224,6 +239,10 @@ class BenefitGroup
   def monthly_max_employee_cost(coverage_kind = nil)
   end
 
-  def elected_plans_by_option_kind
+
+  def build_composite_tier_contributions
+    composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
+      composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
+    end
   end
 end

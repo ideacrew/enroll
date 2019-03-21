@@ -2,13 +2,12 @@ class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  COVERAGE_KINDS = %w[health dental]
-  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum]
-  MARKET_KINDS = %w(shop individual)
-  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
-  PLAN_TYPE_KINDS = %w[pos hmo epo ppo indemnity]
-  DENTAL_METAL_LEVEL_KINDS = %w[high low]
+  COVERAGE_KINDS = %w[health dental].freeze
+  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental].freeze
+  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental].freeze
+  MARKET_KINDS = %w[shop individual].freeze
+  PLAN_TYPE_KINDS = %w[pos hmo epo ppo].freeze
+  DENTAL_METAL_LEVEL_KINDS = %w[high low].freeze
 
 
   field :hbx_id, type: Integer
@@ -17,7 +16,7 @@ class Plan
   field :coverage_kind, type: String
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
-
+  field :service_area_id, type: String
   field :hios_id, type: String
   field :hios_base_id, type: String
   field :csr_variant_id, type: String
