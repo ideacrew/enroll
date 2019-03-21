@@ -495,6 +495,7 @@ describe HbxEnrollment, dbclean: :after_all do
       }
       let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
       let(:active_year) {TimeKeeper.date_of_record.year}
+      let(:thhs) {family.households.first.tax_households}
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -504,7 +505,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
       it "should return plans with csr kind when individual market is selected" do
         decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
-        expect(decorated_plans). to eq(benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', family.households.first.tax_households))
+        expect(decorated_plans). to eq(benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', thhs))
       end
     end
 
