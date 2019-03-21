@@ -327,8 +327,6 @@ class CensusEmployee < CensusMember
     rescue => e
       Rails.logger.error { e }
       false
-    else
-      self
     end
   end
 
@@ -385,8 +383,9 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def terminate_employment!(employment_terminated_on)
+    success = false
 
-   def terminate_employment!(employment_terminated_on)
     if may_schedule_employee_termination?
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -394,19 +393,19 @@ class CensusEmployee < CensusMember
 
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
-        terminate_employee_role!
+        success = terminate_employee_role!
         # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
         raise CensusEmployeeError, message
       end
-    else # Schedule Future Terminations as employment_terminated_on is in the future
-      schedule_employee_termination! if may_schedule_employee_termination?
+    elsif may_schedule_employee_termination? # Schedule Future Terminations as employment_terminated_on is in the future
+      success = schedule_employee_termination!
     end
 
     terminate_employee_enrollments
-    self
+    success
   end
 
   def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
