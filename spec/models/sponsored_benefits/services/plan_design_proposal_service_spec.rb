@@ -93,21 +93,22 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
     }
     let(:health_plan_option_kind) { "single_issuer" }
 
+    let(:benefit_group) { application.benefit_groups.first }
+
     context "#save_health_benefits" do
 
       before do
         allow(organization).to receive_message_chain(:broker_agency_profile, :legal_name).and_return("Broker Profile")
         application
         subject.save_health_benefits(health_attributes)
-        @benefit_group = application.benefit_groups.first
       end
 
       it "should have plan_option_kind being set" do
-        expect(@benefit_group.plan_option_kind).to eq health_plan_option_kind
+        expect(benefit_group.plan_option_kind).to eq health_plan_option_kind
       end
 
       it "should have relationship_benefits being set" do
-        employee_benefits = @benefit_group.relationship_benefits.where(:relationship => "employee").first
+        employee_benefits = benefit_group.relationship_benefits.where(:relationship => "employee").first
         expect(employee_benefits.premium_pct).to eq 65.0
       end
     end
@@ -127,15 +128,14 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
         allow(organization).to receive_message_chain(:broker_agency_profile, :legal_name).and_return "LegalName"
         subject.save_health_benefits(health_attributes)
         subject.save_dental_benefits(dental_attributes)
-        @benefit_group = application.benefit_groups.first
       end
 
       it "should have dental_plan_option_kind being set" do
-        expect(@benefit_group.dental_plan_option_kind).to eq dental_plan_option_kind
+        expect(benefit_group.dental_plan_option_kind).to eq dental_plan_option_kind
       end
 
       it "should have dental_relationship_benefits being set" do
-        employee_dental_benefits = @benefit_group.dental_relationship_benefits.where(:relationship => "employee").first
+        employee_dental_benefits = benefit_group.dental_relationship_benefits.where(:relationship => "employee").first
         expect(employee_dental_benefits.premium_pct).to eq 65.0
       end
     end
