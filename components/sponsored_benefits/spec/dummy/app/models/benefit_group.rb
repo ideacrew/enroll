@@ -68,19 +68,19 @@ class BenefitGroup
 
   def build_relationship_benefits
     relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-      relationship_benefits.build(relationship: relationship, offered: true)
+      self.relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
   def build_composite_tier_contributions
     composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
-      composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
+      self.composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
     end
   end
 
   def build_dental_relationship_benefits
     dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-      dental_relationship_benefits.build(relationship: relationship, offered: true)
+      self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
