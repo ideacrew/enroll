@@ -516,8 +516,8 @@ RSpec.describe Plan, dbclean: :after_each do
       let(:tax_household) {FactoryGirl.create(:tax_household, application_id: application.id, household: family.households.first, is_eligibility_determined: true)}
       let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_94", tax_household: tax_household)}
       let(:applicant) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household.id, family_member_id: primary_family_member.id, is_active: true)}
-      let(:hbx_enrollment_member) {FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)}
-      let(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, plan: plan2, hbx_enrollment_members: [hbx_enrollment_member],  kind: "individual" )}
+      let(:hbx_enrollment_member) {FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month)}
+      let(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household, plan: plan2, hbx_enrollment_members: [hbx_enrollment_member],  kind: "individual")}
 
 
       before :each do
@@ -526,7 +526,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "should return dental plans" do
         plans = [plan4]
-        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_households:nil, hbx_enrollment: nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, tax_households: nil, hbx_enrollment: nil).to_a).to eq plans
       end
 
       it "should return health plans without silver" do

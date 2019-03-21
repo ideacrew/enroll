@@ -65,7 +65,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     describe "Eligibility determined and not_csr_100 user" do
-      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person )}
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
       let(:family_member_ids) {family.family_members.map(&:id)}
       let!(:person) { FactoryGirl.create(:person,  :with_consumer_role) }
       let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
