@@ -165,11 +165,11 @@ RSpec.describe TaxHousehold, type: :model do
       let(:hbx_member1) { double(applicant_id: 'member1', applied_aptc_amount: 20) }
       let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 10) }
       let(:hbx_enrollment) { double(applied_aptc_amount: 30, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-      let(:household) { double }
+      let(:household) { family.active_household }
       let(:application) { double(family: family) }
 
       it "can return result" do
-        tax_household = TaxHousehold.new()
+        tax_household = TaxHousehold.new(household: household)
         allow(tax_household).to receive(:family).and_return family
         allow(family).to receive(:active_household).and_return household
         allow(tax_household).to receive(:application).and_return application
@@ -346,10 +346,10 @@ RSpec.describe TaxHousehold, type: :model do
 
         allow(household).to receive(:hbx_enrollments_with_aptc_by_year).and_return([hbx_enrollment])
         expect(tax_household1.aptc_available_amount_by_member.class).to eq Hash
-        result1 = {family_member1.id.to_s=>30.0, family_member2.id.to_s=>100.0}
+        result1 = { family_member1.id.to_s => 100.0, family_member2.id.to_s => 100.0 }
         expect(tax_household1.aptc_available_amount_by_member).to eq result1
         expect(tax_household2.aptc_available_amount_by_member.class).to eq Hash
-        result2 = {family_member3.id.to_s=>50.0, family_member4.id.to_s=>100.0}
+        result2 = { family_member3.id.to_s => 100.0, family_member4.id.to_s => 100.0 }
         expect(tax_household2.aptc_available_amount_by_member).to eq result2
       end
     end
