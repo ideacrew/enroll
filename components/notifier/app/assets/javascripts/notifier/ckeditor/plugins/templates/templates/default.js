@@ -153,7 +153,7 @@ CKEDITOR.addTemplates( 'default', {
 "<h3>For Questions or Assistance:</h3>"+
 "<p>Please contact #{site_short_name} with any questions:</p>" +
 "<ul>" +
-	"<li>By calling #{contact_center_phone_number}</li>" +
+	"<li>By calling #{Settings.contact_center.phone_number}</li>" +
 	"<li>TTY: #{Settings.contact_center.tty}</li>" +
 	"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
 "</ul>" +

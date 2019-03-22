@@ -649,7 +649,7 @@ class CensusEmployee < CensusMember
           begin
             #exclude new hires
             next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
-            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder", "acapi_trigger" => true)
           rescue Exception => e
             (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
@@ -979,7 +979,7 @@ class CensusEmployee < CensusMember
 
   def active_census_employee_is_unique
     potential_dups = CensusEmployee.by_ssn(ssn).by_employer_profile_id(employer_profile_id).active
-    if potential_dups.detect { |dup| dup.id != self.id  }
+    if potential_dups.detect { |dup| dup.id != self.id }
       message = "Employee with this identifying information is already active. "\
                 "Update or terminate the active record before adding another."
       errors.add(:base, message)

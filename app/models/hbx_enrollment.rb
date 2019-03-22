@@ -1230,9 +1230,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1337,7 +1337,7 @@ class HbxEnrollment
     end
 
     event :force_select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
+      transitions from: :shopping, to: :coverage_selected, after: [:propagate_selection]
     end
 
   end
@@ -1491,6 +1491,10 @@ class HbxEnrollment
 
   def is_enrolled_by_aasm_state?
     ENROLLED_STATUSES.include?(aasm_state)
+  end
+
+  def is_ivl_and_outstanding?
+    is_ivl_by_kind? && is_any_enrollment_member_outstanding? && ENROLLED_AND_RENEWAL_STATUSES.include?(self.aasm_state)
   end
 
   def is_effective_in_current_year?
