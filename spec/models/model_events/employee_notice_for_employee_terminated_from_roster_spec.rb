@@ -119,7 +119,7 @@ RSpec.describe 'ModelEvents::EmployeeNoticeForEmployeeTerminatedFromRoster', dbc
       end
 
       it "should return employee coverage_terminated_on plus 30 days" do
-        expect(merge_model.coverage_terminated_on_plus_30_days).to eq(census_employee.coverage_terminated_on + 30.days).strftime('%m/%d/%Y')
+        expect(merge_model.coverage_terminated_on_plus_30_days).to eq((census_employee.coverage_terminated_on + 30.days).strftime('%m/%d/%Y'))
       end
     end
   end
