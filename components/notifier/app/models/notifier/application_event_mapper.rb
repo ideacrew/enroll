@@ -7,11 +7,11 @@ module Notifier
 
     EVENT_MAP = {
       employer: {
-        binder_paid: :benefit_coverage_initial_binder_paid,
+        binder_paid: :benefit_coverage_initial_binder_paid
       },
       consumer_role: {
         projected_eligibility_notice_2: :projected_eligibility_notice_2
-        },
+      },
       "FinancialAssistance::Application": {
         ineligibility_notice: :ineligibility_notice,
         eligibility_notice: :eligibility_notice
