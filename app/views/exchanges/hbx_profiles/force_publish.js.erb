@@ -1,4 +1,4 @@
-<% if (@plan_year.application_eligibility_warnings.present? || @plan_year.application_errors.present?) && params[:publish_with_warnings] == 'false' %>
+<% if @check_warnings && params[:publish_with_warnings] == 'false' %>
   $(".application-warnings").empty();
   <% @plan_year.application_eligibility_warnings.values.flatten.each do |warning| %>
     $(".application-warnings").append("<li><%= warning %></li>");
