@@ -196,10 +196,7 @@ module Observers
         document = new_model_event.klass_instance
         employer_profile = document.documentable.employer_profile
         plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED - ['suspended']).first
-
-        if new_model_event.event_key == :employer_invoice_available && plan_year
-          deliver(recipient: employer_profile, event_object: plan_year, notice_event: "employer_invoice_available")
-        end
+        deliver(recipient: employer_profile, event_object: plan_year, notice_event: "employer_invoice_available") if (new_model_event.event_key == :employer_invoice_available) && plan_year && plan_year.benefit_groups.none?(&:is_congress)
       end
     end
 
@@ -251,14 +248,15 @@ module Observers
         if model_event.event_key == :initial_employer_no_binder_payment_received
           start_on = TimeKeeper.date_of_record.next_month.beginning_of_month
           EmployerProfile.initial_employers_enrolled_plan_year_state(start_on).each do |org|
-            if !org.employer_profile.binder_paid?
-              plan_year = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
-              deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "initial_employer_no_binder_payment_received")
-              #Notice to employee that there employer misses binder payment
-              org.employer_profile.census_employees.active.each do |ce|
-                begin
-                  deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notice_to_ee_that_er_plan_year_will_not_be_written")
-                end
+            plan_year = org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
+            next if org.employer_profile.binder_paid? || plan_year.benefit_groups.any?(&:is_congress)
+            deliver(recipient: org.employer_profile, event_object: plan_year, notice_event: "initial_employer_no_binder_payment_received")
+            #Notice to employee that there employer misses binder payment
+            org.employer_profile.census_employees.active.each do |ce|
+              begin
+                deliver(recipient: ce.employee_role, event_object: plan_year, notice_event: "notice_to_ee_that_er_plan_year_will_not_be_written")
+              rescue StandardError => e
+                Rails.logger.error { "Unable to deliver notice_to_ee_that_er_plan_year_will_not_be_written notice to #{ce.full_name} due to #{e.backtrace}" }
               end
             end
           end
