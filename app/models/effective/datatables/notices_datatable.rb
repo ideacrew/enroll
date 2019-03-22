@@ -8,6 +8,9 @@ module Effective
           # bulk_action 'Download', notifier.download_notices_notice_kinds_path, target: '_blank'
         end
 
+        table_column :market_kind, :proc => Proc.new { |row|
+          row.market_kind.to_s.titleize
+        }, :filter => false, :sortable => true
         table_column :mpi_indicator, :proc => Proc.new { |row|
           link_to row.notice_number, notifier.preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
@@ -33,7 +36,23 @@ module Effective
 
       def collection
         return @notices_collection if defined? @notices_collection
-        @notices_collection = Notifier::NoticeKind.all
+        notices = Notifier::NoticeKind.all
+        if attributes[:market_kind].present? && !['all'].include?(attributes[:market_kind])
+          notices = notices.send(attributes[:market_kind]) if ['individual','shop'].include?(attributes[:market_kind])
+        end
+        @notices_collection = notices
+      end
+
+      def nested_filter_definition
+        filters = {
+        market_kind:
+         [
+           {scope:'all', label: 'All'},
+           {scope:'individual', label: 'Individul'},
+           {scope:'shop', label: 'Shop'}
+         ],
+        top_scope: :market_kind
+        }
       end
     end
   end
