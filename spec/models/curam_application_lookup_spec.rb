@@ -12,7 +12,7 @@ describe CuramApplicationLookup do
   describe "with an AMQP source" do
     let(:generator) { CuramApplicationLookup::AmqpSource }
     let(:valid_response_code) { "single_user" }
-    let(:amqp_response) { {:body => valid_response_code} }
+    let(:amqp_response) { {:return_status => valid_response_code} }
 
     it "returns a valid response code" do
       allow(Acapi::Requestor).to receive(:request).with("account_management.check_existing_account", person_demographics, 2).and_return(amqp_response)

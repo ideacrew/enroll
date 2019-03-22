@@ -13,7 +13,7 @@ describe AcedsApplicationLookup do
     let(:generator) { AcedsApplicationLookup::AmqpSource }
     let(:valid_response_code) { "single_user" }
     let(:amqp_response) {
-     {:body => valid_response_code}
+     {:return_status => valid_response_code}
     }
 
     it "returns a valid response code" do
