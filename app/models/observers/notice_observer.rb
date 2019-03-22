@@ -335,8 +335,13 @@ module Observers
           start_on = (current_date+2.months).beginning_of_month
           organizations = EmployerProfile.initial_employers_reminder_to_publish(start_on)
           organizations.each do|organization|
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+            begin
+              plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
+              next if plan_year.benefit_groups.any?(&:is_congress)
+              deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+            rescue StandardError => e
+              Rails.logger.error { "Unable to trigger #{model_event.event_key} notice to #{organization.legal_name} due to #{e.backtrace}" }
+            end
           end
         end
 
@@ -344,8 +349,13 @@ module Observers
           start_on = current_date.next_month.beginning_of_month
           organizations = EmployerProfile.initial_employers_reminder_to_publish(start_on)
           organizations.each do|organization|
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
-            deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+            begin
+              plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'draft').first
+              next if plan_year.benefit_groups.any?(&:is_congress)
+              deliver(recipient: organization.employer_profile, event_object: plan_year, notice_event: model_event.event_key.to_s)
+            rescue StandardError => e
+              Rails.logger.error { "Unable to trigger #{model_event.event_key} notice to #{organization.legal_name} due to #{e.backtrace}" }
+            end
           end
         end
 
