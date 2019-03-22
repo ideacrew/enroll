@@ -441,7 +441,7 @@ def employer_poc
     @organization = Organization.find(@element_to_replace_id.split('_').last)
     @plan_year = @organization.renewing_or_draft_py
     @check_warnings = @plan_year.application_eligibility_warnings.blank? || @plan_year.application_errors.present?
-    if @plan_year.may_force_publish? && (params[:publish_with_warnings] == 'true' || (check_warnings && params[:publish_with_warnings] == 'false'))
+    if @plan_year.may_force_publish? && (params[:publish_with_warnings] == 'true' || (@check_warnings && params[:publish_with_warnings] == 'false'))
       @plan_year.force_publish!
     end
     respond_to do |format|
